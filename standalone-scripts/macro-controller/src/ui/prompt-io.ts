@@ -282,7 +282,7 @@ export function mergePrompts(
   overwrite: boolean = true
 ): { merged: CachedPromptEntry[]; results: PromptImportResults } {
 
-  const results: PromptImportResults = { added: 0, updated: 0, total: imported.length, errors: [] };
+  const results: PromptImportResults = { added: 0, updated: 0, total: imported.length, errors: [], defaultsProtected: 0 };
   const mergedMap = new Map<string, CachedPromptEntry>();
 
   existing.forEach((entry) => {
@@ -292,7 +292,15 @@ export function mergePrompts(
 
   imported.forEach((imp) => {
     const key = imp.slug || imp.name;
-    if (mergedMap.has(key)) {
+    const target = mergedMap.get(key);
+    if (target) {
+      // v4.400.0: never let an import overwrite a default row. Defaults are
+      // owned by the re-seed pipeline and are excluded from bundles anyway;
+      // this is a belt-and-suspenders guard for legacy or crafted bundles.
+      if (target.isDefault === true) {
+        results.defaultsProtected = (results.defaultsProtected ?? 0) + 1;
+        return;
+      }
       if (overwrite) {
         results.updated++;
         mergedMap.set(key, imp);
