@@ -68,6 +68,7 @@ interface MarcoSDKApiCredits {
 
 interface MarcoSDKApiWorkspace {
   move(projectId: string, targetWsId: string, options?: MarcoSDKApiCallOptions): Promise<MarcoSDKApiResponse>;
+  moveV2(targetWsId: string, currentUserId: string, options?: MarcoSDKApiCallOptions): Promise<MarcoSDKApiResponse>;
   rename(wsId: string, newName: string, options?: MarcoSDKApiCallOptions): Promise<MarcoSDKApiResponse>;
   markViewed(projectId: string, options?: MarcoSDKApiCallOptions): Promise<MarcoSDKApiResponse>;
   probe(options?: MarcoSDKApiCallOptions): Promise<MarcoSDKApiResponse>;
