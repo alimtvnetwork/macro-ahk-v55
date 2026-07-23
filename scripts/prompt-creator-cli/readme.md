@@ -62,7 +62,7 @@ Workflow: `.github/workflows/prompt-creator-cli.yml`.
 ### Install (macOS / Linux)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/aukgit/macro-ahk-v54/main/scripts/prompt-creator-cli/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/aukgit/macro-ahk-v55/main/scripts/prompt-creator-cli/install.sh | bash
 export PATH="$PWD/bin:$PATH"
 prompt-creator --file my-prompt.md --title "My Prompt"
 ```
@@ -70,7 +70,7 @@ prompt-creator --file my-prompt.md --title "My Prompt"
 ### Install (Windows PowerShell)
 
 ```powershell
-iwr https://raw.githubusercontent.com/aukgit/macro-ahk-v54/main/scripts/prompt-creator-cli/install.ps1 | iex
+iwr https://raw.githubusercontent.com/aukgit/macro-ahk-v55/main/scripts/prompt-creator-cli/install.ps1 | iex
 $env:PATH = "$PWD\bin;$env:PATH"
 prompt-creator --file my-prompt.md --title "My Prompt"
 ```

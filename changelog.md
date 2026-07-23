@@ -2575,7 +2575,7 @@ Baseline-25 rule-family totals: `no-duplicate-string` 6 -> 0, `no-collapsible-if
 ## [v4.193.0] — 2026-07-19 Plan 24 step 2: refactor recipes + real-offender rescope
 
 ### Added
-- `.lovable/plans/subtasks/24-eslint-warnings-cleanup-30/04-real-offenders-scope.md`: rebinds plan steps 3-11 from the sibling-repo upload (`macro-ahk-v54`) to this repo's actual top offenders. Biggest single functions: `StepGroupLibraryPanel.tsx:173` (1174 lines), `StepGroupListPanel.tsx:152` (766), `WebhookSettingsDialog.tsx:330` (601), `StepEditorDialog.tsx:164/251` (396 lines + cog 61). Highest cognitive-complexity: `step-library/import-bundle.ts:342` (70), `failure-logger.ts:389` (65), `StepEditorDialog.tsx:251` (61), `csv-parse.ts:49` (53).
+- `.lovable/plans/subtasks/24-eslint-warnings-cleanup-30/04-real-offenders-scope.md`: rebinds plan steps 3-11 from the sibling-repo upload (`macro-ahk-v55`) to this repo's actual top offenders. Biggest single functions: `StepGroupLibraryPanel.tsx:173` (1174 lines), `StepGroupListPanel.tsx:152` (766), `WebhookSettingsDialog.tsx:330` (601), `StepEditorDialog.tsx:164/251` (396 lines + cog 61). Highest cognitive-complexity: `step-library/import-bundle.ts:342` (70), `failure-logger.ts:389` (65), `StepEditorDialog.tsx:251` (61), `csv-parse.ts:49` (53).
 
 ### Fixed
 - Removed 2 unused `eslint-disable` directives that surfaced as parse-level lint messages: `src/components/options/ProjectDetailView.tsx:1` (`@typescript-eslint/no-explicit-any`) and `src/components/options/project-detail/InjectionOrderPreview.tsx:41` (`max-lines-per-function`). Verified with `npx eslint` on both files: parse-level entries gone; only the real `max-lines-per-function` / `sonarjs/cognitive-complexity` warnings remain, deferred to later sweep steps.
@@ -2593,7 +2593,7 @@ Baseline-25 rule-family totals: `no-duplicate-string` 6 -> 0, `no-collapsible-if
 - `.lovable/plans/pending/24-eslint-warnings-cleanup-30.md` plus subtasks `01-refactor-recipes.md`, `02-failure-logger.md`, `03-field-binding-overlay.md` under `.lovable/plans/subtasks/24-eslint-warnings-cleanup-30/`.
 
 ### Notes
-- Uploaded log referenced sibling repo `macro-ahk-v54` (265 issues); current repo baseline is 201 total. Per-file steps 3-11 will be re-scoped to actual offenders before step 3 begins.
+- Uploaded log referenced sibling repo `macro-ahk-v55` (265 issues); current repo baseline is 201 total. Per-file steps 3-11 will be re-scoped to actual offenders before step 3 begins.
 - Two unused `eslint-disable` directives surfaced as parse-level messages (`ProjectDetailView.tsx`, `InjectionOrderPreview.tsx`); to be removed as part of step 2.
 
 
@@ -5595,9 +5595,9 @@ Preset chips on the `📋 Plan` and `▶ Next` inline strips had no `transition`
 ## [v4.31.0] — 2026-07-16 installer one-liner points at v53
 
 ### Fixed
-- `scripts/download-extension.ps1` default `-Repo` reverted to `alimtvnetwork/macro-ahk-v54` (was resolving to the retired `macro-ahk-v54` when piped through `irm | iex`, which caused the latest one-liner to fetch the older `v4.27.0` release ZIP instead of the current v53 latest).
-- `scripts/installer-contract.json` + regenerated `installer-constants.ps1` / `installer-constants.sh`: `MARCO_DEFAULT_REPO` now `alimtvnetwork/macro-ahk-v54`.
-- Root `readme.md` install/clone/pinned-version URLs and version pins refreshed to `v4.31.0` on `alimtvnetwork/macro-ahk-v54`.
+- `scripts/download-extension.ps1` default `-Repo` reverted to `alimtvnetwork/macro-ahk-v55` (was resolving to the retired `macro-ahk-v55` when piped through `irm | iex`, which caused the latest one-liner to fetch the older `v4.27.0` release ZIP instead of the current v53 latest).
+- `scripts/installer-contract.json` + regenerated `installer-constants.ps1` / `installer-constants.sh`: `MARCO_DEFAULT_REPO` now `alimtvnetwork/macro-ahk-v55`.
+- Root `readme.md` install/clone/pinned-version URLs and version pins refreshed to `v4.31.0` on `alimtvnetwork/macro-ahk-v55`.
 
 ### Release
 - Version pins bumped 4.30.0 to 4.31.0 across `manifest.json`, `version.json`, `src/shared/constants.ts`, all `standalone-scripts/**/instruction.ts`, `shared-state.ts`, `payment-banner-hider/src/index.ts`, and root `readme.md`. Cutting v4.31.0 attaches the corrected `download-extension.ps1` so `irm .../v53/releases/latest/download/download-extension.ps1 | iex` fetches v4.31.0 (and every later release) without needing the `MARCO_DL_REPO` env-var workaround.
@@ -5710,7 +5710,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 ### Fixed
 
 - **Release download helper asset.** `download-extension.ps1` is now copied into GitHub Release assets, required by release verification, and audited by the release watcher/auditor. README and generated release notes now use `/releases/latest/download/download-extension.ps1` or pinned `/releases/download/{VER}/download-extension.ps1` URLs instead of raw `main`, so the quick PowerShell download path does not depend on source cloning or raw branch fetches.
-- **AHK sidecar clone hardening.** `pnpm clone:ahk` now runs `scripts/clone-ahk.mjs`, which rewrites stale `alimtvnetwork/macro-ahk-v54` input to `aukgit/macro-ahk-v54` and uses `--depth=1 --single-branch --filter=blob:none --no-tags` so the sidecar clone avoids the 37k-object full-history transfer that caused GitHub `RPC failed; curl 18` / `early EOF` failures.
+- **AHK sidecar clone hardening.** `pnpm clone:ahk` now runs `scripts/clone-ahk.mjs`, which rewrites stale `alimtvnetwork/macro-ahk-v55` input to `aukgit/macro-ahk-v55` and uses `--depth=1 --single-branch --filter=blob:none --no-tags` so the sidecar clone avoids the 37k-object full-history transfer that caused GitHub `RPC failed; curl 18` / `early EOF` failures.
 - **Source checkout helper.** Added `scripts/clone-repo.ps1` for Windows users hitting GitHub `curl 56 Recv failure` / `early EOF` during raw repository clones. The helper shallow-clones with `--depth=1 --single-branch --filter=blob:none --no-tags`, rewrites the stale owner, and falls back to the branch source ZIP if the git transport is reset.
 
 ### Changed

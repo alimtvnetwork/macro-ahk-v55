@@ -9,13 +9,13 @@
   full-history transfer.
 
 .EXAMPLE
-  irm https://raw.githubusercontent.com/aukgit/macro-ahk-v54/main/scripts/clone-repo.ps1 | iex
+  irm https://raw.githubusercontent.com/aukgit/macro-ahk-v55/main/scripts/clone-repo.ps1 | iex
 #>
 
 [CmdletBinding()]
 param(
-    [string]$Repo = $(if ($env:MARCO_REPO_CLONE_REPO) { $env:MARCO_REPO_CLONE_REPO } else { 'aukgit/macro-ahk-v54' }),
-    [string]$Target = $(if ($env:MARCO_REPO_CLONE_TARGET) { $env:MARCO_REPO_CLONE_TARGET } else { 'macro-ahk-v54' }),
+    [string]$Repo = $(if ($env:MARCO_REPO_CLONE_REPO) { $env:MARCO_REPO_CLONE_REPO } else { 'aukgit/macro-ahk-v55' }),
+    [string]$Target = $(if ($env:MARCO_REPO_CLONE_TARGET) { $env:MARCO_REPO_CLONE_TARGET } else { 'macro-ahk-v55' }),
     [string]$Branch = $(if ($env:MARCO_REPO_CLONE_BRANCH) { $env:MARCO_REPO_CLONE_BRANCH } else { 'main' }),
     [switch]$NoZipFallback
 )
@@ -30,9 +30,9 @@ function Write-Err([string]$msg) { Write-Host "  [ER] $msg" -ForegroundColor Red
 
 function Normalize-Repo([string]$RawRepo) {
     $repoValue = $RawRepo.Trim() -replace '^https://github\.com/', '' -replace '\.git$', ''
-    if ($repoValue -ieq 'alimtvnetwork/macro-ahk-v54') {
-        Write-Warn "Stale repo owner replaced: alimtvnetwork/macro-ahk-v54 -> aukgit/macro-ahk-v54"
-        return 'aukgit/macro-ahk-v54'
+    if ($repoValue -ieq 'alimtvnetwork/macro-ahk-v55') {
+        Write-Warn "Stale repo owner replaced: alimtvnetwork/macro-ahk-v55 -> aukgit/macro-ahk-v55"
+        return 'aukgit/macro-ahk-v55'
     }
     if ($repoValue -notmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') {
         Write-Err "Invalid repo '$RawRepo'"

@@ -214,7 +214,7 @@ Line |
 exist at runtime. This typically happens when:
 - The repo was cloned without the Chrome extension subfolder
 - `extensionDir` points to a path that was moved or renamed
-- Working in a subdirectory repo (e.g., `macro-ahk-v54`) where the extension is at root (`"extensionDir": "."`)
+- Working in a subdirectory repo (e.g., `macro-ahk-v55`) where the extension is at root (`"extensionDir": "."`)
 
 **Fix:**
 1. Check `powershell.json` — verify `extensionDir` matches your actual layout

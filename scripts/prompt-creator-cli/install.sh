@@ -2,12 +2,12 @@
 # Install the prompt-creator CLI binary into ./bin (or $PROMPT_CREATOR_BIN_DIR).
 #
 # Usage:
-#   curl -fsSL https://github.com/aukgit/macro-ahk-v54/releases/latest/download/install-prompt-creator.sh | bash
+#   curl -fsSL https://github.com/aukgit/macro-ahk-v55/releases/latest/download/install-prompt-creator.sh | bash
 #   # or pinned:
 #   PROMPT_CREATOR_VERSION=v4.8.0 ./install.sh
 set -euo pipefail
 
-REPO="${PROMPT_CREATOR_REPO:-aukgit/macro-ahk-v54}"
+REPO="${PROMPT_CREATOR_REPO:-aukgit/macro-ahk-v55}"
 VERSION="${PROMPT_CREATOR_VERSION:-latest}"
 BIN_DIR="${PROMPT_CREATOR_BIN_DIR:-./bin}"
 

@@ -3,11 +3,11 @@
   Install the prompt-creator CLI binary into .\bin (or $env:PROMPT_CREATOR_BIN_DIR).
 
 .EXAMPLE
-  iwr https://github.com/aukgit/macro-ahk-v54/releases/latest/download/install-prompt-creator.ps1 | iex
+  iwr https://github.com/aukgit/macro-ahk-v55/releases/latest/download/install-prompt-creator.ps1 | iex
 #>
 [CmdletBinding()]
 param(
-  [string]$Repo    = $(if ($env:PROMPT_CREATOR_REPO)    { $env:PROMPT_CREATOR_REPO }    else { 'aukgit/macro-ahk-v54' }),
+  [string]$Repo    = $(if ($env:PROMPT_CREATOR_REPO)    { $env:PROMPT_CREATOR_REPO }    else { 'aukgit/macro-ahk-v55' }),
   [string]$Version = $(if ($env:PROMPT_CREATOR_VERSION) { $env:PROMPT_CREATOR_VERSION } else { 'latest' }),
   [string]$BinDir  = $(if ($env:PROMPT_CREATOR_BIN_DIR) { $env:PROMPT_CREATOR_BIN_DIR } else { (Join-Path (Get-Location) 'bin') })
 )

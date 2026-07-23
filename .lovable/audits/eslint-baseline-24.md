@@ -22,5 +22,5 @@ Raw: `.lovable/audits/eslint-baseline-24.json`
 | react-hooks/exhaustive-deps | 2 |
 
 Notes:
-- The uploaded log (user-uploads://file-27) was from a sibling repo (macro-ahk-v54) with 265 issues; the current project baseline is 201 total (193 warn + 8 err). Plan 24 steps 3-11 target file paths that may not exist in this repo; step 2 subtasks stay authoritative for the recipes, but per-file steps will be re-scoped to actual offenders in step 2 follow-up before step 3 begins.
+- The uploaded log (user-uploads://file-27) was from a sibling repo (macro-ahk-v55) with 265 issues; the current project baseline is 201 total (193 warn + 8 err). Plan 24 steps 3-11 target file paths that may not exist in this repo; step 2 subtasks stay authoritative for the recipes, but per-file steps will be re-scoped to actual offenders in step 2 follow-up before step 3 begins.
 - 2 parse errors must be resolved first (they mask further linting in those files).

@@ -7,7 +7,7 @@ Created: 2026-07-19
 
 # Real offender scope (rescope of steps 3-11)
 
-Uploaded log came from sibling repo `macro-ahk-v54`. This repo's actual `pnpm lint` output (see `.lovable/audits/eslint-baseline-24.json` / `.md`) has different hot files. Plan 24 steps 3-11 are rebound to the offenders below. Step numbers unchanged; targets refreshed.
+Uploaded log came from sibling repo `macro-ahk-v55`. This repo's actual `pnpm lint` output (see `.lovable/audits/eslint-baseline-24.json` / `.md`) has different hot files. Plan 24 steps 3-11 are rebound to the offenders below. Step numbers unchanged; targets refreshed.
 
 ## Rebinding
 

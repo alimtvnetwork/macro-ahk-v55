@@ -7,7 +7,7 @@ Created: 2026-07-19
 
 ## Context
 
-CI `pnpm lint` on macro-ahk-v54 reports ~265 issues across 107 files (see user-uploads://file-27):
+CI `pnpm lint` on macro-ahk-v55 reports ~265 issues across 107 files (see user-uploads://file-27):
 - 157 `max-lines-per-function` (limit 40)
 - 47 `id-denylist` (`arr`, `cb`, `fn`, `el`, `msg`, etc.)
 - 31 `sonarjs/cognitive-complexity` (limit 15)
