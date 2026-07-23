@@ -13,6 +13,12 @@
 
 </div>
 
+<div align="center">
+
+Built and maintained by **[Md. Alim Ul Karim](https://alimkarim.com)** · **[Riseup Asia LLC](https://riseup-asia.com)** · **[xProduct](https://the-xproduct.com)** (home of the **xProgramming** language).
+
+</div>
+
 ---
 
 ## Install
@@ -90,6 +96,8 @@ curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.9
 Marco started as a small itch. **Alim** wanted to automate a few repetitive things on Chrome using **AutoHotkey** — just keystrokes and clicks at first. One script led to another, and soon he was recording flows, parameterizing them, and wiring them into proper programs. What began as a Windows-only AHK helper grew into a full browser-side automation runtime: a Manifest V3 Chrome extension with a modular standalone-script architecture, deterministic XPath replay, credit-aware loop control, and an AutoHotkey sidecar that still drives the Windows side.
 
 In short: Marco is the project that came out of taking "let me just automate this one thing" seriously.
+
+Marco is one of several operational systems that share the **xProduct** runtime philosophy: modular infrastructure, typed declarative flows (**xProgramming**), and edge-ready execution.
 
 ---
 
@@ -1309,6 +1317,8 @@ A system architect with **20+ years** of professional software engineering exper
 
 Recognized as a **top 1% talent at Crossover** and one of the top software architects globally. He is also the **Chief Software Engineer of [Riseup Asia LLC](https://riseup-asia.com/)** and maintains an active presence on **[Stack Overflow](https://stackoverflow.com/users/361646/alim-ul-karim)** (2,452+ reputation, member since 2010) and **LinkedIn** (12,500+ followers).
 
+Inventor of the **[xProgramming](https://the-xproduct.com)** language and architect of the **xProduct** operational runtime. Has delivered high quality software for **California based** product companies and **EU based** engineering teams across fintech, workflow automation, and distributed systems.
+
 |  |  |
 |---|---|
 | **Website** | [alimkarim.com](https://alimkarim.com/) · [my.alimkarim.com](https://my.alimkarim.com/) |
@@ -1327,6 +1337,22 @@ Recognized as a **top 1% talent at Crossover** and one of the top software archi
 | **Facebook** | [riseupasia.talent](https://www.facebook.com/riseupasia.talent/) |
 | **LinkedIn** | [Riseup Asia](https://www.linkedin.com/company/105304484/) |
 | **YouTube** | [@riseup-asia](https://www.youtube.com/@riseup-asia) |
+
+### xProduct
+
+**Operational runtime platform. Home of the [xProgramming](https://the-xproduct.com) language.**
+
+xProduct is the modular runtime behind Alim's operational systems: a typed, declarative stack built on HTML, CSS, JavaScript, TypeScript, Less, Supabase, PostgreSQL, Cloudflare Workers, Node.js, and Zod. Its **xProgramming** language lets teams describe operational outcomes declaratively and let the runtime execute, scale, and heal them at the edge.
+
+- **Modular infrastructure:** compose stacks from interoperable modules; swap or scale any part without rebuilding the rest.
+- **Client track record:** high quality delivery for **California based** product companies and **EU based** engineering teams (fintech, workflow automation, distributed systems).
+- **Sister to Riseup Asia LLC** on the delivery side; Marco is one of the operational systems that runs on the same philosophy.
+
+|  |  |
+|---|---|
+| **Website** | [the-xproduct.com](https://the-xproduct.com) |
+| **Language** | [xProgramming](https://the-xproduct.com) |
+| **Founder** | [Md. Alim Ul Karim](https://alimkarim.com) |
 
 ---
 
