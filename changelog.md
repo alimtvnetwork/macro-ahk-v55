@@ -1,5 +1,30 @@
 # Changelog
 
+## [v5.9.0] 2026-07-23 Drag-drop import E2E coverage and CI-fix roll-up
+
+### Added
+- `standalone-scripts/macro-controller/src/ui/__tests__/prompt-library-modal-drop-import-e2e.test.ts`: end-to-end coverage for the live drop-zone import flow. Exercises the real `parsePromptsText`, `mergePrompts`, and `performPromptImport` pipeline across three cases: replace-plus-add, default-row protection, and malformed-JSON validation banner.
+
+### Fixed
+- `standalone-scripts/macro-controller/src/utils/token-substitute.ts`: collapsed the aliased-return branch to an immediate return, clearing the `sonarjs/prefer-immediate-return` warning that broke `npx eslint standalone-scripts --max-warnings=0`.
+- `standalone-scripts/macro-controller/src/seed/__tests__/reseed-command.test.ts`: R3 now overrides `sendToExtension` from `../../db/extension-bridge` (the module the code under test actually imports), so the force-UPDATE failure path is properly mocked and `pnpm run test:quiet` finishes green.
+- `standalone-scripts/macro-controller/src/db/__tests__/prompt-db-rename.test.ts` and nine sibling `db`/`seed`/`ui` suites: added `vi.mock('../extension-bridge')` (or `'../../db/extension-bridge'`) alongside the existing `prompt-loader` mock so the `sql-bridge` -> `extension-bridge` refactor no longer causes 5-second timeouts.
+- `standalone-scripts/macro-controller/src/ui/__tests__/prompt-io-db-bridge-commit.test.ts`: `commitDbEntries` assertions now include `defaultsProtected: 0`, matching the v4.400.0 return shape.
+- `standalone-scripts/macro-controller/src/ui/prompt-dropdown-io.ts`: introduced `UserAddedEntriesState` plus `validateUserAddedEntriesState` so the `entries` field on the state is always a defined, validated array.
+- `standalone-scripts/macro-controller/src/ui/database-json-migrate.ts`: added a typed `schemaResp` adapter so `sql-bridge` callback responses cannot drift back into a `TS2345` mismatch.
+- `standalone-scripts/macro-controller/src/ui/repeat-loop-ui.ts`: guarded `window.addEventListener` and `removeEventListener` with `typeof window !== 'undefined'` so a late interval firing after happy-dom teardown no longer throws.
+
+### Changed
+- `version.json`: bumped to `5.9.0` (single source of truth via `standalone-scripts/shared-version.ts`).
+- `readme.md`: pinned install snippets and version badges to `v5.9.0`.
+
+### Issues
+- [16-release-doc-conflict-version-only-vs-full-bump](.lovable/issues/open/16-release-doc-conflict-version-only-vs-full-bump.md): `.lovable/how-to-release.md` says version.json-only; `.lovable/prompts/08-bump-version.md` and `pipeline/06-versioning.md` describe a multi-file bump. Neither is marked stale; a canonical answer is needed.
+- [17-prompt-library-modal-round-trip-parallel-flake](.lovable/issues/open/17-prompt-library-modal-round-trip-parallel-flake.md): 2 tests in `prompt-library-modal-round-trip.test.ts` pass in isolation but fail under parallel vitest because a shared `URL.createObjectURL` stub bleeds across workers.
+- [18-two-parallel-import-uis](.lovable/issues/open/18-two-parallel-import-uis.md): `prompt-library-modal.ts` and `prompt-import-modal.ts` both ship drag-drop import; converge or retire one.
+- [19-workspace-move-v2-live-verification](.lovable/issues/open/19-workspace-move-v2-live-verification.md): `moveV2` typechecks but has no live-call proof; verify HTTP verb and body against a real membership before dropping the `PENDING-VERIFY` marker.
+
+
 ## [v5.8.0] 2026-07-21 Markdown filename policy compliance
 
 ### Fixed
