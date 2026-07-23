@@ -1,5 +1,12 @@
 # Macro Controller - Changelog
 
+## v5.10.0 (2026-07-23)
+
+Docs-only release. No macro-controller source changes.
+
+### Notes
+- Root `readme.md` hero-layout fix (see repo-root `changelog.md` v5.10.0 entry). Version bumped in lockstep so `standalone-scripts/shared-version.ts` and install snippets stay aligned.
+
 ## v5.9.0 (2026-07-23)
 
 ### Added
