@@ -11,6 +11,7 @@ import { logError } from '../error-utils';
 import { showToast } from '../toast';
 import { DiagnosticError } from '../errors/diagnostic-error';
 import { showDiagnosticToast } from '../errors/show-diagnostic-toast';
+import { isSqlBridgeContractError, resetSqlBridgeCache } from '../db/sql-bridge';
 
 export interface PickPromptOptions {
   role: PromptRole;
@@ -40,6 +41,15 @@ export async function pickPromptFromRole(opts: PickPromptOptions): Promise<Promp
   let res = await listPromptsByRole(opts.role);
   if (!res.ok) initialReason = res.error ?? 'listPromptsByRole returned !ok';
 
+  // Retry-once on contract-shape failure: the sql-bridge may have cached a
+  // method name the backend just started rejecting. Reset the cache and try
+  // one fresh probe before falling through to auto-seed / diagnostic toast.
+  if (!res.ok && isSqlBridgeContractError(initialReason ?? undefined)) {
+    resetSqlBridgeCache();
+    const retry = await listPromptsByRole(opts.role);
+    if (retry.ok) { res = retry; initialReason = null; }
+  }
+
   // Managed Plan/Next roles: auto-seed on empty or failed lookup, then retry
   // once, so users never see a scary "Failed to load" when the DB simply
   // hasn't been seeded yet (fresh install, legacy Role='generic' rows, etc.).
@@ -63,6 +73,16 @@ export async function pickPromptFromRole(opts: PickPromptOptions): Promise<Promp
     }
   }
 
+  if (!res.ok) {
+    const dbReason = res.error ?? 'listPromptsByRole returned !ok';
+    // Second-chance rebuild: if the auto-seed path itself hit a contract
+    // error, reset the bridge cache and retry the SELECT one more time.
+    if (isSqlBridgeContractError(dbReason) || isSqlBridgeContractError(seedReason ?? undefined)) {
+      resetSqlBridgeCache();
+      const retry = await listPromptsByRole(opts.role);
+      if (retry.ok) { res = retry; }
+    }
+  }
   if (!res.ok) {
     const dbReason = res.error ?? 'listPromptsByRole returned !ok';
     const detail = buildLoadFailureDetail({

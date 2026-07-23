@@ -30,7 +30,14 @@ Refactored call sites:
 - `src/ui/read-memory-admin-modal.ts`
 - `src/ui/database-json-migrate.ts`
 
+Introspection API (2026-07-23 addition):
+- `getSqlBridgeState()`: returns `{ winning, rejections, candidates }` for diagnostics. Rejections are bounded to the last 10 per bucket.
+- `resetSqlBridgeCache(bucket?)`: invalidate cached winner. Used by `ui/chip-gear-picker.ts` for retry-once on contract-shape reasons before surfacing `PROMPT_LOAD_E001`.
+- `isSqlBridgeContractError(msg)`: expose the contract-error test so UI recovery paths can classify DB error strings.
+
+Diagnostics export: `ui/seed-diagnostics-panel.ts` ZIP now includes `sql-bridge.json`, `prompt-load-e001.json`, `seed-reseed-e001.json`, `contract.md`. The panel also renders the current bridge state and recent `PROMPT_LOAD_E001` / `SEED_RESEED_E001` events.
+
 Spec: `standalone-scripts/macro-controller/spec/db-bridge/01-rawsql-contract-v2.md`
-Tests: `src/db/__tests__/sql-bridge.test.ts` (probe/cache), `src/test/regression/project-api-rawsql.test.ts` (background contract). Focused regression suite: 98 tests green across rawSql, prompt DB, seed, migration, and handler guards. Typecheck is clean.
+Tests: `src/db/__tests__/sql-bridge.test.ts` (probe/cache), `src/db/__tests__/prompt-load-plan-post-seed-list.e2e.test.ts` (post-seed-list plan load), `src/test/regression/project-api-rawsql.test.ts` (background contract).
 
 Related error codes cleared: `PROMPT_LOAD_E001`, `PROMPT_EDIT_E005`, `SEED_RESEED_E001` (when caused by method-name rejection).
