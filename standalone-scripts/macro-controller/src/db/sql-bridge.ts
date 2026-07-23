@@ -20,7 +20,11 @@
  * lastInsertId? }` contract so callers do not need to change.
  */
 
-import { sendToExtension } from '../ui/extension-relay';
+// NOTE: import via `ui/prompt-loader` (which re-exports `sendToExtension`
+// from `ui/extension-relay`) so the historical test mocks that only stub
+// `ui/prompt-loader` continue to intercept bridge traffic without every
+// call site having to add a second `vi.mock('../ui/extension-relay', ...)`.
+import { sendToExtension } from '../ui/prompt-loader';
 import { DB_NAME } from './db-name';
 
 export interface SqlBridgeResp {
