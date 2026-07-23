@@ -13,6 +13,12 @@
 
 </div>
 
+<div align="center">
+
+Built and maintained by **[Md. Alim Ul Karim](https://alimkarim.com)** · **[Riseup Asia LLC](https://riseup-asia.com)** · **[xProduct](https://the-xproduct.com)** (home of the **xProgramming** language).
+
+</div>
+
 ---
 
 ## Install

@@ -1,89 +1,65 @@
-# Plan: v5.9.0 release + drag-drop import E2E test
 
-Scope: (1) add an end-to-end vitest for the live drag-drop import flow covering replace behavior and validation errors, (2) bump 5.8.0 -> 5.9.0 following the full ceremony so CI stays green, (3) surface remaining follow-ups.
+## Goal
 
-## Part 1 - New E2E test
+Enhance the root `readme.md` Author / company section so it:
+1. Adds **the-xproduct.com** as a third credited entity, positioning Alim as the **inventor of the xProgramming language** and xProduct as the operational runtime platform behind it.
+2. Highlights **high quality software development** delivered to **California based companies** and **EU based companies**, keeping tone consistent with the current Riseup Asia block.
+3. Keeps the existing Riseup Asia LLC block intact ("Top Leading Software Company in WY (2026)") and preserves the current Author bio.
+4. Adds light polish elsewhere in the readme (About Marco intro + a new "Backed by" one-liner near the top) so the new affiliations surface above the fold too. No install commands, versions, badges, or install one-liners change.
 
-Target the live path: `standalone-scripts/macro-controller/src/ui/prompt-library-modal.ts` drop zone (not the newer `prompt-import-modal.ts` state machine, which has separate coverage).
+## Scope
 
-New file: `standalone-scripts/macro-controller/src/ui/__tests__/prompt-library-modal-drop-import-e2e.test.ts`
+Single file: `readme.md`. No code, no specs, no memory writes, no version bump. Purely presentation.
 
-Follow the conventions from `prompt-library-modal-dragover-drop-effect.test.ts`:
-- `// @vitest-environment jsdom`
-- Mock `../prompt-loader` via `buildPromptLoaderMock`, plus `../../logging`, `../../error-utils`, `../../toast`, `../prompt-cache`, `../prompt-io-db-bridge`, `../../db/prompt-db`
-- Keep `parsePromptsText`, `mergePrompts`, `performPromptImport` REAL (do not mock `../prompt-io`) - that is what makes it end-to-end
-- Dispatch real `Event('dragover'|'drop', {bubbles, cancelable})` with a stubbed `dataTransfer.files` on `[data-testid="library-drop-zone"]`
+## Changes
 
-Three test cases:
+### 1. New "Backed by" line under the hero block (around line 14, right after the hero image `</div>`)
 
-1. Happy path add + replace: seed cache with `[{slug:'alpha', text:'old', isDefault:false}]`. Drop a JSON bundle containing `{slug:'alpha', text:'new'}` and `{slug:'beta', text:'new-b'}`. Assert:
-   - `writeJsonCopy` is called with alpha.text === 'new' (replace) and beta present (add)
-   - status/toast reports `updated:1, added:1`
-   - drop zone re-armed (no `aria-busy=true` leftover)
+One centered line linking the three entities so readers see them immediately:
 
-2. Default-protection guard: seed cache with `[{slug:'plan-default', isDefault:true, text:'canon'}]`. Drop a bundle attempting to overwrite `plan-default`. Assert the row is untouched (text still 'canon') and `results.defaultsProtected >= 1`.
+> Built and maintained by **[Md. Alim Ul Karim](https://alimkarim.com)** · **[Riseup Asia LLC](https://riseup-asia.com)** · **[xProduct](https://the-xproduct.com)** (home of the **xProgramming** language).
 
-3. Validation errors: drop a `roundtrip.json` File containing malformed JSON (`{ not json`). Assert:
-   - `renderImportErrorBanner` output is present (`[data-testid="library-import-error"]` or the banner class the modal uses)
-   - `showToast` called with warn/error variant
-   - `writeJsonCopy` NOT called
-   - Drop zone stays interactive (re-armable) for a follow-up drop
+### 2. Expand "About Marco" (line 88 block)
 
-Verification: `bunx vitest run standalone-scripts/macro-controller/src/ui/__tests__/prompt-library-modal-drop-import-e2e.test.ts`
+Append one sentence tying Marco into the xProduct runtime story so the reader understands the platform lineage without leaving the section:
 
-## Part 2 - Minor version bump 5.8.0 -> 5.9.0
+> Marco is one of several operational systems that share the **xProduct** runtime philosophy: modular infrastructure, typed declarative flows (xProgramming), and edge-ready execution.
 
-Follow the full ceremony from `.lovable/prompts/08-bump-version.md` because the user explicitly said "bump" (that doc's trigger phrase). The narrower `how-to-release.md` (version.json-only) conflicts with it; that conflict is logged as a follow-up (see Part 3).
+### 3. Rewrite the "Author" section (lines 1297 to 1330)
 
-Files to edit, in order:
+Structure becomes three stacked blocks under one `## Author` heading:
 
-1. `version.json` - `version: "5.9.0"`, `releaseDate` and `date` to today's UTC date
-2. `standalone-scripts/shared-version.ts` - re-exports `pkg.version`, no manual edit needed; verify only
-3. Any hand-pinned version literals surfaced by `grep -rn "5\.8\.0" standalone-scripts src chrome-extension` (should be zero if the single-source-of-truth rule holds; if any exist, update them)
-4. `changelog.md` (root) - prepend a new section using the existing format:
-   ```
-   ## [v5.9.0] YYYY-MM-DD Drag-drop import E2E + minor bump
-   
-   ### Added
-   - `standalone-scripts/macro-controller/src/ui/__tests__/prompt-library-modal-drop-import-e2e.test.ts`: end-to-end coverage for drop-zone replace, default-protection guard, and malformed-JSON validation banner.
-   
-   ### Fixed
-   - (carry the CI-fix items from the previous turn if they were not already released: token-substitute immediate-return, reseed-command extension-bridge mock, etc.)
-   ```
-   No em dashes anywhere (memory rule + `check-changelog-entry` gate).
-5. `readme.txt` and/or root `readme.md` - update any pinned version banner to 5.9.0 if present
-6. `standalone-scripts/macro-controller/changelog.md` - add a matching `## v5.9.0 (YYYY-MM-DD)` block scoped to macro-controller changes
+**a. Md. Alim Ul Karim** (keep existing bio, add one sentence)
+- Keep the current 20+ years / stack / Crossover / Stack Overflow / LinkedIn paragraph unchanged.
+- Add a new sentence: "Inventor of the **[xProgramming](https://the-xproduct.com)** language and architect of the **xProduct** operational runtime. Has delivered high quality software for **California based** product companies and **EU based** engineering teams across fintech, workflow automation, and distributed systems."
+- Author contact table unchanged.
 
-CI gates to verify locally before finishing:
-- `npx tsc --noEmit -p tsconfig.macro.build.json`
-- `npx eslint standalone-scripts --max-warnings=0`
-- `node scripts/check-markdown-filenames.mjs` (previously bit v5.7/5.8 releases)
-- `node scripts/check-version-sync.mjs` if it exists
-- `node scripts/spec/build-index.mjs` then verify `git diff --exit-code spec/21-app/05-prompts/INDEX.json` is clean (spec-gates)
-- `bunx vitest run` full suite (target: only the pre-existing `prompt-library-modal-round-trip` parallel-flake failure remains)
+**b. Riseup Asia LLC** (unchanged wording, unchanged links)
+- Keep "Top Leading Software Company in WY (2026)" and the existing table exactly as is.
 
-## Part 3 - Follow-ups to log under `.lovable/issues/open/`
+**c. xProduct — new block**
+- Heading: `### xProduct`
+- Tagline: "Operational runtime platform. Home of the **xProgramming** language."
+- Short paragraph: describes xProduct as a modular runtime (HTML / CSS / JS / TypeScript / Less / Supabase / PostgreSQL / Cloudflare Workers / Node.js / Zod stack per the-xproduct.com), and calls out that its xProgramming language lets teams describe operational outcomes declaratively.
+- Notes the CA + EU delivery track record again in one bullet so it appears in the company block, not only in the author bio.
+- Table with a single row: **Website** → [the-xproduct.com](https://the-xproduct.com).
 
-Create `.lovable/issues/open/16-release-doc-conflict-version-only-vs-full-bump.md`:
-- `.lovable/how-to-release.md` says version.json-only; `.lovable/prompts/08-bump-version.md` + `pipeline/06-versioning.md` say full multi-file + changelog + readme
-- Neither is marked stale
-- Ask user which is canonical, then delete or rewrite the loser
+### 4. Nothing else changes
 
-Create `.lovable/issues/open/17-prompt-library-modal-round-trip-parallel-flake.md`:
-- `prompt-library-modal-round-trip.test.ts` (2 tests) passes in isolation, fails under parallel vitest due to shared `URL.createObjectURL` global stub bleeding across workers
-- Fix: scope the stub to the test's own `window` or use `vi.stubGlobal` inside `beforeEach` + `vi.unstubAllGlobals()` in `afterEach`
+- No badge changes.
+- No install snippet edits.
+- No version pins touched.
+- No changelog entry (docs-only polish, no release).
+- No memory / spec / issue files created.
 
-Create `.lovable/issues/open/18-two-parallel-import-uis.md`:
-- `prompt-library-modal.ts` drop zone (live, ~20 tests) and `prompt-import-modal.ts` state machine (only 1 integration test) both exist
-- Confirm which is user-reachable from panel wiring; retire the other or converge tests
+## Verification
 
-Create `.lovable/issues/open/19-workspace-move-v2-live-verification.md`:
-- `moveV2` code shipped and typechecks but no live-call proof; verify HTTP verb + body on a real workspace membership before removing PENDING-VERIFY marker
+- Re-read `readme.md` after edit and confirm: three sub-blocks present under Author, xProduct link resolves, no broken markdown tables, no em dashes introduced in the new prose (per user rule).
+- Grep for `the-xproduct.com` and `xProgramming` to confirm both appear at least twice (hero line + Author section).
+- No commands to run; docs-only change.
 
-## Technical notes
+## Out of scope
 
-- Use `vi.hoisted` for `logError`/`showToast` mocks so assertions can inspect calls
-- The drop zone accepts JSON only; the malformed-JSON test uses `new File([bad], 'x.json', {type:'application/json'})`
-- `results.defaultsProtected` is threaded through `PromptImportResults` (already added in v4.400.0 series)
-- The changelog heading style used in the root file is `## [vX.Y.Z] YYYY-MM-DD Title`, NOT the `## vX.Y.Z - YYYY-MM-DD` style from 08-bump-version.md; follow the actual file
-- Today's UTC date: use whatever `date -u +%Y-%m-%d` returns at edit time
+- Any change to `.lovable/memory/branding/author-identity.md` (it currently names only Riseup Asia; extending it to include xProduct is a separate decision the user has not asked for).
+- Version bump or changelog entry.
+- Website / preview UI edits.
