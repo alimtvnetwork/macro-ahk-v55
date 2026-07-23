@@ -549,6 +549,9 @@ export async function performPromptImport(
   results.total = importedPrompts.length;
   results.updated += dbResult.upserted;
   results.errors.push(...dbResult.errors);
+  if (dbResult.defaultsProtected > 0) {
+    results.defaultsProtected = (results.defaultsProtected ?? 0) + dbResult.defaultsProtected;
+  }
   if (droppedCount > 0) {
     results.errors.push(`${droppedCount} entries skipped (roleFilter=${String(options.roleFilter)})`);
   }
