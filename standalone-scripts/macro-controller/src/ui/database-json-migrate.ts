@@ -186,7 +186,6 @@ export function applySchema(raw: string, logEl: HTMLElement, statusBar: HTMLElem
 /*  Single migration                                                   */
 /* ------------------------------------------------------------------ */
 
-// eslint-disable-next-line max-lines-per-function
 function applyMigration(m: JsonMigration, cb: (ok: boolean, msg: string) => void): void {
   switch (m.action) {
     case 'addColumn': {

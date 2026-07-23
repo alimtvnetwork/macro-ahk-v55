@@ -99,8 +99,6 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
     });
 
     it('manual resetSqlBridgeCache clears winning state for one bucket', () => {
-        // Prime cache via test hook.
-        (getSqlBridgeState as unknown); // no-op ref
         resetSqlBridgeCache('SELECT');
         expect(getSqlBridgeState().winning.SELECT).toBeNull();
     });

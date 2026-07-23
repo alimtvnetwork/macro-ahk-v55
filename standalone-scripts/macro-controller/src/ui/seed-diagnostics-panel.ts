@@ -176,7 +176,7 @@ function buildContractMarkdown(bridge: ReturnType<typeof getSqlBridgeState>): st
   lines.push('## Winning method per bucket');
   lines.push('');
   for (const bucket of ['SELECT', 'WRITE', 'ALTER'] as const) {
-    lines.push('- ' + bucket + ': ' + (bridge.winning[bucket] ?? '(not yet accepted)'));
+    lines.push('- ' + bucket + ': ' + (bridge.winning[bucket] ?? NOT_ACCEPTED));
   }
   lines.push('');
   lines.push('## Candidate probe order');
