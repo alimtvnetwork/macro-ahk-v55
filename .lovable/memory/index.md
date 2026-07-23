@@ -156,4 +156,5 @@ Updated: just now
 - [Re-seed defaults auto-opens editor](mem://features/macro-controller/reseed-defaults-open-editor) - `⚙` gear rows `🔄 Re-seed defaults (safe)` and `⚠️ Force reset defaults` both route through `runReseedAndOpen(role, force)` and `await openDefaultPromptEditor(role)` after success; failure branch adds `role` to `SEED_RESEED_E001` diagnostic context.
 - [Session 2026-07-23 remix checkpoint](mem://workflow/20-session-2026-07-23-remix-checkpoint) - Fresh remix; no code changes; write-memory snapshot only. Pending plans + open issues unchanged.
 - [Prompts authoring + release + {{n}} pipeline](mem://features/prompts-authoring-and-release) - Canonical vs mirror layout, info.json fields, how to add/release a prompt, all five {{n}} substitution sites + guards
+- [SQL bridge adaptive rawSql](mem://features/sql-bridge-adaptive-rawsql) - Probe/cache wrapper for rawSql method churn (QUERY dead, SCHEMA=ALTER-only); import via ui/prompt-loader to keep test mocks intact; fixes PROMPT_LOAD_E001 / PROMPT_EDIT_E005
 
