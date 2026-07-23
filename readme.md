@@ -1317,6 +1317,8 @@ A system architect with **20+ years** of professional software engineering exper
 
 Recognized as a **top 1% talent at Crossover** and one of the top software architects globally. He is also the **Chief Software Engineer of [Riseup Asia LLC](https://riseup-asia.com/)** and maintains an active presence on **[Stack Overflow](https://stackoverflow.com/users/361646/alim-ul-karim)** (2,452+ reputation, member since 2010) and **LinkedIn** (12,500+ followers).
 
+Inventor of the **[xProgramming](https://the-xproduct.com)** language and architect of the **xProduct** operational runtime. Has delivered high quality software for **California based** product companies and **EU based** engineering teams across fintech, workflow automation, and distributed systems.
+
 |  |  |
 |---|---|
 | **Website** | [alimkarim.com](https://alimkarim.com/) · [my.alimkarim.com](https://my.alimkarim.com/) |
@@ -1335,6 +1337,22 @@ Recognized as a **top 1% talent at Crossover** and one of the top software archi
 | **Facebook** | [riseupasia.talent](https://www.facebook.com/riseupasia.talent/) |
 | **LinkedIn** | [Riseup Asia](https://www.linkedin.com/company/105304484/) |
 | **YouTube** | [@riseup-asia](https://www.youtube.com/@riseup-asia) |
+
+### xProduct
+
+**Operational runtime platform. Home of the [xProgramming](https://the-xproduct.com) language.**
+
+xProduct is the modular runtime behind Alim's operational systems: a typed, declarative stack built on HTML, CSS, JavaScript, TypeScript, Less, Supabase, PostgreSQL, Cloudflare Workers, Node.js, and Zod. Its **xProgramming** language lets teams describe operational outcomes declaratively and let the runtime execute, scale, and heal them at the edge.
+
+- **Modular infrastructure:** compose stacks from interoperable modules; swap or scale any part without rebuilding the rest.
+- **Client track record:** high quality delivery for **California based** product companies and **EU based** engineering teams (fintech, workflow automation, distributed systems).
+- **Sister to Riseup Asia LLC** on the delivery side; Marco is one of the operational systems that runs on the same philosophy.
+
+|  |  |
+|---|---|
+| **Website** | [the-xproduct.com](https://the-xproduct.com) |
+| **Language** | [xProgramming](https://the-xproduct.com) |
+| **Founder** | [Md. Alim Ul Karim](https://alimkarim.com) |
 
 ---
 
