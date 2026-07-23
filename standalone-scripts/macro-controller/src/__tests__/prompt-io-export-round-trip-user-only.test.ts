@@ -44,7 +44,7 @@ describe('exportPromptsToJson round trip: user-only (v4.400.0)', () => {
         for (const e of parsed.valid) expect(e.isDefault).toBe(false);
         expect(jsonText).not.toContain('"d-body"');
 
-        globalThis.URL = originalURL;
+        // Leave URL mock in place; the exporter schedules revokeObjectURL via setTimeout(100).
         globalThis.Blob = OriginalBlob;
     });
 });

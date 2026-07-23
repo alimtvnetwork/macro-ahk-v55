@@ -65,7 +65,7 @@ describe('exportPromptsToJson: user-added scope (v4.400.0)', () => {
         expect(String(calls[0][0])).toMatch(/1 user prompts.*1 defaults skipped/);
         expect(calls[0][1]).toBe('success');
 
-        globalThis.URL = originalURL;
+        // Leave URL mock in place; the exporter schedules revokeObjectURL via setTimeout(100).
         globalThis.Blob = OriginalBlob;
     });
 
@@ -84,6 +84,6 @@ describe('exportPromptsToJson: user-added scope (v4.400.0)', () => {
         const calls = (showToast as unknown as { mock: { calls: unknown[][] } }).mock.calls;
         expect(String(calls[0][0])).toMatch(/only default prompts/i);
         expect(calls[0][1]).toBe('warn');
-        globalThis.URL = originalURL;
+        // Leave URL mock in place; the exporter schedules revokeObjectURL via setTimeout(100).
     });
 });
