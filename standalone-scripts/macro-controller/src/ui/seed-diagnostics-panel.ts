@@ -29,6 +29,8 @@ const RELEVANT_CODES = new Set<string>([
   'SEED_RESEED_E001',
 ]);
 
+const NOT_ACCEPTED = '(not yet accepted)';
+
 const STATUS_COLOR: Record<SeedStageStatus, string> = {
   ok: '#22c55e',
   failed: '#ef4444',
