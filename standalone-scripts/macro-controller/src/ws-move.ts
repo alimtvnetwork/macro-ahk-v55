@@ -22,6 +22,7 @@ import { clearResolvedWorkspace } from './credit-balance';
 import { fetchAndPersist } from './credit-balance/fetcher';
 import { logError } from './error-utils';
 import { getCastleRequestToken } from './castle-token';
+import { extractUserIdFromBearer } from './ws-move-user-id';
 
 import { Label } from './types';
 
@@ -351,17 +352,26 @@ async function executeMove(
   const token = await resolveMoveToken(isRetry);
   if (!token) { handleMoveNoToken(); return; }
 
+  const currentUserId = extractUserIdFromBearer(token);
+  if (!currentUserId) {
+    logError('Move aborted', 'unable to extract user id (sub) from bearer for v2 endpoint');
+    updateLoopMoveStatus('error', 'User id missing from token');
+    showToast('Cannot move workspace: user id missing from token.', 'error', { noStop: true });
+    return;
+  }
+
   const label = isRetry ? ' (auth-retry)' : '';
-  log('=== MOVE TO WORKSPACE ===' + label, 'delegate');
-  log('PUT /projects/' + projectId + '/move-to-workspace', 'delegate');
+  log('=== MOVE TO WORKSPACE (v2) ===' + label, 'delegate');
+  log('PUT /workspaces/' + targetWorkspaceId + '/memberships/' + currentUserId, 'delegate');
   logSub('Target: ' + targetWorkspaceName + ' (id=' + targetWorkspaceId + ')', 1);
+  logSub('Project: ' + projectId + ' (no longer in URL; retained for logs)', 1);
   logSub('Auth: Bearer ' + token.substring(0, 12) + '...REDACTED', 1);
   updateLoopMoveStatus('loading', 'Moving to ' + targetWorkspaceName + '...');
 
   const moveHeaders = await buildMoveHeaders();
 
   try {
-    const resp = await window.marco!.api!.workspace.move(projectId, targetWorkspaceId, {
+    const resp = await window.marco!.api!.workspace.moveV2(targetWorkspaceId, currentUserId, {
       baseUrl: CREDIT_API_BASE,
       headers: moveHeaders,
     });
