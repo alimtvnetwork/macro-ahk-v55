@@ -9,6 +9,12 @@ const captured: CapturedCall[] = [];
 let responsesQueue: Record<string, unknown>[] = [];
 let fallback: Record<string, unknown> = { isOk: true, rows: [], lastInsertId: 1 };
 
+vi.mock('../extension-bridge', () => ({
+    sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
+        captured.push({ method: p.method, sql: p.params.sql });
+        return responsesQueue.shift() ?? fallback;
+    }),
+}));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });

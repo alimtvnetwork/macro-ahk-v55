@@ -18,6 +18,12 @@ const captured: CapturedCall[] = [];
 let responsesQueue: QueuedResponse[] = [];
 const clearPromptCacheSpy = vi.fn(async () => { /* void */ });
 
+vi.mock('../extension-bridge', () => ({
+    sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
+        captured.push({ method: payload.method, sql: payload.params.sql });
+        return responsesQueue.shift() ?? { isOk: true };
+    }),
+}));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
         captured.push({ method: payload.method, sql: payload.params.sql });

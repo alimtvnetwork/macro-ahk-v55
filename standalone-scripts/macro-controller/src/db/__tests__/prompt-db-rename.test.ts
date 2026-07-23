@@ -16,6 +16,7 @@ vi.mock('../../error-utils', () => ({ logError: vi.fn(), logDiagnosticFromCode: 
 
 const sendMock = vi.hoisted(() => vi.fn());
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({ sendToExtension: sendMock }));
+vi.mock('../extension-bridge', () => ({ sendToExtension: sendMock }));
 vi.mock('../prompt-role-db', async () => {
     const actual = await vi.importActual<Record<string, unknown>>('../prompt-role-db');
     return { ...actual };

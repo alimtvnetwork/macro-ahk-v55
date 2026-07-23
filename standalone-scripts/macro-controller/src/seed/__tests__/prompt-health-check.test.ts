@@ -25,6 +25,9 @@ vi.mock('../../error-utils', async () => {
 // consumed in FIFO order by successive DB probes (one per role in
 // ROLES_TO_CHECK).
 let responsesQueue: unknown[] = [];
+vi.mock('../../db/extension-bridge', () => ({
+    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { isOk: true, rows: [] }),
+}));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { isOk: true, rows: [] }),
 }));

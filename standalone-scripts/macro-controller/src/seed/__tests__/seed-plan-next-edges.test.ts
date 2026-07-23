@@ -27,6 +27,13 @@ const captured: CapturedCall[] = [];
 let responsesQueue: unknown[] = [];
 let sendImpl: ((sql: string) => Promise<unknown>) | null = null;
 
+vi.mock('../../db/extension-bridge', () => ({
+    sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
+        captured.push({ method: p.method, sql: p.params.sql });
+        if (sendImpl) return sendImpl(p.params.sql);
+        return responsesQueue.shift() ?? { isOk: true, rows: [] };
+    }),
+}));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
