@@ -9,6 +9,7 @@
  * - Idempotent: rows already prefixed are excluded from the match.
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-mock';
 
 interface CapturedCall { method: string; sql: string }
 interface QueuedResponse { isOk: boolean; rows?: unknown[]; errorMessage?: string }
@@ -17,7 +18,7 @@ const captured: CapturedCall[] = [];
 let responsesQueue: QueuedResponse[] = [];
 const clearPromptCacheSpy = vi.fn(async () => { /* void */ });
 
-vi.mock('../../ui/extension-relay', () => ({
+vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
         captured.push({ method: payload.method, sql: payload.params.sql });
         return responsesQueue.shift() ?? { isOk: true };
