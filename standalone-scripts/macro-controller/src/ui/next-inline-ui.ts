@@ -925,7 +925,15 @@ function makeNextPresetButton(deps: TaskNextDeps, n: number, highlighted: boolea
   b.dataset['n'] = String(n);
   b.dataset['highlighted'] = highlighted ? '1' : '0';
   attachChipHover(b, hoverBg);
-  b.onclick = function () { void stageNextPrompt(deps, n); };
+  // v4.402.0: absorb rapid re-entrant clicks while the DB bridge retry loop
+  // is in flight, so PROMPT_LOAD_E001 / PROMPT_EDIT_E005 cannot be re-fired
+  // mid-recovery by an impatient double-click.
+  b.onclick = function () {
+    void import('./async-guard').then(function(mod) {
+      const guarded = mod.guardAsyncClick(b, function() { return stageNextPrompt(deps, n); });
+      void guarded();
+    });
+  };
   return b;
 }
 
