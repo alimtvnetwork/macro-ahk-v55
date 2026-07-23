@@ -29,7 +29,6 @@ import { ensureInlineStripsFrame } from './inline-strips-frame';
 import { substituteToken } from '../utils/token-substitute';
 import { REPLACE_KEY_DEFAULT } from '../db/prompt-defaults';
 import { buildChipGearActionSection } from './chip-gear-menu';
-import { runWithBridgeRetry } from '../db/sql-bridge';
 import { subscribePromptsChanged } from './prompts-changed-event';
 
 /** Hard guard: Plan/Next strips MUST NOT auto-trigger Repeat or each other. */
@@ -155,7 +154,10 @@ async function resolveNextTextDbFirst(deps: TaskNextDeps, n: number): Promise<st
     // v4.402.0: run through the sql-bridge retry helper so a stale cached
     // method-name that surfaces as PROMPT_LOAD_E001 heals in one click
     // instead of the user seeing "Unsupported method: QUERY" and giving up.
-    const result = await runWithBridgeRetry(
+    // Imported lazily to keep next-inline-ui module init side-effect free
+    // (the eager import previously broke tests that mock ../ui/prompt-loader).
+    const bridge = await import('../db/sql-bridge');
+    const result = await bridge.runWithBridgeRetry(
       function() { return mod.getDefaultPromptForRole('next'); },
       function(r) { return r.ok ? undefined : (r.error ?? 'getDefaultPromptForRole !ok'); },
     );
