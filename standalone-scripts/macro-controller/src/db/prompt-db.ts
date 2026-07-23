@@ -12,9 +12,9 @@
  * would collapse the Plan / Next chip fire path.
  */
 
-import { sendToExtension } from '../ui/prompt-loader';
 import { logDiagnosticFromCode } from '../error-utils';
 import { DB_NAME } from './db-name';
+import { runSql as runSqlBridge, type SqlBridgeResp } from './sql-bridge';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
 import { enforceSingleDefaultPerRole, sqlLit, type EnforceResult } from './prompt-role-db';
 import { assertParamTokensUnchanged } from './prompt-token-guard';
@@ -63,13 +63,14 @@ export interface UpsertInput {
     replaceValues?: string[] | undefined;
 }
 
-interface RawSqlOk { isOk: boolean; rows?: unknown[]; errorMessage?: string; lastInsertId?: number }
+type RawSqlOk = SqlBridgeResp;
 
 async function runSql(method: 'QUERY' | 'SCHEMA', sql: string): Promise<RawSqlOk> {
-    const resp = await sendToExtension('PROJECT_API', {
-        project: DB_NAME, method, endpoint: 'rawSql', params: { sql },
-    });
-    return (resp as RawSqlOk) ?? { isOk: false, errorMessage: 'no response' };
+    // Delegates to the adaptive bridge (see db/sql-bridge.ts). The legacy
+    // 'QUERY' | 'SCHEMA' signature is preserved for call-site compatibility;
+    // the bridge maps it onto whichever method name the backend accepts.
+    void DB_NAME; // DB_NAME is applied inside the bridge; kept imported for clarity.
+    return runSqlBridge(method, sql);
 }
 
 function fail<T>(where: string, message: string, context?: unknown): DbResult<T> {
