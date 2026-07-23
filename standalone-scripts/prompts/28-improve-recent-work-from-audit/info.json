@@ -1,0 +1,14 @@
+{
+  "Id": "default-improve-recent-work-from-audit",
+  "Title": "Improve Recent Work From Audit ({{n}} Steps, Maximum Enforcement)",
+  "Slug": "improve-recent-work-from-audit",
+  "Version": "1.0.0",
+  "Author": "marco",
+  "Categories": [
+    "audit"
+  ],
+  "IsDefault": true,
+  "Order": 28,
+  "CreatedAt": "2026-07-20T00:00:00Z",
+  "UpdatedAt": "2026-07-20T00:00:00Z"
+}

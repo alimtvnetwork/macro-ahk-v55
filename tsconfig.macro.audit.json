@@ -1,0 +1,12 @@
+{
+  "//": "Audit-only tsconfig for spec/33-missing-coding-guideline P0-10 fallout measurement.",
+  "//1": "Extends the build tsconfig and enables the 3 strict flags still deferred by 99-baselines.postRemediation.strictFlagsEnabled.",
+  "//2": "Run: `npx tsc --noEmit -p tsconfig.macro.audit.json` to see the exact per-file fallout before promoting a flag in tsconfig.macro.json.",
+  "//3": "NEVER extend this from prod tsconfigs. It is a measurement config only.",
+  "extends": "./tsconfig.macro.build.json",
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": true
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "version": "4.279.0",
+  "branch": "release/v4.279.0",
+  "sourceBranch": "main",
+  "tag": "v4.279.0",
+  "assets": [],
+  "changelog": [
+    "Plan 22 kickoff: reconcile file layout, publish gap matrix, confirm vitest pickup."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-19T00:00:00Z",
+  "isLatest": false
+}

@@ -1,0 +1,16 @@
+{
+  "version": "4.366.0",
+  "branch": "release/v4.366.0",
+  "sourceBranch": "main",
+  "commit": "9bc27338c11f8955ad07693365a2000f0bfa5d4e",
+  "tag": "v4.366.0",
+  "assets": [],
+  "changelog": [
+    "`scripts/compile-instruction.mjs`: load `version.json` and inject `VERSION` into the evaluator scope so `standalone-scripts/marco-sdk/src/instruction.ts` (and any other instruction module importing the shared version) compiles instead of throwing `ReferenceError: VERSION is not defined`. Verified via `pnpm run build:sdk` and `pnpm run build:payment-banner-hider`.",
+    "`tests/e2e/seed-plan-next-regression.spec.ts`: warm-boot mock queue was two responses short after `upgradeLegacyDefaultBodies()` was added between INSERT and `hasDefaultForRole`. Added the two `readCurrentBody` legacy-upgrade probe responses so the queue realigns and both defaults resolve to `alreadyDefault` instead of being re-promoted. All 4 regression tests green."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-20T09:48:02Z",
+  "isLatest": false
+}

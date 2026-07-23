@@ -1,0 +1,20 @@
+{
+  "Id": "default-next-tasks",
+  "Title": "Next {{n}} steps",
+  "Slug": "next-steps",
+  "Version": "3.3.0",
+  "Author": "marco",
+  "Categories": [
+    "next"
+  ],
+  "IsDefault": true,
+  "Order": 13,
+  "IsDynamic": true,
+  "ReplaceKey": "n",
+  "ReplaceValues": ["1", "2", "3", "4", "5", "8"],
+  "SlugTemplate": "next-{{n}}-steps",
+  "SlugRenamedNote": "2026-06-21: slug renamed next-tasks -> next-steps per user v5 prompt",
+  "TokenSyntaxNote": "2026-07-18: migrated ${N} -> {{n}} (v2.0.0) to align with plan-steps convention",
+  "CreatedAt": "2026-03-21T00:00:00Z",
+  "UpdatedAt": "2026-07-20T00:00:00Z"
+}

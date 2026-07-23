@@ -1,0 +1,14 @@
+{
+  "Id": "default-recent-work-audit",
+  "Title": "Recent Work Audit Gap Analysis (Maximum Enforcement)",
+  "Slug": "recent-work-audit",
+  "Version": "1.0.0",
+  "Author": "marco",
+  "Categories": [
+    "audit"
+  ],
+  "IsDefault": true,
+  "Order": 29,
+  "CreatedAt": "2026-07-20T00:00:00Z",
+  "UpdatedAt": "2026-07-20T00:00:00Z"
+}

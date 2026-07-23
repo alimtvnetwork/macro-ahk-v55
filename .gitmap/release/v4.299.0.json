@@ -1,0 +1,16 @@
+{
+  "version": "4.299.0",
+  "branch": "release/v4.299.0",
+  "sourceBranch": "main",
+  "commit": "pending",
+  "tag": "v4.299.0",
+  "assets": [],
+  "changelog": [
+    "Fixed CI check-release-readiness.mjs by generating the missing committed release-asset manifest .gitmap/release/v4.298.0.assets.json so the R1 empty-release guard passes.",
+    "MINOR version bump 4.298.0 to 4.299.0 across manifest.json, src/shared/constants.ts, readme.md, macro-controller/marco-sdk/xpath/payment-banner-hider/lovable-* instruction files, and shared-state."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-19T20:00:00Z",
+  "isLatest": false
+}

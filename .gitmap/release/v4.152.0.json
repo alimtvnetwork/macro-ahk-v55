@@ -1,0 +1,16 @@
+{
+  "version": "4.152.0",
+  "branch": "release/v4.152.0",
+  "sourceBranch": "main",
+  "commit": "153b002823a4a6d939b195d1321f8bece44857cb",
+  "tag": "v4.152.0",
+  "assets": [],
+  "changelog": [
+    "`.lovable/prompts/14-release.md`: re-synced byte-identical to canonical `standalone-scripts/prompts/22-release/prompt.md` (removed stray leading `\u003e` on the Mirror location line, aligned wording to \"this canonical source\").",
+    "Version pins bumped 4.151.0 to 4.152.0 across `version.json`, `manifest.json`, `readme.md`, `RELEASE_NOTES.md`, `src/shared/constants.ts`, all `standalone-scripts/*/src/instruction.ts`, `standalone-scripts/macro-controller/src/shared-state.ts`, and `standalone-scripts/payment-banner-hider/src/index.ts`."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-18T19:13:56Z",
+  "isLatest": false
+}

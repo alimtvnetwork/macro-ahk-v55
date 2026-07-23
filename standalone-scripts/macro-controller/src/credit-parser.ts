@@ -1,0 +1,430 @@
+/**
+ * Credit Parser — API response parsing and tier resolution
+ *
+ * Extracted from credit-fetch.ts (module splitting).
+ * Contains: parseLoopApiResponse, syncCreditStateFromApi, resolveWsTier, WsTier, WS_TIER_LABELS.
+ */
+
+import { log, logSub } from './logger';
+import { CreditSource } from './types';
+import {
+  SubscriptionStatus,
+  WsTierValue,
+  PlanName,
+  isCanceledStatus,
+  isExpiredSubscriptionStatus,
+  normalizeSubscriptionStatus,
+} from './types/subscription-status';
+import { calcTotalCredits, calcAvailableCredits } from './credit-api';
+import { loopCreditState, state } from './shared-state';
+import { getEffectiveStatus, shouldApplyCanceledOverride, applyCanceledCreditOverride } from './workspace-status';
+import { getWorkspaceLifecycleConfigFor } from './workspace-lifecycle-config';
+import { getSettingsOverrides } from './settings-store';
+import { enrichProZeroWorkspaces } from './pro-zero/pro-zero-enrichment';
+import { enrichProOneWorkspaces } from './credit-balance/pro-one-enrichment';
+import { toWireWorkspace, resolveWireSection } from './types/wire-workspace';
+import { toWireWorkspaceCredits } from './types/wire-workspace-credits';
+import { toWireWorkspaceLifecycle, type WireWorkspaceLifecycle } from './types/wire-workspace-lifecycle';
+
+
+
+// ============================================
+// Workspace Tier Enum
+// ============================================
+export const enum WsTier {
+  FREE     = 'FREE',
+  LITE     = 'LITE',
+  PRO      = 'PRO',
+  EXPIRED  = 'EXPIRED',
+}
+
+export const WS_TIER_LABELS: Record<string, { label: string; bg: string; fg: string }> = {
+  FREE:    { label: 'FREE',    bg: 'rgba(255,255,255,0.08)', fg: '#94a3b8' },
+  LITE:    { label: 'LITE',    bg: '#3b82f6',                fg: '#fff' },
+  PRO:     { label: 'PRO',     bg: '#F59E0B',                fg: '#1a1a2e' },
+  EXPIRED: { label: 'EXPIRED', bg: '#7f1d1d',                fg: '#fca5a5' },
+};
+
+/**
+ * Derive workspace tier from plan name + subscription status + billing limit.
+ * - plan "free" or empty + no billing → FREE
+ * - plan "ktlo" or "lite" → LITE
+ * - plan "free" + subStatus "canceled"/"cancelled" → EXPIRED (was pro, now canceled)
+ * - billing limit > 0 + subStatus "active" → PRO
+ * - billing limit > 0 + subStatus canceled → EXPIRED
+ */
+export function resolveWsTier(plan: string, subStatus: string, billingLimit: number): string {
+  const p = (plan || '').toLowerCase().trim();
+  const s = normalizeSubscriptionStatus(subStatus);
+
+  // Lite / ktlo plan (incl. tiered variants like `ktlo_2`, `ktlo_3`)
+  if (p === PlanName.KTLO || p === PlanName.LITE || p.startsWith('ktlo_')) return WsTierValue.LITE;
+
+  // Has billing = was/is pro
+  if (billingLimit > 0 || (p && p !== PlanName.FREE)) {
+    if (s === SubscriptionStatus.ACTIVE) return WsTierValue.PRO;
+    if (isCanceledStatus(s) || s === SubscriptionStatus.PAST_DUE) return WsTierValue.EXPIRED;
+    return WsTierValue.PRO; // default if billing exists
+  }
+
+  // Free plan + canceled sub = expired trial/pro
+  if (isCanceledStatus(s)) return WsTierValue.EXPIRED;
+
+  return WsTierValue.FREE;
+}
+
+// ============================================
+// Expiry helpers — used by ws-list-renderer & filter logic
+// ============================================
+
+/**
+ * Returns true when the workspace is in an "expired" subscription state.
+ * Uses subscription_status (canonical signal): canceled / cancelled / past_due / unpaid.
+ * Centralised here so the filter, badge, and sort code share one definition.
+ */
+export function isExpiredWs(ws: import('./types').WorkspaceCredit): boolean {
+  return isExpiredSubscriptionStatus(ws.subscriptionStatus);
+}
+
+/**
+ * Returns the integer number of full days since the workspace's
+ * subscription_status last changed (i.e. since it became expired).
+ * Returns null when no timestamp is available or it cannot be parsed.
+ */
+export function expiredDays(ws: import('./types').WorkspaceCredit): number | null {
+  const iso = ws.subscriptionStatusChangedAt;
+  if (!iso) return null;
+  const t = Date.parse(iso);
+  if (!Number.isFinite(t)) return null;
+  const ms = Date.now() - t;
+  if (ms < 0) return 0;
+  return Math.floor(ms / 86400000);
+}
+
+/**
+ * Format the workspace expiry-start date as DD/MMM/YY (e.g. 09/Apr/26).
+ * Time is intentionally omitted per UX requirement.
+ * Returns null when no timestamp is available or cannot be parsed.
+ */
+export function formatExpiryStartDate(ws: import('./types').WorkspaceCredit): string | null {
+  const iso = ws.subscriptionStatusChangedAt;
+  if (!iso) return null;
+  const t = Date.parse(iso);
+  if (!Number.isFinite(t)) return null;
+  const d = new Date(t);
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const dayPart = String(d.getDate()).padStart(2, '0');
+  const monPart = months[d.getMonth()];
+  const yearPart = String(d.getFullYear() % 100).padStart(2, '0');
+  return dayPart + '/' + monPart + '/' + yearPart;
+}
+
+/**
+ * Human-readable duration since expiry started, e.g. "12d", "3mo 4d", "1y 2mo".
+ * Returns null when no timestamp is available.
+ */
+export function formatExpiredDuration(ws: import('./types').WorkspaceCredit): string | null {
+  const days = expiredDays(ws);
+  if (days === null) return null;
+  if (days < 1) return '<1d';
+  if (days < 30) return days + 'd';
+  if (days < 365) {
+    const months = Math.floor(days / 30);
+    const remDays = days % 30;
+    return remDays > 0 ? months + 'mo ' + remDays + 'd' : months + 'mo';
+  }
+  const years = Math.floor(days / 365);
+  const remMonths = Math.floor((days % 365) / 30);
+  return remMonths > 0 ? years + 'y ' + remMonths + 'mo' : years + 'y';
+}
+
+// ============================================
+// Phase 1 (workspace-status-tooltip): lifecycle / meta extraction.
+// Pulled out of parseWorkspaceItem to keep that function under the
+// max-lines-per-function limit.
+// ============================================
+interface LifecycleMeta {
+  numProjects: number;
+  nextRefillAt: string;
+  billingPeriodEndAt: string;
+  createdAt: string;
+  planType: string;
+  gitSyncEnabled: boolean;
+  membershipRole: string;
+}
+
+function extractLifecycleMeta(lifecycle: WireWorkspaceLifecycle): LifecycleMeta {
+  return {
+    numProjects: lifecycle.num_projects,
+    nextRefillAt: lifecycle.next_monthly_credit_grant_date,
+    billingPeriodEndAt: lifecycle.billing_period_end_date,
+    createdAt: lifecycle.created_at,
+    planType: lifecycle.plan_type,
+    gitSyncEnabled: lifecycle.gitsync_github_enabled,
+    membershipRole: lifecycle.membership_role,
+  };
+}
+
+
+// ============================================
+// parseWorkspaceItem — extract a single workspace from API response
+// ============================================
+/**
+ * Issue 122 (pro_1 calc): for plan='pro_1', user-specified formula is
+ *   Total     = total_credits_used_in_billing_period + daily_credits_limit + billing_period_credits_limit
+ *   Used      = total_credits_used_in_billing_period
+ *   Available = max(0, Total - Used - daily_credits_used)
+ *               = daily_credits_limit + billing_period_credits_limit - daily_credits_used
+ *
+ * Ambiguity log: .lovable/question-and-ambiguity/122-pro1-total-calculation.md
+ * Other plans (pro_0 — enriched separately; lite/ktlo/free) keep legacy calc.
+ */
+const PRO_ONE_PLAN_LITERAL = 'pro_1';
+
+interface ProOneCalc { totalCredits: number; available: number; totalCreditsUsed: number; }
+
+function calcProOne(
+  totalCreditsUsedInBillingPeriod: number,
+  dLimit: number,
+  bLimit: number,
+  dUsed: number,
+): ProOneCalc {
+  const totalCredits = Math.round(totalCreditsUsedInBillingPeriod + dLimit + bLimit);
+  const available = Math.max(0, Math.round(totalCredits - totalCreditsUsedInBillingPeriod - dUsed));
+  return { totalCredits, available, totalCreditsUsed: Math.round(totalCreditsUsedInBillingPeriod) };
+}
+
+function parseWorkspaceItem(rawItem: Record<string, unknown>, wsIdx: number): import('./types').WorkspaceCredit {
+  const rawWs = rawItem;
+  const ws = resolveWireSection(rawWs);
+  // Plan-10: narrow the wire row at the parse boundary through the three
+  // sanctioned wide surfaces. Zero inline `as` casts on `ws` fields — any
+  // new field consumer must extend one of these surfaces.
+  const wire = toWireWorkspace(ws);
+  const wireCredits = toWireWorkspaceCredits(ws);
+  const lifecycle = toWireWorkspaceLifecycle(ws);
+  const bUsed = wireCredits.billing_period_credits_used;
+  const bLimit = wireCredits.billing_period_credits_limit;
+  const dUsed = wireCredits.daily_credits_used;
+  const dLimit = wireCredits.daily_credits_limit;
+  const rUsed = wireCredits.rollover_credits_used;
+  const rLimit = wireCredits.rollover_credits_limit;
+  const freeGranted = wireCredits.credits_granted;
+  const freeUsed = wireCredits.credits_used;
+  const topupLimit = Math.round(wireCredits.topup_credits_limit);
+  const totalCreditsUsedRaw = wireCredits.total_credits_used;
+  const totalCreditsUsedBpRaw = wireCredits.total_credits_used_in_billing_period;
+  const subStatus = lifecycle.subscription_status;
+  const plan = wire.plan;
+  const meta = extractLifecycleMeta(lifecycle);
+
+  const isProOne = plan.toLowerCase().trim() === PRO_ONE_PLAN_LITERAL;
+  let totalCredits: number;
+  let available: number;
+  let totalCreditsUsed: number;
+  if (isProOne) {
+    const calc = calcProOne(totalCreditsUsedBpRaw, dLimit, bLimit, dUsed);
+    totalCredits = calc.totalCredits;
+    available = calc.available;
+    totalCreditsUsed = calc.totalCreditsUsed;
+  } else {
+    totalCredits = calcTotalCredits(freeGranted, dLimit, bLimit, topupLimit, rLimit);
+    available = calcAvailableCredits(totalCredits, rUsed, dUsed, bUsed, freeUsed);
+    totalCreditsUsed = Math.round(totalCreditsUsedRaw);
+  }
+
+  return {
+    id: wire.id,
+    name: (wire.name || 'WS' + wsIdx).substring(0, 12),
+    fullName: wire.name || 'WS' + wsIdx,
+    dailyFree: Math.max(0, Math.round(dLimit - dUsed)), dailyLimit: Math.round(dLimit), dailyUsed: Math.round(dUsed),
+    rollover: Math.max(0, Math.round(rLimit - rUsed)), rolloverLimit: Math.round(rLimit), rolloverUsed: Math.round(rUsed),
+    available,
+    billingAvailable: Math.max(0, Math.round(bLimit - bUsed)),
+    used: Math.round(bUsed), limit: Math.round(bLimit),
+    freeGranted: Math.round(freeGranted), freeRemaining: Math.max(0, Math.round(freeGranted - freeUsed)),
+    hasFree: freeGranted > 0 && freeUsed < freeGranted,
+    topupLimit, totalCreditsUsed, totalCredits,
+    subscriptionStatus: subStatus,
+    subscriptionStatusChangedAt: lifecycle.subscription_status_changed_at,
+    plan, role: lifecycle.role || 'N/A',
+    tier: resolveWsTier(plan, subStatus, bLimit),
+    raw: ws as Record<string, number | string>, rawApi: rawWs,
+    numProjects: meta.numProjects, gitSyncEnabled: meta.gitSyncEnabled,
+    nextRefillAt: meta.nextRefillAt, billingPeriodEndAt: meta.billingPeriodEndAt,
+    createdAt: meta.createdAt, membershipRole: meta.membershipRole, planType: meta.planType,
+  };
+}
+
+
+
+// ============================================
+// applyLifecycleOverrides — single chokepoint
+// (Phase 5 — workspace-status-tooltip v2.213.0)
+//
+// For canceled / fully-expired / expired workspaces, zero out billing +
+// rollover and recompute `available` from surviving sources only. Runs
+// BEFORE aggregateCreditTotals so global totals reflect post-override values
+// and every downstream consumer (status bar segments, row credit chips,
+// hover card, focus-current summary, CSV export) reads consistent numbers.
+//
+// Idempotent — re-running on the same array is a no-op.
+// ============================================
+function applyLifecycleOverrides(perWs: import('./types').WorkspaceCredit[]): void {
+  // Default true — only opt-out disables the override.
+  const enabled = getSettingsOverrides().enableCanceledCreditOverride !== false;
+  if (!enabled) {
+    log('Lifecycle overrides disabled via enableCanceledCreditOverride=false', 'info');
+    return;
+  }
+  let overridden = 0;
+  for (const ws of perWs) {
+    // Per-workspace override (grace/refill) trumps global config for this row.
+    const wsCfg = getWorkspaceLifecycleConfigFor(ws.id);
+    const status = getEffectiveStatus(ws, wsCfg);
+    if (!shouldApplyCanceledOverride(status)) continue;
+    const beforeAvail = ws.available || 0;
+    const beforeBilling = ws.billingAvailable || 0;
+    const beforeRollover = ws.rollover || 0;
+    applyCanceledCreditOverride(ws, status);
+    overridden++;
+    logSub(
+      'lifecycle override [' + status.kind + '] ' + (ws.fullName || ws.name)
+        + ': available ' + beforeAvail + ' → ' + ws.available
+        + ' (billing ' + beforeBilling + ' → 0, rollover ' + beforeRollover + ' → 0)',
+      2,
+    );
+  }
+  if (overridden > 0) {
+    log('Lifecycle overrides applied to ' + overridden + ' workspace(s)', 'info');
+  }
+}
+
+// ============================================
+// aggregateCreditTotals — sum per-workspace credits (post-override)
+// ============================================
+function aggregateCreditTotals(perWs: import('./types').WorkspaceCredit[]): void {
+  let tdf = 0, tr = 0, ta = 0, tba = 0;
+  for (const ws of perWs) {
+    tdf += ws.dailyFree;
+    tr += ws.rollover;
+    ta += ws.available;
+    tba += ws.billingAvailable;
+  }
+  loopCreditState.totalDailyFree = tdf;
+  loopCreditState.totalRollover = tr;
+  loopCreditState.totalAvailable = ta;
+  loopCreditState.totalBillingAvail = tba;
+}
+
+// ============================================
+// matchCurrentWorkspace — find current ws by name
+// ============================================
+function matchCurrentWorkspace(perWs: import('./types').WorkspaceCredit[]): void {
+  if (!state.workspaceName || perWs.length === 0) return;
+  for (const ws of perWs) {
+    if (ws.fullName === state.workspaceName || ws.name === state.workspaceName) {
+      loopCreditState.currentWs = ws;
+      return;
+    }
+  }
+}
+
+// ============================================
+// buildWsByIdIndex — O(1) lookup dictionary
+// ============================================
+function buildWsByIdIndex(perWs: import('./types').WorkspaceCredit[]): void {
+  loopCreditState.wsById = {};
+  for (const ws of perWs) {
+    if (ws.id) loopCreditState.wsById[ws.id] = ws;
+  }
+}
+
+// ============================================
+// parseLoopApiResponse — parse /user/workspaces API response
+// ============================================
+export function parseLoopApiResponse(data: Record<string, unknown>): boolean {
+  const workspaces = (data.workspaces || data || []) as Array<Record<string, unknown>>;
+  if (!Array.isArray(workspaces)) {
+    log('parseLoopApiResponse: unexpected response shape', 'warn');
+    return false;
+  }
+
+  const perWs = workspaces.map((raw, idx) => parseWorkspaceItem(raw, idx));
+
+  loopCreditState.perWorkspace = perWs;
+  loopCreditState.lastCheckedAt = Date.now();
+
+  applyLifecycleOverrides(perWs);
+  aggregateCreditTotals(perWs);
+  matchCurrentWorkspace(perWs);
+  buildWsByIdIndex(perWs);
+
+  loopCreditState.source = CreditSource.Api;
+  log('Credit API: parsed ' + perWs.length + ' workspaces — dailyFree=' + loopCreditState.totalDailyFree + ' rollover=' + loopCreditState.totalRollover + ' available=' + loopCreditState.totalAvailable + ' | wsById keys=' + Object.keys(loopCreditState.wsById).length, 'success');
+  return true;
+}
+
+/**
+ * Run pro_0 enrichment over the current `perWorkspace` snapshot, then
+ * re-aggregate totals + rebuild indices so downstream consumers reflect the
+ * authoritative /credit-balance numbers.
+ *
+ * Spec: spec/22-app-issues/110-macro-controller-pro-zero-credit-balance.md §3, §8
+ *
+ * Returns the count of rows mutated. No-op (returns 0) when no rows match
+ * the PRO_ZERO branch.
+ */
+export async function applyProZeroEnrichment(): Promise<number> {
+  const perWs = loopCreditState.perWorkspace || [];
+  if (perWs.length === 0) return 0;
+  const mutated = await enrichProZeroWorkspaces(perWs);
+  if (mutated === 0) return 0;
+
+  // Re-run dependent passes so totals + currentWs reflect enriched values.
+  applyLifecycleOverrides(perWs);
+  aggregateCreditTotals(perWs);
+  matchCurrentWorkspace(perWs);
+  buildWsByIdIndex(perWs);
+  log('[ProZero] Enriched ' + mutated + ' workspace(s) — re-aggregated totals', 'success');
+  return mutated;
+}
+
+/**
+ * Overlay cached /credit-balance values onto pro_1 rows, then re-aggregate
+ * totals + indices so downstream consumers reflect authoritative numbers.
+ * Mirrors applyProZeroEnrichment.
+ *
+ * Spec: spec/22-app-issues/122a-credit-balance-throttle-and-persistence.md
+ */
+export async function applyProOneEnrichment(): Promise<number> {
+  const perWs = loopCreditState.perWorkspace || [];
+  if (perWs.length === 0) return 0;
+  const mutated = await enrichProOneWorkspaces(perWs);
+  if (mutated === 0) return 0;
+
+  applyLifecycleOverrides(perWs);
+  aggregateCreditTotals(perWs);
+  matchCurrentWorkspace(perWs);
+  buildWsByIdIndex(perWs);
+  log('[ProOne] Enriched ' + mutated + ' workspace(s) — re-aggregated totals', 'success');
+  return mutated;
+}
+
+
+// ============================================
+// syncCreditStateFromApi — sync loop state from API data
+// ============================================
+export function syncCreditStateFromApi(): void {
+  const cws = loopCreditState.currentWs;
+  if (!cws) {
+    logSub('syncCreditState: no currentWs — cannot determine credit', 1);
+    return;
+  }
+  const dailyFree = cws.dailyFree || 0;
+  const hasCredit = dailyFree > 0;
+  state.hasFreeCredit = hasCredit;
+  state.isIdle = !hasCredit;
+  state.lastStatusCheck = Date.now();
+  log('API Credit Sync: ' + cws.fullName + ' dailyFree=' + dailyFree + ' (available=' + cws.available + ') → ' + (hasCredit ? '[Y] FREE CREDIT' : '[N] NO FREE CREDIT → will move'), hasCredit ? 'success' : 'warn');
+}

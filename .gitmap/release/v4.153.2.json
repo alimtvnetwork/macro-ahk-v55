@@ -1,0 +1,17 @@
+{
+  "version": "4.153.2",
+  "branch": "release/v4.153.2",
+  "sourceBranch": "main",
+  "commit": "3a19d52ed854e20ebbd87da3d41deef16c83389c",
+  "tag": "v4.153.2",
+  "assets": [],
+  "changelog": [
+    "Cleared all 9 `sonarjs/no-nested-template-literals` warnings by extracting inner template expressions to `const` locals (or an IIFE for the JSX case). Zero behaviour change; only whitespace + naming.",
+    "`.lovable/question-and-ambiguity/67-lint-warnings-fix-scope.md`: phased plan for the remaining 194 lint warnings (152 `max-lines-per-function`, 27 `cognitive-complexity`, plus ~15 mixed low-hanging items). Recommendation: continue Phase 2 (~12 low-risk warnings) on the next `next` invocation, then Phase 3 subsystem-by-subsystem.",
+    "Version pins bumped 4.153.1 to 4.153.2 across `version.json`, `manifest.json`, `readme.md`, `RELEASE_NOTES.md`, `src/shared/constants.ts`, all `standalone-scripts/*/src/instruction.ts`, `standalone-scripts/macro-controller/src/shared-state.ts`, and `standalone-scripts/payment-banner-hider/src/index.ts`."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-18T19:22:51Z",
+  "isLatest": false
+}

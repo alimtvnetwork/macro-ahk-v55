@@ -1,0 +1,424 @@
+ 
+/**
+ * MacroLoop Controller — Settings Dialog
+ *
+ * Orchestrator: dialog shell, tab bar, makeField helper, save/reset
+ * footer, and ESC-to-close. Delegates tab content to settings-tab-panels.
+ *
+ * Sub-modules: settings-tab-panels.
+ *
+ * @see spec/04-macro-controller/ts-migration-v2/05-module-splitting.md
+ */
+
+import { state } from '../shared-state';
+
+import { taskNextState, saveTaskNextSettings, type TaskNextDeps } from './task-next-ui';
+import type { ExtensionResponse, ResolvedPromptsConfig } from '../types';
+import { updateLogConfig, type LogManagerConfig } from '../log-manager';
+import { saveSettingsOverrides, getSettingsOverrides, type SettingsOverrides } from '../settings-store';
+import type { XPathPanelResult, TimingPanelResult, TaskNextPanelResult, LoggingPanelResult, ConfigDbPanelResult, GeneralPanelResult } from './settings-tab-panels';
+
+import {
+  CONFIG,
+  TIMING,
+  cInputBg,
+  cInputBorder,
+  cInputFg,
+  cNeutral600,
+  cPanelBg,
+  cPanelBorder,
+  cPanelFg,
+  cPanelText,
+  cPrimary,
+  cPrimaryLight,
+  cSectionHeader,
+  cSuccess,
+  cWarning,
+} from '../shared-state';
+
+import {
+  buildXPathsPanel,
+  buildTimingPanel,
+  buildTaskNextPanel,
+  buildLoggingPanel,
+  buildConfigDbPanel,
+  buildGeneralPanel,
+  buildHistoryPanel,
+} from './settings-tab-panels';
+import { CssFragment } from '../types';
+// ============================================
+// Dependencies injected from createUI closure
+// ============================================
+export interface SettingsDeps {
+  btnStyle: string;
+  taskNextDeps: TaskNextDeps;
+  getPromptsConfig: () => ResolvedPromptsConfig;
+  showToast: (msg: string, level?: string) => void;
+  log: (msg: string, level?: string) => void;
+  sendToExtension: (type: string, payload: Record<string, unknown>) => Promise<ExtensionResponse>;
+}
+
+// ============================================
+// Helper: create labeled input field
+// ============================================
+export interface FieldOptions {
+  type?: string | undefined;
+  hint?: string | undefined;
+  multiline?: boolean | undefined;
+}
+
+export type MakeFieldFn = (label: string, value: string, opts?: FieldOptions) => { row: HTMLElement; input: HTMLInputElement };
+
+function makeField(label: string, value: string, opts?: FieldOptions) {
+  const o = opts || {};
+  const row = document.createElement('div');
+  row.style.cssText = 'margin-bottom:10px;';
+  const lbl = document.createElement('div');
+  lbl.style.cssText = 'font-size:10px;color:' + cSectionHeader + ';margin-bottom:3px;font-weight:600;';
+  lbl.textContent = label;
+  row.appendChild(lbl);
+  const inp = document.createElement(o.multiline ? 'textarea' : 'input') as HTMLInputElement;
+  inp.type = o.type || 'text';
+  inp.value = value || '';
+  inp.style.cssText = 'width:100%;padding:6px 8px;border:1px solid ' + cInputBorder + ';border-radius:5px;background:' + cInputBg + ';color:' + cInputFg + ';font-family:monospace;font-size:11px;box-sizing:border-box;' + (o.multiline ? 'min-height:60px;resize:vertical;' : '');
+  row.appendChild(inp);
+  if (o.hint) {
+    const h = document.createElement('div');
+    h.style.cssText = 'font-size:9px;color:#64748b;margin-top:2px;';
+    h.textContent = o.hint;
+    row.appendChild(h);
+  }
+  return { row, input: inp };
+}
+
+// CQ16: Extracted from showSettingsDialog closure
+function switchSettingsTab(tabBtns: HTMLElement[], panels: HTMLElement[], idx: number): void {
+  tabBtns.forEach(function(b, i) {
+    b.style.borderBottom = i === idx ? '2px solid ' + cPrimary : '2px solid transparent';
+    b.style.color = i === idx ? cPrimaryLight : '#64748b';
+  });
+  panels.forEach(function(p, i) { p.style.display = i === idx ? '' : 'none'; });
+}
+
+// CQ16: Extracted from showSettingsDialog closure
+function onSettingsEsc(overlay: HTMLElement): (e: KeyboardEvent) => void {
+  const handler = function(e: KeyboardEvent) {
+    if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', handler); }
+  };
+  return handler;
+}
+
+// ============================================
+// Show Settings Dialog
+// ============================================
+export function showSettingsDialog(deps: SettingsDeps) {
+  const existing = document.getElementById('macroloop-settings-dialog');
+  if (existing) { existing.remove(); return; }
+
+  const { btnStyle, getPromptsConfig } = deps;
+  const tFontSystem = '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif';
+
+  const overlay = document.createElement('div');
+  overlay.id = 'macroloop-settings-dialog';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+  const dialog = _buildSettingsDialogShell(tFontSystem);
+  const { tabBtns, panels, tabPanels, generalResult, timingResult } = _buildSettingsTabs(deps, getPromptsConfig);
+
+  dialog.appendChild(_buildSettingsHeader(tFontSystem, overlay));
+  dialog.appendChild(tabPanels.tabBar);
+  dialog.appendChild(tabPanels.panelsContainer);
+
+  const footer = _buildSettingsFooter(btnStyle, deps, panels, overlay, generalResult, timingResult);
+  dialog.appendChild(footer);
+
+  overlay.appendChild(dialog);
+  document.body.appendChild(overlay);
+  switchSettingsTab(tabBtns, panels, 0);
+  document.addEventListener('keydown', onSettingsEsc(overlay));
+}
+
+function _buildSettingsDialogShell(tFontSystem: string): HTMLElement {
+  const dialog = document.createElement('div');
+  dialog.style.cssText = CssFragment.Background + cPanelBg + ';border:1px solid ' + cPanelBorder + ';border-radius:12px;padding:0;max-width:560px;width:92%;max-height:80vh;display:flex;flex-direction:column;color:' + cPanelText + ';font-family:' + tFontSystem + ';box-shadow:0 25px 60px rgba(0,0,0,0.5);';
+  dialog.className = 'marco-enter';
+  dialog.onclick = function(e) { e.stopPropagation(); };
+  return dialog;
+}
+
+function _buildSettingsHeader(_fontSystem: string, overlay: HTMLElement): HTMLElement {
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid ' + cPanelBorder + ';flex-shrink:0;font-family:' + _fontSystem + ';';
+  const hdrTitle = document.createElement('div');
+  hdrTitle.style.cssText = 'font-size:16px;font-weight:700;color:' + cPrimaryLight + ';';
+  hdrTitle.textContent = '⚙️ MacroLoop Settings';
+  const hdrClose = document.createElement('span');
+  hdrClose.style.cssText = 'font-size:18px;color:#64748b;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all 0.15s;';
+  hdrClose.textContent = '✕';
+  hdrClose.onmouseenter = function() { hdrClose.style.color = '#e2e8f0'; hdrClose.style.background = 'rgba(255,255,255,0.1)'; };
+  hdrClose.onmouseleave = function() { hdrClose.style.color = '#64748b'; hdrClose.style.background = 'none'; };
+  hdrClose.onclick = function() { overlay.remove(); };
+  hdr.appendChild(hdrTitle);
+  hdr.appendChild(hdrClose);
+  return hdr;
+}
+
+function _buildSettingsTabs(deps: SettingsDeps, getPromptsConfig: () => ResolvedPromptsConfig): { tabBtns: HTMLElement[]; panels: HTMLElement[]; tabPanels: { tabBar: HTMLElement; panelsContainer: HTMLElement }; generalResult: GeneralPanelResult; timingResult: TimingPanelResult } {
+  const tabs = ['XPaths', 'Timing', 'Task Next', 'Logging', 'History', 'Config (DB)', 'General'];
+  const tabBar = document.createElement('div');
+  tabBar.style.cssText = 'display:flex;gap:0;border-bottom:1px solid ' + cPanelBorder + ';padding:0 20px;flex-shrink:0;';
+  const tabPanels = document.createElement('div');
+  tabPanels.style.cssText = 'flex:1;overflow-y:auto;padding:16px 20px;';
+  const tabBtns: HTMLElement[] = [];
+  const panels: HTMLElement[] = [];
+
+  tabs.forEach(function(name, i) {
+    const btn = document.createElement('div');
+    btn.style.cssText = 'padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:color 0.15s;border-bottom:2px solid transparent;color:#64748b;';
+    btn.textContent = name;
+    btn.onclick = function() { switchSettingsTab(tabBtns, panels, i); };
+    tabBar.appendChild(btn);
+    tabBtns.push(btn);
+  });
+
+  const generalResult = buildGeneralPanel(makeField, getPromptsConfig);
+  const timingResult = buildTimingPanel(makeField);
+  panels.push(buildXPathsPanel(makeField).panel);
+  panels.push(timingResult.panel);
+  panels.push(buildTaskNextPanel(makeField).panel);
+  panels.push(buildLoggingPanel(deps).panel);
+  panels.push(buildHistoryPanel().panel);
+  panels.push(buildConfigDbPanel(deps, makeField).panel);
+  panels.push(generalResult.panel);
+
+  panels.forEach(function(p) { tabPanels.appendChild(p); });
+
+  return { tabBtns, panels, tabPanels: { tabBar, panelsContainer: tabPanels }, generalResult, timingResult };
+}
+
+function _buildSettingsFooter(btnStyle: string, deps: SettingsDeps, _panels: HTMLElement[], overlay: HTMLElement, generalResult: GeneralPanelResult, timingResult: TimingPanelResult): HTMLElement {
+  const { showToast, log } = deps;
+  const footer = document.createElement('div');
+  footer.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;padding:12px 20px;border-top:1px solid ' + cPanelBorder + ';flex-shrink:0;';
+
+  const cancelBtn2 = document.createElement('button');
+  cancelBtn2.textContent = 'Cancel';
+  cancelBtn2.style.cssText = btnStyle + CssFragment.Background + cNeutral600 + ';color:' + cPanelFg + ';padding:6px 16px;font-size:12px;';
+  cancelBtn2.onclick = function() { overlay.remove(); };
+
+  const resetBtn = document.createElement('button');
+  resetBtn.textContent = '↺ Reset';
+  resetBtn.title = 'Reset fields to current running values';
+  resetBtn.style.cssText = btnStyle + CssFragment.Background + cWarning + ';color:#1e1e2e;padding:6px 16px;font-size:12px;';
+  resetBtn.onclick = function() {
+    showToast('Fields reset to current values', 'info');
+  };
+
+  const exportBtn = document.createElement('button');
+  exportBtn.textContent = '⬇ Export';
+  exportBtn.title = 'Download current overrides as JSON';
+  exportBtn.style.cssText = btnStyle + CssFragment.Background + cNeutral600 + ';color:' + cPanelFg + ';padding:6px 12px;font-size:12px;';
+  exportBtn.onclick = function() { _exportOverridesJson(showToast); };
+
+  const importBtn = document.createElement('button');
+  importBtn.textContent = '⬆ Import';
+  importBtn.title = 'Load overrides from a JSON file';
+  importBtn.style.cssText = btnStyle + CssFragment.Background + cNeutral600 + ';color:' + cPanelFg + ';padding:6px 12px;font-size:12px;';
+  importBtn.onclick = function() { _importOverridesJson(generalResult, showToast, overlay, deps); };
+
+  const saveBtn2 = document.createElement('button');
+  saveBtn2.textContent = '💾 Save';
+  saveBtn2.style.cssText = btnStyle + CssFragment.Background + cSuccess + ';color:#1e1e2e;padding:6px 20px;font-size:12px;font-weight:600;';
+  saveBtn2.onclick = function() {
+    _persistOverrideToggles(generalResult, timingResult).then(function() {
+
+      log('Settings saved', 'info');
+      showToast('✅ Settings saved', 'info');
+      overlay.remove();
+    }).catch(function(err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast('❌ Save failed: ' + msg, 'error');
+    });
+  };
+
+  footer.appendChild(cancelBtn2);
+  footer.appendChild(resetBtn);
+  footer.appendChild(exportBtn);
+  footer.appendChild(importBtn);
+  footer.appendChild(saveBtn2);
+  return footer;
+}
+
+function _exportOverridesJson(showToast: (m: string, l?: string) => void): void {
+  const overrides = getSettingsOverrides();
+  const payload = JSON.stringify({ kind: 'macro-controller.settings-overrides', version: 1, overrides }, null, 2);
+  const blob = new Blob([payload], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  a.href = url;
+  a.download = 'marco-settings-overrides-' + stamp + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+  showToast('✅ Overrides exported', 'info');
+}
+
+function _importOverridesJson(
+  generalResult: GeneralPanelResult,
+  showToast: (m: string, l?: string) => void,
+  overlay: HTMLElement,
+  deps: SettingsDeps,
+): void {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.onchange = function() {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    file.text().then(function(text: string) {
+      const parsed = JSON.parse(text) as { kind?: string; overrides?: Record<string, unknown> };
+      if (parsed.kind !== 'macro-controller.settings-overrides' || !parsed.overrides) {
+        showToast('❌ Invalid overrides file', 'error');
+        return;
+      }
+      return saveSettingsOverrides(parsed.overrides).then(function() {
+        deps.log('Settings overrides imported', 'success');
+        showToast('✅ Overrides imported — reopen Settings to refresh', 'info');
+        overlay.remove();
+      });
+    }).catch(function(err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast('❌ Import failed: ' + msg, 'error');
+    });
+  };
+  input.click();
+  void generalResult;
+}
+
+function _applyTimingInputOverrides(inputs: NonNullable<TimingPanelResult['inputs']>, next: Partial<SettingsOverrides>): void {
+  if (inputs.nextSubmissionDelaySeconds) {
+    next.nextSubmissionDelaySeconds = parseInt(inputs.nextSubmissionDelaySeconds.value, 10);
+  }
+  if (inputs.creditPollIntervalSeconds) {
+    next.creditPollIntervalSeconds = parseInt(inputs.creditPollIntervalSeconds.value, 10);
+  }
+  if (inputs.maxQueueSize) {
+    const v = parseInt(inputs.maxQueueSize.value, 10);
+    if (!isNaN(v) && v > 0) next.maxQueueSize = v;
+  }
+  if (inputs.creditFetchDelayMs) {
+    const v = parseInt(inputs.creditFetchDelayMs.value, 10);
+    if (!isNaN(v)) next.creditFetchDelayMs = Math.max(500, Math.min(15000, v));
+  }
+}
+
+async function _persistOverrideToggles(generalResult: GeneralPanelResult, timingResult: TimingPanelResult): Promise<void> {
+  const current = getSettingsOverrides() as SettingsOverrides;
+  const next: Partial<SettingsOverrides> = { ...current };
+
+  if (generalResult.toggles) {
+    next.enableCanceledCreditOverride = generalResult.toggles.enableCanceledCreditOverride?.checked ?? true;
+    next.enableWorkspaceStatusLabels = generalResult.toggles.enableWorkspaceStatusLabels?.checked ?? true;
+    next.enableWorkspaceHoverDetails = generalResult.toggles.enableWorkspaceHoverDetails?.checked ?? true;
+  }
+
+  if (timingResult.automationToggles) {
+    next.enableNextSubmissionDelay = timingResult.automationToggles.enableNextSubmissionDelay?.checked ?? true;
+    next.autoDetectDelay = timingResult.automationToggles.autoDetectDelay?.checked ?? true;
+    next.retryOnFailure = timingResult.automationToggles.retryOnFailure?.checked ?? true;
+    next.splitterAutoEnqueue = timingResult.automationToggles.splitterAutoEnqueue?.checked ?? true;
+  }
+
+  if (timingResult.inputs) {
+    _applyTimingInputOverrides(timingResult.inputs, next);
+  }
+
+
+
+  await saveSettingsOverrides(next);
+}
+
+function _applyXPathSettings(xpResult: XPathPanelResult): void {
+  for (const k in xpResult.inputs) {
+    CONFIG[k] = xpResult.inputs[k].value;
+  }
+  const pInp = document.getElementById('xpath-project-btn') as HTMLInputElement;
+  if (pInp) pInp.value = CONFIG.PROJECT_BUTTON_XPATH;
+  const prInp = document.getElementById('xpath-progress-bar') as HTMLInputElement;
+  if (prInp) prInp.value = CONFIG.PROGRESS_XPATH;
+  const wInp = document.getElementById('xpath-workspace-name') as HTMLInputElement;
+  if (wInp) wInp.value = CONFIG.WORKSPACE_XPATH;
+}
+
+function _applyTimingSettings(tmResult: TimingPanelResult): void {
+  for (const k in tmResult.inputs) {
+    const numericValue = parseInt(tmResult.inputs[k].value, 10);
+    if (!isNaN(numericValue) && numericValue >= 0) TIMING[k] = numericValue;
+  }
+}
+
+function _applyTaskNextSettings(tnResult: TaskNextPanelResult, taskNextDeps: TaskNextDeps): void {
+  for (const k in tnResult.inputs) {
+    const isNum = k !== 'buttonXPath' && k !== 'promptSlug';
+    if (isNum) {
+      const v = parseInt(tnResult.inputs[k].value, 10);
+      if (!isNaN(v)) taskNextState.settings[k] = v;
+    } else {
+      taskNextState.settings[k] = tnResult.inputs[k].value;
+    }
+  }
+  saveTaskNextSettings(taskNextDeps);
+}
+
+function _applyLoggingSettings(logResult: LoggingPanelResult): void {
+  const logUpdate: Partial<LogManagerConfig> = {
+    enabled: logResult.logToggles.enabled.checked,
+    consoleOutput: logResult.logToggles.consoleOutput.checked,
+    persistLogs: logResult.logToggles.persistLogs.checked,
+    activityLogUi: logResult.logToggles.activityLogUi.checked,
+    levels: {},
+  };
+  logResult.levelKeys.forEach(function(k: string) { logUpdate.levels![k] = logResult.levelToggles[k].checked; });
+  updateLogConfig(logUpdate);
+}
+
+function _saveConfigEdits(configResult: ConfigDbPanelResult, deps: SettingsDeps): void {
+  for (const ci of configResult.configInputs) {
+    deps.sendToExtension('PROJECT_CONFIG_UPDATE', {
+      project: 'macro-controller',
+      section: ci.section,
+      key: ci.key,
+      value: ci.input.value,
+      valueType: ci.valueType,
+    });
+  }
+}
+
+function _saveGeneralSettings(genResult: GeneralPanelResult, deps: SettingsDeps): void {
+  // Save custom display name to state + localStorage
+  const customName = (genResult.inputs.customDisplayName?.value || '').trim();
+  state.customDisplayName = customName;
+  try {
+    if (customName) {
+      localStorage.setItem('marco_custom_display_name', customName);
+    } else {
+      localStorage.removeItem('marco_custom_display_name');
+    }
+  } catch { /* localStorage unavailable */ } // allow-swallow: localStorage throws in private browsing or when disabled; custom display name is non-critical.
+
+  const newChatXPath = genResult.inputs.pasteTargetXPath.value;
+  if (newChatXPath) {
+    deps.sendToExtension('KV_SET', { key: 'chatbox_xpath_override', value: newChatXPath, projectId: '_global' });
+  }
+}
+
+// Suppress unused warnings — these are wired up at runtime
+void _applyXPathSettings;
+void _applyTimingSettings;
+void _applyTaskNextSettings;
+void _applyLoggingSettings;
+void _saveConfigEdits;
+void _saveGeneralSettings;

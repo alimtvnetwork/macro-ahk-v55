@@ -1,0 +1,20 @@
+{
+  "version": "4.147.0",
+  "branch": "release/v4.147.0",
+  "sourceBranch": "main",
+  "commit": "487870c0066f9515deb6a64fec47b229e1bc235d",
+  "tag": "v4.147.0",
+  "assets": [],
+  "changelog": [
+    "`standalone-scripts/prompts/13-next-tasks/prompt.md` rewritten verbatim to the user-supplied v2 body using `{{n}}` throughout (RULE 0, Definition of Done, output shape, must-follow blocks). Legacy `${N}` fully purged.",
+    "`.lovable/prompts/12-next-steps-v7.md` synced byte-identical to the canonical file.",
+    "`standalone-scripts/prompts/13-next-tasks/info.json`: `Version` 1.4.0 → 2.0.0, `ReplaceKey` `\"N\"` → `\"n\"`, `Title` and `SlugTemplate` updated to `{{n}}` shape, `TokenSyntaxNote` added.",
+    "`src/__tests__/next-tasks-prompt.e2e.test.ts` (11 tests) — locks canonical/mirror byte-identity, `{{n}}` presence, `${N}` purge, `info.ReplaceKey === \"n\"`, `Version \u003e= 2.0.0`, and substitution over a numeric matrix plus every `info.ReplaceValues` entry.",
+    "`npx vitest run src/__tests__/next-tasks-prompt.e2e.test.ts` — 11/11 passing.",
+    "Version-sync bump: 4.146.0 → 4.147.0 across manifest.json, src/shared/constants.ts, all standalone-scripts `instruction.ts`/`shared-state.ts`, and readme.md pins (17 files updated by `scripts/bump-version.mjs minor`)."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-18T18:24:23Z",
+  "isLatest": false
+}

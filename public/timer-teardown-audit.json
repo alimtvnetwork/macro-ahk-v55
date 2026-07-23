@@ -1,0 +1,192 @@
+{
+  "generatedAt": "2026-06-05T16:05:51.416Z",
+  "totalFindings": 31,
+  "findings": [
+    {
+      "file": "src/background/spa-reinject.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/components/options/monaco-js-intellisense.ts",
+      "installer": "\\bsetInterval\\s*\\(",
+      "installs": 2,
+      "teardowns": 0
+    },
+    {
+      "file": "src/components/options/monaco-js-intellisense.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 9,
+      "teardowns": 0
+    },
+    {
+      "file": "src/components/options/monaco-js-intellisense.ts",
+      "installer": "\\.addEventListener\\s*\\(",
+      "installs": 2,
+      "teardowns": 0
+    },
+    {
+      "file": "src/components/options/project-database/ErrorModal.tsx",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/components/options/recorder/recorder-export.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/components/popup/BootFailureBanner.tsx",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 4,
+      "teardowns": 0
+    },
+    {
+      "file": "src/components/popup/DependencyChainPanel.tsx",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/components/popup/InjectionCopyButton.tsx",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 2,
+      "teardowns": 0
+    },
+    {
+      "file": "src/components/popup/InjectionErrorPanel.tsx",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 2,
+      "teardowns": 0
+    },
+    {
+      "file": "src/components/popup/PopupFooter.tsx",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 3,
+      "teardowns": 0
+    },
+    {
+      "file": "src/components/popup/SessionCopyButton.tsx",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/content-scripts/message-relay.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/content-scripts/prompt-injector.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/hooks/use-onboarding.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/hooks/use-popup-actions.ts",
+      "installer": "\\.addEventListener\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/hooks/use-toast.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/lib/click-trail.ts",
+      "installer": "\\.addEventListener\\s*\\(",
+      "installs": 3,
+      "teardowns": 0
+    },
+    {
+      "file": "src/lib/condition-evaluators.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/lib/generate-llm-guide.ts",
+      "installer": "\\.addEventListener\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/options/sections/AuthHealthPanel.tsx",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/options/sections/DiagnosticsPanel.tsx",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/options/sections/ProjectEditor.tsx",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/options/sections/ProjectsSection.tsx",
+      "installer": "\\.addEventListener\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/platform/chrome-adapter.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/platform/preview-adapter.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/platform/preview-adapter.ts",
+      "installer": "\\.addEventListener\\s*\\(",
+      "installs": 2,
+      "teardowns": 0
+    },
+    {
+      "file": "src/popup/components/DebugPanel.tsx",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 2,
+      "teardowns": 0
+    },
+    {
+      "file": "src/popup/components/QuickActions.tsx",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/popup/components/ScriptsList.tsx",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/popup/components/SqliteBundleActions.tsx",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 2,
+      "teardowns": 0
+    }
+  ]
+}

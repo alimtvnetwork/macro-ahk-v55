@@ -1,0 +1,14 @@
+{
+  "Id": "default-read-memory",
+  "Title": "Read Memory (Enhanced)",
+  "Slug": "read-memory-enhanced",
+  "Version": "1.7.0",
+  "Author": "marco",
+  "Categories": [
+    "onboarding"
+  ],
+  "IsDefault": true,
+  "Order": 16,
+  "CreatedAt": "2026-05-14T00:00:00Z",
+  "UpdatedAt": "2026-07-20T00:00:00Z"
+}

@@ -1,0 +1,1 @@
+Files in `.lovable/memory/workflow` should follow a numeric naming convention, for example `01-name-of-the-file.md`, and folder size should be kept minimal. Plan subtasks under `.lovable/plans/subtasks/<parent>/` must also start with the numeric sequence, for example `01-scope.md`; never use `ss-` or `SS-` prefixes.

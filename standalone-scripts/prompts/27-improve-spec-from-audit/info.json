@@ -1,0 +1,14 @@
+{
+  "Id": "default-improve-spec-from-audit",
+  "Title": "Improve Spec From Audit ({{n}} Steps, Maximum Enforcement)",
+  "Slug": "improve-spec-from-audit",
+  "Version": "1.0.0",
+  "Author": "marco",
+  "Categories": [
+    "audit"
+  ],
+  "IsDefault": true,
+  "Order": 27,
+  "CreatedAt": "2026-07-20T00:00:00Z",
+  "UpdatedAt": "2026-07-20T00:00:00Z"
+}

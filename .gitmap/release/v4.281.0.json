@@ -1,0 +1,14 @@
+{
+  "version": "4.281.0",
+  "branch": "release/v4.281.0",
+  "sourceBranch": "main",
+  "tag": "v4.281.0",
+  "assets": [],
+  "changelog": [
+    "Route remaining vi.mock('prompt-loader') sites through buildPromptLoaderMock() to satisfy check-prompt-loader-mocks CI guard."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-19T00:00:00Z",
+  "isLatest": false
+}

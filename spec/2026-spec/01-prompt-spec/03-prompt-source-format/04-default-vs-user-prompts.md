@@ -1,0 +1,75 @@
+# T34 · Defaults vs user prompts — merge precedence
+
+**Created:** 2026-06-02
+
+A running Prompts feature typically merges **two** sources:
+
+1. **Defaults bundle** — read-only prompts shipped with the HostApp
+   (`isDefault: true`, deterministic ids `default-<slug>`).
+2. **User store** — prompts the End User created or edited
+   (`isDefault: false`).
+
+## Merge algorithm
+
+```
+final = []
+for each default D:
+    U = user.getBySlug(D.slug)
+    if U exists:
+        final.push(U)              # user override wins
+    else:
+        final.push(D)
+for each user prompt U where slug not in defaults:
+    final.push(U)
+sort final by (category, order, title)
+```
+
+## Rules
+
+1. **User overrides are by slug**, not by id. Editing a default prompt
+   creates a *new* user record with a *new* id but the *same* slug.
+2. **Defaults are never deleted.** "Delete" on a default record sets
+   a `hidden: true` flag in the user store; the merge skips hidden
+   defaults. Re-show by removing the flag.
+3. **Restoring a default** = delete the user override with the same slug.
+4. **Version drift:** if a shipped default's `version` is newer than
+   the user override's `version`, the UI MAY surface an "update
+   available" affordance, but MUST NOT auto-overwrite the override.
+5. **`createdAt` / `updatedAt`** on an override always reflect the
+   user's write, not the default's timestamps.
+
+## Why "by slug, not by id"
+
+Default ids are deterministic across installs (`default-next-tasks`),
+but user records are created with fresh UUIDs. Slug is the only stable
+key both sides agree on.
+
+## Acceptance
+
+- [ ] The implementation satisfies the `T34 · Defaults vs user prompts — merge precedence` contract in this file and the folder-level acceptance target: prompt source files round-trip through parse and emit without semantic drift.
+- [ ] Verification passes when `UT-source-001..008` passes, and `node scripts/audit/check-acceptance.mjs --root=spec/2026-spec` reports this file has a machine-checkable acceptance contract.
+
+<!-- audit: determinism+pitfalls footer -->
+
+## Determinism (MUST)
+
+- **MUST** keep `info.json` at the prompt folder root with exactly the keys defined in `02-info-json.md`; extra keys fail `schemas/prompt.schema.json`.
+- **MUST** read `prompt.md` body as UTF-8 with explicit BOM strip; trailing whitespace is preserved verbatim (paste-fidelity).
+- **MUST** import/export bundles as ZIP with `prompts-bundle.json` manifest validated by `schemas/prompts-bundle.schema.json` before any disk write.
+- **MUST** treat the `default/` folder as read-only at runtime; user edits clone into `user/` and never modify defaults in place.
+
+## Pitfalls / Counter-examples
+
+- ❌ Detecting prompt type by file extension. ✅ Read `info.json#kind` — the source of truth.
+- ❌ Auto-rewriting `info.json` with a "last modified" timestamp. ✅ See `mem://constraints/readme-txt-prohibitions` SP-1..SP-7 — no auto time stamps in source files.
+- ❌ Streaming a ZIP import directly into IndexedDB without schema validation. ✅ Validate the full bundle in memory first; a single bad entry rejects the whole import.
+- ❌ Trimming the prompt body to "clean up" whitespace. ✅ Body is paste-fidelity; trim only at the editor surface, never at the loader.
+- ❌ Hardcoding the import path. ✅ Use `STORAGE_PROMPTS_ROOT` constant.
+
+<!-- audit: numeric+xref uplift -->
+
+## Numeric Bounds (source-of-truth)
+
+- Default operation budget MUST be **5000 ms** (per `reference/05-runtime-defaults.md`).
+- Maximum retry attempts MUST be **3 items** before escalation.
+- See [folder index](../readme.md) for sibling specs and cross-references.

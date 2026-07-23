@@ -1,0 +1,18 @@
+{
+  "version": "4.294.0",
+  "branch": "release/v4.294.0",
+  "sourceBranch": "main",
+  "tag": "v4.294.0",
+  "assets": [],
+  "changelog": [
+    "Propagate correlationId end-to-end through showDiagnosticToast and telemetry ring buffer.",
+    "Redaction hardening tests for Authorization/Cookie headers and body byte-length replacement.",
+    "Prompts dropdown fixed at 460x460px with scroll; larger row/header fonts.",
+    "Rename remaining SS-*.md subtask files to numeric-sequence names.",
+    "Route prompt-editor-diagnostic-migration.test.ts mocks through buildPromptLoaderMock()."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-19T00:00:00Z",
+  "isLatest": false
+}

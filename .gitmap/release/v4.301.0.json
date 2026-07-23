@@ -1,0 +1,19 @@
+{
+  "version": "4.301.0",
+  "branch": "release/v4.301.0",
+  "sourceBranch": "main",
+  "commit": "2dfe1ea44c6c605cb0f6dacbfd3e780d2307b120",
+  "tag": "v4.301.0",
+  "assets": [],
+  "changelog": [
+    "`.github/workflows/release.yml`: new \"Preflight release readiness (auto-repair manifest)\" step runs `scripts/check-release-readiness.mjs` before the manifest verifier. Auto-generates `.gitmap/release/v\u003cVER\u003e.assets.json` when missing; halts the release job with a grouped `::error` and pointer to `.lovable/memory/workflow/19-release-runbook-and-failure-modes.md` if auto-repair cannot produce a clean manifest.",
+    "`scripts/verify-release-manifest.mjs`: on failure now prints the exact expected REQUIRED asset filenames (derived from the committed `v\u003cVER\u003e.assets.json`) plus four repair commands (regenerate manifest, rebuild+repackage, re-verify locally, re-run release workflow).",
+    "`.github/workflows/audit-releases.yml`: per-tag missing-asset failure now derives the expected filename list from `.gitmap/release/\u003cTAG\u003e.assets.json` (falls back to the built-in pattern list), writes a full job-summary block listing exact missing filenames, the full expected required list, and copy-pasteable repair commands (`generate-release-manifest.mjs`, `gh workflow run release.yml`, `supersededBy` escape hatch).",
+    "`.github/workflows/release-watcher.yml`: `release-asset-guard` now checks out the repo, prefers the descriptor as the source of truth for expected assets, and prints the exact expected list plus repair commands whenever the release page is empty or incomplete.",
+    "Version bump 4.300.0 to 4.301.0 across `manifest.json`, `version.json`, `src/shared/constants.ts`, `readme.md`, macro-controller, marco-sdk, xpath, payment-banner-hider, lovable-common, lovable-owner-switch, lovable-user-add, lovable-dashboard instruction files, and shared-state."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-19T19:36:46Z",
+  "isLatest": false
+}

@@ -1,0 +1,15 @@
+{
+  "detectiveOptions": {
+    "ts": {
+      "skipTypeImports": true,
+      "skipAsyncImports": true
+    },
+    "tsx": {
+      "skipTypeImports": true,
+      "skipAsyncImports": true
+    },
+    "es6": {
+      "skipAsyncImports": true
+    }
+  }
+}

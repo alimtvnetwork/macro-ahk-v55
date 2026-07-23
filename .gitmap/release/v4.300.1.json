@@ -1,0 +1,6 @@
+{
+  "version": "4.300.1",
+  "tag": "v4.300.1",
+  "supersededBy": "v4.300.0",
+  "note": "Tag created by an unrelated prompt-creator workflow; no extension assets. The active extension release remains v4.300.0. Auto-demoted to prerelease by .github/workflows/demote-incomplete-releases.yml so /releases/latest/download/* resolves to a complete tag."
+}

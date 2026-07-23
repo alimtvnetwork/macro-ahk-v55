@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.macro.json",
+  "compilerOptions": {
+    "types": [
+      "chrome"
+    ]
+  },
+  "include": [
+    "standalone-scripts/macro-controller/src/**/*.ts",
+    "standalone-scripts/types/**/*.ts",
+    "standalone-scripts/types/**/*.d.ts",
+    "standalone-scripts/shared-version.ts",
+    "version.json"
+  ],
+  "exclude": [
+    "node_modules",
+    "standalone-scripts/macro-controller/dist",
+    "standalone-scripts/macro-controller/src/**/__tests__/**"
+  ]
+}

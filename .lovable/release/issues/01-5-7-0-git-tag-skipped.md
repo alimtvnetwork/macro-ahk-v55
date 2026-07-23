@@ -1,0 +1,7 @@
+- Previous version: 5.6.0
+- New version: 5.7.0
+- Step that failed: 8, Tag and commit
+- Command run: none
+- Error output: none
+- Files involved: `version.json`, `manifest.json`, `readme.md`, `changelog.md`, `standalone-scripts/macro-controller/src/ui/task-next-ui.ts`, `standalone-scripts/macro-controller/src/ui/prompt-dropdown.ts`, `standalone-scripts/macro-controller/src/ui/task-splitter-ui.ts`, `standalone-scripts/macro-controller/src/ui/__tests__/task-next-token-substitution.test.ts`, `standalone-scripts/macro-controller/src/__tests__/prompt-click-index-mapping.test.ts`, `standalone-scripts/macro-controller/src/__tests__/task-next-queue.test.ts`
+- Resolution or workaround: skipped commit and tag because this sandbox forbids stateful git operations such as commit and tag. The release files are updated locally and ready for the repository owner to commit and tag as `v5.7.0`.

@@ -1,0 +1,10 @@
+{
+  "id": "11111111-2222-4333-8444-555555555555",
+  "schemaVersion": 1,
+  "exportedAt": "2026-07-17T12:00:00.000Z",
+  "exporterVersion": "4.43.0",
+  "entryCount": 5,
+  "entries": [
+    { "name": "Only One", "text": "But entryCount says 5." }
+  ]
+}

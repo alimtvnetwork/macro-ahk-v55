@@ -1,0 +1,15 @@
+{
+  "version": "4.358.0",
+  "branch": "release/v4.358.0",
+  "sourceBranch": "main",
+  "commit": "9a82d4e4079cd8e5bb387482965d38c65e7b86a5",
+  "tag": "v4.358.0",
+  "assets": [],
+  "changelog": [
+    "`src/components/options/recorder/use-recorder-visualisation-controller.ts`: split 244-line orchestrator hook into a 10-line composer plus three focused sub-hooks under `recorder/visualisation/`: `use-recorder-step-selection.ts` (auto-select + selector fetching effects), `use-recorder-step-mutations.ts` (rename/delete/description/tags/link handlers), `use-recorder-selftest-export.ts` (self-test runner + export). Every extracted function is under the 15-line cap; the top-level composer is under 15 lines. Zero behavioural change."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-20T08:51:32Z",
+  "isLatest": false
+}

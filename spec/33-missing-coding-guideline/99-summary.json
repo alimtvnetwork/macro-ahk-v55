@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "generated": "2026-07-17",
+  "generatedBy": "Plan-16 close-out + Plan-17 post-remediation rollup",
+  "source": [
+    "spec/33-missing-coding-guideline/00-inventory.md",
+    "spec/33-missing-coding-guideline/01..13-*.md",
+    "spec/33-missing-coding-guideline/99-backlog.json",
+    "spec/33-missing-coding-guideline/99-baselines.json",
+    "public/error-swallow-audit.json"
+  ],
+  "version": {
+    "root": "4.109.0",
+    "manifest": "4.109.0",
+    "readmePinned": "4.109.0"
+  },
+  "policy": {
+    "P0": "Silent failure, security risk, retry-policy breach, or blocks other refactors",
+    "P1": "Observability + lifecycle correctness; hides type errors; architectural rework",
+    "P2": "Style, structure, typing hygiene, mechanical prune"
+  },
+  "inventory": {
+    "prodTsFiles": 514,
+    "totalLoc": 73000,
+    "packages": [
+      "macro-controller",
+      "marco-sdk",
+      "lovable-common",
+      "lovable-dashboard",
+      "lovable-owner-switch",
+      "lovable-user-add",
+      "payment-banner-hider",
+      "xpath"
+    ]
+  },
+  "audits": [
+    { "id": "00-inventory", "metric": "prodTsFiles", "value": 514 },
+    { "id": "01-typescript-strictness", "metric": "anyInProd", "value": 0 },
+    { "id": "01-typescript-strictness", "metric": "unknownOccurrencesProd", "value": 660 },
+    { "id": "02-cross-language-style", "metric": "bannedIdentifierFiles", "value": 3 },
+    { "id": "03-file-folder-naming", "metric": "pascalCaseFilesInCore", "value": 1 },
+    { "id": "04-security-surface", "metric": "innerHTMLSinks", "value": 187 },
+    { "id": "04-security-surface", "metric": "newFunctionSites", "value": 1 },
+    { "id": "05-design-system-tokens", "metric": "hexLiteralsInUi", "value": 815 },
+    { "id": "05-design-system-tokens", "metric": "rgbLiteralsInUi", "value": 200 },
+    { "id": "06-logger-and-error-manage", "metric": "unauthorizedConsoleError", "value": 4 },
+    { "id": "06-logger-and-error-manage", "metric": "unannotatedSilentCatches", "value": 5 },
+    { "id": "07-timer-and-observer-teardown", "metric": "setIntervalBypassingRegistry", "value": 10 },
+    { "id": "07-timer-and-observer-teardown", "metric": "mutationObserversMissingPagehide", "value": 7 },
+    { "id": "07-timer-and-observer-teardown", "metric": "addEventListenerCount", "value": 143 },
+    { "id": "07-timer-and-observer-teardown", "metric": "removeEventListenerCount", "value": 48 },
+    { "id": "08-storage-key-centralization", "metric": "rawLocalStorageLiteralKeys", "value": 15 },
+    { "id": "08-storage-key-centralization", "metric": "authCriticalRawKeys", "value": 2 },
+    { "id": "09-test-with-features", "metric": "prodTestRatioAggregate", "value": 0.36 },
+    { "id": "09-test-with-features", "metric": "zeroCoveragePackages", "value": 3 },
+    { "id": "09-test-with-features", "metric": "uiTestCoverage", "value": 0.15 },
+    { "id": "10-cognitive-complexity", "metric": "filesOver1000Loc", "value": 3 },
+    { "id": "10-cognitive-complexity", "metric": "filesOver700Loc", "value": 12 },
+    { "id": "11-import-graph-cycles", "metric": "macroControllerCycles", "value": 0 },
+    { "id": "11-import-graph-cycles", "metric": "otherPackageCycles", "value": 0 },
+    { "id": "11-import-graph-cycles", "metric": "exportStarBarrels", "value": 3 },
+    { "id": "12-dead-code", "metric": "unusedExports", "value": 278 },
+    { "id": "13-unknown-usage-top30", "metric": "asUnknownAsDoubleCasts", "value": 71 }
+  ],
+  "backlog": {
+    "totals": { "items": 27, "P0": 10, "P1": 11, "P2": 6 },
+    "reference": "spec/33-missing-coding-guideline/99-backlog.json"
+  },
+  "errorSwallowAudit": {
+    "reference": "public/error-swallow-audit.json",
+    "generatorScript": "scripts/audit-error-swallow.mjs",
+    "totals": { "items": 20, "P0": 0, "P1": 18, "P2": 2 },
+    "byFile": [
+      { "file": "standalone-scripts/macro-controller/01-macro-looping.js", "count": 8, "note": "Bundle artifact; fixes land in TS sources below and disappear on rebuild." },
+      { "file": "standalone-scripts/macro-controller/src/queue-control/index.ts", "count": 1 },
+      { "file": "standalone-scripts/macro-controller/src/selected-workspaces-store.ts", "count": 1 },
+      { "file": "standalone-scripts/macro-controller/src/startup.ts", "count": 1 },
+      { "file": "standalone-scripts/macro-controller/src/ui/prompt-dropdown.ts", "count": 1 },
+      { "file": "standalone-scripts/macro-controller/src/ui/ui-updaters.ts", "count": 2 },
+      { "file": "standalone-scripts/macro-controller/src/visible-workspaces-store.ts", "count": 2 },
+      { "file": "src/components/options/ProjectGroupPanel.tsx", "count": 1 },
+      { "file": "src/test/setup.ts", "count": 1, "note": "Test teardown; candidate for allow-list." }
+    ]
+  },
+  "baselines": {
+    "reference": "spec/33-missing-coding-guideline/99-baselines.json",
+    "snapshotVersion": "v4.103.0",
+    "postRemediation": {
+      "macroControllerCycles": 0,
+      "otherPackageCycles": 0,
+      "unknownOccurrencesProd": 660,
+      "asUnknownAsDoubleCasts": 71,
+      "unusedExports": 278,
+      "strictFlagsEnabled": ["strict", "noImplicitOverride"]
+    }
+  },
+  "ciGates": [
+    { "script": "scripts/check-no-swallowed-errors.mjs", "purpose": "Fail on new silent catch above baseline." },
+    { "script": "scripts/check-swallow-baseline-monotonic.mjs", "purpose": "Baseline must only shrink." },
+    { "script": "scripts/audit-error-swallow.mjs", "purpose": "Emit public/error-swallow-audit.json for Options audit panel." },
+    { "script": "scripts/check-ts-prune.mjs", "purpose": "Unused-export ratchet." },
+    { "script": "scripts/check-unknown-usage.mjs", "purpose": "Ratchet unknown-in-prod count." },
+    { "script": "scripts/check-standalone-baselines.mjs", "purpose": "Enforce all baselines above." },
+    { "script": "scripts/check-manifest-version.mjs", "purpose": "manifest.json matches root version." },
+    { "script": "scripts/check-version-sync.mjs", "purpose": "All package.json files match root." },
+    { "script": "scripts/check-readme-version-pin.mjs", "purpose": "readme.md pin sites match root." },
+    { "script": "scripts/check-lovable-layout.mjs", "purpose": "`.lovable/` folder layout guard." }
+  ]
+}

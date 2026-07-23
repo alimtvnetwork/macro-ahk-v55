@@ -1,0 +1,132 @@
+# Step 02 — Four-Tier Storage Decision Matrix
+
+> Part of [`spec/2026-spec/03-db-and-sqlite-integration-with-chrome-extension/`](./readme.md). Previous: [`step-01-purpose-and-mindset.md`](./01-purpose-and-mindset.md).
+
+## Goal
+
+Give the implementer AI a **single matrix** that maps any data shape to exactly one of the four storage tiers, with the package name and a minimal code sample for each.
+
+## The four tiers
+
+| # | Tier | Package / API | Where it lives | Typical row size |
+|---|---|---|---|---|
+| 1 | **SQLite** (via sql.js) | [`sql.js`](https://www.npmjs.com/package/sql.js) + `sql-wasm.wasm` | In-memory DB persisted to `chrome.storage.local` blob (small) **or** OPFS file (large) — see step 17 | 10 B – 100 KB |
+| 2 | **IndexedDB** | Native (`indexedDB`); optional [`idb`](https://www.npmjs.com/package/idb) wrapper | Browser-managed object store, per-origin | 1 KB – many MB |
+| 3 | **`chrome.storage.local`** | `chrome.storage.local` (MV3 API) | Chrome-managed JSON KV, per-extension | < 8 KB per key |
+| 4 | **`localStorage`** | Native `localStorage` (DOM contexts only) | Per-origin synchronous KV | < 1 KB per key |
+
+## Decision matrix
+
+| Data shape | Read frequency | Survives browser cleanup? | Tier | Why |
+|---|---|---|---|---|
+| Relational rows (joins, indexes, aggregates) | Any | Yes (with persistence) | **SQLite** | Only tier that supports SQL, joins, prepared statements |
+| Append-only logs / audit trail | High write, low read | Yes | **SQLite** (`session-log` table — step 35) | Bind safety + retention/prune SQL |
+| Large blobs (script source, namespace bundles) | Cold-start critical | No, but rebuildable | **IndexedDB** | No JSON serialization overhead; GB-scale quota |
+| Cached fetch responses tagged by version | High | No, rebuildable on update | **IndexedDB** (step 23) | Structured clone + version guard |
+| Small JSON config (settings, last-used tab) | Medium | Yes | **`chrome.storage.local`** | Survives cleanup; synced across popup/options/background |
+| Cross-context UI state (popup ↔ options) | Medium | Yes | **`chrome.storage.local`** | Built-in `onChanged` event |
+| One-tab ephemeral UI state (collapsed panel, scroll position) | High | No | **`localStorage`** | Synchronous, scoped to DOM context |
+| Auth tokens / secrets | Any | n/a | **None of the above** — use `chrome.storage.session` or in-memory + Token Bridge | See [`mem://auth/token-retrieval-strategy`] |
+| Replay-quality session logs | Always | Yes | **SQLite + OPFS** (step 35) | Cannot fit in `chrome.storage.local`; OPFS gives file-grade durability |
+
+## Hard rules (enforced by CI in step 39)
+
+1. **No logs in `localStorage`.** Logs go to SQLite (step 35). Violations are caught by the storage-audit script in step 39.
+2. **No auth tokens in `localStorage` or IndexedDB.** Use `chrome.storage.session` or in-memory token bridge.
+3. **No blobs > 8 KB in `chrome.storage.local`.** Use IndexedDB (step 21) or SQLite (step 17).
+4. **No `JSON.stringify(blob)` into IndexedDB.** Store the blob directly; structured clone is free.
+5. **No remote fetch of `sql-wasm.wasm`.** Bundle locally (step 8). MV3 CSP blocks remote wasm anyway.
+
+## Minimal code sample per tier
+
+### Tier 1 — SQLite (full lifecycle in step 10)
+
+```ts
+// src/background/db-manager.ts
+import initSqlJs, { type Database } from "sql.js";
+
+const SQL = await initSqlJs({
+    locateFile: (file) => chrome.runtime.getURL(`wasm/${file}`),
+});
+const db: Database = new SQL.Database();
+db.run("CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v TEXT)");
+db.run("INSERT OR REPLACE INTO kv (k, v) VALUES (?, ?)", ["theme", "dark"]);
+const [{ values }] = db.exec("SELECT v FROM kv WHERE k = ?", ["theme"]);
+```
+
+### Tier 2 — IndexedDB (wrapper in step 22)
+
+```ts
+const req = indexedDB.open("ext-cache", 1);
+req.onupgradeneeded = () => req.result.createObjectStore("scripts", { keyPath: "url" });
+req.onsuccess = () => {
+    const tx = req.result.transaction("scripts", "readwrite");
+    tx.objectStore("scripts").put({ url: "/a.js", code: "…", version: "3.50.0" });
+};
+```
+
+### Tier 3 — `chrome.storage.local`
+
+```ts
+await chrome.storage.local.set({ theme: "dark", lastTab: 42 });
+const { theme } = await chrome.storage.local.get("theme");
+chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && changes.theme) { /* propagate */ }
+});
+```
+
+### Tier 4 — `localStorage` (DOM contexts only — popup / options / content scripts; **never** the service worker)
+
+```ts
+localStorage.setItem("ui:panel:collapsed", "1");
+const collapsed = localStorage.getItem("ui:panel:collapsed") === "1";
+```
+
+## Error model (forward references)
+
+| Tier | Error class | Logger tag | User-visible surface |
+|---|---|---|---|
+| SQLite | `BindError`, `MigrationError` (step 31) | `SQLITE_BIND`, `MIGRATION` (step 32) | Errors panel row (step 33) + `BootFailureBanner` for init (step 34) |
+| IndexedDB | `QuotaError`, `OpenError` (step 31) | `INDEXEDDB` (step 32) | Errors panel row (step 33) |
+| `chrome.storage.local` | `QuotaError` (step 31) | `CHROME_STORAGE` (step 32) | Errors panel row + storage-auto-pruner toast (step 26) |
+| `localStorage` | `QuotaError` (step 31) | `LOCALSTORAGE` (step 32) | Errors panel row only |
+
+## Acceptance
+
+- [ ] Implementer AI can answer "which tier for X data?" using only this table.
+- [ ] All five hard rules are enforced by automated checks (step 39).
+- [ ] Each minimal code sample compiles in isolation with the packages from step 7 installed.
+
+## Cross-references
+
+- Previous: [`step-01-purpose-and-mindset.md`](./01-purpose-and-mindset.md)
+- Next: [`step-03-quota-persistence-eviction.md`](./03-quota-persistence-eviction.md)
+- Flowchart: [`step-04-choose-a-tier-flowchart.md`](./04-choose-a-tier-flowchart.md)
+- MV3 constraints: [`step-05-mv3-constraints.md`](./05-mv3-constraints.md)
+- Error model: [`step-31-error-model.md`](./31-error-model.md)
+
+<!-- audit: determinism+pitfalls footer -->
+
+## Determinism (MUST)
+
+- **MUST** bind every numeric default (timeouts, quotas, retention, byte caps, chunk sizes) to a named constant declared in `spec/2026-spec/01-prompt-spec/reference/05-runtime-defaults.md` or a local `reference/*-defaults.md` file. Inline literals are rejected.
+- **MUST** keep `chrome.storage.local` per-key payloads ≤ `CHROME_STORAGE_LOCAL_PER_KEY_BYTES` (8 192) and aggregate writes ≤ `CHROME_STORAGE_LOCAL_TOTAL_BYTES` (10 485 760). Larger payloads route to IndexedDB or SQLite.
+- **MUST** await `navigator.storage.persist()` once at boot, log the resolved boolean via `RiseupAsiaMacroExt.Logger.info`, and surface `{ persisted, usage, quota }` in diagnostics — no fire-and-forget.
+- **MUST** classify every DB failure with a stable `Reason` code (see `31-error-model.md`) plus `ReasonDetail`, and route it through `Logger.error` — never `console.error` and never silently swallow.
+
+## Pitfalls / Counter-examples
+
+- ❌ `catch (e) { /* ignored */ }` around `db.exec()` — masks corruption; the error-swallow audit (`public/error-swallow-audit.json`) will fail CI. ✅ Re-throw after `Logger.error` with full SQL + bind context.
+- ❌ Calling `db.run` on a new-tab/blank URL because the auto-injector did not gate the URL. ✅ Use `isNewTabOrBlankUrl()` from `src/shared/url-utils.ts` before scheduling any DB-bound work.
+- ❌ Hardcoding `Asia/Kuala_Lumpur` (or any zone) when persisting timestamps. ✅ Store `Date.now()` as UTC ms; render with `Intl.DateTimeFormat(undefined, { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone })`.
+- ❌ Treating `chrome.storage.local.set` as synchronous and reading back in the next line. ✅ Always `await` the Promise (MV3) and verify the write via `storage.local.get` in tests.
+- ❌ Retrying a failed migration with exponential backoff. ✅ Fail fast per `mem://constraints/no-retry-policy` — surface a Boot Failure Banner (`34-boot-failure-banner.md`) and require user action.
+
+<!-- audit: uplift-to-100 footer -->
+
+## Audit Anchors (source-of-truth)
+
+- Implementations MUST honor every numeric default declared in [runtime defaults](../01-prompt-spec/reference/05-runtime-defaults.md); see also [related](readme.md).
+- Runtime-default values MUST be read from named constants in `reference/05-runtime-defaults.md`, not copied into prose examples.
+- Any deviation MUST raise a spec issue before code is shipped (`60 s` review window minimum).
+

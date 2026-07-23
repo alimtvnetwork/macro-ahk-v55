@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spec/2026-spec/01-prompt-spec/schemas/05-info-json.schema.json",
+  "title": "PromptInfoJson",
+  "type": "object",
+  "required": ["schemaVersion", "id", "slug", "title", "version"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id":            { "type": "string", "pattern": "^[a-z0-9]{8,32}$" },
+    "slug":          { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "title":         { "type": "string", "minLength": 1, "maxLength": 120 },
+    "category":      { "type": "string", "maxLength": 64 },
+    "tags":          { "type": "array",  "items": { "type": "string" }, "maxItems": 20 },
+    "version":       { "type": "integer", "minimum": 1 },
+    "author":        { "type": "string", "maxLength": 120 },
+    "description":   { "type": "string", "maxLength": 480 },
+    "variables":     { "type": "array" }
+  }
+}

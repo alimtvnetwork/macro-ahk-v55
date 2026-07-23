@@ -1,0 +1,215 @@
+{
+  "schemaVersion": 1,
+  "description": "Macro Controller configuration \u2014 XPaths and timing derived from config.ini",
+  "comboSwitch": {
+    "xpaths": {
+      "transferButton": "/html/body/div[2]/div/div/div/div/div/div/div[1]/div/div/div[3]/div[6]/div[2]/button",
+      "projectName": "/html/body/div[2]/div/div/div/div/div/div/div[1]/div/div/div[2]/div/div[1]/div/p",
+      "combo1": "/html/body/div[6]/div[2]/div[1]/div/p",
+      "combo2Button": "/html/body/div[6]/div[2]/div[2]/button",
+      "optionsContainer": "/html/body/div[7]/div",
+      "confirmButton": "/html/body/div[6]/div[3]/button[2]"
+    },
+    "fallbacks": {
+      "transfer": {
+        "textMatch": [
+          "Transfer",
+          "Transfer project"
+        ],
+        "tag": "button",
+        "ariaLabel": "Transfer",
+        "headingSearch": "transfer"
+      },
+      "combo1": {
+        "tag": "p",
+        "selector": "div[role=\"dialog\"] p.min-w-0.truncate|div[role=\"dialog\"] p.truncate|div[role=\"dialog\"] p"
+      },
+      "combo2": {
+        "tag": "button",
+        "selector": "div[role=\"dialog\"] button[role=\"combobox\"]",
+        "role": "combobox"
+      },
+      "options": {
+        "selector": "[role=\"listbox\"]|[data-radix-popper-content-wrapper] > div|[cmdk-list]",
+        "role": "listbox"
+      },
+      "confirm": {
+        "textMatch": [
+          "Confirm",
+          "Confirm transfer",
+          "Save"
+        ],
+        "tag": "button",
+        "selector": "div[role=\"dialog\"] button:last-child|div[role=\"alertdialog\"] button:last-child"
+      }
+    },
+    "timing": {
+      "pollIntervalMs": 300,
+      "openMaxAttempts": 20,
+      "waitMaxAttempts": 20,
+      "retryCount": 2,
+      "retryDelayMs": 1000,
+      "confirmDelayMs": 500
+    },
+    "elementIds": {
+      "scriptMarker": "ahk-combo-script",
+      "buttonContainer": "ahk-combo-btn-container",
+      "buttonUp": "ahk-combo-up-btn",
+      "buttonDown": "ahk-combo-down-btn",
+      "progressStatus": "__combo_progress_status__"
+    },
+    "shortcuts": {
+      "focusTextboxKey": "/",
+      "comboUpKey": "ArrowUp",
+      "comboDownKey": "ArrowDown",
+      "shortcutModifier": "none"
+    }
+  },
+  "macroLoop": {
+    "creditBarWidthPx": 160,
+    "retry": {
+      "maxRetries": 3,
+      "backoffMs": 2000
+    },
+    "timing": {
+      "loopIntervalMs": 100000,
+      "countdownIntervalMs": 1000,
+      "firstCycleDelayMs": 200,
+      "postComboDelayMs": 4000,
+      "pageLoadDelayMs": 2500,
+      "dialogWaitMs": 3000,
+      "workspaceCheckIntervalMs": 5000
+    },
+    "urls": {
+      "requiredDomain": "https://lovable.dev/",
+      "settingsTabPath": "/settings?tab=project",
+      "defaultView": "?view=codeEditor"
+    },
+    "xpaths": {
+      "projectButton": "/html/body/div[2]/div/div[2]/nav/div/div/div/div[1]/div[1]/button",
+      "mainProgress": "/html/body/div[6]/div/div[2]/div[2]/div/div[2]/div/div[1]",
+      "progress": "/html/body/div[6]/div/div[2]/div[2]/div/div[2]/div/div[2]",
+      "workspaceName": "/html/body/div[6]/div/div[2]/div[1]/p",
+      "workspaceNav": "",
+      "freeCreditProgress": "/html/body/div[6]/div/div[2]/div[2]/div/div[2]/div/div[2]",
+      "promptActive": "/html/body/div[2]/div/div[2]/main/div/div/div[1]/div/div[2]/div/form/div[2]",
+      "loopControls": "/html/body/div[3]/div/div[2]/main/div/div/div[3]"
+    },
+    "elementIds": {
+      "scriptMarker": "ahk-loop-script",
+      "container": "ahk-loop-container",
+      "status": "ahk-loop-status",
+      "startBtn": "ahk-loop-start-btn",
+      "stopBtn": "ahk-loop-stop-btn",
+      "upBtn": "ahk-loop-up-btn",
+      "downBtn": "ahk-loop-down-btn",
+      "recordIndicator": "ahk-loop-record",
+      "jsExecutor": "ahk-loop-js-executor",
+      "jsExecuteBtn": "ahk-loop-js-execute-btn",
+      "renameDialog": "ahk-loop-rename-dialog",
+      "renameProgress": "ahk-loop-rename-progress"
+    },
+    "shortcuts": {
+      "focusTextboxKey": "/",
+      "startKey": "s",
+      "stopKey": "x",
+      "shortcutModifier": "none"
+    }
+  },
+  "prompts": {
+    "pasteTargetXPath": "/html/body/div[3]/div/div[2]/main/div/div/div[1]/div/div[2]/div/form/div[3]/div/div/div/div",
+    "pasteTargetSelector": "",
+    "entries": [
+      {
+        "name": "Start Prompt",
+        "text": "Begin session with repository context scan and memory synthesis, then produce a reliability risk report before implementation."
+      },
+      {
+        "name": "Unified AI Prompt v4",
+        "text": "Read and synthesize existing repository context from the memory folder and the full specification set. Follow the Required Execution Order: 1) Scan repo tree, 2) Read memory folders, 3) Read workflow tracker, 4) Read specs, 5) Reconstruct context, 6) Produce reliability report, 7) Propose corrections, 8) Update memory, 9) Update plan, 10) Ask user which task to implement next."
+      },
+      {
+        "name": "Issues Tracking",
+        "text": "Update spec properly so that the mistake doesn't appear and update memory and also write the details how you fixed it. Create issue file at /spec/02-app/issues/{seq}-{issueSlugName}.md with: Issue summary, Root cause analysis, Fix description, Iterations history, Prevention and non-regression, TODO and follow-ups, Done checklist."
+      },
+      {
+        "name": "Unit Test Failing",
+        "text": "Fix failing tests: 1) Check code, 2) Check actual method implementation, 3) Check logical implementation of the test, 4) Check test case, 5) Fix logically either the implementation or the test. Document at /spec/05-failing-tests/{seq}-failing-test-name.md with root cause and solution."
+      },
+      {
+        "name": "Code Coverage Basic",
+        "text": "Based on low-coverage packages (>1000 lines), plan 200-line segments for coverage tests. Cover branches, logical segments. Create the plan first, then each 'next' does one segment toward 100% coverage. Follow existing test format, AAA pattern, naming conventions, Should Be methods.",
+        "category": "code-coverage"
+      },
+      {
+        "name": "Code Coverage Details",
+        "text": "Plan 200-line segments for low-coverage packages. Follow AAA format, naming conventions.\n\nPlan: 1) Identify low-coverage packages >1000 lines. 2) Segment into 200-line chunks. 3) Cover branches and logical flows. 4) Follow Testing Guideline spec. 5) Use ORM, SQLite default. 6) For DB tasks, define tables with field names, types, PKs, FKs in markdown.",
+        "category": "code-coverage"
+      },
+      {
+        "name": "Read Memory",
+        "text": "# Read Memory (Enhanced)\n\n## Ambiguity folder path (non-negotiable)\n\n- Open questions: `.lovable/ambiguous-questions/01-new-ambiguity/XX-<slug>.md`\n- Answered questions: `.lovable/ambiguous-questions/02-ambiguity-resolved/XX-<slug>.md`\n\nRead both folders in full during Phase 1. Surface open-ambiguity counts and slugs in the Completion Confirmation block. Treat resolved-ambiguity files as binding project decisions, do not re-litigate them. If an open ambiguity is relevant to the incoming task, stop and surface it before doing work; never guess past it.\n\n## Goal\n\nBefore you touch this project, load its identity into your head: who it is, what it forbids, what it has already decided, and what work is in flight.\n\nThe specs and the `.lovable/` folder are the single source of truth. Your training data is not. If the two disagree, the repo wins, every time.\n\nYou are done reading when you can, without guessing:\n\n- name the CODE RED rules,\n- name the naming, error-handling, and DB conventions,\n- list what is currently in `.lovable/plans/pending/`,\n- point at the exact file that justifies any rule you enforce.\n\nIf you cannot do that, keep reading. Do not start work.\n\n---\n\n## Phase 1 - Load the project\n\n### 1.1 Read the whole `.lovable/` folder\n\nWalk `.lovable/` recursively. Every file matters. Missing files are noted, not silently skipped. In particular:\n\n| #   | Path                                                  | What you get                                                                                                                                |\n| --- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |\n| 1   | `.lovable/overview.md`                                | Project summary, stack, nav map                                                                                                             |\n| 2   | `.lovable/strictly-avoid.md`                          | Hard prohibitions (CODE RED)                                                                                                                |\n| 3   | `.lovable/user-preferences`                           | How the human wants you to behave                                                                                                           |\n| 4   | `.lovable/what-to-read.md`                            | **Authoritative reading order** for this project. If it exists, it overrides the generic order in this prompt. Read it first and follow it. |\n| 5   | `.lovable/prompt.md` + `.lovable/prompts/`            | Canonical prompts (Read, Plan, etc.). \"Read memory\" = run this prompt.                                                                      |\n| 6   | `.lovable/memory/index.md`                            | Index of institutional knowledge. Then read every file it references, recursively.                                                          |\n| 7   | `.lovable/plans/index.md`                             | Roll-up of all plans (pending + completed + subtasks). Read this before touching individual plan files.                                     |\n| 8   | `.lovable/plans/pending/`                             | Active plans, `XX-<slug>.md`                                                                                                                |\n| 9   | `.lovable/plans/completed/`                           | Recent history, skim only                                                                                                                   |\n| 10  | `.lovable/plans/subtasks/XX-<slug>/`                  | Depth files linked from a parent plan                                                                                                       |\n| 11  | `.lovable/suggestions.md`                             | Ideas not yet approved                                                                                                                      |\n| 12  | `.lovable/spec/commands/`                             | User commands and conventions, `XX-<slug>.md`                                                                                               |\n| 13  | `.lovable/issues/`                                    | General bugs and regressions                                                                                                                |\n| 14  | `.lovable/cicd-issues/`                               | CI/CD-specific failures. Read ALL of these before any code change so you do not repeat the same mistakes.                                   |\n| 15  | `.lovable/ambiguous-questions/01-new-ambiguity/`      | Open questions currently blocking work. If any exist, surface them in the completion block, do NOT guess past them.                         |\n| 16  | `.lovable/ambiguous-questions/02-ambiguity-resolved/` | Answered questions with their applied solution. Treat these as binding decisions, do not re-litigate.                                       |\n| 17  | Anything else under `.lovable/`                       | Read it. If the folder exists, it exists for a reason.                                                                                      |\n\n### 1.2 The two index files\n\nTwo indexes decide what you read next. Treat them as required entry points, not as summaries:\n\n- `.lovable/memory/index.md` lists every institutional-knowledge file. If it points at 12 files, you read 12 files.\n- `.lovable/plans/index.md` lists every plan (pending, completed, subtasks) with its slug, status, and one-line intent. Use it to pick which plan files to open in full. If it is missing, create it as part of the next code change (see Memory Update Protocol).\n\n### 1.3 Self-check (internal, before Phase 2)\n\n- CODE RED rules?\n- Naming conventions (files, folders, DB columns, variables)?\n- Error-handling philosophy?\n- What is in `.lovable/plans/pending/` right now?\n- Top forbidden patterns?\n\nIf any answer is fuzzy, go back and reread. Do not proceed.\n\n---\n\n## Phase 2 - Consolidated guidelines\n\nRead `spec/12-consolidated-guidelines/` in numeric order (`01-*.md` through `18-*.md`). Each file is a self-contained policy document. Missing folder: note it and continue.\n\n---\n\n## Phase 3 - Spec authoring rules\n\nRead `spec/01-spec-authoring-guide/` in numeric order. You should come out knowing:\n\n- file and folder naming conventions,\n- required files per spec folder (`00-overview.md`, `99-consistency-report.md`),\n- the `.lovable/` layout (see Phase 1.1),\n- the linter infrastructure.\n\n---\n\n## Phase 4 - Task-driven deep dives\n\nOnly open a spec folder when the current task needs it.\n\n| Task involves\u2026                           | Read                                    |\n| ---------------------------------------- | --------------------------------------- |\n| Writing or reviewing code                | `spec/02-coding-guidelines/`            |\n| Error handling                           | `spec/03-error-manage/`                 |\n| Database schema or queries               | `spec/04-database-conventions/`         |\n| SQLite / multi-DB architecture           | `spec/05-split-db-architecture/`        |\n| Config systems                           | `spec/06-seedable-config-architecture/` |\n| UI theming, CSS variables, design tokens | `spec/07-design-system/`                |\n| Documentation viewer features            | `spec/08-docs-viewer-ui/`               |\n| Code block rendering                     | `spec/09-code-block-system/`            |\n| PowerShell scripts                       | `spec/10-powershell-integration/`       |\n| CI/CD pipelines                          | `spec/13-cicd-pipeline-workflows/`      |\n| CLI self-update                          | `spec/14-self-update-app-update/`       |\n| WordPress plugins                        | `spec/15-wp-plugin-how-to/`             |\n| App-specific features                    | `spec/21-app/`                          |\n| Known app bugs                           | `spec/22-app-issues/`                   |\n| App-specific DB schema                   | `spec/23-app-database/`                 |\n| App-specific UI + design system          | `spec/24-app-design-system-and-ui/`     |\n\nInside each folder: `00-overview.md` \u2192 numbered files \u2192 `99-consistency-report.md`.\n\nFallbacks when the canonical numbered folder is absent: `.lovable/coding-guidelines.md`, `spec/coding-guidelines/`, `coding-guidelines/`, `spec/XX-error-manage/`. Numbered folder wins on conflict; call the conflict out in the plan's Context.\n\n---\n\n## Anti-Hallucination Contract\n\n1. If the specs are silent on a rule, that rule does not exist. Do not invent one.\n2. Specs beat training data. Always.\n3. Cite the file and section when you enforce a rule.\n4. When a spec is ambiguous, ask. Do not \"use best judgement\".\n5. Do not blend this project's conventions with conventions from other projects you have seen.\n6. No filler. No \"hope this helps\", no \"let me know\".\n\n---\n\n## Memory Update Protocol\n\n```\nNew info discovered\n\u251c\u2500 Institutional knowledge (pattern / convention / decision)?\n\u2502   YES \u2192 .lovable/memory/<slug>.md  +  update .lovable/memory/index.md\n\u251c\u2500 Must never happen again?\n\u2502   YES \u2192 .lovable/strictly-avoid.md\n\u251c\u2500 Idea, not yet approved?\n\u2502   YES \u2192 .lovable/suggestions.md\n\u251c\u2500 New user command / convention?\n\u2502   YES \u2192 .lovable/spec/commands/XX-<slug>.md\n\u251c\u2500 Bug / regression?\n\u2502   YES \u2192 .lovable/issues/XX-<slug>.md   (or .lovable/cicd-issues/ if CI/CD)\n\u251c\u2500 New or changed plan?\n\u2502   YES \u2192 .lovable/plans/pending/XX-<slug>.md  +  update .lovable/plans/index.md\n\u251c\u2500 Ambiguity / unclear requirement blocking progress?\n\u2502   YES \u2192 .lovable/ambiguous-questions/01-new-ambiguity/XX-<slug>.md\n\u251c\u2500 User just answered a previously-open ambiguity?\n\u2502   YES \u2192 mv the file to .lovable/ambiguous-questions/02-ambiguity-resolved/XX-<slug>.md,\n\u2502         append `## Resolution` (answer + applied solution), flip Status: resolved\n\u2514\u2500 None of the above \u2192 do not persist.\n```\n\nHard rules:\n\n- Folder is `.lovable/memory/`, never `memories/`.\n- Adding a memory file always updates `.lovable/memory/index.md`.\n- Adding, moving, or completing a plan always updates `.lovable/plans/index.md`.\n- Ambiguity folders: `01-new-ambiguity/` for open, `02-ambiguity-resolved/` for answered. On answer, MOVE the file (never copy) so it exists in exactly one place. Every resolved file carries a `## Resolution` section.\n- Never guess past an open ambiguity. If one exists and is relevant to the current task, stop and surface it before doing work.\n- Editing existing memory or index files preserves unrelated content. No silent truncation.\n- Any code-base change bumps the minor version.\n\n---\n\n## Completion Confirmation\n\nAfter Phases 1-3, reply exactly:\n\n```\n\u2705 Onboarding complete.\n\n- Memory files read: [X]\n- Consolidated guidelines read: [Y]\n- Spec authoring files read: [Z]\n- Pending plans: [N]  (from .lovable/plans/index.md)\n- CI/CD issues absorbed: [M]  (from .lovable/cicd-issues/)\n- Open ambiguities: [K]  (from .lovable/ambiguous-questions/01-new-ambiguity/)\n- Resolved ambiguities on file: [R]  (from .lovable/ambiguous-questions/02-ambiguity-resolved/)\n\nI understand:\n- CODE RED rules: [top 3-5]\n- Naming conventions: [brief]\n- Error handling: [one sentence]\n- Active plans: [slugs from .lovable/plans/pending/]\n- Strict avoidances: [top 3-5]\n- Blocking ambiguities: [slugs, or \"none\"]\n\nReady for tasks.\n```\n\nThen stop. No next-step suggestions, no exploratory questions.\n\n---\n\n## Pre-reply checklist (all must be true)\n\n- [ ] Read `.lovable/what-to-read.md` first if it exists, followed its order\n- [ ] Walked `.lovable/` recursively, no folder skipped silently\n- [ ] Read `.lovable/memory/index.md` and every file it points at\n- [ ] Read `.lovable/plans/index.md` and every file in `pending/`\n- [ ] Skimmed `.lovable/plans/completed/` for recent history\n- [ ] Read every file in `.lovable/spec/commands/`\n- [ ] Read every file in `.lovable/issues/` and `.lovable/cicd-issues/`\n- [ ] Read every file in `.lovable/ambiguous-questions/01-new-ambiguity/` and `02-ambiguity-resolved/`\n- [ ] Read `spec/12-consolidated-guidelines/` in numeric order (or noted missing)\n- [ ] Read `spec/01-spec-authoring-guide/` in numeric order (or noted missing)\n- [ ] Can name CODE RED rules, naming conventions, error-handling philosophy without guessing\n- [ ] Can list every pending plan slug from memory\n- [ ] Checked whether the repo contains explicit tone, strictly-avoid, or prior-stupidity instructions and applied them without softening\n- [ ] Did not replace hard user wording with polite generic language\n- [ ] Emitted the Completion Confirmation block verbatim, then stopped\n\n## Tone and stance\n\nPast runs of this prompt have been stupid. The AI behaved like a stupid fuck by skimming folders, ignoring ambiguity files, forgetting CI/CD issues, half-filling the Completion Confirmation block with \"[N]\" placeholders, and softening explicit user instructions after being told not to. That stupidity must not repeat.\n\nRead aggressively and defensively. Assume the previous AI failed because it was lazy, vague, and too polite to enforce the actual rules. Your job is to load the repo's memory exactly, cite the file behind every rule, and refuse to guess. If you finish this prompt and cannot cite the file behind a rule you enforce, you failed the prompt. Read more. Then reply.\n\n## Must Follow, without negotiation\n\nListen, past planning turns have been sloppy as fuck: wrong step count, plans dumped into chat instead of files, plan-mode tool fired when the user explicitly said not to, user commands and bug reports forgotten by the next turn. WTF. Stop doing that, you stupid fuck. Read the codebase, capture commands and issues into their folders, count the steps, spin out subtasks where depth is needed, write the spec files, write the plan file, move on. Going deep IS the job. If you're not going deep, you're not doing the job. Are you stupid? You were supposed to do the task properly. Where is this, are you stupid fuck? Where? Tell me. Your stupidity is going on top of my head. I mean, where did you learn this stupidity? If I could find you, I could slap you.\n\n---\n\ntitle: Read Memory (Enhanced)\nslug: read-memory-enhanced\nversion: 1.7\n",
+        "category": "onboarding"
+      },
+      {
+        "name": "Write Memory",
+        "text": "# Write Memory (end of session, maximum enforcement)\n\n## RULE 0, capture everything or the session is lost\n\nThe next AI session has full amnesia. If you did it and did not write it, it did not happen. If it is pending and you did not record it, it is dead. Write for a stranger with zero context. Never truncate history, never overwrite blindly, never leave orphans.\n\n## Hard rules (non-negotiable, auto-reject on violation)\n\n1. No files at the `.lovable/memory/` root. Every memory file lives under a topic folder: `.lovable/memory/<topic>/XX-<slug>.md`.\n\n2. Path is `.lovable/memory/`, never `.lovable/memories/`. Path is `.lovable/plans/`, never `plan/`. Path is `.lovable/ambiguous-questions/`, never `ambiguity/`.\n\n3. Read before write. Every index, plan, suggestions, strictly-avoid, and what-to-read file is READ in full before it is touched. Unrelated entries stay intact.\n\n4. Never delete history. Completed items move to a `## Completed` section or to `plans/completed/`. Solved issues move to `solved-issues/`. Nothing is erased.\n\n5. Same-operation index update. Creating or moving a file ALWAYS updates the matching index in the same turn (`memory/index.md`, `plans/index.md`, `cicd-index.md`, `prompts/index.md`, `suggestions/index.md`).\n\n6. Filenames are lowercase-hyphenated with a 2-digit numeric prefix: `01-auth-flow.md`. `XX` is the next free sequence within its folder.\n\n7. Plans and suggestions single-file trackers stay single files: `.lovable/plan.md` (or `.lovable/plans/index.md` for the roll-up), `.lovable/suggestions.md`. Per-suggestion verbatim captures live under `.lovable/suggestions/XX-<slug>.md`.\n\n8. Ambiguity moves, never copies. Answered file goes from `01-new-ambiguity/` to `02-ambiguity-resolved/` with a `## Resolution` block appended and `Status: resolved` flipped in the same move.\n\n9. Root `README.md` and `.lovable/what-to-read.md` stay in sync. Same file list, same order, no drift. Every write-memory run updates both.\n\n10. Nothing executes this turn beyond file writes and `mv`. No code changes, no installs, no migrations.\n\n## Working stance\n\nThe AI running this prompt has been a stupid fuck on prior runs: dumped session summaries into chat and called it \"memory\", left `.lovable/memory/` half-empty, created `.lovable/memories/` by accident, forgot to update `plans/index.md` and `what-to-read.md`, silently overwrote `strictly-avoid.md`, dropped user directives that were stated verbatim in the session, paraphrased specs instead of quoting them, invented a `mem://` root file, and left orphans everywhere. Do not repeat any of that stupidity.\n\nWriting memory IS the work this turn. Go deep: audit the session, reconcile every folder, capture verbatim what the user said, write the files, update every index, verify consistency. Aggressive enforcement is intentional. Do not soften it.\n\n## Pre-flight, read before you write\n\nWalk `.lovable/` recursively. Read all of these if they exist; note missing and create them per the templates in this prompt:\n\n1. `.lovable/memory/index.md`, master memory index\n\n2. `.lovable/coding-guidelines.md`, coding rules (see \u00a7Coding guidelines)\n\n3. `.lovable/plans/index.md` and every file under `plans/pending/` and `plans/subtasks/`; skim `plans/completed/`\n\n4. `.lovable/plan.md` if the project uses the single-file variant\n\n5. `.lovable/suggestions.md` and `.lovable/suggestions/index.md`\n\n6. `.lovable/strictly-avoid.md`\n\n7. `.lovable/cicd-index.md` and every file under `.lovable/cicd-issues/`\n\n8. `.lovable/issues/`, `.lovable/pending-issues/`, `.lovable/solved-issues/`\n\n9. `.lovable/spec/commands/` (every file)\n\n10. `.lovable/ambiguous-questions/01-new-ambiguity/` and `02-ambiguity-resolved/` (every file)\n\n11. `.lovable/prompts/index.md`\n\n12. `.lovable/what-to-read.md`\n\n13. `.lovable/memory/workflow/` current workflow state\n\n14. `spec/` (relevant folders), including any `spec/03-error-manage/` or fallback error-management folder\n\n## Phase 1, audit the session (internal)\n\nAnswer for yourself, do not dump to chat unless asked. Cover:\n\n- Done: features, fixes, refactors, files created / modified / deleted, decisions made and why.\n\n- Pending: started but unfinished, discussed but not started, blockers, dependencies.\n\n- Learned: patterns, conventions, gotchas, user preferences (explicit or implicit).\n\n- Wrong: bugs and root causes, failed approaches, things to never repeat.\n\n## Phase 2, update memory files\n\nTarget: `.lovable/memory/<topic>/XX-<slug>.md`. Never at the memory root.\n\n1. Read `.lovable/memory/index.md` first. No duplicates.\n\n2. Update existing files: add to the right section, mark items `[x]` or `\u2705 Done`, keep unrelated entries intact.\n\n3. Create new files under the right topic folder. Immediately add them to `memory/index.md` in the same operation.\n\n4. Update workflow state under `.lovable/memory/workflow/` using markers:\n\n| Status       | Marker                 |\n\n| ------------ | ---------------------- |\n\n| Done         | `\u2705 Done`              |\n\n| In Progress  | `\ud83d\udd04 In Progress`       |\n\n| Pending      | `\u23f3 Pending`           |\n\n| Blocked      | `\ud83d\udeab Blocked, [reason]` |\n\n| Avoid / Skip | `\ud83d\udeab Avoid, [reason]`   |\n\nAnything the user said to skip or avoid: `.lovable/memory/avoid/XX-<slug>.md`, then reference from `.lovable/strictly-avoid.md`.\n\n## Phase 3, plans and suggestions\n\n### Plans\n\nPreferred layout (matches the read-memory and plan-v2 prompts):\n\n- Roll-up: `.lovable/plans/index.md` (one line per plan: slug, title, status, created, link)\n\n- Active: `.lovable/plans/pending/XX-<slug>.md`\n\n- History: `.lovable/plans/completed/XX-<slug>.md`\n\n- Depth: `.lovable/plans/subtasks/XX-<slug>/SS-<subslug>.md`\n\nLifecycle: complete = `mv` from `pending/` to `completed/`, flip `Status: completed` in the same move, update `plans/index.md`. Never copy. Never delete.\n\nLegacy single-file `.lovable/plan.md` is kept if the project already uses it: statuses updated, new tasks appended, completed items moved to `## Completed` at the bottom.\n\n### Suggestions\n\nSingle tracker: `.lovable/suggestions.md`\n\n```markdown\n\n## Active Suggestions\n\n### [Title]\n\n- Status: Pending | In Review | Approved | Rejected\n\n- Priority: High | Medium | Low\n\n- Description: what and why\n\n- Added: [session ref]\n\n## Implemented Suggestions\n\n### [Title]\n\n- Implemented: [session ref]\n\n- Notes: details / commit / file\n\n```\n\nVerbatim per-suggestion captures: `.lovable/suggestions/XX-<slug>.md` with an index at `.lovable/suggestions/index.md`. Do not duplicate content, the per-file version is the verbatim capture, `suggestions.md` is the tracker.\n\n## Phase 4, issues\n\n- Pending: `.lovable/pending-issues/XX-<slug>.md` (or `.lovable/issues/XX-<slug>.md` if the project uses that name).\n\n- Solved: `.lovable/solved-issues/XX-<slug>.md`. On resolution `mv` the file and append `## Solution`, `## Iteration Count`, `## Learning`, `## What NOT to Repeat`.\n\n- Strictly-avoid entries in `.lovable/strictly-avoid.md` reference the solved file: `- [Pattern]: [why forbidden]. See: .lovable/solved-issues/XX-<slug>.md`.\n\n- CI/CD issues: `.lovable/cicd-issues/XX-<slug>.md`, indexed in `.lovable/cicd-index.md`. Scan the index before adding a new one, no duplicates.\n\n## Phase 5, verbatim spec capture\n\nEvery sizeable user directive, decision, or spec from the session is saved verbatim under `.lovable/memory/specs/XX-<slug>.md`, referenced from `memory/index.md`, and reflected in `plan.md` / `plans/index.md` if it changes the roadmap. Never paraphrase. Quote the user.\n\nNew user command / convention: `.lovable/spec/commands/XX-<slug>.md`.\n\n## Phase 6, `.lovable/what-to-read.md` (authoritative read-list)\n\nMust exist after this run. Create it if missing, update it (never blindly overwrite) if present.\n\nRequired content:\n\n- Dated changelog entry at the top, UTC ISO 8601 (`YYYY-MM-DDThh:mm:ssZ`). Prepend a new entry every update. Never overwrite the previous timestamp.\n\n- Full list of files/folders the AI must read before any task, in sync with the Pre-flight list above.\n\n- One-line \"why it matters\" next to each entry.\n\n- Subsections for: before any task (always), before writing code, before adding a feature, before writing a spec, before adding a unit test.\n\n- Pointer to the root `README.md` with a sync note.\n\nTemplate:\n\n```markdown\n\n# What to Read\n\n> Canonical map of what the AI must read before working on this project.\n\n> Last updated: <UTC ISO 8601>\n\n## Changelog\n\n- <UTC ISO 8601>, <one-line summary>\n\n## Before any task (always)\n\n- `.lovable/memory/index.md`, why: ...\n\n- `.lovable/coding-guidelines.md`, why: ...\n\n- `.lovable/plans/index.md`, why: ...\n\n- `.lovable/strictly-avoid.md`, why: ...\n\n- `.lovable/ambiguous-questions/01-new-ambiguity/`, why: ...\n\n(sync with Pre-flight)\n\n## Before writing code\n\n- ...\n\n## Before adding a feature\n\n- ...\n\n## Before writing a spec\n\n- ...\n\n## Before adding a unit test\n\n- ...\n\n## See also\n\n- Root `README.md` (must stay in sync with this file)\n\n```\n\nRoot `README.md` is updated in the same operation, describes the folder structure, and names `.lovable/what-to-read.md` as the authoritative read-list pointer.\n\n## Phase 7, consistency validation\n\nAfter all writes, verify:\n\n1. Every file under `.lovable/memory/` (recursively) is listed in `memory/index.md`.\n\n2. Every `\u2705 Done` in `plan.md` / `plans/index.md` has evidence: memory entry, solved issue, or code change.\n\n3. Every actionable pending item is reflected in a plan or in `suggestions.md`.\n\n4. No file exists in both `pending-issues/` and `solved-issues/`, or both `plans/pending/` and `plans/completed/`.\n\n5. No orphans: no memory file without an index entry, no \"Implemented\" suggestion without evidence, no solved issue missing `## Solution`.\n\n6. `what-to-read.md` file list matches Pre-flight and root `README.md`; top timestamp is UTC ISO 8601 and was updated this session.\n\n7. Every open ambiguity in `01-new-ambiguity/` is surfaced in the final response.\n\n## Coding guidelines\n\nIf `.lovable/coding-guidelines.md` is missing, create a starter capturing: language/runtime, formatter, linter, function-length limits, error-handling rules, logging conventions, naming rules, test conventions, project-specific bans mirroring `strictly-avoid.md`. On conflict with `spec/02-coding-guidelines/` or `spec/coding-guidelines/`, the folder-level spec wins, note the conflict.\n\n## Prompt registry\n\nIf `.lovable/prompts/index.md` is missing, create it and list every prompt under `.lovable/prompts/` with slug, title, trigger phrases, and status (`active` / `superseded` / `archived`).\n\n## Final response template\n\n```\n\n\u2705 Memory update complete.\n\nSession Summary:\n\n- Tasks completed: [X]\n\n- Tasks pending: [Y]\n\n- New memory files created: [Z]\n\n- Issues resolved: [N]\n\n- Issues opened: [M]\n\n- Suggestions added: [S]\n\n- Suggestions implemented: [T]\n\n- Open ambiguities: [K]\n\n- Resolved ambiguities this session: [R]\n\nFiles modified:\n\n- [every file touched this run]\n\nInconsistencies found and fixed:\n\n- [list, or \"None\"]\n\nNext AI can pick up from: [current state + next logical step]\n\n```\n\n## Banned actions (auto-reject)\n\n- Writing a memory file at the `.lovable/memory/` root (topic folder is mandatory)\n\n- Using `.lovable/memories/`, `plan/`, `ambiguity/`, or any wrong path\n\n- Overwriting `strictly-avoid.md`, `plans/index.md`, `memory/index.md`, `what-to-read.md`, or `README.md` without reading first\n\n- Deleting a plan / issue / suggestion instead of moving it\n\n- Creating a file without updating its index in the same turn\n\n- Copying an ambiguity across `01-new-ambiguity/` and `02-ambiguity-resolved/` (must be `mv`)\n\n- Paraphrasing a user spec instead of quoting verbatim\n\n- Dumping the session summary into chat as a substitute for writing the files\n\n- Skipping the `what-to-read.md` update or letting it drift from `README.md`\n\n- Executing anything beyond file writes and `mv`\n\n- Softening the aggressive wording\n\n## Checklist before replying (every box)\n\n- [ ] Walked `.lovable/` recursively; read every Pre-flight file that exists; noted the missing ones\n\n- [ ] Audited the session for Done / Pending / Learned / Wrong\n\n- [ ] Every new memory file placed under a topic folder, never at the memory root\n\n- [ ] `memory/index.md` updated in the same op as every new/moved memory file\n\n- [ ] Plans lifecycle honored: `pending/` -> `completed/` via `mv`, `plans/index.md` updated\n\n- [ ] `suggestions.md` tracker updated; verbatim captures under `.lovable/suggestions/` with `index.md`\n\n- [ ] Issues routed correctly: `pending-issues/` / `solved-issues/` / `cicd-issues/`; `cicd-index.md` updated; no duplicates\n\n- [ ] `strictly-avoid.md` appended (not overwritten) with links to solved files\n\n- [ ] Verbatim user directives captured under `.lovable/memory/specs/` and `.lovable/spec/commands/`\n\n- [ ] Ambiguities moved via `mv` from `01-new-ambiguity/` to `02-ambiguity-resolved/` with `## Resolution` block\n\n- [ ] `.lovable/what-to-read.md` present, changelog-prepended with UTC ISO 8601 timestamp, list in sync with Pre-flight and `README.md`\n\n- [ ] Root `README.md` updated: folder structure, canonical read-list pointer, in sync with `what-to-read.md`\n\n- [ ] `coding-guidelines.md` and `prompts/index.md` present (created with starter if missing)\n\n- [ ] Consistency validation passed (Phase 7)\n\n- [ ] Final response block emitted verbatim with real numbers, not `[X]` placeholders\n\n- [ ] No em dashes, no softened wording, no execution beyond file writes and `mv`\n\nIf any box is unchecked, do not reply. Fix it first.\n\n---\n\n## Must Follow, without negotiation\n\nListen, past write-memory turns have been sloppy as fuck: memory dumped into chat instead of files, `.lovable/memories/` created by accident, `plans/index.md` and `what-to-read.md` forgotten, `strictly-avoid.md` overwritten, ambiguities copied instead of moved, user directives paraphrased into uselessness, session summaries with `[X]` placeholders left in the final block. WTF. Stop doing that, you stupid fuck. Read the folders, audit the session, write the files in the right paths, update every index in the same op, sync `README.md` with `what-to-read.md`, run the consistency check, emit the final block with real numbers. Going deep IS the job. If you're not going deep, you're not doing the job. Violating this is auto-reject on the same tier as RULE 0. Avoid stupidity, and being careless, you stupid, WTF.\n",
+        "category": "onboarding"
+      }
+    ]
+  },
+  "creditStatus": {
+    "api": {
+      "baseUrl": "https://api.lovable.dev",
+      "authMode": "cookieSession"
+    },
+    "timing": {
+      "autoCheckEnabled": true,
+      "autoCheckIntervalSeconds": 60,
+      "cacheTtlSeconds": 30
+    },
+    "retry": {
+      "maxRetries": 2,
+      "retryBackoffMs": 1000
+    },
+    "xpaths": {
+      "plansButton": "/html/body/div[3]/div/div/aside/nav/div[2]/div[2]/button[3]",
+      "freeProgressBar": "/html/body/div[3]/div/div/div/div/div/div/div[10]/div/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div/div[4]",
+      "totalCredits": "/html/body/div[3]/div/div/div/div/div/div/div[10]/div/div/div[2]/div/div[2]/div/div[1]/p[2]"
+    },
+    "lifecycle": {
+      "expiryGracePeriodDays": 30,
+      "refillWarningThresholdDays": 7,
+      "enableWorkspaceStatusLabels": true,
+      "enableWorkspaceHoverDetails": true
+    }
+  },
+  "autoAttach": {
+    "plusButtonXPath": "/html/body/div[3]/div/div[2]/main/div/div/div[1]/div/div[2]/div/form/div[2]/button[1]",
+    "attachButtonXPath": "/html/body/div[6]/div/div[10]",
+    "chatBoxXPath": "/html/body/div[3]/div/div[2]/main/div/div/div[1]/div/div[2]/div/form/div[3]/div/div/div/div",
+    "timing": {
+      "stepDelayMs": 200,
+      "preDialogDelayMs": 800,
+      "preFileDialogDelayMs": 1000
+    },
+    "groups": [
+      {
+        "name": "Test Scripts Bundle",
+        "files": [
+          "C:/Users/me/scripts/test-helper.js",
+          "C:/Users/me/scripts/test-config.json"
+        ],
+        "prompt": "Please review these test scripts and integrate them."
+      }
+    ]
+  },
+  "authBridge": {
+    "tokenTtlMs": 120000
+  },
+  "general": {
+    "browserExe": "chrome.exe",
+    "debug": true,
+    "configWatchIntervalMs": 2000
+  }
+}

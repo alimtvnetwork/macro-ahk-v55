@@ -1,0 +1,38 @@
+%% T25 · Scope diagram — HostApp ⇄ Prompts feature ⇄ ChatBox
+%% Created: 2026-06-02
+%% Render with any Mermaid 10+ renderer. Dark theme assumed.
+flowchart LR
+    subgraph HostApp["HostApp (third-party, opaque)"]
+        ChatBox["ChatBox<br/>(EditorKind = ???)"]
+        SubmitBtn["SubmitTarget<br/>(XPath = ???)"]
+        Banner["InterruptionSignal<br/>(XPath = ???)"]
+        ChatBox --> SubmitBtn
+        Banner -.observes.-> ChatBox
+    end
+
+    subgraph PromptsFeature["Prompts Feature (this spec)"]
+        UI["Dropdown UI"]
+        Loader["Prompt Loader"]
+        Store[("PromptStore")]
+        Injector["Injection Adapter"]
+        Queue["Queue Engine"]
+        Delay["Delay Engine"]
+        Settings[("SettingsStore")]
+
+        Loader <--> Store
+        UI --> Loader
+        UI --> Injector
+        UI --> Queue
+        Queue --> Injector
+        Queue --> Delay
+        Settings --> Delay
+        Settings --> Queue
+        Settings --> Injector
+    end
+
+    Integrator(["Integrator answers Q1–Q8"]) -.configures.-> Settings
+    EndUser(["End User"]) -->|picks prompt / clicks Next N| UI
+
+    Injector -->|paste text| ChatBox
+    Queue -->|click| SubmitBtn
+    Banner -->|detected → pause| Queue

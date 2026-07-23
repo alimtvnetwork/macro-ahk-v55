@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://riseup.asia/schemas/event-stream#v1",
+  "title": "MacroEvent",
+  "oneOf": [
+    { "$ref": "#/$defs/RunStarted" },
+    { "$ref": "#/$defs/StepStarted" },
+    { "$ref": "#/$defs/StepCompleted" },
+    { "$ref": "#/$defs/StepFailed" },
+    { "$ref": "#/$defs/ScoreParsed" },
+    { "$ref": "#/$defs/LoopIterated" },
+    { "$ref": "#/$defs/RunCompleted" },
+    { "$ref": "#/$defs/RunAborted" },
+    { "$ref": "#/$defs/RunPaused" },
+    { "$ref": "#/$defs/RunResumed" }
+  ],
+  "$defs": {
+    "Base": {
+      "type": "object",
+      "required": ["Type", "RunId", "At"],
+      "properties": {
+        "Type": { "type": "string" },
+        "RunId": { "type": "string", "format": "uuid" },
+        "At": { "type": "string", "format": "date-time" }
+      }
+    },
+    "RunStarted":   { "allOf": [{ "$ref": "#/$defs/Base" }, { "properties": { "Type": { "const": "RunStarted" }, "Slug": { "type": "string" } } }] },
+    "StepStarted":  { "allOf": [{ "$ref": "#/$defs/Base" }, { "properties": { "Type": { "const": "StepStarted" }, "StepIndex": { "type": "integer" }, "StepKindId": { "type": "integer" } } }] },
+    "StepCompleted":{ "allOf": [{ "$ref": "#/$defs/Base" }, { "properties": { "Type": { "const": "StepCompleted" }, "StepIndex": { "type": "integer" }, "DurationMs": { "type": "integer" } } }] },
+    "StepFailed":   { "allOf": [{ "$ref": "#/$defs/Base" }, { "properties": { "Type": { "const": "StepFailed" }, "StepIndex": { "type": "integer" }, "Reason": { "type": "string" }, "ReasonDetail": { "type": "string" } } }] },
+    "ScoreParsed":  { "allOf": [{ "$ref": "#/$defs/Base" }, { "properties": { "Type": { "const": "ScoreParsed" }, "Score": { "type": "integer", "minimum": 0, "maximum": 100 } } }] },
+    "LoopIterated": { "allOf": [{ "$ref": "#/$defs/Base" }, { "properties": { "Type": { "const": "LoopIterated" }, "Iteration": { "type": "integer" }, "RemainingBudget": { "type": "integer" } } }] },
+    "RunCompleted": { "allOf": [{ "$ref": "#/$defs/Base" }, { "properties": { "Type": { "const": "RunCompleted" }, "FinalScore": { "type": ["integer", "null"] } } }] },
+    "RunAborted":   { "allOf": [{ "$ref": "#/$defs/Base" }, { "properties": { "Type": { "const": "RunAborted" }, "Reason": { "type": "string" }, "ReasonDetail": { "type": "string" } } }] },
+    "RunPaused":    { "allOf": [{ "$ref": "#/$defs/Base" }, { "properties": { "Type": { "const": "RunPaused" } } }] },
+    "RunResumed":   { "allOf": [{ "$ref": "#/$defs/Base" }, { "properties": { "Type": { "const": "RunResumed" } } }] }
+  }
+}

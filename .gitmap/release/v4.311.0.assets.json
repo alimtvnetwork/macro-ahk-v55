@@ -1,0 +1,111 @@
+{
+  "version": "4.311.0",
+  "tag": "v4.311.0",
+  "generatedBy": "scripts/generate-release-manifest.mjs",
+  "note": "Committed before packaging so reviewers can inspect archive names and locations.",
+  "assets": [
+    {
+      "name": "marco-extension-v4.311.0.zip",
+      "role": "chrome-extension",
+      "source": "chrome-extension/",
+      "required": true,
+      "minBytes": 10240
+    },
+    {
+      "name": "prompts-v4.311.0.zip",
+      "role": "prompts-bundle",
+      "source": "standalone-scripts/prompts/",
+      "required": false
+    },
+    {
+      "name": "macro-controller-v4.311.0.zip",
+      "role": "standalone-plugin",
+      "source": "standalone-scripts/macro-controller/",
+      "required": true
+    },
+    {
+      "name": "marco-sdk-v4.311.0.zip",
+      "role": "standalone-plugin",
+      "source": "standalone-scripts/marco-sdk/",
+      "required": true
+    },
+    {
+      "name": "xpath-v4.311.0.zip",
+      "role": "standalone-plugin",
+      "source": "standalone-scripts/xpath/",
+      "required": true
+    },
+    {
+      "name": "payment-banner-hider-v4.311.0.zip",
+      "role": "standalone-plugin",
+      "source": "standalone-scripts/payment-banner-hider/",
+      "required": true
+    },
+    {
+      "name": "lovable-common-v4.311.0.zip",
+      "role": "standalone-plugin",
+      "source": "standalone-scripts/lovable-common/",
+      "required": true
+    },
+    {
+      "name": "lovable-owner-switch-v4.311.0.zip",
+      "role": "standalone-plugin",
+      "source": "standalone-scripts/lovable-owner-switch/",
+      "required": true
+    },
+    {
+      "name": "lovable-user-add-v4.311.0.zip",
+      "role": "standalone-plugin",
+      "source": "standalone-scripts/lovable-user-add/",
+      "required": true
+    },
+    {
+      "name": "lovable-dashboard-v4.311.0.zip",
+      "role": "standalone-plugin",
+      "source": "standalone-scripts/lovable-dashboard/",
+      "required": true
+    },
+    {
+      "name": "install.sh",
+      "role": "loose-file",
+      "source": "scripts/install.sh",
+      "required": true
+    },
+    {
+      "name": "install.ps1",
+      "role": "loose-file",
+      "source": "scripts/install.ps1",
+      "required": true
+    },
+    {
+      "name": "download-extension.ps1",
+      "role": "loose-file",
+      "source": "scripts/download-extension.ps1",
+      "required": true
+    },
+    {
+      "name": "clone-repo.ps1",
+      "role": "loose-file",
+      "source": "scripts/clone-repo.ps1",
+      "required": true
+    },
+    {
+      "name": "VERSION.txt",
+      "role": "loose-file",
+      "source": "<generated>",
+      "required": true
+    },
+    {
+      "name": "changelog.md",
+      "role": "loose-file",
+      "source": "changelog.md",
+      "required": false
+    },
+    {
+      "name": "checksums.txt",
+      "role": "loose-file",
+      "source": "<generated>",
+      "required": true
+    }
+  ]
+}

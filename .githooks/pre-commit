@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Pre-commit hook: enforce lowercase hyphen-case (or ALL-CAPS) for .md filenames.
+# Enable locally with: git config core.hooksPath .githooks
+set -euo pipefail
+
+# Only scan staged .md files for speed; fall back to full scan if none staged.
+STAGED_MD=$(git diff --cached --name-only --diff-filter=ACMR -- '*.md' || true)
+
+if [ -z "$STAGED_MD" ]; then
+  exit 0
+fi
+
+# Filter out excluded dirs the checker also skips.
+FILTERED=$(printf '%s\n' "$STAGED_MD" | grep -Ev '^(node_modules|skipped|\.release|\.git)/' || true)
+if [ -z "$FILTERED" ]; then
+  exit 0
+fi
+
+# Run the canonical checker over the whole tree; it is fast and matches CI exactly.
+if ! node scripts/check-markdown-filenames.mjs .; then
+  echo ""
+  echo "pre-commit: markdown filename policy failed."
+  echo "  Fix: rename offending files to lowercase-hyphen-case (or ALL-CAPS for docs)."
+  echo "  Subtasks under .lovable/plans/subtasks/ must start with the numeric sequence (e.g. 01-slug.md)."
+  echo "  To bypass in emergencies: git commit --no-verify"
+  exit 1
+fi
+
+exit 0

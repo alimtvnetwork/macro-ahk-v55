@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spec/2026-spec/01-prompt-spec/schemas/04-settings.schema.json",
+  "title": "Settings",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "triggerKey":        { "type": "string", "default": "/" },
+    "delayMs":           { "type": "integer", "minimum": 0,    "maximum": 600000, "default": 1500 },
+    "jitterMs":          { "type": "integer", "minimum": 0,    "maximum": 60000,  "default": 250 },
+    "skipFirstDelay":    { "type": "boolean", "default": true },
+    "maxRetries":        { "type": "integer", "minimum": 0,    "maximum": 3,      "default": 1 },
+    "verboseLogging":    { "type": "boolean", "default": false },
+    "planModeEnabled":   { "type": "boolean", "default": false },
+    "queueCapacity":     { "type": "integer", "minimum": 1,    "maximum": 1000,   "default": 100 },
+    "hostOverrides":     {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "delayMs":   { "type": "integer", "minimum": 0 },
+          "selectors": { "type": "object" }
+        }
+      }
+    }
+  }
+}

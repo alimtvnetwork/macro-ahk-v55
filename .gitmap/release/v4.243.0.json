@@ -1,0 +1,17 @@
+{
+  "version": "4.243.0",
+  "branch": "release/v4.243.0",
+  "sourceBranch": "main",
+  "commit": "ed412dc4502e24e90369047051d76522111af507",
+  "tag": "v4.243.0",
+  "assets": [],
+  "changelog": [
+    "**`.githooks/pre-commit`**: runs `node scripts/check-markdown-filenames.mjs` on staged `.md` files to enforce lowercase hyphen-case and sequence-first subtask naming before commits land. Enable per clone with `git config core.hooksPath .githooks`.",
+    "**`.githooks/readme.md`**: documents the hook contract, opt-in command, and bypass policy.",
+    "**`standalone-scripts/macro-controller/src/ui/__tests__/prompt-editor-diff.test.ts`**: added `window.localStorage.clear()` to the `beforeEach` block so the diff-toggle persistence introduced in v4.192.0 no longer leaks the \"diff pane open\" state across tests. Root cause: the \"updates live as the textarea changes while open\" case started with the pane already open (leaked flag), so its toggle click closed the pane instead of opening it, producing `expected [] to include 'add'`. All 8 tests in the suite now pass."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-19T11:17:21Z",
+  "isLatest": false
+}

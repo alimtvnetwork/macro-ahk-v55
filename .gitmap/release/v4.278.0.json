@@ -1,0 +1,14 @@
+{
+  "version": "4.278.0",
+  "branch": "release/v4.278.0",
+  "sourceBranch": "main",
+  "tag": "v4.278.0",
+  "assets": [],
+  "changelog": [
+    "Plan 28 close-out: release preflight unblocked (descriptor + asset manifest + latest.json restored); changelog checker now accepts hyphen separator to align with the no-em-dash memory policy."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-19T00:00:00Z",
+  "isLatest": false
+}

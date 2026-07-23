@@ -1,0 +1,20 @@
+{
+  "version": "4.136.0",
+  "branch": "release/v4.136.0",
+  "sourceBranch": "main",
+  "commit": "20a72e8c2930362394fc46f4eed5872f473d711c",
+  "tag": "v4.136.0",
+  "assets": [],
+  "changelog": [
+    "Added `tests/e2e/utils/esbuild-loader.ts` to resolve the installed esbuild main entry from direct `node_modules` or pnpm `.pnpm` layout before importing it.",
+    "Updated `prompt-rename-regression.spec.ts` and `seed-plan-next-regression.spec.ts` to bundle through the shared loader instead of a bare `esbuild` import.",
+    "Version bump: 4.135.0 -\u003e 4.136.0 (all version files synced).",
+    "`node -e \"import('esbuild/lib/main.js')...\"`: resolves and exposes `build`.",
+    "`pnpm exec playwright test --config=tests/e2e/seed-plan-next-regression.config.ts --list`: 4 tests listed.",
+    "`pnpm exec playwright test tests/e2e/prompt-rename-regression.spec.ts --list`: 3 tests listed."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-18T14:34:49Z",
+  "isLatest": false
+}

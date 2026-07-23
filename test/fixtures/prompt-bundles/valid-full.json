@@ -1,0 +1,37 @@
+{
+  "id": "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
+  "schemaVersion": 1,
+  "exportedAt": "2026-07-17T12:34:56.789Z",
+  "exporterVersion": "4.43.0",
+  "entryCount": 3,
+  "format": "zip",
+  "entries": [
+    {
+      "id": "p1",
+      "slug": "next-n",
+      "name": "Next N",
+      "category": "planning",
+      "tags": ["dynamic", "plan"],
+      "isFavorite": true,
+      "isDefault": false,
+      "excludeFromExport": false,
+      "isDynamic": true,
+      "replaceKey": "N",
+      "replaceValues": ["2", "3", "5"],
+      "slugTemplate": "next-${N}",
+      "parentTitle": "Next N",
+      "parentSlug": "next-n",
+      "variantValue": "2",
+      "text": "Give me the next ${N} steps."
+    },
+    {
+      "slug": "proofread",
+      "name": "Proofread",
+      "text": "Proofread the following passage."
+    },
+    {
+      "name": "Bare Name Only",
+      "text": ""
+    }
+  ]
+}

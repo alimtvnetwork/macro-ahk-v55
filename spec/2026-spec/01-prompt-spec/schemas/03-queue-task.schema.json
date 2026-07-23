@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spec/2026-spec/01-prompt-spec/schemas/03-queue-task.schema.json",
+  "title": "QueueTask",
+  "type": "object",
+  "required": ["id", "promptId", "status", "createdAt"],
+  "additionalProperties": false,
+  "properties": {
+    "id":           { "type": "string", "pattern": "^q_[a-z0-9]{8,32}$" },
+    "promptId":     { "type": "string" },
+    "vars":         { "type": "object", "additionalProperties": true },
+    "status":       { "enum": ["pending", "running", "succeeded", "failed", "cancelled", "held"] },
+    "retries":      { "type": "integer", "minimum": 0, "maximum": 3 },
+    "lastReason":   { "type": "string" },
+    "lastDetail":   { "type": "string" },
+    "scheduledAt":  { "type": "string", "format": "date-time" },
+    "startedAt":    { "type": "string", "format": "date-time" },
+    "finishedAt":   { "type": "string", "format": "date-time" },
+    "createdAt":    { "type": "string", "format": "date-time" }
+  }
+}

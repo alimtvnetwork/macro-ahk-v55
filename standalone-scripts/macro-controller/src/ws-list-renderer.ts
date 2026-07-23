@@ -1,0 +1,1146 @@
+/**
+ * MacroLoop Controller — Workspace List Renderer & Dropdown Populator
+ * Phase 5A: Extracted from ws-selection-ui.ts
+ *
+ * Contains: renderLoopWorkspaceList, populateLoopWorkspaceDropdown,
+ * invalidateWsDropdownHash, wsRenderStats, buildLoopTooltipText,
+ * local state (compact mode, free-only filter)
+ */
+
+import type {
+  WorkspaceCredit,
+  HTMLElementWithHandlers,
+} from './types';
+import { WsTierValue, isExpiredTier } from './types/subscription-status';
+import {
+  loopCreditState,
+  state,
+  getLoopWsCheckedIds,
+  cPrimaryLight,
+  cPrimaryHL,
+  cPrimaryBgAL,
+  cWarning,
+} from './shared-state';
+import { log } from './logger';
+import { publishVisibleWorkspaces } from './visible-workspaces-store';
+import { calcTotalCredits, renderCreditBar } from './credit-api';
+import {
+  fetchLoopCredits,
+  WS_TIER_LABELS,
+  isExpiredWs,
+  expiredDays,
+  formatExpiryStartDate,
+  formatExpiredDuration,
+  getEffectiveStatus,
+  getWorkspaceLifecycleConfig,
+  formatDateDDMMMYY,
+  formatDayCount,
+} from './credit-fetch';
+import type { WorkspaceStatus } from './credit-fetch';
+import { moveToWorkspace } from './workspace-management';
+import { attachWorkspaceHoverCard, hideWorkspaceHoverCard } from './ws-hover-card';
+import { autoDetectLoopCurrentWorkspace } from './workspace-detection';
+import { formatPlanDisplayLabel } from './credit-balance-update/plan-mapper';
+import {
+  handleWsCheckboxClick,
+  setLoopWsNavIndex,
+} from './ws-checkbox-handler';
+import { showWsContextMenu } from './ws-context-menu';
+import { logError } from './error-utils';
+
+// ── Centralized constants ──
+import { SEL_LOOP_WS_ITEM, REFILL_PRIORITY_WINDOW_DAYS } from './constants';
+import { DataAttr, DomId } from './types';
+import { sortByRefillPriority, daysToRefillForWs } from './workspace-refill-priority';
+// Issue 115 — collapsed display classifier + centralised tone resolver.
+import { classifyFromStatus, type WorkspaceDisplayStatus } from './workspace-display-status';
+
+import { resolveBadgeStyle, diluteBadgeBg } from './workspace-badge-styles';
+import { resolveCreditSummary } from './credit-balance-update/credit-summary-resolver';
+import { onCreditResolved } from './credit-balance-update/credit-fetch-controller';
+import { wsRenderStats } from './ws-render-stats';
+
+
+const CSS_BG = ';background:';
+
+// ============================================
+// CQ11/CQ17: Encapsulated view-filter state
+// ============================================
+
+/**
+ * Credit-sort filter modes (v3.30.0 — credit-sort hamburger row).
+ *
+ * - `none`     — no credit sort applied (default ordering wins).
+ * - `high`     — sort all surviving rows by available credits DESC.
+ * - `low`      — sort all surviving rows by available credits ASC.
+ * - `pro-high` — only paid (non-FREE) workspaces in an expiring / expired
+ *                lifecycle state; sort DESC by available credits.
+ * - `pro-low`  — same filter as `pro-high`; sort ASC.
+ */
+export type CreditSortMode = 'none' | 'high' | 'low' | 'pro-high' | 'pro-low';
+
+/** Manages workspace list view state (compact, free-only, expired-with-credits, refill-soon, refill-priority, credit-sort mode). */
+class WsListViewState {
+  private static instance: WsListViewState | null = null;
+  private isFreeOnly = false;
+  private isExpiredWithCredits = false;
+  private isExpiring = false;
+  private isRefillSoon = false;
+  private isCompactMode: boolean;
+  private isRefillPriority: boolean;
+  private creditSortMode: CreditSortMode;
+
+  private constructor() {
+    this.isCompactMode = this.loadBool('ml_compact_mode', true);
+    this.isRefillPriority = this.loadBool('ml_refill_priority', false);
+    this.creditSortMode = this.loadCreditSortMode();
+  }
+
+  static getInstance(): WsListViewState {
+    if (!WsListViewState.instance) {
+      WsListViewState.instance = new WsListViewState();
+    }
+
+    return WsListViewState.instance;
+  }
+
+  private loadBool(key: string, fallback: boolean): boolean {
+    try {
+      const stored: string | null = localStorage.getItem(key);
+
+      return stored === null ? fallback : stored === 'true';
+    } catch (e: unknown) {
+
+      logError('viewState.load', 'Failed to read "' + key + '" from localStorage', e);
+
+      return fallback;
+    }
+  }
+
+  private loadCreditSortMode(): CreditSortMode {
+    try {
+      const stored = localStorage.getItem('ml_credit_sort_mode');
+      if (stored === 'high' || stored === 'low'
+        || stored === 'pro-high' || stored === 'pro-low') {
+        return stored;
+      }
+    } catch (e: unknown) {
+      logError('viewState.loadCreditSortMode',
+        'Failed to read credit sort mode from localStorage', e);
+    }
+    return 'none';
+  }
+
+  getCompactMode(): boolean { return this.isCompactMode; }
+  setCompactMode(enabled: boolean): void { this.isCompactMode = enabled; }
+
+  getFreeOnly(): boolean { return this.isFreeOnly; }
+  setFreeOnly(enabled: boolean): void { this.isFreeOnly = enabled; }
+
+  getExpiredWithCredits(): boolean { return this.isExpiredWithCredits; }
+  setExpiredWithCredits(enabled: boolean): void { this.isExpiredWithCredits = enabled; }
+
+  getExpiring(): boolean { return this.isExpiring; }
+  setExpiring(enabled: boolean): void { this.isExpiring = enabled; }
+
+  getRefillSoon(): boolean { return this.isRefillSoon; }
+  setRefillSoon(enabled: boolean): void { this.isRefillSoon = enabled; }
+
+  getRefillPriority(): boolean { return this.isRefillPriority; }
+
+  setRefillPriority(enabled: boolean): void {
+    this.isRefillPriority = enabled;
+    try {
+      localStorage.setItem('ml_refill_priority', enabled ? 'true' : 'false');
+    } catch (e: unknown) {
+      logError('viewState.setRefillPriority', 'Failed to persist refill priority flag', e);
+    }
+  }
+
+  getCreditSortMode(): CreditSortMode { return this.creditSortMode; }
+
+  setCreditSortMode(mode: CreditSortMode): void {
+    this.creditSortMode = mode;
+    try {
+      localStorage.setItem('ml_credit_sort_mode', mode);
+    } catch (e: unknown) {
+      logError('viewState.setCreditSortMode',
+        'Failed to persist credit sort mode', e);
+    }
+  }
+}
+
+
+/** Shorthand for singleton access. */
+function viewState(): WsListViewState {
+
+  return WsListViewState.getInstance();
+}
+
+/** Get compact mode state. */
+export function getLoopWsCompactMode(): boolean { return viewState().getCompactMode(); }
+
+/** Set compact mode state. */
+export function setLoopWsCompactMode(enabled: boolean): void { viewState().setCompactMode(enabled); }
+
+/** Get free-only filter state. */
+export function getLoopWsFreeOnly(): boolean { return viewState().getFreeOnly(); }
+
+/** Set free-only filter state. */
+export function setLoopWsFreeOnly(enabled: boolean): void { viewState().setFreeOnly(enabled); }
+
+/**
+ * Minimum `available` credit threshold for a workspace to surface in the
+ * "Expired with credits" filter. Workspaces marked EXPIRED but holding
+ * more than this many credits are recovery candidates worth reviewing.
+ */
+export const EXPIRED_WITH_CREDITS_MIN = 5;
+
+/** Get expired-with-credits filter state. */
+export function getLoopWsExpiredWithCredits(): boolean {
+  return viewState().getExpiredWithCredits();
+}
+
+/** Get expiring filter state (only show workspaces with display kind = past-due-expiring). */
+export function getLoopWsExpiring(): boolean {
+  return viewState().getExpiring();
+}
+
+/** Set expiring filter state. */
+export function setLoopWsExpiring(enabled: boolean): void {
+  viewState().setExpiring(enabled);
+}
+
+/** Get refill-soon filter state (only show workspaces with display kind = refill-soon). */
+export function getLoopWsRefillSoon(): boolean {
+  return viewState().getRefillSoon();
+}
+
+/** Set refill-soon filter state. */
+export function setLoopWsRefillSoon(enabled: boolean): void {
+  viewState().setRefillSoon(enabled);
+}
+
+
+/** Set expired-with-credits filter state. */
+export function setLoopWsExpiredWithCredits(enabled: boolean): void {
+  viewState().setExpiredWithCredits(enabled);
+}
+
+/** Get refill-priority sort state. */
+export function getLoopWsRefillPriority(): boolean {
+  return viewState().getRefillPriority();
+}
+
+/** Set refill-priority sort state. */
+export function setLoopWsRefillPriority(enabled: boolean): void {
+  viewState().setRefillPriority(enabled);
+}
+
+/** Get the active credit-sort mode (v3.30.0 — credit-sort hamburger row). */
+export function getLoopWsCreditSortMode(): CreditSortMode {
+  return viewState().getCreditSortMode();
+}
+
+/** Set the active credit-sort mode (persists to localStorage). */
+export function setLoopWsCreditSortMode(mode: CreditSortMode): void {
+  viewState().setCreditSortMode(mode);
+}
+
+// ============================================
+// Helper: fetch credits with auto-detect (used by ws-context-menu)
+// ============================================
+export function fetchLoopCreditsWithDetect(isRetry?: boolean): void {
+  fetchLoopCredits(isRetry, autoDetectLoopCurrentWorkspace);
+}
+
+function buildTooltipProfileLines(ws: WorkspaceCredit): string[] {
+  const lines: string[] = ['🪪 PROFILE:'];
+  lines.push('  Plan: ' + (ws.planType || ws.tier || WsTierValue.FREE));
+  lines.push('  Role: ' + (ws.membershipRole || ws.role || 'N/A'));
+  if (typeof ws.numProjects === 'number' && ws.numProjects > 0) {
+    lines.push('  Projects: ' + ws.numProjects);
+  }
+  lines.push('  Git Sync: ' + (ws.gitSyncEnabled ? 'enabled' : 'disabled'));
+  if (ws.subscriptionStatus) lines.push('  Subscription Status: ' + ws.subscriptionStatus);
+  if (ws.subscriptionStatusChangedAt) {
+    const days = (function () {
+      const t = Date.parse(ws.subscriptionStatusChangedAt);
+      if (!Number.isFinite(t)) return 0;
+      const diff = Date.now() - t;
+      return diff > 0 ? Math.floor(diff / 86_400_000) : 0;
+    })();
+    const suffix = days > 0 ? ' (' + days + 'd ago)' : '';
+    lines.push('  Status Changed: ' + ws.subscriptionStatusChangedAt + suffix);
+  }
+  if (ws.nextRefillAt) lines.push('  Next Refill: ' + ws.nextRefillAt);
+  if (ws.billingPeriodEndAt) lines.push('  Billing Period Ends: ' + ws.billingPeriodEndAt);
+  if (ws.createdAt) lines.push('  Created: ' + ws.createdAt);
+  return lines;
+}
+
+function buildTooltipCalculatedLines(ws: WorkspaceCredit): string[] {
+  const lines: string[] = ['📊 CALCULATED:'];
+  lines.push('  🆓 Daily Free: ' + (ws.dailyFree || 0) + ' (' + ws.dailyLimit + ' - ' + ws.dailyUsed + ')');
+  lines.push('  🔄 Rollover: ' + (ws.rollover || 0) + ' (' + ws.rolloverLimit + ' - ' + ws.rolloverUsed + ')');
+  lines.push('  💰 Available: ' + (ws.available || 0) + ' (total:' + (ws.totalCredits || 0) + ' - rUsed:' + (ws.rolloverUsed || 0) + ' - dUsed:' + (ws.dailyUsed || 0) + ' - bUsed:' + (ws.used || 0) + ')');
+  lines.push('  📦 Billing Only: ' + (ws.billingAvailable || 0) + ' (' + ws.limit + ' - ' + ws.used + ')');
+  const _tc = ws.totalCredits ?? calcTotalCredits(ws.freeGranted, ws.dailyLimit, ws.limit, ws.topupLimit, ws.rolloverLimit, ws.plan);
+  lines.push('  ⚡ Total Credits: ' + _tc + ' (granted:' + (ws.freeGranted || 0) + ' + daily:' + (ws.dailyLimit || 0) + ' + billing:' + (ws.limit || 0) + ' + topup:' + (ws.topupLimit || 0) + ' + rollover:' + (ws.rolloverLimit || 0) + ')');
+  return lines;
+}
+
+function buildTooltipRawLines(ws: WorkspaceCredit): string[] {
+  const lines: string[] = ['📋 RAW DATA:'];
+  lines.push('  ID: ' + ws.id);
+  lines.push('  Billing: ' + ws.used + '/' + ws.limit + ' used');
+  lines.push('  Rollover: ' + ws.rolloverUsed + '/' + ws.rolloverLimit + ' used');
+  lines.push('  Daily: ' + ws.dailyUsed + '/' + ws.dailyLimit + ' used');
+  if (ws.freeGranted > 0) lines.push('  Trial: ' + ws.freeRemaining + '/' + ws.freeGranted + ' remaining');
+  lines.push('  Status: ' + (ws.subscriptionStatus || 'N/A'));
+  if (isExpiredWs(ws)) {
+    const startDate = formatExpiryStartDate(ws);
+    const duration = formatExpiredDuration(ws);
+    if (startDate || duration) {
+      const datePart = startDate || 'unknown date';
+      const durPart = duration ? ' (' + duration + ')' : '';
+      lines.push('  Expired since: ' + datePart + durPart);
+    }
+  }
+  if (ws.raw) {
+    const r = ws.raw;
+    if (r.last_trial_credit_period) lines.push('  Trial Period: ' + r.last_trial_credit_period);
+    if (r.subscription_status) lines.push('  Subscription: ' + r.subscription_status);
+  }
+  return lines;
+}
+
+/**
+ * Build detailed tooltip text for a workspace row.
+ *
+ * Phase 4 (workspace-status-tooltip v2.212.0): adds Plan / Projects / Refill /
+ * Git Sync lines so the plain `title=` fallback carries the same data the
+ * hover card shows.
+ */
+export function buildLoopTooltipText(ws: WorkspaceCredit): string {
+  const lines: string[] = ['━━━ ' + (ws.fullName || ws.name) + ' ━━━', ''];
+  lines.push(...buildTooltipProfileLines(ws));
+  lines.push('');
+  lines.push(...buildTooltipCalculatedLines(ws));
+  lines.push('');
+  lines.push(...buildTooltipRawLines(ws));
+  return lines.join('\n');
+}
+
+/** Active filter state used during rendering. */
+interface WsFilterState {
+  filter: string;
+  freeOnly: boolean;
+  rolloverOnly: boolean;
+  billingOnly: boolean;
+  minCredits: number;
+  expiredWithCredits: boolean;
+  expiring: boolean;
+  refillSoon: boolean;
+  creditSortMode: CreditSortMode;
+}
+
+/** Read filter state from DOM elements once, outside the loop. */
+function readFilterState(filter: string): WsFilterState {
+  const rolloverEl = document.getElementById('loop-ws-rollover-filter');
+  const billingEl = document.getElementById('loop-ws-billing-filter');
+  const minEl = document.getElementById('loop-ws-min-credits');
+  return {
+    filter,
+    freeOnly: viewState().getFreeOnly(),
+    rolloverOnly: rolloverEl?.getAttribute(DataAttr.Active) === 'true',
+    billingOnly: billingEl?.getAttribute(DataAttr.Active) === 'true',
+    minCredits: minEl ? parseInt((minEl as HTMLInputElement).value, 10) || 0 : 0,
+    expiredWithCredits: viewState().getExpiredWithCredits(),
+    expiring: viewState().getExpiring(),
+    refillSoon: viewState().getRefillSoon(),
+    creditSortMode: viewState().getCreditSortMode(),
+  };
+}
+
+/** Check if a workspace matches the current name (fuzzy). */
+function isCurrentWorkspace(ws: WorkspaceCredit, currentName: string): boolean {
+  if (!currentName) return false;
+  if (ws.fullName === currentName || ws.name === currentName) return true;
+  const lcn = currentName.toLowerCase();
+  return (ws.fullName || '').toLowerCase().indexOf(lcn) !== -1 ||
+         lcn.indexOf((ws.fullName || '').toLowerCase()) !== -1;
+}
+
+/** Check if a workspace currently classifies as "refill-soon" (about-to-refill). */
+function isRefillSoonWs(ws: WorkspaceCredit): boolean {
+  try {
+    const config = getWorkspaceLifecycleConfig();
+    const source = getEffectiveStatus(ws, config);
+    const display = classifyFromStatus(source, ws);
+    return display.kind === 'refill-soon';
+  } catch (e: unknown) {
+    logError('passesFilters.refillSoon', 'Failed to classify workspace for refill-soon filter', e);
+    return false;
+  }
+}
+
+/** Check if a workspace currently classifies as "past-due-expiring" (expiring). */
+function isExpiringWs(ws: WorkspaceCredit): boolean {
+  try {
+    const config = getWorkspaceLifecycleConfig();
+    const source = getEffectiveStatus(ws, config);
+    const display = classifyFromStatus(source, ws);
+    return display.kind === 'past-due-expiring';
+  } catch (e: unknown) {
+    logError('passesFilters.expiring', 'Failed to classify workspace for expiring filter', e);
+    return false;
+  }
+}
+
+/**
+ * Credit-sort "Pro" qualifier (v3.30.0).
+ *
+ * A workspace is "Pro & expiring" when:
+ *   1. It is NOT on the FREE tier (PRO, LITE, or EXPIRED — i.e. it had a paid
+ *      subscription at some point), AND
+ *   2. It currently classifies into a payment-lifecycle warning state:
+ *      past-due-expiring (about-to-expire) OR expired.
+ *
+ * Healthy / refill-soon / canceled rows are excluded — those are not the
+ * recovery candidates the "Pro" credit-sort filter targets.
+ */
+function isProExpiringWs(ws: WorkspaceCredit): boolean {
+  try {
+    const tier = (ws.tier || WsTierValue.FREE).toUpperCase().trim();
+    if (tier === WsTierValue.FREE) return false;
+    const config = getWorkspaceLifecycleConfig();
+    const source = getEffectiveStatus(ws, config);
+    const display = classifyFromStatus(source, ws);
+    // v3.32.1: user-canceled rows are EXCLUDED — user request: "the free
+    // version or the canceled ones should not be there". Naturally-expired
+    // PRO rows (subscriptionStatus='expired') still qualify because they
+    // hold recoverable credits — the display layer collapses them into the
+    // 'canceled' bucket, so we additionally check the subscriptionStatus.
+    if (display.kind === 'past-due-expiring'
+      || display.kind === 'expired-hard'
+      || display.kind === 'expire-soon') return true;
+    if (display.kind === 'canceled') {
+      const sub = (ws.subscriptionStatus || '').toLowerCase().trim();
+      return sub !== 'canceled' && sub !== 'cancelled';
+    }
+    return false;
+  } catch (e: unknown) {
+    logError('passesFilters.proExpiring',
+      'Failed to classify workspace for pro credit-sort filter', e);
+    return false;
+  }
+}
+
+/** Check text match against workspace name / fullName. */
+function matchesTextFilter(ws: WorkspaceCredit, filter: string): boolean {
+  if (!filter) return true;
+  return ws.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ||
+    ws.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+}
+
+/** Check expired-with-credits filter sub-conditions. */
+function matchesExpiredWithCreditsFilter(ws: WorkspaceCredit): boolean {
+  // v3.32.1: FREE-tier workspaces and fully-canceled subscriptions are
+  // explicitly excluded — user request: "the free version or the canceled
+  // ones should not be there". Only PAID rows that are past-due / unpaid
+  // (recoverable) AND still hold residual credits qualify.
+  const tier = (ws.tier || WsTierValue.FREE).toUpperCase().trim();
+  if (tier === WsTierValue.FREE) return false;
+  const sub = (ws.subscriptionStatus || '').toLowerCase().trim();
+  if (sub === 'canceled' || sub === 'cancelled') return false;
+  if (!isExpiredWs(ws)) return false;
+  if (resolveCreditSummary(ws).available <= EXPIRED_WITH_CREDITS_MIN) return false;
+  return true;
+}
+
+/** True when active credit-sort mode is a Pro-only mode. */
+function isProOnlySortMode(mode: WsFilterState['creditSortMode']): boolean {
+  return mode === 'pro-high' || mode === 'pro-low';
+}
+
+/** Check sub-filters that gate on workspace credit/lifecycle state. */
+function passesCreditFilters(ws: WorkspaceCredit, fs: WsFilterState): boolean {
+  if (fs.minCredits > 0 && resolveCreditSummary(ws).available < fs.minCredits) return false;
+  if (fs.expiredWithCredits && !matchesExpiredWithCreditsFilter(ws)) return false;
+  if (fs.expiring && !isExpiringWs(ws)) return false;
+  if (fs.refillSoon && !isRefillSoonWs(ws)) return false;
+  if (isProOnlySortMode(fs.creditSortMode) && !isProExpiringWs(ws)) return false;
+  return true;
+}
+
+/** Check if a workspace passes all active filters. */
+function passesFilters(ws: WorkspaceCredit, fs: WsFilterState): boolean {
+  if (!matchesTextFilter(ws, fs.filter || '')) return false;
+  if (fs.freeOnly && (ws.dailyFree || 0) <= 0) return false;
+  if (fs.rolloverOnly && (ws.rollover || 0) <= 0) return false;
+  if (fs.billingOnly && resolveCreditSummary(ws).billingAvailable <= 0) return false;
+  return passesCreditFilters(ws, fs);
+}
+
+
+/**
+ * Recovery score for the "expired with credits" sort.
+ *
+ * Multiplicative on purpose: a workspace with BOTH high credits AND long
+ * expiry rises above rows that score high on only one axis. Days since expiry
+ * is clamped to a +1 floor so a freshly-expired workspace still ranks by its
+ * credit value (rather than collapsing to 0).
+ *
+ *   score = max(credits, 0) × max(daysExpired, 0) + max(credits, 0)
+ *
+ * The trailing `+ credits` term keeps ranking sensible when expiredDays() is
+ * unavailable (returns null → 0): credits-only ordering is preserved as a
+ * graceful fallback.
+ */
+function _expiredRecoveryScore(ws: WorkspaceCredit): number {
+  const credits = Math.max(resolveCreditSummary(ws).available, 0);
+  const days = Math.max(expiredDays(ws) || 0, 0);
+  return credits * days + credits;
+}
+
+/** Resolve the status emoji for a workspace row. */
+function wsStatusEmoji(isCurrent: boolean, available: number, limitInt: number): string {
+  if (isCurrent) return '📍';
+  if (available <= 0) return '🔴';
+  if (available <= limitInt * 0.2) return '🟡';
+  return '🟢';
+}
+
+/** Compute row background style. */
+function wsRowBgStyle(isCurrent: boolean, isSel: boolean): string {
+  if (isCurrent) return 'background:' + cPrimaryHL + ';border-left:3px solid #a78bfa;';
+  return isSel ? 'border-left:3px solid #facc15;' : 'border-left:3px solid transparent;';
+}
+
+/**
+ * Build the lifecycle status pill HTML.
+ *
+ * Issue 115 (v3.12.0): collapses the granular `WorkspaceStatus` into a single
+ * display badge via `classifyFromStatus`. The legacy duplicated badge pair
+ * (`EXPIRED` + `EXPIRED (CANCELED)`, `ABOUT TO EXPIRE` + `EXPIRED`) is gone:
+ * each row now renders **at most one** status pill with one short label
+ * (`Cancel`, `Refill 5d`, `Expire 3d`, `Expired 2d`).
+ *
+ * Issue 118: past-due rows render a main label (`Expire`) plus an optional
+ * sublabel (`Today` / `Passed Nd`) as a second adjacent pill.
+ *
+ * Returns empty string for `normal` rows.
+ */
+export function buildStatusPillHtml(status: WorkspaceStatus, ws: WorkspaceCredit): string {
+  const display: WorkspaceDisplayStatus = classifyFromStatus(status, ws);
+  if (display.kind === 'normal' || !display.label) return '';
+  const style = resolveBadgeStyle(display.tone);
+
+  // Tooltip carries the long-form context (date, internal reason). The
+  // custom hover card consumes this via `data-marco-tip`; native `title=`
+  // is intentionally omitted (spec/22-app-issues/113).
+  const tipParts: string[] = [display.label];
+  if (display.sublabel) tipParts.push(display.sublabel);
+  if (display.tooltip) tipParts.push(display.tooltip);
+  if (status.kind === 'about-to-refill' && status.refillIso) {
+    tipParts.push('Refills ' + formatDateDDMMMYY(status.refillIso)
+      + ' (in ' + formatDayCount(status.daysToRefill) + ')');
+  } else if (status.sinceIso) {
+    const date = formatDateDDMMMYY(status.sinceIso);
+    tipParts.push('Since ' + date + ' (' + formatDayCount(status.daysSince) + ')');
+  }
+  const tip = tipParts.join(' — ').replace(/"/g, '&quot;');
+
+  let html = '<span class="marco-ws-status-pill marco-ws-status-' + display.kind
+    + '" style="font-size:11px;color:' + style.fg
+    + CSS_BG + style.bg
+    + ';border:1px solid ' + style.border
+    + ';padding:2px 7px;border-radius:4px;font-weight:700;margin-left:5px;vertical-align:middle;letter-spacing:0.3px;text-transform:none;"'
+    + ' data-marco-tip="' + tip + '">' + display.label + '</span>';
+
+  if (display.sublabel) {
+    html += '<span class="marco-ws-status-sublabel marco-ws-status-' + display.kind + '-sublabel" style="font-size:11px;color:' + style.fg
+      + ';background:' + diluteBadgeBg(style.bg, 0.35)
+      + ';border:1px solid ' + style.border
+      + ';padding:2px 6px;border-radius:4px;font-weight:600;margin-left:3px;vertical-align:middle;letter-spacing:0.3px;text-transform:none;"'
+      + ' data-marco-tip="' + tip + '">' + display.sublabel + '</span>';
+  }
+
+  return html;
+}
+
+/**
+ * Build the inline `R Nd` refill badge for a workspace row. Returns empty
+ * string when no usable refill date or refill is beyond the priority
+ * window. Colors follow the about-to-refill warning palette:
+ *   - 0 days  → sky-400 (today)
+ *   - 1–3d    → amber-400 (urgent)
+ *   - 4–10d   → slate-400 (heads-up)
+ *
+ * v3.10.0 — spec/22-app-issues/refill-priority-filter/01-overview.md §4.
+ */
+function buildRefillBadgeHtml(ws: WorkspaceCredit): string {
+  const days = daysToRefillForWs(ws);
+  if (days === null) return '';
+  if (days > REFILL_PRIORITY_WINDOW_DAYS) return '';
+  let fg = '#cbd5e1';
+  let bg = 'rgba(71,85,105,0.35)';
+  let border = 'rgba(148,163,184,0.5)';
+  if (days === 0) {
+    fg = '#bae6fd'; bg = 'rgba(2,132,199,0.45)'; border = '#38bdf8';
+  } else if (days <= 3) {
+    fg = '#fde68a'; bg = 'rgba(180,83,9,0.45)'; border = '#f59e0b';
+  }
+  return '<span class="loop-ws-refill-badge" style="font-size:9px;color:' + fg
+    + CSS_BG + bg + ';border:1px solid ' + border
+    + ';padding:1px 5px;border-radius:3px;font-weight:700;margin-left:5px;vertical-align:middle;letter-spacing:0.3px;">R '
+    + days + 'd</span>';
+}
+
+function resolveStatusPill(
+  ws: WorkspaceCredit, config: ReturnType<typeof getWorkspaceLifecycleConfig>,
+): { pillHtml: string; suppressTier: boolean } {
+  if (!config.enableWorkspaceStatusLabels) return { pillHtml: '', suppressTier: false };
+  const wsTier = ws.tier || WsTierValue.FREE;
+  const status = getEffectiveStatus(ws, config);
+  const pillHtml = buildStatusPillHtml(status, ws);
+  let suppressTier = false;
+  if (isExpiredTier(wsTier)) {
+    const display = classifyFromStatus(status, ws);
+    if (display.kind !== 'normal') suppressTier = true;
+  }
+  return { pillHtml, suppressTier };
+}
+
+function buildLegacyExpiredBadge(ws: WorkspaceCredit): string {
+  const days = expiredDays(ws);
+  if (days === null) return '';
+  const startDate = formatExpiryStartDate(ws);
+  const duration = formatExpiredDuration(ws);
+  const tipParts = ['Expired'];
+  if (startDate) tipParts.push('since ' + startDate);
+  if (duration) tipParts.push('(' + duration + ')');
+  const tip = tipParts.join(' ').replace(/"/g, '&quot;');
+  return '<span style="font-size:10px;color:#fca5a5;background:rgba(127,29,29,0.55);padding:2px 5px;border-radius:3px;font-weight:600;margin-left:3px;vertical-align:middle;" data-marco-tip="' + tip + '">·' + days + 'd</span>';
+}
+
+// Tier-badge text is delegated to the shared plan-mapper formatter so the
+// badge, Credit Totals modal, hover card, and CSV all agree on labels.
+function resolveTierBadgeLabel(ws: WorkspaceCredit, fallback: string): string {
+  const label = formatPlanDisplayLabel(ws.plan);
+  return label || fallback;
+}
+
+
+
+/** Build the inner HTML for a workspace row. Exported for tests. */
+export function buildTierBadgeHtml(ws: WorkspaceCredit): string {
+  const wsTier = ws.tier || WsTierValue.FREE;
+  const tierMeta = WS_TIER_LABELS[wsTier] || WS_TIER_LABELS[WsTierValue.FREE];
+  const config = getWorkspaceLifecycleConfig();
+  const { pillHtml: statusPillHtml, suppressTier: suppressTierBadge } = resolveStatusPill(ws, config);
+  const tierLabel = resolveTierBadgeLabel(ws, tierMeta.label);
+
+  let tierBadge = suppressTierBadge
+    ? ''
+    : '<span style="font-size:10px;color:' + tierMeta.fg + CSS_BG + tierMeta.bg + ';padding:2px 5px;border-radius:3px;font-weight:700;margin-left:6px;vertical-align:middle;letter-spacing:0.3px;">' + tierLabel + '</span>';
+
+  if (config.enableWorkspaceStatusLabels) {
+    tierBadge += statusPillHtml;
+  } else if (isExpiredTier(wsTier)) {
+    tierBadge += buildLegacyExpiredBadge(ws);
+  }
+  if (!config.enableWorkspaceStatusLabels) {
+    tierBadge += buildRefillBadgeHtml(ws);
+  }
+  return tierBadge;
+}
+
+function buildWsRowInnerHtml(
+  ws: WorkspaceCredit, isCurrent: boolean, isChecked: boolean,
+  emoji: string, creditBarHtml: string,
+): string {
+  const tierBadge = buildTierBadgeHtml(ws);
+  const nameColor = isCurrent ? '#67e8f9' : '#e2e8f0';
+  const nameBold = isCurrent ? 'font-weight:800;' : 'font-weight:500;';
+
+  let html = '<span class="loop-ws-checkbox" style="font-size:11px;cursor:pointer;color:' + (isChecked ? '#a78bfa' : '#64748b') + ';user-select:none;flex-shrink:0;">' + (isChecked ? '☑' : '☐') + '</span>'
+    + '<span style="font-size:12px;">' + emoji + '</span>'
+    + '<div style="flex:1;min-width:0;">'
+    + '<div class="loop-ws-name" style="color:' + nameColor + ';font-size:11px;' + nameBold + 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (ws.fullName || ws.name) + tierBadge + '</div>'
+    + '<div style="display:flex;align-items:center;gap:4px;margin-top:2px;">' + creditBarHtml + '</div>'
+    + '</div>';
+  if (isCurrent) {
+    html += '<span style="font-size:8px;color:' + cPrimaryLight + CSS_BG + cPrimaryBgAL + ';padding:1px 4px;border-radius:3px;font-weight:700;">NOW</span>';
+  }
+  return html;
+}
+
+/**
+ * Plan 01 Step 6/8b: build the placeholder bar that occupies the credit-bar
+ * slot while the resolver hasn't returned a real number. Pending → animated
+ * `.marco-skeleton` shimmer (160×8px). Timeout/Missing → thin red 2px bar so
+ * the failure is discoverable without collapsing row height. Both keep the
+ * same 160px min-width as `renderCreditBar()` so the table doesn't reflow
+ * when the resolver completes. Exported so it can be unit-tested without
+ * spinning up the full ws-row DOM.
+ */
+export function buildCreditPlaceholderBarHtml(isPending: boolean, dashTooltip: string): string {
+  if (isPending) {
+    return '<span class="marco-skeleton" title="' + dashTooltip + '" style="display:inline-block;min-width:160px;height:8px;vertical-align:middle;"></span>';
+  }
+  return '<span title="' + dashTooltip + '" style="display:inline-block;min-width:160px;height:2px;background:' + cWarning + ';vertical-align:middle;border-radius:2px;opacity:0.85;"></span>';
+}
+
+/** Build a single workspace row DOM element. */
+function buildWsRow(
+  ws: WorkspaceCredit, wsIndex: number, isCurrent: boolean,
+  count: number, maxTotalCredits: number,
+): HTMLDivElement {
+  const creditSummary = resolveCreditSummary(ws);
+  const available = creditSummary.available;
+  const limitInt = creditSummary.billingLimit;
+  const emoji = wsStatusEmoji(isCurrent, available, limitInt);
+  const wsId = String(ws.id || (ws.raw && ws.raw.id) || '');
+  const selEl = document.getElementById(DomId.LoopWsSelected);
+  const isSel = selEl ? selEl.getAttribute(DataAttr.SelectedId) === wsId : false;
+  const isChecked = !!getLoopWsCheckedIds()[wsId];
+  // spec/22-app-issues/113: the custom hover card (ws-hover-card.ts) is the
+  // single source of truth for workspace hover info. Stash the fallback text
+  // on a data- attribute (consumed by the hover card / debug tools) instead
+  // of `row.title`, which would re-introduce the native browser tooltip and
+  // produce the duplicate-tooltip bug.
+  const tooltip = buildLoopTooltipText(ws).replace(/"/g, '&quot;');
+
+  const row = document.createElement('div');
+  row.className = 'loop-ws-item';
+  row.setAttribute(DataAttr.WsId, wsId);
+  row.setAttribute(DataAttr.WsName, ws.fullName || ws.name);
+  row.setAttribute(DataAttr.WsCurrent, isCurrent ? 'true' : 'false');
+  row.setAttribute('data-ws-idx', String(count));
+  row.setAttribute('data-ws-raw-idx', String(wsIndex));
+  row.setAttribute('data-marco-tip', tooltip);
+  // v2.195.0: padding bumped 5px/6px → 7px/8px to give the larger EXPIRED
+  // badge room to breathe without crowding adjacent rows.
+  row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:7px 8px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);transition:background 0.15s;font-size:11px;' + wsRowBgStyle(isCurrent, isSel);
+
+  const isPending = creditSummary.source === 'Pending';
+  const dashTooltip = isPending
+    ? 'Fetching credit balance… click 💰 Credits to refresh'
+    : 'Credit-balance request timed out — click 💰 Credits to retry';
+  const placeholderBarHtml = buildCreditPlaceholderBarHtml(isPending, dashTooltip);
+  const creditBarHtml = creditSummary.renderDash
+    ? placeholderBarHtml
+    : renderCreditBar({
+      totalCredits: creditSummary.total, available: creditSummary.available, totalUsed: creditSummary.totalUsed,
+      freeRemaining: Math.round(ws.freeRemaining || 0), freeGranted: Math.round(ws.freeGranted || 0),
+      billingAvail: creditSummary.billingAvailable, billingLimit: creditSummary.billingLimit,
+      rollover: creditSummary.rollover, rolloverLimit: creditSummary.rolloverLimit,
+      dailyFree: creditSummary.daily, dailyLimit: creditSummary.dailyLimit,
+      compact: viewState().getCompactMode(), maxTotalCredits,
+    });
+
+
+  row.innerHTML = buildWsRowInnerHtml(ws, isCurrent, isChecked, emoji, creditBarHtml);
+  return row;
+}
+
+/**
+ * Render the workspace list with filtering, credit bars, and event delegation.
+ */
+function computeMaxTotalCredits(workspaces: WorkspaceCredit[]): number {
+  let maxTotalCredits = 1;
+  for (const ws of workspaces) {
+    const mtc = Math.round(resolveCreditSummary(ws).total);
+    if (mtc > maxTotalCredits) maxTotalCredits = mtc;
+  }
+  return maxTotalCredits;
+}
+
+export function filterAndSortWorkspaces(
+  workspaces: WorkspaceCredit[],
+  filter: string,
+): Array<{ ws: WorkspaceCredit; wsIndex: number }> {
+  const fs = readFilterState(filter);
+  const survivors: Array<{ ws: WorkspaceCredit; wsIndex: number }> = [];
+  for (const [wsIndex, ws] of workspaces.entries()) {
+    if (!passesFilters(ws, fs)) continue;
+    survivors.push({ ws, wsIndex });
+  }
+
+  if (fs.expiredWithCredits) {
+    survivors.sort(function (a, b) {
+      return _expiredRecoveryScore(b.ws) - _expiredRecoveryScore(a.ws);
+    });
+  } else if (fs.expiring) {
+    // Issue 118: sort expiring workspaces by urgency (days passed desc),
+    // breaking ties by available credits desc so the most critical rows
+    // surface first.
+    survivors.sort(function (a, b) {
+      const config = getWorkspaceLifecycleConfig();
+      const statusA = getEffectiveStatus(a.ws, config);
+      const statusB = getEffectiveStatus(b.ws, config);
+      const daysA = statusA.daysSince || 0;
+      const daysB = statusB.daysSince || 0;
+      if (daysB !== daysA) return daysB - daysA;
+      return resolveCreditSummary(b.ws).available - resolveCreditSummary(a.ws).available;
+    });
+  } else if (viewState().getRefillPriority() || fs.refillSoon) {
+    // v3.16.1 bug fix — When the "Refill-soon" filter is active, ALL surviving rows
+    // are refill-soon (often with identical `daysToRefill`, e.g. all "1d"), so the
+    // natural API order leaves zero-credit workspaces at the top. Apply the refill
+    // priority sort unconditionally in that case so the highest-credit workspaces
+    // float up. `sortByRefillPriority` already breaks score ties by `available` desc.
+    const sorted = sortByRefillPriority(survivors, REFILL_PRIORITY_WINDOW_DAYS);
+    survivors.length = 0;
+    for (const r of sorted) survivors.push(r);
+  }
+
+  // v3.30.0 — credit-sort mode (overrides previous ordering when active).
+  // High / Pro-High → DESC by available credits. Low / Pro-Low → ASC.
+  if (fs.creditSortMode !== 'none') {
+    const desc = fs.creditSortMode === 'high' || fs.creditSortMode === 'pro-high';
+    survivors.sort(function (a, b) {
+      const av = resolveCreditSummary(a.ws).available;
+      const bv = resolveCreditSummary(b.ws).available;
+      return desc ? bv - av : av - bv;
+    });
+  }
+
+  return survivors;
+}
+
+function updateWsCountLabel(count: number, total: number, filter: string): void {
+  const countLabel = document.getElementById('loop-ws-count-label');
+  if (!countLabel) return;
+  const anyFilterActive = filter || getLoopWsFreeOnly() || getLoopWsExpiredWithCredits()
+    || getLoopWsExpiring() || getLoopWsRefillSoon()
+    || viewState().getCreditSortMode() !== 'none' || count !== total;
+  countLabel.textContent = anyFilterActive
+    ? 'Workspaces (' + count + '/' + total + ')'
+    : 'Workspaces (' + total + ')';
+}
+
+export function renderLoopWorkspaceList(
+  workspaces: WorkspaceCredit[],
+  currentName: string,
+  filter: string,
+): void {
+  const listEl = document.getElementById('loop-ws-list');
+  if (!listEl) return;
+
+  let count = 0;
+  let currentIdx = -1;
+  const maxTotalCredits = computeMaxTotalCredits(workspaces);
+  const survivors = filterAndSortWorkspaces(workspaces, filter);
+
+  // Issue 125 Task 9 — publish the FULL workspace catalog so the dashboard
+  // SummaryBar always reflects the true Pro count + total credits, not the
+  // filtered/visible subset. Pro counts must never appear as 0 just because
+  // a filter is hiding rows.
+  publishVisibleWorkspaces(workspaces);
+
+  const frag = document.createDocumentFragment();
+  for (const { ws, wsIndex } of survivors) {
+    const isCurrent = isCurrentWorkspace(ws, currentName);
+    if (isCurrent) currentIdx = count;
+    frag.appendChild(buildWsRow(ws, wsIndex, isCurrent, count, maxTotalCredits));
+    count++;
+  }
+
+  if (count === 0) {
+    const emptyEl = document.createElement('div');
+    emptyEl.style.cssText = 'padding:8px;color:' + cPrimaryLight + ';font-size:10px;text-align:center;';
+    emptyEl.textContent = '🔍 No matches';
+    frag.appendChild(emptyEl);
+  }
+
+  listEl.innerHTML = '';
+  listEl.appendChild(frag);
+
+  updateWsCountLabel(count, workspaces.length, filter);
+  attachWsListEventDelegation(listEl, currentIdx, filter);
+  attachHoverCardForList(listEl);
+}
+
+/** Phase 4 (workspace-status-tooltip v2.212.0): mount the rich hover card. */
+function attachHoverCardForList(listEl: HTMLElement): void {
+  attachWorkspaceHoverCard(listEl, function (id: string) {
+    const list = loopCreditState.perWorkspace || [];
+    for (const w of list) {
+      const wid = String(w.id || (w.raw && w.raw.id) || '');
+      if (wid === id) return w;
+    }
+    return null;
+  });
+  hideWorkspaceHoverCard();
+}
+
+/**
+ * Attach event delegation handlers on the workspace list container.
+ */
+function attachWsListEventDelegation(
+  listEl: HTMLElement,
+  currentIdx: number,
+  filter: string,
+): void {
+  const elWithHandlers = listEl as HTMLElementWithHandlers;
+
+  if (elWithHandlers._wsDelegateHandler) {
+    listEl.removeEventListener('click', elWithHandlers._wsDelegateHandler);
+    listEl.removeEventListener('dblclick', elWithHandlers._wsDblHandler!);
+    listEl.removeEventListener('contextmenu', elWithHandlers._wsCtxHandler!);
+    listEl.removeEventListener('mouseover', elWithHandlers._wsHoverHandler!);
+    listEl.removeEventListener('mouseout', elWithHandlers._wsOutHandler!);
+  }
+
+  elWithHandlers._wsDelegateHandler = _createClickHandler();
+  elWithHandlers._wsDblHandler = _createDblClickHandler();
+  elWithHandlers._wsCtxHandler = _createCtxHandler();
+  elWithHandlers._wsHoverHandler = _createHoverHandler();
+  elWithHandlers._wsOutHandler = _createOutHandler();
+
+  listEl.addEventListener('click', elWithHandlers._wsDelegateHandler);
+  listEl.addEventListener('dblclick', elWithHandlers._wsDblHandler);
+  listEl.addEventListener('contextmenu', elWithHandlers._wsCtxHandler);
+  listEl.addEventListener('mouseover', elWithHandlers._wsHoverHandler);
+  listEl.addEventListener('mouseout', elWithHandlers._wsOutHandler);
+
+  // Auto-scroll to current workspace, but do NOT auto-select it as a move target.
+  // This avoids a misleading no-op where the Move button targets the current workspace.
+  if (currentIdx >= 0 && !filter) {
+    setTimeout(function () {
+      const currentItem = listEl.querySelector('.loop-ws-item[data-ws-current="true"]');
+      if (currentItem) {
+        currentItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }, 50);
+  }
+}
+
+function _createClickHandler(): (e: MouseEvent) => void {
+  return function (e: MouseEvent) {
+    const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
+    if (!item) return;
+    if ((e.target as HTMLElement).classList && (e.target as HTMLElement).classList.contains('loop-ws-checkbox')) {
+      e.preventDefault();
+      e.stopPropagation();
+      // v2.148.0: pass DOM-visible index so shift-click range respects active filters
+      handleWsCheckboxClick(
+        item.getAttribute(DataAttr.WsId) || '',
+        parseInt(item.getAttribute('data-ws-idx') || '0', 10),
+        e.shiftKey,
+      );
+      return;
+    }
+    setLoopWsNavIndex(parseInt(item.getAttribute('data-ws-idx') || '0', 10));
+    log('Selected workspace: ' + item.getAttribute(DataAttr.WsName), 'success');
+  };
+}
+
+function _createDblClickHandler(): (e: MouseEvent) => void {
+  return function (e: MouseEvent) {
+    const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
+    if (!item) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (item.getAttribute(DataAttr.WsCurrent) === 'true') {
+      log('Double-click on current workspace "' + item.getAttribute(DataAttr.WsName) + '" — no move needed', 'warn');
+      return;
+    }
+    log('Double-click move -> ' + item.getAttribute(DataAttr.WsName) + ' (id=' + item.getAttribute(DataAttr.WsId) + ')', 'delegate');
+    moveToWorkspace(item.getAttribute(DataAttr.WsId) || '', item.getAttribute(DataAttr.WsName) || '');
+  };
+}
+
+function _createCtxHandler(): (e: MouseEvent) => void {
+  return function (e: MouseEvent) {
+    const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
+    if (!item) return;
+    e.preventDefault();
+    e.stopPropagation();
+    showWsContextMenu(
+      item.getAttribute(DataAttr.WsId) || '',
+      item.getAttribute(DataAttr.WsName) || '',
+      e.clientX, e.clientY,
+    );
+  };
+}
+
+function _createHoverHandler(): (e: MouseEvent) => void {
+  return function (e: MouseEvent) {
+    const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
+    if (!item || item.getAttribute(DataAttr.WsCurrent) === 'true') return;
+    const selEl = document.getElementById(DomId.LoopWsSelected);
+    const selId = selEl ? selEl.getAttribute(DataAttr.SelectedId) : '';
+    const itemId = item.getAttribute(DataAttr.WsId);
+    if (selId && selId === itemId) return;
+    item.style.background = 'rgba(59,130,246,0.15)';
+  };
+}
+
+function _createOutHandler(): (e: MouseEvent) => void {
+  return function (e: MouseEvent) {
+    const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
+    if (!item || item.getAttribute(DataAttr.WsCurrent) === 'true') return;
+    const selEl = document.getElementById(DomId.LoopWsSelected);
+    const selId = selEl ? selEl.getAttribute(DataAttr.SelectedId) : '';
+    const itemId = item.getAttribute(DataAttr.WsId);
+    if (selId && selId === itemId) return;
+    item.style.background = 'transparent';
+  };
+}
+// ============================================
+
+/** Manages dropdown hash for dirty-flag optimization. Render counters live in
+ *  the `ws-render-stats` leaf so `MacroController` can read them without
+ *  importing this module (Plan-17 step 19). */
+class WsDropdownState {
+  private static instance: WsDropdownState | null = null;
+  private hash = '';
+
+  static getInstance(): WsDropdownState {
+    if (!WsDropdownState.instance) {
+      WsDropdownState.instance = new WsDropdownState();
+    }
+
+    return WsDropdownState.instance;
+  }
+
+  getHash(): string {
+
+    return this.hash;
+  }
+
+  setHash(nextHash: string): void {
+    this.hash = nextHash;
+  }
+
+  invalidate(): void {
+    this.hash = '';
+  }
+
+  recordSkip(): void {
+    wsRenderStats.skipped++;
+  }
+
+  recordExecution(): void {
+    wsRenderStats.executed++;
+  }
+}
+
+/** Shorthand for singleton access. */
+function dropdownState(): WsDropdownState {
+
+  return WsDropdownState.getInstance();
+}
+
+/**
+ * Populate workspace dropdown — dirty-flag guard to skip re-render when unchanged.
+ */
+export function populateLoopWorkspaceDropdown(): void {
+  const listEl = document.getElementById('loop-ws-list');
+  if (!listEl) return;
+  const workspaces = loopCreditState.perWorkspace || [];
+  if (workspaces.length === 0) {
+    if (dropdownState().getHash() === '_empty') { dropdownState().recordSkip(); return; }
+    dropdownState().setHash('_empty');
+    dropdownState().recordExecution();
+    listEl.innerHTML = '<div style="padding:6px;color:' + cPrimaryLight + ';font-size:10px;">📭 No workspaces loaded — click 💰 Credits to retry</div>';
+
+    return;
+  }
+  const currentName = state.workspaceName || '';
+  const searchEl = document.getElementById('loop-ws-search');
+  const filter = searchEl ? (searchEl as HTMLInputElement).value.trim() : '';
+
+  // P1 fix: comprehensive hash including all view/filter/credit state
+  const rolloverEl = document.getElementById('loop-ws-rollover-filter');
+  const billingEl = document.getElementById('loop-ws-billing-filter');
+  const minCreditsEl = document.getElementById('loop-ws-min-credits');
+  const checkedCount = Object.keys(getLoopWsCheckedIds()).length;
+
+  const hash = [
+    workspaces.length,
+    currentName,
+    filter,
+    loopCreditState.lastCheckedAt || 0,
+    viewState().getFreeOnly() ? 1 : 0,
+    viewState().getCompactMode() ? 1 : 0,
+    rolloverEl ? rolloverEl.getAttribute(DataAttr.Active) : '',
+    billingEl ? billingEl.getAttribute(DataAttr.Active) : '',
+    minCreditsEl ? (minCreditsEl as HTMLInputElement).value : '',
+    viewState().getExpiredWithCredits() ? 1 : 0,
+    viewState().getExpiring() ? 1 : 0,
+    viewState().getRefillPriority() ? 1 : 0,
+    // v3.32.1 — these were missing from the hash, so clicking a credit-sort
+    // row or the Refill-soon chip would NOT re-render the list (the dirty
+    // check early-returned). User complaint: "high credit and low credit, the
+    // filter appears later. When I click on it … no filter action immediately."
+    viewState().getRefillSoon() ? 1 : 0,
+    viewState().getCreditSortMode(),
+    checkedCount,
+  ].join('|');
+
+  if (hash === dropdownState().getHash()) { dropdownState().recordSkip(); return; }
+  dropdownState().setHash(hash);
+  dropdownState().recordExecution();
+  renderLoopWorkspaceList(workspaces, currentName, filter);
+  log(
+    'Workspace dropdown populated: ' + workspaces.length +
+    ' workspaces (rendered:' + wsRenderStats.executed +
+    ' skipped:' + wsRenderStats.skipped + ')',
+    'success',
+  );
+}
+
+/** Force-invalidate the dropdown hash so the next populate call re-renders. */
+export function invalidateWsDropdownHash(): void {
+  dropdownState().invalidate();
+}
+
+// ============================================
+// Plan 01 / Step 7 — Resolver completion subscription
+// ============================================
+// When `/credit-balance` completes for any workspace, the cache holds the
+// fresh value but the dropdown's hash short-circuit would otherwise skip the
+// repaint until the next user interaction (RCA #4). We invalidate the hash
+// and re-populate, debounced so a fan-out of N parallel resolves coalesces
+// into a single render pass.
+
+class CreditResolvedRepaintScheduler {
+  private static instance: CreditResolvedRepaintScheduler | null = null;
+  private timer: ReturnType<typeof setTimeout> | null = null;
+  private readonly debounceMs = 120;
+
+  static get(): CreditResolvedRepaintScheduler {
+    if (!CreditResolvedRepaintScheduler.instance) {
+      CreditResolvedRepaintScheduler.instance = new CreditResolvedRepaintScheduler();
+    }
+    return CreditResolvedRepaintScheduler.instance;
+  }
+
+  schedule(): void {
+    if (this.timer !== null) {
+      return;
+    }
+    this.timer = setTimeout(() => {
+      this.timer = null;
+      try {
+        invalidateWsDropdownHash();
+        populateLoopWorkspaceDropdown();
+      } catch (caught: CaughtError) {
+        logError(
+          'CreditBalanceUpdate.repaint',
+          'Path: standalone-scripts/macro-controller/src/ws-list-renderer.ts. Missing item: workspace dropdown repaint after CreditResolved. Reason: populateLoopWorkspaceDropdown threw during debounced re-render.',
+          caught,
+        );
+      }
+    }, this.debounceMs);
+  }
+}
+
+onCreditResolved(function (_workspaceId: string): void {
+  CreditResolvedRepaintScheduler.get().schedule();
+});

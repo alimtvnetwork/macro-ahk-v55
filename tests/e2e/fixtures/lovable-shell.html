@@ -1,0 +1,40 @@
+<!doctype html>
+<!--
+  Fake lovable.dev shell for the macro-controller content-script harness.
+
+  The macro-controller IIFE (standalone-scripts/macro-controller/dist/macro-looping.js)
+  appends its panel to document.body and reads workspace rows from sidebar
+  selectors. This shell provides:
+    - a valid `https://lovable.dev/projects/<id>` URL surface (set via
+      addInitScript + Playwright route fulfilment in macro-controller-harness.ts)
+    - the minimum sidebar/workspace DOM the panel scans on first render
+    - no real network calls (chrome-API stub + credit-balance-stub answer all of them)
+
+  Keep this file tiny — anything that needs to evolve with the real lovable.dev
+  DOM belongs in spec/22-app-issues/* fixtures, not here.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Lovable Shell (E2E Harness)</title>
+    <style>
+      body { margin: 0; font-family: system-ui, sans-serif; background: #0b0f17; color: #e5e7eb; }
+      #app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+      aside { background: #111827; padding: 12px; }
+      main { padding: 16px; }
+      [data-workspace-row] { padding: 8px; border-bottom: 1px solid #1f2937; }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <aside data-testid="workspace-sidebar">
+        <div data-workspace-row data-workspace-id="ktlo-team">KTLO Team</div>
+        <div data-workspace-row data-workspace-id="free-team">Free Team</div>
+        <div data-workspace-row data-workspace-id="cancelled-team">Cancelled Team</div>
+      </aside>
+      <main>
+        <h1 data-testid="project-title">Harness Project</h1>
+      </main>
+    </div>
+  </body>
+</html>

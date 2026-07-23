@@ -1,0 +1,62 @@
+name: Auto-fix Markdown Filenames
+
+# Renames any mixed-case `.md` files (in particular `SS-*.md` under
+# `.lovable/plans/subtasks/`) to lowercase hyphen-case and pushes a
+# follow-up commit on the same branch. Skips `main` and any protected
+# refs, and skips when the previous commit was already produced by
+# this workflow to avoid recursion.
+
+on:
+  push:
+    branches-ignore:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-fix-md-filenames-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  autofix:
+    if: >-
+      !contains(github.event.head_commit.message, '[skip-autofix]') &&
+      github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Detect violations
+        id: detect
+        run: |
+          set +e
+          node scripts/check-markdown-filenames.mjs
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Apply auto-fix
+        if: steps.detect.outputs.status != '0'
+        run: node scripts/fix-markdown-filenames.mjs
+
+      - name: Verify after fix
+        if: steps.detect.outputs.status != '0'
+        run: node scripts/check-markdown-filenames.mjs
+
+      - name: Commit and push
+        if: steps.detect.outputs.status != '0'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "no changes staged; nothing to commit"
+            exit 0
+          fi
+          git add -A
+          git commit -m "ci: auto-fix mixed-case markdown filenames [skip-autofix]"
+          git push origin HEAD:${{ github.ref_name }}

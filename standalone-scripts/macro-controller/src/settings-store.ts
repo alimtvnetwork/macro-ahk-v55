@@ -1,0 +1,294 @@
+/**
+ * Settings Store — v2.218.0
+ *
+ * User-editable overrides for selected `__MARCO_CONFIG__` keys, persisted in
+ * `chrome.storage.local` so they survive page reloads. The base JSON config
+ * remains the source of truth; the override layer is overlaid only when a
+ * field is explicitly present (and valid).
+ *
+ * Currently overridable keys:
+ *   - expiryGracePeriodDays            (number ≥ 0)
+ *   - refillWarningThresholdDays       (number ≥ 0)
+ *
+ * Design rules:
+ *   - In-memory cache populated on `loadSettingsOverrides()`; subsequent
+ *     `getSettingsOverrides()` calls are sync + cheap.
+ *   - Subscribers are notified on change so dependent UI can re-render.
+ *   - Per `mem://constraints/no-retry-policy` — chrome.storage failures are
+ *     surfaced fail-fast, never auto-retried.
+ */
+
+import { logError } from './error-utils';
+import { log as importedLog } from './logger';
+import { throwDiagnostic } from './errors/diagnostic-error';
+
+const STORAGE_KEY = 'marco_settings_overrides_v1';
+
+function logSettings(message: string, type: string): void {
+  if (typeof importedLog === 'function') {
+    importedLog(message, type);
+    return;
+  }
+  logError('SettingsStore', 'logging unavailable: ' + message);
+}
+
+/** Per-workspace lifecycle override (overrides global override + JSON for one wsId). */
+export interface PerWorkspaceLifecycleOverride {
+  expiryGracePeriodDays?: number | undefined;
+  refillWarningThresholdDays?: number | undefined;
+  hoverCardHideGracePeriodMs?: number | undefined;
+}
+
+export interface SettingsOverrides {
+  expiryGracePeriodDays?: number | undefined;
+  refillWarningThresholdDays?: number | undefined;
+  /** pro_0 credit-balance IndexedDB cache TTL (minutes). Spec §9.1 / §11. */
+  proZeroCreditBalanceCacheTtlMinutes?: number | undefined;
+  /** Projects-list SQLite cache TTL (hours). Default 48. */
+  projectsCacheTtlHours?: number | undefined;
+  /** Master switch for the canceled/expired credit override. Default true. */
+  enableCanceledCreditOverride?: boolean | undefined;
+  /** Show inline status labels under each workspace row. */
+  enableWorkspaceStatusLabels?: boolean | undefined;
+  /** Show the rich hover-card with credit details on workspace rows. */
+  enableWorkspaceHoverDetails?: boolean | undefined;
+  /** Delay before the workspace hover card disappears after mouseleave (ms). Default 220. */
+  hoverCardHideGracePeriodMs?: number | undefined;
+
+  /** Delay between next-prompt submissions (seconds). Default 22. Issue 131 Task 1. */
+  nextSubmissionDelaySeconds?: number | undefined;
+  /** Enable/Disable the submission delay. Default true. */
+  enableNextSubmissionDelay?: boolean | undefined;
+  /** Automatically detect if a delay is required based on page content. Default true. */
+  autoDetectDelay?: boolean | undefined;
+  /** Retry prompt on failure (XPath not found / error msg). Default true. */
+  retryOnFailure?: boolean | undefined;
+  /** Interval for checking credits (seconds). Default 5. */
+  creditPollIntervalSeconds?: number | undefined;
+  /** Automatically pause the task queue if a task fails. Default true. */
+  pauseQueueOnError?: boolean | undefined;
+  /** Maximum number of retries for a failed task. Default 3. */
+  maxTaskRetries?: number | undefined;
+  /**
+   * Credit-balance fetch timeout (ms) for Ktlo/Free/Cancelled workspaces.
+   * Spec: spec/21-app/01-chrome-extension/credit-balance-update/06-settings-slider.md.
+   * Range 500..15000, default 3000.
+   */
+  creditFetchDelayMs?: number | undefined;
+
+  /** Task Splitter: auto-enqueue parsed subtasks after split. Default true. */
+  splitterAutoEnqueue?: boolean | undefined;
+  /** Persistent task-queue max size per project. Default 200. */
+  maxQueueSize?: number | undefined;
+
+
+
+
+  /**
+   * Per-workspace lifecycle overrides keyed by workspace id (string UUID).
+   * Values here override the global `expiryGracePeriodDays` /
+   * `refillWarningThresholdDays` for the matching workspace only.
+   */
+  perWorkspace?: Record<string, PerWorkspaceLifecycleOverride> | undefined;
+}
+
+type SettingsListener = (overrides: SettingsOverrides) => void;
+
+interface SettingsCache {
+  loaded: boolean;
+  overrides: SettingsOverrides;
+}
+
+const cache: SettingsCache = { loaded: false, overrides: {} };
+const listeners = new Set<SettingsListener>();
+
+function isFiniteNonNegative(n: unknown): n is number {
+  return typeof n === 'number' && Number.isFinite(n) && n >= 0;
+}
+
+function sanitizePerWorkspace(
+  raw: unknown,
+): Record<string, PerWorkspaceLifecycleOverride> | undefined {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const out: Record<string, PerWorkspaceLifecycleOverride> = {};
+  for (const [wsId, overrideValue] of Object.entries(raw as Record<string, unknown>)) {
+    if (!wsId || typeof wsId !== 'string') continue;
+    if (!overrideValue || typeof overrideValue !== 'object') continue;
+    const overrideRecord = overrideValue as Record<string, unknown>;
+    const entry: PerWorkspaceLifecycleOverride = {};
+    if (isFiniteNonNegative(overrideRecord.expiryGracePeriodDays)) {
+      entry.expiryGracePeriodDays = Math.floor(overrideRecord.expiryGracePeriodDays);
+    }
+    if (isFiniteNonNegative(overrideRecord.refillWarningThresholdDays)) {
+      entry.refillWarningThresholdDays = Math.floor(overrideRecord.refillWarningThresholdDays);
+    }
+    if (isFiniteNonNegative(overrideRecord.hoverCardHideGracePeriodMs)) {
+      entry.hoverCardHideGracePeriodMs = Math.floor(overrideRecord.hoverCardHideGracePeriodMs);
+    }
+    if (entry.expiryGracePeriodDays !== undefined || entry.refillWarningThresholdDays !== undefined || entry.hoverCardHideGracePeriodMs !== undefined) {
+      out[wsId] = entry;
+    }
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
+function sanitize(raw: unknown): SettingsOverrides {
+  if (!raw || typeof raw !== 'object') return {};
+  const r = raw as Record<string, unknown>;
+  const out: SettingsOverrides = {};
+
+  const numericFields: Array<keyof SettingsOverrides> = [
+    'expiryGracePeriodDays',
+    'refillWarningThresholdDays',
+    'proZeroCreditBalanceCacheTtlMinutes',
+    'projectsCacheTtlHours',
+    'hoverCardHideGracePeriodMs',
+    'nextSubmissionDelaySeconds',
+    'creditPollIntervalSeconds',
+    'maxTaskRetries',
+    'maxQueueSize'
+
+  ];
+
+  numericFields.forEach(f => {
+    const fieldValue = r[f];
+    if (isFiniteNonNegative(fieldValue)) {
+      (out as Record<string, unknown>)[f] = Math.floor(fieldValue);
+    }
+  });
+
+  // creditFetchDelayMs — clamped to [500, 15000] per spec 06-settings-slider.md.
+  const cfd = r.creditFetchDelayMs;
+  if (typeof cfd === 'number' && Number.isFinite(cfd)) {
+    const clamped = Math.max(500, Math.min(15000, Math.floor(cfd)));
+    out.creditFetchDelayMs = clamped;
+  }
+
+  const booleanFields: Array<keyof SettingsOverrides> = [
+    'enableCanceledCreditOverride',
+    'enableWorkspaceStatusLabels',
+    'enableWorkspaceHoverDetails',
+    'enableNextSubmissionDelay',
+    'autoDetectDelay',
+    'retryOnFailure',
+    'pauseQueueOnError',
+    'splitterAutoEnqueue'
+
+  ];
+
+  booleanFields.forEach(f => {
+    const fieldValue = r[f];
+    if (typeof fieldValue === 'boolean') {
+      (out as Record<string, unknown>)[f] = fieldValue;
+    }
+  });
+
+  const perWs = sanitizePerWorkspace(r.perWorkspace);
+  if (perWs) {
+    out.perWorkspace = perWs;
+  }
+  return out;
+}
+
+function hasChromeStorage(): boolean {
+  return typeof chrome !== 'undefined'
+    && !!chrome.storage
+    && !!chrome.storage.local;
+}
+
+/**
+ * MAIN-world fallback: when injected into the page world, `chrome.storage.local`
+ * is not exposed. Fall back to `window.localStorage` (same lovable.dev origin),
+ * which still survives reloads. Keys are namespaced with `__marco__:` to avoid
+ * collisions with the host app.
+ */
+const LS_KEY = '__marco__:' + STORAGE_KEY;
+
+function hasLocalStorage(): boolean {
+  try {
+    return typeof window !== 'undefined' && !!window.localStorage;
+  } catch (_e: unknown) { return false; } // allow-swallow: SecurityError in sandboxed iframe.
+}
+
+function readFromLocalStorage(): unknown {
+  if (!hasLocalStorage()) return undefined;
+  try {
+    const raw = window.localStorage.getItem(LS_KEY);
+    return raw ? JSON.parse(raw) : undefined;
+  } catch (_e: unknown) { return undefined; } // allow-swallow: corrupt JSON falls back to defaults.
+}
+
+function writeToLocalStorage(value: SettingsOverrides): { ok: true } | { ok: false; reason: string } {
+  if (!hasLocalStorage()) return { ok: false, reason: 'localStorage unavailable' };
+  try {
+    window.localStorage.setItem(LS_KEY, JSON.stringify(value));
+    return { ok: true };
+  } catch (e: unknown) {
+    return { ok: false, reason: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+/** Load overrides from chrome.storage.local (or localStorage fallback) into the in-memory cache. Idempotent. */
+export async function loadSettingsOverrides(): Promise<SettingsOverrides> {
+  if (!hasChromeStorage()) {
+    cache.overrides = sanitize(readFromLocalStorage());
+    cache.loaded = true;
+    logSettings('[Settings] loaded overrides (localStorage fallback): ' + JSON.stringify(cache.overrides), 'info');
+    return cache.overrides;
+  }
+  try {
+    const result = await chrome.storage.local.get(STORAGE_KEY);
+    cache.overrides = sanitize(result[STORAGE_KEY]);
+    cache.loaded = true;
+    logSettings('[Settings] loaded overrides: ' + JSON.stringify(cache.overrides), 'info');
+    return cache.overrides;
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    logError('SettingsStore', 'load failed: ' + msg);
+    cache.loaded = true;
+    cache.overrides = sanitize(readFromLocalStorage());
+    return cache.overrides;
+  }
+}
+
+/** Sync read of cached overrides. Returns {} when not yet loaded. */
+export function getSettingsOverrides(): SettingsOverrides {
+  return cache.overrides;
+}
+
+/** Persist new overrides. Pass {} to reset to JSON defaults. */
+export async function saveSettingsOverrides(next: SettingsOverrides): Promise<void> {
+  const sanitized = sanitize(next);
+  if (hasChromeStorage()) {
+    await chrome.storage.local.set({ [STORAGE_KEY]: sanitized });
+  } else {
+    // MAIN-world fallback: persist to localStorage so the user's edits survive reload.
+    const result = writeToLocalStorage(sanitized);
+    if (!result.ok) {
+      throwDiagnostic('SETTINGS_PERSIST_E001', {
+        reason: result.reason,
+        fallbackStage: 'localStorage',
+      });
+    }
+    logSettings('[Settings] saved overrides via localStorage fallback', 'info');
+  }
+  cache.overrides = sanitized;
+  cache.loaded = true;
+  logSettings('[Settings] saved overrides: ' + JSON.stringify(sanitized), 'success');
+  listeners.forEach(function (fn) {
+    try { fn(sanitized); } catch (e: unknown) {
+      logError('SettingsStore', 'listener threw: ' + (e instanceof Error ? e.message : String(e)));
+    }
+  });
+}
+
+/** Convenience: clear all overrides (revert to JSON config / defaults). */
+export function clearSettingsOverrides(): Promise<void> {
+  return saveSettingsOverrides({});
+}
+
+/** Subscribe to override changes. Returns an unsubscribe fn. */
+export function onSettingsChange(fn: SettingsListener): () => void {
+  listeners.add(fn);
+  return function () { listeners.delete(fn); };
+}

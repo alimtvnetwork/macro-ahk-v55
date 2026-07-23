@@ -1,0 +1,54 @@
+/**
+ * Lovable User Add — Project Instruction Manifest
+ *
+ * Phase P11 scaffold: declares dependency on `lovable-common` (XPaths +
+ * LovableApiClient) and registers the empty `LovableUserAdd` entry
+ * class. Migrations (P12), CSV (P13), UI (P14) and flow (P15–P17) plug
+ * in via subsequent phases without changing this manifest's shape.
+ *
+ * R12 invariant: Step B (Owner promotion) MUST call the shared
+ * `LovableApiClient.promoteToOwner(...)` — same call site Owner Switch
+ * uses. No separate PUT implementation in this project.
+ *
+ * All keys PascalCase per `mem://standards/pascalcase-json-keys`.
+ */
+
+import type { ProjectInstruction } from "../../types/instruction/project-instruction";
+import { InjectionWorld } from "../../types/instruction/enums/injection-world";
+import { InjectionRunAt } from "../../types/instruction/enums/injection-run-at";
+import { MatchType } from "../../types/instruction/enums/match-type";
+import type { EmptySettings } from "../../types/instruction/seed/empty-settings";
+import { VERSION } from "../../shared-version";
+
+const instruction: ProjectInstruction<EmptySettings> = {
+    SchemaVersion: "1.0",
+    Name: "lovable-user-add",
+    DisplayName: "Lovable User Add",
+    Version: VERSION,
+    Description: "Bulk-add Lovable workspace members from a CSV; promotes Owner rows via shared promoteToOwner.",
+    World: InjectionWorld.Main,
+    IsGlobal: false,
+    Dependencies: ["lovable-common"],
+    LoadOrder: 61,
+    Seed: {
+        Id: "default-lovable-user-add",
+        SeedOnInstall: true,
+        IsRemovable: false,
+        AutoInject: true,
+        RunAt: InjectionRunAt.DocumentIdle,
+        TargetUrls: [{ Pattern: "https://lovable.dev/*", MatchType: MatchType.Glob }],
+        Cookies: [],
+        Settings: {},
+    },
+    Assets: {
+        Css: [],
+        Configs: [],
+        Scripts: [
+            { File: "lovable-user-add.js", Order: 1, IsIife: true },
+        ],
+        Templates: [],
+        Prompts: [],
+    },
+};
+
+export default instruction;

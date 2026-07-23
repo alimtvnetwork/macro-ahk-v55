@@ -1,0 +1,14 @@
+{
+  "Id": "default-jokes-ideas-generate",
+  "Title": "Jokes Ideas Generate (Recruitment Marketing, Maximum Enforcement)",
+  "Slug": "jokes-ideas-generate",
+  "Version": "2.0.0",
+  "Author": "marco",
+  "Categories": [
+    "marketing"
+  ],
+  "IsDefault": true,
+  "Order": 25,
+  "CreatedAt": "2026-07-19T00:00:00Z",
+  "UpdatedAt": "2026-07-20T00:00:00Z"
+}

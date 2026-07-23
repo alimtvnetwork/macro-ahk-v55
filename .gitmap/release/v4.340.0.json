@@ -1,0 +1,16 @@
+{
+  "version": "4.340.0",
+  "branch": "release/v4.340.0",
+  "sourceBranch": "main",
+  "commit": "16c042f88c79e9dd3561fd8b62a89af040f1089b",
+  "tag": "v4.340.0",
+  "assets": [],
+  "changelog": [
+    "`src/components/options/InputSourceDialog.tsx`: reduced from ~280L to a 30-line orchestrator; state and mutation helpers extracted into `src/components/options/input-source/use-input-source-draft.ts` (with `useHeaderMutators`, `useSaveHandler`, `useTestHandler` sub-hooks) and presentational sections into `src/components/options/input-source/input-source-sections.tsx` (Endpoint, Headers, Body, FailurePolicy, TestFetch). 0 lint problems on touched files.",
+    "`src/test/snapshots/Popup.snapshot.test.tsx`: wrapped async mount effects from `SessionCopyButton`, `PopupFooter`, and `BootFailureBanner` in `act()` via a `flushEffects()` helper; eliminates `An update to X inside a test was not wrapped in act(...)` warnings and prevents the CI operation-cancelled timeout."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-20T07:36:35Z",
+  "isLatest": false
+}

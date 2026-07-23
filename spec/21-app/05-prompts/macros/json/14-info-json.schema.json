@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://riseup.asia/schemas/info-json#v1",
+  "title": "PromptInfo",
+  "type": "object",
+  "required": ["Slug", "Title", "Version"],
+  "properties": {
+    "Slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" },
+    "Title": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "Version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "Description": { "type": "string", "maxLength": 1000 },
+    "Categories": { "type": "array", "items": { "type": "string" }, "maxItems": 10 },
+    "Variables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["Name", "Type"],
+        "properties": {
+          "Name": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]*$" },
+          "Type": { "type": "string", "enum": ["string", "integer", "number", "boolean", "enum", "path"] },
+          "Default": {},
+          "Required": { "type": "boolean", "default": false },
+          "Sensitive": { "type": "boolean", "default": false },
+          "Min": { "type": "number" },
+          "Max": { "type": "number" },
+          "Values": { "type": "array", "items": {} },
+          "Description": { "type": "string", "maxLength": 500 }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

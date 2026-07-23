@@ -1,0 +1,16 @@
+{
+  "version": "4.153.3",
+  "branch": "release/v4.153.3",
+  "sourceBranch": "main",
+  "commit": "287b701e1052068a54796e45e47782ec0d339547",
+  "tag": "v4.153.3",
+  "assets": [],
+  "changelog": [
+    "`standalone-scripts/macro-controller/src/ui/next-inline-ui.ts`: extracted the duplicated document-click \"outside closer\" block (previously identical in `buildPlanDropup` at line 239 and `buildNextMorePopover` at line 329) into a shared `attachDropupOutsideCloser(panel, anchor)` helper. Clears `sonarjs/no-identical-functions` and unblocks CI (`ESLint found too many warnings (maximum: 0)`). No behaviour change: same listener registration, same teardown pushed into `_dropupClosers`.",
+    "Version pins bumped 4.153.2 to 4.153.3 across `version.json`, `manifest.json`, `readme.md`, `RELEASE_NOTES.md`, `src/shared/constants.ts`, all `standalone-scripts/*/src/instruction.ts`, `standalone-scripts/macro-controller/src/shared-state.ts`, and `standalone-scripts/payment-banner-hider/src/index.ts`."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-18T19:27:13Z",
+  "isLatest": false
+}

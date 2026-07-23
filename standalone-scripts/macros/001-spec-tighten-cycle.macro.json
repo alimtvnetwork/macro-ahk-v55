@@ -1,0 +1,77 @@
+{
+  "Slug": "spec-tighten-cycle",
+  "Title": "Spec Tighten Cycle",
+  "Description": "Audit a spec subtree, write gap analysis, fix findings via repeated `next`, re-audit, and loop until the score meets TargetScore or MaxLoops is reached.",
+  "Category": "Spec",
+  "Version": "1.0.0",
+  "IsFavorite": true,
+  "IsExperimental": false,
+  "IsUserAuthored": false,
+  "TargetScore": 90,
+  "MaxLoops": 3,
+  "Variables": [
+    {
+      "Name": "TargetFolder",
+      "Type": "path",
+      "Required": true,
+      "Description": "Spec subtree to audit, relative to repo root (e.g. spec/21-app)."
+    },
+    {
+      "Name": "Depth",
+      "Type": "integer",
+      "Required": false,
+      "Default": 3,
+      "Description": "Max depth to walk during the audit."
+    },
+    {
+      "Name": "FixBatchSize",
+      "Type": "integer",
+      "Required": false,
+      "Default": 10,
+      "Description": "How many `next` keywords to emit per fix pass."
+    }
+  ],
+  "Steps": [
+    {
+      "Kind": "audit",
+      "Slug": "audit-spec",
+      "Variables": { "TargetFolder": "spec/21-app", "Depth": 4 },
+      "WriteTo": "spec/audit/{{ RunId }}/01-gap-analysis.md"
+    },
+    {
+      "Kind": "prompt",
+      "Slug": "gap-analysis"
+    },
+    {
+      "Kind": "notify",
+      "Message": "Starting fix loop (batch={{ FixBatchSize }}, loop={{ LoopCount }}/{{ MaxLoops }}).",
+      "Level": "info"
+    },
+    {
+      "Kind": "fix-from-audit"
+    },
+    {
+      "Kind": "next-loop",
+      "Count": 10
+    },
+    {
+      "Kind": "final-audit",
+      "Slug": "final-score",
+      "WriteTo": "spec/audit/{{ RunId }}/99-final-report.md"
+    },
+    {
+      "Kind": "prompt",
+      "Slug": "score-extract"
+    },
+    {
+      "Kind": "loop-if",
+      "GotoStep": 0,
+      "ScoreLessThan": 90
+    },
+    {
+      "Kind": "notify",
+      "Message": "Spec tighten complete. LastScore={{ LastScore }}/100 after {{ LoopCount }} loop(s).",
+      "Level": "info"
+    }
+  ]
+}

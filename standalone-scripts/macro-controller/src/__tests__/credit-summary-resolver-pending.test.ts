@@ -1,0 +1,108 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { WorkspaceCredit } from '../types';
+
+vi.mock('../settings-store', () => ({
+    onSettingsChange: () => () => undefined,
+}));
+vi.mock('../error-utils', () => ({ logError: vi.fn() }));
+vi.mock('../credit-balance-update/credit-balance-fetcher', () => ({
+    fetchWorkspaceCreditBalance: vi.fn(),
+}));
+
+import { resolveCreditSummary } from '../credit-balance-update/credit-summary-resolver';
+import { __writeCreditBalanceUpdateMemoryCacheForTests, clearCreditBalanceUpdateMemoryCache } from '../credit-balance-update/credit-balance-cache';
+import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
+
+function ws(partial: Partial<WorkspaceCredit>): WorkspaceCredit {
+    return {
+        id: 'ws_pending', name: 'ws', fullName: 'workspace',
+        dailyFree: 0, dailyUsed: 0, dailyLimit: 0,
+        rolloverUsed: 0, rolloverLimit: 0,
+        freeGranted: 0, freeRemaining: 0,
+        used: 0, limit: 0, topupLimit: 0,
+        totalCredits: 0, available: 0, rollover: 0, billingAvailable: 0,
+        hasFree: false, totalCreditsUsed: 0,
+        subscriptionStatus: 'active', subscriptionStatusChangedAt: '',
+        plan: 'ktlo', role: 'owner', tier: 'LITE',
+        raw: {}, rawApi: {},
+        numProjects: 0, gitSyncEnabled: false,
+        nextRefillAt: '', billingPeriodEndAt: '', createdAt: '',
+        membershipRole: 'owner', planType: 'monthly',
+        ...partial,
+    };
+}
+
+beforeEach(() => {
+    clearCreditBalanceUpdateMemoryCache();
+});
+
+describe('resolveCreditSummary — Pending state (RCA 2026-06-06)', () => {
+    it('returns Pending+renderDash for new-free workspace with no inline credits and no cache', () => {
+        const summary = resolveCreditSummary(ws({ plan: 'ktlo', limit: 0, rawApi: { grant_type_balances: [] } }));
+        expect(summary.source).toBe('Pending');
+        expect(summary.renderDash).toBe(true);
+        expect(summary.available).toBe(0);
+        expect(summary.total).toBe(0);
+    });
+
+    it('returns Pending for all-zero grant_type_balances rows', () => {
+        const summary = resolveCreditSummary(ws({
+            plan: 'free',
+            limit: 0,
+            rawApi: { grant_type_balances: [{ total_granted: 0, total_remaining: 0, daily_limit: 0 }] },
+        }));
+        expect(summary.source).toBe('Pending');
+        expect(summary.renderDash).toBe(true);
+    });
+
+    it('returns Pending for ktlo_2 stale 20/20 sub-bucket rows until /credit-balance resolves', () => {
+        const summary = resolveCreditSummary(ws({
+            plan: 'ktlo_2',
+            limit: 20,
+            available: 20,
+            totalCredits: 20,
+            billingAvailable: 20,
+            rawApi: { grant_type_balances: [{ granted: 20, remaining: 20 }] },
+        }));
+        expect(summary.source).toBe('Pending');
+        expect(summary.renderDash).toBe(true);
+        expect(summary.available).toBe(0);
+        expect(summary.total).toBe(0);
+    });
+
+    it('returns Inline (no dash) when inline credits are present', () => {
+        const summary = resolveCreditSummary(ws({ limit: 50, available: 45, totalCredits: 50 }));
+        expect(summary.source).toBe('Inline');
+        expect(summary.renderDash).toBe(false);
+        expect(summary.available).toBe(45);
+    });
+
+    it('uses daily credits when cached aggregate totals are zero', () => {
+        __writeCreditBalanceUpdateMemoryCacheForTests('daily_only', {
+            outcome: CreditFetchOutcome.ApiHit,
+            fetchedAt: Date.now(),
+            sourceUrl: 'test',
+            errorDetail: null,
+            balance: {
+                totalRemaining: 0,
+                totalGranted: 0,
+                dailyRemaining: 5,
+                dailyLimit: 5,
+                totalBillingPeriodUsed: 0,
+                expiringGrants: [],
+                grantTypeBalances: [],
+            },
+        });
+        const summary = resolveCreditSummary(ws({ id: 'daily_only', plan: 'free' }));
+        expect(summary.available).toBe(5);
+        expect(summary.total).toBe(5);
+        expect(summary.renderDash).toBe(false);
+    });
+
+    it('does not flip to Pending for plans that do not require /credit-balance', () => {
+        // pro_3 has inline-only credits — should be Inline/Missing, never Pending
+        const summary = resolveCreditSummary(ws({ plan: 'pro_3', limit: 0, available: 0, totalCredits: 0 }));
+        expect(summary.source).not.toBe('Pending');
+        expect(summary.renderDash).toBe(false);
+    });
+});

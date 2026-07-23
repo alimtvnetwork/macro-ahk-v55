@@ -1,0 +1,16 @@
+{
+  "version": "5.2.0",
+  "branch": "release/v5.2.0",
+  "sourceBranch": "main",
+  "commit": "95ddc556d86c8854ce4cc68d604a1b56abe3b3f5",
+  "tag": "v5.2.0",
+  "assets": [],
+  "changelog": [
+    "`standalone-scripts/macro-controller/src/ui/next-inline-ui.ts`: `findNextVariant` now runs `substituteNextValue` on the matched `next-N-steps` body so `{{n}}` (and legacy `${N}`) tokens are rendered before the text reaches the editor, closing the last raw-token paste path.",
+    "`standalone-scripts/macro-controller/src/__tests__/inline-strip-decoupled.test.ts`: regression coverage asserting variant bodies with `{{n}}` render as concrete numbers via the Next chip fallback path."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-21T18:28:05Z",
+  "isLatest": false
+}

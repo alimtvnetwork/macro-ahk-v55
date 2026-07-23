@@ -1,0 +1,485 @@
+/**
+ * MacroLoop Controller — Credit Fetch
+ *
+ * Contains: fetchLoopCredits, fetchLoopCreditsAsync (network layer).
+ * Barrel re-exports parseLoopApiResponse, syncCreditStateFromApi, tier utils from credit-parser.
+ *
+ * v7.39: Replaced recursive retry with single retry after recoverAuthOnce() (RCA-1 fix).
+ *        Auth toasts now use noStop:true to avoid stopping loop on recoverable errors.
+ * v7.40: Migrated from raw fetch() to httpRequest() (XMLHttpRequest + Promise).
+ * v7.50: Migrated to marco.api centralized SDK (Axios + registry).
+ *
+ * @see spec/22-app-issues/authentication-freeze-and-retry-loop.md (RCA-1, RCA-2)
+ * @see memory/architecture/networking/centralized-api-registry
+ */
+
+import { log, logSub } from './logger';
+import { resolveToken, invalidateSessionBridgeKey, markBearerTokenExpired, getLastTokenSource, getAuthDebugSnapshot, getBearerToken } from './auth';
+import { showToast } from './toast';
+import { nsWrite, nsCallTyped } from './api-namespace';
+
+import { MacroController } from './core/MacroController';
+
+import { CREDIT_API_BASE, loopCreditState } from './shared-state';
+import { parseLoopApiResponse, syncCreditStateFromApi, applyProZeroEnrichment, applyProOneEnrichment } from './credit-parser';
+import { logError } from './error-utils';
+import { ApiPath } from './types';
+import { throwDiagnostic } from './errors/diagnostic-error';
+import { enrichCreditBalanceUpdateWorkspaces } from './credit-balance-update/enrichment';
+// Dynamic import: `ws-list-renderer` legitimately depends on many symbols from
+// this module, so a static edge back would close a 2-node cycle. The repaint
+// is fire-and-forget (callers don't await it), so async import is semantically
+// identical and lets madge (skipAsyncImports=true) drop the cycle.
+
+/**
+ * v3.55.x credit-bar repaint fix — see `.lovable/plan.md` 2026-06-06.
+ * Enrichment overlays /credit-balance numbers onto each row, but the per-row
+ * progress bar (renderCreditBar inside renderLoopWorkspaceList) is only
+ * repainted by populateLoopWorkspaceDropdown(). Without this companion call
+ * Free / Lite / Cancelled / pro_0 / pro_1 bars stay pinned at 0/0.
+ */
+function repaintWorkspaceRowsAfterEnrichment(scope: string): void {
+  void import('./ws-list-renderer')
+    .then(({ populateLoopWorkspaceDropdown }) => populateLoopWorkspaceDropdown())
+    .catch((err: unknown) => {
+      logError(LOG_SCOPE_CREDIT_FETCH, scope + ': populateLoopWorkspaceDropdown failed', err);
+    });
+}
+
+const LOG_SCOPE_CREDIT_FETCH = 'credit-fetch';
+const CREDIT_FETCH_ASYNC_SCOPE = 'credit-fetch-async';
+const LOG_PREFIX = 'Credit API (async): ';
+
+function mc() { return MacroController.getInstance(); }
+
+// ============================================
+// Helper — call marco.api.credits.fetchWorkspaces
+// ============================================
+
+interface SdkApiResponse {
+  readonly ok: boolean;
+  readonly status: number;
+  readonly data: unknown;
+  readonly headers: Record<string, string>;
+}
+
+async function apiFetchWorkspaces(): Promise<SdkApiResponse> {
+  // SDK readiness guard, converts the cryptic "Cannot read properties of
+  // undefined (reading 'credits')" crash into a typed, actionable error
+  // when MacroController runs before the marco-sdk has finished injecting
+  // (load-order race). See mem://standards/verbose-logging-and-failure-diagnostics.
+  const sdk = window.marco;
+  if (!sdk) {
+    throwDiagnostic('CREDIT_FETCH_E001', {
+      missingApi: 'window.marco',
+      readinessStage: 'sdk-root',
+      op: 'apiFetchWorkspaces',
+    });
+  }
+  if (!sdk.api) {
+    throwDiagnostic('CREDIT_FETCH_E001', {
+      missingApi: 'window.marco.api',
+      readinessStage: 'sdk-api',
+      op: 'apiFetchWorkspaces',
+    });
+  }
+  if (!sdk.api.credits || typeof sdk.api.credits.fetchWorkspaces !== 'function') {
+    throwDiagnostic('CREDIT_FETCH_E001', {
+      missingApi: 'window.marco.api.credits.fetchWorkspaces',
+      readinessStage: 'sdk-credits',
+      op: 'apiFetchWorkspaces',
+    });
+  }
+
+  return sdk.api.credits.fetchWorkspaces({ baseUrl: CREDIT_API_BASE });
+}
+
+function isAuthFailure(status: number): boolean {
+  return status === 401 || status === 403;
+}
+
+// ============================================
+// Auth diagnostics helpers
+// ============================================
+
+function buildAuthFailureDetail(): string {
+  const snapshot = getAuthDebugSnapshot();
+  const bridgeText = !snapshot.bridgeOutcome.attempted
+    ? 'not attempted'
+    : (snapshot.bridgeOutcome.success
+      ? 'success via ' + snapshot.bridgeOutcome.source
+      : 'failed' + (snapshot.bridgeOutcome.error ? ' — ' + snapshot.bridgeOutcome.error : ''));
+
+  const visibleNames = snapshot.visibleCookieNames.length > 0
+    ? snapshot.visibleCookieNames.join(', ')
+    : '(none visible to page JS)';
+
+  return [
+    'Auth flow: ' + snapshot.flow,
+    'Token source: ' + snapshot.tokenSource,
+    'Resolved token available: ' + (snapshot.hasResolvedToken ? 'YES' : 'NO'),
+    'Session cookie names from bindings: [' + snapshot.sessionCookieNames.join(', ') + ']',
+    'Bridge outcome: ' + bridgeText,
+    'Visible cookie names in document.cookie: [' + visibleNames + ']',
+  ].join('\n');
+}
+
+function emitAuthFailureToast(status: number, statusText: string): void {
+  const detail = buildAuthFailureDetail();
+  logError('unknown', 'Credit API auth failure diagnostics:\n' + detail);
+
+  showToast(
+    'Authentication failed. Tried localStorage → extension bridge → cookie fallback. Click copy for exact cookie names + bridge outcome.',
+    'error',
+    {
+      noStop: true,
+      requestDetail: {
+        method: 'GET', url: CREDIT_API_BASE + ApiPath.UserWorkspaces, headers: {}, status, statusText, responseBody: detail,
+      },
+    },
+  );
+}
+
+// ============================================
+// Auth recovery flow — extracted for reuse
+// ============================================
+
+async function handleAuthRecovery(
+  token: string,
+  status: number,
+  statusText: string,
+): Promise<string | null> {
+  markBearerTokenExpired(LOG_SCOPE_CREDIT_FETCH);
+  if (token) { invalidateSessionBridgeKey(token); }
+
+  log('Credit API: Auth ' + status + ' — forcing token refresh before retry...', 'warn');
+  const userWorkspacesPath = ApiPath.UserWorkspaces;
+  showToast('Auth ' + status + ' — recovering session...', 'warn', {
+    noStop: true,
+    requestDetail: { method: 'GET', url: CREDIT_API_BASE + userWorkspacesPath, headers: {}, status, statusText },
+  });
+
+  const newToken = await getBearerToken({ force: true });
+
+  if (!newToken) {
+    logError('Credit API', 'Auth recovery failed — no retry');
+    emitAuthFailureToast(status, statusText);
+
+    return null;
+  }
+
+  log('Credit API: Token refreshed via getBearerToken({ force }) — retrying', 'check');
+
+  return newToken;
+}
+
+// ============================================
+// CQ4: Extracted helpers from fetchLoopCredits
+// ============================================
+
+function logCreditPreflight(token: string, isRetry?: boolean): void {
+  log('Credit API: GET /user/workspaces' + (isRetry ? ' (RETRY after recovery)' : ''), 'check');
+  logSub('Auth: ' + (token ? 'Bearer ' + token.substring(0, 12) + '...REDACTED' : 'cookies only (no bearer)'), 1);
+
+  if (!token) {
+    const preflight = getAuthDebugSnapshot();
+    logSub('Auth preflight: no bearer. Session cookie names=' + preflight.sessionCookieNames.join(', '), 1);
+    logSub('Auth preflight flow: ' + preflight.flow, 1);
+  }
+}
+
+function handleNonAuthError(resp: SdkApiResponse): void {
+  if (isAuthFailure(resp.status)) {
+    markBearerTokenExpired(LOG_SCOPE_CREDIT_FETCH);
+  }
+
+  const bodyPreview = JSON.stringify(resp.data).substring(0, 500);
+  logError('Credit API', 'HTTP ' + resp.status + ' error body: ' + bodyPreview);
+
+  showToast('Credit API error: HTTP ' + resp.status, 'error', {
+    noStop: true,
+    requestDetail: {
+      method: 'GET', url: CREDIT_API_BASE + ApiPath.UserWorkspaces, headers: {}, status: resp.status, statusText: '', responseBody: bodyPreview,
+    },
+  });
+}
+
+/**
+ * Fire-and-forget pro_0 + pro_1 enrichment after a successful /user/workspaces
+ * parse. Each enrichment promise re-aggregates and triggers `mc().updateUI()`
+ * if it mutated any workspace row.
+ *
+ * Exported (v3.40.2) so the loop-cycle's direct fetch path (`processWorkspaceData`)
+ * can run the same enrichment chain. Previously this was only invoked by
+ * `fetchLoopCredits` → `processSuccessData`, so during an actively running
+ * loop the per-workspace `dailyFree` numbers for pro_0/pro_1 plans went stale
+ * (user complaint: "Free Credit section is not updating while the loop runs").
+ *
+ * Sequential fail-fast inside each enrichment — no retries (honors
+ * `mem://constraints/no-retry-policy`). The two enrichments may run in
+ * parallel because they touch disjoint plan tiers (pro_0 vs pro_1).
+ */
+export function schedulePostParseEnrichment(): void {
+  // Fire-and-forget — pro_0 + pro_1 rows refresh asynchronously and trigger a UI update.
+  applyProZeroEnrichment()
+    .then(function (mutated: number): void {
+      if (mutated === 0) return;
+      syncCreditStateFromApi();
+      mc().updateUI();
+      repaintWorkspaceRowsAfterEnrichment('pro_0');
+    })
+    .catch(function (err: unknown): void {
+      logError(LOG_SCOPE_CREDIT_FETCH, 'pro_0 enrichment failed', err);
+    });
+
+  // pro_1 overlay from SQLite /credit-balance cache (122a).
+  applyProOneEnrichment()
+    .then(function (mutated: number): void {
+      if (mutated === 0) return;
+      syncCreditStateFromApi();
+      mc().updateUI();
+      repaintWorkspaceRowsAfterEnrichment('pro_1');
+    })
+    .catch(function (err: unknown): void {
+      logError(LOG_SCOPE_CREDIT_FETCH, 'pro_1 enrichment failed', err);
+    });
+
+  enrichCreditBalanceUpdateWorkspaces(loopCreditState.perWorkspace)
+    .then(function (mutated: number): void {
+      if (mutated === 0) return;
+      syncCreditStateFromApi();
+      mc().updateUI();
+      repaintWorkspaceRowsAfterEnrichment('ktlo/free/cancelled');
+    })
+    .catch(function (err: CaughtError): void {
+      logError(LOG_SCOPE_CREDIT_FETCH, 'ktlo/free/cancelled enrichment failed', err);
+    });
+}
+
+async function processSuccessData(
+  data: Record<string, unknown>,
+  autoDetectFn?: (token: string) => Promise<void>,
+): Promise<void> {
+  const isParseOk = parseLoopApiResponse(data);
+  if (!isParseOk) return;
+
+  const freshToken = resolveToken();
+  nsWrite('_internal.resolvedToken', freshToken);
+
+  if (autoDetectFn) {
+    await autoDetectFn(freshToken);
+    syncCreditStateFromApi();
+    mc().updateUI();
+    log('Credit API: display updated (workspace detected)', 'success');
+    nsCallTyped('_internal.updateAuthDiag');
+    schedulePostParseEnrichment();
+
+    return;
+  }
+
+  syncCreditStateFromApi();
+  mc().updateUI();
+  nsCallTyped('_internal.updateAuthDiag');
+  schedulePostParseEnrichment();
+}
+
+// ============================================
+// fetchLoopCredits — callback-style credit fetch
+// v7.50: Uses marco.api.credits.fetchWorkspaces() via SDK.
+// ============================================
+export function fetchLoopCredits(
+  isRetry?: boolean,
+  autoDetectFn?: (token: string) => Promise<void>,
+): void {
+  // v3.61.0 — always force-refresh the bearer token before the FIRST attempt.
+  // Previously we used the cached/TTL token from resolveToken() and only
+  // refreshed AFTER a 401/403 came back — which meant the very first
+  // /user/workspaces call after extension boot or wake-up routinely failed
+  // (user complaint: "credits keep failing, please get a fresh bearer
+  // first"). On the retry path the caller already passed isRetry=true and
+  // refreshed via handleAuthRecovery, so we keep the cached read there.
+  const tokenPromise = isRetry
+    ? Promise.resolve(resolveToken())
+    : getBearerToken({ force: true }).catch(function (err: unknown) {
+        logError(LOG_SCOPE_CREDIT_FETCH, 'pre-flight getBearerToken({force}) failed', err);
+        return resolveToken();
+      });
+
+  tokenPromise.then(function (token: string) {
+    logCreditPreflight(token, isRetry);
+
+    apiFetchWorkspaces()
+      .then(async function (resp: SdkApiResponse): Promise<Record<string, unknown> | undefined> {
+        if (!resp.ok) {
+          if (isAuthFailure(resp.status) && !isRetry) {
+            const recovered = await handleAuthRecovery(token, resp.status, '');
+            if (!recovered) { mc().updateUI(); return undefined; }
+            fetchLoopCredits(true, autoDetectFn);
+
+            return undefined;
+          }
+
+          handleNonAuthError(resp);
+          throwDiagnostic('CREDIT_FETCH_E002', {
+            status: resp.status,
+            url: CREDIT_API_BASE + ApiPath.UserWorkspaces,
+            op: 'fetchLoopCredits',
+            isRetry: isRetry === true,
+          });
+        }
+
+        const data = resp.data as Record<string, unknown>;
+        logSub('Credit API: response received, data keys=' + Object.keys(data).join(','), 1);
+
+        return data;
+      })
+      .then(async function (data: Record<string, unknown> | undefined) {
+        if (!data) return;
+        await processSuccessData(data, autoDetectFn);
+      })
+      .catch(function (err: Error) {
+        logError('Credit API failed', '' + err.message);
+        logSub('Token source: ' + getLastTokenSource(), 1);
+        logSub('isRetry: ' + (isRetry ? 'YES' : 'NO'), 1);
+        logSub('Hint: If 401/403, the token may be expired. Check extension bridge or re-login.', 1);
+        nsCallTyped('_internal.updateAuthDiag');
+        mc().updateUI();
+      });
+  });
+}
+
+// ============================================
+// fetchLoopCreditsAsync — Promise-returning version
+// v7.50: Uses marco.api via SDK.
+// ============================================
+
+class CreditAsyncState {
+  private _inFlight: Promise<void> | null = null;
+
+  get inFlight(): Promise<void> | null { return this._inFlight; }
+
+  set inFlight(value: Promise<void> | null) { this._inFlight = value; }
+}
+
+const creditAsyncState = new CreditAsyncState();
+
+export function fetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
+  const isDedup = !isRetry && creditAsyncState.inFlight !== null;
+
+  if (isDedup) {
+    log('Credit API (async): deduped — returning in-flight promise', 'skip');
+
+    return creditAsyncState.inFlight!;
+  }
+
+  const promise = doFetchLoopCreditsAsync(isRetry);
+
+  if (!isRetry) {
+    creditAsyncState.inFlight = promise.finally(function () { creditAsyncState.inFlight = null; });
+
+    return creditAsyncState.inFlight;
+  }
+
+  return promise;
+}
+
+// CQ4: Extracted — resolve token with TTL-aware getBearerToken
+// v3.61.0 — first attempt also forces refresh (was: cached). See fetchLoopCredits comment.
+async function resolveTokenWithRecovery(isRetry?: boolean): Promise<string> {
+  if (isRetry) {
+    log(LOG_PREFIX + 'retry — forcing token refresh', 'check');
+
+    return getBearerToken({ force: true });
+  }
+
+  return getBearerToken({ force: true });
+}
+
+// CQ4: Extracted — handle auth failure in async path
+async function handleAsyncAuthFailure(resp: SdkApiResponse, token: string): Promise<void> {
+  markBearerTokenExpired(CREDIT_FETCH_ASYNC_SCOPE);
+  if (token) { invalidateSessionBridgeKey(token); }
+
+  log(LOG_PREFIX + 'Auth ' + resp.status + ' — forcing token refresh before retry...', 'warn');
+  showToast('Auth ' + resp.status + ' — recovering session...', 'warn', { noStop: true });
+
+  const newToken = await getBearerToken({ force: true });
+
+  if (!newToken) {
+    emitAuthFailureToast(resp.status, '');
+    throwDiagnostic('CREDIT_FETCH_E003', {
+      status: resp.status,
+      reason: 'getBearerToken({force:true}) returned empty after auth failure',
+      tokenSource: getLastTokenSource(),
+    });
+  }
+
+  log('Credit API (async): Token refreshed — retrying once', 'check');
+
+  return fetchLoopCreditsAsync(true);
+}
+
+async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
+  const token = await resolveTokenWithRecovery(isRetry);
+
+  log('Credit API (async): GET /user/workspaces' + (isRetry ? ' (RETRY after recovery)' : ''), 'check');
+
+  if (!token) {
+    const preflightDetail = buildAuthFailureDetail().replace(/\n/g, ' | ');
+    log('Credit API (async): still no bearer after preflight; proceeding with cookie credentials only', 'warn');
+    logSub('Auth preflight detail: ' + preflightDetail, 1);
+  }
+
+  const resp = await apiFetchWorkspaces();
+
+  if (!resp.ok) {
+    if (isAuthFailure(resp.status) && !isRetry) {
+      return handleAsyncAuthFailure(resp, token);
+    }
+
+    if (isAuthFailure(resp.status)) { markBearerTokenExpired(CREDIT_FETCH_ASYNC_SCOPE); }
+    throwDiagnostic('CREDIT_FETCH_E002', {
+      status: resp.status,
+      url: CREDIT_API_BASE + ApiPath.UserWorkspaces,
+      op: 'fetchLoopCreditsAsync',
+      isRetry: isRetry === true,
+    });
+  }
+
+  const data = resp.data as Record<string, unknown>;
+  parseLoopApiResponse(data);
+  log('Credit API (async): parsed ' + (loopCreditState.perWorkspace || []).length + ' workspaces', 'success');
+  // Pro_0 enrichment runs in the foreground; awaited so async callers
+  // (e.g. post-move flow in ws-move.ts) see authoritative numbers before
+  // continuing. v3.40.2 — also await pro_1 enrichment so the Free Credit
+  // panel reflects the destination workspace's free-credit numbers
+  // immediately after a move. Sequential fail-fast: each enrichment is
+  // independently wrapped so one failure does not block the other.
+  const proZeroMutated = await applyProZeroEnrichment().catch(function (err: unknown): number {
+    logError(CREDIT_FETCH_ASYNC_SCOPE, 'pro_0 enrichment failed', err);
+    return 0;
+  });
+  const proOneMutated = await applyProOneEnrichment().catch(function (err: unknown): number {
+    logError(CREDIT_FETCH_ASYNC_SCOPE, 'pro_1 enrichment failed', err);
+    return 0;
+  });
+  if (proZeroMutated + proOneMutated > 0) { syncCreditStateFromApi(); mc().updateUI(); }
+}
+
+// ============================================
+// Barrel re-exports from credit-parser
+// ============================================
+// Plan-17 Step 27: pruned unused re-exports (WsTier, formatDaysAgo, formatDaysIn).
+export { parseLoopApiResponse, syncCreditStateFromApi, applyProZeroEnrichment, resolveWsTier, WS_TIER_LABELS, isExpiredWs, expiredDays, formatExpiryStartDate, formatExpiredDuration } from './credit-parser';
+export {
+  getEffectiveStatus,
+  applyCanceledCreditOverride,
+  shouldApplyCanceledOverride,
+  daysBetween,
+  daysUntil,
+  formatDateDDMMMYY,
+  formatDayCount,
+} from './workspace-status';
+export type { WorkspaceStatus, WorkspaceStatusKind } from './workspace-status';
+export { getWorkspaceLifecycleConfig } from './workspace-lifecycle-config';
+export type { WorkspaceLifecycleConfig } from './workspace-lifecycle-config';

@@ -1,0 +1,15 @@
+{
+  "version": "4.244.2",
+  "branch": "release/v4.244.2",
+  "sourceBranch": "main",
+  "commit": "cc73628e53774589a4ff8f72e40ac9e2d21bdc4b",
+  "tag": "v4.244.2",
+  "assets": [],
+  "changelog": [
+    "**`.github/workflows/audit-releases.yml`**: added `v4.243.0` to `SKIP_TAGS`. That tag was superseded by v4.244.x before any release assets were uploaded, so the audit was failing with \"missing zips/scripts/checksums\" on every run. Skipping it aligns with the same treatment already applied to v4.147.0 and v4.152.0."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-19T11:52:19Z",
+  "isLatest": false
+}

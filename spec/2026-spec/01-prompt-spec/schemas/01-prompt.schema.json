@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spec/2026-spec/01-prompt-spec/schemas/01-prompt.schema.json",
+  "title": "Prompt",
+  "type": "object",
+  "required": ["id", "slug", "title", "body", "version", "createdAt", "updatedAt"],
+  "additionalProperties": false,
+  "properties": {
+    "id":        { "type": "string", "pattern": "^[a-z0-9]{8,32}$" },
+    "slug":      { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 64 },
+    "title":     { "type": "string", "minLength": 1, "maxLength": 120 },
+    "body":      { "type": "string", "minLength": 1, "maxLength": 65536 },
+    "category":  { "type": "string", "maxLength": 64 },
+    "tags":      { "type": "array", "items": { "type": "string", "maxLength": 32 }, "maxItems": 20 },
+    "variables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "name":         { "type": "string", "pattern": "^[A-Z][A-Za-z0-9_]*$" },
+          "type":         { "enum": ["string", "number", "boolean", "enum"] },
+          "default":      {},
+          "enumValues":   { "type": "array", "items": { "type": "string" } },
+          "description":  { "type": "string", "maxLength": 240 },
+          "sensitive":    { "type": "boolean", "default": false }
+        }
+      },
+      "maxItems": 50
+    },
+    "version":   { "type": "integer", "minimum": 1 },
+    "source":    { "enum": ["default", "user", "import"] },
+    "archived":  { "type": "boolean", "default": false },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

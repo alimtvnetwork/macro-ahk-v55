@@ -1,0 +1,18 @@
+{
+  "version": "4.298.0",
+  "branch": "release/v4.298.0",
+  "sourceBranch": "main",
+  "commit": "9df44952183b6b9f7d915877581215755b5cf381",
+  "tag": "v4.298.0",
+  "supersededBy": "v4.299.0",
+  "supersededReason": "Release ceremony did not upload assets to the GitHub Release before v4.299.0 shipped. v4.299.0 carries all v4.298.0 changes plus the regenerated asset manifest.",
+  "assets": [],
+  "changelog": [
+    "New unit-test suite `scripts/__tests__/check-vi-func.test.mjs` (10 cases) that exercises the Node-native `vi.func` scanner across passing and failing fixtures: `vi.fn` acceptance, `vi.func` detection with file:line reporting, multi-hit reporting across files, word-boundary safety (`vifunc`, `vi_func`, `xvi.func`), skip lists (`node_modules`, `dist`, `.github/workflows/`, `.gitmap/`, `changelog.md`), non-source extension filtering (`.txt`, `.png`), and markdown/yaml matches.",
+    "`scripts/check-vi-func.mjs` now accepts `--root \u003cdir\u003e` so tests can point it at temporary fixtures instead of the repo root. Added the new test file to `SKIP_FILES` so its literal `vi.func` fixtures do not trip the scanner on real runs."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-19T19:15:58Z",
+  "isLatest": false
+}

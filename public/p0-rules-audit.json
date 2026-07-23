@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "generated": "2026-07-21T10:26:26.789Z",
+  "baselinesSource": "spec/33-missing-coding-guideline/99-baselines.json",
+  "strict": true,
+  "regressedCount": 0,
+  "findings": [
+    {
+      "id": "P0-01",
+      "title": "innerHTML sinks",
+      "baseline": 187,
+      "observed": 141,
+      "eslintRule": "no-restricted-syntax (AssignmentExpression[left.property.name='innerHTML'])",
+      "delta": -46,
+      "status": "at-or-below-baseline"
+    },
+    {
+      "id": "P0-02",
+      "title": "new Function() dynamic eval",
+      "baseline": 1,
+      "observed": 1,
+      "eslintRule": "no-restricted-syntax (NewExpression[callee.name='Function'])",
+      "delta": 0,
+      "status": "at-or-below-baseline"
+    },
+    {
+      "id": "P0-03",
+      "title": "Silent IndexedDB catch (prompt-dropdown.ts)",
+      "baseline": 1,
+      "observed": 0,
+      "eslintRule": "no-empty ({ allowEmptyCatch: false })",
+      "delta": -1,
+      "status": "at-or-below-baseline"
+    },
+    {
+      "id": "P0-04a",
+      "title": "Unauthorized console.error sites",
+      "baseline": 4,
+      "observed": 0,
+      "eslintRule": "no-restricted-syntax (console.error) + allowlist override",
+      "delta": -4,
+      "status": "at-or-below-baseline"
+    },
+    {
+      "id": "P0-04b",
+      "title": "Unannotated silent catches",
+      "baseline": 5,
+      "observed": 0,
+      "eslintRule": "no-empty ({ allowEmptyCatch: false })",
+      "delta": -5,
+      "status": "at-or-below-baseline"
+    },
+    {
+      "id": "P0-05",
+      "title": "setInterval sites bypassing trackedSetInterval registry",
+      "baseline": 10,
+      "observed": 0,
+      "note": "total setInterval: 13; trackedSetInterval refs: 28",
+      "eslintRule": "custom AST rule (not implemented); enforced by check-timer-teardown.mjs",
+      "delta": -10,
+      "status": "at-or-below-baseline"
+    },
+    {
+      "id": "P0-06",
+      "title": "Raw localStorage literal keys",
+      "baseline": 15,
+      "observed": 15,
+      "eslintRule": "no-restricted-syntax (CallExpression[callee.object.name='localStorage'])",
+      "delta": 0,
+      "status": "at-or-below-baseline"
+    },
+    {
+      "id": "P0-07",
+      "title": "Packages below 0.20 prod:test ratio",
+      "baseline": [
+        "marco-sdk",
+        "lovable-common",
+        "xpath"
+      ],
+      "observed": [],
+      "perPackage": {},
+      "eslintRule": "not enforceable in ESLint; enforced by scripts/check-test-with-features.mjs (to be added)",
+      "status": "informational"
+    },
+    {
+      "id": "P0-08",
+      "title": "Complexity rules status in eslint.config.js",
+      "baseline": "warn (was: disabled for standalone-scripts/**)",
+      "observed": {
+        "cognitiveComplexity": "warn",
+        "maxLinesPerFunction": "off"
+      },
+      "eslintRule": "sonarjs/cognitive-complexity, max-lines-per-function",
+      "status": "informational"
+    },
+    {
+      "id": "P0-09",
+      "title": "macro-controller cycles",
+      "baseline": 0,
+      "observed": 0,
+      "eslintRule": "import/no-cycle (deferred); enforced by check-madge-cycles.mjs",
+      "delta": 0,
+      "status": "at-or-below-baseline"
+    },
+    {
+      "id": "P0-10",
+      "title": "`as unknown as` double-casts",
+      "baseline": 71,
+      "observed": 71,
+      "eslintRule": "no-restricted-syntax (TSAsExpression > TSAsExpression[TSUnknownKeyword])",
+      "delta": 0,
+      "status": "at-or-below-baseline"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "version": "4.297.0",
+  "branch": "release/v4.297.0",
+  "sourceBranch": "main",
+  "commit": "HEAD",
+  "tag": "v4.297.0",
+  "assets": [],
+  "changelog": [
+    "Restored `vi.fn()` across all Vitest specs after an id-denylist rename had rewritten call sites to the nonexistent `vi.func()`, breaking `log-diagnostic.test.ts` and rename-api/prompt-loader tests."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-20T00:00:00Z",
+  "isLatest": false
+}

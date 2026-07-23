@@ -1,0 +1,16 @@
+{
+  "version": "4.296.0",
+  "branch": "release/v4.296.0",
+  "sourceBranch": "main",
+  "commit": "e1244851f5be5a32af8dcb20cef69ed0b63c392f",
+  "tag": "v4.296.0",
+  "assets": [],
+  "changelog": [
+    "Rewrote `standalone-scripts/prompts/22-release/prompt.md` (and mirror `.lovable/prompts/14-release.md`) with the concise 8-step MINOR-default ceremony, explicit mirror-parity clause, and hard rules against ask-for-confirmation, PATCH auto-bumps, or em dashes. Bumped `info.json` to `3.0.0`.",
+    "Bumped project version pins to `v4.296.0` across `version.json`, `manifest.json`, `src/shared/constants.ts`, macro-controller/marco-sdk/lovable-*/xpath/payment-banner-hider instruction files, shared-state, telemetry schema version, and root `readme.md` install snippets."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-19T18:40:45Z",
+  "isLatest": false
+}

@@ -1,0 +1,20 @@
+{
+  "version": "4.148.0",
+  "branch": "release/v4.148.0",
+  "sourceBranch": "main",
+  "commit": "ee49e028b479c4f61cad4948cc3aa42151e03e5e",
+  "tag": "v4.148.0",
+  "assets": [],
+  "changelog": [
+    "`standalone-scripts/macro-controller/src/ui/plan-task-ui.ts`: preset rows now carry `data-plan-preset=\"1\"` so tests and future callers can select them without positional fragility.",
+    "`standalone-scripts/macro-controller/src/ui/__tests__/plan-task-ui-positive.test.ts`: `presetAt` helper now queries `[data-plan-preset]` (skips the gear row).",
+    "`standalone-scripts/macro-controller/src/ui/__tests__/plan-task-ui-db-empty.test.ts`: `firstPresetItem` helper switched to `[data-plan-preset]`.",
+    "`standalone-scripts/macro-controller/src/__tests__/plan-task-ui.test.ts`: 5 selectors migrated from `[data-plan-task-sub] \u003e div` to `[data-plan-preset]`.",
+    "`bunx vitest run` in `standalone-scripts/macro-controller` — 1761 passed, 0 failed (was 1758/1761 before fix).",
+    "Version bump: 4.147.0 → 4.148.0 across manifest.json, src/shared/constants.ts, all standalone-scripts `instruction.ts`/`shared-state.ts`, and readme.md pins."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-18T18:37:15Z",
+  "isLatest": false
+}

@@ -1,0 +1,14 @@
+{
+  "version": "4.277.0",
+  "branch": "release/v4.277.0",
+  "sourceBranch": "main",
+  "tag": "v4.277.0",
+  "assets": [],
+  "changelog": [
+    "Plan 28 reconciliation: Plan 27 moved to completed, duplicated steps rescoped, no production code changes."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-19T00:00:00Z",
+  "isLatest": false
+}

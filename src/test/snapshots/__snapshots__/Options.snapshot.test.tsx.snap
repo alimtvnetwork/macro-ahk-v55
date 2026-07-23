@@ -1,0 +1,97 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Options Page — Structural Snapshot > matches the baseline snapshot 1`] = `
+{
+  "content": {
+    "actionButtons": [
+      "New Project",
+      "Edit",
+      "Duplicate",
+      "Export",
+      "Import JSON",
+      "Import SQLite Bundle",
+      "Merge",
+      "Replace All",
+      "Export Selected…",
+      "Export SQLite Bundle",
+    ],
+    "heading": "Projects",
+    "projectNames": [
+      "Lovable Dashboard",
+    ],
+  },
+  "floatingController": {
+    "mode": "compact",
+    "phase": "",
+  },
+  "header": {
+    "recorderActions": [
+      "Play",
+      "Pause",
+      "Stop",
+      "Keyword Events",
+    ],
+    "title": "Marco Extension",
+    "workspace": "Default Workspace",
+  },
+  "sidebar": [
+    {
+      "label": "Projects",
+      "section": "projects",
+    },
+    {
+      "label": "Scripts",
+      "section": "scripts",
+    },
+    {
+      "label": "Prompts",
+      "section": "prompts",
+    },
+    {
+      "label": "Automation",
+      "section": "automation",
+    },
+    {
+      "label": "Updaters",
+      "section": "updaters",
+    },
+    {
+      "label": "Library",
+      "section": "library",
+    },
+    {
+      "label": "Step Groups",
+      "section": "step-groups",
+    },
+    {
+      "label": "Storage",
+      "section": "storage",
+    },
+    {
+      "label": "API Explorer",
+      "section": "api",
+    },
+    {
+      "label": "Settings",
+      "section": "settings",
+    },
+    {
+      "label": "About",
+      "section": "about",
+    },
+    {
+      "label": "More items",
+      "section": "",
+    },
+    {
+      "label": "Errors",
+      "section": "",
+    },
+  ],
+  "state": {
+    "branch": "ready",
+    "onboardingComplete": "true",
+    "projectsLoading": "false",
+  },
+}
+`;

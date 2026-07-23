@@ -1,0 +1,14 @@
+{
+  "Id": "default-visual-design-proposal",
+  "Title": "Visual Design Proposal : Must Follow 4-5",
+  "Slug": "visual-design-proposal",
+  "Version": "1.1.0",
+  "Author": "marco",
+  "Categories": [
+    "design"
+  ],
+  "IsDefault": true,
+  "Order": 33,
+  "CreatedAt": "2026-07-20T00:00:00Z",
+  "UpdatedAt": "2026-07-20T19:15:00Z"
+}

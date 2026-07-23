@@ -1,0 +1,17 @@
+{
+  "version": "5.8.0",
+  "branch": "release/v5.8.0",
+  "sourceBranch": "main",
+  "commit": "607d8308162c9bd696474258fc993e6b48e93958",
+  "tag": "v5.8.0",
+  "assets": [],
+  "changelog": [
+    "`.lovable/release/issues/01-5-7-0-git-tag-skipped.md`: renamed from the dotted v5.7.0 filename to strict hyphen-case so `node scripts/check-markdown-filenames.mjs` passes; updated the v5.7.0 changelog link to match.",
+    "`version.json`, `manifest.json`, `readme.md`: pinned every install snippet, badge, and version reference to `v5.8.0`.",
+    "[01-5-8-0-git-tag-skipped](.lovable/release/issues/01-5-8-0-git-tag-skipped.md): commit and tag step skipped because sandbox policy forbids stateful git operations."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-21T20:07:24Z",
+  "isLatest": false
+}

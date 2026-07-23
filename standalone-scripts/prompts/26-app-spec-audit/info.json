@@ -1,0 +1,14 @@
+{
+  "Id": "default-app-spec-audit",
+  "Title": "App Spec Audit Gap Analysis (Maximum Enforcement)",
+  "Slug": "app-spec-audit",
+  "Version": "2.0.0",
+  "Author": "marco",
+  "Categories": [
+    "audit"
+  ],
+  "IsDefault": true,
+  "Order": 26,
+  "CreatedAt": "2026-07-19T00:00:00Z",
+  "UpdatedAt": "2026-07-20T00:00:00Z"
+}

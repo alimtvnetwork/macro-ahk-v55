@@ -1,0 +1,185 @@
+{
+  "GeneratedAt": "2026-07-17T20:10:56.107Z",
+  "Items": [
+    {
+      "Id": "f67d58fce71b",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/01-macro-looping.js",
+      "Line": 2,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch{"
+    },
+    {
+      "Id": "e3c57afa53f4",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/01-macro-looping.js",
+      "Line": 1210,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch{"
+    },
+    {
+      "Id": "e3c57afa53f4",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/01-macro-looping.js",
+      "Line": 1210,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch{"
+    },
+    {
+      "Id": "97320b1f73c7",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/01-macro-looping.js",
+      "Line": 1214,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch{"
+    },
+    {
+      "Id": "97320b1f73c7",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/01-macro-looping.js",
+      "Line": 1214,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch{"
+    },
+    {
+      "Id": "96007f6b3fbb",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/01-macro-looping.js",
+      "Line": 1219,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch(function(){"
+    },
+    {
+      "Id": "338d80682a34",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/01-macro-looping.js",
+      "Line": 1222,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch{"
+    },
+    {
+      "Id": "338d80682a34",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/01-macro-looping.js",
+      "Line": 1222,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch{"
+    },
+    {
+      "Id": "f2fd16999341",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/01-macro-looping.js",
+      "Line": 1327,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch{"
+    },
+    {
+      "Id": "f2fd16999341",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/01-macro-looping.js",
+      "Line": 1327,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch{"
+    },
+    {
+      "Id": "9ce78a370955",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/src/queue-control/index.ts",
+      "Line": 36,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch {"
+    },
+    {
+      "Id": "70bc75b08a07",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/src/selected-workspaces-store.ts",
+      "Line": 18,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch (_e: unknown) {"
+    },
+    {
+      "Id": "d955bc859d80",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/src/startup.ts",
+      "Line": 358,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch (_e: unknown) {"
+    },
+    {
+      "Id": "b2ac498063a6",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/src/ui/prompt-dropdown.ts",
+      "Line": 160,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch(function() {"
+    },
+    {
+      "Id": "e6afb3d67486",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/src/ui/ui-updaters.ts",
+      "Line": 215,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch (_e) {"
+    },
+    {
+      "Id": "36175f8d3e94",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/src/ui/ui-updaters.ts",
+      "Line": 223,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch (_e) {"
+    },
+    {
+      "Id": "b10f5432b34e",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/src/visible-workspaces-store.ts",
+      "Line": 26,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch (_e: unknown) {"
+    },
+    {
+      "Id": "5a60a7aaa74b",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/src/visible-workspaces-store.ts",
+      "Line": 37,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch (_e: unknown) {"
+    },
+    {
+      "Id": "9293f9f708e7",
+      "Severity": "P2",
+      "File": "src/components/options/ProjectGroupPanel.tsx",
+      "Line": 116,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch {"
+    },
+    {
+      "Id": "1e4231497ada",
+      "Severity": "P2",
+      "File": "src/test/setup.ts",
+      "Line": 85,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch {"
+    }
+  ]
+}

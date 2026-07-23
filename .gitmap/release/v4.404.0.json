@@ -1,0 +1,26 @@
+{
+  "version": "4.404.0",
+  "branch": "release/v4.404.0",
+  "sourceBranch": "main",
+  "commit": "5ca04bcb795e0d648fa8172d2797663115cf8165",
+  "tag": "v4.404.0",
+  "assets": [],
+  "changelog": [
+    "`src/logger.ts` established as the single canonical logging entry point for `standalone-scripts/macro-controller`; barrel re-exports `./logging` with in-file documentation forbidding direct implementation imports.",
+    "`scripts/check-canonical-logger-imports.mjs` wired into CI to fail the build on any direct import of `./logging` outside the barrel.",
+    "ESLint `import/no-unresolved` enabled via the existing TypeScript resolver so a `../logger` vs `../logging` path typo fails locally, not just in CI.",
+    "`typecheck-clean` job added to `.github/workflows/ci.yml` to guard against cached module-resolution regressions.",
+    "`readme.md`: new \"Prompt Ordering\" section documenting the Terminal 7 contract enforced by `DEFAULT_PROMPT_ORDER`.",
+    "`src/ui/prompt-order-indicator.ts`: clickable badge showing prompt-order source, total count, and terminal-7 violation counter.",
+    "Repo-wide codemod updated 137 import sites in `standalone-scripts/macro-controller/src` to import logging from the relative `./logger` barrel.",
+    "`standalone-scripts/macro-controller/src/error-utils.ts`: P0-10 double-cast restored to baseline (71) by replacing an `as unknown as` cast with a JSON round-trip for type normalization.",
+    "`scripts/audit-logger-compliance.mjs`: P0-04a false positives eliminated by skipping files with zero actual `console.error` call counts (comment/mock-string matches no longer count).",
+    "`db/macro-db.ts` diagnostic prefix realigned with the static scanner (`DB_MACRO_INIT_E001`) so `per-area-migration-coverage.test.ts` and related specs pass.",
+    "`version.json` bumped to `4.404.0`, `releaseDate` set to `2026-07-21`.",
+    "`readme.md` install snippets, badges, and pinned-version references retargeted from `v4.369.0` to `v4.404.0`."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-21T11:49:42Z",
+  "isLatest": false
+}

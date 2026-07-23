@@ -1,0 +1,17 @@
+{
+  "version": "5.6.0",
+  "branch": "release/v5.6.0",
+  "sourceBranch": "main",
+  "commit": "c6e1aefd8b7fb5cf03e77c64cdd37fbc82c46ab6",
+  "tag": "v5.6.0",
+  "assets": [],
+  "changelog": [
+    "`.github/workflows/release.yml`: reordered generated `RELEASE_NOTES.md` so Quick Install (PowerShell + bash) and Manual Install appear near the top of the release body, above the assets table and checksums, matching the v5.1.0 presentation.",
+    "`.github/workflows/release.yml`: added a fallback release body containing the pinned install scripts so the release page is never published without install instructions, even if the rich notes step is delayed.",
+    "Restored parity with v5.1.0 release-page layout after v5.5.0 rendered Quick Install below checksums/assets, making install commands hard to discover."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-21T19:40:40Z",
+  "isLatest": false
+}

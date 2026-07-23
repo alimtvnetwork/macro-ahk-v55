@@ -1,0 +1,393 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "generated": "2026-07-17",
+  "generatedBy": "Plan-16 step 19 (owner + due assignment)",
+  "source": "spec/33-missing-coding-guideline/01..13-*.md",
+  "policy": {
+    "P0": "Silent failure, security risk, retry-policy breach, or blocks other refactors",
+    "P1": "Observability + lifecycle correctness; hides type errors; architectural rework",
+    "P2": "Style, structure, typing hygiene, mechanical prune"
+  },
+  "totals": {
+    "items": 27,
+    "P0": 10,
+    "P1": 11,
+    "P2": 6
+  },
+  "items": [
+    {
+      "id": "P0-01",
+      "audit": "04-security-surface",
+      "title": "innerHTML sinks with untrusted values (187 sites)",
+      "priority": "P0",
+      "files": [
+        "standalone-scripts/macro-controller/src/ui/**"
+      ],
+      "rationale": "XSS vector; violates spec/02-coding-guidelines/11-security",
+      "fix": "Route through escapeHtml + typed template builder; ban raw .innerHTML via ESLint no-restricted-syntax except types/**",
+      "owner": "ui-security",
+      "due": "2026-08-14"
+    },
+    {
+      "id": "P0-02",
+      "audit": "04-security-surface",
+      "title": "new Function() dynamic eval (1 site)",
+      "priority": "P0",
+      "files": [
+        "standalone-scripts/macro-controller/src/ui/database-json-migrate.ts"
+      ],
+      "rationale": "Arbitrary code execution surface",
+      "fix": "Replace with explicit dispatch table",
+      "owner": "ui-security",
+      "due": "2026-07-31"
+    },
+    {
+      "id": "P0-03",
+      "audit": "06-logger-and-error-manage",
+      "title": "Silent IndexedDB catch in prompt-dropdown.ts:157",
+      "priority": "P0",
+      "files": [
+        "standalone-scripts/macro-controller/src/ui/prompt-dropdown.ts"
+      ],
+      "rationale": "Violates mem://standards/error-logging-via-namespace-logger and mem://constraints/file-path-error-logging-code-red",
+      "fix": "Log via Logger.error() with Reason+ReasonDetail; surface to overlay",
+      "owner": "db-and-logging",
+      "due": "2026-07-24"
+    },
+    {
+      "id": "P0-04",
+      "audit": "06-logger-and-error-manage",
+      "title": "4 unauthorized console.error sites + 5 unannotated silent catches",
+      "priority": "P0",
+      "files": [
+        "standalone-scripts/macro-controller/src/**"
+      ],
+      "rationale": "Bypasses namespace logger contract",
+      "fix": "Replace with logError; annotate legitimate silent catches with // reason: ...",
+      "owner": "db-and-logging",
+      "due": "2026-07-31"
+    },
+    {
+      "id": "P0-05",
+      "audit": "07-timer-and-observer-teardown",
+      "title": "10 setInterval sites bypass trackedSetInterval registry",
+      "priority": "P0",
+      "files": [
+        "standalone-scripts/macro-controller/src/ui/macro-ui.ts",
+        "standalone-scripts/macro-controller/src/ui/prompt-utils.ts"
+      ],
+      "rationale": "Leaks intervals on pagehide; violates mem://standards/timer-and-observer-teardown",
+      "fix": "Migrate to trackedSetInterval; add pagehide unwind",
+      "owner": "lifecycle",
+      "due": "2026-08-07"
+    },
+    {
+      "id": "P0-06",
+      "audit": "08-storage-key-centralization",
+      "title": "Auth-critical raw localStorage keys",
+      "priority": "P0",
+      "files": [
+        "standalone-scripts/macro-controller/src/auth-resolve.ts"
+      ],
+      "lines": [
+        351,
+        352
+      ],
+      "rationale": "'marco_bearer_token' and 'lovable-session-id' hardcoded; violates mem://auth/unified-auth-contract",
+      "fix": "Add to StorageKey enum in types/storage-keys.ts",
+      "owner": "auth-surface",
+      "due": "2026-07-24"
+    },
+    {
+      "id": "P0-07",
+      "audit": "09-test-with-features-coverage",
+      "title": "3 packages at 0.00 test ratio",
+      "priority": "P0",
+      "files": [
+        "standalone-scripts/marco-sdk/**",
+        "standalone-scripts/lovable-common/**",
+        "standalone-scripts/xpath/**"
+      ],
+      "rationale": "59 prod files uncovered; marco-sdk hosts auth surface",
+      "fix": "Ship tests for getBearerToken(), dom-utils, xpath core; enforce via CI check-test-with-features.mjs",
+      "owner": "sdk-and-common",
+      "due": "2026-08-21"
+    },
+    {
+      "id": "P0-08",
+      "audit": "10-cognitive-complexity",
+      "title": "ESLint disables complexity rules for standalone-scripts/**",
+      "priority": "P0",
+      "files": [
+        "eslint.config.js"
+      ],
+      "lines": [
+        326,
+        384
+      ],
+      "rationale": "max-lines-per-function and sonarjs/cognitive-complexity silenced; hides all hotspots",
+      "fix": "Re-enable with per-folder caps (ui max: 80, db/core max: 60, sdk/common max: 50)",
+      "owner": "tooling",
+      "due": "2026-08-07"
+    },
+    {
+      "id": "P0-09",
+      "audit": "11-import-graph-cycles",
+      "title": "MacroController god-module \u2014 18 cycle chains",
+      "priority": "P0",
+      "files": [
+        "standalone-scripts/macro-controller/src/core/MacroController.ts"
+      ],
+      "rationale": "Fan-out through ui/ui-updaters -> loop-engine -> credit-balance loops back through api-namespace",
+      "fix": "Extract core/controller-state.ts value module; leaves import state, not controller",
+      "owner": "core-refactor",
+      "due": "2026-08-28"
+    },
+    {
+      "id": "P0-10",
+      "audit": "13-unknown-usage",
+      "title": "95 'as unknown as' double casts hide type errors",
+      "priority": "P0",
+      "files": [
+        "standalone-scripts/macro-controller/src/startup.ts",
+        "standalone-scripts/macro-controller/src/auth-bridge.ts",
+        "..."
+      ],
+      "rationale": "Each site is a missing declaration masqueraded as a cast; violates mem://standards/unknown-usage-policy",
+      "fix": "Per-site: extend target type OR add runtime guard; then ban via no-restricted-syntax outside types/**",
+      "owner": "types-cleanup",
+      "due": "2026-08-28"
+    },
+    {
+      "id": "P1-01",
+      "audit": "05-design-system-tokens",
+      "title": "815 hex + ~200 rgb(a) literals bypass semantic tokens",
+      "priority": "P1",
+      "files": [
+        "standalone-scripts/macro-controller/src/ui/**"
+      ],
+      "rationale": "Bypasses dark-only theme; missing tokens for status ramps and surfaces",
+      "fix": "Add missing tokens; migrate literals; ban via stylelint or no-restricted-syntax",
+      "owner": "design-system",
+      "due": "2026-09-11"
+    },
+    {
+      "id": "P1-02",
+      "audit": "07-timer-and-observer-teardown",
+      "title": "7 MutationObservers missing pagehide unwind",
+      "priority": "P1",
+      "files": [
+        "standalone-scripts/macro-controller/src/**"
+      ],
+      "rationale": "Leaks observers on pagehide",
+      "fix": "Add pagehide handler in each observer owner",
+      "owner": "lifecycle",
+      "due": "2026-08-14"
+    },
+    {
+      "id": "P1-03",
+      "audit": "07-timer-and-observer-teardown",
+      "title": "addEventListener vs removeEventListener parity 143:48",
+      "priority": "P1",
+      "files": [
+        "standalone-scripts/macro-controller/src/**"
+      ],
+      "rationale": "Net 95 unbalanced listeners; ratio 2.98:1",
+      "fix": "Introduce trackedAddEventListener with AbortController-per-scope pattern",
+      "owner": "lifecycle",
+      "due": "2026-08-28"
+    },
+    {
+      "id": "P1-04",
+      "audit": "08-storage-key-centralization",
+      "title": "13 remaining raw localStorage literals in 7 files",
+      "priority": "P1",
+      "files": [
+        "standalone-scripts/macro-controller/src/ws-list-renderer.ts",
+        "standalone-scripts/macro-controller/src/workspace-cache.ts",
+        "standalone-scripts/macro-controller/src/ui/ws-filter-menu.ts",
+        "standalone-scripts/macro-controller/src/shared-state-runtime.ts",
+        "standalone-scripts/macro-controller/src/ui/panel-sections.ts",
+        "standalone-scripts/macro-controller/src/ui/section-auth-diag.ts",
+        "standalone-scripts/macro-controller/src/ui/settings-ui.ts"
+      ],
+      "rationale": "Duplication ratio 1.67 vs target 1.0",
+      "fix": "Migrate to StorageKey enum; add ESLint no-restricted-syntax guard",
+      "owner": "auth-surface",
+      "due": "2026-08-14"
+    },
+    {
+      "id": "P1-05",
+      "audit": "10-cognitive-complexity",
+      "title": "3 files > 1000 LOC ceiling",
+      "priority": "P1",
+      "files": [
+        "standalone-scripts/macro-controller/src/ui/prompt-dropdown.ts",
+        "standalone-scripts/macro-controller/src/ws-list-renderer.ts",
+        "standalone-scripts/macro-controller/src/ui/projects-modal.ts"
+      ],
+      "rationale": "prompt-dropdown 1441, ws-list-renderer 1156, projects-modal 1114",
+      "fix": "Split by domain; enforce soft 800 / hard 1200 via check-file-loc-ceiling.mjs",
+      "owner": "ui-refactor",
+      "due": "2026-09-11"
+    },
+    {
+      "id": "P1-06",
+      "audit": "11-import-graph-cycles",
+      "title": "logging.ts leaf inversion (10 chains)",
+      "priority": "P1",
+      "files": [
+        "standalone-scripts/macro-controller/src/logging.ts",
+        "standalone-scripts/macro-controller/src/log-csv-export.ts"
+      ],
+      "rationale": "logger imports CSV export -> credit -> auth -> interval-registry -> logger",
+      "fix": "logging.ts becomes a leaf; log-csv-export imports logging (not vice-versa)",
+      "owner": "core-refactor",
+      "due": "2026-08-28"
+    },
+    {
+      "id": "P1-07",
+      "audit": "11-import-graph-cycles",
+      "title": "db/macro-db <-> seed/seed-plan-next (11 chains)",
+      "priority": "P1",
+      "files": [
+        "standalone-scripts/macro-controller/src/db/macro-db.ts",
+        "standalone-scripts/macro-controller/src/seed/seed-plan-next.ts"
+      ],
+      "fix": "Move seedPlanNextPrompts() invocation to a bootstrap module that imports both",
+      "owner": "db-and-logging",
+      "due": "2026-08-21"
+    },
+    {
+      "id": "P1-08",
+      "audit": "12-dead-code",
+      "title": "33 legacy auth/credit/rename unused exports",
+      "priority": "P1",
+      "files": [
+        "standalone-scripts/macro-controller/src/auth.ts",
+        "standalone-scripts/macro-controller/src/credit-fetch.ts",
+        "standalone-scripts/macro-controller/src/workspace-rename.ts"
+      ],
+      "rationale": "May shadow mem://auth/unified-auth-contract removals",
+      "fix": "Per-symbol ripgrep triage; delete or reconnect",
+      "owner": "auth-surface",
+      "due": "2026-08-21"
+    },
+    {
+      "id": "P1-09",
+      "audit": "13-unknown-usage",
+      "title": "Class A API response parsing (~80 unknown occurrences)",
+      "priority": "P1",
+      "files": [
+        "standalone-scripts/macro-controller/src/credit-fetch.ts",
+        "standalone-scripts/macro-controller/src/ws-move.ts",
+        "standalone-scripts/macro-controller/src/credit-parser.ts",
+        "..."
+      ],
+      "fix": "Introduce parse<Schema>() helpers per API; throw ApiParseError on mismatch",
+      "owner": "types-cleanup",
+      "due": "2026-09-11"
+    },
+    {
+      "id": "P1-10",
+      "audit": "13-unknown-usage",
+      "title": "Class B namespace bags (~82 unknown occurrences)",
+      "priority": "P1",
+      "files": [
+        "standalone-scripts/types/project-namespace-shape.d.ts",
+        "standalone-scripts/macro-controller/src/api-namespace.ts",
+        "standalone-scripts/marco-sdk/src/self-namespace.ts"
+      ],
+      "fix": "Promote Record<string, unknown> bags into named interfaces in project-namespace-shape.d.ts",
+      "owner": "types-cleanup",
+      "due": "2026-09-11"
+    },
+    {
+      "id": "P1-11",
+      "audit": "09-test-with-features-coverage",
+      "title": "repeat-loop-presets values not asserted (session regression)",
+      "priority": "P1",
+      "files": [
+        "standalone-scripts/macro-controller/src/ui/__tests__/repeat-loop-presets.test.ts"
+      ],
+      "rationale": "Values 10,12,15,20,60,75,80,100,200 shipped v4.74.0 without value-set assertion",
+      "fix": "Add locked value-set assertion; enforce via check-test-with-features.mjs",
+      "owner": "qa-and-tests",
+      "due": "2026-07-31"
+    },
+    {
+      "id": "P2-01",
+      "audit": "01-typescript-strictness",
+      "title": "261 unknown annotations to audit for legitimacy",
+      "priority": "P2",
+      "fix": "Annotate each with // reason: catch|input|opaque-json OR replace",
+      "owner": "types-cleanup",
+      "due": "2026-10-02"
+    },
+    {
+      "id": "P2-02",
+      "audit": "02-cross-language-style",
+      "title": "Banned identifier msg used in flagged files",
+      "priority": "P2",
+      "fix": "Rename to message; add ESLint id-denylist",
+      "owner": "cross-language-style",
+      "due": "2026-09-25"
+    },
+    {
+      "id": "P2-03",
+      "audit": "03-file-and-folder-naming",
+      "title": "PascalCase files in core/",
+      "priority": "P2",
+      "files": [
+        "standalone-scripts/macro-controller/src/core/MacroController.ts"
+      ],
+      "fix": "Rename to macro-controller.ts (coordinated with P0-09 refactor)",
+      "owner": "core-refactor",
+      "due": "2026-09-04"
+    },
+    {
+      "id": "P2-04",
+      "audit": "11-import-graph-cycles",
+      "title": "13 pairwise cycles (mechanical extraction)",
+      "priority": "P2",
+      "files": [
+        "rename-api.ts <-> rename-bulk.ts",
+        "panel-builder <-> panel-header/sections/controls",
+        "database-modal-data <-> database-data-filter",
+        "save-prompt <-> save-prompt-dropdown",
+        "settings-ui <-> settings-tab-panels",
+        "section-auth-diag <-> auth-diag-rows",
+        "database-json-tab <-> database-json-migrate",
+        "task-next-ui <-> lovable-idle"
+      ],
+      "fix": "Extract shared type/state into a third leaf module per pair",
+      "owner": "core-refactor",
+      "due": "2026-10-02"
+    },
+    {
+      "id": "P2-05",
+      "audit": "12-dead-code",
+      "title": "P0 barrel re-export drift (116 items)",
+      "priority": "P2",
+      "files": [
+        "standalone-scripts/macro-controller/src/types/index.ts",
+        "standalone-scripts/macro-controller/src/pro-zero/index.ts",
+        "standalone-scripts/macro-controller/src/queue-control/index.ts",
+        "standalone-scripts/macro-controller/src/ui/summary-bar/index.ts"
+      ],
+      "rationale": "Note: audit calls this P0 within its own scope; classified P2 in consolidated backlog because prune is mechanical and low-risk once P0-09/P1-06/P1-07 land",
+      "fix": "Delete export * barrels; consumers import from source",
+      "owner": "types-cleanup",
+      "due": "2026-09-18"
+    },
+    {
+      "id": "P2-06",
+      "audit": "13-unknown-usage",
+      "title": "Class D/E storage + DOM coercion (~69 unknown occurrences)",
+      "priority": "P2",
+      "fix": "Typed storage accessors keyed by StorageKey; dataset-typed.ts helper",
+      "owner": "types-cleanup",
+      "due": "2026-10-09"
+    }
+  ]
+}

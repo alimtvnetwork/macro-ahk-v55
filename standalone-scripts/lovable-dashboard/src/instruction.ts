@@ -1,0 +1,53 @@
+/**
+ * Lovable Dashboard — Project Instruction Manifest
+ *
+ * Auto-injects ONLY on the exact Lovable dashboard URL. Hosts the
+ * home-screen experience (search bar, nav controls, credit panel,
+ * workspace dictionary, focus-selected, macro-sync). Extracted from
+ * macro-controller bundled home-screen content script into its own
+ * standalone project per the 26-step extraction plan.
+ *
+ * All keys PascalCase per `mem://standards/pascalcase-json-keys`.
+ */
+
+import type { ProjectInstruction } from "../../types/instruction/project-instruction";
+import { InjectionWorld } from "../../types/instruction/enums/injection-world";
+import { InjectionRunAt } from "../../types/instruction/enums/injection-run-at";
+import { MatchType } from "../../types/instruction/enums/match-type";
+import type { EmptySettings } from "../../types/instruction/seed/empty-settings";
+import { VERSION } from "../../shared-version";
+
+const instruction: ProjectInstruction<EmptySettings> = {
+    SchemaVersion: "1.0",
+    Name: "lovable-dashboard",
+    DisplayName: "Lovable Dashboard",
+    Version: VERSION,
+    Description: "Lovable.dev dashboard home-screen enhancements: search, nav controls, credit panel, workspace tools. Auto-injects only on the exact /dashboard URL.",
+    World: InjectionWorld.Main,
+    IsGlobal: false,
+    Dependencies: ["lovable-common"],
+    LoadOrder: 40,
+    Seed: {
+        Id: "default-lovable-dashboard",
+        SeedOnInstall: true,
+        IsRemovable: false,
+        AutoInject: true,
+        RunAt: InjectionRunAt.DocumentIdle,
+        TargetUrls: [
+            { Pattern: "https://lovable.dev/dashboard", MatchType: MatchType.Exact },
+        ],
+        Cookies: [],
+        Settings: {},
+    },
+    Assets: {
+        Css: [],
+        Configs: [],
+        Scripts: [
+            { File: "lovable-dashboard.js", Order: 1, IsIife: true },
+        ],
+        Templates: [],
+        Prompts: [],
+    },
+};
+
+export default instruction;

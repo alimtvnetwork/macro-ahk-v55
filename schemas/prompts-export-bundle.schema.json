@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://riseup.asia/schemas/prompts-export-bundle.schema.json",
+  "title": "PromptsExportBundleV1",
+  "description": "User-facing export/import envelope produced by the macro-controller prompts dropdown (Export button, JSON/ZIP/SQLite formats). Distinct from the build-time PromptsBundle schema (prompts-bundle.schema.json) which uses PascalCase keys for aggregate-prompts.mjs output. This envelope uses camelCase and mirrors the runtime PromptEntry shape in standalone-scripts/macro-controller/src/types/ui-types.ts (L47-70).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "schemaVersion", "exportedAt", "exporterVersion", "entryCount", "entries"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Random UUID for this bundle. Lets importers detect re-imports of the same file.",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Envelope schema version. Increment only for breaking changes."
+    },
+    "exportedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC ISO-8601 timestamp when the bundle was produced."
+    },
+    "exporterVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "EXTENSION_VERSION at export time (e.g. '4.34.0')."
+    },
+    "entryCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of items in entries[]. Importers cross-check against entries.length."
+    },
+    "format": {
+      "enum": ["json", "zip", "sqlite"],
+      "description": "Which serialization the entries were streamed through. Optional; defaults to 'json' when the envelope is embedded inline (JSON export). ZIP/SQLite exports set this explicitly."
+    },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/PromptEntry" }
+    }
+  },
+  "definitions": {
+    "PromptEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Mirror of the runtime PromptEntry (ui-types.ts L47-70). name and text are required; slug is strongly recommended for stable merge keys. Dynamic-expansion fields must round-trip so Next ${N} / Plan ${N} variants survive import (fixes gap identified in plan 12 step 1).",
+      "required": ["name", "text"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "text": { "type": "string" },
+        "id": { "type": "string" },
+        "slug": { "type": "string" },
+        "category": { "type": "string" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "isFavorite": { "type": "boolean" },
+        "isDefault": { "type": "boolean" },
+        "excludeFromExport": { "type": "boolean" },
+        "order": { "type": "integer" },
+        "version": { "type": "string" },
+        "isDynamic": { "type": "boolean" },
+        "replaceKey": { "type": "string" },
+        "replaceValues": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "slugTemplate": { "type": "string" },
+        "parentTitle": { "type": "string" },
+        "parentSlug": { "type": "string" },
+        "variantValue": { "type": "string" }
+      }
+    }
+  }
+}

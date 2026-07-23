@@ -1,0 +1,14 @@
+{
+  "Id": "default-ambiguity-handling",
+  "Title": "Ambiguity Handling (Canonical, Applies to Every Prompt)",
+  "Slug": "ambiguity-handling",
+  "Version": "1.0.0",
+  "Author": "marco",
+  "Categories": [
+    "reference"
+  ],
+  "IsDefault": true,
+  "Order": 31,
+  "CreatedAt": "2026-07-20T00:00:00Z",
+  "UpdatedAt": "2026-07-20T00:00:00Z"
+}

@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "generated": "2026-07-17",
+  "generatedBy": "Plan-16 step 20 (close-out baseline snapshot)",
+  "purpose": "CI floor for the check-* scripts drafted in 14-eslint-and-tsc-rule-additions.md. Any regression above these numbers fails the build.",
+  "baselines": {
+    "innerHTMLSinks": 187,
+    "newFunctionSites": 1,
+    "unauthorizedConsoleError": 4,
+    "unannotatedSilentCatches": 5,
+    "setIntervalBypassingRegistry": 10,
+    "mutationObserversMissingPagehide": 7,
+    "addEventListenerCount": 143,
+    "removeEventListenerCount": 48,
+    "rawLocalStorageLiteralKeys": 15,
+    "authCriticalRawKeys": 2,
+    "hexLiteralsInUi": 815,
+    "rgbLiteralsInUi": 200,
+    "prodTestRatioAggregate": 0.36,
+    "zeroCoveragePackages": ["marco-sdk", "lovable-common", "xpath"],
+    "uiTestCoverage": 0.15,
+    "filesOver1000Loc": 3,
+    "filesOver700Loc": 12,
+    "macroControllerCycles": 0,
+    "otherPackageCycles": 0,
+    "exportStarBarrels": 3,
+    "unusedExports": 278,
+    "unusedExportsTopFile": {"file": "standalone-scripts/macro-controller/src/types/index.ts", "count": 90},
+    "unknownOccurrencesProd": 660,
+    "asUnknownAsDoubleCasts": 71,
+    "any_in_prod": 0,
+    "strictFlagFallout": {
+      "noUncheckedIndexedAccess": 271,
+      "exactOptionalPropertyTypes": 0,
+      "noImplicitOverride": 0,
+      "noPropertyAccessFromIndexSignature": 411
+    }
+  },
+  "targets": {
+    "innerHTMLSinks": 0,
+    "newFunctionSites": 0,
+    "unauthorizedConsoleError": 0,
+    "unannotatedSilentCatches": 0,
+    "setIntervalBypassingRegistry": 0,
+    "mutationObserversMissingPagehide": 0,
+    "listenerParityRatio": 1.0,
+    "rawLocalStorageLiteralKeys": 0,
+    "hexLiteralsInUi": 0,
+    "rgbLiteralsInUi": 0,
+    "prodTestRatioPerPackageMin": 0.20,
+    "macroControllerCycles": 0,
+    "exportStarBarrels": 0,
+    "unusedExports": 50,
+    "unknownOccurrencesProd": 360,
+    "asUnknownAsDoubleCasts": 0
+  },
+  "postRemediation": {
+    "snapshotVersion": "v4.103.0",
+    "snapshotDate": "2026-07-17",
+    "snapshotBy": "Plan-17 steps 29-30 close-out",
+    "macroControllerCycles": 0,
+    "otherPackageCycles": 0,
+    "unknownOccurrencesProd": 660,
+    "asUnknownAsDoubleCasts": 71,
+    "unusedExports": 278,
+    "strictFlagsEnabled": ["strict", "noImplicitOverride"],
+    "strictFlagsDeferred": [
+      "noUncheckedIndexedAccess",
+      "exactOptionalPropertyTypes",
+      "noPropertyAccessFromIndexSignature"
+    ],
+    "notes": [
+      "Steps 29-30 shipped ratchet gates (check-unknown-usage.mjs, check-strict-flag-fallout.mjs) without behavior change.",
+      "Remaining strict flags surface ~704 compile errors combined and are deferred to a dedicated follow-up plan to avoid a large refactor in the close-out release.",
+      "Baselines ratcheted down to reflect current-observed counts so Plan-17 gains are preserved as the CI floor."
+    ]
+  },
+  "inventory": {
+    "prodTsFiles": 514,
+    "totalLoc": 73000,
+    "packages": ["macro-controller", "marco-sdk", "lovable-common", "lovable-dashboard", "lovable-owner-switch", "lovable-user-add", "payment-banner-hider", "xpath"]
+  }
+}

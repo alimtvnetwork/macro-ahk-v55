@@ -1,0 +1,14 @@
+{
+  "Id": "default-folder-structure",
+  "Title": "Canonical .lovable/ Folder Structure (Source of Truth)",
+  "Slug": "folder-structure",
+  "Version": "1.0.0",
+  "Author": "marco",
+  "Categories": [
+    "reference"
+  ],
+  "IsDefault": true,
+  "Order": 30,
+  "CreatedAt": "2026-07-20T00:00:00Z",
+  "UpdatedAt": "2026-07-20T00:00:00Z"
+}

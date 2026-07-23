@@ -1,0 +1,15 @@
+{
+  "version": "4.300.0",
+  "branch": "release/v4.300.0",
+  "sourceBranch": "main",
+  "tag": "v4.300.0",
+  "assets": [],
+  "changelog": [
+    "Audit Releases CI now auto-skips tags whose .gitmap/release descriptor declares supersededBy; v4.298.0 marked superseded by v4.299.0 to unblock the audit.",
+    "Documented the canonical release ceremony at .lovable/memory/workflow/release-ceremony.md and linked it from the memory index."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-19T00:00:00Z",
+  "isLatest": false
+}

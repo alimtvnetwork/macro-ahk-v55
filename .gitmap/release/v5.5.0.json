@@ -1,0 +1,19 @@
+{
+  "version": "5.5.0",
+  "branch": "release/v5.5.0",
+  "sourceBranch": "main",
+  "commit": "d506af1b89bf82a4cd5f93e18d140ceb6af1f59c",
+  "tag": "v5.5.0",
+  "assets": [],
+  "changelog": [
+    "`standalone-scripts/macro-controller/src/db/macro-db.ts`: added `Role` and `IsDefault` column migrations for legacy databases and deferred `idx_prompt_role_isdefault` creation until after migrations, unblocking `PROMPT_EDIT_E005` default-edit repair on old installs.",
+    "`standalone-scripts/macro-controller/src/ui/prompt-dropdown.ts`: removed unused `renderFolderTree` import that failed `tsc --noEmit -p tsconfig.macro.build.json` under `noUnusedLocals`.",
+    "`standalone-scripts/macro-controller/src/ui/chip-gear-menu.ts`: split `buildChipGearActionSection` into `buildPromptActionItems`, `buildPromptActionsTrigger`, `buildPromptActionsSubmenu`, and `wirePromptActionsSubmenu` to satisfy `max-lines-per-function`.",
+    "`standalone-scripts/macro-controller/src/ui/prompt-dropdown-header.ts`: renamed denied `fn` identifier to `showToast` to satisfy `id-denylist`.",
+    "Regression tests in `standalone-scripts/macro-controller/src/db/__tests__/prompt-schema-migration.test.ts` and `prompt-role-db.test.ts` cover the new Role/IsDefault backfill and post-migration index creation."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-21T19:12:46Z",
+  "isLatest": false
+}

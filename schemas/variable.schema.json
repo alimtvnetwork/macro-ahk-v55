@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://riseup.asia/schemas/variable.schema.json",
+  "title": "Variable",
+  "description": "Variable declaration shared by prompt.schema.json and macro.schema.json. PascalCase keys, additionalProperties:false.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["Name", "Type", "Required", "Description"],
+  "properties": {
+    "Name": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z0-9]*$",
+      "maxLength": 40,
+      "description": "PascalCase. Matches {{ Name }} placeholder in body."
+    },
+    "Type": {
+      "enum": ["string", "integer", "number", "boolean", "enum", "path"]
+    },
+    "Required": { "type": "boolean" },
+    "Default": {
+      "type": ["string", "integer", "number", "boolean"],
+      "description": "Forbidden when Required is true AND Source is RunContext (engine supplies value)."
+    },
+    "EnumValues": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true,
+      "minItems": 1,
+      "description": "Required when Type == 'enum'."
+    },
+    "Sensitive": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true the value is masked as '***' in all logs (verbose or not)."
+    },
+    "Source": {
+      "enum": ["User", "RunContext", "Macro", "Step"],
+      "default": "User",
+      "description": "UI hint for where the value is expected to come from."
+    },
+    "Description": { "type": "string", "minLength": 1, "maxLength": 200 }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "Type": { "const": "enum" } }, "required": ["Type"] },
+      "then": { "required": ["EnumValues"] }
+    }
+  ]
+}
