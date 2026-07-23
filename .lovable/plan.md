@@ -1,83 +1,48 @@
-
 ## Goal
 
-Three tightly related fixes, all rooted in the rawSql v2 contract regression:
+Scope the prompt library **Import** and **Export** actions to user-added prompts only (rows with `isDefault=false`). Default/seed prompts stay untouched on export and are never overwritten on import. Cover the new behavior with e2e tests.
 
-1. Add a **Diagnostics Export** that captures the rawSql method the bridge is using and the exact failing-contract shape for `PROMPT_LOAD_E001` and `SEED_RESEED_E001`.
-2. Add an **end-to-end test** for loading Plan prompts at `stage=post-seed-list` with `seedAttempted=true` and `role=plan`.
-3. Repair the **Next button** so clicking it does not surface `PROMPT_LOAD_E001` / `PROMPT_EDIT_E005`.
+## Current state (verified)
 
-## Current state (verified this turn)
+- `CachedPromptEntry.isDefault` already exists (`prompt-io.ts:213`, `prompt-io-db-bridge.ts:49`) and mirrors the DB `IsDefault` column (`prompt-db.ts:36`).
+- `exportPromptsToJson` (`prompt-io.ts:36`) currently exports every entry returned by `collectAllExportEntries()`, honoring only `excludeFromExport`. It does not filter on `isDefault`.
+- Import merge lives in `mergePrompts` (`prompt-io.ts:242`) and the commit path in `prompt-import-commit.ts`; neither currently skips defaults.
+- Modal wiring is in `prompt-library-modal.ts` + `prompt-dropdown-io.ts`, exposed from `chip-gear-menu.ts`.
 
-- `db/sql-bridge.ts` classifies SQL into SELECT / WRITE / ALTER buckets and caches the accepted method in a module-local `winning` map. It already exposes test hooks (`__resetWinning`, `__snapshotWinning`) but has no public read for production/UI code.
-- `ui/seed-diagnostics-panel.ts` already offers a "Download E005 diagnostics ZIP" button. It bundles `entries.json`, `toast-trace.json`, `seed-snapshot.json`, but does not include `PROMPT_LOAD_E001`, `SEED_RESEED_E001`, or the bridge-method state.
-- `errors/error-codes.ts` defines `PROMPT_LOAD_E001` and `SEED_RESEED_E001` with structured context keys that already include `stage`, `role`, `seedAttempted`, `reason` (for load) and `force`, `reason` (for reseed) — we can key the export off those.
-- `ui/next-inline-ui.ts` mounts the Next inline strip. Its click path resolves prompts via `getPromptsConfig()` → prompt-loader/prompt-db, which still hits the sql-bridge; when the WRITE bucket cache is poisoned by an earlier failure (auto-seed insert-or-ignore), subsequent Next clicks report `PROMPT_LOAD_E001`.
+## Changes
 
-## Deliverables
+1. **Export filter (`prompt-io.ts`)**
+   - In `exportPromptsToJson`, after `collectAllExportEntries()`, drop entries where `isDefault === true` before the `excludeFromExport` pass.
+   - Adjust the empty-state toast: `"Only default prompts exist, nothing to export"` when the filter empties the set.
+   - Success toast becomes `Exported N user prompts (D defaults skipped)`.
+   - Same filter applied in ZIP + SQLite exporters (`prompt-io-zip.ts`, `prompt-io-sqlite.ts`) so all three formats agree.
+   - Revisions collection (`collectRevisionsForEntries`) already keys off the filtered entries, so it inherits the scope automatically.
 
-### 1. Bridge introspection API
+2. **Import filter (`prompt-io.ts` + `prompt-import-commit.ts`)**
+   - In `mergePrompts` / commit path, force `isDefault=false` on every imported entry (defensive: incoming bundle from an older export could still carry `isDefault=true`).
+   - Skip any incoming entry whose slug matches an existing `isDefault=true` row; surface it in the import summary as `skipped: N (protected defaults)`.
+   - Skipped entries recorded via existing `prompt-import-audit` channel.
 
-- In `db/sql-bridge.ts`, add a public `getSqlBridgeState()` returning `{ winning: Record<Bucket,string|null>, lastError: { bucket, method, message, at } | null, candidates: typeof CANDIDATES }`.
-- Record `lastError` whenever every candidate in a bucket is rejected (contract error) so diagnostics can prove which methods the backend rejected in this session.
-- Keep `__resetWinning` / `__snapshotWinning` for tests; new API wraps the same state.
+3. **UI copy**
+   - `prompt-library-modal.ts` and `chip-gear-menu.ts`: relabel actions to `Export user prompts` / `Import user prompts` and add a one-line helper: `Defaults are managed by re-seed and never included.`
 
-### 2. Diagnostics export (widen the existing E005 ZIP)
+4. **E2E tests** (`src/ui/__tests__/`)
+   - `prompt-library-modal-export-user-only.e2e.test.ts`: seed a mix of default + user prompts, click Export, assert downloaded bundle contains only user rows and the summary toast reports skipped defaults.
+   - `prompt-library-modal-import-protect-defaults.e2e.test.ts`: pre-seed a default `plan` prompt, import a bundle whose entry collides on that slug, assert default row unchanged, import summary reports protection skip, and non-colliding entries land as `isDefault=false`.
+   - `prompt-io-export-round-trip-user-only.test.ts`: export → parse → re-import, verify defaults untouched across the round trip.
 
-- Rename the button in `ui/seed-diagnostics-panel.ts` to "⬇ Download prompt diagnostics ZIP" (test id stays `marco-download-e005-zip` to avoid churn) and extend the archive to include:
-  - `sql-bridge.json` — output of `getSqlBridgeState()`.
-  - `prompt-load-e001.json` — every `PROMPT_LOAD_E001` toast from the trace with full context (stage, role, roleLabel, seedAttempted, reason).
-  - `seed-reseed-e001.json` — same for `SEED_RESEED_E001` (force, reason).
-  - `contract.md` — one-page dump of the current rawSql v2 contract (methods allowed per bucket, and any observed rejections) so the user can paste it into a report.
-- Add `PROMPT_LOAD_E001` / `SEED_RESEED_E001` sections (mirrors of the E005 section) to the panel so the same data is visible in-app.
-- Extend `RELEVANT_CODES` if any new codes are introduced (none planned).
+5. **Docs / memory**
+   - Update `.lovable/memory/features/` with a new note `prompts-import-export-user-scope.md` capturing the filter rule and rationale, and link it from `.lovable/memory/index.md`.
 
-### 3. End-to-end test
+## Technical notes
 
-- New file: `standalone-scripts/macro-controller/src/db/__tests__/prompt-load-plan-post-seed-list.e2e.test.ts`.
-- Wire the real `prompt-db`, `sql-bridge`, and the background `project-api-handler` in-process (the handler already runs under Node in existing regression tests) so the test exercises the full stack.
-- Steps:
-  1. Reset bridge cache.
-  2. Seed the `prompt-macro` DB with the plan-role schema.
-  3. Call `loadPromptsByRole('plan')` and assert it reaches `stage=post-seed-list` with `seedAttempted=true` and returns the seeded plan rows.
-  4. Force the background to reject `QUERY` (simulating the reported regression) and assert the bridge falls through to `SELECT`/`EXEC` without surfacing `PROMPT_LOAD_E001`.
-  5. Force every SELECT candidate to fail and assert the raised error carries `code=PROMPT_LOAD_E001` with `stage=post-seed-list`, `seedAttempted=true`, `role=plan`.
+- Filter helper `isUserAddedEntry(e: CachedPromptEntry): boolean => e.isDefault !== true` colocated in `prompt-io.ts` so ZIP/SQLite exporters can share it.
+- `mergePrompts` returns a `PromptImportResults` shape; extend with `defaultsProtected: number` (additive, backwards compatible).
+- Existing tests that assumed all entries export (`prompt-io-export-empty.test.ts`, `prompt-library-modal-import-export.test.ts`, `prompt-library-modal-round-trip.test.ts`) will be updated to seed with `isDefault=false` where the assertion depends on the entry appearing in the export.
+- No schema migration — the `IsDefault` column already exists.
 
-### 4. Next-button repair
+## Out of scope
 
-Root cause hypothesis to verify inside the fix:
-- The Next click path calls `getPromptsConfig()` which lazily loads Next-role prompts via the same bridge. When an earlier boot-time auto-seed insert-or-ignore hit the "only ALTER TABLE" backend response, the WRITE bucket was left uncached AND a stale error propagated, so the follow-up SELECT for Next never ran.
-- Fix in three parts:
-  1. In `sql-bridge.ts`, isolate bucket failure: a failed WRITE probe must not shortcut a subsequent SELECT probe. Track `lastError` per bucket, never globally.
-  2. In `ui/next-inline-ui.ts`, wrap the click handler so any prompt-load rejection re-runs a one-shot bridge re-probe (`__resetWinning('SELECT')`) and retries once before surfacing the diagnostic toast. If retry succeeds, log a warn-level breadcrumb; do not toast.
-  3. In `db/prompt-db.ts` `loadPromptsByRole`, ensure the `stage=post-seed-list` branch always attempts a fresh SELECT after auto-seed, even when auto-seed reported failure — the seeded rows may have landed from a concurrent boot.
-- Add a focused test in `ui/__tests__/next-inline-ui-retry.test.ts` covering the retry-once-on-contract-error behavior.
-
-## Non-goals
-
-- No changes to the backend project-api-handler beyond what already shipped last turn.
-- No UI restyle, no new prompts, no version bump beyond what release process requires.
-
-## Verification
-
-- `bunx vitest run standalone-scripts/macro-controller/src/db/__tests__/prompt-load-plan-post-seed-list.e2e.test.ts standalone-scripts/macro-controller/src/ui/__tests__/next-inline-ui-retry.test.ts standalone-scripts/macro-controller/src/db/__tests__/sql-bridge.test.ts`
-- `tsgo -p standalone-scripts/macro-controller`
-- Manual: open the diagnostics panel, click download, inspect ZIP for `sql-bridge.json` + `prompt-load-e001.json` + `seed-reseed-e001.json`.
-
-## Technical notes (for the implementer)
-
-- `getSqlBridgeState` must be pure and synchronous; UI reads it at click time.
-- `lastError` should be capped to the last N=10 rejections per bucket to prevent unbounded growth.
-- The e2e test should NOT touch `chrome.*` globals; use the existing in-process `sendToExtension` mock pattern from `sql-bridge.test.ts`.
-- Next-button retry must not loop: exactly one retry, guarded by a `retriedOnce` local.
-
-## Files touched
-
-- `standalone-scripts/macro-controller/src/db/sql-bridge.ts` (add public state API, per-bucket lastError)
-- `standalone-scripts/macro-controller/src/ui/seed-diagnostics-panel.ts` (widen export, add sections)
-- `standalone-scripts/macro-controller/src/ui/next-inline-ui.ts` (retry-once wrapper on prompt-load)
-- `standalone-scripts/macro-controller/src/db/prompt-db.ts` (post-seed-list fresh-SELECT guarantee)
-- `standalone-scripts/macro-controller/src/db/__tests__/prompt-load-plan-post-seed-list.e2e.test.ts` (new)
-- `standalone-scripts/macro-controller/src/ui/__tests__/next-inline-ui-retry.test.ts` (new)
-- `.lovable/memory/features/sql-bridge-adaptive-rawsql.md` (append: state API + retry semantics)
-- `.lovable/memory/index.md` (touch if new memory file added; none planned)
+- Changing the default-prompt seed mechanism.
+- Any UI beyond relabeling the two buttons + helper line.
+- The still-outstanding `PROMPT_LOAD_E001` / workspace-move v2 verification (tracked separately).

@@ -30,14 +30,41 @@ export interface ExportPromptsOptions {
 }
 
 /**
+ * v4.400.0: import/export is scoped to user-added prompts only. Rows with
+ * `isDefault === true` are managed by the re-seed pipeline and must never
+ * appear in an export blob nor overwrite an existing default row on import.
+ * See `.lovable/memory/features/prompts-import-export-user-scope.md`.
+ */
+export function isUserAddedEntry(entry: CachedPromptEntry): boolean {
+  return entry.isDefault !== true;
+}
+
+export function filterUserAddedEntries(
+  entries: readonly CachedPromptEntry[],
+): { kept: CachedPromptEntry[]; defaultsSkipped: number } {
+  const kept: CachedPromptEntry[] = [];
+  let defaultsSkipped = 0;
+  for (const e of entries) {
+    if (isUserAddedEntry(e)) kept.push(e);
+    else defaultsSkipped++;
+  }
+  return { kept, defaultsSkipped };
+}
+
+/**
  * Exports current prompts from IndexedDB as a JSON file download using
  * the shared `PromptsBundleV1` envelope (plan 12 step 5).
  */
 export async function exportPromptsToJson(options: ExportPromptsOptions = {}): Promise<void> {
   try {
-    const entries = await collectAllExportEntries();
-    if (entries.length === 0) {
+    const rawEntries = await collectAllExportEntries();
+    if (rawEntries.length === 0) {
       showToast('No prompts found to export', 'warn');
+      return;
+    }
+    const { kept: entries, defaultsSkipped } = filterUserAddedEntries(rawEntries);
+    if (entries.length === 0) {
+      showToast('Only default prompts exist, nothing to export', 'warn');
       return;
     }
 
@@ -71,10 +98,11 @@ export async function exportPromptsToJson(options: ExportPromptsOptions = {}): P
     }, 100);
 
     const suffix = skipped > 0 ? ` (${skipped} excluded)` : '';
+    const defSuffix = defaultsSkipped > 0 ? `, ${defaultsSkipped} defaults skipped` : '';
     const revSuffix = bundle.revisions && bundle.revisions.length > 0
       ? ` + ${bundle.revisions.length} revisions`
       : '';
-    showToast(`Exported ${bundle.entryCount} prompts${suffix}${revSuffix}`, 'success');
+    showToast(`Exported ${bundle.entryCount} user prompts${suffix}${defSuffix}${revSuffix}`, 'success');
   } catch (err) {
     log('[PromptIO] Export failed: ' + String(err), 'error');
     showToast('Export failed', 'error');
@@ -127,6 +155,12 @@ export interface PromptImportResults {
    * can surface "+N revisions" in its success summary.
    */
   revisionsImported?: number;
+  /**
+   * v4.400.0: number of incoming entries that were skipped because they
+   * collided with an existing `isDefault=true` row. Additive/backwards
+   * compatible: undefined on older bundles.
+   */
+  defaultsProtected?: number;
 }
 
 
@@ -210,7 +244,10 @@ export function validatePromptEntryDetailed(
     text: e.text,
     category: typeof e.category === 'string' ? e.category.trim() : 'General',
     isFavorite: !!e.isFavorite,
-    isDefault: !!e.isDefault,
+    // v4.400.0: import is scoped to user-added prompts. Force `isDefault=false`
+    // on every incoming entry — defaults are managed by the re-seed pipeline
+    // and must never be re-created via bundle import.
+    isDefault: false,
   };
   if (typeof e.slug === 'string') out.slug = e.slug.trim();
   if (typeof e.order === 'number') out.order = e.order;
@@ -245,7 +282,7 @@ export function mergePrompts(
   overwrite: boolean = true
 ): { merged: CachedPromptEntry[]; results: PromptImportResults } {
 
-  const results: PromptImportResults = { added: 0, updated: 0, total: imported.length, errors: [] };
+  const results: PromptImportResults = { added: 0, updated: 0, total: imported.length, errors: [], defaultsProtected: 0 };
   const mergedMap = new Map<string, CachedPromptEntry>();
 
   existing.forEach((entry) => {
@@ -255,7 +292,15 @@ export function mergePrompts(
 
   imported.forEach((imp) => {
     const key = imp.slug || imp.name;
-    if (mergedMap.has(key)) {
+    const target = mergedMap.get(key);
+    if (target) {
+      // v4.400.0: never let an import overwrite a default row. Defaults are
+      // owned by the re-seed pipeline and are excluded from bundles anyway;
+      // this is a belt-and-suspenders guard for legacy or crafted bundles.
+      if (target.isDefault === true) {
+        results.defaultsProtected = (results.defaultsProtected ?? 0) + 1;
+        return;
+      }
       if (overwrite) {
         results.updated++;
         mergedMap.set(key, imp);
@@ -504,6 +549,9 @@ export async function performPromptImport(
   results.total = importedPrompts.length;
   results.updated += dbResult.upserted;
   results.errors.push(...dbResult.errors);
+  if (dbResult.defaultsProtected > 0) {
+    results.defaultsProtected = (results.defaultsProtected ?? 0) + dbResult.defaultsProtected;
+  }
   if (droppedCount > 0) {
     results.errors.push(`${droppedCount} entries skipped (roleFilter=${String(options.roleFilter)})`);
   }

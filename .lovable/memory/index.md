@@ -157,4 +157,5 @@ Updated: just now
 - [Session 2026-07-23 remix checkpoint](mem://workflow/20-session-2026-07-23-remix-checkpoint) - Fresh remix; no code changes; write-memory snapshot only. Pending plans + open issues unchanged.
 - [Prompts authoring + release + {{n}} pipeline](mem://features/prompts-authoring-and-release) - Canonical vs mirror layout, info.json fields, how to add/release a prompt, all five {{n}} substitution sites + guards
 - [SQL bridge adaptive rawSql](mem://features/sql-bridge-adaptive-rawsql) - Background rawSql handler + client probe/cache bridge for prompt load/edit/reseed failures; fixes PROMPT_LOAD_E001 / PROMPT_EDIT_E005
+- [Prompts import/export user-scope](mem://features/prompts-import-export-user-scope) - v4.400.0: import/export operate on user-added only (isDefault=false); defaults protected on import in both mergePrompts and prompt-io-db-bridge; every incoming entry forced isDefault=false
 
