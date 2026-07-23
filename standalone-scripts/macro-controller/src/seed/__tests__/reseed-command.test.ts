@@ -76,7 +76,7 @@ describe('reseedPromptsOnDemand', () => {
     });
 
     it('R3: force UPDATE failure surfaces error and returns ok:false', async () => {
-        const { sendToExtension } = await import('../../ui/prompt-loader');
+        const { sendToExtension } = await import('../../db/extension-bridge');
         (sendToExtension as unknown as { mockImplementation: (impl: (c: string, p: { params: { sql: string } }) => Promise<unknown>) => void })
             .mockImplementation(async (_c: string, p: { params: { sql: string } }) => {
                 if (p.params.sql.startsWith('UPDATE Prompt SET Body')) {
