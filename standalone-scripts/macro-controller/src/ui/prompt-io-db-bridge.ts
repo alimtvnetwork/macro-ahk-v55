@@ -22,6 +22,12 @@ import type { CachedPromptEntry } from './prompt-cache';
 export interface DbCommitResults {
     upserted: number;
     errors: string[];
+    /**
+     * v4.400.0: count of incoming entries whose slug+role matches an
+     * existing `IsDefault=1` row. Those imports are skipped so defaults are
+     * never mutated by bundle import.
+     */
+    defaultsProtected: number;
 }
 
 export interface PartitionResult {
@@ -92,12 +98,19 @@ async function findExistingRow(role: PromptRole, slug: string): Promise<PromptRo
     return res.value.find((r) => r.Slug === slug) ?? null;
 }
 
-async function commitOneEntry(entry: CachedPromptEntry): Promise<string | null> {
+type CommitOutcome =
+    | { status: 'ok' }
+    | { status: 'error'; reason: string }
+    | { status: 'default-protected' };
+
+async function commitOneEntry(entry: CachedPromptEntry): Promise<CommitOutcome> {
     const role = entry.role;
-    if (!isPromptRole(role)) return 'missing role';
+    if (!isPromptRole(role)) return { status: 'error', reason: 'missing role' };
     const slug = (entry.slug ?? '').trim();
-    if (slug === '') return 'missing slug for role=' + role;
+    if (slug === '') return { status: 'error', reason: 'missing slug for role=' + role };
     const existing = await findExistingRow(role, slug);
+    // v4.400.0: never let import mutate a default-seeded row.
+    if (existing && existing.IsDefault === 1) return { status: 'default-protected' };
     const res = await upsertPrompt({
         id: existing?.Id, slug, name: entry.name, body: entry.text,
         role, previousBody: existing?.Body,
@@ -105,18 +118,22 @@ async function commitOneEntry(entry: CachedPromptEntry): Promise<string | null> 
         replaceValues: entry.replaceValues,
         previousReplaceKey: existing?.ReplaceKey,
     });
-    return res.ok ? null : (res.error ?? 'upsert failed');
+    return res.ok ? { status: 'ok' } : { status: 'error', reason: res.error ?? 'upsert failed' };
 }
 
 /** Route role-tagged entries to `upsertPrompt`; collect per-entry errors. */
 export async function commitDbEntries(entries: readonly CachedPromptEntry[]): Promise<DbCommitResults> {
     const errors: string[] = [];
     let upserted = 0;
+    let defaultsProtected = 0;
     for (const entry of entries) {
-        const err = await commitOneEntry(entry);
-        if (err === null) upserted++;
-        else errors.push('slug=' + (entry.slug ?? '?') + ': ' + err);
+        const outcome = await commitOneEntry(entry);
+        if (outcome.status === 'ok') upserted++;
+        else if (outcome.status === 'default-protected') defaultsProtected++;
+        else errors.push('slug=' + (entry.slug ?? '?') + ': ' + outcome.reason);
     }
-    log('PromptIoDbBridge: commitDbEntries upserted=' + upserted + ' errors=' + errors.length, 'info');
-    return { upserted, errors };
+    log('PromptIoDbBridge: commitDbEntries upserted=' + upserted
+        + ' defaultsProtected=' + defaultsProtected
+        + ' errors=' + errors.length, 'info');
+    return { upserted, errors, defaultsProtected };
 }
