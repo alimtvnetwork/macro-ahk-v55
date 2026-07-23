@@ -13,10 +13,9 @@
  * rows and the DELETE statements become no-ops.
  */
 
-import { sendToExtension } from '../ui/extension-relay';
 import { log } from '../logger';
 import { logDiagnosticFromCode } from '../error-utils';
-import { DB_NAME } from './db-name';
+import { runSql as runSqlBridge } from './sql-bridge';
 
 /**
  * Legacy Read Memory slugs that MUST be purged. Never re-add the canonical
@@ -41,12 +40,7 @@ function buildInList(): string {
 
 async function countLegacyRows(): Promise<number> {
   const sql = 'SELECT COUNT(*) AS c FROM Prompt WHERE Slug IN (' + buildInList() + ')';
-  const resp = await sendToExtension('PROJECT_API', {
-    project: DB_NAME,
-    method: 'QUERY',
-    endpoint: 'rawSql',
-    params: { sql },
-  });
+  const resp = await runSqlBridge('QUERY', sql);
   if (!resp?.isOk || !Array.isArray(resp.rows) || resp.rows.length === 0) return 0;
   const row = resp.rows[0] as { c?: unknown };
   const count = typeof row?.c === 'number' ? row.c : Number(row?.c);
@@ -58,12 +52,7 @@ async function deleteLegacyPromptRows(): Promise<void> {
   const sql =
     'DELETE FROM PromptRevision WHERE Slug IN (' + inList + '); ' +
     'DELETE FROM Prompt WHERE Slug IN (' + inList + ');';
-  const resp = await sendToExtension('PROJECT_API', {
-    project: DB_NAME,
-    method: 'SCHEMA',
-    endpoint: 'rawSql',
-    params: { sql },
-  });
+  const resp = await runSqlBridge('SCHEMA', sql);
   if (!resp?.isOk) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'legacy-read-memory',
