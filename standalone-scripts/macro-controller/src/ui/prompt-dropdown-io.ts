@@ -50,11 +50,6 @@ function todayIso(): string {
   return new Date().toISOString().split('T')[0];
 }
 
-async function readCachedEntries(): Promise<CachedPromptEntry[]> {
-  const io = await import('./prompt-io');
-  return io.collectAllExportEntries();
-}
-
 /**
  * v4.400.0: ZIP + SQLite export share the same "user-added only" scope as
  * the JSON path in `exportPromptsToJson`. Defaults are managed by re-seed
@@ -125,7 +120,7 @@ function buildExportPopover(anchor: HTMLElement): HTMLElement {
 
 /** Export pill: opens a three-option popover (JSON / ZIP / SQLite). */
 export function buildExportButton(): HTMLElement {
-  return buildHeaderPill('📤 Export', 'Export all prompts (JSON, ZIP, or SQLite)', function(e: Event) {
+  return buildHeaderPill('📤 Export', 'Export user-added prompts (JSON, ZIP, or SQLite). Defaults are managed by re-seed and never included.', function(e: Event) {
     e.stopPropagation();
     const target = e.currentTarget as HTMLElement;
     const existing = document.querySelector('[data-marco-export-popover]');
@@ -143,7 +138,7 @@ export function buildExportButton(): HTMLElement {
 
 /** Import pill: opens the six-stage import modal. */
 export function buildImportButton(_ctx: PromptContext, _taskNextDeps: TaskNextDeps, rerender: Rerender): HTMLElement {
-  return buildHeaderPill('📥 Import', 'Import prompts (JSON, ZIP, or SQLite)', function(e: Event) {
+  return buildHeaderPill('📥 Import', 'Import user-added prompts (JSON, ZIP, or SQLite). Default prompts are protected and never overwritten.', function(e: Event) {
     e.stopPropagation();
     void import('./prompt-import-modal').then((mod) => {
       mod.openPromptImportModal({
