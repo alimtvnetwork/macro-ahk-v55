@@ -61,6 +61,9 @@ function buildModal(): HTMLDivElement {
   modal.appendChild(buildHeader());
   modal.appendChild(buildE005Section());
   modal.appendChild(buildSnapshotSection());
+  modal.appendChild(buildBridgeSection());
+  modal.appendChild(buildErrorTraceSection('Recent PROMPT_LOAD_E001', 'PROMPT_LOAD_E001'));
+  modal.appendChild(buildErrorTraceSection('Recent SEED_RESEED_E001', 'SEED_RESEED_E001'));
   modal.appendChild(buildTraceSection());
   return modal;
 }
