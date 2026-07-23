@@ -1016,6 +1016,13 @@ function buildNextStrip(deps: TaskNextDeps): HTMLElement {
   installActionOverflow(body, 'rgba(124,58,237,0.6)');
   void refreshNextChipsFromDb(deps, body, moreWrap, recomputeOverflow);
   subscribeInlineStripGroupCollapse(function () { applyInlineStripGroupCollapse(); });
+  // v4.402.0: refresh the numbered chips whenever a prompt edit lands so a
+  // user who just edited the Next default via the gear menu sees the new
+  // active row on the next click without a reload.
+  subscribePromptsChanged(function(detail) {
+    if (detail.role && detail.role !== 'next') return;
+    void refreshNextChipsFromDb(deps, body, moreWrap, recomputeOverflow);
+  });
   return root;
 }
 
