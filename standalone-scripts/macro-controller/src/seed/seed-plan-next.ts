@@ -9,10 +9,10 @@
  * `logError('SeedPlanNext', ...)` and never swallowed.
  */
 
-import { sendToExtension } from '../ui/prompt-loader';
 import { logDiagnosticFromCode } from '../error-utils';
 import { log } from '../logger';
 import { DB_NAME } from '../db/db-name';
+import { runSql as runSqlBridge, type SqlBridgeResp } from '../db/sql-bridge';
 import { sqlLit } from '../db/prompt-role-db';
 import { PLAN_NEXT_SEED_ROWS, getRequiredTokensForRole, NEXT_DEFAULT_LEGACY_BODIES, PLAN_DEFAULT_LEGACY_BODIES } from './plan-next-prompts';
 
@@ -29,7 +29,7 @@ import type { PromptRole } from '../types/prompt-role';
 import { StorageKey } from '../types/storage-keys';
 import { emitPromptSeedEvent } from '../telemetry/prompt-seed-telemetry';
 
-interface RawSqlResp { isOk: boolean; rows?: unknown[]; errorMessage?: string }
+type RawSqlResp = SqlBridgeResp;
 interface UpgradeMatch {
     isMatch: boolean;
     detail: string;
@@ -60,10 +60,8 @@ const PLAN_DEFAULT_CURRENT_MARKERS = [
 ] as const;
 
 async function rawSql(method: 'QUERY' | 'SCHEMA', sql: string): Promise<RawSqlResp> {
-    const resp = await sendToExtension('PROJECT_API', {
-        project: DB_NAME, method, endpoint: 'rawSql', params: { sql },
-    });
-    return (resp as RawSqlResp) ?? { isOk: false, errorMessage: 'no response' };
+    void DB_NAME;
+    return runSqlBridge(method, sql);
 }
 
 function buildInsertOrIgnoreSql(now: number): string {
