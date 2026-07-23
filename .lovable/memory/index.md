@@ -154,4 +154,5 @@ Updated: just now
 - [Release runbook + failure modes](mem://workflow/19-release-runbook-and-failure-modes) - Release is one `version.json` edit plus optional `v*` tag. Never re-add release checkers.
 - [Re-seed defaults auto-opens editor](mem://features/macro-controller/reseed-defaults-open-editor) - `⚙` gear rows `🔄 Re-seed defaults (safe)` and `⚠️ Force reset defaults` both route through `runReseedAndOpen(role, force)` and `await openDefaultPromptEditor(role)` after success; failure branch adds `role` to `SEED_RESEED_E001` diagnostic context.
 - [Session 2026-07-23 remix checkpoint](mem://workflow/20-session-2026-07-23-remix-checkpoint) - Fresh remix; no code changes; write-memory snapshot only. Pending plans + open issues unchanged.
+- [Prompts authoring + release + {{n}} pipeline](mem://features/prompts-authoring-and-release) - Canonical vs mirror layout, info.json fields, how to add/release a prompt, all five {{n}} substitution sites + guards
 
