@@ -14,6 +14,29 @@ import { appendLog } from './database-json-log';
 import { runSql as runSqlBridge, type SqlBridgeResp } from '../db/sql-bridge';
 
 import { MACRO_CONTROLLER_NS } from '../constants';
+
+/**
+ * Type-safe adapter for sql-bridge `.then` callbacks.
+ *
+ * Every `runSqlBridge(...)` call in this file previously wired a
+ * `.then((resp: ExtensionCallbackResponse) => ...)` handler. Under
+ * `exactOptionalPropertyTypes`, `SqlBridgeResp.rows: unknown[]` is not
+ * assignable to `ExtensionCallbackResponse.rows: Record<string, unknown>[]`,
+ * which produced TS2345 during the macro build (issue #14).
+ *
+ * `schemaResp(onOk, onErr)` locks the argument type to `SqlBridgeResp` at
+ * the single point of truth, so a future call site cannot silently drift
+ * back to the old shape.
+ */
+function schemaResp(
+  onOk: (resp: SqlBridgeResp) => void,
+  onErr: (message: string) => void,
+): (resp: SqlBridgeResp) => void {
+  return (resp: SqlBridgeResp): void => {
+    if (resp?.isOk) onOk(resp);
+    else onErr(resp?.errorMessage || 'unknown');
+  };
+}
 /* ------------------------------------------------------------------ */
 /*  Validate                                                           */
 /* ------------------------------------------------------------------ */
