@@ -104,10 +104,10 @@ function emitLoadFailure(opts: PickPromptOptions, state: LoadState): null {
 }
 
 function emitEmptyToast(opts: PickPromptOptions, seedReason: string | null): null {
-  const msg = seedReason !== null
+  const text = seedReason !== null
     ? '⚠ No ' + opts.roleLabel + ' prompts available. Auto-seed reported: ' + seedReason
     : 'No ' + opts.roleLabel + ' prompts available';
-  showToast(msg, 'warn');
+  showToast(text, 'warn');
   return null;
 }
 
