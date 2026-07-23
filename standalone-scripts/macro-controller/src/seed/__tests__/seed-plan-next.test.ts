@@ -12,6 +12,12 @@ const captured: CapturedCall[] = [];
 let responsesQueue: Record<string, unknown>[] = [];
 const logCalls: Array<{ message: string; level?: string | undefined }> = [];
 
+vi.mock('../../db/extension-bridge', () => ({
+    sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
+        captured.push({ method: p.method, sql: p.params.sql });
+        return responsesQueue.shift() ?? { isOk: true, rows: [] };
+    }),
+}));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
