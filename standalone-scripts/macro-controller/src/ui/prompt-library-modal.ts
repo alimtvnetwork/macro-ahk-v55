@@ -264,6 +264,7 @@ function buildShell(): ModalRefs {
     const exportBtn = document.createElement('button');
     exportBtn.textContent = 'Export';
     exportBtn.dataset.testid = 'library-export';
+    exportBtn.title = 'Export user-added prompts only. Default prompts are managed by re-seed and never included.';
     exportBtn.style.cssText = btnCss('#243050', '#e6edf7');
 
     // Import scope: restrict which roles are applied on import. 'all' keeps
@@ -286,6 +287,7 @@ function buildShell(): ModalRefs {
     const importBtn = document.createElement('button');
     importBtn.textContent = 'Import';
     importBtn.dataset.testid = 'library-import';
+    importBtn.title = 'Import user-added prompts. Existing default prompts are protected and never overwritten.';
     importBtn.style.cssText = btnCss('#243050', '#e6edf7');
     const previewBtn = document.createElement('button');
     previewBtn.textContent = 'Preview';
