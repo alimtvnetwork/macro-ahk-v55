@@ -216,39 +216,31 @@ function applyMigration(m: JsonMigration, cb: (ok: boolean, msg: string) => void
       const type = col.type === 'BOOLEAN' ? 'INTEGER' : col.type;
       const nullable = col.nullable !== false ? '' : ' NOT NULL';
       const def = col.default ? ` DEFAULT ${col.default}` : '';
-      runSqlBridge('SCHEMA', `ALTER TABLE "${m.table}" ADD COLUMN "${col.name}" ${type}${nullable}${def}`, MACRO_CONTROLLER_NS).then((resp: SqlBridgeResp) => {
-        if (resp?.isOk) {
-          cb(true, `Added column "${col.name}" to "${m.table}"`);
-        } else {
-          const err = resp?.errorMessage || '';
+      runSqlBridge('SCHEMA', `ALTER TABLE "${m.table}" ADD COLUMN "${col.name}" ${type}${nullable}${def}`, MACRO_CONTROLLER_NS).then(schemaResp(
+        () => cb(true, `Added column "${col.name}" to "${m.table}"`),
+        (err) => {
           if (err.includes('duplicate column') || err.includes('already exists')) {
             cb(true, `Column "${col.name}" already exists on "${m.table}" — skipped`);
           } else {
             cb(false, `Failed addColumn "${m.table}.${col.name}": ${err}`);
           }
-        }
-      });
+        },
+      ));
       break;
     }
     case 'dropColumn': {
-      runSqlBridge('SCHEMA', `ALTER TABLE "${m.table}" DROP COLUMN "${m.column?.name || m.oldName}"`, MACRO_CONTROLLER_NS).then((resp: SqlBridgeResp) => {
-        const colName = m.column?.name || m.oldName || '?';
-        if (resp?.isOk) {
-          cb(true, `Dropped column "${colName}" from "${m.table}"`);
-        } else {
-          cb(false, `Failed dropColumn "${m.table}.${colName}": ${resp?.errorMessage || 'unknown'}`);
-        }
-      });
+      const colName = m.column?.name || m.oldName || '?';
+      runSqlBridge('SCHEMA', `ALTER TABLE "${m.table}" DROP COLUMN "${colName}"`, MACRO_CONTROLLER_NS).then(schemaResp(
+        () => cb(true, `Dropped column "${colName}" from "${m.table}"`),
+        (err) => cb(false, `Failed dropColumn "${m.table}.${colName}": ${err}`),
+      ));
       break;
     }
     case 'renameColumn': {
-      runSqlBridge('SCHEMA', `ALTER TABLE "${m.table}" RENAME COLUMN "${m.oldName}" TO "${m.newName}"`, MACRO_CONTROLLER_NS).then((resp: SqlBridgeResp) => {
-        if (resp?.isOk) {
-          cb(true, `Renamed "${m.table}.${m.oldName}" → "${m.newName}"`);
-        } else {
-          cb(false, `Failed renameColumn "${m.table}.${m.oldName}": ${resp?.errorMessage || 'unknown'}`);
-        }
-      });
+      runSqlBridge('SCHEMA', `ALTER TABLE "${m.table}" RENAME COLUMN "${m.oldName}" TO "${m.newName}"`, MACRO_CONTROLLER_NS).then(schemaResp(
+        () => cb(true, `Renamed "${m.table}.${m.oldName}" → "${m.newName}"`),
+        (err) => cb(false, `Failed renameColumn "${m.table}.${m.oldName}": ${err}`),
+      ));
       break;
     }
     default:
