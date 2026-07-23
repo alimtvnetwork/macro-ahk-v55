@@ -119,12 +119,11 @@ function _setupTitleDragHandlers(titleRow: HTMLElement, plCtx: PanelLayoutCtx, h
     if (e.target === hideBtn || e.target === panelToggleSpan) return;
     startDragHandler(plCtx, e);
   };
-  titleRow.onpointerup = function(e: PointerEvent) {
-    if (e.target === hideBtn || e.target === panelToggleSpan) return;
-    const dx = Math.abs(e.clientX - plCtx.dragStartPos.x);
-    const dy = Math.abs(e.clientY - plCtx.dragStartPos.y);
-    if (dx < 5 && dy < 5) { toggleMinimize(plCtx); }
-  };
+  // v4.401.0: click-to-toggle removed from the title row. The `[-]/[+]`
+  // span owns the sole toggle path so a single click can never fire the
+  // handler twice (title-row pointerup + span onclick used to race on
+  // synthetic pointer sequences). Drag detection remains on the row.
+  void toggleMinimize; // keep import stable across future edits
 }
 
 function _assembleTitleRow(titleRow: HTMLElement, els: Record<string, HTMLElement>): void {
