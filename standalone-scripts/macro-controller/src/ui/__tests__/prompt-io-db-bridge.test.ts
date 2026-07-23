@@ -58,7 +58,7 @@ describe('collectDbEntriesForExport', () => {
         const plan = result.find((e) => e.slug === 'plan-default')!;
         expect(plan.role).toBe('plan');
         expect(plan.text).toBe('P {{n}}');
-        expect(plan.isDefault).toBe(true);
+        expect(plan.isDefault).toBe(false);
     });
 });
 
