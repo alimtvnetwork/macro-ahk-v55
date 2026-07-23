@@ -11,7 +11,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 const sendMock = vi.fn();
 
-vi.mock('../../ui/extension-relay', () => ({
+vi.mock('../../ui/prompt-loader', () => ({
     sendToExtension: (type: string, payload: Record<string, unknown>) => sendMock(type, payload),
 }));
 vi.mock('../db-name', () => ({ DB_NAME: 'testdb' }));
