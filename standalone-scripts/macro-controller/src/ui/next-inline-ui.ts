@@ -29,6 +29,8 @@ import { ensureInlineStripsFrame } from './inline-strips-frame';
 import { substituteToken } from '../utils/token-substitute';
 import { REPLACE_KEY_DEFAULT } from '../db/prompt-defaults';
 import { buildChipGearActionSection } from './chip-gear-menu';
+import { runWithBridgeRetry } from '../db/sql-bridge';
+import { subscribePromptsChanged } from './prompts-changed-event';
 
 /** Hard guard: Plan/Next strips MUST NOT auto-trigger Repeat or each other. */
 export const INLINE_AUTOCHAIN_DISABLED = true;
@@ -150,7 +152,13 @@ function resolveNextVariantText(deps: TaskNextDeps, n: number): string | null {
 async function resolveNextTextDbFirst(deps: TaskNextDeps, n: number): Promise<string | null> {
   try {
     const mod = await import('../db/prompt-db');
-    const result = await mod.getDefaultPromptForRole('next');
+    // v4.402.0: run through the sql-bridge retry helper so a stale cached
+    // method-name that surfaces as PROMPT_LOAD_E001 heals in one click
+    // instead of the user seeing "Unsupported method: QUERY" and giving up.
+    const result = await runWithBridgeRetry(
+      function() { return mod.getDefaultPromptForRole('next'); },
+      function(r) { return r.ok ? undefined : (r.error ?? 'getDefaultPromptForRole !ok'); },
+    );
     if (result.ok && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
       const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
       log('NextInline.resolve: using DB next-default (' + result.value.Body.length + ' chars, key=' + key + ') for N=' + n, 'info');
