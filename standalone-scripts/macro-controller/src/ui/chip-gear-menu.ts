@@ -354,6 +354,12 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
     );
     return;
   }
+  // v4.401.0: invalidate the in-memory prompt cache so the numbered Next/Plan
+  // chips (which read via `getPromptsConfig()`) see the newly-active row on
+  // the next click instead of pasting the previous default's body.
+  const loader = await import('./prompt-loader');
+  loader.invalidatePromptCache();
+  loader.clearLoadedPrompts();
   showToast('✅ Active ' + roleLabel + ' prompt: ' + picked.Name, 'success');
 }
 
@@ -372,5 +378,8 @@ async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> 
     );
     return;
   }
+  const loader = await import('./prompt-loader');
+  loader.invalidatePromptCache();
+  loader.clearLoadedPrompts();
   showToast('🗑 Deleted "' + picked.Name + '"', 'success');
 }

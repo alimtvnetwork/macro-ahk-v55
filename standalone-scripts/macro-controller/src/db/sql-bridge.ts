@@ -189,3 +189,34 @@ export function _resetSqlBridgeCacheForTest(): void {
 export function _getSqlBridgeCacheForTest(): Readonly<Partial<Record<Bucket, string>>> {
     return { ...winning };
 }
+
+/**
+ * Run an async operation and, if it fails with a sql-bridge contract-shape
+ * error, reset the cache and retry exactly once. Shared by the Next chip and
+ * the picker so both surfaces heal from stale-cache drift the same way.
+ *
+ * `fn` should return either a thrown error or a `{ ok:false, error }` shape;
+ * `isFailure` extracts the human message so we can classify. Return value is
+ * whatever `fn` returned (success or the second-attempt failure).
+ */
+export async function runWithBridgeRetry<T>(
+    fn: () => Promise<T>,
+    isFailure: (v: T) => string | undefined,
+): Promise<T> {
+    try {
+        const first = await fn();
+        const msg = isFailure(first);
+        if (msg && isSqlBridgeContractError(msg)) {
+            resetSqlBridgeCache();
+            return await fn();
+        }
+        return first;
+    } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (isSqlBridgeContractError(msg)) {
+            resetSqlBridgeCache();
+            return await fn();
+        }
+        throw err;
+    }
+}

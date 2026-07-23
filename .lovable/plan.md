@@ -1,48 +1,70 @@
-## Goal
+# Fix minus-button hide toggle and Next-button prompt navigation
 
-Scope the prompt library **Import** and **Export** actions to user-added prompts only (rows with `isDefault=false`). Default/seed prompts stay untouched on export and are never overwritten on import. Cover the new behavior with e2e tests.
+Two independent bugs live in `standalone-scripts/macro-controller/src/ui`. Both are structural: state and DOM drift apart, and the Next chip reads from an in-memory legacy cache that the write path never invalidates.
 
-## Current state (verified)
+## Bug 1: minus / hide toggle desync
 
-- `CachedPromptEntry.isDefault` already exists (`prompt-io.ts:213`, `prompt-io-db-bridge.ts:49`) and mirrors the DB `IsDefault` column (`prompt-db.ts:36`).
-- `exportPromptsToJson` (`prompt-io.ts:36`) currently exports every entry returned by `collectAllExportEntries()`, honoring only `excludeFromExport`. It does not filter on `isDefault`.
-- Import merge lives in `mergePrompts` (`prompt-io.ts:242`) and the commit path in `prompt-import-commit.ts`; neither currently skips defaults.
-- Modal wiring is in `prompt-library-modal.ts` + `prompt-dropdown-io.ts`, exposed from `chip-gear-menu.ts`.
+**Where**: `ui/panel-layout.ts:427-465` (`toggleMinimize`), `ui/panel-header.ts:98-127` (title-row + span click), `ui/panel-builder.ts:277-294` (`_restoreMinimizedPanel`).
 
-## Changes
+**Symptoms**:
+- Clicking the `[-]`/`[+]` span *and* the title row can both fire `toggleMinimize` on the same click on some pointer sequences (double-toggle → visible state doesn't match label).
+- If a DOM mutation in the hide/show loop throws partway, `ctx.panelState` still flips and `savePanelState` still persists, so the next reload restores a half-hidden panel.
+- `_restoreMinimizedPanel` on boot rebuilds the minimized DOM but never re-persists, so a boot-time failure leaves `panelState='minimized'` in storage with nothing to recover it.
 
-1. **Export filter (`prompt-io.ts`)**
-   - In `exportPromptsToJson`, after `collectAllExportEntries()`, drop entries where `isDefault === true` before the `excludeFromExport` pass.
-   - Adjust the empty-state toast: `"Only default prompts exist, nothing to export"` when the filter empties the set.
-   - Success toast becomes `Exported N user prompts (D defaults skipped)`.
-   - Same filter applied in ZIP + SQLite exporters (`prompt-io-zip.ts`, `prompt-io-sqlite.ts`) so all three formats agree.
-   - Revisions collection (`collectRevisionsForEntries`) already keys off the filtered entries, so it inherits the scope automatically.
+**Fix**:
+1. Wrap the hide-loop, show-loop, and geometry writes in `toggleMinimize` in a single try/finally. Compute the target state up front, apply DOM changes, and only call `savePanelState` after the DOM loop completes without throwing. On throw, roll back the label + inline styles to the pre-toggle snapshot and log a diagnostic.
+2. Kill the double-fire path in `panel-header.ts:117-127`: keep only the span's `onclick`, remove the title-row `pointerup` toggle (drag detection stays; the click-to-toggle behavior moves entirely to the `[-]/[+]` span). Preserves drag, removes the duplicate handler.
+3. Add a single `applyMinimizedDom(ctx)` / `applyExpandedDom(ctx)` pair that both `toggleMinimize` and `_restoreMinimizedPanel` call, so boot-restore uses the exact same code path as the toggle. `_restoreMinimizedPanel` then calls `savePanelState('minimized')` at the end for idempotence.
+4. Guarantee the picker/editor modal is still reachable while minimized (already true: `chip-gear-picker.ts` appends to `document.body`). Add a regression test that opens the picker, toggles minimize, and asserts the modal DOM node is still attached and interactive.
 
-2. **Import filter (`prompt-io.ts` + `prompt-import-commit.ts`)**
-   - In `mergePrompts` / commit path, force `isDefault=false` on every imported entry (defensive: incoming bundle from an older export could still carry `isDefault=true`).
-   - Skip any incoming entry whose slug matches an existing `isDefault=true` row; surface it in the import summary as `skipped: N (protected defaults)`.
-   - Skipped entries recorded via existing `prompt-import-audit` channel.
+## Bug 2: Next button throws E001/E005 or pastes stale text
 
-3. **UI copy**
-   - `prompt-library-modal.ts` and `chip-gear-menu.ts`: relabel actions to `Export user prompts` / `Import user prompts` and add a one-line helper: `Defaults are managed by re-seed and never included.`
+**Where**:
+- Numbered Next chip: `ui/next-inline-ui.ts:904-919` → `stageNextPrompt` → `ui/task-next-ui.ts:120-276` → `getPromptsConfig()` in `ui/prompt-loader.ts:394-410` (in-memory legacy cache).
+- Gear-menu Edit/Set-active/Delete: `ui/chip-gear-menu.ts:338-361` → `pickPromptFromRole` in `ui/chip-gear-picker.ts` (sql-bridge, retry-once, `PROMPT_LOAD_E001`).
+- Editor save: `ui/prompt-editor.ts:240,326,345` (`PROMPT_EDIT_E005`).
 
-4. **E2E tests** (`src/ui/__tests__/`)
-   - `prompt-library-modal-export-user-only.e2e.test.ts`: seed a mix of default + user prompts, click Export, assert downloaded bundle contains only user rows and the summary toast reports skipped defaults.
-   - `prompt-library-modal-import-protect-defaults.e2e.test.ts`: pre-seed a default `plan` prompt, import a bundle whose entry collides on that slug, assert default row unchanged, import summary reports protection skip, and non-colliding entries land as `isDefault=false`.
-   - `prompt-io-export-round-trip-user-only.test.ts`: export → parse → re-import, verify defaults untouched across the round trip.
+**Root cause**: the write path (`chip-gear-menu` → editor save) does not call `invalidatePromptCache()` / `clearLoadedPrompts()`, so the numbered Next chip's read from `promptLoaderState.loadedJsonPrompts` is stale after any edit. When the cache is empty or torn, the chip either pastes the wrong body or falls into `pickPromptFromRole` and surfaces `PROMPT_LOAD_E001`; the editor save itself surfaces `PROMPT_EDIT_E005` when the same stale state is written back.
 
-5. **Docs / memory**
-   - Update `.lovable/memory/features/` with a new note `prompts-import-export-user-scope.md` capturing the filter rule and rationale, and link it from `.lovable/memory/index.md`.
+**Fix**:
+1. In `ui/prompt-editor.ts`, after a successful save (both create and update branches), call `invalidatePromptCache()` + `clearLoadedPrompts()` before closing the editor. Same in `chip-gear-menu.ts` delete and set-active handlers.
+2. In `ui/task-next-ui.ts` `selectLegacyTaskNextPrompt`, route the fallback through `listPromptsByRole('next')` from `db/prompt-db.ts` (which already uses the sql-bridge with retry-once) instead of `deps.getPromptsConfig().entries`. Keep the queue-first path unchanged. This means the Next chip and the gear-menu picker share one source of truth.
+3. Wrap the new `listPromptsByRole` call in `next-inline-ui.ts` in the same `isSqlBridgeContractError` → `resetSqlBridgeCache` → retry-once pattern as `chip-gear-picker.ts:44-51`. Extract that pattern into `db/sql-bridge.ts` as `runWithBridgeRetry(fn)` and use it from both call sites so the two paths cannot drift again.
+4. On final failure in the Next-chip path, emit `PROMPT_LOAD_E001` via `showDiagnosticToast` (same shape as the picker) instead of the current silent `showPasteToast('❌ "Next Tasks" prompt not found', true)`. The user then gets one consistent error surface.
+5. Editor save (`prompt-editor.ts:326,345`): when the save call itself hits a bridge contract error, call `resetSqlBridgeCache('write')` + retry once before emitting `PROMPT_EDIT_E005`.
 
-## Technical notes
+## Tests
 
-- Filter helper `isUserAddedEntry(e: CachedPromptEntry): boolean => e.isDefault !== true` colocated in `prompt-io.ts` so ZIP/SQLite exporters can share it.
-- `mergePrompts` returns a `PromptImportResults` shape; extend with `defaultsProtected: number` (additive, backwards compatible).
-- Existing tests that assumed all entries export (`prompt-io-export-empty.test.ts`, `prompt-library-modal-import-export.test.ts`, `prompt-library-modal-round-trip.test.ts`) will be updated to seed with `isDefault=false` where the assertion depends on the entry appearing in the export.
-- No schema migration — the `IsDefault` column already exists.
+New under `standalone-scripts/macro-controller/src/__tests__/` and `src/ui/__tests__/`:
+- `panel-layout-toggle-desync.test.ts`: minimize, throw from a stubbed body element mid-loop, assert `panelState` did not flip and `savePanelState` was not called.
+- `panel-header-single-toggle.test.ts`: dispatch a single click on `[-]`, assert `toggleMinimize` called once (not twice).
+- `panel-restore-picker-reachable.test.ts`: open picker modal, toggle minimize, assert modal still in `document.body`.
+- `next-chip-uses-sql-bridge.test.ts`: seed the DB with a "next" prompt, clear the legacy cache, click the numbered chip, assert `listPromptsByRole` was called and the correct body was pasted.
+- `next-chip-retry-once-on-contract-error.test.ts`: force the first `runSql` to throw a contract error, assert `resetSqlBridgeCache` fires, second call succeeds, no `PROMPT_LOAD_E001` toast.
+- `prompt-editor-invalidates-cache.test.ts`: save via editor, assert `invalidatePromptCache` + `clearLoadedPrompts` were called and `promptLoaderState.loadedJsonPrompts` is null.
+- `runWithBridgeRetry.test.ts`: unit test for the extracted helper.
 
-## Out of scope
+## Files touched
 
-- Changing the default-prompt seed mechanism.
-- Any UI beyond relabeling the two buttons + helper line.
-- The still-outstanding `PROMPT_LOAD_E001` / workspace-move v2 verification (tracked separately).
+Edit:
+- `src/ui/panel-layout.ts` (try/finally, shared `applyMinimizedDom`/`applyExpandedDom`)
+- `src/ui/panel-header.ts` (remove title-row pointerup toggle path)
+- `src/ui/panel-builder.ts` (`_restoreMinimizedPanel` uses shared apply + persists)
+- `src/ui/task-next-ui.ts` (`selectLegacyTaskNextPrompt` reads via sql-bridge)
+- `src/ui/next-inline-ui.ts` (retry-once + diagnostic toast on failure)
+- `src/ui/chip-gear-menu.ts` (invalidate cache after write actions)
+- `src/ui/prompt-editor.ts` (invalidate cache on save; retry-once + E005 fallback)
+- `src/db/sql-bridge.ts` (new `runWithBridgeRetry(fn, bucket)` export)
+
+Add:
+- 7 test files listed above.
+
+Update:
+- `.lovable/memory/features/sql-bridge-adaptive-rawsql.md`: document `runWithBridgeRetry` and the single-source-of-truth rule for Next.
+- `.lovable/memory/index.md`: point to the new note.
+
+## Deliverable
+
+- Minus/hide toggle: single click, single toggle, DOM and persisted state cannot drift.
+- Next button: reads through the same sql-bridge path as the picker, respects retry-once, emits `PROMPT_LOAD_E001` consistently on real failure, and never serves stale text after an edit.
+- All new tests green plus the existing `chip-gear-picker` / `prompt-io` suites still green.
