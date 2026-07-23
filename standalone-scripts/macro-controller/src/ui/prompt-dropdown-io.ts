@@ -21,6 +21,7 @@ import {
 } from './prompt-loader';
 import { clearUISnapshot } from './prompt-cache';
 import { showPasteToast } from './prompt-utils';
+import { dispatchPromptsChanged } from './prompts-changed-event';
 
 export type Rerender = () => void;
 
@@ -147,12 +148,119 @@ export function buildImportButton(_ctx: PromptContext, _taskNextDeps: TaskNextDe
           clearUISnapshot();
           await loadPromptsFromJson();
           rerender();
+          dispatchPromptsChanged({ reason: 'import-commit' });
         },
       });
     }).catch((err: unknown) => {
       showPasteToast('❌ Import modal failed to open: ' + String(err), true);
     });
   });
+}
+
+/**
+ * v4.402.0: Consolidated single-button Import / Export surface.
+ *
+ * Replaces the three separate header pills (📤 Export, 📥 Import, 📥 IO) with
+ * a single dropdown popover. Keeps every existing path reachable — the
+ * legacy pills stay exported for tests and for downstream code that opens
+ * them directly — but the user-facing header now shows one entry point.
+ */
+function makeIoSectionHeader(text: string): HTMLElement {
+  const h = document.createElement('div');
+  h.textContent = text;
+  h.style.cssText = 'font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#c4b5fd;padding:2px 6px;margin-top:2px;';
+  return h;
+}
+
+function makeIoOptionRow(pop: HTMLElement, label: string, run: () => Promise<void> | void): HTMLElement {
+  const row = document.createElement('span');
+  row.textContent = label;
+  row.style.cssText = 'cursor:pointer;padding:5px 12px;border-radius:4px;font-size:10px;font-weight:600;color:#fff;background:rgba(124,58,237,0.55);white-space:nowrap;';
+  row.onmouseover = function() { row.style.background = 'rgba(124,58,237,0.85)'; };
+  row.onmouseout = function() { row.style.background = 'rgba(124,58,237,0.55)'; };
+  row.onclick = function(ev) {
+    ev.stopPropagation();
+    pop.remove();
+    try {
+      const r = run();
+      if (r && typeof (r as Promise<void>).catch === 'function') {
+        (r as Promise<void>).catch(function(err: unknown) {
+          showPasteToast('❌ ' + label + ' failed: ' + String(err), true);
+        });
+      }
+    } catch (err) {
+      showPasteToast('❌ ' + label + ' failed: ' + String(err), true);
+    }
+  };
+  return row;
+}
+
+function openImportModalFromPill(rerender: Rerender): void {
+  void import('./prompt-import-modal').then((mod) => {
+    mod.openPromptImportModal({
+      onCommitted: async () => {
+        clearLoadedPrompts();
+        clearUISnapshot();
+        await loadPromptsFromJson();
+        rerender();
+        dispatchPromptsChanged({ reason: 'import-commit' });
+      },
+    });
+  }).catch((err: unknown) => {
+    showPasteToast('❌ Import modal failed to open: ' + String(err), true);
+  });
+}
+
+function openLegacyIoDialog(): void {
+  void import('./prompt-io-dialog').then(function(mod) {
+    (mod as { renderPromptIODialog: () => void }).renderPromptIODialog();
+  }).catch(function(err: unknown) {
+    showPasteToast('❌ IO dialog failed to open: ' + String(err), true);
+  });
+}
+
+function buildImportExportPopover(anchor: HTMLElement, rerender: Rerender): HTMLElement {
+  const pop = document.createElement('div');
+  pop.setAttribute('data-marco-io-popover', '1');
+  pop.style.cssText = 'position:absolute;z-index:2147483647;display:flex;flex-direction:column;gap:3px;padding:6px;background:#1e1b2e;border:1px solid rgba(255,255,255,0.15);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.6);min-width:180px;';
+  const rect = anchor.getBoundingClientRect();
+  pop.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+  pop.style.left = (rect.left + window.scrollX) + 'px';
+
+  pop.appendChild(makeIoSectionHeader('Export (user prompts)'));
+  pop.appendChild(makeIoOptionRow(pop, '📄 JSON file', exportAsJson));
+  pop.appendChild(makeIoOptionRow(pop, '📦 ZIP bundle', exportAsZip));
+  pop.appendChild(makeIoOptionRow(pop, '🗄️ SQLite DB', exportAsSqlite));
+
+  pop.appendChild(makeIoSectionHeader('Import'));
+  pop.appendChild(makeIoOptionRow(pop, '📥 Import file…', function() { openImportModalFromPill(rerender); }));
+  pop.appendChild(makeIoOptionRow(pop, '🛠 Advanced IO dialog', openLegacyIoDialog));
+  return pop;
+}
+
+/**
+ * Single consolidated "Prompts I/O" pill. Replaces the three separate header
+ * pills (Export / Import / IO) with a submenu so the header is not cluttered.
+ */
+export function buildImportExportButton(rerender: Rerender): HTMLElement {
+  return buildHeaderPill(
+    '📤 Prompts I/O ▾',
+    'Import or export prompts. Defaults are managed by re-seed and never included in exports; imports never overwrite defaults.',
+    function(e: Event) {
+      e.stopPropagation();
+      const target = e.currentTarget as HTMLElement;
+      const existing = document.querySelector('[data-marco-io-popover]');
+      if (existing) { existing.remove(); return; }
+      const pop = buildImportExportPopover(target, rerender);
+      document.body.appendChild(pop);
+      const dismiss = function(ev: Event): void {
+        if (pop.contains(ev.target as Node)) return;
+        pop.remove();
+        document.removeEventListener('click', dismiss, true);
+      };
+      setTimeout(function() { document.addEventListener('click', dismiss, true); }, 0);
+    },
+  );
 }
 
 async function finalizeImport(valid: CachedPromptEntry[], label: string, rerender: Rerender): Promise<void> {
