@@ -1,5 +1,15 @@
 # Changelog
 
+## [v5.10.0] 2026-07-23 Root readme hero-layout fix
+
+### Fixed
+- `readme.md`: moved the "Built and maintained by" credit line back inside the hero `<div align="center">` (directly under the hero screenshot) so it no longer trips `scripts/check-readme-hero-layout.mjs` rule "Centered `<div>` wrappers limited to hero + Author section". Restores the 7/7 hero-layout guardrail and unblocks CI. Ref: `spec/01-spec-authoring-guide/11-root-readme-conventions.md` §"Hard Rules" (rule 7).
+
+### Changed
+- `version.json`: bumped to `5.10.0` (single source of truth via `standalone-scripts/shared-version.ts`).
+- `readme.md`: pinned install snippets, download filename, and pinned-version callout to `v5.10.0`.
+- No macro-controller or extension code changes; docs-only release.
+
 ## [v5.9.0] 2026-07-23 Drag-drop import E2E coverage and CI-fix roll-up
 
 ### Added
