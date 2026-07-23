@@ -1,5 +1,18 @@
 # Macro Controller - Changelog
 
+## v5.9.0 (2026-07-23)
+
+### Added
+- `src/ui/__tests__/prompt-library-modal-drop-import-e2e.test.ts`: end-to-end coverage for the drop-zone import flow (replace, default-protection, malformed-JSON validation).
+
+### Fixed
+- `src/utils/token-substitute.ts`: satisfied `sonarjs/prefer-immediate-return` so the standalone-scripts lint gate stays at zero warnings.
+- `src/seed/__tests__/reseed-command.test.ts` and 9 sibling db/seed/ui suites: routed `sendToExtension` mocks to `../extension-bridge` (the module `sql-bridge` actually imports) so the previous 5s timeouts and 47 CI failures clear.
+- `src/ui/__tests__/prompt-io-db-bridge-commit.test.ts`: assertions carry the new `defaultsProtected: 0` field.
+- `src/ui/prompt-dropdown-io.ts`: `UserAddedEntriesState` interface plus `validateUserAddedEntriesState` normalizer guarantees `entries` is always a defined, validated array.
+- `src/ui/database-json-migrate.ts`: typed `schemaResp` adapter for `sql-bridge` callbacks prevents TS2345 drift.
+- `src/ui/repeat-loop-ui.ts`: `typeof window` guards keep late intervals from throwing after happy-dom teardown.
+
 ## v4.298.0 (2026-07-19)
 
 ### Added
