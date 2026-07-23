@@ -1,5 +1,5 @@
 /**
- * db/sql-bridge.ts - adaptive SQLite bridge (PENDING-VERIFY).
+ * db/sql-bridge.ts - adaptive SQLite bridge.
  *
  * Backend v2 rejects `method: 'QUERY'` and restricts `method: 'SCHEMA'` to
  * `ALTER TABLE` statements. See spec/db-bridge/01-rawsql-contract-v2.md.
@@ -37,9 +37,9 @@ export interface SqlBridgeResp {
 export type LegacyMethod = 'QUERY' | 'SCHEMA';
 type Bucket = 'SELECT' | 'ALTER' | 'WRITE';
 
-// Candidate method names, in probe order. First entry wins on cold boot.
-// Order preserves legacy names first so any environment still honoring the
-// old contract Just Works without an extra roundtrip.
+// Candidate method names, in probe order. The background handler accepts both
+// the legacy names and the bridge fallbacks. The fallbacks remain for older
+// bundled backgrounds and for future API method-name churn.
 const CANDIDATES: Record<Bucket, string[]> = {
     SELECT: ['QUERY', 'SELECT', 'READ', 'EXEC', 'RUN'],
     WRITE: ['SCHEMA', 'EXEC', 'RUN', 'WRITE', 'MUTATE', 'QUERY'],
