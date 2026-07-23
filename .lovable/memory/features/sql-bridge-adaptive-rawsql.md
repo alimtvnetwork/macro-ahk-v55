@@ -11,8 +11,8 @@ Fix, client side: `standalone-scripts/macro-controller/src/db/sql-bridge.ts` is 
 Fix, background side: `src/background/handlers/project-api-handler.ts` handles `endpoint: 'rawSql'` before the standard CRUD dispatcher. The rawSql handler accepts read methods (`QUERY`, `SELECT`, `READ`) and write methods (`SCHEMA`, `EXEC`, `RUN`, `WRITE`, `MUTATE`), classifies statements, rejects unsupported SQL such as `DROP TABLE`, executes multi-statement schema/write blocks with `db.exec`, and marks the DB dirty after writes.
 
 Buckets and probe order:
-- SELECT: `SELECT`, `EXEC`, `RUN`, `QUERY` (QUERY kept last as legacy fallback)
-- WRITE: `EXEC`, `RUN`, `WRITE`, `QUERY`
+- SELECT: `QUERY`, `SELECT`, `READ`, `EXEC`, `RUN`
+- WRITE: `SCHEMA`, `EXEC`, `RUN`, `WRITE`, `MUTATE`, `QUERY`
 - ALTER: `SCHEMA` only (backend contract)
 
 Import path (important): the bridge imports `sendToExtension` from `../ui/prompt-loader` (which re-exports it from `../ui/extension-relay`). This preserves compatibility with the many existing Vitest suites that stub `ui/prompt-loader` via the shared `prompt-loader-mock.ts` helper. Do NOT switch to a direct `ui/extension-relay` import: it will silently bypass every test mock.

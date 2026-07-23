@@ -54,11 +54,11 @@ Unsupported SQL, including `DROP TABLE`, is rejected before execution.
 
 `db/sql-bridge.ts` sends the caller's SQL under a sequence of candidate method
 names, in order, and caches the first name the backend does NOT reject with a
-    contract error. Three independent caches:
+contract error. Three independent caches:
 
 - `SELECT` cache: `['QUERY', 'SELECT', 'READ', 'EXEC', 'RUN']`
 - `WRITE` cache (non-ALTER DML/DDL): `['SCHEMA', 'EXEC', 'RUN', 'WRITE', 'MUTATE', 'QUERY']`
-    - `ALTER` cache: fixed at `'SCHEMA'`.
+- `ALTER` cache: fixed at `'SCHEMA'`.
 
 Contract errors that trigger a fallback:
 
