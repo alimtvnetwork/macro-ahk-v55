@@ -30,14 +30,41 @@ export interface ExportPromptsOptions {
 }
 
 /**
+ * v4.400.0: import/export is scoped to user-added prompts only. Rows with
+ * `isDefault === true` are managed by the re-seed pipeline and must never
+ * appear in an export blob nor overwrite an existing default row on import.
+ * See `.lovable/memory/features/prompts-import-export-user-scope.md`.
+ */
+export function isUserAddedEntry(entry: CachedPromptEntry): boolean {
+  return entry.isDefault !== true;
+}
+
+export function filterUserAddedEntries(
+  entries: readonly CachedPromptEntry[],
+): { kept: CachedPromptEntry[]; defaultsSkipped: number } {
+  const kept: CachedPromptEntry[] = [];
+  let defaultsSkipped = 0;
+  for (const e of entries) {
+    if (isUserAddedEntry(e)) kept.push(e);
+    else defaultsSkipped++;
+  }
+  return { kept, defaultsSkipped };
+}
+
+/**
  * Exports current prompts from IndexedDB as a JSON file download using
  * the shared `PromptsBundleV1` envelope (plan 12 step 5).
  */
 export async function exportPromptsToJson(options: ExportPromptsOptions = {}): Promise<void> {
   try {
-    const entries = await collectAllExportEntries();
-    if (entries.length === 0) {
+    const rawEntries = await collectAllExportEntries();
+    if (rawEntries.length === 0) {
       showToast('No prompts found to export', 'warn');
+      return;
+    }
+    const { kept: entries, defaultsSkipped } = filterUserAddedEntries(rawEntries);
+    if (entries.length === 0) {
+      showToast('Only default prompts exist, nothing to export', 'warn');
       return;
     }
 
@@ -71,10 +98,11 @@ export async function exportPromptsToJson(options: ExportPromptsOptions = {}): P
     }, 100);
 
     const suffix = skipped > 0 ? ` (${skipped} excluded)` : '';
+    const defSuffix = defaultsSkipped > 0 ? `, ${defaultsSkipped} defaults skipped` : '';
     const revSuffix = bundle.revisions && bundle.revisions.length > 0
       ? ` + ${bundle.revisions.length} revisions`
       : '';
-    showToast(`Exported ${bundle.entryCount} prompts${suffix}${revSuffix}`, 'success');
+    showToast(`Exported ${bundle.entryCount} user prompts${suffix}${defSuffix}${revSuffix}`, 'success');
   } catch (err) {
     log('[PromptIO] Export failed: ' + String(err), 'error');
     showToast('Export failed', 'error');
