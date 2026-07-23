@@ -59,7 +59,8 @@ function todayIso(): string {
 async function readUserAddedEntries(): Promise<{ entries: CachedPromptEntry[]; defaultsSkipped: number }> {
   const io = await import('./prompt-io');
   const raw = await io.collectAllExportEntries();
-  return io.filterUserAddedEntries(raw);
+  const { kept, defaultsSkipped } = io.filterUserAddedEntries(raw);
+  return { entries: kept, defaultsSkipped };
 }
 
 async function exportAsJson(): Promise<void> {

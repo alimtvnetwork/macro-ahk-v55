@@ -11,7 +11,7 @@ import { sendToExtension } from './prompt-manager';
 import type { ExtensionCallbackResponse } from '../types';
 import type { JsonSchema, JsonMigration } from './database-json-types';
 import { appendLog } from './database-json-log';
-import { runSql as runSqlBridge } from '../db/sql-bridge';
+import { runSql as runSqlBridge, type SqlBridgeResp } from '../db/sql-bridge';
 
 import { MACRO_CONTROLLER_NS } from '../constants';
 /* ------------------------------------------------------------------ */
@@ -193,7 +193,7 @@ function applyMigration(m: JsonMigration, cb: (ok: boolean, msg: string) => void
       const type = col.type === 'BOOLEAN' ? 'INTEGER' : col.type;
       const nullable = col.nullable !== false ? '' : ' NOT NULL';
       const def = col.default ? ` DEFAULT ${col.default}` : '';
-      runSqlBridge('SCHEMA', `ALTER TABLE "${m.table}" ADD COLUMN "${col.name}" ${type}${nullable}${def}`, MACRO_CONTROLLER_NS).then((resp: ExtensionCallbackResponse) => {
+      runSqlBridge('SCHEMA', `ALTER TABLE "${m.table}" ADD COLUMN "${col.name}" ${type}${nullable}${def}`, MACRO_CONTROLLER_NS).then((resp: SqlBridgeResp) => {
         if (resp?.isOk) {
           cb(true, `Added column "${col.name}" to "${m.table}"`);
         } else {
@@ -208,7 +208,7 @@ function applyMigration(m: JsonMigration, cb: (ok: boolean, msg: string) => void
       break;
     }
     case 'dropColumn': {
-      runSqlBridge('SCHEMA', `ALTER TABLE "${m.table}" DROP COLUMN "${m.column?.name || m.oldName}"`, MACRO_CONTROLLER_NS).then((resp: ExtensionCallbackResponse) => {
+      runSqlBridge('SCHEMA', `ALTER TABLE "${m.table}" DROP COLUMN "${m.column?.name || m.oldName}"`, MACRO_CONTROLLER_NS).then((resp: SqlBridgeResp) => {
         const colName = m.column?.name || m.oldName || '?';
         if (resp?.isOk) {
           cb(true, `Dropped column "${colName}" from "${m.table}"`);
@@ -219,7 +219,7 @@ function applyMigration(m: JsonMigration, cb: (ok: boolean, msg: string) => void
       break;
     }
     case 'renameColumn': {
-      runSqlBridge('SCHEMA', `ALTER TABLE "${m.table}" RENAME COLUMN "${m.oldName}" TO "${m.newName}"`, MACRO_CONTROLLER_NS).then((resp: ExtensionCallbackResponse) => {
+      runSqlBridge('SCHEMA', `ALTER TABLE "${m.table}" RENAME COLUMN "${m.oldName}" TO "${m.newName}"`, MACRO_CONTROLLER_NS).then((resp: SqlBridgeResp) => {
         if (resp?.isOk) {
           cb(true, `Renamed "${m.table}.${m.oldName}" → "${m.newName}"`);
         } else {
