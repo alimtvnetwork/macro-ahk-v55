@@ -84,10 +84,8 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
         // Backend then rolls forward and rejects the cached method with a
         // contract-shape error. The bridge should invalidate the cache and
         // re-probe on the very next call.
-        let call = 0;
         sendMock.mockImplementation((_t: string, p: Record<string, unknown>) => {
-            call++;
-            if (call === 1) {
+            if (p.method === 'QUERY') {
                 return Promise.resolve({ isOk: false, errorMessage: 'Unsupported method: QUERY' });
             }
             if (p.method === 'SELECT') {
