@@ -14,9 +14,9 @@
  * `undefined` or a nondeterministic row.
  */
 
-import { sendToExtension } from '../ui/prompt-loader';
 import { logDiagnosticFromCode } from '../error-utils';
 import { DB_NAME } from './db-name';
+import { runSql as runSqlBridge } from './sql-bridge';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
 
 export interface EnforceResult {
@@ -54,12 +54,8 @@ export async function enforceSingleDefaultPerRole(role: PromptRole, keepId: numb
     ].join('\n');
 
     try {
-        const resp = await sendToExtension('PROJECT_API', {
-            project: DB_NAME,
-            method: 'SCHEMA',
-            endpoint: 'rawSql',
-            params: { sql },
-        });
+        void DB_NAME;
+        const resp = await runSqlBridge('SCHEMA', sql);
         if (resp && resp.isOk) return { ok: true };
         const reason = resp?.errorMessage || 'unknown error';
         const message = 'enforceSingleDefaultPerRole failed: ' + reason;
