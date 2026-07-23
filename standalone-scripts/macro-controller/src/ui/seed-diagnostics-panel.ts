@@ -222,9 +222,9 @@ function buildBridgeSection(): HTMLDivElement {
   const grid = document.createElement('pre');
   grid.style.cssText = 'background:#111827;color:#cbd5e1;padding:8px;border-radius:4px;font-family:ui-monospace,monospace;font-size:11px;white-space:pre-wrap;margin:4px 0;';
   const lines = [
-    'SELECT winning: ' + (state.winning.SELECT ?? '(not yet accepted)'),
-    'WRITE  winning: ' + (state.winning.WRITE ?? '(not yet accepted)'),
-    'ALTER  winning: ' + (state.winning.ALTER ?? '(not yet accepted)'),
+    'SELECT winning: ' + (state.winning.SELECT ?? NOT_ACCEPTED),
+    'WRITE  winning: ' + (state.winning.WRITE ?? NOT_ACCEPTED),
+    'ALTER  winning: ' + (state.winning.ALTER ?? NOT_ACCEPTED),
   ];
   const rejCount = state.rejections.SELECT.length + state.rejections.WRITE.length + state.rejections.ALTER.length;
   lines.push('rejections observed: ' + rejCount);
