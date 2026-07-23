@@ -77,11 +77,10 @@ function todayIso(): string {
  * the JSON path in `exportPromptsToJson`. Defaults are managed by re-seed
  * and never appear in an export blob.
  */
-async function readUserAddedEntries(): Promise<{ entries: CachedPromptEntry[]; defaultsSkipped: number }> {
+async function readUserAddedEntries(): Promise<UserAddedEntriesState> {
   const io = await import('./prompt-io');
   const raw = await io.collectAllExportEntries();
-  const { kept, defaultsSkipped } = io.filterUserAddedEntries(raw);
-  return { entries: kept, defaultsSkipped };
+  return validateUserAddedEntriesState(io.filterUserAddedEntries(raw));
 }
 
 async function exportAsJson(): Promise<void> {
