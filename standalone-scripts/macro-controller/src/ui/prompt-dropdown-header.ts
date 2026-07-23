@@ -15,7 +15,7 @@ import { cPrimary, cPrimaryLight } from '../shared-state';
 import { forceLoadFromDb } from './prompt-loader';
 import type { PromptContext } from './prompt-loader';
 import type { TaskNextDeps } from './task-next-ui';
-import { buildHeaderPill, buildExportButton, buildImportButton } from './prompt-dropdown-io';
+import { buildHeaderPill, buildImportExportButton } from './prompt-dropdown-io';
 import { resetPromptOrderToDefault } from './prompt-drag-order';
 import { buildPromptOrderIndicator } from './prompt-order-indicator';
 
@@ -39,9 +39,11 @@ export function buildDropdownHeader(
   right.style.cssText = 'display:flex;align-items:center;gap:6px;';
   right.appendChild(buildLibraryButton());
   right.appendChild(buildReadMemoryAdminButton());
-  right.appendChild(buildExportButton());
-  right.appendChild(buildImportButton(promptCtx, taskNextDeps, rerender));
-  right.appendChild(buildIOButton());
+  // v4.402.0: single consolidated Prompts I/O button (submenu) replaces the
+  // three separate Export / Import / IO pills. Legacy builders remain
+  // exported for tests + direct callers.
+  right.appendChild(buildImportExportButton(rerender));
+  void promptCtx; void taskNextDeps;
   right.appendChild(buildResetOrderButton(rerender));
   right.appendChild(buildLoadButton(rerender));
   header.appendChild(right);
@@ -100,21 +102,6 @@ function buildPlanTabMarker(): HTMLElement {
 
 
 
-
-/** Build the "📥 IO" button that opens the Prompts Import/Export dialog. */
-function buildIOButton(): HTMLElement {
-  const btn = document.createElement('span');
-  btn.textContent = '📥 IO';
-  btn.title = 'Import / Export prompts as JSON';
-  btn.style.cssText = 'cursor:pointer;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600;color:#fff;background:rgba(124,58,237,0.55);border:1px solid rgba(255,255,255,0.1);';
-  btn.onmouseover = function() { btn.style.background = 'rgba(124,58,237,0.85)'; };
-  btn.onmouseout = function() { btn.style.background = 'rgba(124,58,237,0.55)'; };
-  btn.onclick = function(e: Event) {
-    e.stopPropagation();
-    void import('./prompt-io-dialog').then(function(mod) { (mod as { renderPromptIODialog: () => void }).renderPromptIODialog(); });
-  };
-  return btn;
-}
 
 /** Build the "↺ Reset to default order" pill that restores DEFAULT_PROMPT_ORDER. */
 function buildResetOrderButton(rerender: Rerender): HTMLElement {
