@@ -25,6 +25,27 @@ import { dispatchPromptsChanged } from './prompts-changed-event';
 
 export type Rerender = () => void;
 
+/**
+ * Shape returned by `readUserAddedEntries()`. `entries` is ALWAYS present
+ * (never optional / undefined) so callers can destructure without a guard.
+ * `defaultsSkipped` is always a finite non-negative integer.
+ */
+export interface UserAddedEntriesState {
+  entries: CachedPromptEntry[];
+  defaultsSkipped: number;
+}
+
+function validateUserAddedEntriesState(raw: {
+  kept?: CachedPromptEntry[];
+  defaultsSkipped?: number;
+}): UserAddedEntriesState {
+  const entries = Array.isArray(raw.kept) ? raw.kept : [];
+  const skipped = Number.isFinite(raw.defaultsSkipped) && (raw.defaultsSkipped as number) >= 0
+    ? (raw.defaultsSkipped as number)
+    : 0;
+  return { entries, defaultsSkipped: skipped };
+}
+
 /** Small pill button used for Export / Import in the dropdown header. */
 export function buildHeaderPill(label: string, title: string, onClick: (e: Event) => void): HTMLElement {
   const pill = document.createElement('span');
@@ -56,11 +77,10 @@ function todayIso(): string {
  * the JSON path in `exportPromptsToJson`. Defaults are managed by re-seed
  * and never appear in an export blob.
  */
-async function readUserAddedEntries(): Promise<{ entries: CachedPromptEntry[]; defaultsSkipped: number }> {
+async function readUserAddedEntries(): Promise<UserAddedEntriesState> {
   const io = await import('./prompt-io');
   const raw = await io.collectAllExportEntries();
-  const { kept, defaultsSkipped } = io.filterUserAddedEntries(raw);
-  return { entries: kept, defaultsSkipped };
+  return validateUserAddedEntriesState(io.filterUserAddedEntries(raw));
 }
 
 async function exportAsJson(): Promise<void> {

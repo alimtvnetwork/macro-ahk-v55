@@ -965,13 +965,13 @@ function buildControl(opts: { compact: boolean; useLocalCollapse: boolean }): HT
   const teardown = (): void => {
     if (tickId !== null) { trackedClearInterval(tickId); tickId = null; }
     repeatLoopState.subscribers.delete(render);
-    window.removeEventListener('pagehide', teardown);
+    if (typeof window !== 'undefined') window.removeEventListener('pagehide', teardown);
   };
   tickId = trackedSetInterval('RepeatLoopUI.tick', function () {
     if (typeof document === 'undefined' || !document.body || !document.body.contains(host)) { teardown(); return; }
     if (repeatLoopState.running) render();
   }, 1000);
-  window.addEventListener('pagehide', teardown, { once: true });
+  if (typeof window !== 'undefined') window.addEventListener('pagehide', teardown, { once: true });
   return host;
 }
 

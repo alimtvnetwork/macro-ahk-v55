@@ -23,10 +23,10 @@ import type { CachedPromptEntry } from '../prompt-cache';
 
 const seededRows: Record<string, unknown[]> = {
     plan: [
-        { Id: 1, Slug: 'plan-default', Name: 'Plan default', Body: 'P {{n}}', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 1, Slug: 'plan-default', Name: 'Plan default', Body: 'P {{n}}', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
     ],
     next: [
-        { Id: 3, Slug: 'next-default', Name: 'Next default', Body: 'N {{n}}', Role: 'next', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 3, Slug: 'next-default', Name: 'Next default', Body: 'N {{n}}', Role: 'next', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
     ],
     generic: [],
 };
@@ -58,7 +58,7 @@ describe('collectDbEntriesForExport', () => {
         const plan = result.find((e) => e.slug === 'plan-default')!;
         expect(plan.role).toBe('plan');
         expect(plan.text).toBe('P {{n}}');
-        expect(plan.isDefault).toBe(true);
+        expect(plan.isDefault).toBe(false);
     });
 });
 

@@ -86,7 +86,7 @@ describe('commitDbEntries: forwards replaceKey/replaceValues/previousReplaceKey'
                 ok: true,
                 value: [{
                     Id: 1, Slug: 'plan-default', Name: 'Plan default',
-                    Body: 'P {{n}}', Role: 'plan', IsDefault: 1,
+                    Body: 'P {{n}}', Role: 'plan', IsDefault: 0,
                     ReplaceKey: 'n',
                     ReplaceValues: ['1', '2', '3', '5', '8'],
                     CreatedAt: 0, UpdatedAt: 0,
