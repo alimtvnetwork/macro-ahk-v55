@@ -15,7 +15,7 @@ vi.mock('../ui/prompt-io-db-bridge', () => ({
 }));
 vi.mock('../toast', () => ({ showToast: vi.fn() }));
 vi.mock('../logger', () => ({ log: vi.fn() }));
-vi.mock('../shared-state', () => ({ VERSION: 'v0.test.0' }));
+vi.mock('../shared-state', () => ({ VERSION: '0.1.0' }));
 vi.mock('../db/prompt-revision-db', () => ({
     listPromptRevisions: vi.fn(async () => ({ ok: true, value: [] })),
     insertImportedRevisions: vi.fn(async () => ({ ok: true })),
