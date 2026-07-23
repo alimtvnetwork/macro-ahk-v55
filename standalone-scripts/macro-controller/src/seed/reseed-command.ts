@@ -24,10 +24,10 @@
  * the resolved result — never swallowed.
  */
 
-import { sendToExtension } from '../ui/prompt-loader';
 import { logError } from '../error-utils';
 import { log } from '../logger';
 import { DB_NAME } from '../db/db-name';
+import { runSql as runSqlBridge, type SqlBridgeResp } from '../db/sql-bridge';
 import { sqlLit } from '../db/prompt-role-db';
 import { PLAN_NEXT_SEED_ROWS } from './plan-next-prompts';
 import { seedPlanNextPrompts } from './seed-plan-next';
@@ -46,17 +46,15 @@ export interface ReseedResult {
   error?: string;
 }
 
-interface RawSqlResp { isOk: boolean; rows?: unknown[]; errorMessage?: string }
+type RawSqlResp = SqlBridgeResp;
 
 const EV_RESEED_COMPLETE = 'reseed.complete' as const;
 
 
 
 async function rawSql(method: 'QUERY' | 'SCHEMA', sql: string): Promise<RawSqlResp> {
-  const resp = await sendToExtension('PROJECT_API', {
-    project: DB_NAME, method, endpoint: 'rawSql', params: { sql },
-  });
-  return (resp as RawSqlResp) ?? { isOk: false, errorMessage: 'no response' };
+  void DB_NAME;
+  return runSqlBridge(method, sql);
 }
 
 async function forceResetDefaultBodies(): Promise<{ forced: number; error?: string }> {
