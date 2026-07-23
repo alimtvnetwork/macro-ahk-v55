@@ -1,6 +1,6 @@
 {
-  "version": "5.8.0",
-  "releaseDate": "2026-07-21",
+  "version": "5.9.0",
+  "releaseDate": "2026-07-23",
   "timezonePolicy": "UTC storage; user-local rendering",
-  "date": "2026-07-21"
+  "date": "2026-07-23"
 }
