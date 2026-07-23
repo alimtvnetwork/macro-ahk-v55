@@ -5,6 +5,7 @@
 import { sendToExtension } from '../ui/extension-relay';
 import { log } from '../logger';
 import { logDiagnosticFromCode } from '../error-utils';
+import { runSql as runSqlBridge } from './sql-bridge';
 import {
   REPLACE_KEY_DEFAULT,
   REPLACE_VALUES_DEFAULT_JSON,
@@ -141,12 +142,7 @@ const PROMPT_COLUMN_MIGRATIONS: readonly PromptColumnMigration[] = [
 ];
 
 async function readPromptColumnNames(): Promise<Set<string>> {
-  const resp = await sendToExtension('PROJECT_API', {
-    project: DB_NAME,
-    method: 'QUERY',
-    endpoint: 'rawSql',
-    params: { sql: 'PRAGMA table_info(Prompt)' },
-  });
+  const resp = await runSqlBridge('QUERY', 'PRAGMA table_info(Prompt)');
   const isOk = Boolean(resp?.isOk) && Array.isArray(resp?.rows);
   const rows = isOk ? (resp.rows as PragmaColumnRow[]) : [];
 
@@ -154,12 +150,7 @@ async function readPromptColumnNames(): Promise<Set<string>> {
 }
 
 async function applyPromptColumnMigration(migration: PromptColumnMigration): Promise<void> {
-  const resp = await sendToExtension('PROJECT_API', {
-    project: DB_NAME,
-    method: 'SCHEMA',
-    endpoint: 'rawSql',
-    params: { sql: migration.ddl },
-  });
+  const resp = await runSqlBridge('SCHEMA', migration.ddl);
   if (!resp?.isOk) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', { column: migration.column, reason: resp?.errorMessage ?? UNKNOWN_ERROR });
 
@@ -169,12 +160,7 @@ async function applyPromptColumnMigration(migration: PromptColumnMigration): Pro
 }
 
 async function ensurePromptRoleDefaultIndex(): Promise<void> {
-  const resp = await sendToExtension('PROJECT_API', {
-    project: DB_NAME,
-    method: 'SCHEMA',
-    endpoint: 'rawSql',
-    params: { sql: `CREATE INDEX IF NOT EXISTS ${PROMPT_ROLE_DEFAULT_INDEX} ON Prompt (${PROMPT_ROLE_COLUMN}, ${PROMPT_IS_DEFAULT_COLUMN})` },
-  });
+  const resp = await runSqlBridge('SCHEMA', `CREATE INDEX IF NOT EXISTS ${PROMPT_ROLE_DEFAULT_INDEX} ON Prompt (${PROMPT_ROLE_COLUMN}, ${PROMPT_IS_DEFAULT_COLUMN})`);
   if (resp?.isOk) return;
   logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', { column: PROMPT_ROLE_DEFAULT_INDEX, reason: resp?.errorMessage ?? UNKNOWN_ERROR });
 }
@@ -287,12 +273,7 @@ export async function initMacroDb(): Promise<void> {
   const stages: Stage[] = [];
   let orphanReportRef: OrphanRepairReport | undefined;
   try {
-    const resp = await sendToExtension('PROJECT_API', {
-      project: DB_NAME,
-      method: 'SCHEMA',
-      endpoint: 'rawSql',
-      params: { sql: SCHEMA_SQL },
-    });
+    const resp = await runSqlBridge('SCHEMA', SCHEMA_SQL);
     if (resp && resp.isOk) {
       log('Macro DB initialized: ' + DB_NAME, 'success');
       stages.push({ stage: STAGE_SCHEMA_INIT, status: 'ok' });
@@ -327,12 +308,7 @@ export async function saveProjectMetadata(projectId: string, name: string, url: 
                VALUES ('${projectId.replace(/'/g, "''")}', '${name.replace(/'/g, "''")}', '${url.replace(/'/g, "''")}', CURRENT_TIMESTAMP)`;
   
   try {
-    await sendToExtension('PROJECT_API', {
-      project: DB_NAME,
-      method: 'SCHEMA',
-      endpoint: 'rawSql',
-      params: { sql }
-    });
+    await runSqlBridge('SCHEMA', sql);
   } catch (err) {
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'saveProjectMetadata', reason: err instanceof Error ? err.message : String(err) }, err);
   }
@@ -353,12 +329,7 @@ export async function saveCommunication(projectId: string, prompt: string, respo
                VALUES ('${projectId.replace(/'/g, "''")}', '${prompt.replace(/'/g, "''")}', '${response.replace(/'/g, "''")}')`;
   
   try {
-    await sendToExtension('PROJECT_API', {
-      project: DB_NAME,
-      method: 'SCHEMA',
-      endpoint: 'rawSql',
-      params: { sql }
-    });
+    await runSqlBridge('SCHEMA', sql);
     log('Communication saved to Macro DB', 'info');
   } catch (err) {
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'saveCommunication', reason: err instanceof Error ? err.message : String(err) }, err);
@@ -383,12 +354,7 @@ export async function syncTaskQueueToDb(projectId: string, tasks: DbTask[]): Pro
     : deleteSql;
 
   try {
-    await sendToExtension('PROJECT_API', {
-      project: DB_NAME,
-      method: 'SCHEMA',
-      endpoint: 'rawSql',
-      params: { sql }
-    });
+    await runSqlBridge('SCHEMA', sql);
   } catch (err) {
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'syncTaskQueueToDb', reason: err instanceof Error ? err.message : String(err) }, err);
   }
@@ -420,12 +386,7 @@ export async function forceSyncQueueToDb(): Promise<void> {
 export async function purgeOldCommunications(days: number = 30): Promise<void> {
   const sql = `DELETE FROM Communications WHERE Timestamp < datetime('now', '-${days} days')`;
   try {
-    await sendToExtension('PROJECT_API', {
-      project: DB_NAME,
-      method: 'SCHEMA',
-      endpoint: 'rawSql',
-      params: { sql }
-    });
+    await runSqlBridge('SCHEMA', sql);
     log(`[MacroDb] Purged communications older than ${days} days`, 'info');
   } catch (err) {
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'purgeOldCommunications', reason: err instanceof Error ? err.message : String(err) }, err);
@@ -438,12 +399,7 @@ export async function purgeOldCommunications(days: number = 30): Promise<void> {
 export async function getCommunicationHistory(projectId: string, limit: number = 50): Promise<unknown[]> {
   const sql = `SELECT * FROM v_prompt_history WHERE ProjectId = '${projectId.replace(/'/g, "''")}' ORDER BY Timestamp DESC LIMIT ${limit}`;
   try {
-    const resp = await sendToExtension('PROJECT_API', {
-      project: DB_NAME,
-      method: 'QUERY',
-      endpoint: 'rawSql',
-      params: { sql }
-    });
+    const resp = await runSqlBridge('QUERY', sql);
     return resp?.isOk ? (Array.isArray(resp.rows) ? (resp.rows as unknown[]) : []) : [];
   } catch (err) {
     logDiagnosticFromCode('DB_MACRO_READ_E001', { op: 'getCommunicationHistory', reason: err instanceof Error ? err.message : String(err) }, err);

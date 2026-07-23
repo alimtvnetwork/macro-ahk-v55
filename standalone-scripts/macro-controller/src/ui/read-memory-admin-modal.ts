@@ -12,10 +12,9 @@
  * dropdown re-materializes from SQLite on next open.
  */
 
-import { sendToExtension } from './extension-relay';
 import { log } from '../logger';
 import { logDiagnosticFromCode } from '../error-utils';
-import { DB_NAME } from '../db/db-name';
+import { runSql as runSqlBridge } from '../db/sql-bridge';
 
 const CANONICAL_SLUG = 'read-memory-enhanced';
 const DUPLICATE_PREFIX = '[duplicate] ';
@@ -45,9 +44,7 @@ async function fetchReadMemoryRows(): Promise<ReadMemoryRow[]> {
     + "OR Name LIKE 'Read Memory%' OR Name LIKE 'Rejog%' "
     + "OR Name LIKE '" + DUPLICATE_PREFIX + "%' "
     + 'ORDER BY IsDefault DESC, Slug ASC';
-  const resp = await sendToExtension('PROJECT_API', {
-    project: DB_NAME, method: 'QUERY', endpoint: 'rawSql', params: { sql },
-  });
+  const resp = await runSqlBridge('QUERY', sql);
   if (!resp?.isOk || !Array.isArray(resp.rows)) return [];
   return coerceRows(resp.rows as unknown[]);
 }
@@ -73,9 +70,7 @@ async function deactivateRow(row: ReadMemoryRow): Promise<boolean> {
   const sql =
     "UPDATE Prompt SET IsDefault = 0, Name = '" + escaped + "', "
     + 'UpdatedAt = ' + now + ' WHERE Id = ' + row.Id;
-  const resp = await sendToExtension('PROJECT_API', {
-    project: DB_NAME, method: 'SCHEMA', endpoint: 'rawSql', params: { sql },
-  });
+  const resp = await runSqlBridge('SCHEMA', sql);
   if (!resp?.isOk) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'read-memory-admin-deactivate',

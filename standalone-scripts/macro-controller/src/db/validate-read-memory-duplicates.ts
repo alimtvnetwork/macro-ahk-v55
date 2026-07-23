@@ -12,10 +12,9 @@
  * Idempotent: rows already renamed to `[duplicate] ...` are skipped.
  */
 
-import { sendToExtension } from '../ui/extension-relay';
 import { log } from '../logger';
 import { logDiagnosticFromCode } from '../error-utils';
-import { DB_NAME } from './db-name';
+import { runSql as runSqlBridge } from './sql-bridge';
 
 const CANONICAL_SLUG = 'read-memory-enhanced';
 const DUPLICATE_PREFIX = '[duplicate] ';
@@ -48,12 +47,7 @@ function toDuplicateRows(rows: readonly unknown[]): DuplicateRow[] {
 
 async function findDuplicates(): Promise<DuplicateRow[]> {
   const sql = 'SELECT Id, Slug, Name FROM Prompt WHERE ' + READ_MEMORY_MATCH_WHERE;
-  const resp = await sendToExtension('PROJECT_API', {
-    project: DB_NAME,
-    method: 'QUERY',
-    endpoint: 'rawSql',
-    params: { sql },
-  });
+  const resp = await runSqlBridge('QUERY', sql);
   if (!resp?.isOk || !Array.isArray(resp.rows)) return [];
   return toDuplicateRows(resp.rows as unknown[]);
 }
@@ -66,12 +60,7 @@ async function demoteDuplicates(ids: readonly number[]): Promise<boolean> {
     + "Name = '" + DUPLICATE_PREFIX.replace(/'/g, "''") + "' || Name, "
     + 'UpdatedAt = ' + now + ' '
     + 'WHERE Id IN (' + idList + ')';
-  const resp = await sendToExtension('PROJECT_API', {
-    project: DB_NAME,
-    method: 'SCHEMA',
-    endpoint: 'rawSql',
-    params: { sql },
-  });
+  const resp = await runSqlBridge('SCHEMA', sql);
   if (!resp?.isOk) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'read-memory-duplicates',

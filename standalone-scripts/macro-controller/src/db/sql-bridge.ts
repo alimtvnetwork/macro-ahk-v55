@@ -1,5 +1,5 @@
 /**
- * db/sql-bridge.ts - adaptive SQLite bridge (PENDING-VERIFY).
+ * db/sql-bridge.ts - adaptive SQLite bridge.
  *
  * Backend v2 rejects `method: 'QUERY'` and restricts `method: 'SCHEMA'` to
  * `ALTER TABLE` statements. See spec/db-bridge/01-rawsql-contract-v2.md.
@@ -37,9 +37,9 @@ export interface SqlBridgeResp {
 export type LegacyMethod = 'QUERY' | 'SCHEMA';
 type Bucket = 'SELECT' | 'ALTER' | 'WRITE';
 
-// Candidate method names, in probe order. First entry wins on cold boot.
-// Order preserves legacy names first so any environment still honoring the
-// old contract Just Works without an extra roundtrip.
+// Candidate method names, in probe order. The background handler accepts both
+// the legacy names and the bridge fallbacks. The fallbacks remain for older
+// bundled backgrounds and for future API method-name churn.
 const CANDIDATES: Record<Bucket, string[]> = {
     SELECT: ['QUERY', 'SELECT', 'READ', 'EXEC', 'RUN'],
     WRITE: ['SCHEMA', 'EXEC', 'RUN', 'WRITE', 'MUTATE', 'QUERY'],
@@ -66,9 +66,9 @@ function classify(legacy: LegacyMethod, sql: string): Bucket {
     return /^\s*alter\s+table\b/i.test(sql) ? 'ALTER' : 'WRITE';
 }
 
-async function sendOnce(method: string, sql: string): Promise<SqlBridgeResp> {
+async function sendOnce(method: string, sql: string, project: string): Promise<SqlBridgeResp> {
     const resp = await sendToExtension('PROJECT_API', {
-        project: DB_NAME, method, endpoint: 'rawSql', params: { sql },
+        project, method, endpoint: 'rawSql', params: { sql },
     });
     return (resp as SqlBridgeResp) ?? { isOk: false, errorMessage: 'no response' };
 }
@@ -77,11 +77,11 @@ async function sendOnce(method: string, sql: string): Promise<SqlBridgeResp> {
  * Run a SQL statement through the project bridge, adapting to whichever
  * method-name the backend currently accepts.
  */
-export async function runSql(legacy: LegacyMethod, sql: string): Promise<SqlBridgeResp> {
+export async function runSql(legacy: LegacyMethod, sql: string, project: string = DB_NAME): Promise<SqlBridgeResp> {
     const bucket = classify(legacy, sql);
     const cached = winning[bucket];
     if (typeof cached === 'string') {
-        const resp = await sendOnce(cached, sql);
+        const resp = await sendOnce(cached, sql, project);
         if (resp.isOk || !isContractError(resp.errorMessage)) return resp;
         // Cached name went stale (backend rolled forward): invalidate + reprobe.
         delete winning[bucket];
@@ -89,7 +89,7 @@ export async function runSql(legacy: LegacyMethod, sql: string): Promise<SqlBrid
 
     let lastResp: SqlBridgeResp = { isOk: false, errorMessage: 'no candidate methods tried' };
     for (const method of CANDIDATES[bucket]) {
-        const resp = await sendOnce(method, sql);
+        const resp = await sendOnce(method, sql, project);
         if (resp.isOk) {
             winning[bucket] = method;
             return resp;
