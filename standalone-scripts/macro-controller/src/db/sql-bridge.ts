@@ -35,7 +35,7 @@ export interface SqlBridgeResp {
 }
 
 export type LegacyMethod = 'QUERY' | 'SCHEMA';
-type Bucket = 'SELECT' | 'ALTER' | 'WRITE';
+export type Bucket = 'SELECT' | 'ALTER' | 'WRITE';
 
 // Candidate method names, in probe order. The background handler accepts both
 // the legacy names and the bridge fallbacks. The fallbacks remain for older
@@ -50,10 +50,77 @@ const CANDIDATES: Record<Bucket, string[]> = {
 // re-probes so a backend rollback heals automatically.
 const winning: Partial<Record<Bucket, string>> = {};
 
+export interface SqlBridgeRejection {
+    bucket: Bucket;
+    method: string;
+    message: string;
+    at: string; // ISO timestamp
+}
+
+// Per-bucket rolling history of contract-shape rejections. Bounded so a long
+// session cannot grow unbounded. Consumed by the diagnostics export.
+const REJECTION_LIMIT = 10;
+const rejections: Record<Bucket, SqlBridgeRejection[]> = {
+    SELECT: [], WRITE: [], ALTER: [],
+};
+
+function recordRejection(bucket: Bucket, method: string, message: string): void {
+    const arr = rejections[bucket];
+    arr.push({ bucket, method, message, at: new Date().toISOString() });
+    if (arr.length > REJECTION_LIMIT) arr.splice(0, arr.length - REJECTION_LIMIT);
+}
+
+export interface SqlBridgeState {
+    winning: Record<Bucket, string | null>;
+    rejections: Record<Bucket, SqlBridgeRejection[]>;
+    candidates: Record<Bucket, string[]>;
+}
+
+/**
+ * Read the current adaptive-bridge state. Pure and synchronous — safe to call
+ * from UI code at click time. Consumed by `seed-diagnostics-panel` to include
+ * the accepted rawSql method plus every contract-shape rejection in the
+ * downloaded diagnostics ZIP.
+ */
+export function getSqlBridgeState(): SqlBridgeState {
+    const w: Record<Bucket, string | null> = {
+        SELECT: winning.SELECT ?? null,
+        WRITE: winning.WRITE ?? null,
+        ALTER: winning.ALTER ?? null,
+    };
+    return {
+        winning: w,
+        rejections: {
+            SELECT: [...rejections.SELECT],
+            WRITE: [...rejections.WRITE],
+            ALTER: [...rejections.ALTER],
+        },
+        candidates: {
+            SELECT: [...CANDIDATES.SELECT],
+            WRITE: [...CANDIDATES.WRITE],
+            ALTER: [...CANDIDATES.ALTER],
+        },
+    };
+}
+
+/**
+ * Invalidate the cached winning method for one bucket (or all). The next
+ * `runSql` call for that bucket will re-probe. Used by the Next / picker
+ * retry-once path so a stale cache does not surface `PROMPT_LOAD_E001`.
+ */
+export function resetSqlBridgeCache(bucket?: Bucket): void {
+    if (typeof bucket === 'string') { delete winning[bucket]; return; }
+    for (const k of Object.keys(winning)) delete winning[k as Bucket];
+}
+
 const CONTRACT_ERR_PATTERNS = [
     /^unsupported method:/i,
     /only alter table statements are allowed/i,
 ];
+
+export function isSqlBridgeContractError(message: string | undefined): boolean {
+    return isContractError(message);
+}
 
 function isContractError(msg: string | undefined): boolean {
     if (typeof msg !== 'string' || msg.length === 0) return false;
@@ -84,6 +151,7 @@ export async function runSql(legacy: LegacyMethod, sql: string, project: string 
         const resp = await sendOnce(cached, sql, project);
         if (resp.isOk || !isContractError(resp.errorMessage)) return resp;
         // Cached name went stale (backend rolled forward): invalidate + reprobe.
+        recordRejection(bucket, cached, resp.errorMessage ?? 'unknown');
         delete winning[bucket];
     }
 
@@ -98,6 +166,7 @@ export async function runSql(legacy: LegacyMethod, sql: string, project: string 
             // Real SQL error: return unchanged, don't burn more probes.
             return resp;
         }
+        recordRejection(bucket, method, resp.errorMessage ?? 'unknown');
         lastResp = resp;
     }
     return {
@@ -111,6 +180,9 @@ export async function runSql(legacy: LegacyMethod, sql: string, project: string 
 /** Test-only: reset the winning-method cache between cases. */
 export function _resetSqlBridgeCacheForTest(): void {
     for (const k of Object.keys(winning)) delete winning[k as Bucket];
+    rejections.SELECT.length = 0;
+    rejections.WRITE.length = 0;
+    rejections.ALTER.length = 0;
 }
 
 /** Test-only: read the current cache snapshot. */
