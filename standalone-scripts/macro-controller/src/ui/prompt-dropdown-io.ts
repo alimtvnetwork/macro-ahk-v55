@@ -55,30 +55,43 @@ async function readCachedEntries(): Promise<CachedPromptEntry[]> {
   return io.collectAllExportEntries();
 }
 
+/**
+ * v4.400.0: ZIP + SQLite export share the same "user-added only" scope as
+ * the JSON path in `exportPromptsToJson`. Defaults are managed by re-seed
+ * and never appear in an export blob.
+ */
+async function readUserAddedEntries(): Promise<{ entries: CachedPromptEntry[]; defaultsSkipped: number }> {
+  const io = await import('./prompt-io');
+  const raw = await io.collectAllExportEntries();
+  return io.filterUserAddedEntries(raw);
+}
+
 async function exportAsJson(): Promise<void> {
   const io = await import('./prompt-io');
   await io.exportPromptsToJson();
 }
 
 async function exportAsZip(): Promise<void> {
-  const entries = await readCachedEntries();
-  if (entries.length === 0) { showPasteToast('No prompts to export', true); return; }
+  const { entries, defaultsSkipped } = await readUserAddedEntries();
+  if (entries.length === 0) { showPasteToast('No user prompts to export', true); return; }
   const zip = await import('./prompt-io-zip');
   const state = await import('../shared-state');
   const result = zip.buildPromptsZip(entries, state.VERSION);
   triggerDownload(result.blob, 'prompts-export-' + todayIso() + '.zip');
-  showPasteToast('📦 Exported ' + result.bundle.entryCount + ' prompts to ZIP', false);
+  const suffix = defaultsSkipped > 0 ? ' (' + defaultsSkipped + ' defaults skipped)' : '';
+  showPasteToast('📦 Exported ' + result.bundle.entryCount + ' user prompts to ZIP' + suffix, false);
 }
 
 async function exportAsSqlite(): Promise<void> {
-  const entries = await readCachedEntries();
-  if (entries.length === 0) { showPasteToast('No prompts to export', true); return; }
+  const { entries, defaultsSkipped } = await readUserAddedEntries();
+  if (entries.length === 0) { showPasteToast('No user prompts to export', true); return; }
   const sqlite = await import('./prompt-io-sqlite');
   const state = await import('../shared-state');
   const result = await sqlite.buildPromptsSqlite(entries, state.VERSION);
   const blob = new Blob([result.bytes as BlobPart], { type: 'application/vnd.sqlite3' });
   triggerDownload(blob, 'prompts-export-' + todayIso() + '.sqlite');
-  showPasteToast('🗄️ Exported ' + result.bundle.entryCount + ' prompts to SQLite', false);
+  const suffix = defaultsSkipped > 0 ? ' (' + defaultsSkipped + ' defaults skipped)' : '';
+  showPasteToast('🗄️ Exported ' + result.bundle.entryCount + ' user prompts to SQLite' + suffix, false);
 }
 
 function makeExportOption(pop: HTMLElement, label: string, run: () => Promise<void>): HTMLElement {
