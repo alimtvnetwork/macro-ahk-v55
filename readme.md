@@ -97,6 +97,8 @@ Marco started as a small itch. **Alim** wanted to automate a few repetitive thin
 
 In short: Marco is the project that came out of taking "let me just automate this one thing" seriously.
 
+Marco is one of several operational systems that share the **xProduct** runtime philosophy: modular infrastructure, typed declarative flows (**xProgramming**), and edge-ready execution.
+
 ---
 
 ## Quick Start
