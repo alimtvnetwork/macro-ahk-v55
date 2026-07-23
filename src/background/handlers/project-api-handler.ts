@@ -285,7 +285,7 @@ function handleRawSqlWrite(
         throw new Error(`rawSql: method ${method} cannot execute ${describeStatement(unsafe)}`);
     }
 
-    db.run(sql);
+    db.exec(sql);
     const changes = getRowsModified(db);
     const lastInsertId = readLastInsertId(db);
     void markAndFlush(slug);
