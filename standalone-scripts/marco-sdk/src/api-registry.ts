@@ -57,11 +57,25 @@ export const apiRegistry: ApiRegistry = Object.freeze({
     }),
 
     workspace: Object.freeze({
+        // DEPRECATED 2026-07-23 — retained as rollback lever for one release.
+        // See spec workspace-move/01-membership-scoped-api-v2.md and
+        // mem://features/workspace-move-membership-endpoint-v2. New callers
+        // MUST use `workspace.moveV2` below.
         move: Object.freeze({
             url: "/projects/{projectId}/move-to-workspace",
             method: "PUT" as const,
             auth: true,
-            description: "Move project to a different workspace",
+            description: "DEPRECATED (v1): Move project to a different workspace",
+        }),
+        // PENDING-VERIFY (spec workspace-move/01): verb/body assumed from
+        // Lovable's REST convention and a partial preflight capture. First
+        // live call confirms — patch here if server returns 4xx.
+        moveV2: Object.freeze({
+            url: "/workspaces/{wsId}/memberships/{userId}",
+            method: "PUT" as const,
+            auth: true,
+            description: "Move project to workspace (v2, membership-scoped) — PENDING-VERIFY",
+            timeoutMs: 15_000,
         }),
         rename: Object.freeze({
             url: "/user/workspaces/{wsId}",
