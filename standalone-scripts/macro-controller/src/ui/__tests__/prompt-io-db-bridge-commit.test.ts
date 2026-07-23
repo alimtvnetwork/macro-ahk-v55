@@ -40,7 +40,7 @@ describe('commitDbEntries (Plan 22 gap #10 DB-side integration)', () => {
             { name: 'S1', text: 'new {{n}}', slug: 's1', role: 'plan', replaceKey: 'n' },
         ];
         const res = await commitDbEntries(entries);
-        expect(res).toEqual({ upserted: 1, errors: [] });
+        expect(res).toEqual({ upserted: 1, errors: [], defaultsProtected: 0 });
         expect(upsertPromptMock).toHaveBeenCalledTimes(1);
         const call = upsertPromptMock.mock.calls[0][0];
         expect(call.id).toBe(5);
@@ -103,7 +103,7 @@ describe('commitDbEntries (Plan 22 gap #10 DB-side integration)', () => {
             { name: 'New', text: 'body', slug: 'new-slug', role: 'generic' },
         ];
         const res = await commitDbEntries(entries);
-        expect(res).toEqual({ upserted: 1, errors: [] });
+        expect(res).toEqual({ upserted: 1, errors: [], defaultsProtected: 0 });
         const call = upsertPromptMock.mock.calls[0][0];
         expect(call.id).toBeUndefined();
         expect(call.previousBody).toBeUndefined();
