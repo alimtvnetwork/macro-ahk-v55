@@ -368,7 +368,14 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
 async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> {
   const picked = await pickPromptFromRole({ role, roleLabel, title: 'Delete which custom ' + roleLabel + ' prompt?', excludeDefault: true, confirmLabel: 'Delete' });
   if (!picked) return;
-  const ok = window.confirm('Delete "' + picked.Name + '" (' + picked.Slug + ')?\n\nThis cannot be undone from here (use History to restore).');
+  const { confirmDialog } = await import('./confirm-dialog');
+  const ok = await confirmDialog({
+    title: 'Delete prompt?',
+    message: 'Delete "' + picked.Name + '" (' + picked.Slug + ')?\n\nThis cannot be undone from here. Use History to restore.',
+    confirmLabel: 'Delete',
+    cancelLabel: 'Cancel',
+    destructive: true,
+  });
   if (!ok) return;
   const res = await deletePromptById(picked.Id);
   if (!res.ok) {
