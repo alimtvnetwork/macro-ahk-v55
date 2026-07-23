@@ -18,6 +18,7 @@ import {
 } from '../telemetry/prompt-edit-e005-store';
 import type { PromptEditE005Summary } from '../telemetry/prompt-edit-e005-store';
 import { buildStoredZip } from '../utils/mini-zip';
+import { getSqlBridgeState } from '../db/sql-bridge';
 
 const RELEVANT_CODES = new Set<string>([
   'DB_MACRO_INIT_E001',
@@ -25,6 +26,7 @@ const RELEVANT_CODES = new Set<string>([
   'PROMPT_LOAD_E001',
   'PROMPT_EDIT_E005',
   'SEED_BUNDLE_E001',
+  'SEED_RESEED_E001',
 ]);
 
 const STATUS_COLOR: Record<SeedStageStatus, string> = {
@@ -135,13 +137,21 @@ function buildE005SummaryText(summaries: PromptEditE005Summary[]): string {
 function downloadE005DiagnosticsZip(): void {
   const summaries = summarizeLatestByRole();
   const entries = readPromptEditE005Entries();
-  const trace = readDiagnosticToastTrace().filter((e) => String(e.code) === 'PROMPT_EDIT_E005');
+  const fullTrace = readDiagnosticToastTrace();
+  const trace = fullTrace.filter((e) => String(e.code) === 'PROMPT_EDIT_E005');
+  const loadE001 = fullTrace.filter((e) => String(e.code) === 'PROMPT_LOAD_E001');
+  const reseedE001 = fullTrace.filter((e) => String(e.code) === 'SEED_RESEED_E001');
+  const bridge = getSqlBridgeState();
   const seedSnap = readSeedStatusSnapshot();
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
   const zip = buildStoredZip([
     { path: 'summary.txt', content: buildE005SummaryText(summaries) },
     { path: 'entries.json', content: JSON.stringify(entries, null, 2) },
     { path: 'toast-trace.json', content: JSON.stringify(trace, null, 2) },
+    { path: 'prompt-load-e001.json', content: JSON.stringify(loadE001, null, 2) },
+    { path: 'seed-reseed-e001.json', content: JSON.stringify(reseedE001, null, 2) },
+    { path: 'sql-bridge.json', content: JSON.stringify(bridge, null, 2) },
+    { path: 'contract.md', content: buildContractMarkdown(bridge) },
     { path: 'seed-snapshot.json', content: JSON.stringify(seedSnap, null, 2) },
   ]);
   const url = URL.createObjectURL(zip);
@@ -152,6 +162,70 @@ function downloadE005DiagnosticsZip(): void {
   anchor.click();
   anchor.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function buildContractMarkdown(bridge: ReturnType<typeof getSqlBridgeState>): string {
+  const lines: string[] = [];
+  lines.push('# rawSql v2 contract snapshot');
+  lines.push('');
+  lines.push('captured: ' + new Date().toISOString());
+  lines.push('');
+  lines.push('## Winning method per bucket');
+  lines.push('');
+  for (const bucket of ['SELECT', 'WRITE', 'ALTER'] as const) {
+    lines.push('- ' + bucket + ': ' + (bridge.winning[bucket] ?? '(not yet accepted)'));
+  }
+  lines.push('');
+  lines.push('## Candidate probe order');
+  lines.push('');
+  for (const bucket of ['SELECT', 'WRITE', 'ALTER'] as const) {
+    lines.push('- ' + bucket + ': ' + bridge.candidates[bucket].join(', '));
+  }
+  lines.push('');
+  lines.push('## Observed contract-shape rejections (this session)');
+  lines.push('');
+  let any = false;
+  for (const bucket of ['SELECT', 'WRITE', 'ALTER'] as const) {
+    for (const r of bridge.rejections[bucket]) {
+      any = true;
+      lines.push('- [' + r.at + '] ' + bucket + '/' + r.method + ': ' + r.message);
+    }
+  }
+  if (!any) lines.push('(none)');
+  lines.push('');
+  return lines.join('\n');
+}
+
+function buildErrorTraceSection(title: string, code: string): HTMLDivElement {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'margin-top:12px;';
+  wrap.appendChild(sectionTitle(title));
+  const events = readDiagnosticToastTrace().filter((e) => String(e.code) === code);
+  if (events.length === 0) {
+    wrap.appendChild(muted('No ' + code + ' events recorded.'));
+    return wrap;
+  }
+  for (const evt of events.slice(-10).reverse()) wrap.appendChild(renderTraceRow(evt));
+  return wrap;
+}
+
+function buildBridgeSection(): HTMLDivElement {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'margin-top:12px;';
+  wrap.appendChild(sectionTitle('sql-bridge state (rawSql method-name adapter)'));
+  const state = getSqlBridgeState();
+  const grid = document.createElement('pre');
+  grid.style.cssText = 'background:#111827;color:#cbd5e1;padding:8px;border-radius:4px;font-family:ui-monospace,monospace;font-size:11px;white-space:pre-wrap;margin:4px 0;';
+  const lines = [
+    'SELECT winning: ' + (state.winning.SELECT ?? '(not yet accepted)'),
+    'WRITE  winning: ' + (state.winning.WRITE ?? '(not yet accepted)'),
+    'ALTER  winning: ' + (state.winning.ALTER ?? '(not yet accepted)'),
+  ];
+  const rejCount = state.rejections.SELECT.length + state.rejections.WRITE.length + state.rejections.ALTER.length;
+  lines.push('rejections observed: ' + rejCount);
+  grid.textContent = lines.join('\n');
+  wrap.appendChild(grid);
+  return wrap;
 }
 
 function buildHeader(): HTMLDivElement {
