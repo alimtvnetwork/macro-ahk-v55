@@ -15,6 +15,8 @@ import { logError } from '../error-utils';
 import { getPersistentTaskQueue, resolveTaskQueueProjectId } from '../queue-control/task-queue-project-store';
 import { REPLACE_KEY_DEFAULT } from '../db/prompt-defaults';
 import { substituteToken } from '../utils/token-substitute';
+import { listPromptsByRole } from '../db/prompt-db';
+import { runWithBridgeRetry } from '../db/sql-bridge';
 /** Settings shape for Task Next */
 export interface TaskNextSettings {
   [key: string]: TaskNextSettingValue;
@@ -219,18 +221,41 @@ export function substituteTaskNextPromptText(prompt: Pick<PromptEntry, 'text' | 
 
 function selectLegacyTaskNextPrompt(deps: TaskNextDeps, n: number): TaskNextPromptSelection | null {
   const prompt = findNextTasksPrompt(deps);
-  if (!prompt || !prompt.text) {
-    logError('Task Next', '"Next Tasks" prompt not found — aborting');
-    showPasteToast('❌ "Next Tasks" prompt not found', true);
-    return null;
-  }
+  if (!prompt || !prompt.text) return null;
   return { text: substituteTaskNextPromptText(prompt, n), source: 'legacy', remaining: 0 };
+}
+
+/**
+ * v4.401.0: DB-backed fallback for the Next chip. When the in-memory legacy
+ * cache misses (fresh install, invalidation after an edit, workspace swap)
+ * we read the current default row for `role='next'` straight through the
+ * sql-bridge with retry-once semantics. This unifies the Next chip and the
+ * gear-menu picker onto a single source of truth so an edit through the
+ * picker is immediately visible to the numbered chip.
+ */
+async function selectDbTaskNextPrompt(n: number): Promise<TaskNextPromptSelection | null> {
+  const res = await runWithBridgeRetry(
+    function() { return listPromptsByRole('next'); },
+    function(r) { return r.ok ? undefined : (r.error ?? 'listPromptsByRole !ok'); },
+  );
+  if (!res.ok || !res.value || res.value.length === 0) return null;
+  const rows = res.value;
+  const active = rows.find(function(r) { return r.IsDefault === 1; }) ?? rows[0];
+  if (!active || !active.Body) return null;
+  const text = substituteToken(active.Body, active.ReplaceKey || REPLACE_KEY_DEFAULT, n);
+  return { text, source: 'legacy', remaining: 0 };
 }
 
 async function selectTaskNextPrompt(deps: TaskNextDeps, n: number): Promise<TaskNextPromptResult> {
   const queued = await dequeueTaskNextPrompt();
   if (queued.failed || queued.selection) return queued;
-  return { selection: selectLegacyTaskNextPrompt(deps, n), failed: false };
+  const legacy = selectLegacyTaskNextPrompt(deps, n);
+  if (legacy) return { selection: legacy, failed: false };
+  const dbSel = await selectDbTaskNextPrompt(n);
+  if (dbSel) return { selection: dbSel, failed: false };
+  logError('Task Next', '"Next Tasks" prompt not found in cache or DB — aborting');
+  showPasteToast('❌ "Next Tasks" prompt not found', true);
+  return { selection: null, failed: false };
 }
 
 function reportTaskNextPaste(selection: TaskNextPromptSelection): void {
