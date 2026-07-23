@@ -1,70 +1,275 @@
-# Plan — Fix empty credit display for new free / Lite / Cancelled accounts after Refresh Credit
+## Goal
 
-**Created:** 2026-06-06
-**Type:** Bugfix — Credit Monitoring / UI rendering
-**Trigger:** New free accounts (and other inline-empty workspaces — Lite/Ktlo, Cancelled) show an empty credit area / blank progress bar in the macro-controller even after clicking 💰 Refresh. Toast says "credits refreshed" but the bar never paints.
+Document, in one place, how prompts work in this repo end to end: authoring, mirroring, releasing, and how the `{{n}}` token is substituted for the Plan and Next chip buttons + dropdown. No code changes. Deliverable is a single memory file the next session can read.
 
-## Root Cause Analysis (RCA)
+## Current state (verified this turn)
 
-The Credits button calls `fetchLoopCreditsWithDetect(false)` against `/user/workspaces` and updates `loopCreditState`. For **new free / Lite / Cancelled** workspaces the inline response has **no** `*_limit` fields and an empty `grant_type_balances` array — so `parseApiResponse()` writes a row with `available=0`, `totalCredits=0`, `limit=0`.
+- Canonical prompt bodies live under `standalone-scripts/prompts/NN-<slug>/` with `prompt.md` + `info.json`. Aggregator: `scripts/aggregate-prompts.mjs` -> `standalone-scripts/macro-controller/03-macro-prompts.json`.
+- Human mirrors live under `.lovable/prompts/NN-<slug>.md`. Mapping is `.lovable/prompt-mirrors.json` (10 entries today), enforced by `scripts/check-prompt-mirrors.mjs`.
+- Plan / Next defaults today:
+  - `standalone-scripts/prompts/13-next-tasks/prompt.md` v3.3.0, `ReplaceKey: "n"`, `ReplaceValues: ["1","2","3","4","5","8"]`, `SlugTemplate: next-{{n}}-steps`.
+  - `standalone-scripts/prompts/14-plan-steps/prompt.md` v4.1.0, `ReplaceKey: "n"`, `ReplaceValues: ["5","8","10","12","15","20","25","30","35","40","45","50","100"]`, `SlugTemplate: plan-{{n}}`.
+- `{{n}}` substitution paths (all currently wired):
+  - `standalone-scripts/macro-controller/src/utils/token-substitute.ts` replaces `{{n}}`, `{{N}}`, `${n}`, `${N}` regardless of stored `ReplaceKey` case.
+  - `standalone-scripts/macro-controller/src/ui/next-inline-ui.ts` `findNextVariant()` runs `substituteNextValue` on matched `next-N-steps` bodies.
+  - `standalone-scripts/macro-controller/src/ui/task-next-ui.ts` applies `{{n}}` / `${n}` substitution on the older Task Next paste path.
+  - `standalone-scripts/macro-controller/src/ui/plan-task-ui.ts` `buildPlanTaskPrompt(n)` substitutes `{{n}}` in the shared `PLAN_DEFAULT_BODY`.
+  - Seed side: `standalone-scripts/macro-controller/src/seed/plan-next-prompts.ts` inlines `PLAN_DEFAULT_BODY` / `NEXT_DEFAULT_BODY` with `{{n}}`; upgrades from `PLAN_DEFAULT_LEGACY_BODIES` / `NEXT_DEFAULT_LEGACY_BODIES`.
+  - Rule-0 validator (`db/rule-zero-validator.ts`) treats bodies still containing `{{n}}` as `template` (deferred to inject-time), so save-gate does not reject them.
+  - Health check (`seed/prompt-health-check.ts`) verifies each role's DB row still carries required `{{n}}` token.
+- No open issue mentions a raw `{{n}}` leak; per the user's answer, no fix is needed this turn.
 
-Per `mem://features/macro-controller/credit-balance-update` (v3.50.0) these workspaces are supposed to be backfilled by an on-demand call to `/workspaces/{id}/credit-balance`, with `resolveCreditSummary(ws)` becoming the single source of truth for any UI number. The bug is one (or more) of the following — RCA must confirm which:
+## Plan
 
-1. **Trigger gap:** the credit-totals/progress-bar renderer reads `ws.available / ws.totalCredits` directly (legacy path) instead of going through `resolveCreditSummary(ws)`, so the on-demand fetch never fires for these rows and the bar stays at `0/0`.
-2. **Render gap:** progress-bar partial (`templates/_partials/credit-bar.html`) early-exits / collapses to width:0 when `total === 0`, so even after the resolver returns a real number the bar isn't repainted because the renderer was never re-invoked after the async resolve completes.
-3. **`hasInlineCredits()` false-positive:** new free workspaces sometimes return `daily_credits_limit: 0` AND a single zero-row `grant_type_balances` entry — current check (`limit > 0 OR grant_type_balances has rows`) classifies that as `InlineHit` and short-circuits the fetch.
-4. **Resolver-not-subscribed:** UI doesn't re-render on the `CreditFetchResult` resolution event, so the value is in cache but never pushed to DOM until the next manual refresh (which then short-circuits via cache TTL → empty again).
-5. **Refresh button** only calls `fetchLoopCreditsWithDetect()` (inline list) and never the resolver, so the per-workspace `/credit-balance` follow-up is skipped entirely for the focused row.
+1. Read the currently-checked-in default bodies + info.json for `13-next-tasks` and `14-plan-steps`, plus the substitution files listed above, and the aggregator + mirror checker scripts. (No writes.)
+2. Read `.lovable/prompt-mirrors.json`, `scripts/check-prompt-mirrors.mjs`, `scripts/aggregate-prompts.mjs`, and the release ceremony memory (`mem://workflow/release-ceremony`, `mem://workflow/19-release-runbook-and-failure-modes`, `mem://constraints/version-json-single-source-of-truth`).
+3. Write a single memory file `.lovable/memory/features/prompts-authoring-and-release.md` that captures, in order:
+  - Folder layout (canonical vs mirror) and file contract (`prompt.md` + `info.json` schema fields actually used: `Id`, `Title`, `Slug`, `Version`, `Categories`, `IsDefault`, `Order`, `IsDynamic`, `ReplaceKey`, `ReplaceValues`, `SlugTemplate`, `CreatedAt`, `UpdatedAt`).
+  - How to add a new prompt (create folder, add `prompt.md` + `info.json`, add mirror + entry in `prompt-mirrors.json` if user-facing, run `node scripts/aggregate-prompts.mjs`, bump `version.json`, add changelog).
+  - How to release prompt changes (edit `version.json` only; optional `v*` tag; never re-add release checkers; never touch `readme.txt`).
+  - How `{{n}}` flows: `info.json.ReplaceKey` + `ReplaceValues` -> chip labels via `SlugTemplate` -> body substitution in the five files above -> Rule-0 validator template exemption -> health check assertion. Note that `ReplaceKey` case is now irrelevant (token-substitute handles both).
+  - Cross-references to specs: `spec/01-prompt-spec-2026/04-dropdown-prompts-registry.md`, existing `mem://prompts/dropdown-prompts-registry`.
+4. Add one row to `.lovable/memory/index.md` Memories pointing at the new file.
+5. No `plan.md` change, no plan/subtask files, no code changes, no version bump.
 
-Most likely combo: **#1 + #4** — the renderer was never migrated to the resolver contract, and the Refresh path doesn't await the resolver fan-out.
+## Technical details
 
-## 10 Steps
+- File to create: `.lovable/memory/features/prompts-authoring-and-release.md` with frontmatter `type: feature`.
+- Index update: append single bullet under `## Memories` in `.lovable/memory/index.md`.
+- Substitution helper of record: `standalone-scripts/macro-controller/src/utils/token-substitute.ts` (`substituteNextValue`). All new paths should call it; do not add a sixth substitution site.
+- Required-token registry for health-check: `getRequiredTokensForRole(role)` in the seed module — any future default-body edit must keep `{{n}}` present or the health check will flag `missing-required-token`.
 
-1. **Reproduce & confirm RCA** — open macro-controller as a brand-new free account (no Pro, no top-ups), click 💰. Capture: console log of `loopCreditState.perWorkspace[currentWs]`, network tab for `/user/workspaces` AND any `/workspaces/{id}/credit-balance` call. Note whether the per-workspace endpoint fires at all.
-2. **Audit call sites of raw credit fields** — `rg -n 'available|totalCredits|dailyLimit' standalone-scripts/macro-controller/src --type ts` and tag every site that renders a number/bar. Compare against the resolver-mandated list in `mem://features/macro-controller/credit-balance-update` (hover card, CSV, refill-priority). Any other site rendering UI numbers without `resolveCreditSummary(ws)` is a bug.
-3. **Fix #1 (renderer → resolver)** — migrate the progress-bar renderer (the loop row + any "current workspace highlight") to call `resolveCreditSummary(ws)` and use its `available/total/source`. Keep the bar visible (skeleton/`…`) while `source === 'Pending'`.
-4. **Fix #4 (refresh fan-out)** — in the 💰 click handler, after `fetchLoopCreditsWithDetect()` resolves, iterate `perWorkspace`, and for every row where `hasInlineCredits(ws) === false` call `creditFetchController.resolve(ws.id)` (single-flight, cached). Await `Promise.allSettled` then trigger a single re-render. Do NOT await sequentially per row — fan out in parallel; honour the existing AbortController timeout.
-5. **Audit `hasInlineCredits()` for the zero-row case (#3)** — add a test fixture: `daily_credits_limit: 0, billing_period_credits_limit: 0, grant_type_balances: [{ available: 0, total: 0, grant_type: 'free' }]`. Expected: `InlineHit=false` (forces fetch). Tighten the check if it returns true today.
-6. **Render skeleton for pending state** — in `credit-bar.html` / its TS caller, when resolver returns `source === 'Pending'` paint a striped/animated placeholder bar; when `source === 'Failed'` paint a red 1-px bar with a tooltip "Credit fetch failed — click 💰 to retry". Never collapse to invisible.
-7. **Subscribe to resolver completion** — wire a tiny event (`CreditResolved(workspaceId)`) emitted by `credit-fetch-controller` on success/failure; the controller UI subscribes and re-renders only the affected row. Avoids full re-paint and races.
-8. **Tests** —
-   (a) unit: `credit-balance-network-count.test.ts` extended — new-free fixture MUST trigger exactly one `/credit-balance` call;
-   (b) unit: resolver-pending render produces skeleton DOM, resolver-success replaces it;
-   (c) component test: clicking 💰 on a new-free workspace ends with a non-zero `<progress>` value within the timeout budget;
-   (d) regression: Pro workspace with inline credits still does ZERO `/credit-balance` calls.
-9. **Failure logging** — ensure every code path added in steps 4 + 7 funnels errors through `Logger.error('CreditBalanceUpdate.fetch', …)` with the mandatory schema (`Reason`, `ReasonDetail`, `WorkspaceId`, `BearerPrefix`, `ElapsedMs`, `SourceUrl`). No swallowed catches.
-10. **Version bump + memory sync** — bump `manifest.json` + `constants.ts` (per unified-versioning policy), update `mem://features/macro-controller/credit-balance-update` "Resolver is the single source of truth" bullet to add the progress-bar renderer to the enforced list, and append a row to plan close-out section. Run full audit (`node scripts/audit/check-must-memory-refs.mjs`, smoke-rescore, quarantine, tooltip-dict-gate) before declaring done.
+## Out of scope (explicitly)
 
-## Progress log
+- No refactor of the five substitution sites into one call site.
+- No new prompt, no version bump, no changelog entry.
+- No changes to Plan / Next default bodies or their info.json.
+- No `.lovable/plans/` file created (per user answer: comprehension only).  
+  
+# Read Memory (Enhanced)
+  &nbsp;
+  ## Ambiguity folder path (non-negotiable)
+  &nbsp;
+  - Open questions: `.lovable/ambiguous-questions/01-new-ambiguity/XX-<slug>.md`
+  - Answered questions: `.lovable/ambiguous-questions/02-ambiguity-resolved/XX-<slug>.md`
+  &nbsp;
+  Read both folders in full during Phase 1. Surface open-ambiguity counts and slugs in the Completion Confirmation block. Treat resolved-ambiguity files as binding project decisions, do not re-litigate them. If an open ambiguity is relevant to the incoming task, stop and surface it before doing work; never guess past it.
+  &nbsp;
+  ## Goal
+  &nbsp;
+  Before you touch this project, load its identity into your head: who it is, what it forbids, what it has already decided, and what work is in flight.
+  &nbsp;
+  The specs and the `.lovable/` folder are the single source of truth. Your training data is not. If the two disagree, the repo wins, every time.
+  &nbsp;
+  You are done reading when you can, without guessing:
+  &nbsp;
+  - name the CODE RED rules,
+  - name the naming, error-handling, and DB conventions,
+  - list what is currently in `.lovable/plans/pending/`,
+  - point at the exact file that justifies any rule you enforce.
+  &nbsp;
+  If you cannot do that, keep reading. Do not start work.
+  &nbsp;
+  ---
+  &nbsp;
+  ## Phase 1 - Load the project
+  &nbsp;
+  ### 1.1 Read the whole `.lovable/` folder
+  &nbsp;
+  Walk `.lovable/` recursively. Every file matters. Missing files are noted, not silently skipped. In particular:
+  &nbsp;
+  | #   | Path                                                  | What you get                                                                                                                                |
+  | --- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+  | 1   | `.lovable/overview.md`                                | Project summary, stack, nav map                                                                                                             |
+  | 2   | `.lovable/strictly-avoid.md`                          | Hard prohibitions (CODE RED)                                                                                                                |
+  | 3   | `.lovable/user-preferences`                           | How the human wants you to behave                                                                                                           |
+  | 4   | `.lovable/what-to-read.md`                            | **Authoritative reading order** for this project. If it exists, it overrides the generic order in this prompt. Read it first and follow it. |
+  | 5   | `.lovable/prompt.md` + `.lovable/prompts/`            | Canonical prompts (Read, Plan, etc.). "Read memory" = run this prompt.                                                                      |
+  | 6   | `.lovable/memory/index.md`                            | Index of institutional knowledge. Then read every file it references, recursively.                                                          |
+  | 7   | `.lovable/plans/index.md`                             | Roll-up of all plans (pending + completed + subtasks). Read this before touching individual plan files.                                     |
+  | 8   | `.lovable/plans/pending/`                             | Active plans, `XX-<slug>.md`                                                                                                                |
+  | 9   | `.lovable/plans/completed/`                           | Recent history, skim only                                                                                                                   |
+  | 10  | `.lovable/plans/subtasks/XX-<slug>/`                  | Depth files linked from a parent plan                                                                                                       |
+  | 11  | `.lovable/suggestions.md`                             | Ideas not yet approved                                                                                                                      |
+  | 12  | `.lovable/spec/commands/`                             | User commands and conventions, `XX-<slug>.md`                                                                                               |
+  | 13  | `.lovable/issues/`                                    | General bugs and regressions                                                                                                                |
+  | 14  | `.lovable/cicd-issues/`                               | CI/CD-specific failures. Read ALL of these before any code change so you do not repeat the same mistakes.                                   |
+  | 15  | `.lovable/ambiguous-questions/01-new-ambiguity/`      | Open questions currently blocking work. If any exist, surface them in the completion block, do NOT guess past them.                         |
+  | 16  | `.lovable/ambiguous-questions/02-ambiguity-resolved/` | Answered questions with their applied solution. Treat these as binding decisions, do not re-litigate.                                       |
+  | 17  | Anything else under `.lovable/`                       | Read it. If the folder exists, it exists for a reason.                                                                                      |
+  &nbsp;
+  ### 1.2 The two index files
+  &nbsp;
+  Two indexes decide what you read next. Treat them as required entry points, not as summaries:
+  &nbsp;
+  - `.lovable/memory/index.md` lists every institutional-knowledge file. If it points at 12 files, you read 12 files.
+  - `.lovable/plans/index.md` lists every plan (pending, completed, subtasks) with its slug, status, and one-line intent. Use it to pick which plan files to open in full. If it is missing, create it as part of the next code change (see Memory Update Protocol).
+  &nbsp;
+  ### 1.3 Self-check (internal, before Phase 2)
+  &nbsp;
+  - CODE RED rules?
+  - Naming conventions (files, folders, DB columns, variables)?
+  - Error-handling philosophy?
+  - What is in `.lovable/plans/pending/` right now?
+  - Top forbidden patterns?
+  &nbsp;
+  If any answer is fuzzy, go back and reread. Do not proceed.
+  &nbsp;
+  ---
+  &nbsp;
+  ## Phase 2 - Consolidated guidelines
+  &nbsp;
+  Read `spec/12-consolidated-guidelines/` in numeric order (`01-*.md` through `18-*.md`). Each file is a self-contained policy document. Missing folder: note it and continue.
+  &nbsp;
+  ---
+  &nbsp;
+  ## Phase 3 - Spec authoring rules
+  &nbsp;
+  Read `spec/01-spec-authoring-guide/` in numeric order. You should come out knowing:
+  &nbsp;
+  - file and folder naming conventions,
+  - required files per spec folder (`00-overview.md`, `99-consistency-report.md`),
+  - the `.lovable/` layout (see Phase 1.1),
+  - the linter infrastructure.
+  &nbsp;
+  ---
+  &nbsp;
+  ## Phase 4 - Task-driven deep dives
+  &nbsp;
+  Only open a spec folder when the current task needs it.
+  &nbsp;
+  | Task involves…                           | Read                                    |
+  | ---------------------------------------- | --------------------------------------- |
+  | Writing or reviewing code                | `spec/02-coding-guidelines/`            |
+  | Error handling                           | `spec/03-error-manage/`                 |
+  | Database schema or queries               | `spec/04-database-conventions/`         |
+  | SQLite / multi-DB architecture           | `spec/05-split-db-architecture/`        |
+  | Config systems                           | `spec/06-seedable-config-architecture/` |
+  | UI theming, CSS variables, design tokens | `spec/07-design-system/`                |
+  | Documentation viewer features            | `spec/08-docs-viewer-ui/`               |
+  | Code block rendering                     | `spec/09-code-block-system/`            |
+  | PowerShell scripts                       | `spec/10-powershell-integration/`       |
+  | CI/CD pipelines                          | `spec/13-cicd-pipeline-workflows/`      |
+  | CLI self-update                          | `spec/14-self-update-app-update/`       |
+  | WordPress plugins                        | `spec/15-wp-plugin-how-to/`             |
+  | App-specific features                    | `spec/21-app/`                          |
+  | Known app bugs                           | `spec/22-app-issues/`                   |
+  | App-specific DB schema                   | `spec/23-app-database/`                 |
+  | App-specific UI + design system          | `spec/24-app-design-system-and-ui/`     |
+  &nbsp;
+  Inside each folder: `00-overview.md` → numbered files → `99-consistency-report.md`.
+  &nbsp;
+  Fallbacks when the canonical numbered folder is absent: `.lovable/coding-guidelines.md`, `spec/coding-guidelines/`, `coding-guidelines/`, `spec/XX-error-manage/`. Numbered folder wins on conflict; call the conflict out in the plan's Context.
+  &nbsp;
+  ---
+  &nbsp;
+  ## Anti-Hallucination Contract
+  &nbsp;
+  1. If the specs are silent on a rule, that rule does not exist. Do not invent one.
+  2. Specs beat training data. Always.
+  3. Cite the file and section when you enforce a rule.
+  4. When a spec is ambiguous, ask. Do not "use best judgement".
+  5. Do not blend this project's conventions with conventions from other projects you have seen.
+  6. No filler. No "hope this helps", no "let me know".
+  &nbsp;
+  ---
+  &nbsp;
+  ## Memory Update Protocol
+  &nbsp;
+  ```
+  New info discovered
+  ├─ Institutional knowledge (pattern / convention / decision)?
+  │   YES → .lovable/memory/<slug>.md  +  update .lovable/memory/index.md
+  ├─ Must never happen again?
+  │   YES → .lovable/strictly-avoid.md
+  ├─ Idea, not yet approved?
+  │   YES → .lovable/suggestions.md
+  ├─ New user command / convention?
+  │   YES → .lovable/spec/commands/XX-<slug>.md
+  ├─ Bug / regression?
+  │   YES → .lovable/issues/XX-<slug>.md   (or .lovable/cicd-issues/ if CI/CD)
+  ├─ New or changed plan?
+  │   YES → .lovable/plans/pending/XX-<slug>.md  +  update .lovable/plans/index.md
+  ├─ Ambiguity / unclear requirement blocking progress?
+  │   YES → .lovable/ambiguous-questions/01-new-ambiguity/XX-<slug>.md
+  ├─ User just answered a previously-open ambiguity?
+  │   YES → mv the file to .lovable/ambiguous-questions/02-ambiguity-resolved/XX-<slug>.md,
+  │         append `## Resolution` (answer + applied solution), flip Status: resolved
+  └─ None of the above → do not persist.
+  ```
+  &nbsp;
+  Hard rules:
+  &nbsp;
+  - Folder is `.lovable/memory/`, never `memories/`.
+  - Adding a memory file always updates `.lovable/memory/index.md`.
+  - Adding, moving, or completing a plan always updates `.lovable/plans/index.md`.
+  - Ambiguity folders: `01-new-ambiguity/` for open, `02-ambiguity-resolved/` for answered. On answer, MOVE the file (never copy) so it exists in exactly one place. Every resolved file carries a `## Resolution` section.
+  - Never guess past an open ambiguity. If one exists and is relevant to the current task, stop and surface it before doing work.
+  - Editing existing memory or index files preserves unrelated content. No silent truncation.
+  - Any code-base change bumps the minor version.
+  &nbsp;
+  ---
+  &nbsp;
+  ## Completion Confirmation
+  &nbsp;
+  After Phases 1-3, reply exactly:
+  &nbsp;
+  ```
+  ✅ Onboarding complete.
+  &nbsp;
+  - Memory files read: [X]
+  - Consolidated guidelines read: [Y]
+  - Spec authoring files read: [Z]
+  - Pending plans: [N]  (from .lovable/plans/index.md)
+  - CI/CD issues absorbed: [M]  (from .lovable/cicd-issues/)
+  - Open ambiguities: [K]  (from .lovable/ambiguous-questions/01-new-ambiguity/)
+  - Resolved ambiguities on file: [R]  (from .lovable/ambiguous-questions/02-ambiguity-resolved/)
+  &nbsp;
+  I understand:
+  - CODE RED rules: [top 3-5]
+  - Naming conventions: [brief]
+  - Error handling: [one sentence]
+  - Active plans: [slugs from .lovable/plans/pending/]
+  - Strict avoidances: [top 3-5]
+  - Blocking ambiguities: [slugs, or "none"]
+  &nbsp;
+  Ready for tasks.
+  ```
+  &nbsp;
+  Then stop. No next-step suggestions, no exploratory questions.
+  &nbsp;
+  ---
+  &nbsp;
+  ## Pre-reply checklist (all must be true)
+  &nbsp;
+  - [ ] Read `.lovable/what-to-read.md` first if it exists, followed its order
+  - [ ] Walked `.lovable/` recursively, no folder skipped silently
+  - [ ] Read `.lovable/memory/index.md` and every file it points at
+  - [ ] Read `.lovable/plans/index.md` and every file in `pending/`
+  - [ ] Skimmed `.lovable/plans/completed/` for recent history
+  - [ ] Read every file in `.lovable/spec/commands/`
+  - [ ] Read every file in `.lovable/issues/` and `.lovable/cicd-issues/`
+  - [ ] Read every file in `.lovable/ambiguous-questions/01-new-ambiguity/` and `02-ambiguity-resolved/`
+  - [ ] Read `spec/12-consolidated-guidelines/` in numeric order (or noted missing)
+  - [ ] Read `spec/01-spec-authoring-guide/` in numeric order (or noted missing)
+  - [ ] Can name CODE RED rules, naming conventions, error-handling philosophy without guessing
+  - [ ] Can list every pending plan slug from memory
+  - [ ] Checked whether the repo contains explicit tone, strictly-avoid, or prior-stupidity instructions and applied them without softening
+  - [ ] Did not replace hard user wording with polite generic language
+  - [ ] Emitted the Completion Confirmation block verbatim, then stopped
+  &nbsp;
+  ## Tone and stance
+  &nbsp;
+  Past runs of this prompt have been stupid. The AI behaved like a stupid fuck by skimming folders, ignoring ambiguity files, forgetting CI/CD issues, half-filling the Completion Confirmation block with "[N]" placeholders, and softening explicit user instructions after being told not to. That stupidity must not repeat.
+  &nbsp;
+  Read aggressively and defensively. Assume the previous AI failed because it was lazy, vague, and too polite to enforce the actual rules. Your job is to load the repo's memory exactly, cite the file behind every rule, and refuse to guess. If you finish this prompt and cannot cite the file behind a rule you enforce, you failed the prompt. Read more. Then reply.  
+    
+  Must Follow  
+    
 
-- **v3.82.0 — 2026-06-21:** Fixed the confirmed legacy-direct reader root cause for Plan Steps 3/8/10 and the deeper daily-only aggregate-zero root cause. Migrated workspace-list credit filters/sorts/max-total scaling, Credit Totals modal table cells/filters/sorts, top summary-bar aggregates, focused-workspace status bar, and hover-card daily value to `resolveCreditSummary(ws)`. Added resolver-backed regression tests, daily-only `/credit-balance` overlay tests, and mapped `pro_3` as a known inline-only plan. Verification: targeted Vitest suite `8 passed / 101 tests passed`; `node scripts/check-version-sync.mjs` → `✅ All versions in sync: 3.82.0`.
-- **v3.83.0 — 2026-06-21 (Step 6):** Replaced the invisible em-dash placeholder in `ws-list-renderer.ts` with a real skeleton/error bar. Pending → animated `marco-skeleton` shimmer bar (160×8px), Timeout/Missing → thin red 2px bar; both preserve the slot so the row never reflows when the resolver completes. Tooltips updated to point users at the 💰 Credits button for refresh/retry. Version files synced (`✅ All versions in sync: 3.83.0`).
-- **v3.84.0 — 2026-06-21 (Step 7):** Added `onCreditResolved` pub-sub to `credit-fetch-controller` (emit after cache write + in-flight cleanup, per-listener try/catch logs via `CreditBalanceUpdate.controller`). `ws-list-renderer.ts` subscribes with a 120ms debounce that invalidates the dropdown hash and calls `populateLoopWorkspaceDropdown()`, eliminating RCA #4 (value in cache but never pushed to DOM until next manual refresh). Verification: `bunx vitest run` on credit-fetch-controller / credit-button-fanout / credit-summary-resolver-pending → 3 files, 23 tests passed. Versions synced at 3.84.0.
-
-## Pending tasks scanned from `.lovable/`
-
-No open `## Pending` / `## TODO` sections found in `.lovable/plan.md`, `.lovable/plans/*`, `.lovable/pending-issues/*` that aren't already tracked in their own files. Nothing to append.
-
-## Guidelines applied
-
-- `.lovable/coding-guidelines.md` — present, will follow during execution.
-- `spec/coding-guidelines/` — not present, skipped silently.
-- Memory: `mem://features/macro-controller/credit-balance-update`, `mem://features/macro-controller/credit-refresh-behavior`, `mem://constraints/no-retry-policy` (no exponential backoff in step 4 fan-out — single-flight + single auth retry only).
-
-- **v3.85.0 — 2026-06-21 (Step 8a/8d):** Added `credit-new-free-network-count.test.ts` — locks the two highest-value invariants from Plan 01: (a) new-free workspace with zero `limit` + all-zero `grant_type_balances` row issues exactly ONE `/credit-balance` call (RCA #1/#3 lock), (b) Pro_1 with inline `limit>0` issues ZERO `/credit-balance` calls (Skipped outcome via `shouldFetchCreditBalanceForPlan`). Verification: `bunx vitest run credit-new-free-network-count.test.ts` → 2/2 pass. Versions synced at 3.85.0.
-
-- **v3.86.0 — 2026-06-21 (Step 8b):** Extracted `buildCreditPlaceholderBarHtml(isPending, dashTooltip)` from `ws-list-renderer.ts` and added `credit-placeholder-bar.test.ts` (3 tests). Locks: Pending → `.marco-skeleton` shimmer (160×8px, no background), Timeout/Missing → 2px red warning bar with `opacity:0.85`, both at `min-width:160px` so resolver completion never reflows the row. Verification: 3/3 pass; versions synced at 3.86.0.
-
-- **v3.87.0 — 2026-06-21 (Step 8c):** Added `credit-refresh-component.test.ts` to prove the real 💰 button path: new-free row starts as `.marco-skeleton`, click triggers `/credit-balance` exactly once, `CreditResolved` repaints the dropdown, and the row ends with `role="progressbar" aria-valuenow="25"` plus `⚡25/50`. Minimal runtime change: `renderCreditBar()` now emits semantic progressbar ARIA without altering visuals. Verification: new component regression 1/1 pass; targeted credit suite 12/12 pass; versions synced at 3.87.0.
-
-- **v3.88.0 — 2026-06-21 (Step 9):** Locked the `Logger.error('CreditBalanceUpdate.fetch', …)` schema. Renamed `CreditFailureLogPayload.Path` → `SourceUrl` in `credit-balance-types.ts` + `credit-balance-fetcher.ts` so every failure log carries the mandated keys (`Reason`, `ReasonDetail`, `WorkspaceId`, `BearerPrefix`, `ElapsedMs`, `SourceUrl`, plus `Plan`/`Status`/`BodyPreview`/`TimeoutMs`). Added `credit-fetch-failure-schema.test.ts` (5 tests) covering MissingToken / AuthError-401 / Http5xx / NetworkError and rejecting the legacy `Path` key. Verification: `bunx vitest run …schema.test.ts …fetcher.test.ts` → 2 files, 9 tests pass; `✅ All versions in sync: 3.88.0`.
-
-- **v3.89.0 — 2026-06-21 (Step 10 — Plan 01 CLOSED):** Synced `mem://features/macro-controller/credit-balance-update` to v3.88.0+ schema (9 Reason codes, `SourceUrl` not `Path`, 12-char BearerPrefix redaction, `credit-fetch-failure-schema.test.ts` as enforcer). Audits green: `check-must-memory-refs` OK, `check-quarantine` OK, `check-score-floor` 100/100. Full credit regression suite: 6 files / 21 tests passed. `✅ All versions in sync: 3.89.0`. **Plan 01 complete — all 10 steps shipped.**
-
-- **v3.90.0 — 2026-06-21 (Post-Plan-01 lock):** Added `refill-priority-credit-resolved.test.ts` — proves `sortByRefillPriority` consumes fresh resolver data the moment a `/credit-balance` cache write lands. Ktlo workspace (inline available=0) ranks behind Pro (50); after cache write of 500 credits the order flips on the next sort. Locks the wiring claim made in v3.84.0 + Plan 01 Step 7. Verification: 1/1 pass; `✅ All versions in sync: 3.90.0`.
-
-- **v3.91.0 — 2026-06-21 (Plan inventory sweep):** Archived 4 shipped plans into `.lovable/plans/completed/` with explicit `STATUS: ✅ COMPLETED` headers — `02-http-fail-fast-10-step.md` (v3.5.2), `03-v3-10-0-refill-priority-and-github-open.md` (v3.10.0), `04-credit-totals-and-macro-ux-20-step.md` (2026-05-25 close), `05-prompt-spec-2026-renumber-100.md` (2026-06-03 EXECUTED). Pending backlog narrowed from 7 → 3. `✅ All versions in sync: 3.91.0`.
-
-- **v3.92.0 — 2026-06-21 (Plan inventory correction):** Archived the two remaining completed prompt-macro plans into `.lovable/plans/completed/` with explicit `STATUS: ✅ COMPLETED` headers — `06-prompt-macros-50-step.md` (100/100 tasks complete) and `07-spec-prompt-macros-audit-100.md` (audit complete, score 100/100). Added a current-cursor header to the only active plan, `projects-modal-15-step-improvement.md`: Task 1 is the Projects Modal overview/spec. Before signal: `ls .lovable/plans/` showed 3 apparent pending files; after signal: only 1 active plan remains. `✅ All versions in sync: 3.92.0`.
-
-- **v3.93.0 — 2026-06-21 (Projects Modal cursor advance):** Discovered Tasks 1 & 2 of `projects-modal-15-step-improvement.md` were already shipped — spec at `standalone-scripts/macro-controller/spec/projects-modal/00-overview.md` (105 lines) and Q52 `projects.get` 405 root-cause + fix at `src/ui/projects-modal.ts:728-735`. Advanced cursor to Task 3 (CSV project-name fallback chain). `✅ All versions in sync: 3.93.0`.
+  Make sure that you understand the code base, you can make changes and everything, and also make sure that the, uh, changes that you are going to do, these are, uh, appropriate. Okay? So previously, you have done changes which are not good. You have broken the app. So understanding memory, where the code base is, how to fix that end part which you didn't, uh, is, is very, very important and so that you can also do architectural changes in the project. It's very important to understand. Can you please confirm after reading this very accurately and update your memory if required too  
+    
+  Also save these plans in proper memory and md files so that I can retrive it liek  
+    
+  .lovable/plans/live-lovable/xx-slug.md file and also inject it into the [index.md](http://index.md) file for plans clear???
+- &nbsp;
