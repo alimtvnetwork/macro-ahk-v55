@@ -24,6 +24,7 @@ import { runPromptHealthCheckWithAutoRepair } from '../seed/prompt-health-auto-r
 import { pickPromptFromRole } from './chip-gear-picker';
 import { setDefaultPromptForRole, deletePromptById } from '../db/prompt-db';
 import { exportPromptsToJson } from './prompt-io';
+import { dispatchPromptsChanged } from './prompts-changed-event';
 
 /**
  * Plan 26 step 9: coded diagnostic toast helper for chip-gear actions. Keeps
@@ -361,6 +362,7 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
   loader.invalidatePromptCache();
   loader.clearLoadedPrompts();
   showToast('✅ Active ' + roleLabel + ' prompt: ' + picked.Name, 'success');
+  dispatchPromptsChanged({ role, reason: 'set-active' });
 }
 
 async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> {
@@ -382,4 +384,5 @@ async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> 
   loader.invalidatePromptCache();
   loader.clearLoadedPrompts();
   showToast('🗑 Deleted "' + picked.Name + '"', 'success');
+  dispatchPromptsChanged({ role, reason: 'delete-custom' });
 }
