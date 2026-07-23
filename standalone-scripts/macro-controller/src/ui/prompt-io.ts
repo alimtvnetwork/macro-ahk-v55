@@ -155,6 +155,12 @@ export interface PromptImportResults {
    * can surface "+N revisions" in its success summary.
    */
   revisionsImported?: number;
+  /**
+   * v4.400.0: number of incoming entries that were skipped because they
+   * collided with an existing `isDefault=true` row. Additive/backwards
+   * compatible: undefined on older bundles.
+   */
+  defaultsProtected?: number;
 }
 
 
@@ -238,7 +244,10 @@ export function validatePromptEntryDetailed(
     text: e.text,
     category: typeof e.category === 'string' ? e.category.trim() : 'General',
     isFavorite: !!e.isFavorite,
-    isDefault: !!e.isDefault,
+    // v4.400.0: import is scoped to user-added prompts. Force `isDefault=false`
+    // on every incoming entry — defaults are managed by the re-seed pipeline
+    // and must never be re-created via bundle import.
+    isDefault: false,
   };
   if (typeof e.slug === 'string') out.slug = e.slug.trim();
   if (typeof e.order === 'number') out.order = e.order;
