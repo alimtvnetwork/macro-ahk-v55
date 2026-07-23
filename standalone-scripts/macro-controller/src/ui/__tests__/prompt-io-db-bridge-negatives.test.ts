@@ -63,7 +63,7 @@ describe('commitDbEntries — negative paths', () => {
 
     it('empty entries list: no-op result, no driver calls', async () => {
         const result = await commitDbEntries([]);
-        expect(result).toEqual({ upserted: 0, errors: [] });
+        expect(result).toEqual({ upserted: 0, errors: [], defaultsProtected: 0 });
         expect(listMock).not.toHaveBeenCalled();
         expect(upsertMock).not.toHaveBeenCalled();
     });
