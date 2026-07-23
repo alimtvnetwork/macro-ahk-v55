@@ -32,87 +32,99 @@ function reasonOf(err: unknown, fallback: string): string {
   try { return JSON.stringify(err); } catch { return fallback; }
 }
 
-export async function pickPromptFromRole(opts: PickPromptOptions): Promise<PromptRow | null> {
-  let stage: LoadStage = 'initial-list';
-  let seedAttempted = false;
-  let initialReason: string | null = null;
-  let seedReason: string | null = null;
+type ListRes = Awaited<ReturnType<typeof listPromptsByRole>>;
 
-  let res = await listPromptsByRole(opts.role);
-  if (!res.ok) initialReason = res.error ?? 'listPromptsByRole returned !ok';
+interface LoadState {
+  res: ListRes;
+  stage: LoadStage;
+  seedAttempted: boolean;
+  initialReason: string | null;
+  seedReason: string | null;
+}
 
-  // Retry-once on contract-shape failure: the sql-bridge may have cached a
-  // method name the backend just started rejecting. Reset the cache and try
-  // one fresh probe before falling through to auto-seed / diagnostic toast.
+async function attemptInitialLoad(role: PromptRole): Promise<{ res: ListRes; initialReason: string | null }> {
+  let res = await listPromptsByRole(role);
+  let initialReason = res.ok ? null : (res.error ?? 'listPromptsByRole returned !ok');
   if (!res.ok && isSqlBridgeContractError(initialReason ?? undefined)) {
     resetSqlBridgeCache();
-    const retry = await listPromptsByRole(opts.role);
+    const retry = await listPromptsByRole(role);
     if (retry.ok) { res = retry; initialReason = null; }
   }
+  return { res, initialReason };
+}
 
-  // Managed Plan/Next roles: auto-seed on empty or failed lookup, then retry
-  // once, so users never see a scary "Failed to load" when the DB simply
-  // hasn't been seeded yet (fresh install, legacy Role='generic' rows, etc.).
-  const isManaged = opts.role === 'plan' || opts.role === 'next';
-  const emptyOrFailed = !res.ok || ((res.value ?? []).length === 0);
-  if (isManaged && emptyOrFailed) {
-    stage = 'auto-seed';
-    seedAttempted = true;
-    try {
-      const seedMod = await import('../seed/seed-plan-next');
-      const seedRes = await seedMod.seedPlanNextPrompts();
-      if (!seedRes.ok) {
-        seedReason = seedRes.error ?? 'seedPlanNextPrompts returned !ok';
-        logError('ChipGearPicker', 'auto-seed before pick failed for ' + opts.role, new Error(seedReason));
-      }
-      stage = 'post-seed-list';
-      res = await listPromptsByRole(opts.role);
-    } catch (err) {
-      seedReason = reasonOf(err, 'auto-seed threw');
-      logError('ChipGearPicker', 'auto-seed import/call threw for ' + opts.role, err);
-    }
+async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ res: ListRes; stage: LoadStage; seedReason: string | null; seedAttempted: boolean }> {
+  const isManaged = role === 'plan' || role === 'next';
+  const emptyOrFailed = !current.ok || ((current.value ?? []).length === 0);
+  if (!isManaged || !emptyOrFailed) {
+    return { res: current, stage: 'initial-list', seedReason: null, seedAttempted: false };
   }
+  let stage: LoadStage = 'auto-seed';
+  let seedReason: string | null = null;
+  let res = current;
+  try {
+    const seedMod = await import('../seed/seed-plan-next');
+    const seedRes = await seedMod.seedPlanNextPrompts();
+    if (!seedRes.ok) {
+      seedReason = seedRes.error ?? 'seedPlanNextPrompts returned !ok';
+      logError('ChipGearPicker', 'auto-seed before pick failed for ' + role, new Error(seedReason));
+    }
+    stage = 'post-seed-list';
+    res = await listPromptsByRole(role);
+  } catch (err) {
+    seedReason = reasonOf(err, 'auto-seed threw');
+    logError('ChipGearPicker', 'auto-seed import/call threw for ' + role, err);
+  }
+  return { res, stage, seedReason, seedAttempted: true };
+}
 
-  if (!res.ok) {
-    const dbReason = res.error ?? 'listPromptsByRole returned !ok';
-    // Second-chance rebuild: if the auto-seed path itself hit a contract
-    // error, reset the bridge cache and retry the SELECT one more time.
-    if (isSqlBridgeContractError(dbReason) || isSqlBridgeContractError(seedReason ?? undefined)) {
-      resetSqlBridgeCache();
-      const retry = await listPromptsByRole(opts.role);
-      if (retry.ok) { res = retry; }
-    }
+async function retryOnContractError(role: PromptRole, state: LoadState): Promise<ListRes> {
+  if (state.res.ok) return state.res;
+  const dbReason = state.res.error ?? 'listPromptsByRole returned !ok';
+  if (isSqlBridgeContractError(dbReason) || isSqlBridgeContractError(state.seedReason ?? undefined)) {
+    resetSqlBridgeCache();
+    const retry = await listPromptsByRole(role);
+    if (retry.ok) return retry;
   }
-  if (!res.ok) {
-    const dbReason = res.error ?? 'listPromptsByRole returned !ok';
-    const detail = buildLoadFailureDetail({
-      stage: stage,
-      role: opts.role,
-      roleLabel: opts.roleLabel,
-      seedAttempted: seedAttempted,
-      dbReason: dbReason,
-      initialReason: initialReason,
-      seedReason: seedReason,
-    });
-    const err = new DiagnosticError('PROMPT_LOAD_E001', {
-      role: opts.role,
-      roleLabel: opts.roleLabel,
-      stage: stage,
-      seedAttempted: String(seedAttempted),
-      reason: detail,
-    });
-    showDiagnosticToast(err);
-    return null;
-  }
-  const rows = (res.value ?? []).filter((r) => !opts.excludeDefault || r.IsDefault !== 1);
-  if (rows.length === 0) {
-    if (seedReason !== null) {
-      showToast('⚠ No ' + opts.roleLabel + ' prompts available. Auto-seed reported: ' + seedReason, 'warn');
-    } else {
-      showToast('No ' + opts.roleLabel + ' prompts available', 'warn');
-    }
-    return null;
-  }
+  return state.res;
+}
+
+function emitLoadFailure(opts: PickPromptOptions, state: LoadState): null {
+  const dbReason = state.res.ok ? '' : (state.res.error ?? 'listPromptsByRole returned !ok');
+  const detail = buildLoadFailureDetail({
+    stage: state.stage, role: opts.role, roleLabel: opts.roleLabel,
+    seedAttempted: state.seedAttempted, dbReason,
+    initialReason: state.initialReason, seedReason: state.seedReason,
+  });
+  showDiagnosticToast(new DiagnosticError('PROMPT_LOAD_E001', {
+    role: opts.role, roleLabel: opts.roleLabel, stage: state.stage,
+    seedAttempted: String(state.seedAttempted), reason: detail,
+  }));
+  return null;
+}
+
+function emitEmptyToast(opts: PickPromptOptions, seedReason: string | null): null {
+  const msg = seedReason !== null
+    ? '⚠ No ' + opts.roleLabel + ' prompts available. Auto-seed reported: ' + seedReason
+    : 'No ' + opts.roleLabel + ' prompts available';
+  showToast(msg, 'warn');
+  return null;
+}
+
+export async function pickPromptFromRole(opts: PickPromptOptions): Promise<PromptRow | null> {
+  const initial = await attemptInitialLoad(opts.role);
+  const seeded = await attemptAutoSeed(opts.role, initial.res);
+  const state: LoadState = {
+    res: seeded.res,
+    stage: seeded.seedAttempted ? seeded.stage : 'initial-list',
+    seedAttempted: seeded.seedAttempted,
+    initialReason: initial.initialReason,
+    seedReason: seeded.seedReason,
+  };
+  state.res = await retryOnContractError(opts.role, state);
+  if (!state.res.ok) return emitLoadFailure(opts, state);
+  const rows = (state.res.value ?? []).filter((r) => !opts.excludeDefault || r.IsDefault !== 1);
+  if (rows.length === 0) return emitEmptyToast(opts, state.seedReason);
   return await promptPickerModal(rows, opts);
 }
 
