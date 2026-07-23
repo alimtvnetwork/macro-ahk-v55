@@ -49,16 +49,5 @@ export function substituteToken(body: string, key: string, value: string | numbe
     // n/N alias substitution (case-insensitive) for legacy DB rows.
     const alternateKey = key === 'n' ? 'N' : key === 'N' ? 'n' : '';
     const aliased = alternateKey ? primary.replace(buildTokenRegex(alternateKey), valueText) : primary;
-
-    // Belt-and-suspenders: if the DB row's ReplaceKey drifted to something
-    // other than n/N but the body still contains raw `{{n}}` / `{{N}}` /
-    // `${n}` / `${N}` after the primary pass, force-substitute them so the
-    // Next chip never ships literal `{{n}}` to the chat editor.
-    const residualN = /\{\{\s*[nN]\s*\}\}|\$\{\s*[nN]\s*\}/g;
-    if (residualN.test(aliased)) {
-        logError('TokenSubstitute', 'residual {{n}} after primary substitution; forcing replacement', { key });
-        return aliased.replace(residualN, valueText);
-    }
-
     return aliased;
 }
