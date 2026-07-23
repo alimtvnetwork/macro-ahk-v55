@@ -16,7 +16,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 const sendMock = vi.fn();
 
-vi.mock('../../ui/prompt-loader', () => ({
+vi.mock('../extension-bridge', () => ({
     sendToExtension: (type: string, payload: Record<string, unknown>) =>
         sendMock(type, payload),
 }));
@@ -99,8 +99,6 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
     });
 
     it('manual resetSqlBridgeCache clears winning state for one bucket', () => {
-        // Prime cache via test hook.
-        (getSqlBridgeState as unknown); // no-op ref
         resetSqlBridgeCache('SELECT');
         expect(getSqlBridgeState().winning.SELECT).toBeNull();
     });

@@ -424,53 +424,66 @@ function _showBodyElement(el: HTMLElement): void {
   el.removeAttribute(PREV_DISPLAY_ATTR);
 }
 
-export function toggleMinimize(ctx: PanelLayoutCtx) {
-  const isExpanded = ctx.panelState === 'expanded';
-  // v4.401.0: single guarded transition. Snapshot the inline style + label
-  // up front, run the DOM mutation, and only flip `ctx.panelState` +
-  // `savePanelState` when the mutation completes cleanly. If any body
-  // element throws mid-loop we roll the label + inline styles back so DOM
-  // and persisted state cannot drift.
-  const snapshot = {
+interface ToggleSnapshot {
+  height: string;
+  maxHeight: string;
+  overflow: string;
+  overflowY: string;
+  label: string | null;
+}
+
+function snapshotToggle(ctx: PanelLayoutCtx): ToggleSnapshot {
+  return {
     height: ctx.ui.style.height,
     maxHeight: ctx.ui.style.maxHeight,
     overflow: ctx.ui.style.overflow,
     overflowY: ctx.ui.style.overflowY,
     label: ctx.panelToggleSpan ? ctx.panelToggleSpan.textContent : null,
   };
+}
+
+function runMinimizeTransition(ctx: PanelLayoutCtx, isExpanded: boolean): void {
+  if (isExpanded) {
+    log('Minimizing MacroLoop panel', 'info');
+    ctx.expandedHeight = ctx.ui.style.height;
+    ctx.expandedMaxHeight = ctx.ui.style.maxHeight;
+    ctx.expandedOverflow = ctx.ui.style.overflow;
+    ctx.expandedOverflowY = ctx.ui.style.overflowY;
+    applyMinimizedDom(ctx);
+    if (ctx.panelToggleSpan) ctx.panelToggleSpan.textContent = '[ + ]';
+    ctx.panelState = 'minimized';
+  } else {
+    log('Expanding MacroLoop panel', 'info');
+    applyExpandedDom(ctx);
+    if (ctx.panelToggleSpan) ctx.panelToggleSpan.textContent = '[ - ]';
+    ctx.panelState = 'expanded';
+  }
+  savePanelState(ctx.panelState);
+}
+
+function rollbackMinimize(ctx: PanelLayoutCtx, snapshot: ToggleSnapshot, isExpanded: boolean, err: unknown): void {
+  logSub('toggleMinimize failed mid-transition; rolling back: ' + (err instanceof Error ? err.message : String(err)), 1);
+  ctx.ui.style.height = snapshot.height;
+  ctx.ui.style.maxHeight = snapshot.maxHeight;
+  ctx.ui.style.overflow = snapshot.overflow;
+  ctx.ui.style.overflowY = snapshot.overflowY;
+  if (ctx.panelToggleSpan && snapshot.label !== null) {
+    ctx.panelToggleSpan.textContent = snapshot.label;
+  }
   try {
-    if (isExpanded) {
-      log('Minimizing MacroLoop panel', 'info');
-      ctx.expandedHeight = ctx.ui.style.height;
-      ctx.expandedMaxHeight = ctx.ui.style.maxHeight;
-      ctx.expandedOverflow = ctx.ui.style.overflow;
-      ctx.expandedOverflowY = ctx.ui.style.overflowY;
-      applyMinimizedDom(ctx);
-      if (ctx.panelToggleSpan) { ctx.panelToggleSpan.textContent = '[ + ]'; }
-      ctx.panelState = 'minimized';
-    } else {
-      log('Expanding MacroLoop panel', 'info');
-      applyExpandedDom(ctx);
-      if (ctx.panelToggleSpan) { ctx.panelToggleSpan.textContent = '[ - ]'; }
-      ctx.panelState = 'expanded';
+    for (const element of ctx.bodyElements) {
+      if (isExpanded) _showBodyElement(element); else _hideBodyElement(element);
     }
-    savePanelState(ctx.panelState);
+  } catch { /* best-effort rollback */ }
+}
+
+export function toggleMinimize(ctx: PanelLayoutCtx) {
+  const isExpanded = ctx.panelState === 'expanded';
+  const snapshot = snapshotToggle(ctx);
+  try {
+    runMinimizeTransition(ctx, isExpanded);
   } catch (err) {
-    logSub('toggleMinimize failed mid-transition; rolling back: ' + (err instanceof Error ? err.message : String(err)), 1);
-    ctx.ui.style.height = snapshot.height;
-    ctx.ui.style.maxHeight = snapshot.maxHeight;
-    ctx.ui.style.overflow = snapshot.overflow;
-    ctx.ui.style.overflowY = snapshot.overflowY;
-    if (ctx.panelToggleSpan && snapshot.label !== null) {
-      ctx.panelToggleSpan.textContent = snapshot.label;
-    }
-    // Restore the target state we mutated toward: if we were minimizing,
-    // any partially-hidden elements need re-showing; vice versa on expand.
-    try {
-      for (const el of ctx.bodyElements) {
-        if (isExpanded) _showBodyElement(el); else _hideBodyElement(el);
-      }
-    } catch { /* best-effort rollback */ }
+    rollbackMinimize(ctx, snapshot, isExpanded, err);
   }
 }
 

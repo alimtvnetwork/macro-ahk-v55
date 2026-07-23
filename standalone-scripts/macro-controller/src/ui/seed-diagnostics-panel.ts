@@ -29,6 +29,8 @@ const RELEVANT_CODES = new Set<string>([
   'SEED_RESEED_E001',
 ]);
 
+const NOT_ACCEPTED = '(not yet accepted)';
+
 const STATUS_COLOR: Record<SeedStageStatus, string> = {
   ok: '#22c55e',
   failed: '#ef4444',
@@ -176,7 +178,7 @@ function buildContractMarkdown(bridge: ReturnType<typeof getSqlBridgeState>): st
   lines.push('## Winning method per bucket');
   lines.push('');
   for (const bucket of ['SELECT', 'WRITE', 'ALTER'] as const) {
-    lines.push('- ' + bucket + ': ' + (bridge.winning[bucket] ?? '(not yet accepted)'));
+    lines.push('- ' + bucket + ': ' + (bridge.winning[bucket] ?? NOT_ACCEPTED));
   }
   lines.push('');
   lines.push('## Candidate probe order');
@@ -220,9 +222,9 @@ function buildBridgeSection(): HTMLDivElement {
   const grid = document.createElement('pre');
   grid.style.cssText = 'background:#111827;color:#cbd5e1;padding:8px;border-radius:4px;font-family:ui-monospace,monospace;font-size:11px;white-space:pre-wrap;margin:4px 0;';
   const lines = [
-    'SELECT winning: ' + (state.winning.SELECT ?? '(not yet accepted)'),
-    'WRITE  winning: ' + (state.winning.WRITE ?? '(not yet accepted)'),
-    'ALTER  winning: ' + (state.winning.ALTER ?? '(not yet accepted)'),
+    'SELECT winning: ' + (state.winning.SELECT ?? NOT_ACCEPTED),
+    'WRITE  winning: ' + (state.winning.WRITE ?? NOT_ACCEPTED),
+    'ALTER  winning: ' + (state.winning.ALTER ?? NOT_ACCEPTED),
   ];
   const rejCount = state.rejections.SELECT.length + state.rejections.WRITE.length + state.rejections.ALTER.length;
   lines.push('rejections observed: ' + rejCount);

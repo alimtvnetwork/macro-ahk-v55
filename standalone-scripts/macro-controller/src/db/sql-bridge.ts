@@ -24,7 +24,7 @@
 // from `ui/extension-relay`) so the historical test mocks that only stub
 // `ui/prompt-loader` continue to intercept bridge traffic without every
 // call site having to add a second `vi.mock('../ui/extension-relay', ...)`.
-import { sendToExtension } from '../ui/prompt-loader';
+import { sendToExtension } from './extension-bridge';
 import { DB_NAME } from './db-name';
 
 export interface SqlBridgeResp {
@@ -65,9 +65,9 @@ const rejections: Record<Bucket, SqlBridgeRejection[]> = {
 };
 
 function recordRejection(bucket: Bucket, method: string, message: string): void {
-    const arr = rejections[bucket];
-    arr.push({ bucket, method, message, at: new Date().toISOString() });
-    if (arr.length > REJECTION_LIMIT) arr.splice(0, arr.length - REJECTION_LIMIT);
+    const history = rejections[bucket];
+    history.push({ bucket, method, message, at: new Date().toISOString() });
+    if (history.length > REJECTION_LIMIT) history.splice(0, history.length - REJECTION_LIMIT);
 }
 
 export interface SqlBridgeState {
@@ -122,9 +122,9 @@ export function isSqlBridgeContractError(message: string | undefined): boolean {
     return isContractError(message);
 }
 
-function isContractError(msg: string | undefined): boolean {
-    if (typeof msg !== 'string' || msg.length === 0) return false;
-    return CONTRACT_ERR_PATTERNS.some(function(re) { return re.test(msg); });
+function isContractError(message: string | undefined): boolean {
+    if (typeof message !== 'string' || message.length === 0) return false;
+    return CONTRACT_ERR_PATTERNS.some(function(re) { return re.test(message); });
 }
 
 function classify(legacy: LegacyMethod, sql: string): Bucket {
@@ -200,22 +200,22 @@ export function _getSqlBridgeCacheForTest(): Readonly<Partial<Record<Bucket, str
  * whatever `fn` returned (success or the second-attempt failure).
  */
 export async function runWithBridgeRetry<T>(
-    fn: () => Promise<T>,
+    operation: () => Promise<T>,
     isFailure: (v: T) => string | undefined,
 ): Promise<T> {
     try {
-        const first = await fn();
-        const msg = isFailure(first);
-        if (msg && isSqlBridgeContractError(msg)) {
+        const first = await operation();
+        const message = isFailure(first);
+        if (message && isSqlBridgeContractError(message)) {
             resetSqlBridgeCache();
-            return await fn();
+            return await operation();
         }
         return first;
     } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        if (isSqlBridgeContractError(msg)) {
+        const message = err instanceof Error ? err.message : String(err);
+        if (isSqlBridgeContractError(message)) {
             resetSqlBridgeCache();
-            return await fn();
+            return await operation();
         }
         throw err;
     }

@@ -119,21 +119,29 @@ function buildExportPopover(anchor: HTMLElement): HTMLElement {
   return pop;
 }
 
+function attachPopoverToggle(
+  e: Event,
+  popoverSelector: string,
+  buildPopover: (anchor: HTMLElement) => HTMLElement,
+): void {
+  e.stopPropagation();
+  const target = e.currentTarget as HTMLElement;
+  const existing = document.querySelector(popoverSelector);
+  if (existing) { existing.remove(); return; }
+  const pop = buildPopover(target);
+  document.body.appendChild(pop);
+  const dismiss = function(ev: Event): void {
+    if (pop.contains(ev.target as Node)) return;
+    pop.remove();
+    document.removeEventListener('click', dismiss, true);
+  };
+  setTimeout(function() { document.addEventListener('click', dismiss, true); }, 0);
+}
+
 /** Export pill: opens a three-option popover (JSON / ZIP / SQLite). */
 export function buildExportButton(): HTMLElement {
   return buildHeaderPill('📤 Export', 'Export user-added prompts (JSON, ZIP, or SQLite). Defaults are managed by re-seed and never included.', function(e: Event) {
-    e.stopPropagation();
-    const target = e.currentTarget as HTMLElement;
-    const existing = document.querySelector('[data-marco-export-popover]');
-    if (existing) { existing.remove(); return; }
-    const pop = buildExportPopover(target);
-    document.body.appendChild(pop);
-    const dismiss = function(ev: Event): void {
-      if (pop.contains(ev.target as Node)) return;
-      pop.remove();
-      document.removeEventListener('click', dismiss, true);
-    };
-    setTimeout(function() { document.addEventListener('click', dismiss, true); }, 0);
+    attachPopoverToggle(e, '[data-marco-export-popover]', buildExportPopover);
   });
 }
 
@@ -247,18 +255,9 @@ export function buildImportExportButton(rerender: Rerender): HTMLElement {
     '📤 Prompts I/O ▾',
     'Import or export prompts. Defaults are managed by re-seed and never included in exports; imports never overwrite defaults.',
     function(e: Event) {
-      e.stopPropagation();
-      const target = e.currentTarget as HTMLElement;
-      const existing = document.querySelector('[data-marco-io-popover]');
-      if (existing) { existing.remove(); return; }
-      const pop = buildImportExportPopover(target, rerender);
-      document.body.appendChild(pop);
-      const dismiss = function(ev: Event): void {
-        if (pop.contains(ev.target as Node)) return;
-        pop.remove();
-        document.removeEventListener('click', dismiss, true);
-      };
-      setTimeout(function() { document.addEventListener('click', dismiss, true); }, 0);
+      attachPopoverToggle(e, '[data-marco-io-popover]', function(anchor) {
+        return buildImportExportPopover(anchor, rerender);
+      });
     },
   );
 }

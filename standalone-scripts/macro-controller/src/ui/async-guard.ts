@@ -16,26 +16,26 @@ export interface GuardOptions {
   readonly spinner?: string;
 }
 
-function markBusy(el: HTMLElement, opts: GuardOptions): { restore: () => void } {
-  const prevAria = el.getAttribute('aria-busy');
-  const prevDisabled = (el as HTMLButtonElement).disabled;
-  const prevText = opts.spinner ? el.textContent : null;
-  el.setAttribute(BUSY_ATTR, '1');
-  el.setAttribute('aria-busy', 'true');
-  if ('disabled' in el) (el as HTMLButtonElement).disabled = true;
-  el.style.opacity = '0.6';
-  el.style.pointerEvents = 'none';
+function markBusy(element: HTMLElement, opts: GuardOptions): { restore: () => void } {
+  const prevAria = element.getAttribute('aria-busy');
+  const prevDisabled = (element as HTMLButtonElement).disabled;
+  const prevText = opts.spinner ? element.textContent : null;
+  element.setAttribute(BUSY_ATTR, '1');
+  element.setAttribute('aria-busy', 'true');
+  if ('disabled' in element) (element as HTMLButtonElement).disabled = true;
+  element.style.opacity = '0.6';
+  element.style.pointerEvents = 'none';
   if (opts.spinner && prevText !== null) {
-    el.textContent = opts.spinner + ' ' + prevText;
+    element.textContent = opts.spinner + ' ' + prevText;
   }
   return {
     restore(): void {
-      el.removeAttribute(BUSY_ATTR);
-      if (prevAria === null) el.removeAttribute('aria-busy'); else el.setAttribute('aria-busy', prevAria);
-      if ('disabled' in el) (el as HTMLButtonElement).disabled = prevDisabled;
-      el.style.opacity = '';
-      el.style.pointerEvents = '';
-      if (opts.spinner && prevText !== null) el.textContent = prevText;
+      element.removeAttribute(BUSY_ATTR);
+      if (prevAria === null) element.removeAttribute('aria-busy'); else element.setAttribute('aria-busy', prevAria);
+      if ('disabled' in element) (element as HTMLButtonElement).disabled = prevDisabled;
+      element.style.opacity = '';
+      element.style.pointerEvents = '';
+      if (opts.spinner && prevText !== null) element.textContent = prevText;
     },
   };
 }
@@ -45,13 +45,13 @@ function markBusy(el: HTMLElement, opts: GuardOptions): { restore: () => void } 
  * are silently ignored (they would otherwise race the DB bridge retry loop).
  */
 export function guardAsyncClick(
-  el: HTMLElement,
+  element: HTMLElement,
   handler: () => Promise<void> | void,
   opts: GuardOptions = {},
 ): () => Promise<void> {
   return async function guarded(): Promise<void> {
-    if (el.getAttribute(BUSY_ATTR) === '1') return;
-    const { restore } = markBusy(el, opts);
+    if (element.getAttribute(BUSY_ATTR) === '1') return;
+    const { restore } = markBusy(element, opts);
     try {
       await handler();
     } finally {
@@ -60,6 +60,6 @@ export function guardAsyncClick(
   };
 }
 
-export function isBusy(el: HTMLElement): boolean {
-  return el.getAttribute(BUSY_ATTR) === '1';
+export function isBusy(element: HTMLElement): boolean {
+  return element.getAttribute(BUSY_ATTR) === '1';
 }
