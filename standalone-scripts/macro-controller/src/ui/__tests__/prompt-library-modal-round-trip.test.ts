@@ -26,7 +26,10 @@ vi.mock('../../toast', () => ({ showToast: mocks.showToast }));
 
 // Fixture rows drive both export (via readJsonCopy) and the round-trip assertions.
 const FIXTURE = [
-    { name: 'Alpha', text: 'body A', category: 'General', isFavorite: false, isDefault: true, slug: 'alpha' },
+    // v4.400.0: import/export is scoped to user-added prompts. All fixture
+    // rows must be `isDefault=false` so the round-trip carries them end-to-end.
+    // Default protection is covered in prompt-io-import-protect-defaults.test.ts.
+    { name: 'Alpha', text: 'body A', category: 'General', isFavorite: false, isDefault: false, slug: 'alpha' },
     { name: 'Beta',  text: 'body B', category: 'Plans',   isFavorite: true,  isDefault: false, slug: 'beta' },
     { name: 'Gamma', text: 'body Γ with unicode ✓', category: 'General', isFavorite: false, isDefault: false, slug: 'gamma' },
 ] as const;
