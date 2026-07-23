@@ -138,6 +138,18 @@ const workspace = Object.freeze({
         });
     },
 
+    /**
+     * v2 membership-scoped move (PENDING-VERIFY — see spec workspace-move/01).
+     * Empty body by default; callers may override via `options.body`.
+     */
+    moveV2(targetWsId: string, currentUserId: string, options?: ApiCallOptions): Promise<ApiResponse> {
+        return callEndpoint(apiRegistry.workspace.moveV2, {
+            ...options,
+            params: { wsId: targetWsId, userId: currentUserId, ...options?.params },
+            body: options?.body ?? {},
+        });
+    },
+
     rename(wsId: string, newName: string, options?: ApiCallOptions): Promise<ApiResponse> {
         return callEndpoint(apiRegistry.workspace.rename, {
             ...options,
