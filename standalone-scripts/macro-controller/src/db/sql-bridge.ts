@@ -1,0 +1,115 @@
+/**
+ * db/sql-bridge.ts - adaptive SQLite bridge (PENDING-VERIFY).
+ *
+ * Backend v2 rejects `method: 'QUERY'` and restricts `method: 'SCHEMA'` to
+ * `ALTER TABLE` statements. See spec/db-bridge/01-rawsql-contract-v2.md.
+ *
+ * Every historical caller passed `method: 'QUERY' | 'SCHEMA'` with a raw
+ * SQL string. This module preserves that signature but transparently:
+ *
+ *   1. Classifies the SQL into SELECT / ALTER / WRITE.
+ *   2. Tries a per-class list of candidate method names, in order.
+ *   3. Caches the first name the backend accepts (per class) for the
+ *      lifetime of the page so subsequent calls skip the probe.
+ *   4. Retries only on contract-shape errors ("Unsupported method: ..."
+ *      and "only ALTER TABLE statements are allowed"). Real SQL errors
+ *      (syntax, missing table, no rows) are returned to the caller
+ *      unchanged.
+ *
+ * Return shape matches the historical `{ isOk, rows?, errorMessage?,
+ * lastInsertId? }` contract so callers do not need to change.
+ */
+
+import { sendToExtension } from '../ui/extension-relay';
+import { DB_NAME } from './db-name';
+
+export interface SqlBridgeResp {
+    isOk: boolean;
+    rows?: unknown[];
+    errorMessage?: string;
+    lastInsertId?: number;
+}
+
+export type LegacyMethod = 'QUERY' | 'SCHEMA';
+type Bucket = 'SELECT' | 'ALTER' | 'WRITE';
+
+// Candidate method names, in probe order. First entry wins on cold boot.
+// Order preserves legacy names first so any environment still honoring the
+// old contract Just Works without an extra roundtrip.
+const CANDIDATES: Record<Bucket, string[]> = {
+    SELECT: ['QUERY', 'SELECT', 'READ', 'EXEC', 'RUN'],
+    WRITE: ['SCHEMA', 'EXEC', 'RUN', 'WRITE', 'MUTATE', 'QUERY'],
+    ALTER: ['SCHEMA'],
+};
+
+// Process-local cache of the winning method per bucket. A fresh page load
+// re-probes so a backend rollback heals automatically.
+const winning: Partial<Record<Bucket, string>> = {};
+
+const CONTRACT_ERR_PATTERNS = [
+    /^unsupported method:/i,
+    /only alter table statements are allowed/i,
+];
+
+function isContractError(msg: string | undefined): boolean {
+    if (typeof msg !== 'string' || msg.length === 0) return false;
+    return CONTRACT_ERR_PATTERNS.some(function(re) { return re.test(msg); });
+}
+
+function classify(legacy: LegacyMethod, sql: string): Bucket {
+    if (legacy === 'QUERY') return 'SELECT';
+    // legacy === 'SCHEMA'
+    return /^\s*alter\s+table\b/i.test(sql) ? 'ALTER' : 'WRITE';
+}
+
+async function sendOnce(method: string, sql: string): Promise<SqlBridgeResp> {
+    const resp = await sendToExtension('PROJECT_API', {
+        project: DB_NAME, method, endpoint: 'rawSql', params: { sql },
+    });
+    return (resp as SqlBridgeResp) ?? { isOk: false, errorMessage: 'no response' };
+}
+
+/**
+ * Run a SQL statement through the project bridge, adapting to whichever
+ * method-name the backend currently accepts.
+ */
+export async function runSql(legacy: LegacyMethod, sql: string): Promise<SqlBridgeResp> {
+    const bucket = classify(legacy, sql);
+    const cached = winning[bucket];
+    if (typeof cached === 'string') {
+        const resp = await sendOnce(cached, sql);
+        if (resp.isOk || !isContractError(resp.errorMessage)) return resp;
+        // Cached name went stale (backend rolled forward): invalidate + reprobe.
+        delete winning[bucket];
+    }
+
+    let lastResp: SqlBridgeResp = { isOk: false, errorMessage: 'no candidate methods tried' };
+    for (const method of CANDIDATES[bucket]) {
+        const resp = await sendOnce(method, sql);
+        if (resp.isOk) {
+            winning[bucket] = method;
+            return resp;
+        }
+        if (!isContractError(resp.errorMessage)) {
+            // Real SQL error: return unchanged, don't burn more probes.
+            return resp;
+        }
+        lastResp = resp;
+    }
+    return {
+        isOk: false,
+        errorMessage:
+            'sql-bridge: no accepted method for ' + bucket
+            + ' (last: ' + (lastResp.errorMessage ?? 'unknown') + ')',
+    };
+}
+
+/** Test-only: reset the winning-method cache between cases. */
+export function _resetSqlBridgeCacheForTest(): void {
+    for (const k of Object.keys(winning)) delete winning[k as Bucket];
+}
+
+/** Test-only: read the current cache snapshot. */
+export function _getSqlBridgeCacheForTest(): Readonly<Partial<Record<Bucket, string>>> {
+    return { ...winning };
+}
