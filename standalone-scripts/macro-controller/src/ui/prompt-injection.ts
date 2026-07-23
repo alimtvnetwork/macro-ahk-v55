@@ -629,7 +629,15 @@ function savePromptFromEditor(input: PromptSaveInput): Promise<PromptSaveResult>
 function refreshAfterPromptSave(): void {
   clearLoadedPrompts();
   invalidatePromptCache();
-  forceLoadFromDb().then(function() { rerenderPromptsDropdown(); });
+  forceLoadFromDb().then(function() {
+    rerenderPromptsDropdown();
+    // v4.402.0: notify any surface that renders role-scoped prompt lists
+    // (Next inline chips, empty-state minus buttons, etc.) so they refresh
+    // without a full page reload.
+    void import('./prompts-changed-event').then(function(mod) {
+      mod.dispatchPromptsChanged({ reason: 'editor-save' });
+    }).catch(function() { /* best-effort — refresh already happened */ });
+  });
 }
 
 // ── Prompt Modal Footer ──
