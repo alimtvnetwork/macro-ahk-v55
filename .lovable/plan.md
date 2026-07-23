@@ -1,107 +1,54 @@
+# Restore prompt library + sequence pending backlog
 
-# Plan: New Workspace-Move Endpoint + {{n}} Next-Button Fix
+## Root cause (verified)
 
-## Confirmation of understanding
+The extension's SQLite bridge (`sendToExtension('n', { project, method, endpoint: 'rawSql', params: { sql } })`) now hits a stricter backend:
 
-Yes, I understand the codebase and can make changes safely:
+- `method: 'QUERY'` returns `Unsupported method: QUERY`
+- `method: 'SCHEMA'` rejects anything that is not `ALTER TABLE`, returning `only ALTER TABLE statements are allowed`
 
-- **Prompts**: canonical bodies in `standalone-scripts/prompts/NN-<slug>/{prompt.md,info.json}`, human mirrors in `.lovable/prompts/`, aggregated by `scripts/aggregate-prompts.mjs` into `03-macro-prompts.json`. `{{n}}` is substituted by `standalone-scripts/macro-controller/src/utils/token-substitute.ts` and consumed by `next-inline-ui.ts`, `task-next-ui.ts`, `plan-task-ui.ts`, `plan-next-prompts.ts`. Rule-zero validator and prompt-health-check enforce its presence in `plan` and `next` role bodies.
-- **Releases**: driven by `.lovable/how-to-release.md` (checked, no rewrite needed, see step 1). Only `version.json` is edited; MINOR is the default; log skipped steps under `.lovable/release/issues/`.
-- **Workspace move**: currently `PUT /projects/{projectId}/move-to-workspace` via `marco-sdk` registry `workspace.move`, called from `ws-move.ts::executeMove()` with a Castle token header. The new server contract is membership-scoped and replaces this route.
+Confirmed in `seed/seed-plan-next.ts`, `db/prompt-db.ts`, `db/prompt-role-db.ts`, `db/macro-db.ts`, `db/project-chat-submit-db.ts`, `db/prompt-revision-db.ts`, `db/migrate-legacy-read-memory.ts`, `db/validate-read-memory-duplicates.ts`, `ui/database-json-migrate.ts`, `ui/read-memory-admin-modal.ts`, `seed/reseed-command.ts`. Every `SELECT`, `INSERT`, `UPDATE`, `DELETE`, `CREATE TABLE`, `CREATE INDEX`, `BEGIN`/`COMMIT` funneled through `rawSql` is currently a runtime failure. This produces the two toasts in the report and blocks Repair prompts, Re-seed defaults, prompt editing, and by extension the minus/hide toggle path that reads persisted UI state.
 
-## Note on the fetch you pasted
+## Phase 1 (this session): unblock the prompt library
 
-The snippet shows `method: "OPTIONS"` with `body: null` and `credentials: "omit"`. That is the browser's **CORS preflight**, automatically emitted before the real credentialed call, not the move itself. The real request is the one that follows (with `Authorization`, `credentials: "include"`, and a real method + body). I will code against the conventional Lovable shape and mark it `PENDING-VERIFY` in the registry, exactly like the `memberships.invite/remove/updateRole` entries already do. First live call will confirm; a wrong verb = one-line registry edit.
+1. Add a spec at `standalone-scripts/macro-controller/spec/db-bridge/01-rawsql-contract-v2.md` capturing the new backend contract (allowed methods, allowed statement shapes, error strings) with the raw evidence from the report.
+2. Introduce `db/sql-bridge.ts` that wraps `sendToExtension('n', ...)` and routes by statement kind:
+   - `SELECT` -> new `method: 'SELECT'` endpoint (verify name against SDK; fall back to `EXEC` if `SELECT` unsupported).
+   - `INSERT` / `UPDATE` / `DELETE` / `INSERT OR IGNORE` -> `method: 'EXEC'` (write path).
+   - `CREATE TABLE` / `CREATE INDEX` / `BEGIN` / `COMMIT` -> keep on `SCHEMA` but split so only `ALTER TABLE` uses it directly; use `EXEC` for the rest, or migrate table creation into a first-boot migration file if the backend truly refuses.
+   - All wrappers return the same `{ isOk, rows, errorMessage }` shape callers expect.
+3. Replace every direct `sendToExtension('n', { ... endpoint: 'rawSql' ... })` call site with the bridge. No behavioral change beyond routing.
+4. Add a `PENDING-VERIFY` note next to the bridge until the first live call confirms the correct method names, mirroring the workspace-move v2 pattern.
+5. Update Repair prompts and Re-seed defaults so they surface the bridge's error string verbatim instead of the generic `PROMPT_EDIT_E005` toast when the underlying failure is a bridge-contract error.
+6. Add a vitest that stubs `sendToExtension` and asserts each SQL kind is routed to the expected method, so a future contract drift trips CI.
 
-Working assumption for path + verb (to be confirmed on first live call):
+## Phase 2 (next session, tracked as separate plan file): minus / hide controller
 
-```
-PUT https://api.lovable.dev/workspaces/{targetWorkspaceId}/memberships/{currentUserId}
-Body: { "workspace_id": "{targetWorkspaceId}" }        # placeholder, may be empty
-Headers: Authorization: Bearer <jwt>, x-castle-request-token: <token>, Content-Type: application/json
-Credentials: include
-```
+Investigate `ui/panel-layout.ts` + `ui/panel-builder.ts` collapse path. The failure is almost certainly downstream of Phase 1 because the persisted collapse state lives in the same SQLite bridge. Re-test after Phase 1 lands; only open a dedicated fix if it still misbehaves.
 
-## Deliverables
+## Phase 3: pending backlog sequencing
 
-### 1. Read + audit `.lovable/how-to-release.md`
+The user listed plans 11, 13, 22, 23, 24, 25, 29, 31. Execute in this order, one plan per session, each landing as its own PR-sized change:
 
-Read the file end-to-end and confirm no change needed. If gaps are found (e.g. missing note that new membership-scoped endpoints must be PENDING-VERIFY tagged), add a single "Endpoint changes" subsection. Otherwise leave untouched and record "no change" in the plan progress log.
+1. `29-version-json-single-source-of-truth` (touches release infra; do first so later plans don't fight version drift).
+2. `11-prompts-import-export-section` (feature).
+3. `13-per-project-chat-submit-tracker` (feature, depends on healthy prompt DB from Phase 1).
+4. `23-prompt-library-relocate-and-light-mode` (UI move + theming).
+5. `22-prompt-library-test-coverage-50` (tests, done after 23 so new UI is covered).
+6. `24-eslint-warnings-cleanup-30`, then `25-eslint-cleanup-continuation-30`, then `31-lint-cleanup-ctx-denylist-and-15-line-cap` (mechanical, batched last).
 
-### 2. New spec: `standalone-scripts/macro-controller/spec/workspace-move/01-membership-scoped-api-v2.md`
+Each phase-3 plan is picked up only after Phase 1 is verified green in the live extension.
 
-Content:
-- Old contract (link to `00-api-contract.md`) marked deprecated.
-- New endpoint shape (path, headers, cookies, castle token requirement carries over).
-- User-supplied fetch snippet reproduced verbatim under "Captured preflight".
-- Explicit PENDING-VERIFY block listing what the first live call must confirm: HTTP verb, request body keys, response body shape, castle-denied still returns `{type:"castle_denied"}`.
-- Response class table copied from v1, plus a new row for `404` (membership not found → user must be a member of target workspace first).
-- Invariants unchanged: single call site (`executeMove`), no retry beyond one auth-refresh, awaited post-move credit refresh.
+## Deliverables this session
 
-### 3. New memory: `.lovable/memory/features/workspace-move-membership-endpoint-v2.md`
+- `spec/db-bridge/01-rawsql-contract-v2.md`
+- `src/db/sql-bridge.ts` + tests
+- Refactor of the 10 call-site files listed above
+- Memory note at `.lovable/memory/features/sql-bridge-rawsql-contract-v2.md`
+- Plan file at `.lovable/plans/pending/34-sql-bridge-rawsql-contract-v2.md` moved to `live-lovable/` on completion
 
-Frontmatter `type: feature`. Body:
-- Status: pending live-call verification.
-- Where it is wired (registry entry name, ws-move.ts call site).
-- What changed vs v1 (project-scoped → membership-scoped path; project id no longer in URL; user id required from bearer or `/user/me`).
-- Do-not list: do not resurrect `PUT /projects/{id}/move-to-workspace`; do not remove castle-token header; do not add generic retry.
-- Link to spec 01 above.
+## Out of scope
 
-Add reference line to `.lovable/memory/index.md` under Memories.
-
-### 4. Registry + code changes
-
-`standalone-scripts/marco-sdk/src/api-registry.ts`:
-- Add `workspace.moveV2` entry:
-  ```ts
-  moveV2: { url: "/workspaces/{wsId}/memberships/{userId}", method: "PUT", auth: true,
-            description: "Move project to workspace (v2, membership-scoped) — PENDING-VERIFY",
-            timeoutMs: 15_000 }
-  ```
-- Keep `workspace.move` (v1) in place for one release as a rollback lever, mark with a `// DEPRECATED 2026-07-23 — see spec workspace-move/01` comment.
-
-`standalone-scripts/marco-sdk/src/api.ts` (or the workspace facade):
-- Add `workspace.moveV2(wsId, userId, opts)` that resolves params + forwards headers, same signature contract as `move`.
-
-`standalone-scripts/macro-controller/src/ws-move.ts`:
-- Introduce `resolveCurrentUserId()` helper. Source order: existing decoded-JWT util if present, else `state.currentUserId`, else `GET /user/me`. Cache per session.
-- Replace `window.marco!.api!.workspace.move(projectId, targetWorkspaceId, …)` with `window.marco!.api!.workspace.moveV2(targetWorkspaceId, currentUserId, …)` inside `executeMove()`.
-- Keep castle-token flow, auth-retry, castle-denied handling, and post-move `fetchAndPersist` unchanged.
-- Update log lines from `PUT /projects/…/move-to-workspace` to the new path.
-- File stays ≤100 lines per function; extract `resolveCurrentUserId` to its own file if `ws-move.ts` grows past its budget.
-
-### 5. Fix `{{n}}` next-button substitution
-
-Investigation-first (already partially mapped in memory `prompts-authoring-and-release`). Steps:
-1. Read `next-inline-ui.ts`, `task-next-ui.ts`, and `token-substitute.ts` to identify why the replacement produces literal `{{n}}` in the composer.
-2. Common root causes to check in order: (a) substitution called before `n` is resolved, (b) prompt body pulled from a cached bundle that predates the token, (c) the button copies the raw canonical body instead of the substituted body.
-3. Fix the smallest layer that satisfies all four call sites; add a regression test alongside existing `next-tasks-prompt.e2e.test.ts` covering "click next N times, expect prompt to contain N and never `{{n}}`".
-
-If root cause turns out to require prompt-body edits, update canonical + mirror byte-identically and regenerate the bundle (per how-to-release rule).
-
-### 6. Verification (build mode)
-
-- `bunx vitest run` (all suites).
-- `bun run build:macro-controller` (or project equivalent) to confirm the SDK + controller bundle compile.
-- Manual smoke: reload extension, trigger move on a test project, capture network in devtools, and reconcile actual verb + body against the PENDING-VERIFY block in spec 01. Patch registry entry if reality differs.
-- Manual smoke: click Next button twice, confirm composer shows `next 2` (or equivalent), not `next {{n}}`.
-
-### 7. No release this turn
-
-Version bump only if the user says `release`. Follow `how-to-release.md` verbatim when they do.
-
-## Order of execution
-
-1. Read `how-to-release.md` (audit only).
-2. Write spec 01.
-3. Write memory file + update index.
-4. Registry + SDK facade + `ws-move.ts` edits.
-5. `{{n}}` investigation + fix + test.
-6. Run typecheck, lint, vitest.
-7. Report findings; wait for user to trigger a live move so the PENDING-VERIFY block can be confirmed.
-
-## Risk + rollback
-
-- Wrong verb/body → server returns 4xx on first click; registry entry is one-line editable; v1 route still exists as rollback.
-- User-id resolution failure → move aborts with the existing "auth token missing" toast path; no data loss.
-- `{{n}}` fix regressing other prompts → guarded by existing `prompt-parity-check.test.ts` and new regression test.
+- Any change to backend behavior (we adapt the client).
+- Workspace-move v2 verification (still `PENDING-VERIFY` from last session; separate turn).
+- The minus/hide button unless it survives Phase 1.
