@@ -515,6 +515,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.setup.outputs.ref }}
+          fetch-depth: 0
 
       # Regenerate version.json from the pushed tag so any build step that
       # reads it (vite copy-manifest, sync-manifest-version, shared-version
@@ -523,7 +524,6 @@ jobs:
         env:
           VERSION: ${{ needs.setup.outputs.publish_tag }}
         run: node scripts/write-version-from-tag.mjs
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
