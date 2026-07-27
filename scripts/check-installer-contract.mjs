@@ -273,11 +273,31 @@ if (paramBlock) {
 }
 
 // ── 5. default repo consistency ─────────────────────────────────────
+const autoResolveRepo = CONTRACT.repo && CONTRACT.repo.autoResolve === true;
 const expectedRepo = CONTRACT.repo.default;
+/**
+ * In autoResolve mode, the installer-constants and install.{sh,ps1}
+ * fallbacks are allowed to disagree with the resolved slug: the release
+ * pipeline regenerates them (or the env-var indirection wins at runtime).
+ * Mismatches are recorded as informational notices, not hard failures,
+ * so a repo rename cannot brick the release job. See
+ * .lovable/memory/features/release-pipeline-repo-url-agnostic.md.
+ */
+function pushRepoFinding(finding) {
+    if (autoResolveRepo) {
+        process.stderr.write(
+            `[check-installer-contract] notice (autoResolve): ${finding.message}` +
+                (finding.location ? ` @ ${finding.location}` : "") +
+                ` — expected='${finding.expected}' actual='${finding.actual}'\n`,
+        );
+        return;
+    }
+    findings.push(finding);
+}
 const shRepoRe = /REPO="\$\{MARCO_DEFAULT_REPO:-([^}]+)\}"/;
 const shMatch = sh.match(shRepoRe);
 if (!shMatch) {
-    findings.push({
+    pushRepoFinding({
         section: "Default repo consistency",
         message:
             "install.sh no longer reads REPO via ${MARCO_DEFAULT_REPO:-…}",
@@ -287,7 +307,7 @@ if (!shMatch) {
         hint: "Restore the env-var indirection so the contract can override REPO.",
     });
 } else if (shMatch[1] !== expectedRepo) {
-    findings.push({
+    pushRepoFinding({
         section: "Default repo consistency",
         message: "install.sh fallback repo disagrees with contract",
         location: `${rel(SH_PATH)}:${lineOf(sh, shMatch[0])}`,
@@ -298,7 +318,7 @@ if (!shMatch) {
 }
 
 if (!ps1.includes("$script:MarcoDefaultRepo")) {
-    findings.push({
+    pushRepoFinding({
         section: "Default repo consistency",
         message: "install.ps1 no longer references $script:MarcoDefaultRepo",
         location: rel(PS1_PATH),
@@ -311,7 +331,7 @@ const ps1FallbackRe = /\$script:MarcoDefaultRepo\s*=\s*'([^']+)'/g;
 let pmRepo;
 while ((pmRepo = ps1FallbackRe.exec(ps1)) !== null) {
     if (pmRepo[1] !== expectedRepo) {
-        findings.push({
+        pushRepoFinding({
             section: "Default repo consistency",
             message: "install.ps1 fallback repo disagrees with contract",
             location: `${rel(PS1_PATH)}:${lineOf(ps1, pmRepo[0])}`,
