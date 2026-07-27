@@ -99,6 +99,16 @@ jobs:
         run: node scripts/check-installer-contract-acids.mjs
 
       # ───────────────────────────────────────────────────────────
+      # Auto-heal repo rename: rewrite hardcoded owner/repo literals
+      # in installer scripts to whatever GITHUB_REPOSITORY says
+      # BEFORE the contract drift check runs. Idempotent; no-op on
+      # already-synced trees. See
+      # .lovable/memory/features/release-pipeline-repo-url-agnostic.md.
+      # ───────────────────────────────────────────────────────────
+      - name: Sync repo slug (auto-heal rename)
+        run: node scripts/sync-repo-slug.mjs
+
+      # ───────────────────────────────────────────────────────────
       # Drift detector — runs BEFORE the test bundle so a contract
       # mismatch (install.sh / install.ps1 / installer-constants.{sh,ps1}
       # vs. installer-contract.json) fails fast. No Node deps required —
