@@ -30,6 +30,7 @@ _None — all known CI/CD issues resolved._
 | 11 | [`11-audit-releases-ver-placeholder-collision.md`](./cicd-issues/11-audit-releases-ver-placeholder-collision.md) | Audit Releases mangled `VERSION.txt` into `<tag>SION.txt` because the `VER` placeholder collided with the literal substring inside `VERSION.txt` | `.github/workflows/audit-releases.yml` | ✅ Resolved | 2026-05-26 |
 | 12 | [`12-stale-repo-owner-ci-report-links.md`](./cicd-issues/12-stale-repo-owner-ci-report-links.md) | CI/CD status reports, badges, installers, and release docs pointed at stale `alimtvnetwork/macro-ahk-v55` instead of current `aukgit/macro-ahk-v55` | README + installer/release docs | ✅ Resolved | 2026-06-21 |
 | 13 | [`13-release-page-not-created-from-server-side-tag.md`](./issues/13-release-page-not-created-from-server-side-tag.md) | Release page not created from server-side tag (web UI / REST / external tag paths skipped packaging) | `.github/workflows/release.yml` | ✅ Resolved | 2026-07-21 |
+| 14 | [`03-release-page-empty-v5-12-1-version-json-drift.md`](./issues/03-release-page-empty-v5-12-1-version-json-drift.md) | Release page empty on v5.12.1 (version.json vs tag drift) | `.github/workflows/release.yml` | ✅ Resolved | 2026-07-27 |
 
 ## Referenced specs
 
