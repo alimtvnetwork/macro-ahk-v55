@@ -86,7 +86,10 @@ export interface BundleValidationResult {
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-const SEMVER_RE = /^\d+\.\d+\.\d+$/;
+// Accepts strict X.Y.Z plus optional prerelease/build suffix (e.g. `0.0.0-dev`
+// produced by scripts/write-version-from-tag.mjs as the local-dev fallback,
+// or `5.13.0-rc.1`). Kept aligned with SEMVER pattern in that script.
+const SEMVER_RE = /^\d+\.\d+\.\d+([.-].+)?$/;
 
 /** True when the value is a plain object (rejects null / arrays). */
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -150,7 +153,7 @@ function validateEnvelopeFields(value: Record<string, unknown>): string[] {
   if (typeof value['exportedAt'] !== 'string') errors.push('exportedAt must be an ISO-8601 string');
   const exporterVersion = value['exporterVersion'];
   if (typeof exporterVersion !== 'string' || !SEMVER_RE.test(exporterVersion)) {
-    errors.push('exporterVersion must be semver (e.g. 4.34.0)');
+    errors.push('exporterVersion must be semver (e.g. 4.34.0 or 0.0.0-dev)');
   }
   return errors;
 }
