@@ -30,8 +30,8 @@ function Write-Err([string]$msg) { Write-Host "  [ER] $msg" -ForegroundColor Red
 
 function Normalize-Repo([string]$RawRepo) {
     $repoValue = $RawRepo.Trim() -replace '^https://github\.com/', '' -replace '\.git$', ''
-    if ($repoValue -ieq 'alimtvnetwork/macro-ahk-v55') {
-        Write-Warn "Stale repo owner replaced: alimtvnetwork/macro-ahk-v55 -> aukgit/macro-ahk-v55"
+    if ($repoValue -ieq 'alimtvnetwork/macro-ahk-v53') {
+        Write-Warn "Stale repo owner replaced: alimtvnetwork/macro-ahk-v53 -> aukgit/macro-ahk-v55"
         return 'aukgit/macro-ahk-v55'
     }
     if ($repoValue -notmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') {
