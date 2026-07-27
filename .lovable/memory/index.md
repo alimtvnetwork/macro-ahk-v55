@@ -9,7 +9,7 @@ Updated: just now
 - **No Supabase**: Supabase is strictly forbidden (auth, tokens, SDKs, localStorage).
 - **No Plan 10 (unified billing)**: Plan 10 unified-billing-all-workspaces is rejected. Never list, propose, or resurrect. See `mem://constraints/no-plan-10-unified-billing`.
 - **No Storage PascalCase Migration**: Phase 2c-storage v2 is strictly forbidden. Rewriting `StoredProject` keys in `chrome.storage.local` would break ~50+ consumers.
-- **Versioning**: `version.json` is the only human-edited release version. Manifest output is generated and guarded from it. See `mem://constraints/version-json-single-source-of-truth`.
+- **Versioning**: The GIT TAG `vX.Y.Z` is the SOLE source of truth for the release version. `version.json` is a build-time artifact regenerated from the tag by `scripts/write-version-from-tag.mjs`; never hand-edit it to declare a release. See `mem://spec/commands/05-tag-is-single-source-of-truth-for-version`.
 - **No version-specific workflow tests**: Never require historical version tags, `SKIP_TAGS`, or disabled auditor asset lists in CI tests or workflow comments. See `mem://constraints/no-version-specific-workflow-contract-tests`.
 - **Suggestions & Planning**: Roadmap tracked in `plan.md`. Suggestions in `.lovable/memory/suggestions/`.
 - **Plan Mode layout**: Plans go in `.lovable/plans/pending/NN-slug.md`, subtasks in `.lovable/plans/subtasks/NN-slug/01-*.md` (NUMERIC prefix ONLY, never `SS-`), index row in `.lovable/plans/index.md`. On completion move to `completed/` and flip index status. See `mem://workflow/plan-mode-convention` and `mem://constraints/subtask-numeric-filenames`.
@@ -44,7 +44,8 @@ Updated: just now
 - [Dropdown prompts registry](mem://prompts/dropdown-prompts-registry) - 8 prompts shipped in macro-controller dropdown (coding-guidelines, lowercase-readme, explain-like-layman, read-memory, write-memory, next-${N}, plan-${N}, proofread); .md mirror under `.lovable/prompts/`; spec at `spec/01-prompt-spec-2026/04-dropdown-prompts-registry.md`
 - [Timezone](mem://localization/timezone) - Never hardcode a timezone; render in user's local timezone
 - [Versioning policy](mem://workflow/versioning-policy) - Unified versioning across manifest, constants.ts, scripts
-- [version.json canonical source](mem://constraints/version-json-single-source-of-truth) - Only human-edit version.json; generate and guard manifest versions from it
+- [Tag = version](mem://spec/commands/05-tag-is-single-source-of-truth-for-version) - Git tag is the release version; version.json regenerated from tag by scripts/write-version-from-tag.mjs
+- [Release pipeline repo-URL agnostic](mem://features/release-pipeline-repo-url-agnostic) - release.yml derives version from tag, syncs repo slug, regenerates version.json in every build job
 - [No version-specific workflow contract tests](mem://constraints/no-version-specific-workflow-contract-tests) - Ban brittle workflow regex checks for historical version tags, SKIP_TAGS, and disabled auditor asset lists
 - [Release ceremony](mem://workflow/release-ceremony) - MINOR release flow: sync pins, readme, changelog, lowercase md names, prompt mirrors, and issue logs
 - [Planning roadmap](mem://workflow/planning-roadmap) - plan.md as authoritative prioritized backlog
