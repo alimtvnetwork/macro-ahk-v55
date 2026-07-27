@@ -1,5 +1,15 @@
 # Changelog
 
+## [v5.11.0] 2026-07-27 E2E round-trip fix and release pin
+
+### Fixed
+- `tests/e2e/prompt-export-import-roundtrip.spec.ts`: seeded `JsonCopy` entries now use `isDefault: false` so the v5.9.0 user-scope export filter (`filterUserAddedEntries`) keeps them and the download event fires. Resolves the 60s Playwright timeout in the `chrome-extension` project (`page.waitForEvent('download')`).
+
+### Changed
+- `version.json`: bumped to `5.11.0` (single source of truth via `standalone-scripts/shared-version.ts`).
+- `readme.md`: pinned install snippets, download filename, and pinned-version callout to `v5.11.0`.
+- No macro-controller or extension source changes; test + docs release.
+
 ## [v5.10.0] 2026-07-23 Root readme hero-layout fix
 
 ### Fixed
