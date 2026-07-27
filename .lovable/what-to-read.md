@@ -38,6 +38,12 @@ section.
 - `.lovable/memory/architecture/` — module boundaries, lifecycle, storage layers.
 - `.lovable/memory/standards/` — error-logging, verbose-logging, timer teardown, JS-step diagnostics.
 
+## Before touching CI/CD or releases
+
+- `.lovable/memory/features/release-pipeline-repo-url-agnostic.md`, the repo-URL contract. Read first before renaming the repo, editing `.github/workflows/release.yml`, or touching any `scripts/install*` file.
+- `.lovable/cicd/issues/02-release-page-missing-built-assets.md`, earlier RCA for the empty-release-page failure mode.
+- `.lovable/cicd/issues/12-stale-repo-owner-ci-report-links.md`, earlier RCA for repo-owner drift breaking badges and installers.
+
 ## Before adding a feature
 
 - The relevant folder under `spec/21-app/` or `spec/26-macro-controller/` (write the spec first).

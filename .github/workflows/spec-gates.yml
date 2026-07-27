@@ -17,6 +17,33 @@ jobs:
         run: node scripts/spec/check-perf-budget.mjs
         continue-on-error: false
 
+  # Fails CI if a new hardcoded owner/repo literal for
+  # macro-ahk-v{N} sneaks into tracked sources. See
+  # .lovable/memory/features/release-pipeline-repo-url-agnostic.md.
+  verify-no-hardcoded-repo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for hardcoded owner/repo literals
+        run: |
+          set -euo pipefail
+          # Only scan primary source trees. Installer/build scripts
+          # (scripts/install*, scripts/clone-*, scripts/installer-*,
+          # scripts/download-*, scripts/prompt-creator-cli/**) are
+          # auto-managed by scripts/sync-repo-slug.mjs; docs, spec, RCA,
+          # changelog, and .gitmap history intentionally reference past
+          # slugs. This gate guards against a stray literal appearing in
+          # app code, tests, workflows, or content-scripts.
+          matches=$(grep -RIn -E '(alimtvnetwork|aukgit)/macro-ahk-v[0-9]+' \
+            src standalone-scripts .github/workflows tests \
+            2>/dev/null || true)
+          if [ -n "$matches" ]; then
+            echo "::error::Hardcoded owner/repo literals found. Use resolveRepoSlug() or env vars instead."
+            echo "$matches"
+            exit 1
+          fi
+          echo "OK: no hardcoded owner/repo literals in primary source trees."
+
   spec-xref:
     runs-on: ubuntu-latest
     steps:

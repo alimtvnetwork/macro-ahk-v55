@@ -1,5 +1,12 @@
 # Macro Controller - Changelog
 
+## v5.12.0 (2026-07-27)
+
+CI/CD release. No macro-controller source changes.
+
+### Notes
+- Root release-pipeline hardening: `.github/workflows/release.yml`, `scripts/installer-contract.json`, and `scripts/check-installer-contract.mjs` are now repo-URL agnostic (see repo-root `changelog.md` v5.12.0 entry). Version bumped in lockstep so `standalone-scripts/shared-version.ts` and install snippets stay aligned.
+
 ## v5.11.0 (2026-07-27)
 
 Test + docs release. No macro-controller source changes.

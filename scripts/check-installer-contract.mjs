@@ -30,11 +30,27 @@ import { join, resolve, relative, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { generateInstallerConstants } from "./generate-installer-constants.mjs";
+import { resolveRepoSlug } from "./resolve-repo-slug.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const CONTRACT_PATH = join(__dirname, "installer-contract.json");
 const CONTRACT = JSON.parse(readFileSync(CONTRACT_PATH, "utf8"));
+
+/**
+ * With `repo.autoResolve=true`, the expected owner/repo is resolved from
+ * GITHUB_REPOSITORY / git remote / contract fallback, so a repo rename
+ * does not break the release pipeline. See
+ * .lovable/memory/features/release-pipeline-repo-url-agnostic.md.
+ */
+if (CONTRACT.repo && CONTRACT.repo.autoResolve === true) {
+    const { slug, source } = resolveRepoSlug({ fallback: CONTRACT.repo.fallback });
+    CONTRACT.repo.default = slug;
+    if (process.env.DEBUG_INSTALLER_CONTRACT) {
+        process.stderr.write(`[check-installer-contract] repo.autoResolve → ${slug} (source=${source})\n`);
+    }
+}
+
 const SH_PATH = join(__dirname, "install.sh");
 const PS1_PATH = join(__dirname, "install.ps1");
 const SH_CONST = join(__dirname, "installer-constants.sh");
@@ -257,11 +273,31 @@ if (paramBlock) {
 }
 
 // ── 5. default repo consistency ─────────────────────────────────────
+const autoResolveRepo = CONTRACT.repo && CONTRACT.repo.autoResolve === true;
 const expectedRepo = CONTRACT.repo.default;
+/**
+ * In autoResolve mode, the installer-constants and install.{sh,ps1}
+ * fallbacks are allowed to disagree with the resolved slug: the release
+ * pipeline regenerates them (or the env-var indirection wins at runtime).
+ * Mismatches are recorded as informational notices, not hard failures,
+ * so a repo rename cannot brick the release job. See
+ * .lovable/memory/features/release-pipeline-repo-url-agnostic.md.
+ */
+function pushRepoFinding(finding) {
+    if (autoResolveRepo) {
+        process.stderr.write(
+            `[check-installer-contract] notice (autoResolve): ${finding.message}` +
+                (finding.location ? ` @ ${finding.location}` : "") +
+                ` — expected='${finding.expected}' actual='${finding.actual}'\n`,
+        );
+        return;
+    }
+    findings.push(finding);
+}
 const shRepoRe = /REPO="\$\{MARCO_DEFAULT_REPO:-([^}]+)\}"/;
 const shMatch = sh.match(shRepoRe);
 if (!shMatch) {
-    findings.push({
+    pushRepoFinding({
         section: "Default repo consistency",
         message:
             "install.sh no longer reads REPO via ${MARCO_DEFAULT_REPO:-…}",
@@ -271,7 +307,7 @@ if (!shMatch) {
         hint: "Restore the env-var indirection so the contract can override REPO.",
     });
 } else if (shMatch[1] !== expectedRepo) {
-    findings.push({
+    pushRepoFinding({
         section: "Default repo consistency",
         message: "install.sh fallback repo disagrees with contract",
         location: `${rel(SH_PATH)}:${lineOf(sh, shMatch[0])}`,
@@ -282,7 +318,7 @@ if (!shMatch) {
 }
 
 if (!ps1.includes("$script:MarcoDefaultRepo")) {
-    findings.push({
+    pushRepoFinding({
         section: "Default repo consistency",
         message: "install.ps1 no longer references $script:MarcoDefaultRepo",
         location: rel(PS1_PATH),
@@ -295,7 +331,7 @@ const ps1FallbackRe = /\$script:MarcoDefaultRepo\s*=\s*'([^']+)'/g;
 let pmRepo;
 while ((pmRepo = ps1FallbackRe.exec(ps1)) !== null) {
     if (pmRepo[1] !== expectedRepo) {
-        findings.push({
+        pushRepoFinding({
             section: "Default repo consistency",
             message: "install.ps1 fallback repo disagrees with contract",
             location: `${rel(PS1_PATH)}:${lineOf(ps1, pmRepo[0])}`,
