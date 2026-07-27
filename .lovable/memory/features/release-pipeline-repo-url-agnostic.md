@@ -40,6 +40,8 @@ the local git remote (elsewhere), not from a checked-in literal.
    `alimtvnetwork/macro-ahk-v*` or `aukgit/macro-ahk-v*` occurrence in
    `scripts/installer-*.{json,sh,ps1}` and `scripts/install*.{sh,ps1}` to
    the resolved slug. Idempotent: no-op when already in sync.
+   It is also called first in `.github/workflows/installer-tests.yml` for
+   the same reason.
 4. `.github/workflows/spec-gates.yml` -> `verify-no-hardcoded-repo` fails CI
    if any tracked file (outside historical RCA docs, spec examples, and the
    changelog) reintroduces such a literal.
@@ -48,6 +50,31 @@ the local git remote (elsewhere), not from a checked-in literal.
 6. On any release-job failure, an `on-failure` step appends the failing job
    URLs to the release body, so future empty releases are self-explaining
    from the page itself.
+
+## Known failure modes
+
+### `version.json` vs pushed-tag drift (v5.12.1)
+
+`v5.12.1` shipped an empty release page (tag + auto source archives, no
+built ZIPs, placeholder body). Root cause: `.gitmap` created the tag as
+`v5.12.1` but root `version.json` still said `5.12.0`. The `setup` job in
+`release.yml` compared `PUBLISH_TAG=v5.12.0` to `TARGET_TAG=v5.12.1` and
+fataled, which skipped every `build-*` and `release` job. Only the early
+`create-release-page` job (no `needs:`) ran, so the tag page existed with a
+placeholder body and zero assets.
+
+Fix contract:
+
+- `setup` -> "Read version from version.json" now **self-heals** the
+  mismatch by default: it rewrites `version.json` in-workflow to match the
+  pushed tag and emits a `::warning::` telling the maintainer to commit a
+  matching bump. Strict mode is preserved behind `vars.STRICT_VERSION_MATCH=1`
+  for local or opt-in strict runs.
+- Do not restore the hard fatal without wiring a pre-push guard that keeps
+  `version.json` and the intended tag aligned. The single-source-of-truth
+  rule (`mem://spec/commands/05-version-json-single-source-of-truth`) is
+  still enforced by the follow-up human PR; the self-heal only prevents an
+  otherwise-avoidable empty release page.
 
 ## Safe rename checklist (for developers)
 
