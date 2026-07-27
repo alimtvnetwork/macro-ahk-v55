@@ -1,5 +1,12 @@
 # Macro Controller - Changelog
 
+## v5.11.0 (2026-07-27)
+
+Test + docs release. No macro-controller source changes.
+
+### Notes
+- Root E2E fix: `tests/e2e/prompt-export-import-roundtrip.spec.ts` seeds now use `isDefault: false` so the v5.9.0 user-scope export filter keeps them and the Playwright download event fires (was timing out at 60s in the `chrome-extension` project). Version bumped in lockstep so `standalone-scripts/shared-version.ts` and install snippets stay aligned.
+
 ## v5.10.0 (2026-07-23)
 
 Docs-only release. No macro-controller source changes.
