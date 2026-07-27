@@ -118,14 +118,17 @@ test.describe('prompt export -> import round trip', () => {
         const page = await newHarnessPage();
 
         // ---- Stage 1: seed JsonCopy with two role-scoped entries ----
+        // IMPORTANT: seeds must use `isDefault: false`. Export is scoped to
+        // user-added entries (v5.9.0 `filterUserAddedEntries`), so default
+        // rows would be filtered out and the download would never fire.
         await page.evaluate(async ({ slugA, slugB }) => {
             interface Api {
                 writeJsonCopy: (entries: unknown[]) => Promise<void>;
             }
             const api = (window as unknown as { __roundtrip: Api }).__roundtrip;
             await api.writeJsonCopy([
-                { name: 'Plan default', text: 'plan body v2', category: 'plan', slug: slugA, role: 'plan', isFavorite: false, isDefault: true },
-                { name: 'Next default', text: 'next body v2', category: 'next', slug: slugB, role: 'next', isFavorite: false, isDefault: true },
+                { name: 'Plan default', text: 'plan body v2', category: 'plan', slug: slugA, role: 'plan', isFavorite: false, isDefault: false },
+                { name: 'Next default', text: 'next body v2', category: 'next', slug: slugB, role: 'next', isFavorite: false, isDefault: false },
             ]);
         }, { slugA: SLUG_A, slugB: SLUG_B });
 
