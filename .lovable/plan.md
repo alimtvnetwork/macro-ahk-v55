@@ -1,45 +1,51 @@
-## Problem
+## Root cause
 
-CI job `check-readme-hero-layout.mjs` fails: the "Backed by ... xProduct" line I added yesterday sits in a **second** `<div align="center">` at line 16, outside the hero block. Spec `11-root-readme-conventions.md` §Hard Rules allows centered `<div>` wrappers only inside the hero block or the `## Author` section. All other CI gates (`check-readme-compliance`, badges, one-H1, hero-close) pass.
-
-Same release also needs a minor version bump so the readme change ships cleanly and 14 pinned `v5.9.0` references in `readme.md` stay consistent with `version.json`.
+`tests/e2e/prompt-export-import-roundtrip.spec.ts` seeds two entries with `isDefault: true`. After the v5.9.0 user-scope export refactor (`filterUserAddedEntries`), the exporter drops all default-flagged rows and never dispatches a download blob, so `page.waitForEvent('download')` hits the 60s timeout and the harness page closes.
 
 ## Plan
 
-### 1. Fix hero layout (unblock CI)
+### 1. Fix the failing E2E (test-only change)
 
-In `readme.md`:
-- Delete the standalone `<div align="center"> ... Built and maintained by ... </div>` block currently at lines ~15-19.
-- Move that single "Backed by" sentence **inside** the existing hero `<div align="center">`, placed on its own paragraph directly below the badges and immediately above the hero screenshot `<img ... marco-extension-hero.png ...>`. This keeps the "Backed by" credit visible in the hero, satisfies rule 7 (one hero div, closed before first `##`), and re-runs of `check-readme-hero-layout.mjs` return 7/7.
+In `tests/e2e/prompt-export-import-roundtrip.spec.ts`:
+- Flip both seeded entries in Stage 1 to `isDefault: false` so the user-scope filter keeps them.
+- Keep the rest of the harness (mock `sendMessage`, synthesised revisions, badge assertions) intact.
+- Add a short comment above the seed block noting the user-scope invariant so future edits do not regress this.
 
-### 2. Version bump 5.9.0 to 5.10.0
+No production code changes needed. If a full green run reveals the same filter assumption in `tests/e2e/prompt-history-import-roundtrip.spec.ts`, apply the same one-line seed fix there.
 
-- `version.json`: bump `version` and `date`/`releaseDate` to today (2026-07-23).
-- `readme.md`: replace all 14 occurrences of `v5.9.0` with `v5.10.0` (install snippets, pinned-version callout, "Macro Controller: v5.9.0" line, download filename `marco-extension-v5.9.0.zip`).
-- Root `changelog.md`: add `## v5.10.0 - 2026-07-23` entry noting (a) hero-layout fix, moved "Backed by" credit inside hero div per spec 11 Hard Rule 7; (b) no functional changes.
-- `standalone-scripts/macro-controller/changelog.md`: matching `## v5.10.0` stub entry (docs-only release, no controller code changes).
+### 2. Verify CI gates locally (parallel)
 
-### 3. Verify all CI gates locally
-
-Run in parallel and confirm exit 0:
-- `node scripts/check-readme-hero-layout.mjs`
-- `node scripts/check-readme-compliance.mjs`
-- `node scripts/check-readme-txt.mjs`
-- `node scripts/check-spec-readme-structure.mjs`
-- `node scripts/check-no-pnpm-dlx-less-readme.md` (if executable, else skip)
+- `npx playwright test tests/e2e/prompt-export-import-roundtrip.spec.ts` (green)
+- `npx tsc --noEmit -p tsconfig.macro.build.json`
+- `npx eslint standalone-scripts --max-warnings=0`
 - `node scripts/check-madge-cycles.mjs --strict`
 - `node scripts/audit-p0-rules.mjs --strict`
-- `npx eslint standalone-scripts --max-warnings=0`
-- `npx tsc --noEmit -p tsconfig.macro.build.json`
+- `node scripts/check-readme-hero-layout.mjs`
+- `node scripts/check-readme-compliance.mjs`
 
-If any additional check reports a regression tied to the version bump (e.g. installer-tests referencing v5.9.0 assets), patch inline and re-run.
+### 3. Minor release v5.10.0 to v5.11.0
 
-### 4. Log follow-ups
+Follow `.lovable/prompts/08-bump-version.md` (full ceremony, per the last release turn's precedent):
 
-Append/create entries under `.lovable/issues/open/` only for genuinely new pending items surfaced during verification (e.g. if any pinned-version reference lives outside readme.md and needs a broader sweep). No speculative issues.
+- `version.json`: `version` to `5.11.0`, `releaseDate` and `date` to today UTC.
+- Root `changelog.md`: prepend `## v5.11.0 - <today>` entry with:
+  - Fixed: prompt export -> import round-trip E2E timeout caused by user-scope export filter dropping default-flagged seed entries.
+- `standalone-scripts/macro-controller/changelog.md`: matching `## v5.11.0` stub (test-only release, no controller code changes).
+- Root `readme.md`: replace all `v5.10.0` occurrences with `v5.11.0` (badges, install snippets, pinned-version callout, download filename).
+
+### 4. Follow-ups logged under `.lovable/issues/open/`
+
+- `20-e2e-user-scope-export-seed-invariant.md`: document the "seeds must use `isDefault: false` for export tests" rule so new E2Es do not regress.
+- Carry forward existing open items (16 release doc conflict, 17 modal round-trip flake, 18 two parallel import UIs, 19 workspace move v2 live verify) unchanged.
+
+### 5. Report back
+
+- Previous and new version, bump tier (MINOR).
+- Files updated: `tests/e2e/prompt-export-import-roundtrip.spec.ts`, `version.json`, root `changelog.md`, macro-controller `changelog.md`, root `readme.md`, one new issue file.
+- Confirmation that all listed CI gates exit 0.
 
 ## Technical notes
 
-- `check-readme-hero-layout.mjs` flags disallowed centered wrappers by line number; only line 16 is offending, so a single-block edit resolves it.
-- The `## Author` section already has its own permitted centered `<div>`; do not touch it.
-- Version sweep scope for readme.md is limited to literal `v5.9.0` tokens (14 hits confirmed via grep). No code files reference the release string.
+- Root cause verified against `standalone-scripts/macro-controller/src/ui/prompt-io.ts` (filterUserAddedEntries) added in v5.9.0.
+- No production code touched, so the release is docs + test only and safe as a minor bump.
+- Release doc conflict (`how-to-release.md` says version.json-only, `08-bump-version.md` says multi-file) remains unresolved; sticking with the multi-file ceremony per the user's explicit "add changelog and pin that version" instruction. Logged separately as issue 16.
