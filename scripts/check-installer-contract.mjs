@@ -30,11 +30,27 @@ import { join, resolve, relative, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { generateInstallerConstants } from "./generate-installer-constants.mjs";
+import { resolveRepoSlug } from "./resolve-repo-slug.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const CONTRACT_PATH = join(__dirname, "installer-contract.json");
 const CONTRACT = JSON.parse(readFileSync(CONTRACT_PATH, "utf8"));
+
+/**
+ * With `repo.autoResolve=true`, the expected owner/repo is resolved from
+ * GITHUB_REPOSITORY / git remote / contract fallback, so a repo rename
+ * does not break the release pipeline. See
+ * .lovable/memory/features/release-pipeline-repo-url-agnostic.md.
+ */
+if (CONTRACT.repo && CONTRACT.repo.autoResolve === true) {
+    const { slug, source } = resolveRepoSlug({ fallback: CONTRACT.repo.fallback });
+    CONTRACT.repo.default = slug;
+    if (process.env.DEBUG_INSTALLER_CONTRACT) {
+        process.stderr.write(`[check-installer-contract] repo.autoResolve → ${slug} (source=${source})\n`);
+    }
+}
+
 const SH_PATH = join(__dirname, "install.sh");
 const PS1_PATH = join(__dirname, "install.ps1");
 const SH_CONST = join(__dirname, "installer-constants.sh");
