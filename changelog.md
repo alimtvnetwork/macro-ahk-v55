@@ -1,5 +1,22 @@
 # Changelog
 
+## [v5.12.0] 2026-07-27 Release pipeline repo-URL-agnostic hardening
+
+### Fixed
+- Release page for `v5.11.0` shipped with no built assets and a bare "Release v5.11.0" body. Root cause: `scripts/installer-contract.json` hardcoded `repo.default` to `alimtvnetwork/macro-ahk-v55` while the active repo is `alimtvnetwork/macro-ahk-v53`. `scripts/check-installer-contract.mjs` failed the `setup` job on rename, so every downstream `build-*` + `release` job in `.github/workflows/release.yml` was skipped; only the early `create-release-page` placeholder body survived.
+
+### Changed
+- `scripts/installer-contract.json`: added `repo.autoResolve: true`; `repo.default` is now the sentinel `__GITHUB_REPOSITORY__` and treated as a fallback only.
+- `scripts/check-installer-contract.mjs`: when `repo.autoResolve` is set, resolves the expected owner/repo from `GITHUB_REPOSITORY` env (or `git remote get-url origin`) instead of comparing against a static literal. Backwards-compatible: legacy contracts without the flag keep the literal check.
+- `scripts/resolve-repo-slug.mjs`: new helper exporting `resolveRepoSlug()` used by the contract check and by release CI.
+- `.github/workflows/release.yml`: new `Resolve repo slug` step in `setup` writes `REPO_SLUG=${GITHUB_REPOSITORY}` into `$GITHUB_ENV` and `MARCO_DEFAULT_REPO` for downstream installer generation; added `on: release: types: [created]` so `.gitmap`-driven tag creation also triggers a build; added an `on-failure` job that appends the failing job URLs to the release body so future empty releases are self-explaining.
+- `.github/workflows/spec-gates.yml`: new `verify-no-hardcoded-repo` gate that fails CI if any tracked source file (outside historical RCA docs) reintroduces `alimtvnetwork/macro-ahk-v*` or `aukgit/macro-ahk-v*` literals.
+- `.lovable/memory/features/release-pipeline-repo-url-agnostic.md`: new developer-facing memory file explaining the failure chain, the `GITHUB_REPOSITORY` resolver contract, and the "how to rename this repo safely" checklist.
+- `.lovable/what-to-read.md`: linked the new memory file under "Before touching CI/CD or releases".
+- `readme.md`: added a "Release pipeline" note under Contributing summarizing the repo-URL-agnostic contract; repinned all install snippets, download filename, badges, and pinned-version callouts to `v5.12.0`.
+- `version.json`: bumped to `5.12.0` (single source of truth via `standalone-scripts/shared-version.ts`).
+- `scripts/__tests__/installer-contract-repo-autoresolve.test.mjs`: new test asserting the resolver honours `GITHUB_REPOSITORY` and falls back to the git remote parse.
+
 ## [v5.11.0] 2026-07-27 E2E round-trip fix and release pin
 
 ### Fixed
