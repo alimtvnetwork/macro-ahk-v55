@@ -11,7 +11,7 @@ section.
 
 ## Changelog
 
-- 2026-07-21T12:00:00Z: Captured version mismatch prevention: `version.json` is the only human-edited release version, manifest output is generated and guarded from it.
+- 2026-07-27T05:45:00Z: SUPERSEDED — Git tag is now the single source of truth for the release version. `version.json` is a build-time artifact regenerated from the tag by `scripts/write-version-from-tag.mjs`. See `.lovable/spec/commands/05-tag-is-single-source-of-truth-for-version.md` and `.lovable/cicd/issues/03-release-page-empty-v5-12-1-version-json-drift.md`.
 - 2026-07-21T09:15:00Z: Captured chip-gear `Re-seed defaults (safe)` + `Force reset defaults` auto-open-editor flow (`mem://features/macro-controller/reseed-defaults-open-editor`).
 - 2026-07-19T11:11:25Z: Write-memory checkpoint after Plan 25 Steps 39-48 + subtask-naming policy shift (sequence-first, no `ss-`/`SS-` prefix). Verified read-list still matches §0 pre-flight and root readme.md.
 - 2026-07-20T00:00:00Z: Added repeat-regression reminder for denied identifiers and function-size limits.
@@ -72,8 +72,9 @@ section.
 
 ## Before running a release (trigger phrases: `release`, `bump version`)
 
-- `.lovable/how-to-release.md` — MUST-follow version.json-only release checklist (defaults, ordered steps, never-do list, reporting). Every release must follow this file end to end.
-- `.lovable/memory/workflow/release-ceremony.md` — canonical flow: edit `version.json` only, optionally create the matching `v*` tag.
+- `.lovable/how-to-release.md` — MUST-follow tag-only release checklist (defaults, ordered steps, never-do list, reporting). Every release must follow this file end to end.
+- `.lovable/memory/workflow/release-ceremony.md` — canonical flow: create the matching `v*` tag; the tag itself is the version.
+- `.lovable/spec/commands/05-tag-is-single-source-of-truth-for-version.md` — non-negotiable rule that the tag IS the release version.
 - `.lovable/prompts/14-release.md` — release trigger prompt.
 - `.lovable/memory/workflow/19-release-runbook-and-failure-modes.md` — failure mode memory: do not re-add release checkers.
 
