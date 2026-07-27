@@ -1058,6 +1058,39 @@ The project enforces strict engineering standards (26 rules documented in `spec/
 
 ---
 
+## Repo rename & release pipeline (developer note)
+
+A repository rename or fork must **never** brick the release pipeline. That
+almost happened at `v5.11.0`: the release page existed but had a placeholder
+body and no built ZIPs because one hardcoded string (`repo.default` in
+`scripts/installer-contract.json`) still pointed at the old repo name. The
+installer-contract drift check in `installer-tests.yml` fataled, `setup`
+failed, and every downstream `build-*` and `release` job was skipped, so only
+the early `create-release-page` job's placeholder body survived.
+
+The pipeline is now **repo-URL agnostic**:
+
+1. `scripts/resolve-repo-slug.mjs` resolves `owner/repo` in this order:
+   `GITHUB_REPOSITORY` env → `MARCO_DEFAULT_REPO` env →
+   `git remote get-url origin` → `installer-contract.json → repo.fallback`.
+2. `scripts/sync-repo-slug.mjs` runs first in `installer-tests.yml` and
+   rewrites any stale `owner/repo` literals in the installer scripts to the
+   resolved slug. Idempotent.
+3. `scripts/installer-contract.json → repo.autoResolve: true` makes the
+   contract check accept whatever the resolver returned in memory.
+4. `.github/workflows/spec-gates.yml → verify-no-hardcoded-repo` fails CI if
+   a new `alimtvnetwork/macro-ahk-v??` or `aukgit/macro-ahk-v??` literal
+   sneaks into tracked sources (RCA docs, spec examples, and the changelog
+   are excluded).
+5. Release runs on `release: created` in addition to tag pushes, so an
+   out-of-band release page still triggers a build.
+
+**If you rename or fork the repo:** update `git remote`, push a `vX.Y.Z`
+tag, and the pipeline heals itself. Full contract, checklist, and "what NOT
+to do" list live in `.lovable/memory/features/release-pipeline-repo-url-agnostic.md`.
+
+---
+
 ## Troubleshooting
 
 ### `vite:load-fallback` ENOENT — module cannot be loaded
