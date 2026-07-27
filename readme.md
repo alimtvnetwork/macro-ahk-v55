@@ -1085,6 +1085,15 @@ The pipeline is now **repo-URL agnostic**:
 5. Release runs on `release: created` in addition to tag pushes, so an
    out-of-band release page still triggers a build.
 
+**Version drift self-heal (added v5.12.1).** If root `version.json` and the
+pushed `vX.Y.Z` tag disagree, `release.yml → setup` used to fatal, which
+skipped every build job and left only an empty placeholder release page.
+That's exactly what happened on `v5.12.1`. The `setup` job now rewrites
+`version.json` in-workflow to match the pushed tag, emits a `::warning::`,
+and continues so assets still ship. Follow up with a small PR that commits
+the matching `version.json` bump. Full strict mode is still available
+behind repo variable `STRICT_VERSION_MATCH=1`.
+
 **If you rename or fork the repo:** update `git remote`, push a `vX.Y.Z`
 tag, and the pipeline heals itself. Full contract, checklist, and "what NOT
 to do" list live in `.lovable/memory/features/release-pipeline-repo-url-agnostic.md`.
