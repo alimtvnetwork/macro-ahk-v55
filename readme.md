@@ -300,7 +300,7 @@ In **discovery mode**, if the GitHub API responds `200 OK` with zero releases (o
 
 #### Sibling-repo discovery (advanced)
 
-When the project ships successive major rewrites in sibling repos (e.g. `macro-ahk-v55` → `macro-ahk-v55` → `macro-ahk-v55`), discovery mode can optionally probe ahead and pick the newest. Defaults live in [`scripts/install.config.sh`](scripts/install.config.sh) and are **off by default**:
+When the project ships successive major rewrites in sibling repos (e.g. `macro-ahk-v53` → `macro-ahk-v54` → `macro-ahk-v55`), discovery mode can optionally probe ahead and pick the newest. Defaults live in [`scripts/install.config.sh`](scripts/install.config.sh) and are **off by default**:
 
 ```bash
 SIBLING_DISCOVERY_ENABLED=0          # opt-in
