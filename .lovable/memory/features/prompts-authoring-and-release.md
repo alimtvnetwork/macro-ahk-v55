@@ -34,7 +34,7 @@ Dynamic prompts (chips with `{{n}}`) MUST set `IsDynamic: true`, `ReplaceKey: "n
 ## 4. Release
 
 - Release surface = one edit to `version.json`. Optional matching `v*` git tag.
-- Never re-add CI stale-version / release-readiness / asset-manifest checkers. See `mem://workflow/19-release-runbook-and-failure-modes`, `mem://constraints/version-json-single-source-of-truth`.
+- Never re-add CI stale-version / release-readiness / asset-manifest checkers. See `mem://workflow/19-release-runbook-and-failure-modes`, `mem://spec/commands/05-tag-is-single-source-of-truth-for-version`.
 - `readme.txt` is off-limits (no timestamps, no autowrites). See `mem://constraints/readme-txt-prohibitions`.
 
 ## 5. `{{n}}` substitution pipeline (Plan + Next chips + dropdown)

@@ -1085,14 +1085,15 @@ The pipeline is now **repo-URL agnostic**:
 5. Release runs on `release: created` in addition to tag pushes, so an
    out-of-band release page still triggers a build.
 
-**Version drift self-heal (added v5.12.1).** If root `version.json` and the
-pushed `vX.Y.Z` tag disagree, `release.yml → setup` used to fatal, which
-skipped every build job and left only an empty placeholder release page.
-That's exactly what happened on `v5.12.1`. The `setup` job now rewrites
-`version.json` in-workflow to match the pushed tag, emits a `::warning::`,
-and continues so assets still ship. Follow up with a small PR that commits
-the matching `version.json` bump. Full strict mode is still available
-behind repo variable `STRICT_VERSION_MATCH=1`.
+**Tag is the version (added v5.12.1).** The GIT TAG `vX.Y.Z` is the single
+source of truth for the release version. `version.json` is a build-time
+artifact regenerated from the tag by `scripts/write-version-from-tag.mjs`
+(committed value is a placeholder). Releasing = `git tag vX.Y.Z && git push
+origin vX.Y.Z`; no file edit required. Prior to this rule, `v5.12.1` shipped
+an empty page because `version.json` still said `5.12.0` and `release.yml →
+setup` fataled on the mismatch. See spec
+`.lovable/spec/commands/05-tag-is-single-source-of-truth-for-version.md`
+and RCA `.lovable/cicd/issues/03-release-page-empty-v5-12-1-version-json-drift.md`.
 
 **If you rename or fork the repo:** update `git remote`, push a `vX.Y.Z`
 tag, and the pipeline heals itself. Full contract, checklist, and "what NOT

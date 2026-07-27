@@ -8,9 +8,11 @@ type: preference
 
 ## Rule
 
-Release is limited to one repo edit: `version.json` (`version` and `releaseDate`).
-
-If publishing is explicitly requested, the only second action is creating the matching `v<version>` Git tag. The tag triggers `.github/workflows/release.yml`.
+Release is a single action: create the matching `v<version>` Git tag on the
+release branch and (when publishing) push it. The tag triggers
+`.github/workflows/release.yml`, which reads the version from the tag itself
+and regenerates `version.json` in-workflow via
+`scripts/write-version-from-tag.mjs`. No repo file edit is required.
 
 `release.yml` must also keep `release` event coverage because GitHub web UI, REST API, and external release tooling can create a Release page and tag server-side without a normal tag-push event.
 
@@ -23,6 +25,7 @@ If publishing is explicitly requested, the only second action is creating the ma
 - Changelog entry checkers.
 - Release asset manifest generation, diffing, or verification.
 - Manifest/version sync lifecycle hooks before build or test.
+- `version.json` vs tag comparison gates. The tag is the only version.
 
 ## Manifest version mismatch rule
 

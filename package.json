@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/write-version-from-tag.mjs",
+    "version:from-tag": "node scripts/write-version-from-tag.mjs",
     "db:diagrams": "node scripts/render-db-diagrams.mjs",
     "db:diagrams:check": "node scripts/render-db-diagrams.mjs --check",
     "diagrams:render": "node scripts/render-db-diagrams.mjs",

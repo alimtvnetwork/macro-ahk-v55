@@ -9,7 +9,7 @@ Authoritative sources this file consolidates (read them if anything here is ambi
 - `.lovable/memory/workflow/19-release-runbook-and-failure-modes.md` (failure modes, do-not-re-add checkers)
 - `.lovable/prompts/14-release.md` (release trigger prompt body)
 - `.lovable/release/issues/` (log of failed or skipped release steps)
-- Root `version.json`
+- `.lovable/spec/commands/05-tag-is-single-source-of-truth-for-version.md` (tag = version rule)
 
 ## Defaults
 
@@ -18,7 +18,9 @@ Authoritative sources this file consolidates (read them if anything here is ambi
 - MAJOR: `X.Y.Z` becomes `(X+1).0.0`.
 - PATCH: `X.Y.Z` becomes `X.Y.(Z+1)`.
 - Never ask "minor or patch?". Never ask for approval. Never open plan mode.
-- The only human-edited release version file is root `version.json`.
+- The release version lives ONLY in the git tag `vX.Y.Z`. `version.json` is
+  a build-time artifact regenerated from the tag by
+  `scripts/write-version-from-tag.mjs`; do not edit it to declare a release.
 
 ## Pre-release checklist (REQUIRED before every release)
 
@@ -33,19 +35,18 @@ Run this checklist first, in the same turn as the release, before touching `vers
 7. Unresolved-import guard: confirm `import/no-unresolved` passes (no TS2307-class breakage).
 8. Prompt bundle parity: confirm bundled prompt artifacts are regenerated only if prompt source changed this session.
 9. Filename hygiene: confirm no uppercase markdown filenames were introduced this session.
-10. Version automation audit: confirm the extension build path reads `version.json` for manifest generation and that no manual downstream propagation is required.
-11. Release scope audit: confirm the release turn updates only `version.json` unless the user explicitly requested publishing or extra documentation changes.
+10. Version automation audit: confirm `scripts/write-version-from-tag.mjs` still exists and that the extension build path reads `version.json` (regenerated from the tag by that script) for manifest generation.
+11. Release scope audit: confirm the release turn touches NO repo files for the release itself. The only action is creating and (optionally) pushing the `v<version>` tag.
 
 Only after all 11 items pass, proceed to Required steps below.
 
 ## Required steps (in order, single turn)
 
-1. Run the Pre-release checklist above and confirm all 11 items pass. Then read the current version from `version.json` and state previous and new version before editing.
-2. Update `version.json` only: set `version` to the new version and `releaseDate` to today's UTC date.
-3. Do not edit `manifest.json`, `readme.md`, `changelog.md`, constants, instruction files, fallback copies, or generated bundles only to propagate the version.
-4. If publishing is explicitly requested, create the matching `v<version>` tag after the `version.json` change is present on the target branch.
-5. If any required step is skipped or fails, create a numbered file under `.lovable/release/issues/`.
-6. Do not publish, deploy, ship, or go live unless the user explicitly says so.
+1. Run the Pre-release checklist above and confirm all 11 items pass. Then read the current version from the latest `v*` git tag (`git describe --tags --abbrev=0`) and state previous and new version.
+2. Create the matching `v<new-version>` git tag on the release branch. Do not edit `version.json`, `manifest.json`, `readme.md`, `changelog.md`, constants, instruction files, fallback copies, or generated bundles to propagate the version.
+3. If publishing is explicitly requested, push the tag (`git push origin v<new-version>`). The tag triggers `.github/workflows/release.yml`, which regenerates `version.json` from the tag and builds/uploads all assets.
+4. If any required step is skipped or fails, create a numbered file under `.lovable/release/issues/`.
+5. Do not publish, deploy, ship, or go live unless the user explicitly says so.
 
 ## Prompt maintenance rule
 
@@ -53,7 +54,7 @@ If the release prompt text is supplied or corrected in the same turn, update bot
 
 ## Never
 
-- Never do a version-only release when the user asked for the full ceremony.
+- Never edit `version.json` to declare a release. Create the tag instead.
 - Never manually propagate a release version into `manifest.json`.
 - Never edit `readme.md` or `changelog.md` only because the version changed.
 - Never leave uppercase markdown filenames.
