@@ -37,29 +37,37 @@ Resolved - 2026-07-27
 
 ## Fix
 
-- `release.yml -> setup` now runs `node scripts/sync-repo-slug.mjs` right
-  after checkout of the resolved ref, before any script that reads the
-  installer contract.
-- "Read version from version.json" self-heals a `PUBLISH_TAG != TARGET_TAG`
-  mismatch by default: it rewrites `version.json` in-workflow to match the
-  pushed tag, emits a `::warning::`, and continues. Strict fatal is behind
-  `vars.STRICT_VERSION_MATCH=1`.
-- Root `version.json` bumped to `5.12.1` to match the pushed tag on main.
-- Memory `.lovable/memory/features/release-pipeline-repo-url-agnostic.md`
-  updated with a "Known failure modes" section for this drift.
+- **New rule (non-negotiable):** the GIT TAG is the single source of truth
+  for the release version. `version.json` is a build-time artifact, no
+  longer a hand-edited pin. Spec:
+  `.lovable/spec/commands/05-tag-is-single-source-of-truth-for-version.md`.
+- Added `scripts/write-version-from-tag.mjs` which resolves the version
+  from `$VERSION`, then `GITHUB_REF_NAME`, then `git describe`, then
+  falls back to `0.0.0-dev`, and rewrites root `version.json` so every
+  existing reader sees the same value with no code changes.
+- `release.yml → setup` now derives `VERSION` from the resolved tag, deletes
+  the `version.json` vs tag comparison entirely, and runs
+  `write-version-from-tag.mjs`. `sync-repo-slug.mjs` also runs first
+  (delivering on the v5.12.0 memory promise).
+- Every build job regenerates `version.json` from
+  `needs.setup.outputs.publish_tag` right after checkout.
+- Root `version.json` reset to the placeholder `0.0.0-dev` — future
+  releases never require a version.json edit.
 
 ## Recovery for v5.12.1
 
 Re-run `release.yml` via `workflow_dispatch` with input `version=v5.12.1`.
-With `version.json` now aligned (and the self-heal path in place regardless),
-`setup` passes, `build-*` and `release` run, and `softprops/action-gh-release`
-overwrites the placeholder body with real notes and uploads the ZIPs,
-installers, checksums, and notes to the existing tag page.
+`setup` derives the version from that tag, regenerates `version.json`,
+`build-*` and `release` run, and `softprops/action-gh-release` overwrites
+the placeholder body with real notes and uploads the ZIPs, installers,
+checksums, and notes to the existing tag page. No `version.json` edit
+needed, ever again.
 
 ## Prevention
 
-- Self-heal removes the class of failure where a forgotten version bump
-  bricks the pipeline.
+- The class of failure ("version.json out of sync with tag") is deleted:
+  there is no version.json to be out of sync any more; the tag IS the
+  version.
 - `sync-repo-slug.mjs` is now truly wired into `release.yml`, matching the
   memory contract.
 - No new watcher / auditor workflow added (blocked by
