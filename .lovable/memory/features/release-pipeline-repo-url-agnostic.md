@@ -55,26 +55,26 @@ the local git remote (elsewhere), not from a checked-in literal.
 
 ### `version.json` vs pushed-tag drift (v5.12.1)
 
-`v5.12.1` shipped an empty release page (tag + auto source archives, no
-built ZIPs, placeholder body). Root cause: `.gitmap` created the tag as
-`v5.12.1` but root `version.json` still said `5.12.0`. The `setup` job in
-`release.yml` compared `PUBLISH_TAG=v5.12.0` to `TARGET_TAG=v5.12.1` and
-fataled, which skipped every `build-*` and `release` job. Only the early
-`create-release-page` job (no `needs:`) ran, so the tag page existed with a
-placeholder body and zero assets.
+`v5.12.1` shipped an empty release page. Root cause: `.gitmap` created the
+tag as `v5.12.1` but root `version.json` still said `5.12.0`. The `setup`
+job compared the two and fataled, which skipped every `build-*` and
+`release` job. Only the early `create-release-page` job (no `needs:`) ran,
+leaving a placeholder body and zero assets.
 
-Fix contract:
+Fix contract (this is the CURRENT rule, non-negotiable):
 
-- `setup` -> "Read version from version.json" now **self-heals** the
-  mismatch by default: it rewrites `version.json` in-workflow to match the
-  pushed tag and emits a `::warning::` telling the maintainer to commit a
-  matching bump. Strict mode is preserved behind `vars.STRICT_VERSION_MATCH=1`
-  for local or opt-in strict runs.
-- Do not restore the hard fatal without wiring a pre-push guard that keeps
-  `version.json` and the intended tag aligned. The single-source-of-truth
-  rule (`mem://spec/commands/05-version-json-single-source-of-truth`) is
-  still enforced by the follow-up human PR; the self-heal only prevents an
-  otherwise-avoidable empty release page.
+- The GIT TAG is the single source of truth for the release version.
+  `version.json` is a build-time artifact regenerated from the tag by
+  `scripts/write-version-from-tag.mjs` (see spec command
+  `05-tag-is-single-source-of-truth-for-version.md`).
+- `release.yml → setup` no longer reads `version.json` to decide the
+  release version. It derives `VERSION` from the resolved tag and calls
+  `write-version-from-tag.mjs` so downstream readers see the fresh value.
+- Every build job (`build-sdk`, `build-xpath`, `build-macro-controller`,
+  `build-prompts`, `release`) runs `write-version-from-tag.mjs` right
+  after checkout with `VERSION=${{ needs.setup.outputs.publish_tag }}`.
+- Do not restore the strict "version.json must equal tag" fatal. There is
+  no version to compare against: the tag is the only version.
 
 ## Safe rename checklist (for developers)
 
