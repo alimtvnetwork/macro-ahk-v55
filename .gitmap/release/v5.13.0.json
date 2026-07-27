@@ -1,0 +1,17 @@
+{
+  "version": "5.13.0",
+  "branch": "release/v5.13.0",
+  "sourceBranch": "main",
+  "commit": "14bc77b26f0ed10bf3fc8e0f0f8206613cc9d0e8",
+  "tag": "v5.13.0",
+  "assets": [],
+  "changelog": [
+    "Widened `SEMVER_RE` in `standalone-scripts/macro-controller/src/ui/prompt-bundle-types.ts` to accept the `0.0.0-dev` local fallback (and prerelease suffixes) produced by `scripts/write-version-from-tag.mjs`. Restores `parsePromptsText` validation for exports built during local test runs.",
+    "Updated `src/test/regression/macro-controller-recovery.test.ts` to match the same broadened pattern; the strict `X.Y.Z` assertion only holds on tag-triggered CI, not on sandbox runs where no git tag exists.",
+    "Added `node scripts/write-version-from-tag.mjs` to `pretest` and `pretest:quiet` so `version.json` is regenerated from the real tag whenever Vitest runs in CI, and cleanly falls back to `0.0.0-dev` locally."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-27T10:31:29Z",
+  "isLatest": false
+}
