@@ -4,10 +4,10 @@
   "description": "Single source of truth for install.sh and install.ps1. Both installers parse this file at startup so flags, exit codes, env-var names, default endpoints and spec-step IDs cannot drift between Bash and PowerShell. Conforms to spec/14-update/01-generic-installer-behavior.md. See scripts/check-installer-contract.mjs for drift detection.",
 
   "repo": {
-    "default": "__GITHUB_REPOSITORY__",
+    "default": "alimtvnetwork/macro-ahk-v53",
     "autoResolve": true,
     "fallback": "alimtvnetwork/macro-ahk-v53",
-    "rationale": "With autoResolve=true, scripts/check-installer-contract.mjs resolves the expected repo from GITHUB_REPOSITORY (or `git remote get-url origin`) instead of comparing against a hardcoded literal. This makes the pipeline auto-heal on repo rename / fork. The `fallback` field is used only when the resolver has no signal (bare filesystem checkout with no git remote and no env var), typically local one-off runs. See .lovable/memory/features/release-pipeline-repo-url-agnostic.md."
+    "rationale": "With autoResolve=true, scripts/check-installer-contract.mjs resolves the expected repo from GITHUB_REPOSITORY (or `git remote get-url origin`) instead of enforcing a hardcoded literal. The release workflow additionally runs `scripts/sync-repo-slug.mjs` before the check, which rewrites `default`, `fallback`, and `scripts/installer-constants.{sh,ps1}` to the resolved slug — so a repo rename auto-heals the pipeline without any manual PR. `default` is kept as a real slug (not a sentinel) so runtime installs still work when the sync step has not run yet. See .lovable/memory/features/release-pipeline-repo-url-agnostic.md."
   },
 
   "version": {
