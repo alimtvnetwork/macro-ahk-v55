@@ -276,8 +276,7 @@ jobs:
             # human edit to version.json restores durability.
             echo "::warning::version.json says ${PUBLISH_TAG} but tag is ${TARGET_TAG}. Self-healing version.json in-workflow so assets can build. Update root version.json in a follow-up PR."
             NEW_VERSION="${TARGET_TAG#v}"
-            node -e "const fs=require('fs');const p='./version.json';const j=JSON.parse(fs.readFileSync(p,'utf8'));j.version=process.env.NEW_VERSION;fs.writeFileSync(p,JSON.stringify(j,null,2)+'\n');" \
-              NEW_VERSION="${NEW_VERSION}"
+            NEW_VERSION="${NEW_VERSION}" node -e "const fs=require('fs');const p='./version.json';const j=JSON.parse(fs.readFileSync(p,'utf8'));j.version=process.env.NEW_VERSION;fs.writeFileSync(p,JSON.stringify(j,null,2)+'\n');"
             VERSION="${NEW_VERSION}"
             PUBLISH_TAG="${TARGET_TAG}"
           fi
