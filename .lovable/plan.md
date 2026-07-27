@@ -1,51 +1,56 @@
-## Root cause
+# Release page empty (v5.11.0) — root cause + repo-URL-agnostic hardening
 
-`tests/e2e/prompt-export-import-roundtrip.spec.ts` seeds two entries with `isDefault: true`. After the v5.9.0 user-scope export refactor (`filterUserAddedEntries`), the exporter drops all default-flagged rows and never dispatches a download blob, so `page.waitForEvent('download')` hits the 60s timeout and the harness page closes.
+## What is broken
 
-## Plan
+`v5.11.0` on GitHub (`alimtvnetwork/macro-ahk-v53`) shows only 2 GitHub-generated source archives, a plain "Release v5.11.0" body, and no built ZIPs / installers / checksums / rich notes. Previous releases (e.g. `v4.404.0` under `macro-ahk-v55`) had the full asset set + rich body.
 
-### 1. Fix the failing E2E (test-only change)
+## Root cause (three compounding defects)
 
-In `tests/e2e/prompt-export-import-roundtrip.spec.ts`:
-- Flip both seeded entries in Stage 1 to `isDefault: false` so the user-scope filter keeps them.
-- Keep the rest of the harness (mock `sendMessage`, synthesised revisions, badge assertions) intact.
-- Add a short comment above the seed block noting the user-scope invariant so future edits do not regress this.
+1. **Hardcoded owner/repo in installer contract and downstream artifacts.** `scripts/installer-contract.json → repo.default` is pinned to `alimtvnetwork/macro-ahk-v55`, but the current active repo is `alimtvnetwork/macro-ahk-v53`. `check-installer-contract.mjs` runs in `setup` (lint/test). On a repo rename it fails, so `setup` fails, so `build-*` + `release` jobs never run, so only the early `create-release-page` job succeeds, producing the empty page we see.
+2. **Placeholder body is what wins when the build job fails.** `create-release-page` writes a terse body; `Force rich release notes` (which uses `body_path`) lives inside the `release` job that never ran. On any setup/build failure the placeholder is the final body — exactly what the screenshot shows (actually even less: a bare "Release v5.11.0", meaning create-release-page itself may also have short-circuited on this tag).
+3. **No tag was pushed for `v5.11.0` through the actions pipeline.** `.gitmap/release/v5.11.0.json` was created (metadata-only release), but `release.yml` only fires on `push: tags: v*` / `workflow_dispatch` / `release: created`. The `.gitmap`-driven release created a tag+release page out-of-band without triggering `release.yml`. Combined with (1), even a manual re-run fails at `setup`.
 
-No production code changes needed. If a full green run reveals the same filter assumption in `tests/e2e/prompt-history-import-roundtrip.spec.ts`, apply the same one-line seed fix there.
+**Why a repo rename breaks this:** every place that hardcodes `owner/repo` (installer contract, install scripts, badges, docs) becomes wrong the moment the repo is renamed or forked. CI gates that assert these values against the live repo (`GITHUB_REPOSITORY`) start failing and cascade-kill the release job. `github.repository` in the workflow is fine; the hardcoded JSON/scripts/docs are not.
 
-### 2. Verify CI gates locally (parallel)
+## Fix
 
-- `npx playwright test tests/e2e/prompt-export-import-roundtrip.spec.ts` (green)
-- `npx tsc --noEmit -p tsconfig.macro.build.json`
-- `npx eslint standalone-scripts --max-warnings=0`
-- `node scripts/check-madge-cycles.mjs --strict`
-- `node scripts/audit-p0-rules.mjs --strict`
-- `node scripts/check-readme-hero-layout.mjs`
-- `node scripts/check-readme-compliance.mjs`
+### 1. Make the pipeline auto-heal on repo rename
 
-### 3. Minor release v5.10.0 to v5.11.0
+- **`scripts/installer-contract.json`**: change `repo.default` to a sentinel `"__GITHUB_REPOSITORY__"`. Add `repo.autoResolve: true` so `check-installer-contract.mjs` reads `process.env.GITHUB_REPOSITORY` (falling back to `git remote get-url origin` parse) instead of comparing to a hardcoded literal.
+- **`scripts/check-installer-contract.mjs`**: when `repo.autoResolve` is true, resolve the expected owner/repo dynamically and stop comparing to a static string. Installer scripts (`install.sh`, `install.ps1`, `installer-constants.{sh,ps1}`) get their default from the same resolver at build time via a new `scripts/resolve-repo-slug.mjs` helper that CI writes into `installer-constants.generated.{sh,ps1}`.
+- **New `.github/workflows/release.yml` step** (in `setup`, before lint): `Resolve repo slug` writes `REPO_SLUG=${GITHUB_REPOSITORY}` into `$GITHUB_ENV` and regenerates `installer-constants.generated.*` so no gate can fail on rename.
+- **New CI job `verify-no-hardcoded-repo`** in `spec-gates.yml`: greps for `alimtvnetwork/macro-ahk-v` and `aukgit/macro-ahk-v` in tracked files (excluding historical RCA docs) and fails if any appear. Prevents recurrence.
 
-Follow `.lovable/prompts/08-bump-version.md` (full ceremony, per the last release turn's precedent):
+### 2. Guarantee the release page always gets the rich body + assets
 
-- `version.json`: `version` to `5.11.0`, `releaseDate` and `date` to today UTC.
-- Root `changelog.md`: prepend `## v5.11.0 - <today>` entry with:
-  - Fixed: prompt export -> import round-trip E2E timeout caused by user-scope export filter dropping default-flagged seed entries.
-- `standalone-scripts/macro-controller/changelog.md`: matching `## v5.11.0` stub (test-only release, no controller code changes).
-- Root `readme.md`: replace all `v5.10.0` occurrences with `v5.11.0` (badges, install snippets, pinned-version callout, download filename).
+- **`release.yml → create-release-page`**: expand the placeholder body to include a visible "⚠️ Build in progress or failed — check Actions" banner and always include the `## Marco Extension {TAG}` header so the empty-title case in the screenshot cannot happen.
+- **`release.yml → release job`**: add `needs: [create-release-page, setup, build-extension]` with `if: always() && needs.build-extension.result == 'success'` so a partial failure is loud, and add a final `on-failure` job that edits the release body to append the failing job URLs (so future empty releases are self-explaining on the page itself).
+- **New trigger**: add `on: release: types: [created]` handling that also runs the build when the release was created out-of-band (e.g. by `.gitmap`), so metadata-only tag creation still produces assets.
 
-### 4. Follow-ups logged under `.lovable/issues/open/`
+### 3. Documentation + memory
 
-- `20-e2e-user-scope-export-seed-invariant.md`: document the "seeds must use `isDefault: false` for export tests" rule so new E2Es do not regress.
-- Carry forward existing open items (16 release doc conflict, 17 modal round-trip flake, 18 two parallel import UIs, 19 workspace move v2 live verify) unchanged.
+- **New `.lovable/memory/features/release-pipeline-repo-url-agnostic.md`** (developer-oriented): explains the failure chain, the sentinel + `GITHUB_REPOSITORY` resolver contract, the new spec-gate, and the "how to rename this repo safely" checklist.
+- **Update `.lovable/what-to-read.md`**: add a "Before touching CI/CD or releases" bullet pointing to the new memory file and to `.lovable/cicd/issues/02-release-page-missing-built-assets.md` + `12-stale-repo-owner-ci-report-links.md`.
+- **Update root `readme.md`**: new "Release pipeline" subsection under Contributing that summarizes the repo-URL-agnostic contract for developers (2–3 short paragraphs, no CI internals).
 
-### 5. Report back
+### 4. Minor version bump + changelog + readme pin
 
-- Previous and new version, bump tier (MINOR).
-- Files updated: `tests/e2e/prompt-export-import-roundtrip.spec.ts`, `version.json`, root `changelog.md`, macro-controller `changelog.md`, root `readme.md`, one new issue file.
-- Confirmation that all listed CI gates exit 0.
+- `version.json`: `5.11.0 → 5.12.0`, `releaseDate: 2026-07-27`.
+- Root `changelog.md` + `standalone-scripts/macro-controller/changelog.md`: add `## v5.12.0` entry summarizing the fix.
+- Root `readme.md`: repin all 14 install snippets, badges, and pinned-version callouts from `v5.11.0` to `v5.12.0`.
+- `.gitmap/release/latest.json` + new `.gitmap/release/v5.12.0.json`.
 
-## Technical notes
+## Technical details
 
-- Root cause verified against `standalone-scripts/macro-controller/src/ui/prompt-io.ts` (filterUserAddedEntries) added in v5.9.0.
-- No production code touched, so the release is docs + test only and safe as a minor bump.
-- Release doc conflict (`how-to-release.md` says version.json-only, `08-bump-version.md` says multi-file) remains unresolved; sticking with the multi-file ceremony per the user's explicit "add changelog and pin that version" instruction. Logged separately as issue 16.
+- `check-installer-contract.mjs` change is backwards-compatible: if `repo.autoResolve` is absent, it keeps the old literal check.
+- Repo resolver precedence: `GITHUB_REPOSITORY` env → `git config --get remote.origin.url` parse → error with actionable message.
+- The generated `installer-constants.generated.{sh,ps1}` files are gitignored; the tracked `installer-constants.{sh,ps1}` source them with a fallback constant equal to the current `GITHUB_REPOSITORY` at commit time (kept fresh by CI's `verify-no-hardcoded-repo` gate).
+- Version bump is minor (5.12.0) per the "every code change bumps at least minor" policy in `pipeline/06-versioning.md`.
+- No touching of the closed `.gitmap/release/v5.11.0.json`.
+
+## Verification
+
+- `node scripts/check-installer-contract.mjs` under `GITHUB_REPOSITORY=alimtvnetwork/macro-ahk-v53` and `=alimtvnetwork/macro-ahk-v55` both pass.
+- Local dry run of `.github/workflows/release.yml` via `act` (or manual `workflow_dispatch` with `version: v5.12.0`) produces all expected assets.
+- `bunx vitest run` for existing installer/contract tests stays green.
+- New test `scripts/__tests__/installer-contract-repo-autoresolve.test.mjs` asserts the resolver returns the env value.
