@@ -1,5 +1,17 @@
 # Changelog
 
+## [v5.13.0] 2026-07-27 Vitest green after tag-is-source-of-truth switch
+
+### Fixed
+
+- Widened `SEMVER_RE` in `standalone-scripts/macro-controller/src/ui/prompt-bundle-types.ts` to accept the `0.0.0-dev` local fallback (and prerelease suffixes) produced by `scripts/write-version-from-tag.mjs`. Restores `parsePromptsText` validation for exports built during local test runs.
+- Updated `src/test/regression/macro-controller-recovery.test.ts` to match the same broadened pattern; the strict `X.Y.Z` assertion only holds on tag-triggered CI, not on sandbox runs where no git tag exists.
+- Added `node scripts/write-version-from-tag.mjs` to `pretest` and `pretest:quiet` so `version.json` is regenerated from the real tag whenever Vitest runs in CI, and cleanly falls back to `0.0.0-dev` locally.
+
+### Root cause
+
+After the tag-is-source-of-truth switch, `version.json` ships as a `0.0.0-dev` placeholder. Two downstream consumers still hard-coded strict `X.Y.Z`: the bundle exporter validator and the recovery regression test. Both flagged the placeholder as invalid, breaking three tests deterministically (not flaky).
+
 ## [v5.12.0] 2026-07-27 Release pipeline repo-URL-agnostic hardening
 
 ### Fixed
