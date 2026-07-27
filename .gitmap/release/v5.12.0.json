@@ -1,0 +1,24 @@
+{
+  "version": "5.12.0",
+  "branch": "release/v5.12.0",
+  "sourceBranch": "main",
+  "tag": "v5.12.0",
+  "assets": [],
+  "changelog": [
+    "Release pipeline is now repo-URL agnostic. Root cause of the v5.11.0 empty release page: scripts/installer-contract.json hardcoded repo.default to the old repo slug; the drift check in installer-tests.yml fataled after the rename to alimtvnetwork/macro-ahk-v53 and blocked every downstream build/release job.",
+    "scripts/resolve-repo-slug.mjs: single resolver (env, git remote, fallback).",
+    "scripts/sync-repo-slug.mjs: auto-heals stale literals in installer scripts.",
+    "scripts/installer-contract.json: repo.autoResolve true.",
+    "scripts/check-installer-contract.mjs: honors autoResolve and downgrades residual mismatches to notices.",
+    ".github/workflows/installer-tests.yml: runs sync-repo-slug.mjs before the contract-drift check.",
+    ".github/workflows/spec-gates.yml: new verify-no-hardcoded-repo gate.",
+    ".lovable/memory/features/release-pipeline-repo-url-agnostic.md: new developer memory + safe-rename checklist, linked from .lovable/what-to-read.md.",
+    "readme.md: new 'Repo rename & release pipeline' developer note, 14 install pins repinned to v5.12.0.",
+    "version.json: bumped to 5.12.0.",
+    "No macro-controller or extension source changes."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-07-27T05:00:00Z",
+  "isLatest": true
+}
