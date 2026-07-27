@@ -238,54 +238,32 @@ jobs:
         if: steps.resolve_ref.outputs.skip != 'true'
         run: node scripts/sync-repo-slug.mjs
 
-      # ── Version comes from version.json — the ONLY source of truth.
-      #    See mem://constraints/version-json-single-source-of-truth and
-      #    Plan 29. Never derive VERSION from tag names, branch names,
-      #    manifest.json, package.json, or workflow inputs.
-      - name: Read version from version.json (single source of truth)
+      # ── The GIT TAG is the single source of truth for the release version.
+      #    version.json is a build-time artifact regenerated from the tag by
+      #    scripts/write-version-from-tag.mjs, not a hand-edited pin. See
+      #    .lovable/spec/commands/05-tag-is-single-source-of-truth-for-version.md
+      #    and the RCA for v5.12.1 in .lovable/cicd/issues/03-*.md.
+      - name: Resolve version from tag
         id: read_version
         if: steps.resolve_ref.outputs.skip != 'true'
-        env:
-          STRICT_VERSION_MATCH: ${{ vars.STRICT_VERSION_MATCH || '0' }}
         run: |
           set -euo pipefail
-          if [[ ! -f version.json ]]; then
-            echo "::error::version.json missing at the resolved ref — cannot build a release without the single source of truth"
-            exit 1
-          fi
-          VERSION=$(node -p "require('./version.json').version")
-          if [[ -z "${VERSION}" || "${VERSION}" == "undefined" ]]; then
-            echo "::error::version.json does not define a 'version' field"
-            cat version.json
-            exit 1
-          fi
-          if [[ ! "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-].+)?$ ]]; then
-            echo "::error::version.json version '${VERSION}' is not a valid MAJOR.MINOR.PATCH string"
-            exit 1
-          fi
-          PUBLISH_TAG="v${VERSION}"
           TARGET_TAG="${{ steps.resolve_ref.outputs.target_tag }}"
-          if [[ "${PUBLISH_TAG}" != "${TARGET_TAG}" ]]; then
-            if [[ "${STRICT_VERSION_MATCH}" == "1" ]]; then
-              echo "::error::version.json resolves to ${PUBLISH_TAG}, but workflow target is ${TARGET_TAG} (STRICT_VERSION_MATCH=1)"
-              exit 1
-            fi
-            # Self-heal: the pushed tag is ground truth once it exists. Align
-            # version.json in-workflow so downstream build steps see a matching
-            # version. We do NOT commit this back to the repo — a follow-up
-            # human edit to version.json restores durability.
-            echo "::warning::version.json says ${PUBLISH_TAG} but tag is ${TARGET_TAG}. Self-healing version.json in-workflow so assets can build. Update root version.json in a follow-up PR."
-            NEW_VERSION="${TARGET_TAG#v}"
-            NEW_VERSION="${NEW_VERSION}" node -e "const fs=require('fs');const p='./version.json';const j=JSON.parse(fs.readFileSync(p,'utf8'));j.version=process.env.NEW_VERSION;fs.writeFileSync(p,JSON.stringify(j,null,2)+'\n');"
-            VERSION="${NEW_VERSION}"
-            PUBLISH_TAG="${TARGET_TAG}"
+          if [[ ! "${TARGET_TAG}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-].+)?$ ]]; then
+            echo "::error::Release tag '${TARGET_TAG}' is not a valid vMAJOR.MINOR.PATCH tag"
+            exit 1
           fi
-
+          VERSION="${TARGET_TAG#v}"
+          PUBLISH_TAG="${TARGET_TAG}"
+          # Regenerate version.json from the tag so every downstream reader
+          # (vite copy-manifest, sync-manifest-version, shared-version modules,
+          # csp checker) sees the same value without needing code changes.
+          VERSION="${VERSION}" node scripts/write-version-from-tag.mjs
           {
             echo "version=${PUBLISH_TAG}"
             echo "publish_tag=${PUBLISH_TAG}"
           } >> "$GITHUB_OUTPUT"
-          echo "Resolved release version: ${PUBLISH_TAG} (from version.json)"
+          echo "Resolved release version: ${PUBLISH_TAG} (from tag; version.json regenerated)"
 
       - name: Setup Node.js
         if: steps.resolve_ref.outputs.skip != 'true'
