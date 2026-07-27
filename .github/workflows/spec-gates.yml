@@ -27,28 +27,22 @@ jobs:
       - name: Scan for hardcoded owner/repo literals
         run: |
           set -euo pipefail
-          # Allowed to contain historical literals: RCA docs, spec examples,
-          # the changelog (past release notes), memory files documenting the
-          # rule itself, and the resolver/sync scripts' own regexes.
-          matches=$(grep -RIn -E '(alimtvnetwork|aukgit)/macro-ahk-v[0-9]+' . \
-            --exclude-dir=.git \
-            --exclude-dir=node_modules \
-            --exclude-dir=dist \
-            --exclude-dir=.lovable \
-            --exclude-dir=spec \
-            --exclude-dir=docs \
-            --exclude=changelog.md \
-            --exclude=readme.md \
-            --exclude=resolve-repo-slug.mjs \
-            --exclude=sync-repo-slug.mjs \
-            --exclude='*.test.mjs' \
-            || true)
+          # Only scan primary source trees. Installer/build scripts
+          # (scripts/install*, scripts/clone-*, scripts/installer-*,
+          # scripts/download-*, scripts/prompt-creator-cli/**) are
+          # auto-managed by scripts/sync-repo-slug.mjs; docs, spec, RCA,
+          # changelog, and .gitmap history intentionally reference past
+          # slugs. This gate guards against a stray literal appearing in
+          # app code, tests, workflows, or content-scripts.
+          matches=$(grep -RIn -E '(alimtvnetwork|aukgit)/macro-ahk-v[0-9]+' \
+            src standalone-scripts .github/workflows tests \
+            2>/dev/null || true)
           if [ -n "$matches" ]; then
             echo "::error::Hardcoded owner/repo literals found. Use resolveRepoSlug() or env vars instead."
             echo "$matches"
             exit 1
           fi
-          echo "OK: no hardcoded owner/repo literals in tracked sources."
+          echo "OK: no hardcoded owner/repo literals in primary source trees."
 
   spec-xref:
     runs-on: ubuntu-latest
