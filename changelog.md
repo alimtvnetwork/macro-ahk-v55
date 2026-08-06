@@ -1,3 +1,13 @@
+# Changelog
+
+## [v5.18.0] 2026-08-06 fix cicd for E2E · Playwright
+
+### Fixed
+- Fixed `ReferenceError: openOptions is not defined` in `e2e-24-cross-project-sync.spec.ts` by adding missing fixture imports.
+- Corrected `e2e-24-cross-project-sync.spec.ts` to use the custom `test` fixture from `./fixtures`.
+- Fixed CI preflight failure `[check-prompt-loader-mocks]` by routing the direct `vi.doMock` in `remix-invalidate-sentinel.test.ts` through the mandatory `buildPromptLoaderMock` factory.
+- Standardized extension directory resolution across Playwright config, setup, and fixtures to support both local (`chrome-extension/`) and CI (`dist/`) layouts.
+
 ## [v5.17.0] 2026-08-06 Minor bump ceremony and CI/CD hardening
 
 ### Fixed
