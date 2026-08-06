@@ -1,10 +1,7 @@
 import { test as base, chromium, type BrowserContext, type Page } from '@playwright/test';
 import path from 'path';
 import fs from 'fs';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { EXTENSION_CANDIDATES, resolveExtensionDir } from './extension-dir';
 
 /*
  * Chrome Extension E2E — Shared Fixtures
@@ -29,24 +26,7 @@ const __dirname = path.dirname(__filename);
 // We probe both candidates and pick the one that actually contains a manifest, so
 // the fixture survives any future rename without breaking E2E.
 
-const REPO_ROOT = path.resolve(__dirname, '../..');
-const EXTENSION_CANDIDATES = [
-  path.join(REPO_ROOT, 'chrome-extension'),
-  path.join(REPO_ROOT, 'dist'),
-];
-
-function resolveExtensionPath(): string {
-  for (const candidate of EXTENSION_CANDIDATES) {
-    if (fs.existsSync(path.join(candidate, 'manifest.json'))) {
-      return candidate;
-    }
-  }
-  // Fall back to the canonical build dir; Chromium will produce a clear error
-  // and the diagnostic message below points at the real cause.
-  return EXTENSION_CANDIDATES[0];
-}
-
-const EXTENSION_PATH = resolveExtensionPath();
+const EXTENSION_PATH = resolveExtensionDir();
 
 const SYSTEM_CHROMIUM_CANDIDATES = [
   '/bin/chromium',
