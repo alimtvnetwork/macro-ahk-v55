@@ -1,0 +1,70 @@
+# ──────────────────────────────────────────────────────────────
+# Marco Extension — Tag and Release (server-side tag creation)
+#
+# The sandbox/dev environment cannot create or push git tags, which
+# left every release ceremony without a `v*` tag and therefore without
+# a Release Build run. This workflow creates the tag server-side with
+# GITHUB_TOKEN; `release.yml` then triggers on the resulting tag.
+#
+# Usage: Actions > Tag and Release > Run workflow > version = 5.21.0
+# ──────────────────────────────────────────────────────────────
+
+name: Tag and Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to tag, without the leading v (for example 5.21.0)"
+        required: true
+        type: string
+      ref:
+        description: "Commit-ish to tag. Defaults to the branch this run targets."
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tag-and-release-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  create-tag:
+    name: Create v${{ inputs.version }} tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.ref || github.ref }}
+
+      - name: Validate version input
+        run: |
+          VER="${{ inputs.version }}"
+          if ! printf '%s' "$VER" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Invalid version '$VER'. Expected MAJOR.MINOR.PATCH without a leading v."
+            exit 1
+          fi
+          echo "TAG_NAME=v$VER" >> "$GITHUB_ENV"
+
+      - name: Fail if tag already exists
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG_NAME" >/dev/null 2>&1; then
+            echo "::error::Tag $TAG_NAME already exists on the remote. Delete it first or pick a new version."
+            exit 1
+          fi
+
+      - name: Create and push tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+          git push origin "$TAG_NAME"
+
+      - name: Summary
+        run: |
+          echo "Created and pushed **$TAG_NAME**. \`release.yml\` picks it up from the tag push event." >> "$GITHUB_STEP_SUMMARY"
