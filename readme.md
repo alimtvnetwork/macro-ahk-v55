@@ -396,6 +396,23 @@ Marco is a Chrome extension that automates workspace management workflows throug
 | **Self-Healing Storage** | Two-stage builtin script guard that detects and repairs corrupted script storage |
 | **Build-Aware Cache** | Injection cache invalidation tied to build version, preventing runtime drift |
 
+--- 
+
+## AI and Development
+
+This project is optimized for AI-assisted development. All project memory, rules, and plans live in the [.lovable/](./.lovable/) folder.
+
+Before contributing, AIs **must** read the authoritative read-list at [.lovable/what-to-read.md](./.lovable/what-to-read.md).
+
+### Project Structure
+
+- `src/`: Main extension source (React/TypeScript).
+- `standalone-scripts/`: Injectable automation runtimes.
+- `spec/`: Detailed technical specifications.
+- `scripts/`: Build and automation tools.
+- `.lovable/`: Project memory and AI instructions.
+
+---
 ### Script Architecture
 
 The extension uses a **declarative, instruction-driven** architecture. Each standalone script defines its own `instruction.ts` manifest that declares:
