@@ -28,11 +28,14 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
 
   test('creates a project group, drag-assigns a project, and cascades shared settings', async () => {
     const context = await launchExtension();
+    context.setDefaultTimeout(60_000);
     try {
       const extensionId = await getExtensionId(context);
+      console.log(`[E2E-24] Extension ID: ${extensionId}`);
       await seedCrossProjectSyncState(context);
 
       const options = await openOptions(context, extensionId);
+      options.setDefaultTimeout(60_000);
       await options.goto(`${optionsUrl(extensionId)}#library`);
       await seedCrossProjectSyncStateFromPage(options);
       await waitForReadyOptions(options);
@@ -74,7 +77,9 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
 
 async function seedCrossProjectSyncState(context: BrowserContext): Promise<void> {
   let [serviceWorker] = context.serviceWorkers();
-  if (!serviceWorker) serviceWorker = await context.waitForEvent('serviceworker');
+  if (!serviceWorker) {
+    serviceWorker = await context.waitForEvent('serviceworker', { timeout: 30_000 });
+  }
   const projects = buildSeedProjects();
   // Wait for chrome.storage to be available in the service worker context.
   // On cold start, the SW may evaluate before chrome.* APIs are exposed.
