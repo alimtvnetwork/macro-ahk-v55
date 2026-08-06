@@ -1,3 +1,16 @@
+## [v5.17.0] 2026-08-06 Minor bump ceremony and CI/CD hardening
+
+### Fixed
+- Automated versioning process via `node scripts/bump-version.mjs minor`.
+- Ensured all version pin sites including `readme.md` and `prompt-bundle-types.ts` are synchronized to v5.17.0.
+- Regenerated `macro-prompts.json` artifacts.
+
+### Added
+- Standardized version bump ritual under `14-release.md` ceremony compliance.
+
+### Issues
+- [01-5-17-0-git-tag-skipped](.lovable/release/issues/01-5-17-0-git-tag-skipped.md) Git tag/commit skipped due to sandbox restrictions.
+
 # Changelog
 
 ## [v5.16.0] 2026-08-06 CI/CD Hardening and Readme Compliance
