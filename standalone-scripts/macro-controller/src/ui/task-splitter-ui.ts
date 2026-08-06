@@ -573,7 +573,10 @@ function buildControl(): HTMLElement {
   state.subscribers.add(render);
 
   const tickId = setInterval(function () {
-    if (!document.body.contains(root)) { clearInterval(tickId); return; }
+    if (typeof document === 'undefined' || !document.body?.contains(root)) {
+      clearInterval(tickId);
+      return;
+    }
     if (state.running) render();
   }, 1000);
 
