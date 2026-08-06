@@ -531,18 +531,12 @@ jobs:
       - name: Preflight · actionable wiring report (prints exact files to create)
         env:
           CI: 'true'
-          # Extension comes from the downloaded chrome-extension-dist artifact;
-          # global-setup must not rebuild it (standalone dists are not present here).
-          E2E_SKIP_BUILD: '1'
         run: node scripts/preflight-standalone-wiring.mjs
 
       - name: Strict standalone-registry check (fails on ANY wiring gap)
         if: always()
         env:
           CI: 'true'
-          # Extension comes from the downloaded chrome-extension-dist artifact;
-          # global-setup must not rebuild it (standalone dists are not present here).
-          E2E_SKIP_BUILD: '1'
         run: node scripts/report-standalone-registry.mjs --strict
 
   # ════════════════════════════════════════════════════════════
