@@ -1,16 +1,12 @@
 import { execSync } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import {
   EXTENSION_CANDIDATES,
   REPO_ROOT,
   prebuiltExtensionExists,
   resolveExtensionDir,
 } from './extension-dir';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 /**
  * Playwright Global Setup — Chrome Extension
