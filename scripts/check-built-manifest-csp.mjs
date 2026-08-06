@@ -75,11 +75,11 @@ function readRootVersion() {
         );
     }
 
-    if (typeof versionFile.version !== "string" || !/^\d+\.\d+\.\d+$/.test(versionFile.version)) {
+    if (typeof versionFile.version !== "string" || !/^[0-9]+\.[0-9]+\.[0-9]+([.-].+)?$/.test(versionFile.version)) {
         fail(
             "version.json semver",
             VERSION_JSON,
-            "version string matching X.Y.Z",
+            "version string matching SEMVER",
             `Current version value is ${JSON.stringify(versionFile.version)}. The Chrome manifest version must be generated from this canonical field.`,
         );
     }
