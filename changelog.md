@@ -1,5 +1,22 @@
 # Changelog
 
+## [v5.21.0] 2026-08-06 CI Trigger and Release Path Repair
+
+### Added
+- `.github/workflows/tag-and-release.yml`: a `workflow_dispatch` job that validates the version input, refuses to overwrite an existing tag, and creates plus pushes `v<version>` server-side with `GITHUB_TOKEN`. `release.yml` then triggers from that tag push, so a release no longer depends on a local `git tag` the sandbox cannot create.
+
+### Fixed
+- Repository slug drift: `scripts/clone-ahk.mjs` now resolves the slug at runtime through `resolveRepoSlug()` with `alimtvnetwork/macro-ahk-v55` as the compiled-in fallback, and treats `aukgit/macro-ahk-v55` as the stale owner. `scripts/prompt-creator-cli/{install.sh,install.ps1,readme.md}` and `scripts/print-quality-badges.mjs` were still pinned to the `aukgit` slug and are now unified.
+- `scripts/check-remote-tag.mjs` no longer skips silently on a `-dev` version. It logs `[BYPASS]` and writes a GitHub Step Summary warning stating that release readiness was not verified.
+
+### Changed
+- `.github/workflows/ci.yml` concurrency: `cancel-in-progress` is now scoped to pull requests. Pushes to `main` always run to completion instead of being cancelled by the next commit, which was being misread as "CI never triggered".
+- `scripts/__tests__/ci-workflow-trigger-policy.test.mjs` asserts the corrected canonical/stale owners and the runtime slug resolution.
+- `pipeline/03-release-workflow.md` Companion Workflows table lists `tag-and-release.yml`.
+
+### Notes
+- A job stuck at `Waiting for a runner to pick up this job...` is a GitHub account condition (runner minutes, spending limit, or Actions disabled), not a repository defect. No workflow change can clear it.
+
 ## [v5.20.0] 2026-08-06 Action Download Surface Reduction
 
 ### Changed
