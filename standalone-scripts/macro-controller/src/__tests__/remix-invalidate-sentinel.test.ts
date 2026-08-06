@@ -86,7 +86,7 @@ describe('invalidateInjectionSentinel', () => {
     it('returns sentInvalidateMessage=false when the message bridge throws', async () => {
         installDom({ withSentinel: false, withRelayFlag: false });
         vi.resetModules();
-        vi.doMock('../ui/prompt-loader', () => ({
+        vi.doMock('../ui/prompt-loader', () => buildPromptLoaderMock({
             sendToExtension: async () => { throw new Error('bridge down'); },
         }));
         vi.doMock('../error-utils', () => ({ logError: () => {} }));
