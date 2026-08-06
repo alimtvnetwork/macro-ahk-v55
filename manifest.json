@@ -1,24 +1,24 @@
 {
-  "manifest_version": 3,
-  "name": "Marco Extension",
-  "version": "5.18.0",
-  "action": {
-    "default_popup": "src/popup/popup.html"
-  },
-  "options_ui": {
-    "page": "src/options/options.html"
-  },
-  "permissions": [
-    "storage",
-    "cookies",
-    "scripting",
-    "activeTab",
-    "webNavigation",
-    "tabs",
-    "contextMenus",
-    "alarms"
-  ],
-  "background": {
-    "service_worker": "src/background/service-worker.ts"
-  }
+    "manifest_version": 3,
+    "name": "Marco Extension",
+    "version": "5.18.0-dev",
+    "action": {
+        "default_popup": "src/popup/popup.html"
+    },
+    "options_ui": {
+        "page": "src/options/options.html"
+    },
+    "permissions": [
+        "storage",
+        "cookies",
+        "scripting",
+        "activeTab",
+        "webNavigation",
+        "tabs",
+        "contextMenus",
+        "alarms"
+    ],
+    "background": {
+        "service_worker": "src/background/service-worker.ts"
+    }
 }
