@@ -12,7 +12,11 @@
     "storage",
     "cookies",
     "scripting",
-    "activeTab"
+    "activeTab",
+    "webNavigation",
+    "tabs",
+    "contextMenus",
+    "alarms"
   ],
   "background": {
     "service_worker": "src/background/service-worker.ts"
