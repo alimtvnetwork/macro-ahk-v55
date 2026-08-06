@@ -1,5 +1,15 @@
 # Changelog
 
+## [v5.15.0] 2026-08-06 CI/CD Recovery and Prompt Registry Sync
+
+### Fixed
+- Restored `.lovable/coding-guidelines.md` symlink to `memory/standards/01-coding-guidelines.md`, resolving `FATAL: .lovable/coding-guidelines.md does not exist` in `scripts/check-coding-guidelines-coverage.mjs`.
+- Synchronized `standalone-scripts/prompts/22-release/prompt.md` and `.lovable/prompts/14-release.md` with the latest v1.2 ceremony requirements.
+- Updated all project-wide version pins in `readme.md`, `standalone-scripts/macro-controller/src/ui/prompt-bundle-types.ts`, and regression tests to v5.15.0.
+
+### Added
+- Created `.lovable/release/issues/01-5-15-0-git-tag-skipped.md` to document the manual tag requirement for sandbox releases.
+
 ## [v5.14.0] 2026-08-06 Semantic versioning alignment for build pipeline
 
 ### Added
