@@ -89,17 +89,11 @@ Target: `.lovable/memory/<topic>/XX-<slug>.md`. Never at the memory root.
 4. Update workflow state under `.lovable/memory/workflow/` using markers:
 
 | Status       | Marker                 |
-
 | ------------ | ---------------------- |
-
 | Done         | `✅ Done`              |
-
 | In Progress  | `🔄 In Progress`       |
-
 | Pending      | `⏳ Pending`           |
-
 | Blocked      | `🚫 Blocked, [reason]` |
-
 | Avoid / Skip | `🚫 Avoid, [reason]`   |
 
 Anything the user said to skip or avoid: `.lovable/memory/avoid/XX-<slug>.md`, then reference from `.lovable/strictly-avoid.md`.
