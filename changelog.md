@@ -1,5 +1,15 @@
 # Changelog
 
+## [v5.22.0] 2026-08-06 Release Publication Path Fix
+
+### Fixed
+- **Tag created, release page empty.** A tag pushed with the built-in `GITHUB_TOKEN` does not emit a `push` event (GitHub suppresses it to prevent recursive runs), so `release.yml`'s `push: tags: v*` trigger could never fire from the tag created by `tag-and-release.yml`. `release.yml` now also accepts `workflow_call`, and `tag-and-release.yml` invokes it directly with the created tag (`secrets: inherit`, `contents: write`). One run of **Actions > Tag and Release** now creates the tag and publishes the release with all assets.
+
+### Changed
+- `.github/workflows/tag-and-release.yml`: the tag step exports a `tag` output and a new `release` job calls `./.github/workflows/release.yml`.
+- `readme.md`: Troubleshooting entry "The tag exists but the Releases page is empty" documenting the `GITHUB_TOKEN` event rule and the runner-queue billing check.
+- `.lovable/memory/rca/05-ci-not-triggering-and-not-releasing.md`: rewritten with the `GITHUB_TOKEN` root cause and a note that `aukgit` on the repo page is the commit author, not the owner (canonical slug remains `alimtvnetwork/macro-ahk-v55`, confirmed from the CI job path).
+
 ## [v5.21.0] 2026-08-06 CI Trigger and Release Path Repair
 
 ### Added

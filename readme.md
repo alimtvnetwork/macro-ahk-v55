@@ -64,7 +64,7 @@ irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/i
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh | bash
 ```
 
-> **[v5.22.0] 2026-08-06 CI Trigger and Release Path Repair**
+> **[v5.22.0] 2026-08-06 Release Publication Path Fix (workflow_call)**
 
 ```powershell
 ## Windows · PowerShell
