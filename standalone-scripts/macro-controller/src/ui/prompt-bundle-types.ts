@@ -88,7 +88,7 @@ export interface BundleValidationResult {
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 // Accepts strict X.Y.Z plus optional prerelease/build suffix (e.g. `0.0.0-dev`
 // produced by scripts/write-version-from-tag.mjs as the local-dev fallback,
-// or `5.16.0-rc.1`). Kept aligned with SEMVER pattern in that script.
+// or `5.17.0-rc.1`). Kept aligned with SEMVER pattern in that script.
 const SEMVER_RE = /^\d+\.\d+\.\d+([.-].+)?$/;
 
 /** True when the value is a plain object (rejects null / arrays). */
