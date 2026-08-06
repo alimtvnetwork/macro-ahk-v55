@@ -51,7 +51,7 @@ function readCanonicalVersion() {
         fail(
             "version.json semver",
             VERSION_JSON_PATH,
-            "version string matching X.Y.Z",
+            "version string matching SEMVER",
             `Current version value is ${JSON.stringify(versionFile.version)}.`,
         );
     }
