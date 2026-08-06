@@ -70,6 +70,9 @@ jobs:
       - name: Strict spec-link check (fails on ANY broken link)
         run: node scripts/report-spec-links-ci.mjs
 
+      - name: Remote tag presence check (fails if current version tag is missing)
+        run: node scripts/check-remote-tag.mjs
+
   markdown-filename-policy:
     name: Preflight · Markdown Filename Policy
     runs-on: ubuntu-latest
