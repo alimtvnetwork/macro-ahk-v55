@@ -37,36 +37,19 @@ const REQUIRED_PERMISSIONS = [
   'activeTab',
 ];
 
-async function globalSetup() {
-  const repoRoot = REPO_ROOT;
-
-  // CI downloads the `chrome-extension-dist` artifact built by the
-  // `build-extension` job, so rebuilding here is both wasteful (9 sequential
-  // builds inside a 30 min job) and impossible: `build:extension` requires the
-  // standalone dist artifacts that only exist in their own jobs. Skip the build
-  // whenever a built extension is already on disk, or when E2E_SKIP_BUILD=1.
-  const skipBuild =
-    process.env.E2E_SKIP_BUILD === '1' || prebuiltExtensionExists();
-
-  if (skipBuild) {
-    console.log(
-      `\n⏭️  Skipping extension build, using prebuilt output at ${pickExtensionDir()}`
-    );
-  } else {
-    console.log('\n🔨 Building extension…');
+/** Detect the package manager: prefer pnpm, fall back to npm. */
+function detectPackageManager(): 'pnpm' | 'npm' {
+  try {
+    execSync('pnpm --version', { stdio: 'ignore' });
+    return 'pnpm';
+  } catch {
+    return 'npm';
   }
+}
 
-  if (!skipBuild) {
-  // Detect package manager: composite scripts (e.g. build:macro-controller) call `pnpm run …`
-  // internally, so we prefer pnpm when available and fall back to npm otherwise.
-  const pm = (() => {
-    try {
-      execSync('pnpm --version', { stdio: 'ignore' });
-      return 'pnpm';
-    } catch {
-      return 'npm';
-    }
-  })();
+/** Build every standalone dist plus the extension, sequentially. */
+function buildExtension(): void {
+  const pm = detectPackageManager();
   console.log(`📦 Using package manager: ${pm}`);
 
   // build:extension requires every standalone dist artifact checked by
@@ -89,7 +72,7 @@ async function globalSetup() {
     console.log(`\n→ Building ${step.label} (${cmd})…`);
     try {
       execSync(cmd, {
-        cwd: repoRoot,
+        cwd: REPO_ROOT,
         stdio: 'inherit',
         timeout: step.timeout,
       });
@@ -100,6 +83,24 @@ async function globalSetup() {
       );
     }
   }
+}
+
+async function globalSetup() {
+  // CI downloads the `chrome-extension-dist` artifact built by the
+  // `build-extension` job, so rebuilding here is both wasteful (9 sequential
+  // builds inside a 30 min job) and impossible: `build:extension` requires the
+  // standalone dist artifacts that only exist in their own jobs. Skip the build
+  // whenever a built extension is already on disk, or when E2E_SKIP_BUILD=1.
+  const skipBuild =
+    process.env.E2E_SKIP_BUILD === '1' || prebuiltExtensionExists();
+
+  if (skipBuild) {
+    console.log(
+      `\n⏭️  Skipping extension build, using prebuilt output at ${pickExtensionDir()}`
+    );
+  } else {
+    console.log('\n🔨 Building extension…');
+    buildExtension();
   }
 
   // Step 2: Re-resolve extension dir AFTER the build (build:extension may have created it).
