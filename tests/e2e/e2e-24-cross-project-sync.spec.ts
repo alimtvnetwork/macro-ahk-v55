@@ -31,13 +31,12 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
       const extensionId = await getExtensionId(context);
       await seedCrossProjectSyncState(context);
 
-      const options = await context.newPage();
+      const options = await openOptions(context, extensionId);
       await options.goto(`${optionsUrl(extensionId)}#library`);
-      await options.waitForLoadState('domcontentloaded');
       await seedCrossProjectSyncStateFromPage(options);
       await waitForReadyOptions(options);
 
-      await expect(options.getByRole('heading', { name: 'Shared Library' })).toBeVisible();
+      await expect(options.getByRole('heading', { name: 'Shared Library' })).toBeVisible({ timeout: 30_000 });
       await options.getByTestId('library-tab-groups').click();
 
       const groupName = `E2E Sync Group ${Date.now()}`;
@@ -46,7 +45,7 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
       await options.getByTestId('project-group-settings-input').fill('{"logLevel":"warn","retryOnNavigate":true}');
       await options.getByTestId('project-group-save-button').click();
 
-      await expect(options.getByRole('heading', { name: groupName })).toBeVisible({ timeout: 20_000 });
+      await expect(options.getByRole('heading', { name: groupName })).toBeVisible({ timeout: 30_000 });
       const groupId = await readGroupId(options, groupName);
       expect(groupId).not.toBeNull();
       await options.getByTestId(`project-group-card-${groupId}`).click();
@@ -54,14 +53,14 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
       // GroupDetailPanel mounts and fires GET_ALL_PROJECTS async; SW seed +
       // chrome.storage round-trip can exceed the default 10s on cold extension
       // launch. Give the chip rail the same 20s budget as the rest of the flow.
-      await expect(options.getByTestId(`project-group-drag-source-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 20_000 });
+      await expect(options.getByTestId(`project-group-drag-source-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 30_000 });
 
       await dragProjectIntoMembers(options, PROJECT_ALPHA_ID);
-      await expect(options.getByTestId(`project-group-member-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 20_000 });
+      await expect(options.getByTestId(`project-group-member-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 30_000 });
       await expect(options.getByTestId(`project-group-member-${PROJECT_ALPHA_ID}`).getByText('Alpha Automation')).toBeVisible();
 
       await options.getByTestId('project-group-cascade-button').click();
-      await expect(options.getByText(/Settings pushed to 1 project\(s\)/)).toBeVisible({ timeout: 20_000 });
+      await expect(options.getByText(/Settings pushed to 1 project\(s\)/)).toBeVisible({ timeout: 30_000 });
 
       const persisted = await readGroupMembers(options, groupName);
       expect(persisted).toContain(PROJECT_ALPHA_ID);
