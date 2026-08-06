@@ -12,7 +12,7 @@
 - [Preferences](.lovable/memory/preferences/)
 - [Project](.lovable/memory/project/)
 - [Prompts](.lovable/memory/prompts/)
-- [RCA](.lovable/memory/rca/)
+- [RCA](.lovable/memory/rca/index.md)
 - [Security](.lovable/memory/security/)
 - [Specs](.lovable/memory/specs/)
 - [Standards](.lovable/memory/standards/)
