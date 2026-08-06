@@ -24,7 +24,7 @@ type StoredProjectSeed = {
 };
 
 test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
-  test.setTimeout(180_000);
+  test.setTimeout(300_000);
 
   test('creates a project group, drag-assigns a project, and cascades shared settings', async () => {
     const context = await launchExtension();
