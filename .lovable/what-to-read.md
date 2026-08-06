@@ -2,10 +2,11 @@
 
 > Canonical map of what the AI must read before working on this project.
 
-> Last updated: 2026-08-06T09:40:00Z
+> Last updated: 2026-08-06T09:30:00Z
 
 ## Changelog
 
+- 2026-08-06T09:30:00Z, Updated Release prompt to v1.2 with strict Ceremony and MINOR bump enforcement.
 - 2026-08-06T09:40:00Z, Implemented Write-Memory v3.0 (Maximum Enforcement) and unified .lovable folder structure.
 - 2026-07-27T05:45:00Z, SUPERSEDED: Git tag is now the single source of truth for the release version.
 - 2026-07-21T09:15:00Z, Captured chip-gear Re-seed defaults flow.
