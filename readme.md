@@ -1137,6 +1137,25 @@ to do" list live in `.lovable/memory/features/release-pipeline-repo-url-agnostic
 
 ## Troubleshooting
 
+### The tag exists but the Releases page is empty
+
+**Root cause.** A tag pushed by a workflow using the built-in
+`GITHUB_TOKEN` does **not** emit a `push` event. GitHub suppresses it to
+prevent recursive workflow runs. `release.yml` used to listen only on
+`push: tags: v*`, so a tag created by `tag-and-release.yml` landed on the
+remote and nothing built.
+
+**Fix (shipped in v5.22.0).** `release.yml` also accepts `workflow_call`,
+and `tag-and-release.yml` calls it directly after creating the tag. One
+run of **Actions > Tag and Release** now produces the tag *and* the
+published release with all assets. Never re-wire this back to an implicit
+tag-push trigger.
+
+**If the run is queued forever** (`Waiting for a runner to pick up this
+job...`), that is an account condition, not a repository defect: Actions
+minutes exhausted, spending limit reached, or Actions disabled. Check
+Settings > Billing and Settings > Actions. No workflow change clears it.
+
 ### `vite:load-fallback` ENOENT - module cannot be loaded
 
 **Symptom.** A development build fails partway through with output similar to:
