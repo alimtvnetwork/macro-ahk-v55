@@ -66,14 +66,14 @@ curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/sc
 > **[v5.16.0] 2026-08-06 CI/CD Recovery and Prompt Registry Sync**
 
 ```powershell
-# Windows · PowerShell
+## Windows · PowerShell
 irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.16.0/install.ps1 | iex
 
 
 ```
 
 ```bash
-# macOS · Linux · Bash
+## macOS · Linux · Bash
 curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.16.0/install.sh | bash
 
 
@@ -140,12 +140,12 @@ The unified installer auto-derives the pinned version from its download URL. Use
 #### 🔒 Pinned to a specific release
 
 ```powershell
-# PowerShell (Windows) - replace v4.109.0 with any released tag
+## PowerShell (Windows) - replace v4.109.0 with any released tag
 irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.16.0/install.ps1 | iex
 ```
 
 ```bash
-# Bash (Linux / macOS)
+## Bash (Linux / macOS)
 curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.16.0/install.sh | bash
 ```
 
@@ -164,14 +164,14 @@ curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/sc
 Since **v4.154.0** the Bash installer defaults its target to `$(pwd)/marco-extension` - the plain curl-pipe one-liner drops the extension into whatever directory you ran it from, never into `$HOME`. PowerShell has the same behavior via `-InstallDir (Join-Path $PWD 'marco-extension')`.
 
 ```bash
-# Bash (Linux / macOS) - installs to ./marco-extension under the CURRENT directory
+## Bash (Linux / macOS) - installs to ./marco-extension under the CURRENT directory
 cd ~/projects/my-workspace
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh | sh
-# → ~/projects/my-workspace/marco-extension/
+## → ~/projects/my-workspace/marco-extension/
 ```
 
 ```powershell
-# PowerShell (Windows) - installs to .\marco-extension under the current folder
+## PowerShell (Windows) - installs to .\marco-extension under the current folder
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.ps1))) -InstallDir (Join-Path $PWD 'marco-extension')
 ```
 
@@ -204,21 +204,21 @@ curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/sc
 All four spellings are equivalent. Pick whichever reads best in your shell; the canonical flag is `--install-dir`.
 
 ```bash
-# Canonical, space-separated
+## Canonical, space-separated
 ./install.sh --install-dir ~/marco-extension
 
-# Canonical, equals-joined (useful in pipelines / CI vars)
+## Canonical, equals-joined (useful in pipelines / CI vars)
 ./install.sh --install-dir=/opt/marco-extension
 
-# Path containing spaces - quote it (either form works)
+## Path containing spaces - quote it (either form works)
 ./install.sh --install-dir "$HOME/Marco Tools/marco-extension"
 ./install.sh --install-dir="$HOME/Marco Tools/marco-extension"
 
-# Short aliases (identical behavior)
+## Short aliases (identical behavior)
 ./install.sh --dir ./tmp/marco-extension
 ./install.sh -d /var/tmp/marco-extension
 
-# Pipe form - pass flags after `bash -s --`
+## Pipe form - pass flags after `bash -s --`
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh \
   | bash -s -- --install-dir "$HOME/marco-extension"
 ```
@@ -324,17 +324,17 @@ Use `--dry-run` to inspect the resolved decision without installing - the plan p
 #### Examples
 
 ```bash
-# Preview what would happen with the latest release - no network writes:
+## Preview what would happen with the latest release - no network writes:
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh \
   | bash -s -- --dry-run
 
-# Pin a specific version into a custom directory:
+## Pin a specific version into a custom directory:
 ./install.sh --version v4.109.0 --dir ~/marco-extension/v4.109.0
 
-# Force-enable sibling-repo discovery for this one run:
+## Force-enable sibling-repo discovery for this one run:
 ./install.sh --enable-sibling-discovery
 
-# Print full usage and the spec link:
+## Print full usage and the spec link:
 ./install.sh --help
 ```
 
@@ -713,16 +713,16 @@ Two independent guards live in this repo and run on every build, and you
 can also run them by hand any time you touch `manifest.json`:
 
 ```bash
-# 1. Source-manifest preflight - runs BEFORE Vite, fails the build if
-#    the source manifest's CSP is missing or doesn't allow Wasm.
+## 1. Source-manifest preflight - runs BEFORE Vite, fails the build if
+##    the source manifest's CSP is missing or doesn't allow Wasm.
 pnpm run check:manifest
 
-# 2. Build the extension. The pipeline ends with check:built-csp, which
-#    re-validates chrome-extension/manifest.json AFTER Vite has rewritten
-#    path fields, then prints a 4-step reload-and-verify checklist.
+## 2. Build the extension. The pipeline ends with check:built-csp, which
+##    re-validates chrome-extension/manifest.json AFTER Vite has rewritten
+##    path fields, then prints a 4-step reload-and-verify checklist.
 pnpm run build:extension
 
-# 3. Manual re-validation against the built artifact.
+## 3. Manual re-validation against the built artifact.
 pnpm run check:built-csp
 ```
 
@@ -1193,7 +1193,7 @@ resolved path for `result-webhook` *before* invoking the same dev build:
 
 ```bash
 pnpm run repro:build
-# → scripts/repro-build-error.mjs
+## → scripts/repro-build-error.mjs
 ```
 
 The same helper is exposed as a **"Reproduce build error"** button in the
