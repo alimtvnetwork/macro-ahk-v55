@@ -2616,6 +2616,16 @@ jobs:
           name: chrome-extension-dist
           path: dist/
 
+      - name: Assert downloaded extension artifact is usable
+        run: |
+          set -euo pipefail
+          if [ ! -f dist/manifest.json ]; then
+            echo "::error::dist/manifest.json missing after artifact download; the chrome-extension-dist artifact is empty or misnamed."
+            ls -la dist || true
+            exit 1
+          fi
+          node -e "const m=require('./dist/manifest.json');if(m.manifest_version!==3){console.error('::error::built manifest is not MV3');process.exit(1)}console.log('extension artifact ok:',m.name,m.version)"
+
       - name: Install Playwright browsers (chromium + system deps)
         run: pnpm exec playwright install --with-deps chromium
 
