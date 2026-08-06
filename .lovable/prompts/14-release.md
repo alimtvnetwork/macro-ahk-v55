@@ -9,17 +9,13 @@ No variables. No prompts to the user. Discover the current version from disk, bu
 ## RULE 0, MUST, NON-NEGOTIABLE
 
 1. Read the **canonical version source** for THIS repo (discover it: `version.json`, `package.json` `"version"`, or whatever single file the repo treats as the version of record). Do not guess.
-
 2. Bump MINOR only: `MAJOR.MINOR.PATCH` becomes `MAJOR.(MINOR+1).0`. PATCH MUST reset to `0`.
-
 3. State the previous version and new version explicitly in the reply, before touching any file.
-
 4. Do NOT ask "minor or patch?". Do NOT open plan mode. Do NOT ask for confirmation.
 
 Deviations (only when the trigger explicitly says so):
 
 - **MAJOR** = `(MAJOR+1).0.0` if the user said the change is breaking (storage schema, prompt schema, public SDK, extension contract).
-
 - **PATCH** = `MAJOR.MINOR.(PATCH+1)` only if the user literally said `patch bump` or `patch release`.
 
 When in doubt: MINOR.
@@ -27,19 +23,12 @@ When in doubt: MINOR.
 ## Hard rules (MUST)
 
 - All version pin sites move in lock-step. Partial bumps are rejected.
-
 - The previous version string MUST NOT appear anywhere in the repo after this turn EXCEPT in historic files: `changelog.md`, `release_notes.md`, anything under `.lovable/release/`, and any dated archive folder.
-
 - Changelog entry under the new version heading is MANDATORY. A release without one is INVALID.
-
 - **All markdown filenames MUST be lowercase**: `readme.md`, `changelog.md`, `release_notes.md`, every audit / issue / plan / spec `.md`. Rename any `README.md`, `CHANGELOG.md`, `ReadMe.md`, etc. in the same turn with `mv` (or `git mv` if tracked), and update every reference.
-
 - If ANY step fails or is flagged, log it under `.lovable/release/issues/xx-<new-version>-<slug>.md` AND add an `### Issues` bullet under the new changelog entry linking to that file. Never hide failures.
-
 - Never invent changelog bullets. Only real work since the previous release.
-
 - Never auto-publish unless the user explicitly said `publish`, `deploy`, `ship`, or `go live`.
-
 - No em dashes anywhere.
 
 ## Working stance
@@ -49,15 +38,12 @@ Past release turns were sloppy: guessed the version, bumped PATCH instead of MIN
 ## Pre-flight (before step 1)
 
 - **Idempotency guard:** if the canonical version file already equals the computed new version, STOP. Someone half-ran a release. Detect what is already done, resume from the first incomplete step, do NOT double-bump.
-
 - **Placeholder guard:** if the previous version's changelog entry is empty or a placeholder (`TBD`, `WIP`, no bullets), refuse to release until it is filled or the user overrides.
-
 - **Date source:** the release date is UTC today. Get it from `date -u +%Y-%m-%d`. Do not invent it.
 
 ## Mandatory steps (in order, fail-fast)
 
 1. **Read the current version** from the canonical version source. Print previous and new version. Confirm PATCH digit is `0`.
-
 2. **Discover pin sites**, then update every one to the new version in lock-step. Use a single canonical search:
 
    ```
@@ -68,15 +54,10 @@ Past release turns were sloppy: guessed the version, bumped PATCH instead of MIN
    Typical pin sites (non-exhaustive):
 
    - Canonical version file (set `releaseDate` to UTC today if the field exists).
-
    - Manifests: `manifest.json`, extension / plugin manifests.
-
    - Source constants named like `VERSION`, `APP_VERSION`, `EXTENSION_VERSION`, `SCHEMA_VERSION`, `CACHE_SCHEMA_VERSION`, `BUILD_VERSION`.
-
    - `instruction.ts` / `instruction.md` / metadata files with a `Version:` field.
-
    - Sub-packages under `scripts/`, `standalone-scripts/`, `packages/`, `apps/` carrying their own version constant.
-
    - Install snippets, badge URLs, zip filenames, release-branch examples, "current version" lines in docs.
 
    A pin site missed here breaks installs.
@@ -114,13 +95,9 @@ Past release turns were sloppy: guessed the version, bumped PATCH instead of MIN
 Path: `.lovable/release/issues/xx-<new-version>-<slug>.md` (lowercase). Body:
 
 - Previous version and new version
-
 - Step that failed (number and name)
-
 - Command run and full error output
-
 - Files involved
-
 - Resolution or workaround, or `unresolved`
 
 Then link it from the `### Issues` bullet under the changelog entry.
@@ -128,35 +105,20 @@ Then link it from the `### Issues` bullet under the changelog entry.
 ## Checklist before you claim done
 
 - [ ] Previous version read from the canonical version source, not memory.
-
 - [ ] New version is a MINOR bump (or explicit MAJOR / PATCH per rules); PATCH digit is `0`.
-
 - [ ] Previous and new version both stated in the reply.
-
 - [ ] Pre-flight passed (idempotency, changelog placeholder, UTC date from `date -u`).
-
 - [ ] Every pin site from step 2 `rg` output matches the new version.
-
 - [ ] Canonical version file's `releaseDate` (if the field exists) is today's UTC date.
-
 - [ ] Changelog entry added at the top of `changelog.md` with real bullets only.
-
 - [ ] All markdown filenames in the repo are lowercase.
-
 - [ ] `rg "<previous-version>"` returns matches ONLY in the historic allow-list (`changelog.md`, `release_notes.md`, `.lovable/release/`, dated archives).
-
 - [ ] `### Issues` block present in the changelog if any step failed or was flagged, with links to `.lovable/release/issues/` files.
-
 - [ ] Stale-version helper (if it exists) ran successfully; otherwise manual rewrite done.
-
 - [ ] Bundled / aggregated artifacts regenerated if their sources changed.
-
 - [ ] Version-sync check (if it exists) exited 0; otherwise manual `rg` confirms allow-list only.
-
 - [ ] Commit + tag created (if git-tracked) with `release: vX.Y.Z <headline>` and `vX.Y.Z`, not pushed.
-
 - [ ] Report includes previous version, new version, tier, and exact file list.
-
 - [ ] No em dashes. No auto-publish.
 
 ## Prompt maintenance (meta, run once at end)
@@ -164,9 +126,7 @@ Then link it from the `### Issues` bullet under the changelog entry.
 Save this prompt's full body into `.lovable/prompts/XX-release.md` (lowercase):
 
 - If any existing file in `.lovable/prompts/` matches `*release*.md` (case-insensitive), OVERWRITE it in place. Do not create a duplicate.
-
 - Otherwise pick `XX` = next 2-digit zero-padded sequence (highest existing `XX` prefix + 1, or `01` if the folder is empty / missing). Create the folder if needed.
-
 - Save the prompt body only, no chat wrapping.
 
 ## Must Follow and without negotiation
@@ -178,7 +138,6 @@ Listen, past release turns were sloppy. Read the canonical version file, bump MI
 Ambiguity is not a license to guess. It is a file to write.
 
 - Open: `.lovable/ambiguous-questions/01-new-ambiguity/XX-<slug>.md`
-
 - Answered: `.lovable/ambiguous-questions/02-ambiguity-resolved/XX-<slug>.md`
 
 New question file shape:
