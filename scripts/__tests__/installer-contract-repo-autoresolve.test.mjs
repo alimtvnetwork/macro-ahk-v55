@@ -26,9 +26,9 @@ afterEach(() => {
 });
 
 test("prefers GITHUB_REPOSITORY when set", () => {
-    process.env.GITHUB_REPOSITORY = "alimtvnetwork/macro-ahk-v53";
+    process.env.GITHUB_REPOSITORY = "alimtvnetwork/macro-ahk-v55";
     const { slug, source } = resolveRepoSlug({ fallback: "x/y" });
-    assert.equal(slug, "alimtvnetwork/macro-ahk-v53");
+    assert.equal(slug, "alimtvnetwork/macro-ahk-v55");
     assert.equal(source, "env-github");
 });
 
@@ -42,9 +42,9 @@ test("falls through to MARCO_DEFAULT_REPO when GITHUB_REPOSITORY missing", () =>
 test("uses the fallback when no env or git remote is available", () => {
     const { slug } = resolveRepoSlug({
         cwd: "/tmp",
-        fallback: "alimtvnetwork/macro-ahk-v53",
+        fallback: "alimtvnetwork/macro-ahk-v55",
     });
-    assert.equal(slug, "alimtvnetwork/macro-ahk-v53");
+    assert.equal(slug, "alimtvnetwork/macro-ahk-v55");
 });
 
 test("throws when every source is missing and no fallback is passed", () => {
@@ -53,16 +53,16 @@ test("throws when every source is missing and no fallback is passed", () => {
 
 test("parses https remote URLs", () => {
     assert.equal(
-        parseRemoteUrl("https://github.com/alimtvnetwork/macro-ahk-v53.git"),
-        "alimtvnetwork/macro-ahk-v53",
+        parseRemoteUrl("https://github.com/alimtvnetwork/macro-ahk-v55.git"),
+        "alimtvnetwork/macro-ahk-v55",
     );
     assert.equal(parseRemoteUrl("https://github.com/acme/foo"), "acme/foo");
 });
 
 test("parses ssh remote URLs", () => {
     assert.equal(
-        parseRemoteUrl("git@github.com:alimtvnetwork/macro-ahk-v53.git"),
-        "alimtvnetwork/macro-ahk-v53",
+        parseRemoteUrl("git@github.com:alimtvnetwork/macro-ahk-v55.git"),
+        "alimtvnetwork/macro-ahk-v55",
     );
 });
 

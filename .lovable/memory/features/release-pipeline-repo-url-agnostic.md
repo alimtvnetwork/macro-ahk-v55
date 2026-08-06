@@ -12,7 +12,7 @@ type: feature
 archives, no built ZIPs, and a bare `Release v5.11.0` body. Root cause was a
 single hardcoded string:
 
-- The active repo had been renamed to `alimtvnetwork/macro-ahk-v53`.
+- The active repo had been renamed to `alimtvnetwork/macro-ahk-v55`.
 - `scripts/installer-contract.json` -> `repo.default` still said
   `alimtvnetwork/macro-ahk-v55`.
 - `scripts/check-installer-contract.mjs` runs in `.github/workflows/release.yml`

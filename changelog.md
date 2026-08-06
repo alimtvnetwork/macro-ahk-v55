@@ -26,7 +26,7 @@ After the tag-is-source-of-truth switch, `version.json` ships as a `0.0.0-dev` p
 ## [v5.12.0] 2026-07-27 Release pipeline repo-URL-agnostic hardening
 
 ### Fixed
-- Release page for `v5.11.0` shipped with no built assets and a bare "Release v5.11.0" body. Root cause: `scripts/installer-contract.json` hardcoded `repo.default` to `alimtvnetwork/macro-ahk-v55` while the active repo is `alimtvnetwork/macro-ahk-v53`. `scripts/check-installer-contract.mjs` failed the `setup` job on rename, so every downstream `build-*` + `release` job in `.github/workflows/release.yml` was skipped; only the early `create-release-page` placeholder body survived.
+- Release page for `v5.11.0` shipped with no built assets and a bare "Release v5.11.0" body. Root cause: `scripts/installer-contract.json` hardcoded `repo.default` to `alimtvnetwork/macro-ahk-v55` while the active repo is `alimtvnetwork/macro-ahk-v55`. `scripts/check-installer-contract.mjs` failed the `setup` job on rename, so every downstream `build-*` + `release` job in `.github/workflows/release.yml` was skipped; only the early `create-release-page` placeholder body survived.
 
 ### Changed
 - `scripts/installer-contract.json`: added `repo.autoResolve: true`. `repo.default` remains a real slug (not a sentinel) so runtime installs still work when the sync step has not run yet; `repo.fallback` is the last-resort value the resolver uses.
