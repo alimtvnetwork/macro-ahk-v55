@@ -1,5 +1,22 @@
 # Changelog
 
+## [v5.23.0] 2026-08-06 Workflow YAML Validation and Tag Recovery
+
+### Fixed
+- **`release.yml` was rejected by GitHub's YAML parser.** A markdown line starting with `**Windows` sat at column zero inside a `run:` heredoc, so the parser read it as an undefined alias (`unidentified alias "*Windows"` at 736:10). GitHub silently ran zero jobs, which is why `v5.22.0` produced a tag with only the automatic source archives and no built assets. The heredoc block in the `emit_install_sections` step is now indented inside the block scalar.
+
+### Added
+- `scripts/check-workflow-yaml.mjs`: parses every `.github/workflows/*.yml` with the real `yaml` parser and reports the failing file, line, and column as a GitHub annotation. Wired into the `setup` job of `.github/workflows/ci.yml` and into `test:cicd-spec`, so an unparseable workflow now fails preflight instead of failing silently on GitHub.
+- `yaml@^2.9.0` dev dependency in `package.json` for that check.
+
+### Changed
+- `.github/workflows/tag-and-release.yml`: tag creation is now idempotent. An existing tag that already points at the target commit is reused instead of aborting, so a release whose workflow was rejected can be recovered without deleting and re-pushing the tag.
+- `scripts/__tests__/ci-workflow-trigger-policy.test.mjs`: added coverage for the `workflow_call` wiring and the tag-reuse recovery path.
+- `.lovable/memory/rca/05-ci-not-triggering-and-not-releasing.md`: records the parser-rejection failure mode alongside the earlier `GITHUB_TOKEN` event-suppression rule.
+
+### Issues
+- [01-5-23-0-git-tag-skipped](.lovable/release/issues/01-5-23-0-git-tag-skipped.md) the sandbox cannot run git commands, so the `v5.23.0` commit and tag must be created through **Actions > Tag and Release**.
+
 ## [v5.22.0] 2026-08-06 Release Publication Path Fix
 
 ### Fixed
