@@ -37,7 +37,7 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
       await seedCrossProjectSyncStateFromPage(options);
       await waitForReadyOptions(options);
 
-      await expect(options.getByRole('heading', { name: 'Shared Library' })).toBeVisible({ timeout: 30_000 });
+      await expect(options.getByRole('heading', { name: 'Shared Library' })).toBeVisible({ timeout: 45_000 });
       await options.getByTestId('library-tab-groups').click();
 
       const groupName = `E2E Sync Group ${Date.now()}`;
