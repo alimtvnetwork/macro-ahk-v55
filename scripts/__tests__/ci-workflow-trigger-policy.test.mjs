@@ -19,6 +19,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, "..", "..");
 const CI_WORKFLOW = resolve(REPO_ROOT, ".github/workflows/ci.yml");
 const RELEASE_WORKFLOW = resolve(REPO_ROOT, ".github/workflows/release.yml");
+const TAG_AND_RELEASE_WORKFLOW = resolve(REPO_ROOT, ".github/workflows/tag-and-release.yml");
 const PACKAGE_JSON = resolve(REPO_ROOT, "package.json");
 const CLONE_AHK_SCRIPT = resolve(REPO_ROOT, "scripts/clone-ahk.mjs");
 const CLONE_REPO_PS1 = resolve(REPO_ROOT, "scripts/clone-repo.ps1");
@@ -213,8 +214,20 @@ test("Release Build catches every GitHub release and tag creation path", () => {
     assert.match(src, /\n\s*create:\s*\n/, "release.yml must run on tag create events");
     assert.match(src, /\n\s*release:\s*\n\s*types:/, "release.yml must run on GitHub Release events");
     assert.match(src, /\n\s*workflow_dispatch:\s*\n\s*inputs:/, "release.yml must keep manual recovery dispatch");
+    assert.match(src, /\n\s*workflow_call:\s*\n\s*inputs:/, "release.yml must remain callable by the tagging workflow");
     assert.match(src, /RELEASE_TAG_NAME: \$\{\{ github\.event\.release\.tag_name \|\| '' \}\}/, "release.yml must read the release event tag name");
     assert.match(src, /GITHUB_REF_TYPE:-/, "release.yml must recognize create-event tag refs");
+});
+
+test("Tag and Release directly calls Release Build and supports safe tag recovery", () => {
+    assert.ok(existsSync(TAG_AND_RELEASE_WORKFLOW), `Workflow missing at ${TAG_AND_RELEASE_WORKFLOW}`);
+    const src = readFileSync(TAG_AND_RELEASE_WORKFLOW, "utf8");
+
+    assert.match(src, /uses: \.\/\.github\/workflows\/release\.yml/, "tagging workflow must directly call release.yml");
+    assert.match(src, /version: \$\{\{ needs\.create-tag\.outputs\.tag \}\}/, "tagging workflow must pass the validated tag output");
+    assert.match(src, /git rev-list -n 1 "\$TAG_NAME"/, "existing tags must resolve to an immutable commit");
+    assert.match(src, /Refusing to move an immutable release tag/, "mismatched existing tags must fail safely");
+    assert.doesNotMatch(src, /Fail if tag already exists/, "existing matching tags must be recoverable");
 });
 
 // Ping diagnostics removed 2026-07-20: release.yml itself now covers tag pushes,

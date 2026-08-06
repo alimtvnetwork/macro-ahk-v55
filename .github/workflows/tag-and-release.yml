@@ -59,25 +59,33 @@ jobs:
           fi
           echo "TAG_NAME=v$VER" >> "$GITHUB_ENV"
 
-      - name: Fail if tag already exists
-        run: |
-          if git ls-remote --exit-code --tags origin "refs/tags/$TAG_NAME" >/dev/null 2>&1; then
-            echo "::error::Tag $TAG_NAME already exists on the remote. Delete it first or pick a new version."
-            exit 1
-          fi
-
-      - name: Create and push tag
+      - name: Create or safely reuse tag
         id: tag
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
-          git push origin "$TAG_NAME"
+          set -euo pipefail
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG_NAME" >/dev/null 2>&1; then
+            git fetch --force origin "refs/tags/$TAG_NAME:refs/tags/$TAG_NAME"
+            TAG_COMMIT=$(git rev-list -n 1 "$TAG_NAME")
+            if [ -n "${{ inputs.ref }}" ]; then
+              REQUESTED_COMMIT=$(git rev-parse HEAD)
+              if [ "$TAG_COMMIT" != "$REQUESTED_COMMIT" ]; then
+                echo "::error::Existing tag $TAG_NAME points to $TAG_COMMIT, not requested commit $REQUESTED_COMMIT. Refusing to move an immutable release tag."
+                exit 1
+              fi
+            fi
+            echo "Reusing existing immutable tag $TAG_NAME at $TAG_COMMIT."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+            git push origin "$TAG_NAME"
+            echo "Created and pushed $TAG_NAME at $(git rev-parse HEAD)."
+          fi
           echo "tag=$TAG_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Summary
         run: |
-          echo "Created and pushed **$TAG_NAME**. The \`release\` job below calls \`release.yml\` directly for this tag." >> "$GITHUB_STEP_SUMMARY"
+          echo "Validated **$TAG_NAME**. The \`release\` job below calls \`release.yml\` directly for this tag." >> "$GITHUB_STEP_SUMMARY"
 
   # ──────────────────────────────────────────────────────────────
   # Build and publish the GitHub Release for the tag just created.
