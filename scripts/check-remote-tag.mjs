@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { appendFileSync, readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { resolveRepoSlug } from "./resolve-repo-slug.mjs";
@@ -7,11 +7,20 @@ import { resolveRepoSlug } from "./resolve-repo-slug.mjs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const VERSION_JSON = resolve(__dirname, "../version.json");
 
+/** Surface a line in the GitHub Actions job summary when running in CI. */
+function writeStepSummary(line) {
+  const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+  if (!summaryPath) return;
+  appendFileSync(summaryPath, `${line}\n`, "utf8");
+}
+
 function main() {
   const { version } = JSON.parse(readFileSync(VERSION_JSON, "utf8"));
 
   if (version.endsWith("-dev")) {
-    console.log(`[SKIP] Local dev version detected (${version}). Skipping remote tag check.`);
+    const notice = `> [!WARNING] Release tag guard BYPASSED: version.json is \`${version}\` (dev suffix), so the remote tag presence check did not run. No \`v${version.replace(/-dev$/, "")}\` tag was verified.`;
+    console.log(`[BYPASS] Dev version detected (${version}). Remote tag check skipped, release readiness NOT verified.`);
+    writeStepSummary(notice);
     process.exit(0);
   }
 
