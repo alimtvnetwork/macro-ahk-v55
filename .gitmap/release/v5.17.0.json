@@ -1,0 +1,19 @@
+{
+  "version": "5.17.0",
+  "branch": "release/v5.17.0",
+  "sourceBranch": "main",
+  "commit": "3d69d30796c244d01887771672d03cc6785105d8",
+  "tag": "v5.17.0",
+  "assets": [],
+  "changelog": [
+    "Automated versioning process via `node scripts/bump-version.mjs minor`.",
+    "Ensured all version pin sites including `readme.md` and `prompt-bundle-types.ts` are synchronized to v5.17.0.",
+    "Regenerated `macro-prompts.json` artifacts.",
+    "Standardized version bump ritual under `14-release.md` ceremony compliance.",
+    "[01-5-17-0-git-tag-skipped](.lovable/release/issues/01-5-17-0-git-tag-skipped.md) Git tag/commit skipped due to sandbox restrictions."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-08-06T09:45:29Z",
+  "isLatest": false
+}
