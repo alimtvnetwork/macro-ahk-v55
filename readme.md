@@ -1412,6 +1412,28 @@ xProduct is the modular runtime behind Alim's operational systems: a typed, decl
 
 ---
 
+## Project Structure
+
+This project follows a modular Manifest V3 architecture.
+
+### Key Folders
+
+- `chrome-extension/`: Extension background, content scripts, and UI.
+- `standalone-scripts/`: Modular automation scripts and prompt templates.
+- `scripts/`: Build, install, and maintenance tools.
+- `.lovable/`: Project memory, plans, and authoritative read-list.
+
+### Authoritative Read-List
+
+All AI contributors MUST read the following before starting any task:
+- [Authoritative Read-List](.lovable/what-to-read.md)
+- [Project Memory Index](.lovable/memory/index.md)
+- [Coding Guidelines](.lovable/memory/standards/01-coding-guidelines.md)
+- [Project Prohibitions](.lovable/memory/constraints/01-rules.md)
+
+---
+
 ## License
 
 This project is proprietary software owned by Riseup Asia LLC. All rights reserved.
+
