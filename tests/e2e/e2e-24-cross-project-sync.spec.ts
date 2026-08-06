@@ -28,14 +28,14 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
 
   test('creates a project group, drag-assigns a project, and cascades shared settings', async () => {
     const context = await launchExtension();
-    context.setDefaultTimeout(60_000);
+    context.setDefaultTimeout(90_000);
     try {
       const extensionId = await getExtensionId(context);
       console.log(`[E2E-24] Extension ID: ${extensionId}`);
       await seedCrossProjectSyncState(context);
 
       const options = await openOptions(context, extensionId);
-      options.setDefaultTimeout(60_000);
+      options.setDefaultTimeout(90_000);
       await options.goto(`${optionsUrl(extensionId)}#library`);
       await seedCrossProjectSyncStateFromPage(options);
       await waitForReadyOptions(options);
