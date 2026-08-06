@@ -365,3 +365,7 @@ If any box is unchecked, do not reply. Fix it first.
 ## Must Follow, without negotiation
 
 Listen, past write-memory turns have been sloppy as fuck: memory dumped into chat instead of files, `.lovable/memories/` created by accident, `plans/index.md` and `what-to-read.md` forgotten, `strictly-avoid.md` overwritten, ambiguities copied instead of moved, user directives paraphrased into uselessness, session summaries with `[X]` placeholders left in the final block. WTF. Stop doing that, you stupid fuck. Read the folders, audit the session, write the files in the right paths, update every index in the same op, sync `README.md` with `what-to-read.md`, run the consistency check, emit the final block with real numbers. Going deep IS the job. If you're not going deep, you're not doing the job. Violating this is auto-reject on the same tier as RULE 0. Avoid stupidity, and being careless, you stupid, WTF.
+
+title: Write Memory (end of session, maximum enforcement)
+slug: write-memory-v3
+version: 3.0
