@@ -8,6 +8,9 @@
 ### Added
 - Standardized version bump ritual under `14-release.md` ceremony compliance.
 
+### Issues
+- [01-5-17-0-git-tag-skipped](.lovable/release/issues/01-5-17-0-git-tag-skipped.md) Git tag/commit skipped due to sandbox restrictions.
+
 # Changelog
 
 ## [v5.16.0] 2026-08-06 CI/CD Hardening and Readme Compliance
