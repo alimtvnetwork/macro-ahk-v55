@@ -63,7 +63,7 @@ irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/i
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh | bash
 ```
 
-# [v5.16.0] 2026-08-06 CI/CD Recovery and Prompt Registry Sync
+> **[v5.16.0] 2026-08-06 CI/CD Recovery and Prompt Registry Sync**
 
 ```powershell
 # Windows · PowerShell
