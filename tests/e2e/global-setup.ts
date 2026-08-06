@@ -2,6 +2,12 @@ import { execSync } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import {
+  EXTENSION_CANDIDATES,
+  REPO_ROOT,
+  prebuiltExtensionExists,
+  resolveExtensionDir,
+} from './extension-dir';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,20 +23,9 @@ const __dirname = path.dirname(__filename);
  *   globalSetup: './tests/e2e/global-setup.ts'
  */
 
-// IMPORTANT: this MUST stay in sync with vite.config.extension.ts (`DIST_DIR`).
-// We probe both `chrome-extension/` (current) and `dist/` (legacy) so the setup
-// keeps working through any future rename — first match wins.
-const EXTENSION_CANDIDATES = [
-  path.resolve(__dirname, '../../chrome-extension'),
-  path.resolve(__dirname, '../../dist'),
-];
-function pickExtensionDir(): string {
-  for (const dir of EXTENSION_CANDIDATES) {
-    if (existsSync(path.join(dir, 'manifest.json'))) return dir;
-  }
-  return EXTENSION_CANDIDATES[0];
-}
-const EXTENSION_DIR = pickExtensionDir();
+// Build-output resolution lives in ./extension-dir so the config, this setup
+// and the fixtures can never disagree about where the extension is.
+const pickExtensionDir = resolveExtensionDir;
 
 const REQUIRED_MANIFEST_KEYS = [
   'manifest_version',
@@ -47,10 +42,25 @@ const REQUIRED_PERMISSIONS = [
 ];
 
 async function globalSetup() {
-  console.log('\n🔨 Building extension…');
+  const repoRoot = REPO_ROOT;
 
-  const repoRoot = path.resolve(__dirname, '../..');
+  // CI downloads the `chrome-extension-dist` artifact built by the
+  // `build-extension` job, so rebuilding here is both wasteful (9 sequential
+  // builds inside a 30 min job) and impossible: `build:extension` requires the
+  // standalone dist artifacts that only exist in their own jobs. Skip the build
+  // whenever a built extension is already on disk, or when E2E_SKIP_BUILD=1.
+  const skipBuild =
+    process.env.E2E_SKIP_BUILD === '1' || prebuiltExtensionExists();
 
+  if (skipBuild) {
+    console.log(
+      `\n⏭️  Skipping extension build, using prebuilt output at ${pickExtensionDir()}`
+    );
+  } else {
+    console.log('\n🔨 Building extension…');
+  }
+
+  if (!skipBuild) {
   // Detect package manager: composite scripts (e.g. build:macro-controller) call `pnpm run …`
   // internally, so we prefer pnpm when available and fall back to npm otherwise.
   const pm = (() => {
@@ -93,6 +103,7 @@ async function globalSetup() {
         `Ensure the corresponding npm script exists in package.json and that prior steps produced their dist/ output.\n${err}`
       );
     }
+  }
   }
 
   // Step 2: Re-resolve extension dir AFTER the build (build:extension may have created it).
