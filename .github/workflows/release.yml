@@ -55,6 +55,19 @@ on:
         description: "Release tag to build, for example v4.395.1"
         required: true
         type: string
+  # Callable directly by .github/workflows/tag-and-release.yml.
+  #
+  # A tag pushed with the built-in GITHUB_TOKEN does NOT emit a `push`
+  # event, by GitHub design (recursive-run prevention). So creating the
+  # tag server-side can never trigger the `push: tags: v*` path above.
+  # workflow_call removes that dependency: the tagging workflow invokes
+  # this pipeline in the same run, right after the tag exists.
+  workflow_call:
+    inputs:
+      version:
+        description: "Release tag to build, for example v5.22.0"
+        required: true
+        type: string
 
 # Release builds must NEVER be cancelled — every release commit
 # must produce a GitHub Release regardless of newer commits.

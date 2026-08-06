@@ -1,10 +1,16 @@
 # ──────────────────────────────────────────────────────────────
-# Marco Extension — Tag and Release (server-side tag creation)
+# Marco Extension — Tag and Release (server-side tag creation + release)
 #
 # The sandbox/dev environment cannot create or push git tags, which
 # left every release ceremony without a `v*` tag and therefore without
 # a Release Build run. This workflow creates the tag server-side with
-# GITHUB_TOKEN; `release.yml` then triggers on the resulting tag.
+# GITHUB_TOKEN and then CALLS `release.yml` in the same run.
+#
+# Why the call is mandatory: a push made with the built-in GITHUB_TOKEN
+# does not emit a `push` event (GitHub suppresses it to prevent
+# recursive runs). So `release.yml`'s `push: tags: v*` trigger can never
+# fire from the tag created here. Relying on it produced the exact
+# "tag exists, release page empty" symptom. `workflow_call` is the fix.
 #
 # Usage: Actions > Tag and Release > Run workflow > version = 5.21.0
 # ──────────────────────────────────────────────────────────────
@@ -34,6 +40,8 @@ jobs:
   create-tag:
     name: Create v${{ inputs.version }} tag
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
 
     steps:
       - name: Checkout repository
@@ -59,12 +67,30 @@ jobs:
           fi
 
       - name: Create and push tag
+        id: tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
           git push origin "$TAG_NAME"
+          echo "tag=$TAG_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Summary
         run: |
-          echo "Created and pushed **$TAG_NAME**. \`release.yml\` picks it up from the tag push event." >> "$GITHUB_STEP_SUMMARY"
+          echo "Created and pushed **$TAG_NAME**. The \`release\` job below calls \`release.yml\` directly for this tag." >> "$GITHUB_STEP_SUMMARY"
+
+  # ──────────────────────────────────────────────────────────────
+  # Build and publish the GitHub Release for the tag just created.
+  # Called directly, never relying on a tag-push event.
+  # ──────────────────────────────────────────────────────────────
+  release:
+    name: Release Build
+    needs: create-tag
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    uses: ./.github/workflows/release.yml
+    secrets: inherit
+    with:
+      version: ${{ needs.create-tag.outputs.tag }}

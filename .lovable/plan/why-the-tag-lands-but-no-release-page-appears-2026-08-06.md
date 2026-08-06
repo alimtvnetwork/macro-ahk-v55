@@ -1,4 +1,8 @@
-# Why the tag lands but no release page appears
+# Why the tag lands but no release page appears  
+  
+
+
+Also write the root cause of it and also update the lovable memory so that it does not happen again or ever. Okay? Avoid stupidity
 
 ## What the screenshot actually shows
 
