@@ -10,7 +10,6 @@ const VERSION_JSON = resolve(__dirname, "../version.json");
 function main() {
   const { version } = JSON.parse(readFileSync(VERSION_JSON, "utf8"));
 
-
   if (version.endsWith("-dev")) {
     console.log(`[SKIP] Local dev version detected (${version}). Skipping remote tag check.`);
     process.exit(0);
