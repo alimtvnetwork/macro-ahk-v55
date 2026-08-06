@@ -34,13 +34,13 @@ irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/d
 **Windows · PowerShell - pin a version + custom folder name (env-var form, works with `irm | iex`):**
 
 ```powershell
-$env:MARCO_DL_VERSION='v5.15.0'; $env:MARCO_DL_FOLDER='marco'; irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/download-extension.ps1 | iex
+$env:MARCO_DL_VERSION='v5.16.0'; $env:MARCO_DL_FOLDER='marco'; irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/download-extension.ps1 | iex
 ```
 
 **Windows · PowerShell - run a local clone with explicit flags:**
 
 ```powershell
-.\scripts\download-extension.ps1 -Version v5.15.0 -FolderName marco-extension
+.\scripts\download-extension.ps1 -Version v5.16.0 -FolderName marco-extension
 ```
 
 **Windows · PowerShell - source checkout without full-history clone:**
@@ -49,7 +49,7 @@ $env:MARCO_DL_VERSION='v5.15.0'; $env:MARCO_DL_FOLDER='marco'; irm https://raw.g
 irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/clone-repo.ps1 | iex
 ```
 
-After it finishes, load the resulting folder via `chrome://extensions → Load unpacked`. The `marco-extension-v5.15.0.zip` backup sits next to it.
+After it finishes, load the resulting folder via `chrome://extensions → Load unpacked`. The `marco-extension-v5.16.0.zip` backup sits next to it.
 
 ### 🪟 Windows · PowerShell installer (latest)
 
@@ -63,23 +63,23 @@ irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/i
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh | bash
 ```
 
-# [v5.15.0] 2026-08-06 CI/CD Recovery and Prompt Registry Sync
+> **[v5.16.0] 2026-08-06 CI/CD Recovery and Prompt Registry Sync**
 
 ```powershell
-# Windows · PowerShell
-irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.15.0/install.ps1 | iex
+## Windows · PowerShell
+irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.16.0/install.ps1 | iex
 
 
 ```
 
 ```bash
-# macOS · Linux · Bash
-curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.15.0/install.sh | bash
+## macOS · Linux · Bash
+curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.16.0/install.sh | bash
 
 
 ```
 
-**Pinned version:** `v5.15.0` &nbsp;•&nbsp; **Macro Controller:** `v5.15.0`
+**Pinned version:** `v5.16.0` &nbsp;•&nbsp; **Macro Controller:** `v5.16.0`
 
 > **v2.243.0 release-asset fix (historical):** the previous release pipeline pointed at a legacy `chrome-extension/dist/` subfolder that no longer exists (the unpacked extension is built into `chrome-extension/` itself - see `vite.config.extension.ts` and `powershell.json → distDir`). That mismatch caused `marco-extension-{VER}.zip` to be silently absent from the GitHub Releases page. The workflow now zips `chrome-extension/` directly and fails fast if the extension zip is missing or `< 10 KiB`. RCA: [`mem://constraints/chrome-extension-dist-path`](.lovable/memory/constraints/chrome-extension-dist-path.md).
 
@@ -106,12 +106,12 @@ Pick your platform - each section is a self-contained install path with the reco
 **Recommended path.** Open **PowerShell** (Win + X → "Windows PowerShell" or "Terminal") and run:
 
 ```powershell
-irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.15.0/install.ps1 | iex
+irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.16.0/install.ps1 | iex
 
 
 ```
 
-- 🔒 Pinned to `v5.15.0` - see [Pinned to a specific release](#-pinned-to-a-specific-release) to change versions
+- 🔒 Pinned to `v5.16.0` - see [Pinned to a specific release](#-pinned-to-a-specific-release) to change versions
 - 🌊 Want auto-update? Use the [latest channel](#-latest-channel-auto-update) one-liner
 - 📁 Custom install folder? See [Custom Directory Install](#custom-directory-install)
 - 🚩 Full flag list, exit codes, checksum behavior → [Installer Options](#installer-options)
@@ -121,12 +121,12 @@ irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.15.0/ins
 Open your terminal and run:
 
 ```bash
-curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.15.0/install.sh | bash
+curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.16.0/install.sh | bash
 
 
 ```
 
-- 🔒 Pinned to `v5.15.0` - see [Pinned to a specific release](#-pinned-to-a-specific-release) for other tags
+- 🔒 Pinned to `v5.16.0` - see [Pinned to a specific release](#-pinned-to-a-specific-release) for other tags
 - 🌊 Auto-update channel → [latest channel](#-latest-channel-auto-update)
 - 📁 Custom install folder? See [Custom Directory Install](#custom-directory-install)
 - 🚩 Full flag list, exit codes, checksum behavior → [Installer Options](#installer-options)
@@ -140,13 +140,13 @@ The unified installer auto-derives the pinned version from its download URL. Use
 #### 🔒 Pinned to a specific release
 
 ```powershell
-# PowerShell (Windows) - replace v4.109.0 with any released tag
-irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.15.0/install.ps1 | iex
+## PowerShell (Windows) - replace v4.109.0 with any released tag
+irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.16.0/install.ps1 | iex
 ```
 
 ```bash
-# Bash (Linux / macOS)
-curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.15.0/install.sh | bash
+## Bash (Linux / macOS)
+curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.16.0/install.sh | bash
 ```
 
 #### 🌊 Latest channel (auto-update)
@@ -164,14 +164,14 @@ curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/sc
 Since **v4.154.0** the Bash installer defaults its target to `$(pwd)/marco-extension` - the plain curl-pipe one-liner drops the extension into whatever directory you ran it from, never into `$HOME`. PowerShell has the same behavior via `-InstallDir (Join-Path $PWD 'marco-extension')`.
 
 ```bash
-# Bash (Linux / macOS) - installs to ./marco-extension under the CURRENT directory
+## Bash (Linux / macOS) - installs to ./marco-extension under the CURRENT directory
 cd ~/projects/my-workspace
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh | sh
-# → ~/projects/my-workspace/marco-extension/
+## → ~/projects/my-workspace/marco-extension/
 ```
 
 ```powershell
-# PowerShell (Windows) - installs to .\marco-extension under the current folder
+## PowerShell (Windows) - installs to .\marco-extension under the current folder
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.ps1))) -InstallDir (Join-Path $PWD 'marco-extension')
 ```
 
@@ -204,21 +204,21 @@ curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/sc
 All four spellings are equivalent. Pick whichever reads best in your shell; the canonical flag is `--install-dir`.
 
 ```bash
-# Canonical, space-separated
+## Canonical, space-separated
 ./install.sh --install-dir ~/marco-extension
 
-# Canonical, equals-joined (useful in pipelines / CI vars)
+## Canonical, equals-joined (useful in pipelines / CI vars)
 ./install.sh --install-dir=/opt/marco-extension
 
-# Path containing spaces - quote it (either form works)
+## Path containing spaces - quote it (either form works)
 ./install.sh --install-dir "$HOME/Marco Tools/marco-extension"
 ./install.sh --install-dir="$HOME/Marco Tools/marco-extension"
 
-# Short aliases (identical behavior)
+## Short aliases (identical behavior)
 ./install.sh --dir ./tmp/marco-extension
 ./install.sh -d /var/tmp/marco-extension
 
-# Pipe form - pass flags after `bash -s --`
+## Pipe form - pass flags after `bash -s --`
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh \
   | bash -s -- --install-dir "$HOME/marco-extension"
 ```
@@ -249,7 +249,7 @@ The installers (`install.ps1`, `install.sh`) conform to the [Generic Installer B
 
 | Flag | Description | Example |
 |------|-------------|---------|
-| `-Version` | Pin a specific release (`vX.Y.Z[-pre]`) or `latest` | `-Version v5.15.0` |
+| `-Version` | Pin a specific release (`vX.Y.Z[-pre]`) or `latest` | `-Version v5.16.0` |
 | `-InstallDir` | Custom install directory | `-InstallDir D:\marco-extension\v3.6.1` |
 | `-Repo` | Override GitHub `owner/repo` | `-Repo alimtvnetwork/macro-ahk-v55` |
 | `-Help` | Print usage and exit 0 | `-Help` |
@@ -324,17 +324,17 @@ Use `--dry-run` to inspect the resolved decision without installing - the plan p
 #### Examples
 
 ```bash
-# Preview what would happen with the latest release - no network writes:
+## Preview what would happen with the latest release - no network writes:
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh \
   | bash -s -- --dry-run
 
-# Pin a specific version into a custom directory:
+## Pin a specific version into a custom directory:
 ./install.sh --version v4.109.0 --dir ~/marco-extension/v4.109.0
 
-# Force-enable sibling-repo discovery for this one run:
+## Force-enable sibling-repo discovery for this one run:
 ./install.sh --enable-sibling-discovery
 
-# Print full usage and the spec link:
+## Print full usage and the spec link:
 ./install.sh --help
 ```
 
@@ -713,16 +713,16 @@ Two independent guards live in this repo and run on every build, and you
 can also run them by hand any time you touch `manifest.json`:
 
 ```bash
-# 1. Source-manifest preflight - runs BEFORE Vite, fails the build if
-#    the source manifest's CSP is missing or doesn't allow Wasm.
+## 1. Source-manifest preflight - runs BEFORE Vite, fails the build if
+##    the source manifest's CSP is missing or doesn't allow Wasm.
 pnpm run check:manifest
 
-# 2. Build the extension. The pipeline ends with check:built-csp, which
-#    re-validates chrome-extension/manifest.json AFTER Vite has rewritten
-#    path fields, then prints a 4-step reload-and-verify checklist.
+## 2. Build the extension. The pipeline ends with check:built-csp, which
+##    re-validates chrome-extension/manifest.json AFTER Vite has rewritten
+##    path fields, then prints a 4-step reload-and-verify checklist.
 pnpm run build:extension
 
-# 3. Manual re-validation against the built artifact.
+## 3. Manual re-validation against the built artifact.
 pnpm run check:built-csp
 ```
 
@@ -1193,7 +1193,7 @@ resolved path for `result-webhook` *before* invoking the same dev build:
 
 ```bash
 pnpm run repro:build
-# → scripts/repro-build-error.mjs
+## → scripts/repro-build-error.mjs
 ```
 
 The same helper is exposed as a **"Reproduce build error"** button in the

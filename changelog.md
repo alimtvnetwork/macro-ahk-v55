@@ -1,6 +1,17 @@
 # Changelog
 
-## [v5.15.0] 2026-08-06 CI/CD Recovery and Prompt Registry Sync
+## [v5.16.0] 2026-08-06 CI/CD Hardening and Readme Compliance
+
+### Fixed
+- Fixed `readme.md` compliance error: resolved dual-H1 violation by converting the tagline em-dash to parentheses and ensuring only one `#` heading exists.
+- Fixed `readme.md` hero layout: consolidated badge lines to ensure centering and folding compliance.
+- Synchronized `standalone-scripts/prompts/22-release/prompt.md` and `.lovable/prompts/14-release.md` to v1.2 with strict MINOR bump enforcement.
+
+### Added
+- Created `scripts/check-remote-tag.mjs` to verify expected release tags exist on the remote during CI.
+- Wired `check-remote-tag.mjs` into `.github/workflows/ci.yml` as a fail-fast preflight gate.
+- Logged `.lovable/release/issues/01-5-16-0-git-tag-skipped.md` documenting manual git operations required post-release.
+
 
 ### Fixed
 - Restored `.lovable/coding-guidelines.md` symlink to `memory/standards/01-coding-guidelines.md`, resolving `FATAL: .lovable/coding-guidelines.md does not exist` in `scripts/check-coding-guidelines-coverage.mjs`.
