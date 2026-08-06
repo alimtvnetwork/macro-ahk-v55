@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const VERSION_JSON_PATH = resolve(ROOT, "version.json");
 const MANIFEST_PATH = resolve(ROOT, "manifest.json");
-const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
+const SEMVER_PATTERN = /^[0-9]+\.[0-9]+\.[0-9]+([.-].+)?$/;
 
 function fail(title, exactPath, missing, reason) {
     console.error("");
@@ -51,7 +51,7 @@ function readCanonicalVersion() {
         fail(
             "version.json semver",
             VERSION_JSON_PATH,
-            "version string matching X.Y.Z",
+            "version string matching SEMVER",
             `Current version value is ${JSON.stringify(versionFile.version)}.`,
         );
     }
