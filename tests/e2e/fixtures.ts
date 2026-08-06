@@ -2,6 +2,7 @@ import { test as base, chromium, type BrowserContext, type Page } from '@playwri
 import path from 'path';
 import fs from 'fs';
 import { EXTENSION_CANDIDATES, resolveExtensionDir } from './extension-dir';
+import { resolveChromiumExecutablePath } from './chromium-path';
 
 /*
  * Chrome Extension E2E — Shared Fixtures
@@ -27,22 +28,6 @@ import { EXTENSION_CANDIDATES, resolveExtensionDir } from './extension-dir';
 // the fixture survives any future rename without breaking E2E.
 
 const EXTENSION_PATH = resolveExtensionDir();
-
-const SYSTEM_CHROMIUM_CANDIDATES = [
-  '/bin/chromium',
-  '/usr/bin/chromium',
-  '/usr/bin/chromium-browser',
-  '/usr/bin/google-chrome',
-  '/usr/bin/google-chrome-stable',
-];
-
-function resolveChromiumExecutablePath(): string | undefined {
-  for (const candidate of SYSTEM_CHROMIUM_CANDIDATES) {
-    if (fs.existsSync(candidate)) return candidate;
-  }
-
-  return undefined;
-}
 
 // ─── Manifest-Driven Page Paths ──────────────────────────────────────
 //

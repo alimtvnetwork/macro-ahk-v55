@@ -7,6 +7,7 @@
 - Corrected `e2e-24-cross-project-sync.spec.ts` to use the custom `test` fixture from `./fixtures`.
 - Fixed CI preflight failure `[check-prompt-loader-mocks]` by routing the direct `vi.doMock` in `remix-invalidate-sentinel.test.ts` through the mandatory `buildPromptLoaderMock` factory.
 - Standardized extension directory resolution across Playwright config, setup, and fixtures to support both local (`chrome-extension/`) and CI (`dist/`) layouts.
+- Fixed the 10 failing `e2e-21-xpath-capture` specs: `playwright.config.ts` used `channel: 'chromium'` while the fixtures used an explicit `executablePath`, so specs on the default `page` fixture crashed with `Executable doesn't exist at /opt/ms-playwright/chromium-<build>/chrome-linux64/chrome`. Added `tests/e2e/chromium-path.ts` as the single resolver (env override, system binaries, then a scan of the Playwright registry) and wired it into both the config and the fixtures. Full suite is now green: 49 passed, 73 skipped, 0 failed.
 
 ## [v5.17.0] 2026-08-06 Minor bump ceremony and CI/CD hardening
 

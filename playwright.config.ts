@@ -1,5 +1,6 @@
 import { defineConfig } from '@playwright/test';
 import { resolveExtensionDir } from './tests/e2e/extension-dir';
+import { resolveChromiumExecutablePath } from './tests/e2e/chromium-path';
 
 /**
  * Playwright configuration for Chrome Extension E2E tests.
@@ -13,6 +14,12 @@ import { resolveExtensionDir } from './tests/e2e/extension-dir';
 // Resolved at run time: `chrome-extension/` locally, `dist/` when CI downloads
 // the prebuilt artifact. Hard-coding one of them broke the CI E2E job.
 const EXTENSION_DIR = resolveExtensionDir();
+
+// Specs that use the default Playwright `page` fixture (e.g. e2e-21-xpath-capture)
+// must launch the same binary the extension fixture uses. Without this, they fail
+// with "Executable doesn't exist at /opt/ms-playwright/chromium-<build>/…" whenever
+// the installed registry build differs from the one this Playwright version wants.
+const CHROMIUM_EXECUTABLE = resolveChromiumExecutablePath();
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -57,10 +64,13 @@ export default defineConfig({
       use: {
         /* Extensions only work in headed Chromium */
         headless: false,
-        channel: 'chromium',
+        // `channel` and `executablePath` are mutually exclusive: only fall back to
+        // the channel when no concrete binary could be resolved.
+        ...(CHROMIUM_EXECUTABLE ? {} : { channel: 'chromium' as const }),
 
         /* Load the unpacked extension */
         launchOptions: {
+          ...(CHROMIUM_EXECUTABLE ? { executablePath: CHROMIUM_EXECUTABLE } : {}),
           args: [
             `--disable-extensions-except=${EXTENSION_DIR}`,
             `--load-extension=${EXTENSION_DIR}`,
