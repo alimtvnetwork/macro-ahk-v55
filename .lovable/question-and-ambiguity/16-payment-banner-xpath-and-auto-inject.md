@@ -1,4 +1,4 @@
-# 16 — Payment banner: latest XPath + auto-injection failure
+# 16 - Payment banner: latest XPath + auto-injection failure
 
 **Asked:** 2026-06-19  •  **Status:** open (logged under No-Questions Mode)
 
@@ -25,7 +25,7 @@ v3.57.0 → v3.62.0. Cause: `scripts/bump-version.mjs` and
 `scripts/check-version-sync.mjs` never listed this project, so every
 release bumped the host extension but left the banner-hider seed at
 3.56.0. `check-version-sync` passed because it didn't check this
-file either — silent drift.
+file either - silent drift.
 
 ### Why a stale seed Version breaks auto-injection
 
@@ -78,7 +78,7 @@ log, or commit message. The current patterns in
 - **A. Wait for the XPath.** Cannot extend `BANNER_PATTERNS` without
   the actual new path + a textContent substring to anchor the match.
   *Recommended.* Pros: no guessing. Cons: blocks until user pastes
-  the XPath. **Need from user:** `xpath` + 1–2 expected text snippets
+  the XPath. **Need from user:** `xpath` + 1-2 expected text snippets
   inside the banner (so it doesn't match unrelated elements).
 - **B. Add a "find by visible text only" fallback** that scans
   `document.body` for any sticky banner whose text matches a list of
@@ -93,7 +93,7 @@ log, or commit message. The current patterns in
 
 ### Recommendation
 
-Pick **A** for this turn — paste the XPath + the visible text and we
+Pick **A** for this turn - paste the XPath + the visible text and we
 land a one-line addition to `BANNER_PATTERNS`. Schedule **C** as a
 follow-up plan if banner DOM keeps moving.
 

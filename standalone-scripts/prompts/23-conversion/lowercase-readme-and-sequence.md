@@ -7,7 +7,7 @@ slug: lowercase-readme-and-sequence
 
 Enforce these naming rules across the entire repository:
 
-1. **All README files must be lowercase**: rename every `README.md`, `Readme.md`, `ReadMe.md`, etc. to `readme.md`. Apply recursively at every depth (root, subfolders, packages, specs, prompts, scripts — everywhere). Update every internal link and import reference to match.
+1. **All README files must be lowercase**: rename every `README.md`, `Readme.md`, `ReadMe.md`, etc. to `readme.md`. Apply recursively at every depth (root, subfolders, packages, specs, prompts, scripts - everywhere). Update every internal link and import reference to match.
 
 2. **Sequence-prefixed markdown files must use `xx-lower-case.md` slug form**: any markdown file that begins with a numeric sequence prefix must follow the pattern `NN-kebab-lower-case.md` where:
 
@@ -33,7 +33,7 @@ Enforce these naming rules across the entire repository:
 
 3. Update every reference: markdown links, code imports, doc indexes, sidebars, and `.lovable/memory/index.md`.
 
-4. Verify with a final scan — fail loudly if any non-conforming file remains.
+4. Verify with a final scan - fail loudly if any non-conforming file remains.
 
 5. Run the build and link checker; fix any broken references.
 

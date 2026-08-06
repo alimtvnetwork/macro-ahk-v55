@@ -21,7 +21,7 @@ repeated release-blocking failures the user has explicitly banned.
   (already removed; verify).
 - `.github/workflows/audit-releases.yml` required-assets FAIL counter
   (already removed; verify no `exit 1` on missing assets).
-- `.github/workflows/demote-incomplete-releases.yml` — evaluate whether to
+- `.github/workflows/demote-incomplete-releases.yml` - evaluate whether to
   keep as advisory only (never fail) or delete entirely.
 - Any `check-version-sync.mjs` invocation in CI: downgrade to a warning-only
   step, or move behind the propagator so it can never fail (propagator

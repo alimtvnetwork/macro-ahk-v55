@@ -4,7 +4,7 @@ description: Pure token validation/extraction utilities moved from macro-control
 type: feature
 ---
 
-## SDK AuthTokenUtils — Static Class
+## SDK AuthTokenUtils - Static Class
 
 **Moved**: 2026-04-09
 **From**: `standalone-scripts/macro-controller/src/auth-resolve.ts`
@@ -12,16 +12,16 @@ type: feature
 **Exposed on**: `window.marco.authUtils`
 
 ### Methods (all static)
-- `normalizeBearerToken(raw)` — Strip "Bearer " prefix
-- `isJwtToken(raw)` — JWT format check (eyJ + 3 parts)
-- `isUsableToken(raw)` — Full validation (length, whitespace, JSON-like, JWT)
-- `extractBearerTokenFromUnknown(raw)` — Extract from string/JSON with fallback
+- `normalizeBearerToken(raw)` - Strip "Bearer " prefix
+- `isJwtToken(raw)` - JWT format check (eyJ + 3 parts)
+- `isUsableToken(raw)` - Full validation (length, whitespace, JSON-like, JWT)
+- `extractBearerTokenFromUnknown(raw)` - Extract from string/JSON with fallback
 
 ### Backward compatibility
 auth-resolve.ts still exports `normalizeBearerToken`, `isJwtToken`, `isUsableToken`, `extractBearerTokenFromUnknown` as thin wrappers that delegate to `window.marco.authUtils.*` at runtime, with an inline fallback for early boot before SDK loads.
 
 ### Error policy
-- NO swallowed errors — every catch block logs with context
+- NO swallowed errors - every catch block logs with context
 - Nested ifs inverted to guard clauses with early returns
 - JSON parse fallbacks log at debug level (intentional fallback behavior)
 

@@ -1,4 +1,4 @@
-# 36 — Validator main(): which "incompleteness" did the user mean?
+# 36 - Validator main(): which "incompleteness" did the user mean?
 
 **Original task:** "Fix the validator script's incomplete main() block
 so it fully validates and exits with the correct status code for each
@@ -28,7 +28,7 @@ the user's "correct status code … for each project and repo-wide" bar:
 
 1. **Per-project mode accepted any directory.** A folder without
    `src/instruction.ts` was treated as a project, looped through, and
-   exited 0 with `Scanned: 1 project(s), 0 artifact(s)` — a false
+   exited 0 with `Scanned: 1 project(s), 0 artifact(s)` - a false
    green. Now exits 2 with a clear message.
 2. **Per-project mode flattened "missing dist/" into exit 1.** The
    header docstring (lines 38-39) literally says "project lacks dist/
@@ -41,7 +41,7 @@ the user's "correct status code … for each project and repo-wide" bar:
    would silently pass. Now exits 2 with a layout-broken message.
 4. **No top-level error guard.** An uncaught throw inside `main()`
    (future schema refactor, fs race, malformed JSON the parser missed)
-   would crash with whatever exit code Node felt like — sometimes 0
+   would crash with whatever exit code Node felt like - sometimes 0
    on CI runners that swallow promise rejections. Now wrapped in a
    try/catch that exits 3 with a `::error` annotation.
 

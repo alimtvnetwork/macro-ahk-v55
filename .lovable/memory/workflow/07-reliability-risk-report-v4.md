@@ -1,4 +1,4 @@
-# Reliability & Failure-Chance Report v4 — Extension v2.128.0
+# Reliability & Failure-Chance Report v4 - Extension v2.128.0
 
 **Date**: 2026-04-09
 **Purpose**: Assess spec quality and AI-handoff readiness after enum reorganization, error logging, rename preset persistence, and cross-project sync data layer.
@@ -30,31 +30,31 @@
 
 | Tier | Module | Success % | Δ from v3 | Notes |
 |------|--------|-----------|-----------|-------|
-| **Simple** | Config loading (JSON schema) | 99% | — | Stable |
-| **Simple** | CSV/JSON export | 99% | — | Stable |
-| **Simple** | Progress bar rendering | 97% | — | Stable |
-| **Simple** | SQLite bundle import/export | 98% | — | Stable |
+| **Simple** | Config loading (JSON schema) | 99% | - | Stable |
+| **Simple** | CSV/JSON export | 99% | - | Stable |
+| **Simple** | Progress bar rendering | 97% | - | Stable |
+| **Simple** | SQLite bundle import/export | 98% | - | Stable |
 | **Simple** | Rename preset persistence | 97% | NEW | ProjectKvStore; IndexedDB backed |
-| **Medium** | Credit formula calculation | 96% | — | Shared helpers; 5-pool model |
+| **Medium** | Credit formula calculation | 96% | - | Shared helpers; 5-pool model |
 | **Medium** | Bearer token auth bridge | 97% | +1% | AuthTokenUtils in SDK; cleaner boundary |
-| **Medium** | Extension popup UI (React) | 96% | — | PlatformAdapter; 35+ smoke tests |
+| **Medium** | Extension popup UI (React) | 96% | - | PlatformAdapter; 35+ smoke tests |
 | **Medium** | Extension options UI (React) | 95% | +1% | Error modal added; hooks-order validated |
-| **Medium** | Storage UI (4-category) | 95% | — | Spec 55 complete |
-| **Medium** | Advanced automation engine | 93% | — | 46 unit tests; drag-drop builder |
-| **Medium** | Prompt management (dual cache) | 94% | — | IndexedDB dual-cache stable |
+| **Medium** | Storage UI (4-category) | 95% | - | Spec 55 complete |
+| **Medium** | Advanced automation engine | 93% | - | 46 unit tests; drag-drop builder |
+| **Medium** | Prompt management (dual cache) | 94% | - | IndexedDB dual-cache stable |
 | **Medium** | Namespace database CRUD | 95% | NEW | Validation rules well-specified |
 | **Complex** | Injection pipeline (≤500ms) | 92% | +1% | Better error logging aids debugging |
-| **Complex** | Workspace detection (XPath + CSS) | 92% | — | Self-healing XPath stable |
-| **Complex** | Smart workspace switching | 89% | — | Race condition risk remains |
+| **Complex** | Workspace detection (XPath + CSS) | 92% | - | Self-healing XPath stable |
+| **Complex** | Smart workspace switching | 89% | - | Race condition risk remains |
 | **Complex** | SDK namespace (riseup) | 94% | +1% | AuthTokenUtils solidified |
-| **Complex** | SDK notifier + config seeding | 91% | — | Hash-based re-seed |
-| **Complex** | Live script hot-reload | 88% | — | File watcher + hash compare |
-| **Complex** | Class-based architecture (V2) | 95% | +10% | **All 8 phases complete** — monolith decomposed |
+| **Complex** | SDK notifier + config seeding | 91% | - | Hash-based re-seed |
+| **Complex** | Live script hot-reload | 88% | - | File watcher + hash compare |
+| **Complex** | Class-based architecture (V2) | 95% | +10% | **All 8 phases complete** - monolith decomposed |
 | **Complex** | Cross-project sync (data layer) | 90% | +25% | Migration v7, handler, hasher, version manager all implemented |
 | **E2E** | Full macro loop cycle | 88% | +1% | Error logging improves diagnosis |
-| **E2E** | ComboSwitch 8-step transfer | 75% | — | Still DOM-coupled; highest fragility |
+| **E2E** | ComboSwitch 8-step transfer | 75% | - | Still DOM-coupled; highest fragility |
 | **E2E** | Extension inject→detect→credit | 91% | +1% | Auth + error logging improvements |
-| **E2E** | P Store marketplace | 70% | — | Still no backend API |
+| **E2E** | P Store marketplace | 70% | - | Still no backend API |
 | **E2E** | Cross-project sync (full) | 78% | +13% | Data layer done; UI Phase 2 pending |
 
 ### Overall AI Handoff Success: **93%** (↑2% from v3)
@@ -95,13 +95,13 @@
 
 | # | What Changed |
 |---|-------------|
-| F-023 | **macro-looping.ts monolith decomposed** — all 8 TS Migration V2 phases complete |
-| F-026 | **Cross-project sync data layer complete** — migration v7, handler, sync engine, content hasher, version manager |
+| F-023 | **macro-looping.ts monolith decomposed** - all 8 TS Migration V2 phases complete |
+| F-026 | **Cross-project sync data layer complete** - migration v7, handler, sync engine, content hasher, version manager |
 | F-027 | Hooks-order violations fixed across all components |
-| — | Enum reorganization eliminates duplicate/inconsistent enum values |
-| — | All error logs now include exact path + missing item + reasoning |
-| — | Version sync automated and enforced via check-version-sync.mjs |
-| — | Test suite expanded from 822 → 1,079 tests |
+| - | Enum reorganization eliminates duplicate/inconsistent enum values |
+| - | All error logs now include exact path + missing item + reasoning |
+| - | Version sync automated and enforced via check-version-sync.mjs |
+| - | Test suite expanded from 822 → 1,079 tests |
 
 ---
 
@@ -119,40 +119,40 @@
 
 ## 4. Readiness Decision
 
-### Verdict: **READY — with minor caveats**
+### Verdict: **READY - with minor caveats**
 
 ### What's Excellent ✅
 
 1. **1,079 unit tests** across 96 files (+31% from v3)
-2. **All 8 TS Migration V2 phases complete** — monolith fully decomposed
-3. **26 engineering standards** — ESLint SonarJS zero errors/zero warnings
-4. **Structured error logging** — every error includes path, missing item, reasoning
-5. **Centralized enums** — no duplicate definitions, consistent naming
-6. **Cross-project sync data layer** — 4 tables, 22 message types, full CRUD + sync engine
-7. **50+ memory files** — architecture, features, workflow, constraints all documented
-8. **Automated version sync** — check-version-sync.mjs + 8 version locations
-9. **SDK auth boundary** — AuthTokenUtils static class, clean separation
-10. **17 numbered spec folders** — well-organized with single-source-of-truth convention
+2. **All 8 TS Migration V2 phases complete** - monolith fully decomposed
+3. **26 engineering standards** - ESLint SonarJS zero errors/zero warnings
+4. **Structured error logging** - every error includes path, missing item, reasoning
+5. **Centralized enums** - no duplicate definitions, consistent naming
+6. **Cross-project sync data layer** - 4 tables, 22 message types, full CRUD + sync engine
+7. **50+ memory files** - architecture, features, workflow, constraints all documented
+8. **Automated version sync** - check-version-sync.mjs + 8 version locations
+9. **SDK auth boundary** - AuthTokenUtils static class, clean separation
+10. **17 numbered spec folders** - well-organized with single-source-of-truth convention
 
 ### What Reduces AI Success ⚠️
 
 1. **No E2E verification** of React unification (Step 10 never run in Chrome)
-2. **P Store spec is DRAFT** — no backend API exists
-3. **Cross-project sync Phase 2** — UI not yet built (data layer ready)
-4. **1 flaky test** — js-executor "warns when textbox not found"
-5. **No automated E2E test runner** — all verification is manual
+2. **P Store spec is DRAFT** - no backend API exists
+3. **Cross-project sync Phase 2** - UI not yet built (data layer ready)
+4. **1 flaky test** - js-executor "warns when textbox not found"
+5. **No automated E2E test runner** - all verification is manual
 
 ### AI Failure Scenarios
 
 | Scenario | Probability | Δ from v3 | Cause |
 |----------|------------|-----------|-------|
-| AI edits skipped/ folder | 2% | — | Policy well-documented + memory rule |
-| AI breaks credit formula | 7% | — | Shared helpers reduce risk |
+| AI edits skipped/ folder | 2% | - | Policy well-documented + memory rule |
+| AI breaks credit formula | 7% | - | Shared helpers reduce risk |
 | AI breaks injection pipeline | 8% | ↓1% | Better error logging |
 | AI introduces state race condition | 10% | ↓2% | Enum centralization, class decomposition |
-| AI doesn't run build verification | 18% | — | No CI/CD; relies on manual build |
+| AI doesn't run build verification | 18% | - | No CI/CD; relies on manual build |
 | AI misidentifies function in monolith | 5% | ↓9% | **Monolith decomposed into class modules** |
-| AI modifies .release folder | 3% | — | Explicitly prohibited in memory |
+| AI modifies .release folder | 3% | - | Explicitly prohibited in memory |
 | AI breaks cross-project sync state | 8% | NEW | 3 link states × N assets, but well-documented rules |
 
 ---
@@ -161,15 +161,15 @@
 
 | Aspect | Rating | Δ from v3 | Notes |
 |--------|--------|-----------|-------|
-| Architecture documentation | ⭐⭐⭐⭐⭐ | — | Master overview + 17 spec folders + developer guide |
-| Code conventions & standards | ⭐⭐⭐⭐⭐ | — | 26 standards + ESLint SonarJS zero-warning |
-| Error handling documentation | ⭐⭐⭐⭐⭐ | — | 90+ issue write-ups + structured error logging |
-| Root cause analysis docs | ⭐⭐⭐⭐⭐ | — | Prevention rules for every issue |
-| UI sync patterns | ⭐⭐⭐⭐⭐ | — | All state changes verified |
+| Architecture documentation | ⭐⭐⭐⭐⭐ | - | Master overview + 17 spec folders + developer guide |
+| Code conventions & standards | ⭐⭐⭐⭐⭐ | - | 26 standards + ESLint SonarJS zero-warning |
+| Error handling documentation | ⭐⭐⭐⭐⭐ | - | 90+ issue write-ups + structured error logging |
+| Root cause analysis docs | ⭐⭐⭐⭐⭐ | - | Prevention rules for every issue |
+| UI sync patterns | ⭐⭐⭐⭐⭐ | - | All state changes verified |
 | Testing guidance | ⭐⭐⭐⭐½ | ↑½ | 1,079 tests; no E2E runner |
-| Version clarity | ⭐⭐⭐⭐⭐ | — | Automated version sync check |
-| AI onboarding guide | ⭐⭐⭐⭐⭐ | — | S-029 checklist + developer guide |
-| Memory system | ⭐⭐⭐⭐⭐ | — | 50+ memory files, structured conventions |
+| Version clarity | ⭐⭐⭐⭐⭐ | - | Automated version sync check |
+| AI onboarding guide | ⭐⭐⭐⭐⭐ | - | S-029 checklist + developer guide |
+| Memory system | ⭐⭐⭐⭐⭐ | - | 50+ memory files, structured conventions |
 | Integration test coverage | ⭐⭐⭐½ | ↑½ | 1,079 tests but no E2E runner |
 | Future feature specs | ⭐⭐⭐⭐ | ↑1 | Cross-project sync Phase 1 done; P Store still DRAFT |
 

@@ -1,4 +1,4 @@
-# CI/CD Issue 03 — Tag created out-of-band does not trigger release.yml
+# CI/CD Issue 03 - Tag created out-of-band does not trigger release.yml
 
 ## Pipeline / Workflow
 
@@ -27,7 +27,7 @@ on:
 ```
 
 When the tag is created by the Lovable release tooling (or GitHub web UI / API)
-the `push: tags: v*` event is **not** delivered to Actions in every code path —
+the `push: tags: v*` event is **not** delivered to Actions in every code path -
 typically because the tag is created server-side rather than via `git push
 origin vX.Y.Z`. The descriptor file `.gitmap/release/vX.Y.Z.json` lands on
 main, but nothing converts that signal into a `release.yml` run, so the asset
@@ -51,7 +51,7 @@ Added `.github/workflows/release-watcher.yml`:
 
 `release.yml`'s existing `workflow_dispatch` path then checks out the exact
 tag for packaging, builds every asset, runs the required-asset verification gate, and
-uploads to the existing Release object (idempotent — `softprops/action-gh-release@v2`
+uploads to the existing Release object (idempotent - `softprops/action-gh-release@v2`
 updates in place).
 
 ## Recovery for v3.1.0
@@ -67,4 +67,4 @@ edit to `.gitmap/release/latest.json` so the new watcher picks it up.
 
 ## Status
 
-✅ Resolved — 2026-05-18 (v3.2.0)
+✅ Resolved - 2026-05-18 (v3.2.0)

@@ -43,11 +43,11 @@ Confidence in these numbers: **medium**. They are calibrated against the last ~4
 | # | Fix | Where | Expected gain |
 |---|---|---|---|
 | 1 | Add one-page **"Fresh-AI first 5 minutes"** card at top of `spec/00-what-to-read-first.md` listing the 7 hard bans (Supabase, retry, unknown, skipped/, storage rewrite, readme.txt stamps, ask_questions in No-Questions Mode). | `spec/00-what-to-read-first.md` | +0.10 on all tiers |
-| 2 | Complete **issue 01 — Task Next queue sequential** (SS-01 idle helper extract, SS-02 runner, Vitest). | `standalone-scripts/macro-controller/src/ui/lovable-idle.ts` (new), `task-next-ui.ts` | Unblocks user-visible feature |
-| 3 | Complete **subtasks 08 — Task Splitter + Next Queue** (IndexedDB `task_queue` section, splitter parse-back, Next consumes queue). | `standalone-scripts/macro-controller/src/queue-control/` (new) | Unblocks issue 131 spec |
+| 2 | Complete **issue 01 - Task Next queue sequential** (SS-01 idle helper extract, SS-02 runner, Vitest). | `standalone-scripts/macro-controller/src/ui/lovable-idle.ts` (new), `task-next-ui.ts` | Unblocks user-visible feature |
+| 3 | Complete **subtasks 08 - Task Splitter + Next Queue** (IndexedDB `task_queue` section, splitter parse-back, Next consumes queue). | `standalone-scripts/macro-controller/src/queue-control/` (new) | Unblocks issue 131 spec |
 | 4 | Add release-ritual acceptance test: enumerate every unified-version site and assert equality. | `scripts/__tests__/unified-version-sites.test.mjs` | Prevents most-common CI red |
 | 5 | Rename `.lovable/plan.md` to `.lovable/plan-pointer.md` (or delete) to remove the "which plan is authoritative?" trap the audit S81 flagged. | `.lovable/` | Removes ambiguity for fresh AI |
-| 6 | Add lint rule / CI check that flags `console.error` outside `src/test/**` and `standalone-scripts/*/test/**`. | `scripts/audit/logger-compliance.mjs` (exists — extend) | Enforces namespace Logger contract |
+| 6 | Add lint rule / CI check that flags `console.error` outside `src/test/**` and `standalone-scripts/*/test/**`. | `scripts/audit/logger-compliance.mjs` (exists - extend) | Enforces namespace Logger contract |
 | 7 | Publish the "release trigger phrase" recognition rule (`bump version + add changelog + pin that version to root readme`) into `spec/00-what-to-read-first.md` so a fresh AI doesn't split it into three separate tasks. | `spec/` + `mem://workflow/release-trigger-phrase` | Prevents partial releases |
 
 ---
@@ -66,11 +66,11 @@ Confidence in these numbers: **medium**. They are calibrated against the last ~4
 
 ## 5. Suggestions & plan artifacts status
 
-- Suggestions tracker: `.lovable/memory/suggestions/01-suggestions-tracker.md` — active, 1 open entry (installer AC2 fallback).
-- Plan file: root `plan.md` — active, 688 lines, up-to-date through 2026-06-04 CI/CD spec closure. `.lovable/plan.md` is a 70-line pointer only (see corrective #5).
-- Issues: `.lovable/issues/01-task-next-queue-sequential.md` — open, subtasks staged.
+- Suggestions tracker: `.lovable/memory/suggestions/01-suggestions-tracker.md` - active, 1 open entry (installer AC2 fallback).
+- Plan file: root `plan.md` - active, 688 lines, up-to-date through 2026-06-04 CI/CD spec closure. `.lovable/plan.md` is a 70-line pointer only (see corrective #5).
+- Issues: `.lovable/issues/01-task-next-queue-sequential.md` - open, subtasks staged.
 - Pending subtasks: `.lovable/plans/subtasks/01-task-next-queue-sequential/{01,02}-*.md`, `.lovable/plans/subtasks/08-task-splitter-and-next-queue/01-rca.md`.
 
 ---
 
-*End of report. Per interaction rule, the user is asked which task to implement next — candidates listed in the chat reply.*
+*End of report. Per interaction rule, the user is asked which task to implement next - candidates listed in the chat reply.*

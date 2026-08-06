@@ -10,7 +10,7 @@ type: preference
 **Decision date**: 2026-04-25 (user direction during the `ProjectInstruction` migration session).
 **CI guard**: `scripts/check-pascalcase-instruction-migration.mjs` blocks any regression at PR time. See `mem://architecture/instruction-dual-emit-phase-2b`.
 
-Every key in every standalone-script `instruction.ts`, every emitted `dist/instruction.json`, every `seed-manifest.json`, and every runtime read of those files MUST be `PascalCase`. This is a **case-only** convention — semantics, value shapes, and string-literal unions (e.g. `"document_idle"`, `"glob"`) are unchanged. The only camelCase that may persist is at **third-party boundaries** (Chrome APIs like `chrome.cookies.get({ url, name })`, user-facing `ProjectManifest` export/import format) — those are explicitly carved out below.
+Every key in every standalone-script `instruction.ts`, every emitted `dist/instruction.json`, every `seed-manifest.json`, and every runtime read of those files MUST be `PascalCase`. This is a **case-only** convention - semantics, value shapes, and string-literal unions (e.g. `"document_idle"`, `"glob"`) are unchanged. The only camelCase that may persist is at **third-party boundaries** (Chrome APIs like `chrome.cookies.get({ url, name })`, user-facing `ProjectManifest` export/import format) - those are explicitly carved out below.
 
 ---
 
@@ -29,18 +29,18 @@ Every key in every standalone-script `instruction.ts`, every emitted `dist/instr
 
 ## Canonical key mapping (legacy camelCase → PascalCase)
 
-Source of truth is `standalone-scripts/types/instruction/**/*.ts`. The table below is the **authoritative** rename list — it must round-trip with the type files. If you add a new field to any instruction type, append it here.
+Source of truth is `standalone-scripts/types/instruction/**/*.ts`. The table below is the **authoritative** rename list - it must round-trip with the type files. If you add a new field to any instruction type, append it here.
 
-### Top-level — `ProjectInstruction<T>`
+### Top-level - `ProjectInstruction<T>`
 
 | Legacy key | Canonical key | Notes |
 |---|---|---|
-| `schemaVersion` | `SchemaVersion` | `VersionString` — `"1.0"` etc. |
-| `name` | `Name` | `Identifier` — project id |
+| `schemaVersion` | `SchemaVersion` | `VersionString` - `"1.0"` etc. |
+| `name` | `Name` | `Identifier` - project id |
 | `displayName` | `DisplayName` | Human-readable label |
 | `version` | `Version` | `VersionString` |
 | `description` | `Description` | |
-| `world` | `World` | `"MAIN" \| "ISOLATED"` (value casing unchanged — Chrome API contract) |
+| `world` | `World` | `"MAIN" \| "ISOLATED"` (value casing unchanged - Chrome API contract) |
 | `isGlobal` | `IsGlobal` | Optional |
 | `dependencies` | `Dependencies` | `ReadonlyArray<Identifier>` |
 | `loadOrder` | `LoadOrder` | |
@@ -56,12 +56,12 @@ Source of truth is `standalone-scripts/types/instruction/**/*.ts`. The table bel
 | `seedOnInstall` | `SeedOnInstall` | |
 | `isRemovable` | `IsRemovable` | |
 | `autoInject` | `AutoInject` | |
-| `runAt` | `RunAt` | Value union `"document_start" \| "document_end" \| "document_idle"` unchanged — Chrome `chrome.scripting` vocabulary |
+| `runAt` | `RunAt` | Value union `"document_start" \| "document_end" \| "document_idle"` unchanged - Chrome `chrome.scripting` vocabulary |
 | `cookieBinding` | `CookieBinding` | `string` (cookie name) |
 | `targetUrls` | `TargetUrls` | `ReadonlyArray<TargetUrl>` |
 | `cookies` | `Cookies` | `ReadonlyArray<CookieSpec>` |
-| `settings` | `Settings` | Project-specific `TSettings` — keys also PascalCase |
-| `configSeedIds` | `ConfigSeedIds` | `Record<string, string>` — VALUES inside this map are user-chosen binding names (e.g. `"config"`, `"theme"`) and are intentionally lowercase; the **keys** of `ConfigSeedIds` are PascalCase but here the property is a free-form id map, so the lowercase entries `config`/`theme` are explicitly allowlisted in `LOWERCASE_KEY_ALLOWLIST` of `scripts/check-pascalcase-instruction-migration.mjs` |
+| `settings` | `Settings` | Project-specific `TSettings` - keys also PascalCase |
+| `configSeedIds` | `ConfigSeedIds` | `Record<string, string>` - VALUES inside this map are user-chosen binding names (e.g. `"config"`, `"theme"`) and are intentionally lowercase; the **keys** of `ConfigSeedIds` are PascalCase but here the property is a free-form id map, so the lowercase entries `config`/`theme` are explicitly allowlisted in `LOWERCASE_KEY_ALLOWLIST` of `scripts/check-pascalcase-instruction-migration.mjs` |
 
 ### `TargetUrl`
 
@@ -127,7 +127,7 @@ Source of truth is `standalone-scripts/types/instruction/**/*.ts`. The table bel
 |---|---|
 | `file` | `File` |
 
-### `XPathRegistry` (⚠️ Phase 1 carve-out — see "Known drift" below)
+### `XPathRegistry` (⚠️ Phase 1 carve-out - see "Known drift" below)
 
 The XPath sub-tree under `XPaths.entries` / `XPaths.groups` still uses camelCase property names (`kind`, `name`, `value`, `description`, `wrappingXPath`, `entries`, `groups`, `relativeTo`). The intended PascalCase mapping is:
 
@@ -148,7 +148,7 @@ These types live under `standalone-scripts/types/instruction/xpath/` and have no
 
 | Legacy key | Canonical key |
 |---|---|
-| `schemaVersion` | `SchemaVersion` (pinned to `2` — v1 = pre-PascalCase, refused at load) |
+| `schemaVersion` | `SchemaVersion` (pinned to `2` - v1 = pre-PascalCase, refused at load) |
 | `projects` | `Projects` |
 
 Each `Projects[]` entry is a slimmed `ProjectInstruction` and follows the same mapping above.
@@ -161,17 +161,17 @@ Each `Projects[]` entry is a slimmed `ProjectInstruction` and follows the same m
 
 Maintained as `COMPAT_READER_ALLOWLIST` in `scripts/check-pascalcase-instruction-migration.mjs`. As of Phase 2c (post-2026-05-16):
 
-- `scripts/compile-instruction.mjs` — emitter (no longer emits compat; retains the filename in dead-code path).
-- `scripts/check-standalone-dist.mjs` — dist-shape validator (compat removed from required-artifacts, name still referenced in comments).
-- `scripts/generate-seed-manifest.mjs` — references the filename in comments only.
-- `scripts/check-pascalcase-instruction-migration.mjs` — self-reference (this guard).
+- `scripts/compile-instruction.mjs` - emitter (no longer emits compat; retains the filename in dead-code path).
+- `scripts/check-standalone-dist.mjs` - dist-shape validator (compat removed from required-artifacts, name still referenced in comments).
+- `scripts/generate-seed-manifest.mjs` - references the filename in comments only.
+- `scripts/check-pascalcase-instruction-migration.mjs` - self-reference (this guard).
 - Plus permanent residents for truncation-test fixtures that ship a frozen `instruction.compat.json` to exercise legacy parsers.
 
-The runtime entry (`vite.config.extension.ts`) was removed in Phase 2c. All remaining entries are build-tooling / test fixtures — none consume the camelCase keys at runtime.
+The runtime entry (`vite.config.extension.ts`) was removed in Phase 2c. All remaining entries are build-tooling / test fixtures - none consume the camelCase keys at runtime.
 
 ### Variable names that flag CHECK C
 
-`INSTRUCTION_RECEIVER_NAMES` in the same checker. Bare `manifest` is intentionally **excluded** — it collides with the user-facing `ProjectManifest` export schema (deliberately camelCase, see exemption below). To flag instruction-tree access on a `manifest` binding, rename the local variable to `instructionManifest`.
+`INSTRUCTION_RECEIVER_NAMES` in the same checker. Bare `manifest` is intentionally **excluded** - it collides with the user-facing `ProjectManifest` export schema (deliberately camelCase, see exemption below). To flag instruction-tree access on a `manifest` binding, rename the local variable to `instructionManifest`.
 
 ### Third-party / boundary exemptions (camelCase remains intentional)
 
@@ -179,7 +179,7 @@ The runtime entry (`vite.config.extension.ts`) was removed in Phase 2c. All rema
 |---|---|
 | `chrome.cookies.get({ url, name, ... })` and other Chrome extension APIs | We don't own the contract. |
 | `ProjectManifest` (user-facing project export/import JSON: `src/lib/project-exporter.ts`) | Stable user-facing schema; renaming would break every existing exported file. The CHECK C heuristic excludes the bare `manifest` receiver name to avoid false positives here. |
-| `StoredScript` / `StoredProject` rows (chrome.storage.local persistence layer) | Separate workstream — their migration is independent and tracked separately. CHECK C only fires on receivers known to hold `instruction.json` parses, so storage-row reads (`script.runAt`, `meta.loadOrder`) are not flagged. |
+| `StoredScript` / `StoredProject` rows (chrome.storage.local persistence layer) | Separate workstream - their migration is independent and tracked separately. CHECK C only fires on receivers known to hold `instruction.json` parses, so storage-row reads (`script.runAt`, `meta.loadOrder`) are not flagged. |
 | Logging UI rows (`Timestamp` SQL → `timestamp` JS) | Documented in `mem://architecture/logging-data-contract`. The remap happens at the SQL → UI boundary; nothing inside the instruction tree is touched. |
 
 ---
@@ -187,18 +187,18 @@ The runtime entry (`vite.config.extension.ts`) was removed in Phase 2c. All rema
 ## Known drift (must be cleaned up)
 
 1. **XPath sub-tree** under `standalone-scripts/types/instruction/xpath/` still uses camelCase. Mapping table above is the target. Add to `LEGACY_CAMEL_KEYS` in the CI guard once the types are renamed and consumers updated.
-2. **`SeedBlock.ConfigSeedIds`** values are free-form lowercase ids (`config`, `theme`). The CI guard's `LOWERCASE_KEY_ALLOWLIST` covers these — when adding new binding names, update both the source `instruction.ts` and the allowlist together.
+2. **`SeedBlock.ConfigSeedIds`** values are free-form lowercase ids (`config`, `theme`). The CI guard's `LOWERCASE_KEY_ALLOWLIST` covers these - when adding new binding names, update both the source `instruction.ts` and the allowlist together.
 
 ---
 
 ## How to apply (when adding/renaming a field)
 
-1. Update the type file under `standalone-scripts/types/instruction/**/*.ts` first — PascalCase only.
+1. Update the type file under `standalone-scripts/types/instruction/**/*.ts` first - PascalCase only.
 2. Update every `standalone-scripts/<name>/src/instruction.ts` that uses the field.
-3. Run `node scripts/compile-instruction.mjs standalone-scripts/<name>` for each affected project — the collision guard inside the compiler catches camelCase ↔ PascalCase clashes (e.g. both `Foo` and `foo` on the same node) and fails with a JSON path + rename hint.
+3. Run `node scripts/compile-instruction.mjs standalone-scripts/<name>` for each affected project - the collision guard inside the compiler catches camelCase ↔ PascalCase clashes (e.g. both `Foo` and `foo` on the same node) and fails with a JSON path + rename hint.
 4. Update every consumer that reads the field. CHECK C of the migration guard will surface anything missed when the receiver is named `instruction*` / `projectInstruction`.
 5. If the new field name introduces a fresh **distinctive** camelCase form (one that doesn't already mean something on a storage row), add it to `LEGACY_CAMEL_KEYS` in `scripts/check-pascalcase-instruction-migration.mjs` so future regressions are caught.
-6. Run `node scripts/check-pascalcase-instruction-migration.mjs` locally before pushing — it returns in <1s and blocks the PR if any of the three checks fail.
+6. Run `node scripts/check-pascalcase-instruction-migration.mjs` locally before pushing - it returns in <1s and blocks the PR if any of the three checks fail.
 
 ## Pre-merge sanity command
 

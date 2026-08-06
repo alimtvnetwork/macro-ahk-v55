@@ -27,7 +27,7 @@ This file is included by:
 4. Per-project `globals.d.ts` files MUST NOT re-declare
    `RiseupAsiaMacroExtNamespace`, `RiseupAsiaProject`, `RiseupAsiaCookieBinding`,
    or the bare `RiseupAsiaMacroExt` const. Reference the shared file instead.
-5. The bare global `RiseupAsiaMacroExt` is declared once in the shared file —
+5. The bare global `RiseupAsiaMacroExt` is declared once in the shared file -
    duplicate `const` declarations are a TS error.
 
 ## Why

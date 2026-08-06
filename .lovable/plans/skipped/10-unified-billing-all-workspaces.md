@@ -28,7 +28,7 @@ Related:
 2. Update `WireWorkspace` type (list-endpoint shape) to include optional `experimental_features?: { unified_billing?: boolean }` and `plan_type`.
 3. ✅ Change the fetcher fan-out to iterate ALL workspaces where `needsBalanceEnrichment` is true and issue `/credit-balance` in parallel with `Promise.allSettled` (fail-fast per workspace, never blocks siblings). See `./subtasks/10-unified-billing-all-workspaces/01-fanout.md`.
 4. Extend the `/credit-balance` response mapper: map `total_granted → totalCredits`, `total_remaining → available`, `total_billing_period_used → totalCreditsUsed`, `daily_limit/daily_remaining → dailyLimit/dailyFree`, `cloud_remaining`, `ai_remaining`, and preserve `grant_type_balances[]` on `WorkspaceCredit`.
-5. In `parseApiResponse`, bypass the legacy `calcTotalCredits`/`calcAvailableCredits` formula for any enriched workspace — the enrichment payload is authoritative. Guard with `if (enriched) { … } else { legacy math }`.
+5. In `parseApiResponse`, bypass the legacy `calcTotalCredits`/`calcAvailableCredits` formula for any enriched workspace - the enrichment payload is authoritative. Guard with `if (enriched) { … } else { legacy math }`.
 6. Add tests: extend `tests/e2e/fixtures/credit-balance/workspaces.ts` with `KTLO_2_UNIFIED_WORKSPACE` (real payload from user paste) and a corresponding `KTLO_2_CREDIT_BALANCE`; add unit test asserting `needsBalanceEnrichment` is true for `ktlo_2` and for `experimental_features.unified_billing === true`.
 7. Add E2E spec `tests/e2e/e2e-credit-balance-unified-billing.spec.ts` verifying: multi-workspace fan-out fires one `/credit-balance` per unified workspace, totals reflect `total_granted`, and non-unified workspaces do NOT trigger a fetch.
 8. Update `mem://features/macro-controller/pro-zero-credit-balance` → rename memory to `credit-balance-enrichment` and rewrite trigger rule; update `mem://index.md` reference.
@@ -37,7 +37,7 @@ Related:
 
 ## Verification
 
-- `pnpm test` (unit) — new `needsBalanceEnrichment` test green.
+- `pnpm test` (unit) - new `needsBalanceEnrichment` test green.
 - `pnpm test:e2e -- e2e-credit-balance-unified-billing` green.
 - Preview build: manifest/constants/version.json versions match (`scripts/__tests__/unified-version-sites.test.mjs`).
 - Manual DevTools Network tab: exactly one `/credit-balance` call per unified workspace; zero calls for non-unified.
@@ -45,4 +45,4 @@ Related:
 
 ## Appended from prior pending tasks
 
-none — all `.lovable/plans/pending/` slots were previously empty; `.lovable/issues/01-task-next-queue-sequential.md` is already tracked in `completed/01-*`.
+none - all `.lovable/plans/pending/` slots were previously empty; `.lovable/issues/01-task-next-queue-sequential.md` is already tracked in `completed/01-*`.

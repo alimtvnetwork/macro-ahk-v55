@@ -1,4 +1,4 @@
-# Reliability & Failure-Chance Report v3 — Extension v2.5.0
+# Reliability & Failure-Chance Report v3 - Extension v2.5.0
 
 **Date**: 2026-04-05
 **Purpose**: Assess spec quality and AI-handoff readiness after remix baseline.
@@ -78,8 +78,8 @@
 |---|-------------|
 | F-022 | TS Migration V2 Phase 01 init fix complete (v1.75.0) |
 | F-027 (partial) | Options.tsx hooks-order violation fixed |
-| — | ESLint full zero-warning scan complete |
-| — | TS Migration V2 all 6 phases complete |
+| - | ESLint full zero-warning scan complete |
+| - | TS Migration V2 all 6 phases complete |
 
 ---
 
@@ -98,29 +98,29 @@
 
 ## 4. Readiness Decision
 
-### Verdict: **READY — with caveats**
+### Verdict: **READY - with caveats**
 
 ### What's Excellent ✅
 
 1. **90+ issue write-ups** with root cause analysis
-2. **26 engineering standards** — enforced via ESLint SonarJS (0 errors, 0 warnings)
-3. **10 numbered spec folders** — well-organized, cross-referenced
+2. **26 engineering standards** - enforced via ESLint SonarJS (0 errors, 0 warnings)
+3. **10 numbered spec folders** - well-organized, cross-referenced
 4. **822+ unit tests** across 72+ files + 46 automation engine tests
-5. **17 completed workflow plans** — full implementation history
-6. **TS Migration V2 complete** (all 6 phases) — class-based modules, DI, performance logging
-7. **Comprehensive memory system** — 40+ memory files covering architecture, features, workflow
+5. **17 completed workflow plans** - full implementation history
+6. **TS Migration V2 complete** (all 6 phases) - class-based modules, DI, performance logging
+7. **Comprehensive memory system** - 40+ memory files covering architecture, features, workflow
 8. **Version sync** validated via automated check-version-sync.mjs
-9. **Developer guide** — 10-chapter AI-ready guide in `spec/21-app/02-features/devtools-and-injection/developer-guide/`
-10. **Prompt management** — dual-cache IndexedDB, manual-load model
+9. **Developer guide** - 10-chapter AI-ready guide in `spec/21-app/02-features/devtools-and-injection/developer-guide/`
+10. **Prompt management** - dual-cache IndexedDB, manual-load model
 
 ### What Reduces AI Success ⚠️
 
 1. **No E2E verification** of React unification (Step 10 never run in Chrome)
-2. **macro-looping.ts still ~4,165 lines** — class refactor spec written but not started
-3. **P Store spec is DRAFT** — no backend API exists
-4. **Cross-project sync spec is DRAFT** — complex linking model needs maturation
-5. **No automated E2E test runner** — all verification is manual
-6. **Version discrepancy in suggestions tracker** — shows v7.38 but macro controller is v7.41
+2. **macro-looping.ts still ~4,165 lines** - class refactor spec written but not started
+3. **P Store spec is DRAFT** - no backend API exists
+4. **Cross-project sync spec is DRAFT** - complex linking model needs maturation
+5. **No automated E2E test runner** - all verification is manual
+6. **Version discrepancy in suggestions tracker** - shows v7.38 but macro controller is v7.41
 
 ### AI Failure Scenarios
 

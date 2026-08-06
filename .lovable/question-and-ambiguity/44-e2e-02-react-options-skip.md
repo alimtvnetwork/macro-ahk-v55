@@ -1,7 +1,7 @@
-# 44 — Skip e2e-02 React Options CRUD spec under deferred-workstreams
+# 44 - Skip e2e-02 React Options CRUD spec under deferred-workstreams
 
 **Date:** 2026-05-05
-**Status:** SUPERSEDED 2026-05-05 — user requested deterministic seeding
+**Status:** SUPERSEDED 2026-05-05 - user requested deterministic seeding
 instead of skip. See "Resolution" below.
 
 ## Context
@@ -11,11 +11,11 @@ instead of skip. See "Resolution" below.
 `ProjectDetailView`) end-to-end via Playwright + an unpacked extension.
 
 Two consecutive fix attempts (selectors aligned to the real components,
-context reuse via `describe.serial`, service-worker–based onboarding seed)
+context reuse via `describe.serial`, service-worker-based onboarding seed)
 left the suite still hitting the full per-test timeout (60s → 180s after
 budget bump). The slow-step reporter confirms no individual step exceeds
 60s, so the failure is the test-level wait for "New Project" never
-resolving — i.e. the projects view never paints inside the Playwright
+resolving - i.e. the projects view never paints inside the Playwright
 extension context, despite `[Options] mount-to-interactive=712ms` being
 logged in the local preview.
 
@@ -60,7 +60,7 @@ are eliminated by a four-stage readiness gate in `openProjectsView`:
 1. **SW seed + read-back verification** in `beforeAll`
    (`seedOnboardingFromServiceWorker`).
 2. **Page-side re-seed + read-back verification** on every page open
-   (`ensureOnboardingSeededFromPage`) — defeats MV3 SW teardown races.
+   (`ensureOnboardingSeededFromPage`) - defeats MV3 SW teardown races.
 3. **Wait for `[Options] ── INTERACTIVE ──` console log** (the page's own
    ground-truth signal that all `*Loading` flags resolved). Subscribed
    BEFORE navigation. Falls back to a body-text probe to handle the case
@@ -71,7 +71,7 @@ are eliminated by a four-stage readiness gate in `openProjectsView`:
    failure is self-explaining instead of a blind 3-min timeout.
 
 If a future CI run still fails, the diagnostic block tells us exactly
-which stage broke and what the page is showing — no more guessing.
+which stage broke and what the page is showing - no more guessing.
 
 ## Re-enable steps
 
@@ -79,6 +79,6 @@ which stage broke and what the page is showing — no more guessing.
    `tests/e2e/e2e-02-project-crud.spec.ts`.
 2. Run `pnpm exec playwright test e2e-02-project-crud`.
 3. Investigate any remaining "New Project" never-paints failure with the
-   trace viewer (`pnpm exec playwright show-trace …/trace.zip`) — the
+   trace viewer (`pnpm exec playwright show-trace …/trace.zip`) - the
    trace will pinpoint whether the page is stuck on `OnboardingFlow`,
    `OnboardingLoadingGate`, or a Suspense fallback.

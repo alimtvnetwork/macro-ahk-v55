@@ -1,4 +1,4 @@
-# Prompt Library UX misplaced — Plan/Next editing must live on the chips, not only in Library modal
+# Prompt Library UX misplaced - Plan/Next editing must live on the chips, not only in Library modal
 
 Status: open
 Created: 2026-07-18
@@ -22,10 +22,10 @@ Created: 2026-07-18
    - edit the currently selected prompt,
    - add a new prompt scoped to that role.
 2. The edit screen reuses the existing "Add / Edit prompt" modal (the one used by the prompts dropdown), NOT a separate one buried inside the Library modal.
-3. The edit screen renders a prominent, non-dismissible callout listing every `{{token}}` placeholder that MUST be preserved (drift guard already exists — surface it in UI).
+3. The edit screen renders a prominent, non-dismissible callout listing every `{{token}}` placeholder that MUST be preserved (drift guard already exists - surface it in UI).
 4. A "Download AI guideline" button on the edit screen exports a markdown file explaining the token contract so the user can paste it into an AI chat before asking the AI to rewrite the prompt.
 5. Library modal keeps role filter (plan / next / generic) but every row has an inline Edit button that opens the same reused editor.
-6. "Generic" role documented in the UI (tooltip or subheading) — what it is, when it applies, how to create one.
+6. "Generic" role documented in the UI (tooltip or subheading) - what it is, when it applies, how to create one.
 7. Import expects a JSON in the shape emitted by Export. Provide a "Download sample JSON" button next to Import, and link to `schemas/prompts-export-bundle.schema.json`.
 
 ## Actual
@@ -35,7 +35,7 @@ Created: 2026-07-18
 - No visible token-preservation callout.
 - No downloadable AI guideline.
 - Generic role is unexplained and appears uneditable in the modal.
-- Import surface exists with no sample or schema link — user has no way to construct a valid JSON.
+- Import surface exists with no sample or schema link - user has no way to construct a valid JSON.
 
 ## Related files
 

@@ -6,7 +6,7 @@ Created: 2026-07-17
 
 **Priority**: High
 **Spec**: `.lovable/memory/workflow/04-react-ui-unification-checklist.md` (Step 10)
-**Status**: ✅ **Resolved** — 2026-04-22
+**Status**: ✅ **Resolved** - 2026-04-22
 **Created**: 2026-03-16
 **Closed**: 2026-04-22
 **Resolution report**: `spec/validation-reports/2026-04-22-e2e-verification-react-ui.md`
@@ -15,16 +15,16 @@ Created: 2026-07-17
 
 Step 10 closed via automated coverage rather than ad-hoc manual testing:
 
-1. **Coverage validated** — 74 Playwright tests across 22 spec files cover all 10 checklist items
+1. **Coverage validated** - 74 Playwright tests across 22 spec files cover all 10 checklist items
    (popup, options tabs, project CRUD, script CRUD/toggle/injection, XPath recorder, log export
    JSON+ZIP, SQLite bundle import/export, context menus, hot-reload, preview env).
-2. **Bug fixed** — Repaired ESM `__dirname` regression in `playwright.config.ts`,
+2. **Bug fixed** - Repaired ESM `__dirname` regression in `playwright.config.ts`,
    `tests/e2e/fixtures.ts`, and `tests/e2e/global-setup.ts` (project is `"type": "module"`,
    `__dirname` was undefined). `npx playwright test --list` now succeeds.
-3. **CI wired** — New `e2e` job appended to `.github/workflows/ci.yml` runs the full suite under
+3. **CI wired** - New `e2e` job appended to `.github/workflows/ci.yml` runs the full suite under
    xvfb + headed Chromium on every push to `main`. Gated on `verify-built-manifest-csp` so no
    browser minutes are burned on an unbootable build. HTML report + failure artifacts uploaded.
-4. **Local script** — `pnpm run test:e2e` added to `package.json` for developer parity.
+4. **Local script** - `pnpm run test:e2e` added to `package.json` for developer parity.
 
 ## Why not run manually in the sandbox
 
@@ -34,16 +34,16 @@ Execution is delegated to CI where all prerequisites are met.
 
 ## Original Verification Checklist (now satisfied by CI)
 
-- [x] Load extension in Chrome, verify popup opens and displays status — `e2e-08-popup-match`, `cold-start`, `e2e-14-state-transitions`
-- [x] Verify options page loads all tabs — `e2e-19-options-crud`
-- [x] Verify project CRUD (create, edit, duplicate, delete, import/export) — `e2e-02-project-crud`, `e2e-19-options-crud`
-- [x] Verify script CRUD + toggle + injection — `script-injection`, `e2e-04-injection-isolated`, `e2e-05-injection-main`
-- [x] Verify XPath recorder toggle — `e2e-20-xpath-recorder` (7 tests)
-- [x] Verify log export (JSON + ZIP) — `e2e-18-zip-export`
-- [x] Verify SQLite bundle import/export — `e2e-19-options-crud` (system section)
-- [x] Verify context menu actions — `e2e-15-multi-tab`
-- [x] Verify hot-reload poller still detects new builds — `e2e-17-watch-mode`
-- [x] Verify preview environment renders same UI with mock data — `e2e-19-options-crud` (sidebar render)
+- [x] Load extension in Chrome, verify popup opens and displays status - `e2e-08-popup-match`, `cold-start`, `e2e-14-state-transitions`
+- [x] Verify options page loads all tabs - `e2e-19-options-crud`
+- [x] Verify project CRUD (create, edit, duplicate, delete, import/export) - `e2e-02-project-crud`, `e2e-19-options-crud`
+- [x] Verify script CRUD + toggle + injection - `script-injection`, `e2e-04-injection-isolated`, `e2e-05-injection-main`
+- [x] Verify XPath recorder toggle - `e2e-20-xpath-recorder` (7 tests)
+- [x] Verify log export (JSON + ZIP) - `e2e-18-zip-export`
+- [x] Verify SQLite bundle import/export - `e2e-19-options-crud` (system section)
+- [x] Verify context menu actions - `e2e-15-multi-tab`
+- [x] Verify hot-reload poller still detects new builds - `e2e-17-watch-mode`
+- [x] Verify preview environment renders same UI with mock data - `e2e-19-options-crud` (sidebar render)
 
 ---
 
@@ -57,10 +57,10 @@ Single iteration once architecture decided (CI-only, no sandbox manual run).
 
 ## Learning
 
-Chrome extensions require headed Chromium with `--load-extension`; sandbox-only Playwright `chromium-headless-shell` rejects this flag and there's no X server. Manual sandbox testing is structurally impossible — delegate to CI where xvfb + headed Chromium are available.
+Chrome extensions require headed Chromium with `--load-extension`; sandbox-only Playwright `chromium-headless-shell` rejects this flag and there's no X server. Manual sandbox testing is structurally impossible - delegate to CI where xvfb + headed Chromium are available.
 
 ## What NOT to Repeat
 
 - Do **not** attempt to run extension E2E tests in the Lovable sandbox.
-- Do **not** propose `chromium-headless-shell` for `--load-extension` — it is unsupported.
+- Do **not** propose `chromium-headless-shell` for `--load-extension` - it is unsupported.
 - Do **not** treat manual smoke testing as a substitute for the wired Playwright suite.

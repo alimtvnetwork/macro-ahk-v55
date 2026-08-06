@@ -4,11 +4,11 @@ Created: 2026-07-17
 
 > **STATUS (2026-06-03):** ✅ EXECUTED ✅ EXECUTED CONFIRMED 100/100. Old `spec/2026-spec/01-prompt-spec/` path references below describe the pre-rename state. Live path is `spec/2026-spec/01-prompt-spec/`. See changelog at `spec/2026-spec/01-prompt-spec/99-spec-issues/200-renumber-baseline.md`.
 
-# Plan — Rename `spec/2026-spec/01-prompt-spec/` → `spec/2026-spec/01-prompt-spec/` and renumber children to dense `01..NN`
+# Plan - Rename `spec/2026-spec/01-prompt-spec/` → `spec/2026-spec/01-prompt-spec/` and renumber children to dense `01..NN`
 
 **Created:** 2026-06-03
 **Owner:** Lovable agent
-**Trigger:** User request — "keep nice folder structure inside the 2026 spec; rename root to `2026-spec`; renumber children as 01, 02, 03 sequential; audit & fix every cross-reference; 100-step plan; final blind-AI audit score."
+**Trigger:** User request - "keep nice folder structure inside the 2026 spec; rename root to `2026-spec`; renumber children as 01, 02, 03 sequential; audit & fix every cross-reference; 100-step plan; final blind-AI audit score."
 **Memory anchors:** `mem://architecture/spec-organization`, `mem://workflow/file-naming-convention`, `mem://constraints/skipped-folders`.
 
 ---
@@ -43,13 +43,13 @@ spec/2026-spec/01-prompt-spec/
 └── 20-adoption-checklist/             (was 200-adoption-checklist)
 ```
 
-Inner-file numbering inside each child folder stays as-authored (already `00`–`99`).
+Inner-file numbering inside each child folder stays as-authored (already `00`-`99`).
 
 ---
 
 ## 100 sequential steps
 
-### Phase A — Discovery & freeze (1–10)
+### Phase A - Discovery & freeze (1-10)
 1. Snapshot every file path under `spec/2026-spec/01-prompt-spec/**` → `.lovable/audits/2026-06-03-renumber/inventory-before.txt`.
 2. `grep -rIn '2026-spec\|spec/2026-spec' .` → `…/refs-before.txt` (exclude `node_modules`, `.release/`, `skipped/`).
 3. Classify references by file type (md / json / ts / html / yml / shell) → `…/refs-classified.csv`.
@@ -61,19 +61,19 @@ Inner-file numbering inside each child folder stays as-authored (already `00`–
 9. Write mapping table to `.lovable/audits/2026-06-03-renumber/path-map.json` (oldPath → newPath, all dirs + nested files).
 10. Open `99-spec-issues/200-renumber-baseline.md` under target folder for changelog.
 
-### Phase B — Root rename (11–20)
+### Phase B - Root rename (11-20)
 11. `git mv spec/2026-spec spec/2026-spec` (single atomic move).
 12. Verify no orphaned siblings (`ls spec/2026-spec` returns ENOENT).
 13. Update `spec/2026-spec/01-prompt-spec/README.md` heading + intro paragraph to new path.
 14. Update `00-overview.md` self-references.
 15. Update `02-hardening-backlog.md` self-references.
 16. Update `01-plan-tasks-1-20.md` task IDs that embed the path.
-17. Run `lint-cross-refs.mjs` — capture failures (expected ~30).
+17. Run `lint-cross-refs.mjs` - capture failures (expected ~30).
 18. Commit checkpoint marker in changelog (`200-renumber-baseline.md` §1 done).
 19. Re-snapshot inventory → `inventory-after-phase-b.txt`.
 20. Diff Phase-A vs Phase-B inventory; assert only root prefix changed.
 
-### Phase C — Child folder renames (21–40, one step per folder)
+### Phase C - Child folder renames (21-40, one step per folder)
 21. `10-glossary` → `01-glossary` (git mv + update internal links).
 22. `20-data-model` → `02-data-model`.
 23. `30-prompt-source-format` → `03-prompt-source-format`.
@@ -95,14 +95,14 @@ Inner-file numbering inside each child folder stays as-authored (already `00`–
 39. `190-reference-snippets` → `19-reference-snippets`.
 40. `200-adoption-checklist` → `20-adoption-checklist`.
 
-### Phase D — Intra-spec cross-reference repair (41–60)
+### Phase D - Intra-spec cross-reference repair (41-60)
 41. Auto-rewrite intra-spec links using `path-map.json` via `scripts/spec/apply-rename-map.mjs` (dry-run first).
 42. Manual review of dry-run diff; reject any false positives (e.g. `100` digits unrelated to `100-queue-model`).
 43. Apply rewrite for `*.md` files.
 44. Apply rewrite for `*.json` schema/index files.
 45. Apply rewrite for HTML reference snippets (`19-reference-snippets/`).
 46. Rebuild `spec/2026-spec/01-prompt-spec/INDEX.json` (if present) via `scripts/spec/build-index.mjs --root spec/2026-spec`.
-47. Rerun `lint-cross-refs.mjs` against new root — must reach 0 hard-fails.
+47. Rerun `lint-cross-refs.mjs` against new root - must reach 0 hard-fails.
 48. Re-run `runbook-smoke.mjs` (unaffected sanity).
 49. Update `BLIND-AI-SMOKE-TEST.md` paths.
 50. Update `IMPLEMENTATION-CHECKLIST.md` paths.
@@ -117,7 +117,7 @@ Inner-file numbering inside each child folder stays as-authored (already `00`–
 59. Audit `ui/**/*.md`.
 60. Snapshot fully patched inventory → `inventory-after-phase-d.txt`.
 
-### Phase E — Repository-wide reference repair (61–80)
+### Phase E - Repository-wide reference repair (61-80)
 61. Update `.lovable/question-and-ambiguity/58-2026-spec-scope-placeholders.md` with redirect note.
 62. Update `.lovable/question-and-ambiguity/59-2026-spec-folder-name.md` (mark superseded; new decision = Option B executed).
 63. Update `.lovable/question-and-ambiguity/readme.md` index entry.
@@ -125,7 +125,7 @@ Inner-file numbering inside each child folder stays as-authored (already `00`–
 65. Update `spec/audit/blind-ai-implementation-audit/final-readiness-report-100.md`.
 66. Update `spec/audit/blind-ai-implementation-audit/progress.md`.
 67. Update `spec/audit/blind-ai-implementation-audit/steps/step-097.md`.
-68. Update `poc/2026-spec/README.md` paths (PoC folder name itself stays — it's code, not spec).
+68. Update `poc/2026-spec/README.md` paths (PoC folder name itself stays - it's code, not spec).
 69. Update `poc/2026-spec/index.html` comment headers.
 70. Optional: rename `poc/2026-spec` → `poc/2026-spec` only if user confirms (defer; log decision).
 71. Update CI workflows `.github/workflows/spec-gates.yml` paths.
@@ -139,7 +139,7 @@ Inner-file numbering inside each child folder stays as-authored (already `00`–
 79. Update `scripts/spec/governance-report.mjs` paths.
 80. Update `scripts/spec/tooltip-dict-gate.mjs` paths.
 
-### Phase F — Memory, indexes, and tracker hygiene (81–90)
+### Phase F - Memory, indexes, and tracker hygiene (81-90)
 81. Update `mem://architecture/spec-organization` to mention the renumber convention (dense `01..NN`, no gap-10s in `spec/2026-spec/01-prompt-spec/`).
 82. Update `mem://workflow/file-naming-convention` with worked example.
 83. Append a new memory `mem://workflow/prompt-spec-2026-layout` describing canonical layout.
@@ -151,11 +151,11 @@ Inner-file numbering inside each child folder stays as-authored (already `00`–
 89. Update `readme.txt` ONLY if it already cites the path (do not introduce time/clock).
 90. Rebuild & commit fresh `INDEX.json`.
 
-### Phase G — Validation, gates, and close-out (91–100)
-91. Run full `spec-gates` matrix locally (`perf-budget`, `spec-xref`, `spec-index`, `smoke-rescore`, `runbook-smoke`, `tooltip-dict-gate`) — all green required.
+### Phase G - Validation, gates, and close-out (91-100)
+91. Run full `spec-gates` matrix locally (`perf-budget`, `spec-xref`, `spec-index`, `smoke-rescore`, `runbook-smoke`, `tooltip-dict-gate`) - all green required.
 92. Run `npm run lint` (zero warnings policy).
 93. Run `vitest run` (unit suite stable).
-94. Run `bunx playwright test` smoke (E2E unaffected — sanity only).
+94. Run `bunx playwright test` smoke (E2E unaffected - sanity only).
 95. Diff `inventory-before.txt` ↔ `inventory-after-phase-d.txt` ↔ `inventory-after-phase-g.txt`; assert file count constant.
 96. Write `99-spec-issues/201-renumber-closeout.md` with metrics (files moved, refs rewritten, gates passing).
 97. Update changelog (`macros/CHANGELOG.md` v2.5.0 entry) noting structural rename only (no semantic change).
@@ -179,6 +179,6 @@ Inner-file numbering inside each child folder stays as-authored (already `00`–
 
 ## Deferred / out of scope
 
-- Renaming inner files (already dense `00`–`NN` per folder).
+- Renaming inner files (already dense `00`-`NN` per folder).
 - Renaming `poc/2026-spec/` (separate decision, step 70).
-- Renaming `spec/audit/blind-ai-implementation-audit/` (audit lineage — keep stable).
+- Renaming `spec/audit/blind-ai-implementation-audit/` (audit lineage - keep stable).

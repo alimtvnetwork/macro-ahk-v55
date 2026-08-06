@@ -52,8 +52,8 @@ Your task now is to create a detailed execution plan.
       ii. Require segmentation
 
    b. Medium Packages:
-      i. LOC 300–1000
-      ii. 1–3 tasks
+      i. LOC 300-1000
+      ii. 1-3 tasks
 
    c. Small Packages:
       i. LOC < 300
@@ -70,12 +70,12 @@ Your task now is to create a detailed execution plan.
 2. Example:
 
    PackageA (1200 LOC)
-      → Segment 01: Lines 1–200
-      → Segment 02: Lines 201–400
-      → Segment 03: Lines 401–600
-      → Segment 04: Lines 601–800
-      → Segment 05: Lines 801–1000
-      → Segment 06: Lines 1001–1200
+      → Segment 01: Lines 1-200
+      → Segment 02: Lines 201-400
+      → Segment 03: Lines 401-600
+      → Segment 04: Lines 601-800
+      → Segment 05: Lines 801-1000
+      → Segment 06: Lines 1001-1200
 
 
 ### 4. Test Design Methodology
@@ -155,10 +155,10 @@ Your task now is to create a detailed execution plan.
          C. Confirm AAA compliance
 
 
-#### 3. Medium Package Processing (300–1000 LOC)
+#### 3. Medium Package Processing (300-1000 LOC)
 
    a. Break into:
-      i. 2–4 logical segments
+      i. 2-4 logical segments
 
    b. Repeat:
       i. Coverage analysis

@@ -7,7 +7,7 @@ type: feature
 
 Two-layer cache for `standalone-scripts/*` builds (sdk, xpath, macro-controller, payment-banner-hider, lovable-common, lovable-owner-switch, lovable-user-add).
 
-## Layer 1 — content-hash wrapper (`scripts/cached-build.mjs`)
+## Layer 1 - content-hash wrapper (`scripts/cached-build.mjs`)
 
 Wraps the `tsc + vite + post-snapshot` portion of each `pnpm run build:<name>` chain. Pre-guards (`check-axios-version`, `compile-instruction`, `check-instruction-json-casing`, prompts/less/templates/seed-manifest/version-sync) stay outside the cache because they are cheap and have side effects beyond `dist/`.
 
@@ -31,13 +31,13 @@ Wraps the `tsc + vite + post-snapshot` portion of each `pnpm run build:<name>` c
 
 **Measured speedup (lovable-common, 32 source files):** 3734ms → 617ms wall-clock (6.0×); the `tsc + vite` inner portion alone went 3199ms → 5ms (~640×).
 
-## Layer 2 — TS incremental
+## Layer 2 - TS incremental
 
 Every standalone tsconfig (`tsconfig.{sdk,xpath,macro.build,payment-banner-hider,lovable-common,lovable-owner-switch,lovable-user-add}.json`) has `incremental: true` + `tsBuildInfoFile: .cache/tsbuildinfo/<name>.tsbuildinfo`. Even on cache MISS this trims tsc time by reusing the previous run's type-check graph.
 
-## Layer 3 — CI cache integration
+## Layer 3 - CI cache integration
 
-Each of the 8 standalone build jobs in `.github/workflows/ci.yml` has a `Cache standalone build · <name>` step (using `actions/cache@v4`) inserted **immediately before** the `pnpm run build:<name>` step. It caches both `.cache/standalone-builds/<name>` and `.cache/tsbuildinfo/<name>.tsbuildinfo`. Cache key uses `hashFiles(...)` over the same input set as the script. The script then re-validates per-input on restore — even partial/stale CI restores still produce correct builds (script falls through to MISS for any per-input mismatch).
+Each of the 8 standalone build jobs in `.github/workflows/ci.yml` has a `Cache standalone build · <name>` step (using `actions/cache@v4`) inserted **immediately before** the `pnpm run build:<name>` step. It caches both `.cache/standalone-builds/<name>` and `.cache/tsbuildinfo/<name>.tsbuildinfo`. Cache key uses `hashFiles(...)` over the same input set as the script. The script then re-validates per-input on restore - even partial/stale CI restores still produce correct builds (script falls through to MISS for any per-input mismatch).
 
 ## Orchestrator wiring (`scripts/build-standalone.mjs`)
 

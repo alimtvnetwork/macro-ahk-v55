@@ -20,7 +20,7 @@ descending `available`. Workspaces with no refill date → `score = -1`
 
 **Filter UI:** new row in `ws-filter-menu.ts` with id
 `loop-ws-refill-priority-filter`, icon ⏳, label "Refill priority",
-hint "urgency × credits". Default OFF. Pure sort — does NOT hide rows.
+hint "urgency × credits". Default OFF. Pure sort - does NOT hide rows.
 
 **Badge:** inline `R Nd` chip next to `.loop-ws-name` whenever
 `0 ≤ daysToRefill ≤ K`. Color tiers per spec

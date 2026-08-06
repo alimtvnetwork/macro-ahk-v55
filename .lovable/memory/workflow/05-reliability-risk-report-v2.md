@@ -1,4 +1,4 @@
-# Reliability & Failure-Chance Report v2 — Automator Extension v1.60.0
+# Reliability & Failure-Chance Report v2 - Automator Extension v1.60.0
 
 **Date**: 2026-04-01  
 **Purpose**: Assess spec quality and AI-handoff readiness after Issues 76-88 resolved.  
@@ -84,27 +84,27 @@
 
 | Priority | Action | Where to Change | Expected Reliability Gain | Status |
 |----------|--------|----------------|--------------------------|--------|
-| **P1** | TS Migration V2 Phase 01 — Init fix | `macro-looping.ts` startup sequence | +3% overall (eliminates F-022) | ⬜ Critical |
+| **P1** | TS Migration V2 Phase 01 - Init fix | `macro-looping.ts` startup sequence | +3% overall (eliminates F-022) | ⬜ Critical |
 | **P2** | E2E verification React UI (Step 10) | Manual Chrome testing | +2% overall (eliminates F-024) | ⬜ High |
 | **P3** | ESLint SonarJS full scan + triage | Root + chrome-extension | +1% (catches hidden code smells) | ⬜ Medium |
-| **P4** | TS Migration V2 Phase 02 — Class arch | Macro controller modules | +2% (eliminates F-023 partially) | ⬜ High (blocked by P1) |
+| **P4** | TS Migration V2 Phase 02 - Class arch | Macro controller modules | +2% (eliminates F-023 partially) | ⬜ High (blocked by P1) |
 | **P5** | Macro-looping.ts splitting (8 segments) | `standalone-scripts/macro-controller/` | +1% (reduces F-023) | ⬜ Medium |
 | **P6** | Prompt click E2E verification (52/53) | Live environment test | +0.5% | ⬜ Medium |
-| **P7** | TS Migration V2 Phase 04 — Perf/logging | Macro controller | +1% | ⬜ High |
+| **P7** | TS Migration V2 Phase 04 - Perf/logging | Macro controller | +1% | ⬜ High |
 
 ---
 
 ## 4. Readiness Decision
 
-### Verdict: **READY — with caveats (same as v1, but improved)**
+### Verdict: **READY - with caveats (same as v1, but improved)**
 
 ### What's Excellent ✅
 
-1. **88 issue write-ups** with RCA — up from 44
-2. **26 engineering standards** — battle-tested
-3. **Comprehensive spec hierarchy** — 10 numbered folders, well-organized
+1. **88 issue write-ups** with RCA - up from 44
+2. **26 engineering standards** - battle-tested
+3. **Comprehensive spec hierarchy** - 10 numbered folders, well-organized
 4. **822+ unit tests** across 72 files + 46 automation engine tests
-5. **16 completed workflow plans** — full history of major work
+5. **16 completed workflow plans** - full history of major work
 6. **Spec reorganization plan** ready (14 atomic tasks)
 7. **IndexedDB injection cache** with auto-invalidation on deploy
 8. **SDK namespace migration** complete (window.marco → riseup)
@@ -113,11 +113,11 @@
 
 ### What Reduces AI Success ⚠️
 
-1. **TS Migration V2 Phase 01 not started** — initialization race condition exists (F-022)
-2. **macro-looping.ts still ~4,165 lines** — AI may struggle with function boundaries
+1. **TS Migration V2 Phase 01 not started** - initialization race condition exists (F-022)
+2. **macro-looping.ts still ~4,165 lines** - AI may struggle with function boundaries
 3. **No E2E verification** of React unification (Step 10 never run)
-4. **ComboSwitch DOM coupling** — hardcoded XPaths, fragile to Lovable UI changes
-5. **No automated E2E test runner** — all verification is manual
+4. **ComboSwitch DOM coupling** - hardcoded XPaths, fragile to Lovable UI changes
+5. **No automated E2E test runner** - all verification is manual
 
 ### AI Failure Scenarios
 

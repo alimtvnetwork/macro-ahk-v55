@@ -22,4 +22,4 @@ The build system was refactored from a monolithic 1758-line `run.ps1` into a ~27
 
 ## Console encoding rule
 
-All console output must use ASCII-safe characters only — no Unicode symbols. Use `[OK]`, `[FAIL]`, `[WARN]`, `[INFO]` prefixes instead of checkmarks/crosses.
+All console output must use ASCII-safe characters only - no Unicode symbols. Use `[OK]`, `[FAIL]`, `[WARN]`, `[INFO]` prefixes instead of checkmarks/crosses.

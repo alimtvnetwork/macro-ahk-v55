@@ -1,4 +1,4 @@
-# Conversation Log — Pre-Action Wrapper for Any Follow-up Prompt
+# Conversation Log - Pre-Action Wrapper for Any Follow-up Prompt
 
 > **Purpose:** Before acting on the *next* prompt the user pastes, the AI must (a) persist the full chat so far to disk as a numbered Markdown log, (b) rewrite and improve the user's follow-up prompt in place, (c) confirm that the project's coding guidelines are captured in memory, and (d) surface any ambiguity. The AI does **NOT** execute the follow-up prompt yet.
 
@@ -10,13 +10,13 @@
 
 1. **DO NOT ACT** on the follow-up prompt the user provides after this one. No file edits, no commands, no implementation. Rewrite-and-stage only.
 2. **DO NOT** invent facts about the conversation. If something is unclear, list it under *Ambiguities* and ask.
-3. Conversation log files are **append-only artefacts** — never rewrite or renumber existing files in `conversation/`.
+3. Conversation log files are **append-only artefacts** - never rewrite or renumber existing files in `conversation/`.
 4. All file/folder names use kebab-case with a zero-padded 3-digit numeric prefix (e.g. `001-initial-scoping.md`).
 5. Honor every Core rule in `mem://index.md` (timezone, no-Supabase, dark-only, etc.) when generating any artefact.
 
 ---
 
-## Phase 1 — Persist the Conversation
+## Phase 1 - Persist the Conversation
 
 **Target folder:** `conversation/` at repo root (create if missing).
 
@@ -66,23 +66,23 @@
 
 **Rules:**
 - User prompts are **verbatim** (preserve typos, casing, punctuation). Wrap each in a blockquote.
-- Assistant side is a **terse factual summary only** — never paste internal reasoning, never invent quotes.
+- Assistant side is a **terse factual summary only** - never paste internal reasoning, never invent quotes.
 - Use UTC ISO-8601 for stored timestamps; render local time only in UI.
-- If you cannot recall a prior user prompt with confidence, write `> [unrecoverable — see chat history index N]` rather than guessing. Use `chat_search` tools to recover when possible.
+- If you cannot recall a prior user prompt with confidence, write `> [unrecoverable - see chat history index N]` rather than guessing. Use `chat_search` tools to recover when possible.
 
 ---
 
-## Phase 2 — Cross-check Memory & Coding Guidelines
+## Phase 2 - Cross-check Memory & Coding Guidelines
 
 1. Read `mem://index.md` and confirm the following exist; if any is missing, **propose** (do not auto-create unless the user confirms):
    - A `coding-guidelines` memory entry mirroring `.lovable/coding-guidelines.md`. If the file exists on disk but no memory entry references it, draft a `mem://standards/coding-guidelines.md` stub and list it under *Proposed Memory Writes* below.
    - `plan.md` reference (roadmap source of truth).
-   - Conversation-log convention (this very prompt) — propose `mem://workflow/conversation-log` if absent.
+   - Conversation-log convention (this very prompt) - propose `mem://workflow/conversation-log` if absent.
 2. List every relevant memory file the follow-up prompt would touch, so the user can audit before approval.
 
 ---
 
-## Phase 3 — Rewrite the Follow-up Prompt
+## Phase 3 - Rewrite the Follow-up Prompt
 
 Take the user's pasted follow-up prompt and produce an **improved, unambiguous, AI-ready** version. Rules:
 
@@ -93,7 +93,7 @@ Take the user's pasted follow-up prompt and produce an **improved, unambiguous, 
 - End the rewritten prompt with a self-instruction: **"Before acting, re-read `mem://index.md` and `.lovable/coding-guidelines.md`; restate which rules apply."**
 - Ask the AI (in the rewritten prompt itself) to suggest further improvements to *this* instruction after execution.
 
-**Save the rewrite to:** `prompts/NNN-<slug>.md` at repo root (3-digit prefix, kebab slug derived from the prompt's title). Do not overwrite existing files — pick the next free `NNN`.
+**Save the rewrite to:** `prompts/NNN-<slug>.md` at repo root (3-digit prefix, kebab slug derived from the prompt's title). Do not overwrite existing files - pick the next free `NNN`.
 
 **Also update:** `prompts/index.md` (create if missing). Format:
 
@@ -109,15 +109,15 @@ Append the new row; never rewrite history.
 
 ---
 
-## Phase 4 — Report Back (single chat reply)
+## Phase 4 - Report Back (single chat reply)
 
 Reply to the user with **exactly** these sections, in this order:
 
-1. **Conversation files written** — list paths + sequence numbers.
-2. **Memory check** — what exists, what's missing, what you propose to add (with file paths).
-3. **Rewritten prompt** — path under `prompts/` plus a short diff-style summary of changes (what you added, what you tightened).
-4. **Ambiguities / Questions** — anything you couldn't resolve. If none, write `None — ready to execute on your "go".`
-5. **Next step** — explicit sentence: *"Awaiting your explicit 'go' before executing the rewritten prompt at `prompts/NNN-<slug>.md`."*
+1. **Conversation files written** - list paths + sequence numbers.
+2. **Memory check** - what exists, what's missing, what you propose to add (with file paths).
+3. **Rewritten prompt** - path under `prompts/` plus a short diff-style summary of changes (what you added, what you tightened).
+4. **Ambiguities / Questions** - anything you couldn't resolve. If none, write `None - ready to execute on your "go".`
+5. **Next step** - explicit sentence: *"Awaiting your explicit 'go' before executing the rewritten prompt at `prompts/NNN-<slug>.md`."*
 
 ---
 
@@ -128,10 +128,10 @@ Reply to the user with **exactly** these sections, in this order:
 - ❌ Renumbering or editing existing `conversation/NNN-*.md` files.
 - ❌ Silently creating new memory entries without listing them under *Proposed Memory Writes*.
 - ❌ Skipping the index update at `prompts/index.md`.
-- ❌ Asking the user vague/context-free questions (per `mem://preferences/question-asking-style` — always include recommendation + pros/cons).
+- ❌ Asking the user vague/context-free questions (per `mem://preferences/question-asking-style` - always include recommendation + pros/cons).
 
 ---
 
 ## Acknowledgement Required
 
-Begin your reply with one line: **"Understood — staging only, not executing."** Then proceed through Phases 1–4.
+Begin your reply with one line: **"Understood - staging only, not executing."** Then proceed through Phases 1-4.

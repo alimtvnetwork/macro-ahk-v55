@@ -28,4 +28,4 @@ Related:
 - Regression: Plan number buttons (5,10,12,15,20,25,30,50) and Next buttons (1,2,3,4,5,8,10,15) still paste-only, no submit.
 
 ## Appended from prior pending tasks
-- `10-unified-billing-all-workspaces.md` — unrelated billing workstream, remains pending.
+- `10-unified-billing-all-workspaces.md` - unrelated billing workstream, remains pending.

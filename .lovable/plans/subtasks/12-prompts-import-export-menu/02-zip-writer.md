@@ -15,10 +15,10 @@ Ship a ZIP export that a human can unzip and read without the extension.
    store-only writer. If a custom writer covers our needs in under ~150
    lines, prefer it (no new dep).
 2. Layout:
-   - `/manifest.json` — envelope from `buildPromptsBundle()` minus bodies.
-   - `/entries/<slug>.md` — the Markdown body.
-   - `/entries/<slug>.html` — the HTML body if `bodyHtml` is present.
-   - `/entries/<slug>.meta.json` — the entry's metadata block.
+   - `/manifest.json` - envelope from `buildPromptsBundle()` minus bodies.
+   - `/entries/<slug>.md` - the Markdown body.
+   - `/entries/<slug>.html` - the HTML body if `bodyHtml` is present.
+   - `/entries/<slug>.meta.json` - the entry's metadata block.
 3. Filenames sanitized per parent step 21.
 4. ZIP importer reads `/manifest.json` first, then walks `/entries/*.meta.json`
    and pairs to bodies by slug.

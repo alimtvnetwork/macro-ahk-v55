@@ -1,4 +1,4 @@
-# 34 — ESLint pin on run-summary-types.ts: scope & wiring
+# 34 - ESLint pin on run-summary-types.ts: scope & wiring
 
 **Original task:** "Add an eslint step in CI that runs on
 `run-summary-types.ts` and fails if `sonarjs/no-nested-template-literals`
@@ -20,7 +20,7 @@ ambiguity #31) targeting the same file. The user is now asking for a
 
 | # | Option | Pros | Cons |
 |---|--------|------|------|
-| A | Replace scanner with ESLint job | One source of truth | Loses the no-install <100ms preflight — install takes ~30s in CI |
+| A | Replace scanner with ESLint job | One source of truth | Loses the no-install <100ms preflight - install takes ~30s in CI |
 | B | Add ESLint job alongside scanner, single-file scope | Belt-and-braces; scanner stays fast preflight; ESLint catches *config drift* (e.g. someone moves the file into the legacy `warn` override block) | Two jobs to maintain |
 | C | Run project-wide ESLint instead | Already exists as `lint-standalone` job | Doesn't *pin* this specific file; a future `warn` override would silently mask a regression |
 
@@ -30,7 +30,7 @@ ambiguity #31) targeting the same file. The user is now asking for a
 failure modes:
 
 - **Scanner** catches a new nested backtick getting added to the file.
-- **ESLint job** catches *config drift* — someone disabling the rule
+- **ESLint job** catches *config drift* - someone disabling the rule
   project-wide, or adding `run-summary-types.ts` to the legacy-file
   `warn` override block in `eslint.config.js`. The scanner alone would
   still pass in that case, hiding the regression.

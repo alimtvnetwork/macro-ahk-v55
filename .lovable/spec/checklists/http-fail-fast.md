@@ -1,4 +1,4 @@
-# HTTP Fail-Fast (HEFF) — Agent Checklist
+# HTTP Fail-Fast (HEFF) - Agent Checklist
 
 Use this checklist EVERY time you write, review, or refactor code that
 calls `fetch()`, `XMLHttpRequest`, or any HTTP-bearing SDK in this repo.
@@ -32,7 +32,7 @@ Source of truth:
    Reason: <human reason>
    Loop halted. Awaiting user instruction.
    ```
-   Use `HttpFailFastError.toReportString()` — do NOT hand-format.
+   Use `HttpFailFastError.toReportString()` - do NOT hand-format.
 5. **UI surfacing is automatic**. Throwing `HttpFailFastError` in a UI
    context dispatches `marco:http-fail-fast`; the banner picks it up.
    Do NOT add ad-hoc toasts for HTTP failures.
@@ -60,7 +60,7 @@ Before adding ANY new HTTP call:
 - [ ] `node scripts/lint/no-bare-fetch.mjs` clean (also runs in prebuild).
 - [ ] `node scripts/verify-http-fail-fast.mjs` clean for the touched
       modules.
-- [ ] Searched the file for `.catch(` swallowing `HttpFailFastError` —
+- [ ] Searched the file for `.catch(` swallowing `HttpFailFastError` -
       none allowed unless paired with `Logger.error()` AND re-throw.
 - [ ] No new `setTimeout(..., backoffMs)` near the call site.
 
@@ -69,11 +69,11 @@ Before adding ANY new HTTP call:
 - [ ] Every new `fetch(` in the diff has a sibling `httpFailFast` /
       `httpFetchOrThrow` / `res.ok` check.
 - [ ] Failure path uses `Logger.error(scope, message, caught)` with the
-      HEFF report string as `message` — never bare `console.log`.
+      HEFF report string as `message` - never bare `console.log`.
 - [ ] No silent `.catch(() => null)` over an HTTP call.
 - [ ] No `MAX_RETRIES`, no `attempt < N`, no `await sleep(... * 2 ** i)`
       patterns introduced.
-- [ ] UI-side callers do NOT add custom toasts — the global
+- [ ] UI-side callers do NOT add custom toasts - the global
       `HttpFailFastBanner` already surfaces failures.
 
 ---
@@ -83,11 +83,11 @@ Before adding ANY new HTTP call:
 ```ts
 import { httpFetchOrThrow, httpFailFast, HttpFailFastError } from "@/shared/http-fail-fast";
 
-// Option A — preferred for the common case
+// Option A - preferred for the common case
 const res = await httpFetchOrThrow(url);
 const body = await res.json();
 
-// Option B — when you need init or to inspect Response before check
+// Option B - when you need init or to inspect Response before check
 const raw = await fetch(url, { method: "POST", body });
 await httpFailFast(raw, { method: "POST", url });
 const body = await raw.json();

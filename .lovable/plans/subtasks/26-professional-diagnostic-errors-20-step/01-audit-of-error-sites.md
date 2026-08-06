@@ -37,9 +37,9 @@ Errors across the extension are emitted as ad-hoc `new Error(...)` throws and `t
 
 ## Duplicate-message evidence (grep-visible)
 
-- `throw new Error('HTTP ' + resp.status ...)` appears in: `ws-members-mutations.ts` (x3), `credit-fetch.ts` (x2), `remix-fetch.ts` (x2), `remix-bulk.ts`, `ws-adjacent.ts`, `gitsync/progress-probe.ts`, `rename-api.ts` — 11+ throw sites with the SAME message shape and no code.
-- `throw new Error('SdkNotReady: ...')` appears in: `credit-fetch.ts` (x3), `loop-cycle-fallback.ts`, `ws-adjacent.ts` — 5 sites, pseudo-coded via string prefix (not enforced, not unique).
-- `marco.api... is not available` / `unavailable` appears in: `ws-members-mutations.ts`, `ws-members-fetch.ts`, `remix-fetch.ts` (x2), `remix-bulk.ts`, `pro-zero/pro-zero-sdk-adapter.ts` — 6+ sites.
+- `throw new Error('HTTP ' + resp.status ...)` appears in: `ws-members-mutations.ts` (x3), `credit-fetch.ts` (x2), `remix-fetch.ts` (x2), `remix-bulk.ts`, `ws-adjacent.ts`, `gitsync/progress-probe.ts`, `rename-api.ts` - 11+ throw sites with the SAME message shape and no code.
+- `throw new Error('SdkNotReady: ...')` appears in: `credit-fetch.ts` (x3), `loop-cycle-fallback.ts`, `ws-adjacent.ts` - 5 sites, pseudo-coded via string prefix (not enforced, not unique).
+- `marco.api... is not available` / `unavailable` appears in: `ws-members-mutations.ts`, `ws-members-fetch.ts`, `remix-fetch.ts` (x2), `remix-bulk.ts`, `pro-zero/pro-zero-sdk-adapter.ts` - 6+ sites.
 
 ## Missing variables (categories)
 
@@ -47,24 +47,24 @@ Across the 151 sites the following context fields are almost never captured:
 - HTTP throws: missing `{ url, method, wsId, projectId, requestId, bodyPreview }` (only status is included).
 - SDK-not-ready throws: missing `{ readinessStage, elapsedMs, expectedApi }`.
 - Prompt validation throws: missing `{ role, slug, ruleId, expected, actual, tokensFound }` (partially present in a few sites, inconsistent).
-- User-facing `toast.error(...)`: 74/74 sites pass a bare string with no code and no context — nothing lands in the diagnostics ZIP.
+- User-facing `toast.error(...)`: 74/74 sites pass a bare string with no code and no context - nothing lands in the diagnostics ZIP.
 
 ## Slot allocation (feeds SS-02 taxonomy)
 
-- `HTTP_E001..` — every `HTTP ' + status` throw (11+ callsites collapse into one code family, differentiated by `context.url` + `context.op`).
-- `SDK_NOT_READY_E001..` — SDK-unavailable throws (5).
-- `PROMPT_VALIDATE_E001..` — prompt-editor / prompt-utils / prompt-injection validation.
-- `PROMPT_EDIT_E001..` — editor open/save/reset action failures.
-- `PROMPT_IO_E001..` — import/export/zip/sqlite readers.
-- `SEED_E001..` / `HEALTH_E001..` / `REPAIR_E001..` — seeding + health + repair.
-- `HISTORY_E001..` — history panel slug resolution.
-- `DB_E001..` — SQLite adapter errors.
-- `WS_MEMBERS_E001..`, `WS_MOVE_E001..`, `WS_CONTEXT_E001..` — workspace ops.
+- `HTTP_E001..` - every `HTTP ' + status` throw (11+ callsites collapse into one code family, differentiated by `context.url` + `context.op`).
+- `SDK_NOT_READY_E001..` - SDK-unavailable throws (5).
+- `PROMPT_VALIDATE_E001..` - prompt-editor / prompt-utils / prompt-injection validation.
+- `PROMPT_EDIT_E001..` - editor open/save/reset action failures.
+- `PROMPT_IO_E001..` - import/export/zip/sqlite readers.
+- `SEED_E001..` / `HEALTH_E001..` / `REPAIR_E001..` - seeding + health + repair.
+- `HISTORY_E001..` - history panel slug resolution.
+- `DB_E001..` - SQLite adapter errors.
+- `WS_MEMBERS_E001..`, `WS_MOVE_E001..`, `WS_CONTEXT_E001..` - workspace ops.
 - `REMIX_E001..`, `RENAME_E001..`, `GITSYNC_E001..`, `CREDIT_E001..`, `PROZERO_E001..`, `SETTINGS_E001..`, `SPLITTER_E001..`.
 
 ## Blocks / unblocks
 
-- Blocks: steps 8–13 (per-area migrations), step 14 (CI uniqueness check needs the code registry seeded from these slots), step 15 (ESLint ban on bare `new Error`).
+- Blocks: steps 8-13 (per-area migrations), step 14 (CI uniqueness check needs the code registry seeded from these slots), step 15 (ESLint ban on bare `new Error`).
 - Unblocks: step 2 (taxonomy) can now be finalized with real slot counts; step 3 (registry file scaffold) can list the areas above.
 
 ## Verification

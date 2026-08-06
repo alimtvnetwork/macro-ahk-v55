@@ -21,14 +21,14 @@ so the suite never hits the network.
 
 ## Coverage map (acceptance criteria from spec §8)
 
-- AC-3 — URL-pinned strict mode (release-asset URL → strict)
-- AC-4 — `--version vX.Y.Z` strict (no API call)
-- AC-6 — invalid `--version` → exit 3
-- AC-7 — `--version latest` → API lookup
-- AC-8 — API unreachable + no `--version` → exit 5
-- AC-9 — strict mode + API down → succeeds
-- AC-12 — `--no-sibling-discovery` flag accepted
-- AC-14 — `--dry-run --version` → exit 0, no install dir created
+- AC-3 - URL-pinned strict mode (release-asset URL → strict)
+- AC-4 - `--version vX.Y.Z` strict (no API call)
+- AC-6 - invalid `--version` → exit 3
+- AC-7 - `--version latest` → API lookup
+- AC-8 - API unreachable + no `--version` → exit 5
+- AC-9 - strict mode + API down → succeeds
+- AC-12 - `--no-sibling-discovery` flag accepted
+- AC-14 - `--dry-run --version` → exit 0, no install dir created
 - Plus discovery-banner sanity, `--help` exit 0 + spec link
 
 Not yet exercised (require sibling discovery to land in install.sh):

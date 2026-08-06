@@ -1,6 +1,6 @@
 ---
 name: prompt-macros
-description: Prompt-Macros subsystem — ordered chains of typed steps (prompt, next-loop, audit, fix-from-audit, final-audit, loop-if, set-var, notify) driving repeatable AI workflows
+description: Prompt-Macros subsystem - ordered chains of typed steps (prompt, next-loop, audit, fix-from-audit, final-audit, loop-if, set-var, notify) driving repeatable AI workflows
 type: feature
 ---
 
@@ -31,7 +31,7 @@ A **Macro** is an ordered chain of typed steps that drives an AI workflow end-to
 
 ## Score extraction
 
-Regex: `/^\s*Score:\s*(\d{1,3})\s*\/\s*100\s*$/m` — last match wins.
+Regex: `/^\s*Score:\s*(\d{1,3})\s*\/\s*100\s*$/m` - last match wins.
 
 ## Loop bounds
 
@@ -48,5 +48,5 @@ Regex: `/^\s*Score:\s*(\d{1,3})\s*\/\s*100\s*$/m` — last match wins.
 ## Constraints
 
 - No Supabase. No localStorage for state. State lives in `chrome.storage.local`.
-- No-retry policy applies — single-attempt for outbound webhook results.
+- No-retry policy applies - single-attempt for outbound webhook results.
 - Failure-log schema (Reason + ReasonDetail + SelectorAttempts + VariableContext) is mandatory.

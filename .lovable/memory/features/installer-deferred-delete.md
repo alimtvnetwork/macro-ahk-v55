@@ -1,6 +1,6 @@
 ---
 name: Installer deferred-delete
-description: Windows reboot-safe self-replace cleanup for scripts/install.ps1 — RunId-stamped artifacts, canonical leaf-name patterns (marco-install-*, .delete-pending-*, gitmap-update-*, *.old.*), schema/owner-signature markers, and scoped sweepers that NEVER touch foreign files
+description: Windows reboot-safe self-replace cleanup for scripts/install.ps1 - RunId-stamped artifacts, canonical leaf-name patterns (marco-install-*, .delete-pending-*, gitmap-update-*, *.old.*), schema/owner-signature markers, and scoped sweepers that NEVER touch foreign files
 type: feature
 ---
 
@@ -11,7 +11,7 @@ has files in the existing install dir locked, plain
 `Remove-Item -Recurse -Force` raises `ERROR_SHARING_VIOLATION` /
 `ACCESS_DENIED` and aborts the install. The deferred-delete machinery
 makes re-installs **always succeed** by deferring cleanup of locked
-artifacts to next reboot — and (v2.225+) **only ever touches files this
+artifacts to next reboot - and (v2.225+) **only ever touches files this
 updater itself created**.
 
 ## RunId & canonical artifact identity
@@ -27,12 +27,12 @@ $script:MarcoOwnerSignature = 'marco-installer'
 
 Every artifact this run creates embeds the RunId in its leaf name. The
 sweep helpers use these stamps (plus the marker schema/owner) to tell
-"ours" from "theirs" — random `.old` files, third-party `delete-pending-*`
+"ours" from "theirs" - random `.old` files, third-party `delete-pending-*`
 dirs, and unowned markers in `pending-deletes/` are **never** touched.
 
 ### Canonical leaf patterns (the contract)
 
-Stored as `$script:MarcoArtifactLeafPatterns` — kept in sync with the
+Stored as `$script:MarcoArtifactLeafPatterns` - kept in sync with the
 test suite:
 
 | Pattern                                                    | Created by                           |
@@ -60,29 +60,29 @@ Anything not matching is foreign and left alone.
 
 `Remove-PathSafely -Path <p> -Reason <why>` runs:
 
-1. **Try Remove-Item** — fast path; succeeds in 99% of cases.
-2. **POSIX short-circuit** — on Linux/macOS, locked-file failure means
+1. **Try Remove-Item** - fast path; succeeds in 99% of cases.
+2. **POSIX short-circuit** - on Linux/macOS, locked-file failure means
    real perms problem; surface a warning and return.
-3. **Classify the failure** via `Test-IsSharingViolation` — sharing/lock
+3. **Classify the failure** via `Test-IsSharingViolation` - sharing/lock
    errors get the informational treatment, other errors get a yellow
    warning but still proceed to fallback.
-4. **Rename out of the way** — rename `<p>` to a sibling
+4. **Rename out of the way** - rename `<p>` to a sibling
    `.<leaf>.delete-pending-<runId>`. The original name is now free for
    the new install to atomically reuse.
 5. **Schedule via MoveFileEx** with `MOVEFILE_DELAY_UNTIL_REBOOT` (0x4)
    and `lpNewFileName=$null`. Windows queues the deletion in
    `HKLM\System\CurrentControlSet\Control\Session Manager\PendingFileRenameOperations`
    and processes it on next boot.
-6. **Marker-file fallback** — if MoveFileEx fails (no
+6. **Marker-file fallback** - if MoveFileEx fails (no
    `SeRestorePrivilege`, exotic FS), write a JSON marker to
    `%LOCALAPPDATA%\Marco\pending-deletes\<rand>.txt` recording
    `{ Schema, OwnerSignature, RunId, Path, Reason, ScheduledAt, Pid }`.
-7. **Sweep on startup** — `Invoke-PendingDeleteSweep` runs first thing
+7. **Sweep on startup** - `Invoke-PendingDeleteSweep` runs first thing
    in `Main`. **Strict ownership**: refuses to act on markers without
    the schema + owner stamps; refuses to delete recorded paths whose
    leaf doesn't match a canonical pattern. Foreign markers are reported
    as `Skipped N unowned marker(s)` and left in place.
-8. **Stale-artifact sweep** — `Invoke-StaleArtifactSweep -installDir <d>`
+8. **Stale-artifact sweep** - `Invoke-StaleArtifactSweep -installDir <d>`
    runs after the install dir is resolved. Finds canonical-pattern
    leftovers under `$env:TEMP`, `$env:LOCALAPPDATA\Marco`, and the
    install-dir's parent. Deletes if possible; defers via
@@ -93,8 +93,8 @@ Anything not matching is foreign and left alone.
 Sharing/lock errors during cleanup are framed as **informational
 notices** via `Write-Note` (DarkCyan), not warnings. The post-install
 summary explicitly states `"Install completed successfully. N path(s)
-had locked files; cleanup deferred."` plus `"No action needed — your new
-install is live now."` Cleanup paths never call `exit` — the install's
+had locked files; cleanup deferred."` plus `"No action needed - your new
+install is live now."` Cleanup paths never call `exit` - the install's
 exit code is unaffected by cleanup outcomes.
 
 ## P/Invoke surface
@@ -129,7 +129,7 @@ regressed to `Get-Random`-suffixed names (foreign tools could collide).
 
 ## Tests
 
-- `tests/installer/deferred-delete.test.sh` — **69 static-analysis
+- `tests/installer/deferred-delete.test.sh` - **69 static-analysis
   assertions** covering: `Remove-PathSafely` surface, rename-then-replace
   pattern, MoveFileEx P/Invoke surface, marker fallback, cross-platform
   short-circuit, callsite migration (positive + negative), informational
@@ -150,9 +150,9 @@ regressed to `Get-Random`-suffixed names (foreign tools could collide).
   third-party tool leaves a `foo.old` or `bar.delete-pending-XYZ` in
   `$env:TEMP`, we walk past it.
 - **Does not retry deletion in a loop** within the same session (waste
-  of time when Chrome is the holder — locks won't release until the
+  of time when Chrome is the holder - locks won't release until the
   user closes it).
-- **Does not unload the Chrome extension or kill Chrome** — that's
+- **Does not unload the Chrome extension or kill Chrome** - that's
   user-policy territory.
 - **Does not run on POSIX** beyond the no-op short-circuit;
   POSIX deletes don't have the lock problem.
@@ -160,7 +160,7 @@ regressed to `Get-Random`-suffixed names (foreign tools could collide).
 ## Spec link
 
 Cleanup behavior should be added to
-`spec/14-update/01-generic-installer-behavior.md` §5 (TODO — the spec
+`spec/14-update/01-generic-installer-behavior.md` §5 (TODO - the spec
 currently doesn't address self-replace cleanup, the informational
 framing, or the canonical artifact-naming contract; all three belong
 there for downstream installers).

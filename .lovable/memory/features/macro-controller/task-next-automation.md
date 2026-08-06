@@ -1,7 +1,7 @@
 # Memory: features/macro-controller/task-next-automation
 Updated: 2026-03-21
 
-The 'Task Next' feature (S-042) is an automation utility in the macro controller's prompts dropdown menu. It appears as the **first item** (⏭ Task Next) with a hover sub-menu offering preset counts (1, 2, 3, 5, 10, 20, 30, 40), a custom number input (1–999), and a ⚙ Settings button.
+The 'Task Next' feature (S-042) is an automation utility in the macro controller's prompts dropdown menu. It appears as the **first item** (⏭ Task Next) with a hover sub-menu offering preset counts (1, 2, 3, 5, 10, 20, 30, 40), a custom number input (1-999), and a ⚙ Settings button.
 
 **Automation loop**: For each task, it injects the "Next Tasks" prompt (slug: `next-tasks`) into the chatbox via DOM append, waits a configurable pre-click delay, clicks the "Add To Tasks" button (XPath-based with CSS fallback), and waits a post-click delay. Button disabled state is handled with configurable retries. Users can cancel via Escape key.
 

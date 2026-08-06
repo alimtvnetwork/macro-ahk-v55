@@ -1,4 +1,4 @@
-# 46 — chrome.storage.local PascalCase Migrator Scope
+# 46 - chrome.storage.local PascalCase Migrator Scope
 
 ## Context
 Plan task 2c-storage: "rewrite already-persisted projects on extension upgrade; bump storage schema version".
@@ -24,4 +24,4 @@ Skip until UI consumers migrated.
 - **Cons**: Plan item lingers.
 
 ## Decision
-**Option A** — establish the framework now so future PascalCase rewrites are mechanical drop-ins. Keeps slice atomic and reversible.
+**Option A** - establish the framework now so future PascalCase rewrites are mechanical drop-ins. Keeps slice atomic and reversible.

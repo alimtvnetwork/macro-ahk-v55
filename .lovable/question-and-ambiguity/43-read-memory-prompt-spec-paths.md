@@ -1,4 +1,4 @@
-# 43 — Read-Memory prompt references non-existent spec paths
+# 43 - Read-Memory prompt references non-existent spec paths
 
 **Logged:** session of "read memory" install
 **Source:** user prompt v1.0 ("Read Memory")
@@ -27,10 +27,10 @@ Prompt v1.0 references several spec folders that do not match the actual repo la
 
 ## Recommendation
 
-**B** — applied. The user's intent (a working onboarding prompt) is served by paths that resolve. The drift is documented here so it can be reconciled when the user next touches the prompt or the spec reorg lands content into `17-consolidated-guidelines/`.
+**B** - applied. The user's intent (a working onboarding prompt) is served by paths that resolve. The drift is documented here so it can be reconciled when the user next touches the prompt or the spec reorg lands content into `17-consolidated-guidelines/`.
 
 ## Follow-ups for user
 
 1. Should `spec/17-consolidated-guidelines/` actually be authored (currently empty stub), or should the prompt's Phase 2 be removed?
 2. Is `.lovable/user-preferences` intentionally absent, or should it be created from `mem://~user`?
-3. Confirm folder restructure: prompt asked "Restructure folder if not according to this" — current `.lovable/` already matches the canonical layout in `spec/01-spec-authoring-guide/07-memory-folder-guide.md`, so no restructure was performed.
+3. Confirm folder restructure: prompt asked "Restructure folder if not according to this" - current `.lovable/` already matches the canonical layout in `spec/01-spec-authoring-guide/07-memory-folder-guide.md`, so no restructure was performed.

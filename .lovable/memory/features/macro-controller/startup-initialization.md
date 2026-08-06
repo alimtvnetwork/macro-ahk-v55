@@ -19,18 +19,18 @@ The macro controller now renders UI **immediately at t=0** before any auth or wo
 
 ### Key Design Decisions
 
-- **Cached workspace name from localStorage** — on reload, the last-known workspace name is seeded into `state.workspaceName` from `marco_last_workspace_name` in localStorage. The title badge shows it at 60% opacity with "(cached)" until the API confirms. The cache is written by `updateUI()` after every successful workspace resolution. See `workspace-cache.ts`.
-- **UI renders with cached/loading state** — workspace shows cached name or shimmer skeleton placeholder until data arrives
-- **Token timeout reduced to 2s** (was 4s) — token is usually immediate from bridge
-- **No UI timeout fallback needed** — UI is already rendered, only data hydration is async
+- **Cached workspace name from localStorage** - on reload, the last-known workspace name is seeded into `state.workspaceName` from `marco_last_workspace_name` in localStorage. The title badge shows it at 60% opacity with "(cached)" until the API confirms. The cache is written by `updateUI()` after every successful workspace resolution. See `workspace-cache.ts`.
+- **UI renders with cached/loading state** - workspace shows cached name or shimmer skeleton placeholder until data arrives
+- **Token timeout reduced to 2s** (was 4s) - token is usually immediate from bridge
+- **No UI timeout fallback needed** - UI is already rendered, only data hydration is async
 - **Toast shows "loading workspace..."** during data fetch, dismissed on completion
 
 ### Related Files
 
-- `standalone-scripts/macro-controller/src/startup.ts` — bootstrap implementation
-- `.lovable/fixes/macro-controller-toast-crash-and-slow-startup.md` — root cause analysis
-- `spec/21-app/02-features/macro-controller/ts-migration-v2/01-initialization-fix.md` — spec
-- `.lovable/memory/features/macro-controller/initialization-flow-v2.md` — v2 flow details
+- `standalone-scripts/macro-controller/src/startup.ts` - bootstrap implementation
+- `.lovable/fixes/macro-controller-toast-crash-and-slow-startup.md` - root cause analysis
+- `spec/21-app/02-features/macro-controller/ts-migration-v2/01-initialization-fix.md` - spec
+- `.lovable/memory/features/macro-controller/initialization-flow-v2.md` - v2 flow details
 
 ### Previous Behavior (v7.36-v7.41)
 

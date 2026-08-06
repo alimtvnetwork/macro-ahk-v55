@@ -1,4 +1,4 @@
-# Issue RCA — MV3 CSP Install Failure + Osano Injection Breakage
+# Issue RCA - MV3 CSP Install Failure + Osano Injection Breakage
 Updated: 2026-03-19
 
 ## Summary
@@ -54,7 +54,7 @@ From codebase:
 
 ## Root Cause Analysis
 
-## Root Cause A — MV3 CSP policy violation (install-time blocker)
+## Root Cause A - MV3 CSP policy violation (install-time blocker)
 **What happened**
 - `'unsafe-eval'` was added to `manifest.json` extension CSP to support eval fallback.
 
@@ -67,7 +67,7 @@ From codebase:
 
 ---
 
-## Root Cause B — ISOLATED fallback design depends on eval (architectural conflict)
+## Root Cause B - ISOLATED fallback design depends on eval (architectural conflict)
 **What happened**
 - ISOLATED fallback implementation uses `(0, eval)(code)`.
 
@@ -79,7 +79,7 @@ From codebase:
 
 ---
 
-## Root Cause C — Osano monkey-patch interferes with MAIN-world script-tag injection
+## Root Cause C - Osano monkey-patch interferes with MAIN-world script-tag injection
 **What happened**
 - On Osano pages, patched append flow re-parses injected script and throws parse errors (`Unexpected identifier 'let'`).
 
@@ -88,7 +88,7 @@ From codebase:
 
 ---
 
-## Root Cause D — UX visibility gap for build/runtime mismatch
+## Root Cause D - UX visibility gap for build/runtime mismatch
 **What happened**
 - Users saw failures but lacked immediate, explicit UI correlation of:
   - current extension build,
@@ -147,22 +147,22 @@ Why:
 
 ## Implementation Plan (phased)
 
-### Phase 0 — Stabilize (immediate)
+### Phase 0 - Stabilize (immediate)
 - Remove `'unsafe-eval'` from manifest CSP.
 - Fail fast with explicit error code when fallback mechanism requires forbidden policy.
 
-### Phase 1 — Compliance refactor
+### Phase 1 - Compliance refactor
 - Introduce `userScripts` execution path for dynamic user scripts.
 - Feature-flag old fallback path off by default.
 
-### Phase 2 — UX/debug resilience
+### Phase 2 - UX/debug resilience
 - Surface in popup:
   - active extension version,
   - failing error version,
   - normalized root-cause code.
 - Add explicit "extension failed to load due to CSP policy" diagnostic in docs + checks.
 
-### Phase 3 — CI guardrails
+### Phase 3 - CI guardrails
 - Add preflight rule to reject `'unsafe-eval'` in `manifest.json` for `extension_pages`.
 - Keep version sync check as required gate.
 

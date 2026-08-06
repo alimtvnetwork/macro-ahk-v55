@@ -1,6 +1,6 @@
 ---
 name: pro-one-credit-totals
-description: Issue 120 — pro_1 (and other non-pro_0 paid plans) Credit Totals use billing-period fields only
+description: Issue 120 - pro_1 (and other non-pro_0 paid plans) Credit Totals use billing-period fields only
 type: feature
 ---
 
@@ -11,7 +11,7 @@ For every workspace whose `plan` is NOT `pro_0` and whose `tier` is NOT `FREE`,
 `aggregateCreditTotals()` in `standalone-scripts/macro-controller/src/credit-totals.ts`
 reads ONLY the workspace **billing-period** fields. The legacy "sum of five pools"
 total (`granted + daily + billing + topup + rollover`) is forbidden for the
-Credit Totals modal — it double-counts daily free + bonus + topup credits and
+Credit Totals modal - it double-counts daily free + bonus + topup credits and
 inflates the user's monthly plan grant.
 
 ### Mapping table
@@ -29,17 +29,17 @@ inflates the user's monthly plan grant.
 - everything else (`pro_1`, `pro_3`, `lite`, `ktlo`, …) → billing-period fields only.
 
 ### Spec references
-- `spec/21-app/03-data-and-api/api-response/04-plan.md` line 40 — "Credits summary
+- `spec/21-app/03-data-and-api/api-response/04-plan.md` line 40 - "Credits summary
   text: Derived from `daily_credits_used / daily_credits_limit` and
   `billing_period_credits_used / billing_period_credits_limit`."
-- `spec/21-app/02-features/macro-controller/credit-system.md` — pool definitions
+- `spec/21-app/02-features/macro-controller/credit-system.md` - pool definitions
   (the five-pool sum is still valid for the per-row Credit Bar; the Credit
   Totals modal uses billing-period only).
 - Related: `mem://features/macro-controller/pro-zero-credit-balance`,
   `mem://features/macro-controller/credit-totals-exclude-free`.
 
 ### Test coverage
-`standalone-scripts/macro-controller/src/__tests__/credit-totals.test.ts` —
+`standalone-scripts/macro-controller/src/__tests__/credit-totals.test.ts` -
 11 tests including the explicit Issue 120 regression
 ("pro_1 Total equals billing_period_credits_limit ONLY"). All 83 credit-totals
 suite tests green at v3.32.0.

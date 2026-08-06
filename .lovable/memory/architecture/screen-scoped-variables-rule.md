@@ -8,9 +8,9 @@ type: constraint
 
 Every screen-specific config object (XPath maps, selector tables, layout enums) MUST be:
 
-1. **Named after the screen** — e.g. `HomepageDashboardVariables`, `MacroControllerVariables`, `OptionsPageVariables`.
-2. **Isolated** — no key in one screen's config may also exist in another screen's config with a different value/meaning.
-3. **Imported only by code scoped to that screen** — no cross-screen imports of these configs.
+1. **Named after the screen** - e.g. `HomepageDashboardVariables`, `MacroControllerVariables`, `OptionsPageVariables`.
+2. **Isolated** - no key in one screen's config may also exist in another screen's config with a different value/meaning.
+3. **Imported only by code scoped to that screen** - no cross-screen imports of these configs.
 
 ## Why
 
@@ -20,7 +20,7 @@ The Lovable extension overlays UI on multiple distinct screens (home, dashboard,
 
 - New screen feature → new `<ScreenName>Variables` object in `src/content/<screen>/`.
 - Never put screen XPaths in a shared `selectors.ts`.
-- If two screens genuinely share a node (e.g. global header), each screen still keeps its own entry — duplicated values are acceptable, shared keys are not.
+- If two screens genuinely share a node (e.g. global header), each screen still keeps its own entry - duplicated values are acceptable, shared keys are not.
 
 ## Reference
 

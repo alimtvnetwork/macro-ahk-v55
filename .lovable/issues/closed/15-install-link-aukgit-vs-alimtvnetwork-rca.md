@@ -2,7 +2,7 @@ Slug: install-link-aukgit-vs-alimtvnetwork-rca
 Status: closed
 Created: 2026-07-17
 
-# RCA — v51 install link / `download-extension.ps1` pointed at wrong owner
+# RCA - v51 install link / `download-extension.ps1` pointed at wrong owner
 
 **Date:** 2026-06-23
 **Reporter:** user
@@ -21,7 +21,7 @@ irm https://github.com/aukgit/macro-ahk-v55/releases/latest/download/download-ex
 ## Root cause
 
 The canonical published repo for v51 is **`alimtvnetwork/macro-ahk-v55`** (same
-owner pattern as v50 — `alimtvnetwork/macro-ahk-v55`). An earlier change
+owner pattern as v50 - `alimtvnetwork/macro-ahk-v55`). An earlier change
 inverted the assumption and treated `aukgit/macro-ahk-v55` as canonical:
 
 - `readme.md` install/clone/install-from-release URLs pointed to `aukgit/...`.
@@ -38,16 +38,16 @@ back to the dead `aukgit` org for the release download.
 
 `difflib` against
 `https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/download-extension.ps1`
-shows **two lines** differ — both the `-Repo` default in the param block and
+shows **two lines** differ - both the `-Repo` default in the param block and
 the `.PARAMETER Repo` docstring. The download/extract logic is byte-identical.
 
 The script itself is not broken; only the default repo identifier was wrong.
 
 ## Fix
 
-1. `scripts/download-extension.ps1` — `-Repo` default reverted to
+1. `scripts/download-extension.ps1` - `-Repo` default reverted to
    `alimtvnetwork/macro-ahk-v55`; docstring updated.
-2. `readme.md` — every `aukgit/macro-ahk-v55` occurrence (install commands,
+2. `readme.md` - every `aukgit/macro-ahk-v55` occurrence (install commands,
    clone URLs, badge URLs, release URLs) rewritten to
    `alimtvnetwork/macro-ahk-v55`.
 

@@ -1,7 +1,7 @@
 # Memory: architecture/auth-bridge-service
 Updated: 2026-04-03
 
-The Auth Bridge service (`src/auth-recovery.ts`) provides `getBearerToken(options?)` — the single TTL-aware entry point for all token consumers.
+The Auth Bridge service (`src/auth-recovery.ts`) provides `getBearerToken(options?)` - the single TTL-aware entry point for all token consumers.
 
 ## Token Resolution Flow
 
@@ -13,7 +13,7 @@ The Auth Bridge service (`src/auth-recovery.ts`) provides `getBearerToken(option
 | Function | Description |
 |---|---|
 | `getBearerToken(options?)` | TTL-aware async accessor. Returns cached if fresh, recovers if stale. `{ force: true }` bypasses TTL. |
-| `getRawToken()` | Sync — returns localStorage token without TTL check. |
+| `getRawToken()` | Sync - returns localStorage token without TTL check. |
 | `getTokenAge()` | Returns ms since last `saveTokenWithTimestamp()`. |
 | `getTokenSavedAt()` | Raw timestamp from `marco_token_saved_at`. |
 | `saveTokenWithTimestamp(token)` | Atomically writes token + timestamp to localStorage. |
@@ -32,4 +32,4 @@ Type: `AuthBridgeConfig` in `src/types/config-types.ts`.
 
 `persistResolvedBearerToken()` now calls `saveTokenWithTimestamp()` internally, ensuring every persisted token gets a timestamp for TTL checks.
 
-All components (Credits, Workspace Loader, Macro Controller) call `getBearerToken()` — they never manage tokens directly.
+All components (Credits, Workspace Loader, Macro Controller) call `getBearerToken()` - they never manage tokens directly.

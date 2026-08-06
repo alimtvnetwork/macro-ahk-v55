@@ -9,7 +9,7 @@ Scope: every package under `standalone-scripts/**` (macro-controller, payment-ba
 
 ## Verbatim
 
-"Can you please make sure that the coding that you have done in the standalone scripts, this actually follows the coding guideline? And how many places it does not follow — create a folder on top of the spec folder inside the spec folder, say, missing coding guideline. That would be 33-missing-coding-guideline, and the files which are missing and what it is missing, how we can improve it. Find those things from the standalone scripts to follow the coding guideline and error management."
+"Can you please make sure that the coding that you have done in the standalone scripts, this actually follows the coding guideline? And how many places it does not follow - create a folder on top of the spec folder inside the spec folder, say, missing coding guideline. That would be 33-missing-coding-guideline, and the files which are missing and what it is missing, how we can improve it. Find those things from the standalone scripts to follow the coding guideline and error management."
 
 ## When it applies
 

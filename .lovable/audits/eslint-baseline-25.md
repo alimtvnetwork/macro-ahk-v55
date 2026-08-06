@@ -1,4 +1,4 @@
-# ESLint Baseline — Plan 25, Step 1
+# ESLint Baseline - Plan 25, Step 1
 
 Captured: 2026-07-19
 Command: `npx eslint . -f json`
@@ -32,7 +32,7 @@ Raw: `.lovable/audits/eslint-baseline-25.json`
 
 The `max-lines-per-function` uptick reflects new controller/hook extractions from Plan 24 SS-04..SS-09 that stayed above the 25-line ceiling; those are targeted by Steps 9-23 below.
 
-## Top 25 offenders — max-lines-per-function
+## Top 25 offenders - max-lines-per-function
 | Lines | File:line |
 | --- | --- |
 | 327 | src/components/recorder/KeywordEventsPanel.tsx:799 |
@@ -61,7 +61,7 @@ The `max-lines-per-function` uptick reflects new controller/hook extractions fro
 | 144 | src/components/options/step-group-library/use-view-model.ts:59 |
 | 141 | src/background/recorder/url-tab-click.ts:315 |
 
-## Top 10 offenders — sonarjs/cognitive-complexity
+## Top 10 offenders - sonarjs/cognitive-complexity
 (Numeric score not surfaced in the message body; sites listed by file:line.)
 - src/components/recorder/SelectorTesterPanel.tsx:47
 - src/components/recorder/KeywordEventsPanel.tsx:1159

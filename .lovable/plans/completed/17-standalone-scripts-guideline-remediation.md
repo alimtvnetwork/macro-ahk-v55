@@ -11,7 +11,7 @@ Execute the P0/P1/P2 backlog authored across Plan-16 (v4.80.0 -> v4.88.0) withou
 
 Captured command: `.lovable/spec/commands/02-remediate-spec-33-drift.md`
 Related prior audit plan: `.lovable/plans/completed/16-standalone-scripts-coding-guideline-audit.md`
-Orthogonal pending plans (NOT pulled in): `10-unified-billing-all-workspaces.md`, `11-prompts-import-export-section.md`, `13-per-project-chat-submit-tracker.md` — each is an independent product workstream and remains untouched.
+Orthogonal pending plans (NOT pulled in): `10-unified-billing-all-workspaces.md`, `11-prompts-import-export-section.md`, `13-per-project-chat-submit-tracker.md` - each is an independent product workstream and remains untouched.
 
 Non-negotiable operating rules for every step:
 - No behavior change. Every PR ships value-locking tests before the refactor lands.
@@ -46,7 +46,7 @@ Non-negotiable operating rules for every step:
 24. P1-05 file splits: `ui/prompt-dropdown.ts` (1441 LOC), `ws-list-renderer.ts` (1156), `ui/projects-modal.ts` (1114). Each split by domain (event wiring, rendering, data). Ship `scripts/check-file-loc-ceiling.mjs` (soft 800, hard 1200). See `./subtasks/17-standalone-scripts-guideline-remediation/06-file-split-strategy.md`.
 25. P0-08: remove ESLint disables at `eslint.config.js:326,384`; re-enable `max-lines-per-function` (120 default; 60 for db/core; 50 for sdk/common) and `sonarjs/cognitive-complexity` (20). Fix any remaining hotspots inline. PR-F live.
 26. P0-07 + P1-11: ship tests for the 3 zero-coverage packages. `marco-sdk`: `getBearerToken()` + auth waterfall. `lovable-common`: dom-utils. `xpath`: core selector. Also lock `repeat-loop-presets.ts` value-set (10,12,15,20,60,75,80,100,200). Ship `scripts/check-test-with-features.mjs` (per-package prod:test ≥ 0.20). PR-G live.
-27. P1-08 legacy dead-code triage: per-symbol ripgrep on `auth.ts`, `credit-fetch.ts`, `workspace-rename.ts` — delete unused exports OR reconnect the caller. Cross-check `mem://auth/unified-auth-contract` to confirm nothing legitimate is orphaned. Removes the 33 flagged items.
+27. P1-08 legacy dead-code triage: per-symbol ripgrep on `auth.ts`, `credit-fetch.ts`, `workspace-rename.ts` - delete unused exports OR reconnect the caller. Cross-check `mem://auth/unified-auth-contract` to confirm nothing legitimate is orphaned. Removes the 33 flagged items.
 28. P2-05 barrel prune + P2-03 rename: delete `export *` from `types/index.ts`, `pro-zero/index.ts`, `queue-control/index.ts`, `ui/summary-bar/index.ts`; consumers import from source. Rename `core/MacroController.ts` -> `core/macro-controller.ts` now that P0-09 is done. Enable barrel `no-restricted-syntax` (PR-H). Ship `scripts/check-ts-prune.mjs` with baseline 278 -> target 50.
 29. P2-01 + P2-02 + P2-06 cleanup pass: annotate the 261 remaining `unknown` with `// reason: catch|input|opaque-json`; rename banned `msg` identifiers; migrate Class D/E storage + DOM coercion (~69 sites) to typed accessors. `check-unknown-usage.mjs` target reaches ≤ 360.
 30. tsconfig strictness + close-out (PR-I): enable `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride`, `noPropertyAccessFromIndexSignature` one at a time in `tsconfig.macro.build.json`, fix fallout per flag. Final release: bump minor, update changelog / RELEASE_NOTES / root readme, move this plan to `.lovable/plans/completed/17-standalone-scripts-guideline-remediation.md`, snapshot final numbers into `spec/33-missing-coding-guideline/99-baselines.json` under a `postRemediation` block.

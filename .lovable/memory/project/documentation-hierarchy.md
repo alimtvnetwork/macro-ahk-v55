@@ -1,11 +1,11 @@
 # Memory: project/documentation-hierarchy
 Updated: 2026-04-22 (post v3.2.0 reorganization)
 
-Project documentation lives in the `spec/` directory using the canonical Spec Authoring Guide v3.2.0 layout. The tree is divided into **core (01–17)** universal standards, **app (21+)** product-specific content, **archive (99)** for retired material, and **governance** files at the root and under `validation-reports/`.
+Project documentation lives in the `spec/` directory using the canonical Spec Authoring Guide v3.2.0 layout. The tree is divided into **core (01-17)** universal standards, **app (21+)** product-specific content, **archive (99)** for retired material, and **governance** files at the root and under `validation-reports/`.
 
 ---
 
-## Core fundamentals (01–17)
+## Core fundamentals (01-17)
 
 Universal standards that apply to any project consuming this spec tree.
 
@@ -26,7 +26,7 @@ Universal standards that apply to any project consuming this spec tree.
 | `14-update/` | Update mechanism specifications | 🟡 Stub |
 | `17-consolidated-guidelines/` | Aggregated cross-cutting guidelines | 🟡 Stub |
 
-Reserved gaps: **13, 15, 16, 18, 19, 20** — vacant by design for future core topics. App content must NOT fill these.
+Reserved gaps: **13, 15, 16, 18, 19, 20** - vacant by design for future core topics. App content must NOT fill these.
 
 ---
 
@@ -51,9 +51,9 @@ Chrome-extension product content lives entirely under `21-app/`.
 
 ---
 
-## Archive (99) — historical / retired content
+## Archive (99) - historical / retired content
 
-Frozen material — never edited, never linked from active specs except as historical reference.
+Frozen material - never edited, never linked from active specs except as historical reference.
 
 | Folder | Content |
 |--------|---------|
@@ -75,13 +75,13 @@ Frozen material — never edited, never linked from active specs except as histo
 | `spec/00-overview.md` | Master spec index (created Phase 7) |
 | `spec/99-consistency-report.md` | Root-level consistency health report |
 | `spec/validation-reports/` | Time-stamped audits (e.g., `2026-04-22-reorganization-audit.md`) |
-| `spec/.spec-folder-registry.json` | Authoritative folder list — protects against auto-cleanup pruning |
+| `spec/.spec-folder-registry.json` | Authoritative folder list - protects against auto-cleanup pruning |
 
 ---
 
 ## Conventions
 
-- **Numbering**: Folders use a 2-digit numeric prefix. Numbers are unique within their parent. Reserved gaps in core 01–17 are intentional.
+- **Numbering**: Folders use a 2-digit numeric prefix. Numbers are unique within their parent. Reserved gaps in core 01-17 are intentional.
 - **Required files per folder**: Every active folder has `00-overview.md` and `99-consistency-report.md`. Stubs may have only `00-overview.md`.
 - **File naming**: kebab-case, descriptive. Example: `02-class-architecture.md`.
 - **Single source of truth**: each topic lives in exactly one folder.
@@ -93,7 +93,7 @@ Frozen material — never edited, never linked from active specs except as histo
 
 ## Migration history (2026-04-22)
 
-The repository was reorganized in 10 phases on 2026-04-22 from an ad-hoc layout (with duplicate-prefix collisions, app content polluting the core 01–20 range, and stale duplicates) to the canonical v3.2.0 structure. Authoritative records:
+The repository was reorganized in 10 phases on 2026-04-22 from an ad-hoc layout (with duplicate-prefix collisions, app content polluting the core 01-20 range, and stale duplicates) to the canonical v3.2.0 structure. Authoritative records:
 
 | Document | Location |
 |----------|----------|

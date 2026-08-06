@@ -1,4 +1,4 @@
-# CI/CD Issue 07 — Release recovery is async and not gated, so source-only releases can remain published
+# CI/CD Issue 07 - Release recovery is async and not gated, so source-only releases can remain published
 
 ## Pipeline / Workflow
 
@@ -37,7 +37,7 @@ that a release exists, but it does not upload or validate any assets.
 
 ## Status
 
-✅ Resolved — 2026-05-18
+✅ Resolved - 2026-05-18
 
 ## Fix
 

@@ -41,14 +41,14 @@ When a suggestion is completed:
 - **description**: Deeper integration tests needed. Target: 900+ tests.
 - **status**: done
 - **priority**: Medium
-- **completionNotes**: Target exceeded — 2186 tests passing as of 2026-05-25 (v3.15.0). Vitest suite covers unit, component, and E2E layers.
+- **completionNotes**: Target exceeded - 2186 tests passing as of 2026-05-25 (v3.15.0). Vitest suite covers unit, component, and E2E layers.
 
 ### S-055: P Store Backend API Implementation
 - **createdAt**: 2026-04-05
 - **source**: Risk report v3
 - **affectedProject**: P Store (`spec/21-app/02-features/misc-features/pstore-marketplace.md`)
 - **description**: P Store frontend spec exists but no backend API. Need to define and implement the server-side API or mock service.
-- **rationale**: F-025 — 100% failure until backend exists. Highest-impact corrective action for new features.
+- **rationale**: F-025 - 100% failure until backend exists. Highest-impact corrective action for new features.
 - **status**: open
 - **priority**: High
 
@@ -84,8 +84,8 @@ When a suggestion is completed:
 | S-025 | Hover Micro-Interactions | 2026-03-15 | v2.4.0 | Tailwind transitions |
 | S-026 | Animate List-to-Editor Transition | 2026-03-15 | v2.4.0 | CSS keyframe animations |
 | S-027 | Build Verification | 2026-03-15 | v1.17 | 6.65s build verified |
-| S-028 | CDP Injection Alternative | 2026-03-16 | — | Full spec created |
-| S-029 | AI Onboarding Checklist | 2026-03-16 | — | Master overview |
+| S-028 | CDP Injection Alternative | 2026-03-16 | - | Full spec created |
+| S-029 | AI Onboarding Checklist | 2026-03-16 | - | Master overview |
 | S-030 | Startup loads workspaces | 2026-03-20 | v7.36 | fetchLoopCreditsAsync |
 | S-031 | Check button fast-path | 2026-03-20 | v7.37 | Skip bridge if cached |
 | S-032 | Changelog in controller menu | 2026-03-20 | v7.37 | Menu item |
@@ -115,7 +115,7 @@ When a suggestion is completed:
 
 ## Known Issues (Current)
 
-### I-003: DevTools Requirement (LOW — mitigated)
+### I-003: DevTools Requirement (LOW - mitigated)
 - **severity**: Low
 - **description**: Silent failure if DevTools not open
 - **mitigation**: Two-branch injection, domain guards, VerifyInjectionSuccess

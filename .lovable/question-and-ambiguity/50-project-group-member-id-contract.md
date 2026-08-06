@@ -1,4 +1,4 @@
-# 50 — ProjectGroupMember.ProjectId number vs StoredProject.id UUID
+# 50 - ProjectGroupMember.ProjectId number vs StoredProject.id UUID
 
 ## Context
 Cross-Project Sync Phase 3 wants drag-to-assign projects → groups and a project-picker UX. But there's a contract mismatch:
@@ -23,6 +23,6 @@ The existing "Add Member" input accepts a raw integer, so today the table stores
 - **Cons:** Phase 3 "drag-to-assign" remains open until B is scheduled.
 
 ## Recommendation
-**Option C** for this loop. Fix the real `useState`→`useEffect` bug in `ProjectGroupPanel.GroupDetailPanel` (member list doesn't refresh on group change), and surface this contract mismatch via an inline TODO + this log entry. Then schedule Option B (`logs.db` migration v8) as its own work-item next session — too large for a "next" sweep and needs migration discussion.
+**Option C** for this loop. Fix the real `useState`→`useEffect` bug in `ProjectGroupPanel.GroupDetailPanel` (member list doesn't refresh on group change), and surface this contract mismatch via an inline TODO + this log entry. Then schedule Option B (`logs.db` migration v8) as its own work-item next session - too large for a "next" sweep and needs migration discussion.
 
 Drag-and-drop is intentionally NOT implemented in this loop because every interaction would write a fabricated numeric ID into `ProjectGroupMember.ProjectId`, making the data unrecoverable after Option B lands.

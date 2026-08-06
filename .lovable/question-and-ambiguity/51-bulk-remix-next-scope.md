@@ -1,6 +1,6 @@
-# Q51 — Bulk Remix Next: target scope
+# Q51 - Bulk Remix Next: target scope
 
-**Context:** P3 backlog item says "Bulk Remix Next — toolbar button to remix every workspace's current project in sequence." Semantics of "every workspace's current project" are not defined; remix today operates on a single (projectId, workspaceId, currentName) tuple.
+**Context:** P3 backlog item says "Bulk Remix Next - toolbar button to remix every workspace's current project in sequence." Semantics of "every workspace's current project" are not defined; remix today operates on a single (projectId, workspaceId, currentName) tuple.
 
 ## The ambiguity
 

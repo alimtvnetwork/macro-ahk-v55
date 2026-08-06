@@ -1,4 +1,4 @@
-# 33 — Refactor doc placement: in-file comment vs sibling README
+# 33 - Refactor doc placement: in-file comment vs sibling README
 
 **Original task:** "Document the refactor approach (detailSuffix, head array
 concatenation) in a short comment or README inside the file so future edits
@@ -7,7 +7,7 @@ keep the same output."
 ## Point of confusion
 
 The user said "comment **or** README **inside the file**". A README cannot
-literally live *inside* a `.ts` file — so the phrasing implies one of:
+literally live *inside* a `.ts` file - so the phrasing implies one of:
 
 - **A.** A JSDoc-style block comment inside `run-summary-types.ts` (the
   refactored file).
@@ -25,7 +25,7 @@ literally live *inside* a `.ts` file — so the phrasing implies one of:
 
 ## Decision
 
-**Proceeded with Option A** — single in-file block comment placed
+**Proceeded with Option A** - single in-file block comment placed
 immediately above the text renderers, the functions whose output the
 contract governs. Rationale:
 

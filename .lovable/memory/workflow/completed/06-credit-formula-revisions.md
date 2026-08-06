@@ -1,4 +1,4 @@
-# Plan: Credit Formula Revisions & Progress Bar Overhaul (v7.9.9–v7.9.15)
+# Plan: Credit Formula Revisions & Progress Bar Overhaul (v7.9.9-v7.9.15)
 
 **Status**: COMPLETED
 **Date Completed**: 2026-02-22
@@ -10,7 +10,7 @@ Iterative refinement of credit calculation logic and progress bar visuals across
 ## Issues Fixed
 
 ### 1. Total Credits Formula (v7.9.9 → v7.9.15)
-- **Root Cause**: Repeated confusion about what constitutes "Total Credits" — initial implementations conflated total capacity with available amounts
+- **Root Cause**: Repeated confusion about what constitutes "Total Credits" - initial implementations conflated total capacity with available amounts
 - **Final Formula**: `credits_granted + daily_credits_limit + billing_period_credits_limit + topup_credits_limit + rollover_credits_limit`
 - **Fix**: Extracted `calcTotalCredits()` helper function in both controllers
 
@@ -22,7 +22,7 @@ Iterative refinement of credit calculation logic and progress bar visuals across
 - **Formula**: `daily_credits_limit - daily_credits_used`
 - **Fix**: Extracted `calcFreeCreditAvailable()` helper
 
-### 4. Progress Bar Visual Overhaul (v7.9.10–v7.9.14)
+### 4. Progress Bar Visual Overhaul (v7.9.10-v7.9.14)
 - Widened bars (combo 300px, macro 260px)
 - Height increased to 14px/12px
 - Reddish used-credit background (`rgba(239,68,68,0.25)`)

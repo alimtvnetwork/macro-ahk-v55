@@ -1,4 +1,4 @@
-# 64 — Compact Plan + Next into prompts dropdown; exclude-from-export flag
+# 64 - Compact Plan + Next into prompts dropdown; exclude-from-export flag
 
 Date: 2026-06-28
 Status: Open (no-questions-mode active)
@@ -14,11 +14,11 @@ Status: Open (no-questions-mode active)
 1. The two inline strips above the Lovable chat box (📋 Plan and ▶ Next,
    mounted by `next-inline-ui.ts`) are visually noisy. User wants them
    collapsed into the existing **prompts dropdown** row (built by
-   `prompt-dropdown.ts`) as two compact dropdown buttons — Plan ▾ / Next ▾
-   — instead of always-visible preset chips.
+   `prompt-dropdown.ts`) as two compact dropdown buttons - Plan ▾ / Next ▾
+   - instead of always-visible preset chips.
 2. "Disable the cut prompts" → assumed to mean: hide/disable the legacy
    "cut" prompt entries (any prompt whose slug contains `cut`) from the
-   dropdown for now. Not deleting files — just filtering.
+   dropdown for now. Not deleting files - just filtering.
 3. "Flag to disable prompts from exporting" → add an optional boolean
    `excludeFromExport` on each prompt entry (info.json + runtime type +
    PromptsConfig). When true, `prompt-io.ts` exporter skips that entry.

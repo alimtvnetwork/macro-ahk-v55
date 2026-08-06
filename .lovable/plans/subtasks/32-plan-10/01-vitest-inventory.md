@@ -1,4 +1,4 @@
-# Plan 10 Step 1 — Vitest `act(...)` warning inventory
+# Plan 10 Step 1 - Vitest `act(...)` warning inventory
 
 Parent: 32-plan-10
 Slug: 01-vitest-inventory
@@ -29,13 +29,13 @@ Created: 2026-07-20
 
 ## Offending test files (7)
 
-1. `src/components/popup/__tests__/BootFailureBanner.report.test.tsx` — BootFailureBanner mount effect.
-2. `src/components/recorder/__tests__/KeywordEventsPanel.selection.test.tsx` — KeywordEventsEditor + FloatingControllerHost + RecorderControlBar.
-3. `src/options/sections/DiagnosticsPanel.test.tsx` — DiagnosticsPanel status/health effect (uses `waitFor` but initial render assertion trips).
-4. `src/options/sections/ProjectEditor.test.tsx` — ErrorDrawer + BootFailureBanner (indirect).
-5. `src/options/sections/ProjectsSection.test.tsx` — ProjectsSection async load.
-6. `src/pages/__tests__/Popup.test.tsx` — SessionCopyButton, PopupFooter, InjectionCopyButton, BootFailureBanner (all four probe effects, dominant contributor: ~30 of 54 warnings).
-7. `src/test/snapshots/Options.snapshot.test.tsx` — same set as Popup + ProjectsSection.
+1. `src/components/popup/__tests__/BootFailureBanner.report.test.tsx` - BootFailureBanner mount effect.
+2. `src/components/recorder/__tests__/KeywordEventsPanel.selection.test.tsx` - KeywordEventsEditor + FloatingControllerHost + RecorderControlBar.
+3. `src/options/sections/DiagnosticsPanel.test.tsx` - DiagnosticsPanel status/health effect (uses `waitFor` but initial render assertion trips).
+4. `src/options/sections/ProjectEditor.test.tsx` - ErrorDrawer + BootFailureBanner (indirect).
+5. `src/options/sections/ProjectsSection.test.tsx` - ProjectsSection async load.
+6. `src/pages/__tests__/Popup.test.tsx` - SessionCopyButton, PopupFooter, InjectionCopyButton, BootFailureBanner (all four probe effects, dominant contributor: ~30 of 54 warnings).
+7. `src/test/snapshots/Options.snapshot.test.tsx` - same set as Popup + ProjectsSection.
 
 ## Root-cause categories
 

@@ -1,4 +1,4 @@
-# ESLint Cleanup Continuation — Second 30-Step Sweep
+# ESLint Cleanup Continuation - Second 30-Step Sweep
 
 Slug: eslint-cleanup-continuation-30
 Steps: 30

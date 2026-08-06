@@ -2,7 +2,7 @@ Slug: three-strip-decoupled-flow
 Status: active
 Created: 2026-07-17
 
-# Command — Three-Strip Decoupled Flow (Plan / Next / Repeat)
+# Command - Three-Strip Decoupled Flow (Plan / Next / Repeat)
 
 **Captured:** 2026-06-25
 **Scope:** macro-controller inline strip UI (above Lovable chat composer)
@@ -17,11 +17,11 @@ Created: 2026-07-17
 >
 > **Repeat** (renamed from "Start", the only executor): when pressed with count N, submit and repeat the current chat content N times, waiting for Lovable idle between cycles.
 >
-> The three are decoupled — no auto-chaining between them.
+> The three are decoupled - no auto-chaining between them.
 
 ## Rules
 
 1. Strip order top→bottom: **Plan → Next → Repeat**.
-2. Plan and Next are **paste-only stagers** — never auto-submit, never loop.
+2. Plan and Next are **paste-only stagers** - never auto-submit, never loop.
 3. Repeat is the **only submitter**. Rename every "Start" label/aria/tooltip to "Repeat".
 4. No strip triggers another. Clicking Plan must not arm Next; clicking Next must not arm Repeat.

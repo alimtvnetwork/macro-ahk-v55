@@ -1,4 +1,4 @@
-# 49 — Release hardening final version target
+# 49 - Release hardening final version target
 
 ## Original task text
 
@@ -13,7 +13,7 @@ the existing release tags.
 
 ## Options considered
 
-### Option A — Treat "major version" as authoritative: bump `2.250.0` → `3.0.0`
+### Option A - Treat "major version" as authoritative: bump `2.250.0` → `3.0.0`
 
 **Pros**
 - Correct SemVer interpretation of a major bump.
@@ -23,7 +23,7 @@ the existing release tags.
 **Cons**
 - Does not literally match the phrase "two point one".
 
-### Option B — Treat "two point one" literally: bump to `2.1.0`
+### Option B - Treat "two point one" literally: bump to `2.1.0`
 
 **Pros**
 - Matches the spoken phrase literally.
@@ -33,7 +33,7 @@ the existing release tags.
 - Risks GitHub/latest release ordering problems.
 - Conflicts with the project's unified versioning policy.
 
-### Option C — Use `2.251.0`
+### Option C - Use `2.251.0`
 
 **Pros**
 - Safe forward version.

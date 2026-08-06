@@ -1,6 +1,6 @@
 ---
 name: CSS injection sentinel validation
-description: Runtime CSS load validation via #marco-css-sentinel element — if CSS fails to load, emergency dark styles are applied inline and a toast warns the user.
+description: Runtime CSS load validation via #marco-css-sentinel element - if CSS fails to load, emergency dark styles are applied inline and a toast warns the user.
 type: feature
 ---
 ## How it works
@@ -11,4 +11,4 @@ type: feature
    - Console error with diagnostic details
    - Emergency inline dark styles applied (background, foreground, card, primary, border, muted, secondary)
    - Sonner toast warning shown for 15 seconds
-5. If sentinel IS `none`, CSS loaded correctly — no action taken
+5. If sentinel IS `none`, CSS loaded correctly - no action taken

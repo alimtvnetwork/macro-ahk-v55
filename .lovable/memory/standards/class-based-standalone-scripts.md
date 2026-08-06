@@ -7,7 +7,7 @@ type: preference
 Each `standalone-scripts/<name>/src/index.ts` MUST:
 
 1. Export a single default class named in PascalCase matching the script (e.g. `PaymentBannerHider`, `XPathRecorder`, `MacroController`).
-2. Place every operation related to the script (lifecycle, DOM access, event handling, settings IO) on the class — either as a method or as a dependency injected through the constructor.
+2. Place every operation related to the script (lifecycle, DOM access, event handling, settings IO) on the class - either as a method or as a dependency injected through the constructor.
 3. NOT export top-level free functions for behaviour. The only acceptable top-level exports are: the default class, the bootstrap call (e.g. `new PaymentBannerHider().start()`), and `type` re-exports.
 
 If multiple cohesive responsibilities exist (e.g. selector resolution + animation + telemetry), split them into their own classes and inject them through the constructor of the entry-point class.

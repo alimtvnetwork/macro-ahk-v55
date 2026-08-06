@@ -1,4 +1,4 @@
-# 65 — "Remove the prompts I have shared"
+# 65 - "Remove the prompts I have shared"
 
 Date: 2026-06-29
 Status: Open (no-questions-mode)

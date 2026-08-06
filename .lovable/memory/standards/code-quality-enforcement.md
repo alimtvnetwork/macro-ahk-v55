@@ -5,15 +5,15 @@ Code quality is enforced via `eslint-plugin-sonarjs`, integrated into both the r
 
 ## Configuration
 
-### Root project (`eslint.config.js` — flat config)
+### Root project (`eslint.config.js` - flat config)
 - Plugin: `eslint-plugin-sonarjs` recommended rules
 - `max-lines-per-function`: 25 lines (warning)
 - `sonarjs/cognitive-complexity`: 15 (warning)
 
-### Chrome extension (`chrome-extension/.eslintrc.json` — legacy config)
+### Chrome extension (`chrome-extension/.eslintrc.json` - legacy config)
 - Plugin: `eslint-plugin-sonarjs` recommended rules
 - `max-lines-per-function`: 25 lines (warning)
-- `sonarjs/cognitive-complexity`: 10 (warning — stricter for extension code)
+- `sonarjs/cognitive-complexity`: 10 (warning - stricter for extension code)
 
 ## Disabled Rules (both configs)
 The following rules are turned **off** to avoid false positives from the project's dynamic script injection, SDK-export, and cross-project architecture:

@@ -1,4 +1,4 @@
-# ESLint Baseline — Plan 24, Step 1
+# ESLint Baseline - Plan 24, Step 1
 
 Captured: 2026-07-19
 Command: `npx eslint . -f json`

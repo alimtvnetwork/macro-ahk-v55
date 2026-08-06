@@ -1,13 +1,13 @@
 ---
-name: Session 2026-04-21 — `check-no-pnpm-dlx-less` hardening
+name: Session 2026-04-21 - `check-no-pnpm-dlx-less` hardening
 description: Hardened the standalone preflight guard with --json output, --scan-dir flag, per-physical-line reporting, offendingCommand field, JSON-schema README, and 15 new regression fixtures (67/67 passing) including a universal caret-integrity check.
 type: workflow
 ---
 
-# Session 2026-04-21 — `check-no-pnpm-dlx-less` Hardening
+# Session 2026-04-21 - `check-no-pnpm-dlx-less` Hardening
 
 **Status:** ✅ Done
-**Scope:** Standalone CI preflight script — no extension code, no version bump.
+**Scope:** Standalone CI preflight script - no extension code, no version bump.
 **Files touched:** 3 (`scripts/check-no-pnpm-dlx-less.mjs`, `scripts/check-no-pnpm-dlx-less-readme.md` (new), `readme.txt`)
 
 ## Iteration log
@@ -46,4 +46,4 @@ The preflight script and its README/`readme.txt` marker are not part of any vers
 - No suggestions added or implemented.
 - The plan's "🔄 In Progress" section remains empty (last session closed v2.169.0; this session was orthogonal CI tooling).
 - Next logical work item per `.lovable/plan.md`:
-  > **Pending #1** — Vitest coverage for `assertBindable` + `BindError` (Proxy intercept + column-name inference).
+  > **Pending #1** - Vitest coverage for `assertBindable` + `BindError` (Proxy intercept + column-name inference).

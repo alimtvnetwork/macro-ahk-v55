@@ -19,7 +19,7 @@ on:
       - version.json
 ```
 
-(No branch filter, per `mem://constraints/ci-push-trigger-unfiltered` — the
+(No branch filter, per `mem://constraints/ci-push-trigger-unfiltered` - the
 `paths` filter is acceptable here because the workflow is scoped to a single
 file whose change IS the trigger, not to code paths.)
 
@@ -38,7 +38,7 @@ file whose change IS the trigger, not to code paths.)
 - Never edit `version.json` itself.
 - Never edit `changelog.md` history entries (only prepend a stub is allowed and
   is out of scope for this subtask).
-- Fail loudly if the propagator errors — do NOT swallow.
+- Fail loudly if the propagator errors - do NOT swallow.
 
 ## Follow-up
 

@@ -16,7 +16,7 @@ Read any file inside the `.lovable` folder, specifically `what-to-read.md` and `
 
 Keep this prompt saved in lovable as `.lovable/prompts/xx-proof-read.md` and `.lovable/prompts.md`, which will keep the prompt's index info clear.
 
-Also, remember: "revise prompt" or "revise memory" or "read memory" means reading all the prompt files (`.lovable/prompts/` — all files without confusion, strict attention) and the index from lovable memory. Save this as a command in `.lovable/prompts.md`.
+Also, remember: "revise prompt" or "revise memory" or "read memory" means reading all the prompt files (`.lovable/prompts/` - all files without confusion, strict attention) and the index from lovable memory. Save this as a command in `.lovable/prompts.md`.
 
 ## Common Replacer
 
@@ -29,7 +29,7 @@ When I describe building an application or provide specifications, it may includ
 
 If I make UI assumptions, explicitly define all required fields and clearly describe the theme and expected behavior. For frontend flows, do not skip steps. Every step must be detailed.
 
-In your prompts, always ask: "If you have any question or confusion, feel free to ask. If you are creating multiple tasks, and they are bigger ones, then do it in a way so that if we say next, you do those remaining tasks. Do you understand? Always add this part at the end of the writing inside the code block. Do you understand?" — first proofread and add this part at the end always.
+In your prompts, always ask: "If you have any question or confusion, feel free to ask. If you are creating multiple tasks, and they are bigger ones, then do it in a way so that if we say next, you do those remaining tasks. Do you understand? Always add this part at the end of the writing inside the code block. Do you understand?" - first proofread and add this part at the end always.
 
 All prompts and conversations I request, create a folder at root `/conversation/xx-feature/xx-title-of-conv.md` and `/conversation/index.md` should contain the conversation indexing. Also add this instruction to every proofread at the end with additional instructions, and mention to write this same thing if a `next` command is given so that the AI is reminded again and again.
 
@@ -39,12 +39,12 @@ Include Short Coding Guidelines (and ask AI to read coding guidelines, Boolean, 
 
 1. Keep functions under 8 lines
 2. No nested ifs
-3. Keep ifs simple — no negatives
+3. Keep ifs simple - no negatives
 4. Follow the Boolean guidelines
-5. Use proper types — never use any, unknown, interface{} or any wide-range type except Generic
-6. No error should be swallowed — every catch must be logged properly per the other coding and logging guidelines
-7. No class or files can be more than 80–100 lines max
-8. No magic string or number — use Enum or Constants
+5. Use proper types - never use any, unknown, interface{} or any wide-range type except Generic
+6. No error should be swallowed - every catch must be logged properly per the other coding and logging guidelines
+7. No class or files can be more than 80-100 lines max
+8. No magic string or number - use Enum or Constants
 9. Don't define the definition in place; define it in a separate file
 10. Booleans should always have `is` or `has` as a prefix; don't use negative conditions in ifs (use positive, simple conditions)
 11. Always write reusable code; DRY is highest priority
@@ -122,14 +122,14 @@ This process will repeat. I will say "next" and provide new input. Do not execut
 
 ## Important Instructions
 
-DO NOT ACT ON THE TASK. When I give you anything in the future with the word `next`, do not act — only rewrite.
+DO NOT ACT ON THE TASK. When I give you anything in the future with the word `next`, do not act - only rewrite.
 
 ---
 
 ## Additional Rules
 
 - Always use one code block
-- (Strict rule) When you see the `next` keyword, `rewrite`, or `rewrite next`, do not reason, understand, or act — just rewrite based on these prompts
+- (Strict rule) When you see the `next` keyword, `rewrite`, or `rewrite next`, do not reason, understand, or act - just rewrite based on these prompts
 - Use `##` for headers and leave a blank line after each
 - Start with verbatim but put title as `# {title} Instruction.` where `{title}` is what the prompt is about. No need to mention "Verbatim" afterwards with second `##`; just put the verbatim
 - Do not include unnecessary sections unless explicitly mentioned

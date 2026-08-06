@@ -1,6 +1,6 @@
 ---
 name: Dark-only theme enforcement
-description: Extension always uses dark theme — no light mode, no toggle. bg-black overlay reduced to 40% opacity.
+description: Extension always uses dark theme - no light mode, no toggle. bg-black overlay reduced to 40% opacity.
 type: preference
 ---
 The extension uses dark-only mode. Never add a light/dark toggle or theme switching.

@@ -1,5 +1,5 @@
 ---
-name: Prompt Spec 2026 — folder layout
+name: Prompt Spec 2026 - folder layout
 description: Renamed from spec/2026-spec/01-prompt-spec/ to spec/2026-spec/01-prompt-spec/ with dense 01..20 child numbering; layout, history, and rewrite tool
 type: feature
 ---
@@ -67,9 +67,9 @@ Sub-200 children (`10..90` → `01..09`) renamed in lockstep.
 
 ## Rewrite tool
 
-`scripts/spec/apply-rename-map.mjs` — pair-based regex rewriter keyed on full `NN-name` (not bare `NN-`) to avoid collisions. 3-digit pairs ordered first so `100-…` is never partially eaten by `10-…`. Word-boundary regex prevents false matches. Default scope: renamed spec tree only; extensions `.md|.json|.html|.mjs|.ts|.tsx|.yml|.yaml`.
+`scripts/spec/apply-rename-map.mjs` - pair-based regex rewriter keyed on full `NN-name` (not bare `NN-`) to avoid collisions. 3-digit pairs ordered first so `100-…` is never partially eaten by `10-…`. Word-boundary regex prevents false matches. Default scope: renamed spec tree only; extensions `.md|.json|.html|.mjs|.ts|.tsx|.yml|.yaml`.
 
-**Use it again** for any future spec-tree rename — update `ROOT_PAIR` (line 44) and re-run.
+**Use it again** for any future spec-tree rename - update `ROOT_PAIR` (line 44) and re-run.
 
 ## Scripts repaired in Phase E
 

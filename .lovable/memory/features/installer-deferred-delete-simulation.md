@@ -1,6 +1,6 @@
 ---
 name: Installer deferred-delete behavioral simulation
-description: PowerShell-driven simulation that synthesizes ERROR_SHARING_VIOLATION / ERROR_ACCESS_DENIED during install.ps1 cleanup and verifies rotation, MoveFileEx scheduling, marker fallback, scoped sweep, and no-throw guarantees — runs via system pwsh or `nix run nixpkgs#powershell`
+description: PowerShell-driven simulation that synthesizes ERROR_SHARING_VIOLATION / ERROR_ACCESS_DENIED during install.ps1 cleanup and verifies rotation, MoveFileEx scheduling, marker fallback, scoped sweep, and no-throw guarantees - runs via system pwsh or `nix run nixpkgs#powershell`
 type: feature
 ---
 
@@ -20,22 +20,22 @@ and verifies the production helpers behave correctly.
 
 ## Scenarios (29 assertions)
 
-1. **Classifier** — `Test-IsSharingViolation` accepts canonical HResults
+1. **Classifier** - `Test-IsSharingViolation` accepts canonical HResults
    (-2147024864 sharing-violation, -2147024891 access-denied), rejects
    unrelated IOExceptions (disk full), handles null safely.
-2. **Rotation** — Mocked `Remove-Item` throws `ERROR_SHARING_VIOLATION`
+2. **Rotation** - Mocked `Remove-Item` throws `ERROR_SHARING_VIOLATION`
    on the original path; verifies `Remove-PathSafely` does not throw,
    counters increment, leaf matches `^\..+\.delete-pending-marco-\d{14}-[0-9a-f]{6}$`,
    carries this run's RunId, original is renamed on disk, `Write-Note`
    fired (not `Write-Err`/`Write-Warn`).
-3. **Marker fallback** — Verifies marker JSON has `Schema = marco-deferred-delete/v1`,
+3. **Marker fallback** - Verifies marker JSON has `Schema = marco-deferred-delete/v1`,
    `OwnerSignature = marco-installer`, current `RunId`, `Path`, `Reason`
    fields, and validates as ours via `Test-IsMarcoMarker`.
-4. **Scoped sweep** — Plants foreign markers (no schema, wrong owner)
+4. **Scoped sweep** - Plants foreign markers (no schema, wrong owner)
    and foreign artifacts (`*.old`, `random-delete-pending-*`) alongside
    our own RunId-stamped temp dir; verifies foreign files are NOT
    touched while ours IS swept; "unowned marker" notice is emitted.
-5. **No-throw** — Both `Remove-Item` AND `Rename-Item` mocked to always
+5. **No-throw** - Both `Remove-Item` AND `Rename-Item` mocked to always
    throw `ERROR_ACCESS_DENIED`; verifies `Remove-PathSafely` still
    completes without raising, falling back to scheduling the original
    path for delayed delete.

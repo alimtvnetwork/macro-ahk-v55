@@ -1,6 +1,6 @@
 ---
 name: Close → Re-inject Bug (v3.60.0)
-description: When the controller is closed via the X button and then re-injected, the panel must rebuild — destroyPanel must wipe ALL stale state, not just marker+container
+description: When the controller is closed via the X button and then re-injected, the panel must rebuild - destroyPanel must wipe ALL stale state, not just marker+container
 type: feature
 ---
 # Controller Re-Injection After Close (v3.60.0)
@@ -15,16 +15,16 @@ type: feature
 removed only the marker + main container. Several pieces of stale state
 survived in the page and silently sabotaged the next bootstrap:
 
-1. **Record indicator** (`IDS.RECORD_INDICATOR`, fixed-position) — left behind.
+1. **Record indicator** (`IDS.RECORD_INDICATOR`, fixed-position) - left behind.
    `createRecordIndicator()` has an idempotency guard that bails when the id
    already exists, so on re-inject we kept a stale floating dot AND skipped
    the rebuild path.
-2. **Inline repeat strip** (`#marco-repeat-inline`) — `mountRepeatInlineStrip()`
+2. **Inline repeat strip** (`#marco-repeat-inline`) - `mountRepeatInlineStrip()`
    is also idempotent on id, so it never reattached.
-3. **`window.__marcoRouteGuardInstalled`** — set to `true` on first install.
+3. **`window.__marcoRouteGuardInstalled`** - set to `true` on first install.
    `installSpaRouteGuard()` returns a no-op teardown when the flag is `true`,
    so the SPA route guard never re-installed after re-inject.
-4. **`domCache`** — held cached XPath lookups pointing at detached DOM nodes
+4. **`domCache`** - held cached XPath lookups pointing at detached DOM nodes
    from the first injection. `createUI()` calls `getByXPath(CONFIG.CONTROLS_XPATH)`
    first; if the cache returned a node that was no longer in the document,
    the panel was appended into a detached subtree and rendered invisible.

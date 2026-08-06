@@ -1,4 +1,4 @@
-# 10 | Smart Workspace Switching, History & DevTools Stabilization | v7.9.35–v7.9.41
+# 10 | Smart Workspace Switching, History & DevTools Stabilization | v7.9.35-v7.9.41
 
 ## Summary
 

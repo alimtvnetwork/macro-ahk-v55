@@ -40,16 +40,16 @@ Dynamic prompts (chips with `{{n}}`) MUST set `IsDynamic: true`, `ReplaceKey: "n
 ## 5. `{{n}}` substitution pipeline (Plan + Next chips + dropdown)
 
 Canonical bodies today:
-- `standalone-scripts/prompts/13-next-tasks/prompt.md` (v3.3.0) — `ReplaceValues ["1","2","3","4","5","8"]`, `SlugTemplate next-{{n}}-steps`.
-- `standalone-scripts/prompts/14-plan-steps/prompt.md` (v4.1.0) — `ReplaceValues ["5","8","10","12","15","20","25","30","35","40","45","50","100"]`, `SlugTemplate plan-{{n}}`.
+- `standalone-scripts/prompts/13-next-tasks/prompt.md` (v3.3.0) - `ReplaceValues ["1","2","3","4","5","8"]`, `SlugTemplate next-{{n}}-steps`.
+- `standalone-scripts/prompts/14-plan-steps/prompt.md` (v4.1.0) - `ReplaceValues ["5","8","10","12","15","20","25","30","35","40","45","50","100"]`, `SlugTemplate plan-{{n}}`.
 
 Substitution helper of record: `standalone-scripts/macro-controller/src/utils/token-substitute.ts` -> `substituteNextValue`. Replaces `{{n}}`, `{{N}}`, `${n}`, `${N}` regardless of stored `ReplaceKey` case. Do NOT add a sixth substitution site; call this helper.
 
 Current call sites (five, all wired):
-1. `standalone-scripts/macro-controller/src/ui/next-inline-ui.ts` `findNextVariant()` — Next chip fallback path.
-2. `standalone-scripts/macro-controller/src/ui/task-next-ui.ts` — older Task Next paste path.
-3. `standalone-scripts/macro-controller/src/ui/plan-task-ui.ts` `buildPlanTaskPrompt(n)` — Plan chip.
-4. `standalone-scripts/macro-controller/src/seed/plan-next-prompts.ts` — `PLAN_DEFAULT_BODY` / `NEXT_DEFAULT_BODY` seed + `PLAN_DEFAULT_LEGACY_BODIES` / `NEXT_DEFAULT_LEGACY_BODIES` upgrade path.
+1. `standalone-scripts/macro-controller/src/ui/next-inline-ui.ts` `findNextVariant()` - Next chip fallback path.
+2. `standalone-scripts/macro-controller/src/ui/task-next-ui.ts` - older Task Next paste path.
+3. `standalone-scripts/macro-controller/src/ui/plan-task-ui.ts` `buildPlanTaskPrompt(n)` - Plan chip.
+4. `standalone-scripts/macro-controller/src/seed/plan-next-prompts.ts` - `PLAN_DEFAULT_BODY` / `NEXT_DEFAULT_BODY` seed + `PLAN_DEFAULT_LEGACY_BODIES` / `NEXT_DEFAULT_LEGACY_BODIES` upgrade path.
 5. Runtime injector path via the aggregated `03-macro-prompts.json` -> chip dispatch.
 
 Guards that expect `{{n}}` to survive:

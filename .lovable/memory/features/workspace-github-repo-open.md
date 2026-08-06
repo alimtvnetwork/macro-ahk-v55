@@ -13,7 +13,7 @@ Also: "↻ Refresh gitsync" entry invalidates cache then re-runs.
 **Flow:**
 1. Check `WorkspaceGitsyncCache` table for (`WorkspaceId`, `ProjectId`).
 2. `Status='found'` → `window.open(RepoUrl, '_blank')`.
-3. `Status='not_linked'` → toast warn — **never refetch** (negative-result
+3. `Status='not_linked'` → toast warn - **never refetch** (negative-result
    caching is mandatory per user requirement).
 4. Cache miss/expired → `GET https://api.lovable.dev/workspaces/{wsId}/projects/{pid}/gitsync`,
    persist outcome, branch as above.

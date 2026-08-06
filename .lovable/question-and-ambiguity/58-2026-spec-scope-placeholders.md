@@ -1,4 +1,4 @@
-# 58 — 2026 Spec — scope & placeholders
+# 58 - 2026 Spec - scope & placeholders
 
 **Date (KL):** 2026-06-02
 **Trigger:** User asked to create a `2026` spec folder containing a
@@ -12,13 +12,13 @@ total 120 tasks; user will drive execution with `next ten steps`.
 | # | Ambiguity | Options | Chosen | Why |
 |---|---|---|---|---|
 | A1 | Spec folder name | `spec/2026-…` / `spec/27-prompts-generic` / `spec/2026-spec` | **`spec/2026-spec`** | Matches user's literal "2026 spec" phrasing; avoids colliding with numeric series (26 is taken by `26-chrome-extension-generic`). Reversible via a folder move. |
-| A2 | Where the "first 20 steps" live | Single file vs 20 separate files | **Single `01-plan-tasks-1-20.md`** | User said "write what you do in the next 100 tasks" — that is a plan document, not 20 deliverables. |
+| A2 | Where the "first 20 steps" live | Single file vs 20 separate files | **Single `01-plan-tasks-1-20.md`** | User said "write what you do in the next 100 tasks" - that is a plan document, not 20 deliverables. |
 | A3 | Mapping `next ten steps` → tasks | 10 spec tasks per turn vs 10 planning steps per turn | **10 spec tasks per turn (= 2 planning steps)** | "Next ten steps" reads naturally as 10 actual tasks; 100 remaining / 10 = 10 turns to finish, clean cadence. |
 | A4 | XPath placeholders | Invent generic selectors vs leave blank vs `???` with HOST comment | **`???` + `<!-- HOST: … -->` comment** | User explicitly said "put those XPaths as question marks". |
-| A5 | Default delay between Next-loop tasks | 5s, 7s, 10s | **7s default, 5–10s configurable range** | User said "usually 5 seconds, 10 seconds" → midpoint as default, both endpoints documented. |
+| A5 | Default delay between Next-loop tasks | 5s, 7s, 10s | **7s default, 5-10s configurable range** | User said "usually 5 seconds, 10 seconds" → midpoint as default, both endpoints documented. |
 | A6 | Persistence backend in the generic spec | mandate one vs leave open | **Interface only (`PromptStore`, `QueueStore`, `SettingsStore`)** with localStorage as the documented default | User stressed "as generic as possible". |
 | A7 | Whether to copy `standalone-scripts/prompts/**` into the spec | copy / symlink / reference | **Reference by path only** (read-only) | Prevents drift; keeps spec lean; matches "skipped/.release read-only folders" memory pattern. |
-| A8 | Banned vocabulary list | implicit vs explicit | **Explicit `04-vocabulary-banlist.md`** (Task 24) | User said "should never have macro controller code" — codify it as a lint-grade rule inside the spec. |
+| A8 | Banned vocabulary list | implicit vs explicit | **Explicit `04-vocabulary-banlist.md`** (Task 24) | User said "should never have macro controller code" - codify it as a lint-grade rule inside the spec. |
 
 ## Deferred to host integrator (collected in `140-integration-onboarding/`)
 
@@ -29,4 +29,4 @@ fills via the onboarding questionnaire.
 
 ## Status
 
-Tasks 1–120 and H1–H10 hardening are **complete**.
+Tasks 1-120 and H1-H10 hardening are **complete**.

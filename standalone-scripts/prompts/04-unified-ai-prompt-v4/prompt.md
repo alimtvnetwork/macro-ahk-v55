@@ -1,6 +1,6 @@
-# Unified AI Prompt — v4
+# Unified AI Prompt - v4
 
-## Part 1 — Repository Analysis, Memory Reconstruction, and Implementation Readiness
+## Part 1 - Repository Analysis, Memory Reconstruction, and Implementation Readiness
 
 ### Proofread prompt
 
@@ -11,7 +11,7 @@ Read and synthesize existing repository context from the Lovable memory folder a
 Before producing any report or analysis, the AI must:
 
 1. **Scan the entire repository tree at the directory level** to understand project boundaries, folder structure, and dependencies. Do not read contents inside folders marked skipped, ignored, deprecated, generated, archived, or otherwise excluded.
-2. **Read workflow memory** — specifically `.lovable/memory/workflow/01-plan.md` — to understand what has been done and what is pending. This avoids repeated work.
+2. **Read workflow memory** - specifically `.lovable/memory/workflow/01-plan.md` - to understand what has been done and what is pending. This avoids repeated work.
 3. **Read all relevant memory files** under `.lovable/memory/`, including workflow, suggestions, rules, decisions, history, issue references, and any protocol or process files present.
 
 ### Goals
@@ -29,8 +29,8 @@ Before producing any report or analysis, the AI must:
    2. memory/
    3. memory/suggestions/
    4. any other Lovable state folders present
-   5. What todo and what not to do — remember.
-   6. Folders marked skipped, ignored, deprecated, generated, or archived must not be read or modified — they may be listed structurally but their contents must not be opened.
+   5. What todo and what not to do - remember.
+   6. Folders marked skipped, ignored, deprecated, generated, or archived must not be read or modified - they may be listed structurally but their contents must not be opened.
 2. Spec folder content for all projects:
    1. ideas
    2. backend and frontend specs
@@ -44,9 +44,9 @@ Before producing any report or analysis, the AI must:
 ### Deliverable 1: Reliability and failure-chance report
 
 1. **Success probability estimates** by module complexity tier (simple, medium, complex agentic workflows, end-to-end), with explicit assumptions.
-2. **Failure map** — where (module + workflow), why (missing constraints, ambiguity, cross-file inconsistency), how it manifests.
-3. **Corrective actions** — prioritized list of spec fixes; for each: what to change, where, expected reliability gain.
-4. **Readiness decision** — classify each major area as: ready / ready with assumptions / blocked by ambiguity / blocked by contradiction / blocked by missing acceptance criteria. State what must be fixed before implementation and what can be deferred safely.
+2. **Failure map** - where (module + workflow), why (missing constraints, ambiguity, cross-file inconsistency), how it manifests.
+3. **Corrective actions** - prioritized list of spec fixes; for each: what to change, where, expected reliability gain.
+4. **Readiness decision** - classify each major area as: ready / ready with assumptions / blocked by ambiguity / blocked by contradiction / blocked by missing acceptance criteria. State what must be fixed before implementation and what can be deferred safely.
 
 ### Deliverable 2: Lovable suggestions workflow (filesystem contract)
 
@@ -54,7 +54,7 @@ All suggestions must be tracked in a single file: `.lovable/memory/suggestions/0
 
 **Suggestion entry fields:** suggestionId, createdAt, source (Lovable), affectedProject, description, rationale, proposed change, acceptance criteria, status (open, inProgress, done), completion notes.
 
-**Completion handling** — When a suggestion is completed, update its status to done. Optionally move completed items to `completed/` subfolder.
+**Completion handling** - When a suggestion is completed, update its status to done. Optionally move completed items to `completed/` subfolder.
 
 ### Deliverable 3: plan.md future work roadmap
 
@@ -70,9 +70,9 @@ All suggestions must be tracked in a single file: `.lovable/memory/suggestions/0
 
 - `.lovable/memory/workflow/01-plan.md`
 - `.lovable/memory/suggestions/01-suggestions.md`
-- `.lovable/memory/history/01-decisions.md` — create the `history/` folder if it does not exist
-- `.lovable/memory/01-working-rules.md` — if new rules or constraints are discovered
-- Root `plan.md` — only if a handoff roadmap is needed
+- `.lovable/memory/history/01-decisions.md` - create the `history/` folder if it does not exist
+- `.lovable/memory/01-working-rules.md` - if new rules or constraints are discovered
+- Root `plan.md` - only if a handoff roadmap is needed
 - Update memory issue references if analysis uncovers prior unresolved issue patterns
 
 ### Interaction rule
@@ -81,7 +81,7 @@ After producing the report and creating the memory and plan artifacts, ask which
 
 ---
 
-## Part 2 — Specification Fix Workflow and Issue Documentation
+## Part 2 - Specification Fix Workflow and Issue Documentation
 
 ### Original input (verbatim)
 
@@ -121,17 +121,17 @@ Issues use **sequential numbering** across the entire issues folder. Before crea
 
 Create an issue file at `/spec/02-app/issues/{seq}-{issueSlugName}.md`. Sections in this exact order:
 
-**Issue summary** — what happened, where (feature/module + paths), symptoms and impact, how discovered.
+**Issue summary** - what happened, where (feature/module + paths), symptoms and impact, how discovered.
 
-**Root cause analysis** — direct cause, contributing factors, triggering conditions, why existing spec did not prevent it.
+**Root cause analysis** - direct cause, contributing factors, triggering conditions, why existing spec did not prevent it.
 
-**Fix description** — spec changes (no code), new rules/constraints, why fix resolves root cause, config/default changes, logging or diagnostics required.
+**Fix description** - spec changes (no code), new rules/constraints, why fix resolves root cause, config/default changes, logging or diagnostics required.
 
-**Iterations history** (only if multiple attempts) — Iteration 1: what was tried and why it failed. Iteration 2: ... continue until final resolution.
+**Iterations history** (only if multiple attempts) - Iteration 1: what was tried and why it failed. Iteration 2: ... continue until final resolution.
 
-**Prevention and non-regression** — prevention rule, acceptance criteria/test scenarios, guardrails or linting policies, references to exact spec sections updated (by file path), explicit testable regression prevention rule.
+**Prevention and non-regression** - prevention rule, acceptance criteria/test scenarios, guardrails or linting policies, references to exact spec sections updated (by file path), explicit testable regression prevention rule.
 
-**TODO and follow-ups** — remaining tasks, owners or roles if applicable.
+**TODO and follow-ups** - remaining tasks, owners or roles if applicable.
 
 **Done checklist**
 - [ ] Spec updated under /spec/01-app/
@@ -167,7 +167,7 @@ Required entries: architecture changes, spec interpretation decisions, rejected 
 
 ---
 
-## Part 3 — Unit Test Failure Investigation and Documentation
+## Part 3 - Unit Test Failure Investigation and Documentation
 
 ### Original input (verbatim)
 
@@ -175,11 +175,11 @@ Fix these and when fixing failing tests: 1. check code, 2. Method code actual on
 
 ### Unit Test Failure Logic
 
-1. **Check code** — read the production code under test.
-2. **Method code actual implementation** — understand what the method actually does.
-3. **Logical implementation of the test** — read the test and understand what it asserts.
-4. **Check the testcase logic** — verify whether the test expectation is logically correct, including fixtures, mocks, seed data, and expected outputs.
-5. **Decide** — fix either the implementation or the test depending on which is logically wrong.
+1. **Check code** - read the production code under test.
+2. **Method code actual implementation** - understand what the method actually does.
+3. **Logical implementation of the test** - read the test and understand what it asserts.
+4. **Check the testcase logic** - verify whether the test expectation is logically correct, including fixtures, mocks, seed data, and expected outputs.
+5. **Decide** - fix either the implementation or the test depending on which is logically wrong.
 
 ### Documentation requirement for failing tests
 
@@ -280,12 +280,12 @@ Folders marked skipped, ignored, deprecated, generated, or archived must not be 
 
 ### Code style (GitMap enforced)
 - All `if` conditions must be **positive** (no `!`, no negation).
-- Functions: **8–15 lines**.
-- Files: **100–200 lines max**.
-- Small, focused packages — one responsibility per package.
+- Functions: **8-15 lines**.
+- Files: **100-200 lines max**.
+- Small, focused packages - one responsibility per package.
 
 ### Version bumping
-Any changes to code must bump at least the minor version. The `.release` folder is off-limits — do not read, modify, or reference it.
+Any changes to code must bump at least the minor version. The `.release` folder is off-limits - do not read, modify, or reference it.
 
 ### File naming
 - Use stable canonical filenames such as `01-plan.md`, `01-suggestions.md`, `01-decisions.md` for singleton tracker files.
@@ -294,7 +294,7 @@ Any changes to code must bump at least the minor version. The `.release` folder 
 - Plans and suggestions are tracked in single files and updated in place unless explicitly split by scale.
 
 ### Regression prevention
-Every fix — specs, code, or tests — must include an explicit, testable regression prevention rule.
+Every fix - specs, code, or tests - must include an explicit, testable regression prevention rule.
 
 ### Definition of Done
 A task is done only when:

@@ -1,37 +1,37 @@
 ---
 name: Payment Banner Hider
-description: Auto-injected global script hiding Lovable payment banners — multi-pattern (BANNER_PATTERNS[]) so new variants need only one entry
+description: Auto-injected global script hiding Lovable payment banners - multi-pattern (BANNER_PATTERNS[]) so new variants need only one entry
 type: feature
 ---
 # Payment Banner Hider (v3.59.0)
 
 ## Multi-pattern matcher (v3.59.0)
 `src/types.ts` exports `BANNER_PATTERNS: BannerPattern[]`. Each entry has:
-- `xpath` — anchor element
-- `anyText[]` — banner matches if ANY string appears in `textContent`
-- `id` — diagnostic label
+- `xpath` - anchor element
+- `anyText[]` - banner matches if ANY string appears in `textContent`
+- `id` - diagnostic label
 
 Current entries:
-1. Legacy `/html/body/div[2]/main/div/div[1]` — `["Payment issue detected."]`
-2. v3.59 `/html/body/div[2]/main/div/div[1]/div` — `["Update payment method", "Final notice", "reverted to the Free plan"]`
+1. Legacy `/html/body/div[2]/main/div/div[1]` - `["Payment issue detected."]`
+2. v3.59 `/html/body/div[2]/main/div/div[1]/div` - `["Update payment method", "Final notice", "reverted to the Free plan"]`
 
 To support a new variant: append a `BannerPattern` to the array. Do NOT add new
-locator classes — `BannerLocator` iterates the array.
+locator classes - `BannerLocator` iterates the array.
 
 Standalone-script project at `standalone-scripts/payment-banner-hider/` that
 auto-injects on `https://lovable.dev/*` and hides the sticky "Payment issue
 detected." banner at XPath `/html/body/div[2]/main/div/div[1]`.
 
-## Architecture (post-Issue-98 RCA refactor — 2026-04-24)
+## Architecture (post-Issue-98 RCA refactor - 2026-04-24)
 
 Reference implementation of the standards index. Files:
 
-- `src/index.ts` — `class PaymentBannerHider` entry point + bootstrap
-- `src/banner-locator.ts` — `class BannerLocator` (injected dependency)
-- `src/types.ts` — `enum BannerState`, constants, `PaymentBannerHiderApi`
-- `src/globals.d.ts` — `declare global { interface Window … }` (no casts)
-- `src/instruction.ts` — declarative seed manifest with `assets.css` entry
-- `css/payment-banner-hider.css` — scoped via `[data-marco-banner-hider]`, zero `!important`
+- `src/index.ts` - `class PaymentBannerHider` entry point + bootstrap
+- `src/banner-locator.ts` - `class BannerLocator` (injected dependency)
+- `src/types.ts` - `enum BannerState`, constants, `PaymentBannerHiderApi`
+- `src/globals.d.ts` - `declare global { interface Window … }` (no casts)
+- `src/instruction.ts` - declarative seed manifest with `assets.css` entry
+- `css/payment-banner-hider.css` - scoped via `[data-marco-banner-hider]`, zero `!important`
 
 ## Behavior
 - Auto-runs (no manual "Run script" click), `world: MAIN`, `isGlobal: true`, `loadOrder: 2`.
@@ -49,8 +49,8 @@ Reference implementation of the standards index. Files:
 - Also wired into `build:extension`.
 
 ## Debug API
-`window.PaymentBannerHider.check()` — manual one-pass detection trigger.
-`window.PaymentBannerHider.version` — version string.
+`window.PaymentBannerHider.check()` - manual one-pass detection trigger.
+`window.PaymentBannerHider.version` - version string.
 
 ## Standards compliance (audited 2026-04-24)
 | Standard | Compliant |
@@ -60,6 +60,6 @@ Reference implementation of the standards index. Files:
 | `no-css-important` | ✓ zero `!important` (scoped attribute selector) |
 | `no-error-swallowing` | ✓ `Logger.error` + rethrow in the only catch |
 | `no-type-casting` | ✓ `declare global` instead of `as unknown as` |
-| `no-unjustified-raf` | ✓ zero rAF — CSS transition + `queueMicrotask` |
+| `no-unjustified-raf` | ✓ zero rAF - CSS transition + `queueMicrotask` |
 | `blank-line-before-return` | ✓ |
 | CQ3 (no magic strings) | ✓ `BannerState` enum |

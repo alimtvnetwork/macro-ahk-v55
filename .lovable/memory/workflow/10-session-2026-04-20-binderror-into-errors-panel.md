@@ -1,6 +1,6 @@
-# Session 2026-04-20 — BindError → Errors Panel (v2.168.0)
+# Session 2026-04-20 - BindError → Errors Panel (v2.168.0)
 
-> **Goal:** Any future undefined-bind that escapes the entry-point guards (Layer 1) and is caught by the Proxy (Layer 3) must automatically land in the Errors panel — not just the message-router console — with the precise column name + SQL preview attached.
+> **Goal:** Any future undefined-bind that escapes the entry-point guards (Layer 1) and is caught by the Proxy (Layer 3) must automatically land in the Errors panel - not just the message-router console - with the precise column name + SQL preview attached.
 
 ## What changed
 
@@ -16,13 +16,13 @@
   logBgError(
     BgLogTag.SQLITE_BIND,
     "SQLITE_BIND_ERROR",
-    `Undefined bind for column "${col}" (param #${idx}) in ${msgType} — SQL: ${sqlPreview}`,
+    `Undefined bind for column "${col}" (param #${idx}) in ${msgType} - SQL: ${sqlPreview}`,
     error,
     { contextDetail: `messageType=… paramIndex=… column="…" sql="…"` },
   );
   ```
   This routes the BindError through the existing `handleLogError` pipeline → SQLite `Errors` table → `ERROR_COUNT_CHANGED` broadcast → Errors panel.
-- Non-BindError throws still go through `logCaughtError(BgLogTag.MESSAGE_ROUTER, …)` exactly as before — no behavior change for normal handler failures.
+- Non-BindError throws still go through `logCaughtError(BgLogTag.MESSAGE_ROUTER, …)` exactly as before - no behavior change for normal handler failures.
 
 ## Why this matters
 
@@ -39,7 +39,7 @@ The user had no visual signal in the Errors panel that the SQLite layer rejected
 | 1 | `handler-guards` at handler entry points | ✅ 10 handlers adopted |
 | 2 | SDK-side defaulting (KV self-namespace `projectId`) | ✅ Unchanged |
 | 3 | `wrapDatabaseWithBindSafety` Proxy → typed `BindError` | ✅ Wired at every DB boundary |
-| 4 | **NEW** — Message router routes `BindError` to Errors panel via `logBgError(SQLITE_BIND_ERROR)` | ✅ v2.168.0 |
+| 4 | **NEW** - Message router routes `BindError` to Errors panel via `logBgError(SQLITE_BIND_ERROR)` | ✅ v2.168.0 |
 
 ## Verification
 

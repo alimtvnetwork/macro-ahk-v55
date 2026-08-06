@@ -1,10 +1,10 @@
-# 12 — Per-user storage for Batch Rename Sequence settings
+# 12 - Per-user storage for Batch Rename Sequence settings
 
 ## Request
 > Store the last used Batch Rename Sequence settings per logged-in user
 > (instead of globally in localStorage) so different users don't share defaults.
 
-Currently persisted at `localStorage["marco.bulkRename.sequence.v1"]` —
+Currently persisted at `localStorage["marco.bulkRename.sequence.v1"]` -
 shared by every user of the same Chrome profile.
 
 ## Blockers
@@ -21,7 +21,7 @@ shared by every user of the same Chrome profile.
 
 ## Options
 
-### A. Skip — recommend Chrome profile separation
+### A. Skip - recommend Chrome profile separation
 - **Pros:** zero work; matches current security model (no-Supabase,
   no auth); profiles already give per-user isolation at the OS layer.
 - **Cons:** users on one shared Chrome profile keep sharing defaults.
@@ -33,12 +33,12 @@ shared by every user of the same Chrome profile.
   not as a storage key); breaks on token refresh / logout / multi-account
   switch; no migration path; `getBearerToken()` may be unavailable when
   the popup opens before token readiness; couples a UI pref to auth.
-- **Risk:** medium — silent data loss on token rotation.
+- **Risk:** medium - silent data loss on token rotation.
 
 ### C. Workspace-scoped (use selected workspace as the partition)
 - **Pros:** workspace switching already works; key is stable per-session.
 - **Cons:** different *users* on the same workspace still share; the
-  setting is about *user* preference, not workspace policy — wrong
+  setting is about *user* preference, not workspace policy - wrong
   semantic axis.
 - **Risk:** low, but doesn't solve the stated problem.
 

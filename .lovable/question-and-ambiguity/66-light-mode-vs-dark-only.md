@@ -1,4 +1,4 @@
-# 66 — Light mode support vs dark-only memory
+# 66 - Light mode support vs dark-only memory
 
 ## Ambiguity
 - Project memory `mem://preferences/dark-only-theme` states: dark-only, no light mode, no theme toggles.

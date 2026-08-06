@@ -5,7 +5,7 @@ Created: 2026-06-21
 Parent: 01-task-next-queue-sequential
 ---
 
-# SS-02 — Queue runner implementation
+# SS-02 - Queue runner implementation
 
 ## State additions (`task-next-ui.ts` near line 32)
 
@@ -47,7 +47,7 @@ export async function runTaskNextQueue(deps: TaskNextDeps, count: number) {
       await waitForLovableIdle(deps, { debounceMs: 250, timeoutMs: 180_000 });
 
       taskNextState.queue.completed = k + 1;
-      updateQueueBadge();                              // see SS — queue indicator
+      updateQueueBadge();                              // see SS - queue indicator
       log(`[TaskNextQueue] cycle ${k + 1}/${n} idle=${Date.now() - cycleStart}ms`, 'info');
     }
     if (!taskNextState.cancelled) showPasteToast(`✅ Task Next queue finished ${n}/${n}`, false);
@@ -70,7 +70,7 @@ export async function runTaskNextQueue(deps: TaskNextDeps, count: number) {
 
 ## Constraints
 
-- Sequential fail-fast (`mem://constraints/no-retry-policy`) — no exponential backoff, no per-cycle retry beyond the single auth retry that `pasteIntoEditor` already does internally.
+- Sequential fail-fast (`mem://constraints/no-retry-policy`) - no exponential backoff, no per-cycle retry beyond the single auth retry that `pasteIntoEditor` already does internally.
 - Every catch logs via `Logger.error('TaskNextQueue.cycle', …)` with the mandatory schema (`mem://standards/verbose-logging-and-failure-diagnostics`).
 - `runTaskNextLoop(deps, 1)` is left untouched so the split-button label still does its paste-once behaviour from v3.79.x.
 

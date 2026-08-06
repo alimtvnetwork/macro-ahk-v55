@@ -10,9 +10,9 @@ Scripts can declare dependencies on other scripts via `StoredScript.dependencies
 ### Type Extensions
 
 `StoredScript` includes:
-- `isGlobal?: boolean` — If true, loaded before all dependent scripts
-- `dependencies?: string[]` — IDs of required scripts (loaded first)
-- `loadOrder?: number` — Numeric sort key (lower = loaded first)
+- `isGlobal?: boolean` - If true, loaded before all dependent scripts
+- `dependencies?: string[]` - IDs of required scripts (loaded first)
+- `loadOrder?: number` - Numeric sort key (lower = loaded first)
 
 ### Resolution Flow
 

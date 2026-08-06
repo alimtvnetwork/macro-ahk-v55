@@ -7,9 +7,9 @@
 
 Earlier in this same session (a few messages ago), the user explicitly approved creating `spec/23-database/` with `diagrams/` and `images/` subfolders. That work was completed:
 - `spec/23-database/00-overview.md` (index)
-- `spec/23-database/diagrams/` — 4 `.mmd` files (extension DB, project recorder DB, step-group library, storage layers) + readme
-- `spec/23-database/images/` — 4 rendered PNGs + readme
-- `scripts/render-db-diagrams.mjs` — build script
+- `spec/23-database/diagrams/` - 4 `.mmd` files (extension DB, project recorder DB, step-group library, storage layers) + readme
+- `spec/23-database/images/` - 4 rendered PNGs + readme
+- `scripts/render-db-diagrams.mjs` - build script
 - Registered in `spec/.spec-folder-registry.json`
 
 Now the user has asked again for the same thing, offering two location options: `src/db/diagrams` OR "the correct twenty-three folder".
@@ -23,7 +23,7 @@ Now the user has asked again for the same thing, offering two location options: 
 
 ### B. Create `src/db/diagrams` + `src/db/images` (literal first option)
 - **Pros**: Honors the literal first phrasing.
-- **Cons**: Pollutes `src/` (runtime code) with documentation. Duplicates work already in `spec/23-database/`. Breaks convention — no other docs live under `src/`.
+- **Cons**: Pollutes `src/` (runtime code) with documentation. Duplicates work already in `spec/23-database/`. Breaks convention - no other docs live under `src/`.
 
 ### C. Mirror at both locations
 - **Pros**: Both paths exist.

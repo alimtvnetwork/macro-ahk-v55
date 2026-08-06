@@ -1,4 +1,4 @@
-# CI/CD Issue 10 — Release Watcher asset guard used empty version
+# CI/CD Issue 10 - Release Watcher asset guard used empty version
 
 ## Pipeline / Workflow
 
@@ -32,13 +32,13 @@ asset filename, producing `marco-extension-.zip` and the other invalid names.
 
 ## Status
 
-✅ Resolved — 2026-05-26
+✅ Resolved - 2026-05-26
 
 ## Fix
 
 - Changed `release-asset-guard.needs` to include both direct dependencies:
-  - `resolve-release` — provides the resolved release tag output.
-  - `run-release` — ensures the canonical release build/upload finished first.
+  - `resolve-release` - provides the resolved release tag output.
+  - `run-release` - ensures the canonical release build/upload finished first.
 - Added a regression test to `scripts/__tests__/ci-workflow-trigger-policy.test.mjs` that fails if the guard can no longer read the resolved tag.
 - Updated the release-assets publish contract memory with the direct-`needs` rule.
 

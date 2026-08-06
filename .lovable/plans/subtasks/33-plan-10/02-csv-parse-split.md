@@ -1,4 +1,4 @@
-# Subtask 02 — Split csv-parse cognitive complexity 53 -> <=15
+# Subtask 02 - Split csv-parse cognitive complexity 53 -> <=15
 
 Slug: 02-csv-parse-split
 Parent: 33-plan-10
@@ -7,7 +7,7 @@ Created: 2026-07-20
 
 ## Target
 
-`src/background/recorder/step-library/csv-parse.ts:49` — the top-level parse function currently has cognitive complexity 53 (baseline shows this as the single worst offender in the repo).
+`src/background/recorder/step-library/csv-parse.ts:49` - the top-level parse function currently has cognitive complexity 53 (baseline shows this as the single worst offender in the repo).
 
 ## Extraction plan
 
@@ -35,13 +35,13 @@ Top-level `parseCsv()` becomes a composition of these three helpers plus a `for`
 
 ## Tests
 
-- `csv-parse.header.test.ts` — 3 cases (happy, BOM present, delimiter override).
-- `csv-parse.body.test.ts` — 4 cases (happy, mismatched column count, unbalanced quotes, type coercion).
-- `csv-parse.classify.test.ts` — 3 cases (one per failure branch).
+- `csv-parse.header.test.ts` - 3 cases (happy, BOM present, delimiter override).
+- `csv-parse.body.test.ts` - 4 cases (happy, mismatched column count, unbalanced quotes, type coercion).
+- `csv-parse.classify.test.ts` - 3 cases (one per failure branch).
 - Regression: existing `csv-parse.test.ts` MUST still pass unchanged (public API preserved).
 
 ## Verification
 
 - `rg -n "cognitive-complexity" $(node -e "console.log(process.cwd())") --type ts` shows no rule violation for this file after refactor.
 - Targeted lint: `pnpm lint src/background/recorder/step-library/csv-parse.ts` exits 0.
-- `bunx vitest run csv-parse` — full green.
+- `bunx vitest run csv-parse` - full green.

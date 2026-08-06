@@ -1,4 +1,4 @@
-# 42 — CI lint failure report (already-fixed in worktree)
+# 42 - CI lint failure report (already-fixed in worktree)
 
 **Date (KL):** 2026-04-29
 **Trigger:** User pasted CI log: 11 sonarjs/max-lines warnings across 9 files
@@ -15,7 +15,7 @@ Reproduced the exact CI command locally:
 npx eslint standalone-scripts --max-warnings=0 --format=stylish
 ```
 
-Result: **exit 0, zero output** — every cited warning is already absent from the
+Result: **exit 0, zero output** - every cited warning is already absent from the
 current worktree.
 
 Targeted re-run on just the 9 cited files: also exit 0, zero output.
@@ -31,4 +31,4 @@ the latest commit; if still failing, clear the GitHub Actions cache for the
 
 Documents a no-op decision so a future AI does not re-attempt to "fix"
 already-fixed warnings (which would risk gratuitously re-touching the
-8 legacy files demoted to `warn` in `eslint.config.js` lines 147–161).
+8 legacy files demoted to `warn` in `eslint.config.js` lines 147-161).

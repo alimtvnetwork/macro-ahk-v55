@@ -14,7 +14,7 @@ When `db-init` failed, the popup showed only `Boot failed at step: db-init` plus
 
 Two failure sites now wrap their errors with a structured tag prefix that `setBootError()` parses into `BootErrorContext`:
 
-### 1. `schema-migration.ts` — `applySingleMigration`
+### 1. `schema-migration.ts` - `applySingleMigration`
 
 - `runIgnoringDuplicates()` records each statement into module-level `lastAttemptedSql` BEFORE running it. Duplicate-column / "already exists" errors are still swallowed; everything else re-throws so the migration wrapper can attach context.
 - `applySingleMigration()` catches, then re-throws as:
@@ -24,7 +24,7 @@ Two failure sites now wrap their errors with a structured tag prefix that `setBo
     Reason: <original message>
   ```
 
-### 2. `db-manager.ts` — `runSchemaWithIsolation`
+### 2. `db-manager.ts` - `runSchemaWithIsolation`
 
 - Replaces the old `db.run(FULL_LOGS_SCHEMA)` blob call inside `initInMemory()`.
 - Splits the schema on `;`, runs each statement individually, and on failure throws:
@@ -61,4 +61,4 @@ Returns `null` when no recognised tag is present so the banner falls back to the
 
 ## Report bundle additions
 
-The plain-text report from `Copy report` now includes a new `── Failing operation ─────` block listing migration version, step description, scope, and the failing SQL (indented) — printed only when structured context exists.
+The plain-text report from `Copy report` now includes a new `── Failing operation ─────` block listing migration version, step description, scope, and the failing SQL (indented) - printed only when structured context exists.

@@ -1,4 +1,4 @@
-# Completed: TypeScript Migration Phase 4 — Strict Typing
+# Completed: TypeScript Migration Phase 4 - Strict Typing
 
 **Completed**: 2026-03-21
 **Version**: v1.53.0
@@ -28,5 +28,5 @@ Removed `@ts-nocheck` from all 18 macro controller modules and achieved zero `ts
 
 - Task 1.1: Content scripts already in `src/content-scripts/` (verified)
 - Task 1.3: message-client.ts already uses PlatformAdapter (verified)
-- Task 2.1: Extension build verification — passes clean in 6.1s
+- Task 2.1: Extension build verification - passes clean in 6.1s
 - Task 2.2: Fixed 5 failing tests (table name casing, snapshot update)

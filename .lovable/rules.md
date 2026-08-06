@@ -29,7 +29,7 @@ Consolidated prohibitions. Do not violate. Do not "improve" or re-propose.
 - Dark-only theme. No light mode, no toggle.
 - No hardcoded color classes (`text-white`, `bg-black`). Use semantic tokens.
 - No `<noscript><img></noscript>` inside `<head>`.
-- Em dashes (—) are BANNED in all output. Use commas, colons, or parentheses.
+- Em dashes (-) are BANNED in all output. Use commas, colons, or parentheses.
 
 ## Timezone
 - No hardcoded timezone. UI uses `Intl.DateTimeFormat().resolvedOptions().timeZone`. Store UTC ISO-8601.

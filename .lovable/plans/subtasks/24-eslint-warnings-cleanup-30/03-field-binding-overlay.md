@@ -42,9 +42,9 @@ export function mountFieldBindingOverlay(host: HTMLElement, opts: MountOpts): Di
 
 ## `renderColumns` split
 
-- `renderHeader(shell, state)` — column titles + sort chevrons.
-- `renderRows(shell, state)` — row virtualization loop.
-- `renderFooter(shell, state)` — bulk actions + counts.
+- `renderHeader(shell, state)` - column titles + sort chevrons.
+- `renderRows(shell, state)` - row virtualization loop.
+- `renderFooter(shell, state)` - bulk actions + counts.
 
 Each < 40 lines. `renderColumns` becomes a 6-line orchestrator.
 

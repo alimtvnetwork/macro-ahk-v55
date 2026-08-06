@@ -1,6 +1,6 @@
 ---
 name: Spec tree v3.2.0 layout
-description: Authoritative folder map after the 2026-04-22 reorganization (core 01–17, app 21+, archive 99)
+description: Authoritative folder map after the 2026-04-22 reorganization (core 01-17, app 21+, archive 99)
 type: reference
 ---
 
@@ -14,8 +14,8 @@ type: reference
 
 | Range | Contents |
 |-------|----------|
-| `01–17` | **Core fundamentals** — universal, project-agnostic standards |
-| `21–22` | **App-specific** — Riseup Asia Macro Chrome Extension + its issues |
+| `01-17` | **Core fundamentals** - universal, project-agnostic standards |
+| `21-22` | **App-specific** - Riseup Asia Macro Chrome Extension + its issues |
 | `99-archive/` | Retired content (legacy duplicates, governance history, WordPress imports) |
 | `validation-reports/` | Automated audit outputs |
 
@@ -85,8 +85,8 @@ For any reference written before 2026-04-22:
 
 ## Invariants going forward
 
-- **Core (01–20)** = no app-specific content. Anything tied to the Chrome extension lives under `21-app/`.
+- **Core (01-20)** = no app-specific content. Anything tied to the Chrome extension lives under `21-app/`.
 - **App issues** = single canonical tracker at `22-app-issues/`.
 - **Every top-level folder** has `00-overview.md` and `99-consistency-report.md`.
-- **Number gaps** in the core range (13, 15, 16, 18, 19, 20) are reserved for future core topics — do not fill with app content.
+- **Number gaps** in the core range (13, 15, 16, 18, 19, 20) are reserved for future core topics - do not fill with app content.
 - **`99-archive/`** is read-only history. Never re-promote from it.

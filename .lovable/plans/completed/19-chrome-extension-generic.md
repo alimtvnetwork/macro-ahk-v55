@@ -2,12 +2,12 @@ Slug: chrome-extension-generic
 Status: completed
 Created: 2026-07-17
 
-# Plan — `spec/26-chrome-extension-generic/`
+# Plan - `spec/26-chrome-extension-generic/`
 
-**Status:** Draft (planning only — no spec files written yet)
+**Status:** Draft (planning only - no spec files written yet)
 **Author:** Lovable AI
 **Date:** 2026-04-24
-**Goal:** Produce a *drop-in* spec folder distilled from everything we learned building the Riseup Asia Macro Extension, written generically so any AI can read it and **blindly build a new Chrome MV3 extension end-to-end** — UI, TypeScript, SQLite + IndexedDB + chrome.storage layering, namespace concept, error model, design tokens, linter setup, folder structure, CI, and packaging.
+**Goal:** Produce a *drop-in* spec folder distilled from everything we learned building the Riseup Asia Macro Extension, written generically so any AI can read it and **blindly build a new Chrome MV3 extension end-to-end** - UI, TypeScript, SQLite + IndexedDB + chrome.storage layering, namespace concept, error model, design tokens, linter setup, folder structure, CI, and packaging.
 
 The spec must be **AI-followable, not human tutorial**. Every section ends with explicit *DO / DO NOT / VERIFY* checklists.
 
@@ -17,18 +17,18 @@ The spec must be **AI-followable, not human tutorial**. Every section ends with 
 
 Today, our Chrome-extension knowledge is spread across:
 
-- `spec/21-app/` (app-specific — too coupled)
-- `spec/22-app-issues/` (post-mortems — context-heavy)
+- `spec/21-app/` (app-specific - too coupled)
+- `spec/22-app-issues/` (post-mortems - context-heavy)
 - `mem://architecture/*` (project-private memories)
-- `standalone-scripts/marco-sdk/` (concrete code — not portable)
+- `standalone-scripts/marco-sdk/` (concrete code - not portable)
 
 A new project cannot reuse this without weeks of archaeology. The new
 folder **`spec/26-chrome-extension-generic/`** will:
 
-1. Live in the **core fundamentals range (01–20 reserved → 26 is app-adjacent foundational)**. Because it is foundational *and* app-shaped, we place it at **26** — first free slot after 22, kept separate from `21-app` so it is not confused with the current app. This matches the "next available number" rule in `spec/01-spec-authoring-guide/01-folder-structure.md`.
-2. Contain **only generic, reusable patterns** — never reference Riseup, Marco, Lovable IDE, or this codebase by name.
+1. Live in the **core fundamentals range (01-20 reserved → 26 is app-adjacent foundational)**. Because it is foundational *and* app-shaped, we place it at **26** - first free slot after 22, kept separate from `21-app` so it is not confused with the current app. This matches the "next available number" rule in `spec/01-spec-authoring-guide/01-folder-structure.md`.
+2. Contain **only generic, reusable patterns** - never reference Riseup, Marco, Lovable IDE, or this codebase by name.
 3. Ship templates a junior AI can copy-paste (manifest, tsconfig, vite, eslint, folder skeleton).
-4. Be **self-contained** — no required cross-references outside `spec/01-…` (authoring) and `spec/02-coding-guidelines/02-typescript/` (TS rules).
+4. Be **self-contained** - no required cross-references outside `spec/01-…` (authoring) and `spec/02-coding-guidelines/02-typescript/` (TS rules).
 
 ---
 
@@ -149,7 +149,7 @@ spec/26-chrome-extension-generic/
 ### 3.1 `00-overview.md`
 
 - Header block (Version 1.0.0, Status Active, AI Confidence Production-Ready, Ambiguity None).
-- 2-paragraph "what is this" — generic Chrome MV3 extension blueprint.
+- 2-paragraph "what is this" - generic Chrome MV3 extension blueprint.
 - **Goal statement:** "An AI that reads only this folder must be able to scaffold, build, lint, package, and ship a production-quality MV3 extension without referring to any other project."
 - File inventory table (all 13 sub-areas).
 - Cross-refs only to `spec/01-spec-authoring-guide/` and `spec/02-coding-guidelines/02-typescript/`.
@@ -176,7 +176,7 @@ Each file ends with a literal **template snippet** (full JSON / TS) the AI can c
 **Sources:** `eslint.config.js`, `tsconfig.json`, `mem://standards/unknown-usage-policy`, `mem://architecture/linting-policy`, `mem://standards/formatting-and-logic`.
 
 - Strict TS settings table (every `compilerOptions` flag justified).
-- ESLint flat-config template — sonarjs + react-hooks + import + no-any + custom `lint-const-reassign.mjs`-style guard.
+- ESLint flat-config template - sonarjs + react-hooks + import + no-any + custom `lint-const-reassign.mjs`-style guard.
 - Naming conventions (mem://architecture/constant-naming-convention condensed).
 - Zero-warnings policy + CI enforcement.
 
@@ -191,7 +191,7 @@ Each file has:
 - Reference implementation snippet (≤ 30 lines).
 - Common pitfalls table.
 
-The **namespace system** spec (05) is the keystone — it documents:
+The **namespace system** spec (05) is the keystone - it documents:
 - `window.<Root>.Projects.<ProjectName>.*` shape.
 - `Object.freeze` policy.
 - `register{Name}SelfNamespace()` factory pattern.
@@ -216,13 +216,13 @@ Plus dedicated files for SQLite-in-SW (sql.js bundling, WASM checksum, OPFS opt-
 
 **Sources:** `spec/07-design-system/`, `mem://preferences/dark-only-theme`, `mem://style/animation-strategy`, `mem://ui/view-transition-patterns`, `mem://features/css-injection-sentinel`, `tailwind.config.ts`, `src/index.css`, `src/components/ui/`.
 
-- HSL token system (semantic only — never raw colors in JSX).
+- HSL token system (semantic only - never raw colors in JSX).
 - Recommended palette presets (4 dark, 2 light) with hex+HSL.
 - Tailwind + cva variant pattern with example.
 - Options shell: sidebar + animated content area + ThemeProvider (locked to dark by default).
 - Popup shell: 360×600 baseline, action log, debug panel.
 - **Injected controller UI:** the floating-widget pattern (z-index, shadow-root vs. data-attrs, CSS sentinel, drag handle, dropdown menu).
-- Notification system: `marco.notify`-equivalent (renamed `ext.notify`) — info/warn/error/success, 5s dedupe window, max 3 visible, copy-to-clipboard diagnostic on errors, version banner during init.
+- Notification system: `marco.notify`-equivalent (renamed `ext.notify`) - info/warn/error/success, 5s dedupe window, max 3 visible, copy-to-clipboard diagnostic on errors, version banner during init.
 - Customization hooks: per-project CSS injection slot, theme overrides via CSS variables.
 
 ### 3.8 `07-error-management/` (7 files)
@@ -230,8 +230,8 @@ Plus dedicated files for SQLite-in-SW (sql.js bundling, WASM checksum, OPFS opt-
 **Sources:** `spec/03-error-manage/`, `mem://constraints/file-path-error-logging-code-red`, `mem://standards/error-logging-requirements`, `mem://architecture/extension-error-management`, `mem://architecture/real-time-error-synchronization`, `mem://preferences/stack-trace-filtering`, `mem://features/log-diagnostics-export`, `src/types/error-model.ts`.
 
 - The `AppError` shape (code, severity, path?, missing?, reason, timestamp, stack).
-- Error code registry — SCREAMING_SNAKE with module prefix (`TOKEN-SEEDER_ERROR`, `STORAGE_QUOTA_EXCEEDED`, ...).
-- **CODE-RED file/path rule:** every FS or chrome.storage error MUST include exact path, what was missing, and why — non-negotiable, with examples.
+- Error code registry - SCREAMING_SNAKE with module prefix (`TOKEN-SEEDER_ERROR`, `STORAGE_QUOTA_EXCEEDED`, ...).
+- **CODE-RED file/path rule:** every FS or chrome.storage error MUST include exact path, what was missing, and why - non-negotiable, with examples.
 - NamespaceLogger contract (info/warn/error + per-namespace prefix).
 - ERROR_COUNT_CHANGED broadcast pattern + UI badge sync.
 - Stack-trace filter regex (drops `chunk-*.js` / `assets/*.js`).
@@ -239,7 +239,7 @@ Plus dedicated files for SQLite-in-SW (sql.js bundling, WASM checksum, OPFS opt-
 
 ### 3.9 `08-auth-and-tokens/` (4 files)
 
-Generic version of the bearer-token bridge — uses placeholder header name `Authorization`, abstracts away Lovable specifics. Documents the **single-path policy** (no fallbacks), **10s readiness gate**, **no recursive retry / exponential backoff**, and the host-permission failure recovery the user just hit ("Cannot access contents of the page").
+Generic version of the bearer-token bridge - uses placeholder header name `Authorization`, abstracts away Lovable specifics. Documents the **single-path policy** (no fallbacks), **10s readiness gate**, **no recursive retry / exponential backoff**, and the host-permission failure recovery the user just hit ("Cannot access contents of the page").
 
 ### 3.10 `09-injection-and-host-access/` (5 files)
 
@@ -249,7 +249,7 @@ Direct synthesis of the recent token-seeder work + diagnostics indicator. Will g
 - Restricted scheme list (chrome://, chrome-extension://, edge://, view-source:, file:// without flag, Web Store).
 - Tab eligibility evaluator interface.
 - Cooldown + blocked-tab diagnostics data shape (mirrors `TokenSeederStatusIndicator` payload).
-- `chrome.scripting.executeScript` MAIN-world seeder template with retry-cooldown-on-failure (NOT exponential backoff — fixed cooldown).
+- `chrome.scripting.executeScript` MAIN-world seeder template with retry-cooldown-on-failure (NOT exponential backoff - fixed cooldown).
 
 ### 3.11 `10-testing-and-qa/` (4 files)
 
@@ -272,7 +272,7 @@ Translation of our current `scripts/check-*.mjs` validation gauntlet into a gene
 Literal copy-paste artifacts. Each begins with a header comment:
 
 ```
-// TEMPLATE — spec/26-chrome-extension-generic/12-templates/<name>
+// TEMPLATE - spec/26-chrome-extension-generic/12-templates/<name>
 // Replace <PROJECT_NAME>, <ROOT_NAMESPACE>, <VERSION> tokens.
 // Last reviewed: <YYYY-MM-DD>
 ```
@@ -300,9 +300,9 @@ Followed by the 10-step checklist:
 
 ### 3.15 Governance files
 
-- `97-acceptance-criteria.md` — ~40 numbered, testable AC items grouped by section (AC-FUND-01..06, AC-BUILD-01..08, AC-TS-01..05, AC-ARCH-01..07, AC-STORAGE-01..07, AC-UI-01..09, AC-ERR-01..07, AC-AUTH-01..04, AC-INJ-01..05, AC-TEST-01..04, AC-CICD-01..05).
-- `98-changelog.md` — initial entry: 1.0.0 / 2026-04-25 / Initial generic Chrome extension blueprint extracted from Riseup Asia Macro Extension v2.194.0.
-- `99-consistency-report.md` — populated by the standard template in `spec/01-spec-authoring-guide/03-required-files.md`.
+- `97-acceptance-criteria.md` - ~40 numbered, testable AC items grouped by section (AC-FUND-01..06, AC-BUILD-01..08, AC-TS-01..05, AC-ARCH-01..07, AC-STORAGE-01..07, AC-UI-01..09, AC-ERR-01..07, AC-AUTH-01..04, AC-INJ-01..05, AC-TEST-01..04, AC-CICD-01..05).
+- `98-changelog.md` - initial entry: 1.0.0 / 2026-04-25 / Initial generic Chrome extension blueprint extracted from Riseup Asia Macro Extension v2.194.0.
+- `99-consistency-report.md` - populated by the standard template in `spec/01-spec-authoring-guide/03-required-files.md`.
 
 ---
 
@@ -317,19 +317,19 @@ While extracting from this codebase, the writer AI MUST:
    - `getBearerToken()` (Lovable-coupled) → keep the *name* (it is a generic verb) but strip Lovable specifics.
 2. **Strip** every URL, secret, hostname, customer name, internal team reference.
 3. **Strip** Supabase, axios-version-pin specifics, and any vendor lock-in beyond what MV3 itself requires.
-4. **Add** a top-of-file banner: `*Generic blueprint — no project-specific identifiers. If you find one, file an issue.*`
+4. **Add** a top-of-file banner: `*Generic blueprint - no project-specific identifiers. If you find one, file an issue.*`
 5. **Verify** by `rg -i 'riseup|marco|lovable|supabase' spec/26-chrome-extension-generic/` returning **zero hits** before publishing v1.0.0.
 
 ---
 
 ## 5. Cross-references the spec WILL use
 
-- `spec/01-spec-authoring-guide/01-folder-structure.md` — folder rules.
-- `spec/01-spec-authoring-guide/03-required-files.md` — required files & templates.
-- `spec/02-coding-guidelines/02-typescript/00-overview.md` — TS standards.
-- `spec/03-error-manage/00-overview.md` — error management foundations.
-- `spec/04-database-conventions/00-overview.md` — DB conventions (only the generic parts).
-- `spec/07-design-system/00-overview.md` — design system foundations.
+- `spec/01-spec-authoring-guide/01-folder-structure.md` - folder rules.
+- `spec/01-spec-authoring-guide/03-required-files.md` - required files & templates.
+- `spec/02-coding-guidelines/02-typescript/00-overview.md` - TS standards.
+- `spec/03-error-manage/00-overview.md` - error management foundations.
+- `spec/04-database-conventions/00-overview.md` - DB conventions (only the generic parts).
+- `spec/07-design-system/00-overview.md` - design system foundations.
 
 The spec MUST NOT reference `spec/21-app/`, `spec/22-app-issues/`, or any `mem://` path (those are project-private).
 
@@ -354,7 +354,7 @@ The spec MUST NOT reference `spec/21-app/`, `spec/22-app-issues/`, or any `mem:/
 | 13 | `12-templates/` (15 copy-paste artifacts) | 15 | 90 min |
 | 14 | `13-ai-onboarding-prompt.md` | 1 | 30 min |
 | 15 | `97-acceptance-criteria.md` (≈ 65 ACs) | 1 | 45 min |
-| 16 | Generification grep + final consistency pass | — | 30 min |
+| 16 | Generification grep + final consistency pass | - | 30 min |
 | **Total** | | **80 files** | **~17 hours of writer AI time** |
 
 Recommended split into **4 chat sessions** (≈ 4 hours each) to stay within context budgets:
@@ -368,13 +368,13 @@ Recommended split into **4 chat sessions** (≈ 4 hours each) to stay within con
 
 ## 7. Open questions (please confirm before I start writing)
 
-1. **Folder number 26 OK?** Or do you prefer slotting it into the foundational range (e.g., reusing `15` or `16`, both currently empty)? Per the authoring guide, 15–20 are reserved for *core fundamentals* — a generic Chrome-extension blueprint qualifies. My recommendation: **place it at `15-chrome-extension-generic/`** instead of 26, to live with the other foundational specs. The folder list in this plan still says 26 — say the word and I'll renumber.
+1. **Folder number 26 OK?** Or do you prefer slotting it into the foundational range (e.g., reusing `15` or `16`, both currently empty)? Per the authoring guide, 15-20 are reserved for *core fundamentals* - a generic Chrome-extension blueprint qualifies. My recommendation: **place it at `15-chrome-extension-generic/`** instead of 26, to live with the other foundational specs. The folder list in this plan still says 26 - say the word and I'll renumber.
 2. **Light-mode optional?** Default we ship is dark-only (per `mem://preferences/dark-only-theme`), but for a generic blueprint should I include a "light + dark + system" path too? My recommendation: **document dark-only as default, with one optional appendix for light-mode opt-in**.
-3. **Include the SDK / standalone-scripts pattern?** That is one of our most powerful patterns (re-usable per-project namespaces with `require()` + self-test). It adds ~3 files to `04-architecture/`. My recommendation: **yes, include — it is generic, valuable, and fully decoupled**.
-4. **Templates — full files or skeletons?** Full files (e.g., a complete `eslint.config.js`) are more useful but date faster. My recommendation: **full files, with a "Last reviewed" date in the header banner**.
+3. **Include the SDK / standalone-scripts pattern?** That is one of our most powerful patterns (re-usable per-project namespaces with `require()` + self-test). It adds ~3 files to `04-architecture/`. My recommendation: **yes, include - it is generic, valuable, and fully decoupled**.
+4. **Templates - full files or skeletons?** Full files (e.g., a complete `eslint.config.js`) are more useful but date faster. My recommendation: **full files, with a "Last reviewed" date in the header banner**.
 
 ---
 
 ## 8. Acceptance for this plan
 
-This plan is approved when you confirm answers to the four open questions in §7. After approval I will execute Sessions A–D in order, opening one task per session and closing this plan with a pointer to `spec/<NN>-chrome-extension-generic/00-overview.md`.
+This plan is approved when you confirm answers to the four open questions in §7. After approval I will execute Sessions A-D in order, opening one task per session and closing this plan with a pointer to `spec/<NN>-chrome-extension-generic/00-overview.md`.

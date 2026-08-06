@@ -4,13 +4,13 @@ description: Behaviour of `scripts/check-spec-links.mjs` and `scripts/report-spe
 type: feature
 ---
 
-# Spec-Link Checker — Config-Driven + Auto-Resolve
+# Spec-Link Checker - Config-Driven + Auto-Resolve
 
 ## Single source of truth
 
 All scan/exclude/auto-resolve behaviour lives in
 **`scripts/check-spec-links.config.json`**. To add an archive folder or tune
-the auto-resolver, edit the JSON — no JS changes.
+the auto-resolver, edit the JSON - no JS changes.
 
 | Field | Purpose |
 |---|---|
@@ -28,7 +28,7 @@ to built-in defaults with a `WARN` (never crashes the build).
 
 `scripts/lib/spec-links-core.mjs` houses the shared parser, exclude logic, and
 the suffix-overlap auto-resolver. **All three scripts** (`check-spec-links`,
-`report-spec-links-ci`, `rewrite-spec-links`) MUST import from here — drift
+`report-spec-links-ci`, `rewrite-spec-links`) MUST import from here - drift
 between local parsers caused historical false-greens in CI.
 
 ## Auto-resolve algorithm
@@ -38,7 +38,7 @@ For each broken link the CI checker:
 2. Scores every basename match against the broken target via trailing
    path-segment overlap (numeric-prefix swaps like `06-` ↔ `10-` score 0.9).
 3. Accepts the top candidate iff `score ≥ minScore` AND it strictly beats
-   the runner-up. Ambiguous (tied) matches stay as hard errors — never
+   the runner-up. Ambiguous (tied) matches stay as hard errors - never
    silently picks the wrong target.
 
 Output for each auto-resolved link: shows the `suggested:` absolute path and a
@@ -65,9 +65,9 @@ ready-to-paste `rewrite:` (relative form). Run
 
 ## Why this design
 
-- **Adding archives is a JSON edit** — historically required code changes in
+- **Adding archives is a JSON edit** - historically required code changes in
   two places that drifted out of sync.
-- **Auto-resolve is opt-in via config**, not a CLI dance — local devs and CI
+- **Auto-resolve is opt-in via config**, not a CLI dance - local devs and CI
   share the same defaults.
-- **Confident-only matching** — ambiguous basenames stay as errors so the
+- **Confident-only matching** - ambiguous basenames stay as errors so the
   fallback never lies about what's reachable.

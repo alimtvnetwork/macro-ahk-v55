@@ -16,8 +16,8 @@ Five errors were traced to **two root causes** that cascade through the system.
 ### Root Cause B: CSP Missing 'unsafe-eval' for Script Injection
 
 **Problem**: `csp-fallback.ts` used `new Function(code)` to execute user scripts. This requires `'unsafe-eval'` in the CSP. The manifest only had `'wasm-unsafe-eval'`, so:
-- MAIN world injection failed (target page CSP blocks eval) — expected, fallback handles this
-- ISOLATED world fallback ALSO failed (extension CSP lacked 'unsafe-eval') — this was the bug
+- MAIN world injection failed (target page CSP blocks eval) - expected, fallback handles this
+- ISOLATED world fallback ALSO failed (extension CSP lacked 'unsafe-eval') - this was the bug
 
 **Fix**: 
 1. Added `'unsafe-eval'` to manifest CSP `extension_pages` directive
@@ -27,7 +27,7 @@ Five errors were traced to **two root causes** that cascade through the system.
 
 ### Root Cause C: Osano Monkey-Patch Breaks MAIN World Script Injection
 
-**Problem**: Osano.js (cookie consent manager) monkey-patches `HTMLHeadElement.prototype.appendChild`. When `executeInMainWorld` used `target.appendChild(script)`, Osano intercepted the call, re-parsed the script content in its own strict-mode sandbox, and threw `"Unexpected strict mode reserved word"` errors — silently killing injection with no UI or error output.
+**Problem**: Osano.js (cookie consent manager) monkey-patches `HTMLHeadElement.prototype.appendChild`. When `executeInMainWorld` used `target.appendChild(script)`, Osano intercepted the call, re-parsed the script content in its own strict-mode sandbox, and threw `"Unexpected strict mode reserved word"` errors - silently killing injection with no UI or error output.
 
 **Fix**: Changed `executeInMainWorld` to use `Node.prototype.appendChild.call(target, script)`, bypassing Osano's (and any other third-party) monkey-patch on `appendChild`.
 
@@ -43,14 +43,14 @@ Five errors were traced to **two root causes** that cascade through the system.
 
 ### Root Cause E: ISOLATED World Requires eval, Not Script Tags
 
-**Problem**: `<script>` tags appended from ISOLATED world still execute in MAIN world context (per Chrome extension architecture). When CSP fallback switched to ISOLATED world but still used script-tag injection, the code ran in MAIN world anyway — defeating the fallback.
+**Problem**: `<script>` tags appended from ISOLATED world still execute in MAIN world context (per Chrome extension architecture). When CSP fallback switched to ISOLATED world but still used script-tag injection, the code ran in MAIN world anyway - defeating the fallback.
 
 **Fix**: Split execution into two functions: `executeInMainWorld` (script tag + `Node.prototype.appendChild.call`) and `executeInIsolatedWorld` (indirect eval `(0, eval)(code)`). The dispatcher in `tryInject` selects based on the `world` parameter.
 
 **Prevention Rule**: ISOLATED world execution MUST use `eval` or `new Function`, never script tag injection. Script tags always run in MAIN world regardless of which world appends them.
 
 ### Cascade Effects (not separate bugs)
-- **"DbManager not bound"** — SW crashed before `bindAllHandlers()` ran (fixed by Root Cause A)
-- **"Could not establish connection"** — Popup messaged dead SW (fixed by Root Cause A)
-- **WASM CSP errors** — SW crash prevented WASM init; also CSP now correct (fixed by both A + B)
-- **Silent injection failure (no UI, no errors)** — Osano swallowed the error (fixed by C + D + E)
+- **"DbManager not bound"** - SW crashed before `bindAllHandlers()` ran (fixed by Root Cause A)
+- **"Could not establish connection"** - Popup messaged dead SW (fixed by Root Cause A)
+- **WASM CSP errors** - SW crash prevented WASM init; also CSP now correct (fixed by both A + B)
+- **Silent injection failure (no UI, no errors)** - Osano swallowed the error (fixed by C + D + E)

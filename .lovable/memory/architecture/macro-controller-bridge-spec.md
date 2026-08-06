@@ -19,14 +19,14 @@ Response flow is reversed. The `window.marco` SDK (injected before user scripts)
 
 ### Key Files
 
-- `spec/21-app/02-features/chrome-extension/43-macro-controller-extension-bridge.md` — Full bridge API spec
-- `spec/21-app/02-features/chrome-extension/42-user-script-logging-and-data-bridge.md` — `window.marco` SDK spec
-- `spec/21-app/02-features/chrome-extension/18-message-protocol.md` — Message type registry
-- `src/background/handlers/data-bridge-handler.ts` — Storage handler implementation
-- `src/background/message-router.ts` — Message routing
+- `spec/21-app/02-features/chrome-extension/43-macro-controller-extension-bridge.md` - Full bridge API spec
+- `spec/21-app/02-features/chrome-extension/42-user-script-logging-and-data-bridge.md` - `window.marco` SDK spec
+- `spec/21-app/02-features/chrome-extension/18-message-protocol.md` - Message type registry
+- `src/background/handlers/data-bridge-handler.ts` - Storage handler implementation
+- `src/background/message-router.ts` - Message routing
 
 ### Constraints
 
 - Key max: 256 chars, Value max: 1 MB, Total: 50 MB, Keys per project: 1,000
 - Rate limit: 100 messages/second
-- No AHK involvement — Chrome extension only
+- No AHK involvement - Chrome extension only

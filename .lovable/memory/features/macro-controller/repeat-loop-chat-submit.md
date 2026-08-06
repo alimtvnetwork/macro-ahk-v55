@@ -27,4 +27,4 @@ The strategy used MUST appear in the log so regressions are visible.
 
 ## Regression test
 Any future "auto submit" feature (slash-commands, plan-task, hot-reload trigger)
-MUST reuse `dispatchChatSubmit()` — do NOT re-implement `.click()` paths.
+MUST reuse `dispatchChatSubmit()` - do NOT re-implement `.click()` paths.

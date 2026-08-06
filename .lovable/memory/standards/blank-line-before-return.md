@@ -12,12 +12,12 @@ A `return` statement MUST be preceded by a blank line when:
 Examples:
 
 ```ts
-// ✅ ok — sole statement
+// ✅ ok - sole statement
 function getName(): string {
     return this.name;
 }
 
-// ✅ ok — first statement after `{`
+// ✅ ok - first statement after `{`
 function getName(): string {
     if (cached) {
         return cached;
@@ -26,7 +26,7 @@ function getName(): string {
     return computeName();
 }
 
-// ✅ ok — blank line above
+// ✅ ok - blank line above
 function compute(): number {
     const partial = step1();
     const full = step2(partial);
@@ -34,7 +34,7 @@ function compute(): number {
     return full;
 }
 
-// ❌ wrong — no blank line
+// ❌ wrong - no blank line
 function compute(): number {
     const partial = step1();
     const full = step2(partial);
@@ -44,4 +44,4 @@ function compute(): number {
 
 **Why**: Visual separation makes the exit point of every function obvious during review. Project formatting standard CQ15 already required this; the 2026-04-24 banner-hider RCA showed multiple violations slipping through.
 
-**How to apply**: ESLint rule `padding-line-between-statements: ["error", { blankLine: "always", prev: "*", next: "return" }]` — planned in `plan.md` Task 0.8. Until enabled, agent must visually inspect every `return` in the diff.
+**How to apply**: ESLint rule `padding-line-between-statements: ["error", { blankLine: "always", prev: "*", next: "return" }]` - planned in `plan.md` Task 0.8. Until enabled, agent must visually inspect every `return` in the diff.

@@ -4,10 +4,10 @@ Include Short Coding Guidelines (and also ask AI to read coding guidelines, Bool
 
 1. Keep functions under 8 lines
 2. No nested ifs
-3. Keep ifs simple — no negatives
+3. Keep ifs simple - no negatives
 4. Follow the Boolean guidelines
-5. Use proper types — never use any, unknown or interface{} or any type that takes a wide range of types except for Generic
-6. No error should be swallowed — every catch must be logged properly per the other coding and logging guidelines
+5. Use proper types - never use any, unknown or interface{} or any type that takes a wide range of types except for Generic
+6. No error should be swallowed - every catch must be logged properly per the other coding and logging guidelines
 7. No class or files can be more than 80 - 100 lines max.
 8. No magic string or number, use Enum or Constants
 9. Don't define the definition in place, but in a separate file and separately.

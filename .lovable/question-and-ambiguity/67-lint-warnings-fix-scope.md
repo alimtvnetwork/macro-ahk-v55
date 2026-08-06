@@ -1,4 +1,4 @@
-# 67 — Lint warnings fix scope (203 warnings, ~100 files)
+# 67 - Lint warnings fix scope (203 warnings, ~100 files)
 
 ## Situation
 
@@ -12,13 +12,13 @@ User then asked: *"can we fix these warnings"*.
 
 | Rule | Count | Effort | Risk |
 | --- | ---: | --- | --- |
-| `max-lines-per-function` | 152 | High (real refactor per function) | Medium — must not break behaviour, needs tests |
+| `max-lines-per-function` | 152 | High (real refactor per function) | Medium - must not break behaviour, needs tests |
 | `sonarjs/cognitive-complexity` | 27 | High (real refactor) | Medium |
 | `sonarjs/no-nested-template-literals` | 9 | Trivial (extract to const) | Very low |
 | `sonarjs/no-duplicate-string` | 4 | Low (extract constants) | Low |
 | `sonarjs/no-collapsible-if` | 2 | Trivial | Very low |
 | `sonarjs/no-identical-functions` | 1 | Low | Low |
-| `react-hooks/exhaustive-deps` | 2 | Low (wrap in `useMemo`) | Medium — can change behaviour |
+| `react-hooks/exhaustive-deps` | 2 | Low (wrap in `useMemo`) | Medium - can change behaviour |
 | `react-refresh/only-export-components` | 2 | Low (move constant out) | Low |
 | Other | 4 | Low | Low |
 
@@ -38,7 +38,7 @@ Chosen phased plan:
   - `src/components/recorder/failure-toast.ts` (1)
   - `src/components/recorder/selector-replay-trace.ts` (1)
 - **Phase 2 (next turn):** `no-collapsible-if` (2), `no-duplicate-string` (4), `no-identical-functions` (1), unused `eslint-disable` (1), `react-refresh/only-export-components` (2), `react-hooks/exhaustive-deps` (2). ~12 warnings.
-- **Phase 3+ (many turns):** `max-lines-per-function` + `cognitive-complexity` — split by subsystem, one file per turn, with regression tests where behaviour is non-trivial:
+- **Phase 3+ (many turns):** `max-lines-per-function` + `cognitive-complexity` - split by subsystem, one file per turn, with regression tests where behaviour is non-trivial:
   - 3a: `src/background/recorder/*` (recorder subsystem; heaviest cluster)
   - 3b: `src/background/handlers/*` + `src/background/*`
   - 3c: `src/components/options/*`
@@ -47,7 +47,7 @@ Chosen phased plan:
 
 ## Alternatives considered
 
-- **Bulk-raise the thresholds** in `eslint.config.js` (e.g. `max-lines-per-function: 100`): rejected — memory core rule "Zero ESLint warnings/errors; modular architecture" bans relaxing quality gates.
+- **Bulk-raise the thresholds** in `eslint.config.js` (e.g. `max-lines-per-function: 100`): rejected - memory core rule "Zero ESLint warnings/errors; modular architecture" bans relaxing quality gates.
 - **Add per-file `eslint-disable` comments:** rejected for the same reason. Only acceptable on generated / vendored files.
 
 ## Proceed

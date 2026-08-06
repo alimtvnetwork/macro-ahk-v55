@@ -1,4 +1,4 @@
-# Reliability & Failure-Chance Report — Automator v7.23 + Extension v1.17
+# Reliability & Failure-Chance Report - Automator v7.23 + Extension v1.17
 
 **Date**: 2026-03-16
 **Purpose**: Assess spec quality and AI-handoff readiness for the active codebase.
@@ -74,12 +74,12 @@ All previously high-risk failures (F-002 through F-019) resolved. See previous r
 
 | Priority | Action | Where to Change | Expected Reliability Gain | Status |
 |----------|--------|----------------|--------------------------|--------|
-| ~~P1~~ | ~~E2E test plan (S-011)~~ | — | — | ✅ Done |
-| ~~P2~~ | ~~XPath self-healing (S-012)~~ | — | — | ✅ Done |
-| ~~P3~~ | ~~Config.ini schema validation (S-013)~~ | — | — | ✅ Done |
-| ~~P4~~ | ~~Last known good state snapshot~~ | — | — | ✅ Done |
-| ~~P5~~ | ~~Chrome version compatibility matrix~~ | — | — | ✅ Done |
-| ~~P6~~ | ~~Profile picker fix~~ | — | — | ✅ Done |
+| ~~P1~~ | ~~E2E test plan (S-011)~~ | - | - | ✅ Done |
+| ~~P2~~ | ~~XPath self-healing (S-012)~~ | - | - | ✅ Done |
+| ~~P3~~ | ~~Config.ini schema validation (S-013)~~ | - | - | ✅ Done |
+| ~~P4~~ | ~~Last known good state snapshot~~ | - | - | ✅ Done |
+| ~~P5~~ | ~~Chrome version compatibility matrix~~ | - | - | ✅ Done |
+| ~~P6~~ | ~~Profile picker fix~~ | - | - | ✅ Done |
 | **P7** | Complete React UI unification (Steps 6, 10-11) | `src/content-scripts/`, build configs | +2% overall (eliminates F-021) | 🔄 In Progress |
 | **P8** | Extension build verification (S-027) | `vite.config.extension.ts` | +1% overall (confirms build pipeline) | ⬜ Open |
 | **P9** | Add React component tests for Options/Popup | `tests/` | +1% overall (catches regression in 14 React components) | ⬜ Open |
@@ -89,29 +89,29 @@ All previously high-risk failures (F-002 through F-019) resolved. See previous r
 
 ## 4. Readiness Decision
 
-### Verdict: **READY — with caveats**
+### Verdict: **READY - with caveats**
 
 The spec set is comprehensive and well-structured enough for AI handoff. The 89% success estimate is high for a project of this complexity.
 
 ### What's Excellent ✅
 
-1. **44 issue write-ups with RCA** — Every major bug documented with root cause and prevention rules
-2. **26 engineering standards** — Derived from real failures, not theoretical
-3. **Comprehensive spec hierarchy** — 10 numbered spec files + extension specs + imported specs
-4. **Version history** — Full changelog from v1 to v7.23, 17 extension releases
-5. **Session-bridge auth** — Modern pattern eliminating manual bearer token management
-6. **150+ AHK test cases + 822 unit tests** — Extensive coverage
-7. **React UI unification** — 9/12 steps complete with detailed checklist
-8. **Suggestions tracker** — Structured workflow for capturing and completing improvements
-9. **12 completed workflow plans** — Full history of major work efforts
+1. **44 issue write-ups with RCA** - Every major bug documented with root cause and prevention rules
+2. **26 engineering standards** - Derived from real failures, not theoretical
+3. **Comprehensive spec hierarchy** - 10 numbered spec files + extension specs + imported specs
+4. **Version history** - Full changelog from v1 to v7.23, 17 extension releases
+5. **Session-bridge auth** - Modern pattern eliminating manual bearer token management
+6. **150+ AHK test cases + 822 unit tests** - Extensive coverage
+7. **React UI unification** - 9/12 steps complete with detailed checklist
+8. **Suggestions tracker** - Structured workflow for capturing and completing improvements
+9. **12 completed workflow plans** - Full history of major work efforts
 
 ### What Reduces AI Success ⚠️
 
-1. **DevTools injection fragility (F-001)** — No fallback to CDP; entire system depends on keyboard shortcut injection
-2. **ComboSwitch DOM coupling (F-020)** — Hardcoded XPaths to Lovable's Transfer dialog; any UI change breaks it
-3. **Incomplete React unification** — Steps 6, 10-11 pending; an AI might not realize content scripts haven't been migrated
-4. **No integration tests** — 822 unit tests exist but no automated E2E test runner
-5. **Cross-controller state sharing (F-009)** — Documented but unfixed; could cause subtle bugs
+1. **DevTools injection fragility (F-001)** - No fallback to CDP; entire system depends on keyboard shortcut injection
+2. **ComboSwitch DOM coupling (F-020)** - Hardcoded XPaths to Lovable's Transfer dialog; any UI change breaks it
+3. **Incomplete React unification** - Steps 6, 10-11 pending; an AI might not realize content scripts haven't been migrated
+4. **No integration tests** - 822 unit tests exist but no automated E2E test runner
+5. **Cross-controller state sharing (F-009)** - Documented but unfixed; could cause subtle bugs
 
 ### Specific AI Failure Scenarios
 

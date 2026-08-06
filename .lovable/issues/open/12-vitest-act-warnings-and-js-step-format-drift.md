@@ -9,7 +9,7 @@ Reporter: user (CI log excerpt, `user-uploads://file-54`)
 CI run of `vitest` on `standalone-scripts/**` + `src/**` produced:
 
 1. Hard failure at `src/background/recorder/__tests__/js-step-diagnostics.test.ts:272`
-   — assertion `expect(text).toContain("Reason: JsThrew —")` failed because
+   - assertion `expect(text).toContain("Reason: JsThrew -")` failed because
    `formatFailureReport` emits `Reason: <code>, <detail>` (comma, no em dash).
 2. `Warning: An update to LiveRecordedActionsTree inside a test was not
    wrapped in act(...)` fired from the pulse-clear test

@@ -1,4 +1,4 @@
-# Repeat row overflows — needs a "More" dropdown after 50
+# Repeat row overflows - needs a "More" dropdown after 50
 
 Status: open
 Created: 2026-07-18

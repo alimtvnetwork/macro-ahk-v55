@@ -1,4 +1,4 @@
-# Plan: Workspace State Synchronization Fix (v7.9–v7.9.2)
+# Plan: Workspace State Synchronization Fix (v7.9-v7.9.2)
 
 **Status**: COMPLETED
 **Date Completed**: 2026-02-21
@@ -21,13 +21,13 @@ Fixed workspace state synchronization across all UI sections in both controllers
 - **Root Cause**: `moveToWorkspace()` success handler in combo.js didn't update `__wsCurrentName` or refresh UI
 - **Fix**: Added state update + full UI refresh (header, status, workspace list)
 
-### 4. Workspace State Clobber — The Root Bug (v7.9.2)
+### 4. Workspace State Clobber - The Root Bug (v7.9.2)
 - **Root Cause**: `autoDetectCurrentWorkspace()` had 3 fallback paths that unconditionally set `__wsCurrentName = perWs[0]` on ANY API failure/mismatch, overwriting the correct state set by user actions 2 seconds earlier
 - **Fix**: All 6 fallback paths (3 per controller) now preserve existing state if set. "Known-Good State Wins" principle.
 - **Spec**: `specs/spec-issues-v7.9-workspace-state-clobber.md`
 
 ## Principle Established
-**"Known-Good State Wins"** — User-action-set state is authoritative. Background API polls may only update state if no higher-priority source has set it.
+**"Known-Good State Wins"** - User-action-set state is authoritative. Background API polls may only update state if no higher-priority source has set it.
 
 ## Files Changed
 - `combo.js` (switch handler, move handler, autoDetectCurrentWorkspace fallbacks)

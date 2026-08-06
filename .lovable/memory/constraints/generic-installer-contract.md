@@ -1,6 +1,6 @@
 ---
 name: generic-installer-contract
-description: All installer scripts must follow spec/14-update/01-generic-installer-behavior.md — strict on tag/URL, latest→main fallback otherwise, optional parallel sibling-repo discovery
+description: All installer scripts must follow spec/14-update/01-generic-installer-behavior.md - strict on tag/URL, latest→main fallback otherwise, optional parallel sibling-repo discovery
 type: constraint
 ---
 
@@ -11,7 +11,7 @@ Updated: 2026-04-22
 
 **Every** installation script in **every** repo (`install.*`, `quick-install.*`, `release-install.*`, feature-scoped variants) MUST conform to the generic installer behavior spec:
 
-📄 **`spec/14-update/01-generic-installer-behavior.md`** — share this file with any AI to bootstrap a compliant installer in another repository.
+📄 **`spec/14-update/01-generic-installer-behavior.md`** - share this file with any AI to bootstrap a compliant installer in another repository.
 
 ## Non-negotiable behaviors
 
@@ -24,10 +24,10 @@ Updated: 2026-04-22
 
 ## Why
 
-Without one shared contract, every project's installer answers "what do I install when no version is given?" differently — leading to surprise main-branch installs, silent version drift, and broken CI. Strict mode locks down release-pinned installs; discovery mode gives a predictable fallback ladder.
+Without one shared contract, every project's installer answers "what do I install when no version is given?" differently - leading to surprise main-branch installs, silent version drift, and broken CI. Strict mode locks down release-pinned installs; discovery mode gives a predictable fallback ladder.
 
 ## How to apply
 
 - New repo: copy the spec file into `spec/14-update/01-generic-installer-behavior.md`, implement against §2, validate against §8 acceptance criteria.
 - Existing repo: walk through the §9 migration checklist, refactor to a single `resolve_version()`, add the strict-mode guard, add CI for the applicable ACs.
-- This repo's current installers (`scripts/install.{ps1,sh}`) already implement most of this — see `mem://features/release-installer` for what's done and the open gaps.
+- This repo's current installers (`scripts/install.{ps1,sh}`) already implement most of this - see `mem://features/release-installer` for what's done and the open gaps.

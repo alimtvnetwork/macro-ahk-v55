@@ -1,6 +1,6 @@
 ---
 name: prompt-variables
-description: Variable system for prompt-macros — Mustache-lite {{ Var }} interpolation with typed declarations, 5-tier resolution waterfall, sensitive-value masking
+description: Variable system for prompt-macros - Mustache-lite {{ Var }} interpolation with typed declarations, 5-tier resolution waterfall, sensitive-value masking
 type: feature
 ---
 
@@ -10,7 +10,7 @@ Variables let one prompt describe a **shape of work**; the macro fills specifics
 
 ## Syntax
 
-- Token: `{{ VarName }}` (Mustache-lite — no logic, no helpers, no nesting)
+- Token: `{{ VarName }}` (Mustache-lite - no logic, no helpers, no nesting)
 - Whitespace around name is optional and ignored
 - Unknown variable → run aborts with `Reason='UndeclaredVariable'`
 - Unresolved required variable → run aborts with `Reason='MissingVariable'`
@@ -43,7 +43,7 @@ Variables let one prompt describe a **shape of work**; the macro fills specifics
 
 - `Sensitive: true` → value replaced with `***` in logs, audit files, and event stream
 - Auto-masked field-name patterns: `/password|token|secret|api[_-]?key|bearer/i`
-- Verbose logging gate does NOT override masking — sensitive stays masked even with `Project.VerboseLogging=true`
+- Verbose logging gate does NOT override masking - sensitive stays masked even with `Project.VerboseLogging=true`
 
 ## Built-in context (read-only)
 

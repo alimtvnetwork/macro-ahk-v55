@@ -45,17 +45,17 @@ Decomposition requires moving state ownership, not just JSX slicing.
 
 Under `src/components/options/step-group-library/`:
 
-1. `useStepGroupLibraryState.ts` — custom hook owning all `useState`s,
+1. `useStepGroupLibraryState.ts` - custom hook owning all `useState`s,
    `useEffect`s, `useMemo`s and persisted state. Returns a typed
    view-model with `handlers` and `derived` sub-records.
-2. `LibraryToolbar.tsx` — top toolbar (project chip, batch buttons,
+2. `LibraryToolbar.tsx` - top toolbar (project chip, batch buttons,
    import/export).
-3. `LibraryTreePane.tsx` — left pane (search, filter, tree list,
+3. `LibraryTreePane.tsx` - left pane (search, filter, tree list,
    EmptyTreeState wiring).
-4. `LibraryStepPane.tsx` — right pane (active group header, step list,
-   dialog-open buttons — this is where the four `SELECT_GROUP_FIRST_TOOLTIP`
+4. `LibraryStepPane.tsx` - right pane (active group header, step list,
+   dialog-open buttons - this is where the four `SELECT_GROUP_FIRST_TOOLTIP`
    usages live).
-5. `LibraryDialogs.tsx` — bundle of AlertDialog / Dialog / Csv / Wait /
+5. `LibraryDialogs.tsx` - bundle of AlertDialog / Dialog / Csv / Wait /
    Webhook / InputSource dialogs, wired to the hook.
 6. `StepGroupLibraryPanel.tsx` shrinks to <80 lines: instantiate the
    hook, render toolbar + two panes + dialogs, mount `Toaster`.

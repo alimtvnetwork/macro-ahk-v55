@@ -24,7 +24,7 @@ Result: automated in-sandbox reproduction is not viable this turn.
   import path all exist and do not throw at module load.
 
 Conclusion: the "inert" symptom in `.lovable/issues/03-prompts-import-export-inert.md`
-is almost certainly a **stale bundle** — the deployed zip predates the
+is almost certainly a **stale bundle** - the deployed zip predates the
 wiring in `prompt-dropdown.ts` L246-249. The next release
 (`v4.33.0`) picks up the wired handlers automatically; the plan's
 Steps 3-11 then upgrade them from bare JSON to the JSON/ZIP/SQLite

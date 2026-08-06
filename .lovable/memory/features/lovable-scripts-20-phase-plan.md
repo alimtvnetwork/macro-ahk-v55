@@ -10,7 +10,7 @@ Updated: 2026-04-24
 
 ## Status
 
-📋 **Pending — execute one phase per explicit `next` command.**
+📋 **Pending - execute one phase per explicit `next` command.**
 
 ## What was captured
 
@@ -22,9 +22,9 @@ run one phase per `next`.
 
 `spec/21-app/02-features/chrome-extension/72-lovable-owner-switch-and-user-add-phase-plan/`
 
-- `01-overview.md` — phase table, execution rules, AC coverage map
-- `02-progress-log.md` — append one line per completed phase
-- `03-open-questions.md` — 10 questions (Q1, Q2 are blockers for P1)
+- `01-overview.md` - phase table, execution rules, AC coverage map
+- `02-progress-log.md` - append one line per completed phase
+- `03-open-questions.md` - 10 questions (Q1, Q2 are blockers for P1)
 
 ## Plan tracking
 
@@ -35,7 +35,7 @@ references but are subsumed by task 9's phased execution.
 ## Critical contracts (do not violate during phases)
 
 - Step B Owner promotion in User Add MUST call the same
-  `LovableApiClient.promoteToOwner(...)` used by Owner Switch — Review item
+  `LovableApiClient.promoteToOwner(...)` used by Owner Switch - Review item
   R12 in `.lovable/plan.md`.
 - Coding rules from `70-lovable-owner-switch/05-coding-rules-recap.md` apply
   to every phase (file ≤100 lines, fn ≤15 lines, no `!important`, no inline

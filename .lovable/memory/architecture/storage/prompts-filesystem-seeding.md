@@ -6,9 +6,9 @@ The prompts system uses a folder-based structure in `standalone-scripts/prompts/
 ## Build Pipeline
 
 `scripts/aggregate-prompts.mjs` reads all prompt folders and outputs to a single location:
-- **`dist/prompts/macro-prompts.json`** — sole output, copied to `chrome-extension/dist/prompts/` by the Vite `viteStaticCopy` plugin
+- **`dist/prompts/macro-prompts.json`** - sole output, copied to `chrome-extension/dist/prompts/` by the Vite `viteStaticCopy` plugin
 
-The legacy copy to `standalone-scripts/macro-controller/dist/03-macro-prompts.json` was removed (consolidated in April 2026). The `instruction.ts` prompts field is now empty since the `__MARCO_PROMPTS__` preamble injection was removed in v7.43 — prompts are fetched dynamically via the GET_PROMPTS bridge.
+The legacy copy to `standalone-scripts/macro-controller/dist/03-macro-prompts.json` was removed (consolidated in April 2026). The `instruction.ts` prompts field is now empty since the `__MARCO_PROMPTS__` preamble injection was removed in v7.43 - prompts are fetched dynamically via the GET_PROMPTS bridge.
 
 ## Runtime Loading
 
@@ -16,7 +16,7 @@ The prompt-handler loads from `prompts/macro-prompts.json` via `chrome.runtime.g
 
 ## UI Snapshot Cache
 
-The prompt dropdown now caches its fully rendered HTML + filter state + scroll position + data hash in IndexedDB (`ui_snapshots` store). On re-open, the snapshot is restored instantly with event listeners re-bound — no re-render loop needed. The cache auto-invalidates when the underlying data hash changes, or on explicit save/delete operations.
+The prompt dropdown now caches its fully rendered HTML + filter state + scroll position + data hash in IndexedDB (`ui_snapshots` store). On re-open, the snapshot is restored instantly with event listeners re-bound - no re-render loop needed. The cache auto-invalidates when the underlying data hash changes, or on explicit save/delete operations.
 
 ## Deploy Reseed (Full Wipe)
 

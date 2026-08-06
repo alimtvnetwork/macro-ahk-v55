@@ -1,4 +1,4 @@
-# CI/CD Issue 06 — Release watcher dispatches old tag workflow, so asset fixes do not run
+# CI/CD Issue 06 - Release watcher dispatches old tag workflow, so asset fixes do not run
 
 ## Pipeline / Workflow
 
@@ -35,7 +35,7 @@ The intended behavior is different:
 
 ## Status
 
-✅ Resolved — 2026-05-18
+✅ Resolved - 2026-05-18
 
 ## Fix
 

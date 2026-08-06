@@ -1,4 +1,4 @@
-# Plan: DevTools Focus-Steal Fix, CSV Export & Progress Bar Reorder (v7.9.51–v7.9.53)
+# Plan: DevTools Focus-Steal Fix, CSV Export & Progress Bar Reorder (v7.9.51-v7.9.53)
 
 **Status**: COMPLETED
 **Date Completed**: 2026-02-24

@@ -1,4 +1,4 @@
-# CI/CD Issue 04 — Create event release ref does not enter release mode
+# CI/CD Issue 04 - Create event release ref does not enter release mode
 
 ## Pipeline / Workflow
 
@@ -29,7 +29,7 @@ the wrong release.
 
 ## Status
 
-✅ Resolved — 2026-05-18 (v3.4.0)
+✅ Resolved - 2026-05-18 (v3.4.0)
 
 ## Fix
 

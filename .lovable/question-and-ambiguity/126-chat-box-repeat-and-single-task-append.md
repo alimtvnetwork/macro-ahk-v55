@@ -1,12 +1,12 @@
-# 126 — Chat-box Repeat selector + Next/Plan single-task append
+# 126 - Chat-box Repeat selector + Next/Plan single-task append
 
 **Date:** 2026-06-19
-**Source message:** user verbatim — "the next prompts will be added
+**Source message:** user verbatim - "the next prompts will be added
 as, like, as a single task. It would not be repeating automatically
 … Same would go for the plan … in the chat box, there should be a
 section called repeat … the prompts that we have picked, this would
 be appended rather than replacing."
-**Status:** open — implementation deferred until interpretation is
+**Status:** open - implementation deferred until interpretation is
 confirmed (or No-Questions Mode window closes).
 
 ---
@@ -20,15 +20,15 @@ confirmed (or No-Questions Mode window closes).
 2. **Replace the auto-loop with a new "Repeat" selector** rendered
    near the chat box. The user picks how many times to repeat (1, 2,
    …, 50). Repeat acts on the prompt(s) the user has already picked.
-3. **Append, not replace.** Every paste — single or repeated — must
+3. **Append, not replace.** Every paste - single or repeated - must
    append to the chat box's existing content, never overwrite it.
 
 ## Current behaviour (verified in code)
 
 - `standalone-scripts/macro-controller/src/ui/prompt-utils.ts`
   `pasteIntoEditor(...)` already **appends** with a `\n` prefix
-  (lines 197–251). So clicking a prompt in the dropdown — including
-  dynamic "Next 5 steps" / "Plan 10" — already pastes once and
+  (lines 197-251). So clicking a prompt in the dropdown - including
+  dynamic "Next 5 steps" / "Plan 10" - already pastes once and
   appends. Requirement 3 is already satisfied for the dropdown path.
 - `standalone-scripts/macro-controller/src/ui/task-next-ui.ts`
   `runTaskNextLoop(deps, count)` is the auto-repeat loop. It pastes
@@ -38,7 +38,7 @@ confirmed (or No-Questions Mode window closes).
       generic Alt+N preset), and
     - a "Task Next" button in `ui/panel-sections.ts`.
 - There is no dropdown wiring that calls `runTaskNextLoop` when a
-  user picks "Next ${N}" — that pick path uses `pasteIntoEditor`
+  user picks "Next ${N}" - that pick path uses `pasteIntoEditor`
   only.
 
 So the gap is:
@@ -56,12 +56,12 @@ Three plausible semantics:
 
 - **(a) Concatenate-only.** Repeat N pastes the SAME picked prompt
   body N times into the chat box (each separated by `\n\n`) without
-  clicking submit. User submits once manually. — Cheapest, no DOM
+  clicking submit. User submits once manually. - Cheapest, no DOM
   clicks, fully manual.
 - **(b) Paste-then-submit cycle.** For each of N cycles: paste the
   picked prompt, click submit, wait, repeat. This is what
-  `runTaskNextLoop` already does — just driven by a UI selector
-  instead of fixed keyboard presets. — Behaviour-preserving rename
+  `runTaskNextLoop` already does - just driven by a UI selector
+  instead of fixed keyboard presets. - Behaviour-preserving rename
   of existing feature.
 - **(c) Paste once, submit N times.** Paste once, then click submit
   N times (no re-paste between clicks). Useful if the prompt asks
@@ -70,7 +70,7 @@ Three plausible semantics:
 **Recommendation:** **(b) Paste-then-submit cycle.** Reasons:
 
 - Matches the existing `runTaskNextLoop` flow the user has been
-  using for months — minimal regression risk.
+  using for months - minimal regression risk.
 - Matches the user's phrase "we can repeat as many times as we
   want" combined with the existing Task Next button behaviour.
 - The "append, not replace" requirement is naturally satisfied
@@ -152,7 +152,7 @@ User mentioned "50" as an example. Recommended bounds:
 **Recommendation:** Keep `runTaskNextLoop` as the underlying engine;
 wire the new Repeat selector to call it with the resolved
 last-picked prompt and the user's count. Keep the existing keyboard
-shortcuts (Ctrl+Alt+P/;/., Alt+N) intact — they remain useful
+shortcuts (Ctrl+Alt+P/;/., Alt+N) intact - they remain useful
 power-user shortcuts and the user did not ask to remove them.
 
 ### Q6. Prompt-body change for Next/Plan
@@ -209,7 +209,7 @@ contradicts it explicitly.
 
 ---
 
-## RESOLVED 2026-06-19 — User answers
+## RESOLVED 2026-06-19 - User answers
 
 User explicitly opened a one-shot question turn and chose:
 
@@ -219,23 +219,23 @@ User explicitly opened a one-shot question turn and chose:
 - **Q2 Which prompt repeats:** Whatever text is currently in the
   chat box at the moment Start is clicked. No pinning, no "last
   picked" tracking.
-- **Q3 Where Repeat lives:** BOTH — floating macro panel
+- **Q3 Where Repeat lives:** BOTH - floating macro panel
   (number input + presets 1/5/10/25/50/100 + Start/Stop) AND an
   inline strip injected directly above Lovable's chat textarea.
   Both controls share the same state.
 - **Q4 Stop conditions:** Manual Stop button ONLY. No auto-stop on
   errors, no credit threshold. User wants full manual control.
 
-**Status:** RESOLVED — ready to implement. No further questions.
+**Status:** RESOLVED - ready to implement. No further questions.
 
 ---
 
 ## Follow-up answers (2026-06-19)
 
-- **Wait between iterations:** dropdown — `auto (submit ready)` *(default)* OR `fixed delay`. When fixed: number input (1–3600s) + presets **5/8/12/15/20/30/60s** + free custom value.
-- **Empty chat box:** Start **anyway** — guard removed; logs a warning only.
-- **Payment-notice scope:** unchanged — payment-failure banners only (credit/upgrade modals stay visible).
-- **Persistence:** `chrome.storage.local` (falls back to `localStorage`) under key `marco-repeat-loop-prefs`. Persists `count`, `waitMode`, `delaySec` only. **Never** persists running state — loops never auto-resume after reload.
+- **Wait between iterations:** dropdown - `auto (submit ready)` *(default)* OR `fixed delay`. When fixed: number input (1-3600s) + presets **5/8/12/15/20/30/60s** + free custom value.
+- **Empty chat box:** Start **anyway** - guard removed; logs a warning only.
+- **Payment-notice scope:** unchanged - payment-failure banners only (credit/upgrade modals stay visible).
+- **Persistence:** `chrome.storage.local` (falls back to `localStorage`) under key `marco-repeat-loop-prefs`. Persists `count`, `waitMode`, `delaySec` only. **Never** persists running state - loops never auto-resume after reload.
 
 ### Correction (2026-06-19, same day)
 - **Empty-box guard:** kept (refuse + red toast). Previous "start anyway" reverted.

@@ -24,7 +24,7 @@
 - **"next prompt" / "plan prompt"**: Edits the button BODY text in `standalone-scripts/prompts/`.
 - **CI push trigger unfiltered**: `.github/workflows/ci.yml` MUST use bare `on: push:`.
 - **Loop iteration cap 250**: Hard-capped at 250 iterations for all loops.
-- **Em dashes banned**: Never use em dashes (—) in any output. Use commas, colons, or parentheses.
+- **Em dashes banned**: Never use em dashes (-) in any output. Use commas, colons, or parentheses.
 
 ## Memories
 - [Latest release policy](mem://constraints/latest-release-must-be-complete)

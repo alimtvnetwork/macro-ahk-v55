@@ -2,7 +2,7 @@ Slug: result-webhook-missing-rebuild
 Status: closed
 Created: 2026-07-17
 
-# 12 — `result-webhook.ts` missing from worktree (rebuild from importers)
+# 12 - `result-webhook.ts` missing from worktree (rebuild from importers)
 
 ## Description
 
@@ -39,13 +39,13 @@ reconstructing the public surface from:
    for success/skipped/failure variants and the `WEBHOOK_RESULT_SCHEMA_VERSION`
    constant value.
 3. Three Core memories that fix policy:
-   - `mem://constraints/webhook-fail-fast` — single fetch attempt, no retry,
+   - `mem://constraints/webhook-fail-fast` - single fetch attempt, no retry,
      no backoff, no scheduled redelivery.
-   - `mem://features/webhook-result-schema-version` — v=2 stamped on every
+   - `mem://features/webhook-result-schema-version` - v=2 stamped on every
      result; `migrateWebhookDeliveryResult` upgrades legacy v1 blobs (no
      `SchemaVersion` field) on read; unknown versions yield a
      `buildCorruptPlaceholder` failure.
-   - `mem://constraints/no-supabase` — storage layer is `localStorage` only.
+   - `mem://constraints/no-supabase` - storage layer is `localStorage` only.
 
 Public surface restored: `WEBHOOK_RESULT_SCHEMA_VERSION`,
 `ALL_WEBHOOK_EVENTS`, `DEFAULT_WEBHOOK_CONFIG`, `WebhookEventKind`,
@@ -59,7 +59,7 @@ Public surface restored: `WEBHOOK_RESULT_SCHEMA_VERSION`,
 
 ## Iteration Count
 
-1 attempt — fully derivable from already-committed signals.
+1 attempt - fully derivable from already-committed signals.
 
 ## Verification
 
@@ -71,7 +71,7 @@ Public surface restored: `WEBHOOK_RESULT_SCHEMA_VERSION`,
 - The two-tier prebuild guard (`check-step-library-files.mjs` enumerating the
   full step-library + `check-result-webhook.mjs` asserting named exports +
   known importer paths) made the failure surface immediately with exact paths
-  and a clear remediation message — no Vite/Rollup mid-bundle ENOENT chase
+  and a clear remediation message - no Vite/Rollup mid-bundle ENOENT chase
   required. Both guards earned their keep here.
 - Project-memory invariants (`webhook-fail-fast`,
   `webhook-result-schema-version`) acted as a recoverable spec: the lost file
@@ -80,16 +80,16 @@ Public surface restored: `WEBHOOK_RESULT_SCHEMA_VERSION`,
 ## What NOT to Repeat
 
 - Do **not** introduce a retry queue, exponential backoff, or scheduled
-  redelivery to `dispatchWebhook` — `mem://constraints/webhook-fail-fast`
+  redelivery to `dispatchWebhook` - `mem://constraints/webhook-fail-fast`
   forbids it.
 - Do **not** drop the `SchemaVersion` field from any persisted
-  `WebhookDeliveryResult` — the migrator distinguishes "v1 legacy" (field
+  `WebhookDeliveryResult` - the migrator distinguishes "v1 legacy" (field
   absent → upgrade) from "unknown future version" (field present but unequal →
   corrupt placeholder). Removing the field collapses both paths.
 - Do **not** delete this module again without first auditing
   `EXPECTED_STEP_LIBRARY_FILES` in
   `scripts/lib/step-library-file-guard.mjs` and the importers list in
-  `scripts/check-result-webhook.mjs` — both are pinned and will fail loudly.
+  `scripts/check-result-webhook.mjs` - both are pinned and will fail loudly.
 
 ## References
 

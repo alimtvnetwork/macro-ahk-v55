@@ -13,11 +13,11 @@ Target: `src/hooks/use-step-library.ts` (`useStepLibrary` 278L, inner arrow 70L,
 
 Create `src/hooks/step-library/` and split by concern:
 
-- `use-step-library-load.ts` — `loadStepLibrary()` and cache hydration
-- `use-step-library-mutations.ts` — create/update/delete step group actions
-- `use-step-library-seed.ts` — `seedExampleData()` split into `buildSeedRows()` + `insertSeedRows()`
-- `use-step-library-selection.ts` — active-group state and selection reducer
-- `use-step-library-import-export.ts` — bundle round-trip helpers
+- `use-step-library-load.ts` - `loadStepLibrary()` and cache hydration
+- `use-step-library-mutations.ts` - create/update/delete step group actions
+- `use-step-library-seed.ts` - `seedExampleData()` split into `buildSeedRows()` + `insertSeedRows()`
+- `use-step-library-selection.ts` - active-group state and selection reducer
+- `use-step-library-import-export.ts` - bundle round-trip helpers
 
 `useStepLibrary` becomes an orchestrator hook (<=15 body lines) that composes the sub-hooks. Every extracted function stays under 15 body lines.
 

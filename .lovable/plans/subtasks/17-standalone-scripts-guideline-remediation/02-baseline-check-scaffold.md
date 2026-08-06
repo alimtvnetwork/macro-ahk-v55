@@ -5,7 +5,7 @@ Created: 2026-07-17
 Parent: 17-standalone-scripts-guideline-remediation
 ---
 
-# SS-02 — Baseline check scaffold
+# SS-02 - Baseline check scaffold
 
 Purpose: single CI entry point that reads `spec/33-missing-coding-guideline/99-baselines.json` and fails when any measured metric regresses above baseline (or, once the target column is reached, above target).
 
