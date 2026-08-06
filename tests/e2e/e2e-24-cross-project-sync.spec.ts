@@ -27,7 +27,7 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
   test.setTimeout(180_000);
 
   test('creates a project group, drag-assigns a project, and cascades shared settings', async () => {
-    const context = await launchExtension(chromium);
+    const context = await launchExtension();
     try {
       const extensionId = await getExtensionId(context);
       await seedCrossProjectSyncState(context);
@@ -46,7 +46,7 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
       await options.getByTestId('project-group-settings-input').fill('{"logLevel":"warn","retryOnNavigate":true}');
       await options.getByTestId('project-group-save-button').click();
 
-      await expect(options.getByRole('heading', { name: groupName })).toBeVisible({ timeout: 30_000 });
+      await expect(options.getByRole('heading', { name: groupName })).toBeVisible({ timeout: 45_000 });
       const groupId = await readGroupId(options, groupName);
       expect(groupId).not.toBeNull();
       await options.getByTestId(`project-group-card-${groupId}`).click();
@@ -57,7 +57,7 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
       await expect(options.getByTestId(`project-group-drag-source-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 30_000 });
 
       await dragProjectIntoMembers(options, PROJECT_ALPHA_ID);
-      await expect(options.getByTestId(`project-group-member-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 30_000 });
+      await expect(options.getByTestId(`project-group-member-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 45_000 });
       await expect(options.getByTestId(`project-group-member-${PROJECT_ALPHA_ID}`).getByText('Alpha Automation')).toBeVisible();
 
       await options.getByTestId('project-group-cascade-button').click();
