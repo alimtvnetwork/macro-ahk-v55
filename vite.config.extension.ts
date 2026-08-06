@@ -156,6 +156,9 @@ function copyManifest(): Plugin {
 
             manifest.version = rootVersion;
             manifest.background.service_worker = "background/index.js";
+            manifest.content_security_policy = manifest.content_security_policy || {};
+            manifest.content_security_policy.extension_pages = manifest.content_security_policy.extension_pages 
+                || "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'";
             manifest.action.default_popup = "src/popup/popup.html";
             manifest.action.default_icon = {
                 "16": "assets/icons/icon-16.png",
