@@ -64,7 +64,7 @@ irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/i
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh | bash
 ```
 
-> **[v5.20.0] 2026-08-06 CI/CD Recovery and Prompt Registry Sync**
+> **[v5.20.0] 2026-08-06 Action Download Surface Reduction**
 
 ```powershell
 ## Windows · PowerShell
