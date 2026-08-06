@@ -1,5 +1,5 @@
 import { test, expect, chromium, type BrowserContext, type Page } from '@playwright/test';
-import { launchExtension, getExtensionId, optionsUrl } from './fixtures';
+import { launchExtension, getExtensionId, openOptions, optionsUrl } from './fixtures';
 
 const ONBOARDING_KEY = 'marco_onboarding_complete';
 const PROJECTS_KEY = 'marco_projects';
