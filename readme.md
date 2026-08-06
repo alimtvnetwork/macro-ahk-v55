@@ -34,13 +34,13 @@ irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/d
 **Windows · PowerShell - pin a version + custom folder name (env-var form, works with `irm | iex`):**
 
 ```powershell
-$env:MARCO_DL_VERSION='v5.18.0'; $env:MARCO_DL_FOLDER='marco'; irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/download-extension.ps1 | iex
+$env:MARCO_DL_VERSION='v5.19.0'; $env:MARCO_DL_FOLDER='marco'; irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/download-extension.ps1 | iex
 ```
 
 **Windows · PowerShell - run a local clone with explicit flags:**
 
 ```powershell
-.\scripts\download-extension.ps1 -Version v5.18.0 -FolderName marco-extension
+.\scripts\download-extension.ps1 -Version v5.19.0 -FolderName marco-extension
 
 ```
 
@@ -50,7 +50,7 @@ $env:MARCO_DL_VERSION='v5.18.0'; $env:MARCO_DL_FOLDER='marco'; irm https://raw.g
 irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/clone-repo.ps1 | iex
 ```
 
-After it finishes, load the resulting folder via `chrome://extensions → Load unpacked`. The `marco-extension-v5.17.0.zip` backup sits next to it.
+After it finishes, load the resulting folder via `chrome://extensions → Load unpacked`. The `marco-extension-v5.19.0.zip` backup sits next to it.
 
 ### 🪟 Windows · PowerShell installer (latest)
 
