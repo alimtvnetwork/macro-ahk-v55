@@ -727,71 +727,71 @@ jobs:
 
           emit_install_sections() {
             cat <<EOF
-### Quick Install
+          ### Quick Install
 
-### 📦 Download-only (unpack into current folder)
+          ### 📦 Download-only (unpack into current folder)
 
-For quick local testing: downloads the release ZIP into the current folder as a backup and extracts it as a flat folder (no \`v\`, no version suffix). The ZIP is kept next to the extracted folder; only the extracted folder is overwritten on re-run. No \`\$HOME\` install, no profile changes, no auto-update wiring.
+          For quick local testing: downloads the release ZIP into the current folder as a backup and extracts it as a flat folder (no \`v\`, no version suffix). The ZIP is kept next to the extracted folder; only the extracted folder is overwritten on re-run. No \`\$HOME\` install, no profile changes, no auto-update wiring.
 
-**Windows · PowerShell, latest into \`.\\marco-extension\`:**
+          **Windows · PowerShell, latest into \`.\\marco-extension\`:**
 
-\`\`\`powershell
-irm https://github.com/${REPO}/releases/latest/download/download-extension.ps1 | iex
-\`\`\`
+          \`\`\`powershell
+          irm https://github.com/${REPO}/releases/latest/download/download-extension.ps1 | iex
+          \`\`\`
 
-**Windows · PowerShell, pin a version + custom folder name (env-var form, works with \`irm | iex\`):**
+          **Windows · PowerShell, pin a version + custom folder name (env-var form, works with \`irm | iex\`):**
 
-\`\`\`powershell
-\$env:MARCO_DL_VERSION='${VER}'; \$env:MARCO_DL_FOLDER='marco'; irm https://github.com/${REPO}/releases/download/${VER}/download-extension.ps1 | iex
-\`\`\`
+          \`\`\`powershell
+          \$env:MARCO_DL_VERSION='${VER}'; \$env:MARCO_DL_FOLDER='marco'; irm https://github.com/${REPO}/releases/download/${VER}/download-extension.ps1 | iex
+          \`\`\`
 
-**Windows · PowerShell, run a local clone with explicit flags:**
+          **Windows · PowerShell, run a local clone with explicit flags:**
 
-\`\`\`powershell
-.\\scripts\\download-extension.ps1 -Version ${VER} -FolderName marco-extension
-\`\`\`
+          \`\`\`powershell
+          .\\scripts\\download-extension.ps1 -Version ${VER} -FolderName marco-extension
+          \`\`\`
 
-After it finishes, load the resulting folder via \`chrome://extensions → Load unpacked\`. The \`marco-extension-${VER}.zip\` backup sits next to it.
+          After it finishes, load the resulting folder via \`chrome://extensions → Load unpacked\`. The \`marco-extension-${VER}.zip\` backup sits next to it.
 
-#### 🔒 Pinned to \`${VER}\` (recommended from this page)
+          #### 🔒 Pinned to \`${VER}\` (recommended from this page)
 
-These one-liners download \`install.{ps1,sh}\` from this release's assets. The script auto-derives \`${VER}\` from its own URL and installs exactly that version.
+          These one-liners download \`install.{ps1,sh}\` from this release's assets. The script auto-derives \`${VER}\` from its own URL and installs exactly that version.
 
-**Windows (PowerShell):**
-\`\`\`powershell
-irm https://github.com/${REPO}/releases/download/${VER}/install.ps1 | iex
-\`\`\`
+          **Windows (PowerShell):**
+          \`\`\`powershell
+          irm https://github.com/${REPO}/releases/download/${VER}/install.ps1 | iex
+          \`\`\`
 
-**Linux / macOS:**
-\`\`\`bash
-curl -fsSL https://github.com/${REPO}/releases/download/${VER}/install.sh | bash
-\`\`\`
+          **Linux / macOS:**
+          \`\`\`bash
+          curl -fsSL https://github.com/${REPO}/releases/download/${VER}/install.sh | bash
+          \`\`\`
 
-#### 🌊 Latest channel (auto-update)
+          #### 🌊 Latest channel (auto-update)
 
-These one-liners always resolve the newest published release.
+          These one-liners always resolve the newest published release.
 
-**Windows (PowerShell):**
-\`\`\`powershell
-irm https://raw.githubusercontent.com/${REPO}/main/scripts/install.ps1 | iex
-\`\`\`
+          **Windows (PowerShell):**
+          \`\`\`powershell
+          irm https://raw.githubusercontent.com/${REPO}/main/scripts/install.ps1 | iex
+          \`\`\`
 
-**Linux / macOS:**
-\`\`\`bash
-curl -fsSL https://raw.githubusercontent.com/${REPO}/main/scripts/install.sh | bash
-\`\`\`
+          **Linux / macOS:**
+          \`\`\`bash
+          curl -fsSL https://raw.githubusercontent.com/${REPO}/main/scripts/install.sh | bash
+          \`\`\`
 
-### Manual Install (Chromium)
+          ### Manual Install (Chromium)
 
-1. Download \`marco-extension-${VER}.zip\` from this release.
-2. Extract it to a local folder.
-3. Open \`chrome://extensions\`.
-4. Enable **Developer mode**.
-5. Click **Load unpacked** and select the extracted folder.
+          1. Download \`marco-extension-${VER}.zip\` from this release.
+          2. Extract it to a local folder.
+          3. Open \`chrome://extensions\`.
+          4. Enable **Developer mode**.
+          5. Click **Load unpacked** and select the extracted folder.
 
----
+          ---
 
-EOF
+          EOF
           }
 
           # Build categorized release notes

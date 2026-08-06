@@ -6,6 +6,18 @@ type: feature
 
 # Why CI looked dead and releases never shipped
 
+0. **THE v5.22.0 TAG-EXISTS-BUT-ASSETS-ARE-MISSING ROOT CAUSE.**
+   `.github/workflows/release.yml` was invalid YAML. Markdown emitted from a
+   `run: |` heredoc was not indented as part of that YAML scalar, so a line
+   beginning with `**Windows` was parsed as an invalid YAML alias. GitHub
+   rejected the workflow before creating any jobs. The tag and automatic
+   source archives could therefore exist while no extension assets were built.
+   Fix: indent the complete heredoc, parse every workflow with the `yaml`
+   package in CI, and make `test:cicd-spec` run that parser before policy tests.
+   NEVER treat a release file as valid because regex policy tests pass. A real
+   YAML parse is mandatory. `Tag and Release` must also safely reuse an existing
+   immutable tag so a parser failure can be recovered without moving the tag.
+
 0. **THE tag-lands-but-no-release ROOT CAUSE.** A push made with the built-in
    `GITHUB_TOKEN` does not emit a `push` event; GitHub suppresses it to prevent
    recursive runs. `tag-and-release.yml` creates the tag with `GITHUB_TOKEN`, so
