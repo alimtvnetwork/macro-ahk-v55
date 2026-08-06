@@ -1,7 +1,8 @@
 {
-  "version": "0.0.0-dev",
+  "version": "0.1.0",
   "generatedFrom": "fallback",
   "note": "This file is a build-time artifact derived from the git tag by scripts/write-version-from-tag.mjs. The release version is the git tag (vX.Y.Z), not this file. Do not hand-edit the 'version' field. See .lovable/spec/commands/05-tag-is-single-source-of-truth-for-version.md.",
   "timezonePolicy": "UTC storage; user-local rendering",
-  "generatedAt": "2026-08-06T09:24:58.968Z"
+  "generatedAt": "2026-08-06T09:24:58.968Z",
+  "releaseDate": "2026-08-06"
 }
