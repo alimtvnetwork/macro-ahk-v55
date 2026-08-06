@@ -1,0 +1,19 @@
+{
+  "version": "5.20.0",
+  "branch": "release/v5.20.0",
+  "sourceBranch": "main",
+  "commit": "a2ce0234ac0e8e79703b9981601c79051d20876f",
+  "tag": "v5.20.0",
+  "assets": [],
+  "changelog": [
+    "Replaced all 21 `pnpm/action-setup@v4` steps in `.github/workflows/ci.yml` and `.github/workflows/release.yml` with native `corepack enable \u0026\u0026 corepack prepare pnpm@9 --activate` shell steps, removing 21 action-resolution calls per pipeline run.",
+    "Replaced `oven-sh/setup-bun@v2` in `.github/workflows/ci.yml` with the official `curl | bash` install plus a `GITHUB_PATH` append.",
+    "`scripts/clone-ahk.mjs`: `CANONICAL_REPO` equalled `STALE_REPO` (`alimtvnetwork/macro-ahk-v55`), which failed `scripts/__tests__/ci-workflow-trigger-policy.test.mjs`. Set to `aukgit/macro-ahk-v55`; the suite is now 6/6 green.",
+    "`.lovable/memory/rca/04-action-download-resolution-hardening.md` documenting the `Failed to resolve action download info` failure class, the mitigation, and the residual risk.",
+    "[01-5-20-0-git-tag-skipped](.lovable/release/issues/01-5-20-0-git-tag-skipped.md) git tag and commit cannot be created from the sandbox; apply manually."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-08-06T17:14:55Z",
+  "isLatest": false
+}
