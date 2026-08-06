@@ -3,11 +3,21 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync } from "node:fs";
 import { basename, resolve } from "node:path";
+import { resolveRepoSlug } from "./resolve-repo-slug.mjs";
 
 const CANONICAL_REPO = "alimtvnetwork/macro-ahk-v55";
-const STALE_REPO = "alimtvnetwork/macro-ahk-v55";
+const STALE_REPO = "aukgit/macro-ahk-v55";
 const DEFAULT_TARGET = "macro-ahk";
 const DEFAULT_BRANCH = "main";
+
+/** Runtime slug wins over the compiled-in default so a rename auto-heals. */
+function resolvedDefaultRepo() {
+    try {
+        return resolveRepoSlug({ fallback: CANONICAL_REPO }).slug;
+    } catch {
+        return CANONICAL_REPO;
+    }
+}
 
 function printHelp() {
     console.log(`Usage: node scripts/clone-ahk.mjs [--target DIR] [--repo OWNER/REPO] [--branch BRANCH]
@@ -67,7 +77,7 @@ function main() {
         return;
     }
 
-    const repo = normalizeRepo(readOption(args, "--repo", process.env.MARCO_AHK_REPO || CANONICAL_REPO));
+    const repo = normalizeRepo(readOption(args, "--repo", process.env.MARCO_AHK_REPO || resolvedDefaultRepo()));
     const target = readOption(args, "--target", readOption(args, "--dir", process.env.MARCO_AHK_TARGET || DEFAULT_TARGET));
     const branch = readOption(args, "--branch", process.env.MARCO_AHK_BRANCH || DEFAULT_BRANCH);
     const targetPath = resolve(process.cwd(), target);
