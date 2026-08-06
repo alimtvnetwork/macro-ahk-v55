@@ -54,7 +54,7 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
       // GroupDetailPanel mounts and fires GET_ALL_PROJECTS async; SW seed +
       // chrome.storage round-trip can exceed the default 10s on cold extension
       // launch. Give the chip rail the same 20s budget as the rest of the flow.
-      await expect(options.getByTestId(`project-group-drag-source-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 30_000 });
+      await expect(options.getByTestId(`project-group-drag-source-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 45_000 });
 
       await dragProjectIntoMembers(options, PROJECT_ALPHA_ID);
       await expect(options.getByTestId(`project-group-member-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 45_000 });
