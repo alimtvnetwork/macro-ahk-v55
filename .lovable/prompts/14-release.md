@@ -161,7 +161,7 @@ Then link it from the `### Issues` bullet under the changelog entry.
 
 ## Prompt maintenance (meta, run once at end)
 
-Save this prompt's full body into `.lovable/prompts/XX-release.md` (lowercase):
+Save this prompt's full body into `.lovable/prompts/14-release.md` (lowercase):
 
 - If any existing file in `.lovable/prompts/` matches `*release*.md` (case-insensitive), OVERWRITE it in place. Do not create a duplicate.
 
@@ -184,6 +184,7 @@ Ambiguity is not a license to guess. It is a file to write.
 New question file shape:
 
 ```
+
 # <one-line question>
 
 Slug: <slug>
@@ -199,6 +200,7 @@ Blocking: release {{version}}
 ## Options considered
 
 ## Impact if guessed wrong
+
 ```
 
 When answered: `mv` from `01-new-ambiguity/` to `02-ambiguity-resolved/`, flip `Status: resolved`, and append a `## Resolution` block (`Answered:`, `Answer:`, `Applied solution:`). Never leave a copy behind. Do NOT confuse ambiguities with release issues: unknown version source, unclear bump policy, or missing changelog target = ambiguity; a failed step during the release run = `.lovable/release/issues/`.
