@@ -6,6 +6,16 @@ import { resolveRepoSlug } from "./resolve-repo-slug.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const VERSION_JSON = resolve(__dirname, "../version.json");
+const CONTRACT_JSON = resolve(__dirname, "./installer-contract.json");
+
+/** Contract fallback keeps slug resolution working when no GitHub remote exists. */
+function contractFallbackSlug() {
+  try {
+    return JSON.parse(readFileSync(CONTRACT_JSON, "utf8")).repo.fallback;
+  } catch {
+    return undefined;
+  }
+}
 
 /** Surface a line in the GitHub Actions job summary when running in CI. */
 function writeStepSummary(line) {
@@ -28,7 +38,7 @@ function main() {
   console.log(`Checking for remote tag: ${tagName}`);
 
   try {
-    const { slug } = resolveRepoSlug();
+    const { slug } = resolveRepoSlug({ fallback: contractFallbackSlug() });
     console.log(`Checking for remote tag: ${tagName} on ${slug}`);
     
     // Use ls-remote with the full URL to be remote-agnostic and handle cases where 'origin' isn't set
