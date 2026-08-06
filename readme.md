@@ -64,7 +64,7 @@ irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/i
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh | bash
 ```
 
-> **[v5.23.0] 2026-08-06 Release Publication Path Fix (workflow_call)**
+> **[v5.23.0] 2026-08-06 Workflow YAML Validation and Tag Recovery**
 
 ```powershell
 ## Windows · PowerShell
