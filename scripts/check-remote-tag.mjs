@@ -2,6 +2,7 @@ import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolveRepoSlug } from "./resolve-repo-slug.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const VERSION_JSON = resolve(__dirname, "../version.json");
@@ -17,9 +18,13 @@ function main() {
   console.log(`Checking for remote tag: ${tagName}`);
 
   try {
-    const remoteTags = execSync("git ls-remote --tags origin", { encoding: "utf8" });
+    const { slug } = resolveRepoSlug();
+    console.log(`Checking for remote tag: ${tagName} on ${slug}`);
+    
+    // Use ls-remote with the full URL to be remote-agnostic and handle cases where 'origin' isn't set
+    const remoteTags = execSync(`git ls-remote --tags https://github.com/${slug}.git`, { encoding: "utf8" });
     if (!remoteTags.includes(`refs/tags/${tagName}`)) {
-      console.error(`[FATAL] Expected release tag ${tagName} not found on remote 'origin'.`);
+      console.error(`[FATAL] Expected release tag ${tagName} not found on remote 'https://github.com/${slug}.git'.`);
       console.error("Release builds MUST be tagged before they can be promoted to main.");
       process.exit(1);
     }
