@@ -1,11 +1,11 @@
-# 09 — Macro Controller Panel BG Transparency (UI bleed)
+# 09 - Macro Controller Panel BG Transparency (UI bleed)
 
 **Logged:** 2026-06-23
 **Source:** User screenshot attached with message "FIX the UI issues and then release".
 
 ## What I see in the screenshot
 
-In the floating macro-controller panel, the area from the Search input downward (workspace list + Move row) appears to render *over* the IDE code editor — IDE text strings such as `lovable-blank-page-placeholder`, `Image data:`, `<Link`, `className="absolute bottom...`, etc. visibly bleed through behind the workspace rows. The title row (TS Macro / Pro counts / Stopped / Check / Play / Credits / Prompts) is solidly opaque.
+In the floating macro-controller panel, the area from the Search input downward (workspace list + Move row) appears to render *over* the IDE code editor - IDE text strings such as `lovable-blank-page-placeholder`, `Image data:`, `<Link`, `className="absolute bottom...`, etc. visibly bleed through behind the workspace rows. The title row (TS Macro / Pro counts / Stopped / Check / Play / Credits / Prompts) is solidly opaque.
 
 ## Why I did not auto-fix
 

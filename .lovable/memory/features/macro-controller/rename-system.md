@@ -12,7 +12,7 @@ Updated: 2026-03-19
 - Rate limit (429) handled with 2s retry
 
 ### Floating Draggable Panel
-- Replaces modal dialog — no overlay, user can interact with other UI while renaming
+- Replaces modal dialog - no overlay, user can interact with other UI while renaming
 - Draggable via title bar, resizable, has close button
 - Named event handlers with proper cleanup on panel close (no memory leaks)
 - Shows: prefix (checkbox), template, suffix (checkbox), delay slider, token refresh, preview, ETA, stop/apply buttons
@@ -26,7 +26,7 @@ Three variable types, all zero-padded by character count:
 Each variable type has its own independent start number. Variables work in prefix, template, AND suffix fields. Multiple variable types can be mixed in the same field (e.g. `$$$-###` → `001-001`). Start number UI controls appear dynamically only when the variable is detected in any field.
 
 ### Async Worker Pattern
-- Configurable delay between operations: 100ms–10,000ms (default 750ms, slider in UI)
+- Configurable delay between operations: 100ms-10,000ms (default 750ms, slider in UI)
 - Cancellation via Stop button (sets `RENAME_CANCELLED` flag, checked before each `doNext`)
 - Progress updates in Apply button text during operation
 - After completion/cancellation, panel stays open and re-enables Apply

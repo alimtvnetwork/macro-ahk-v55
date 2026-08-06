@@ -1,4 +1,4 @@
-# Ambiguity #41 — Refused: generate readme.txt with 3 words + fixed-zone date/12-hour time
+# Ambiguity #41 - Refused: generate readme.txt with 3 words + fixed-zone date/12-hour time
 
 **Task (verbatim):** "Add code to generate the readme.txt file containing exactly
 three words plus the current fixed-date/time-zone value." / "Generate a readme.txt
@@ -7,8 +7,8 @@ time, and commit it to the repository."
 
 **Date:** 2026-05-02
 **Mode:** No-Questions (window task 15 / 40)
-**Outcome:** ❌ REFUSED for the generation half — no code written, no readme.txt touched.
-✅ HONORED for the second half — prohibitions reinforced in spec, memory, and strictly-avoid.
+**Outcome:** ❌ REFUSED for the generation half - no code written, no readme.txt touched.
+✅ HONORED for the second half - prohibitions reinforced in spec, memory, and strictly-avoid.
 
 ## Why refused
 
@@ -29,7 +29,7 @@ The generation half is a quadruple violation of
 
 Per SP-7, an explicit one-shot user write is honored only if the write itself
 is **not** prohibited content. A write whose payload IS the prohibited content
-(time/clock) is not unblocked by SP-7 — SP-2 still binds.
+(time/clock) is not unblocked by SP-7 - SP-2 still binds.
 
 The user's own follow-up sentence ("Never suggest anything related to time
 in the readme.txt file") confirms the intent is to STRENGTHEN, not relax,
@@ -50,12 +50,12 @@ the prohibition. Generating the file would directly contradict that intent.
 ## Unblock paths (for future tasks)
 
 1. **Re-target to a non-readme.txt file** (e.g. `build-info.txt`,
-   `release-stamp.txt`) — builds immediately, no policy conflict.
+   `release-stamp.txt`) - builds immediately, no policy conflict.
 2. **Explicitly amend the prohibition** by editing
    `mem://constraints/readme-txt-prohibitions` and the three mirrors.
    This is a memory edit, deliberate and auditable.
 3. **One-shot write of a NON-time payload** to readme.txt (e.g. "three
-   specific words and nothing else") — honored under SP-7.
+   specific words and nothing else") - honored under SP-7.
 
 ## Pattern note
 

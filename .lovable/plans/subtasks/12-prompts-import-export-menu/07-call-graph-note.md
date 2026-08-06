@@ -29,7 +29,7 @@ Created: 2026-07-17
 
 Every handler exists. `onclick` is assigned directly (not a delegated
 listener), so a missing bubble path is not possible. The buttons are
-`<span>` elements with `cursor:pointer` — pointer events default on.
+`<span>` elements with `cursor:pointer` - pointer events default on.
 
 ## Runtime `PromptEntry` (ui-types.ts L47-70)
 
@@ -51,7 +51,7 @@ array). `validatePromptEntry()` requires `name` + `text`, keeps `slug`,
 `category` (default `'General'`), `isFavorite`, `isDefault`, `order`,
 `version`, `excludeFromExport`. **Drops `tags`, `id`, `isDynamic`,
 `replaceKey`, `replaceValues`, `slugTemplate`, `parentTitle`,
-`parentSlug`, `variantValue`** — round-trip is lossy for dynamic prompts.
+`parentSlug`, `variantValue`** - round-trip is lossy for dynamic prompts.
 
 ## Schema gap (schemas/prompts-bundle.schema.json)
 
@@ -63,7 +63,7 @@ export/import envelope. Plan 12 needs a **new** schema file, e.g.
 `{ id, schemaVersion, exportedAt, exporterVersion, entryCount,
   entries[] }`.
 
-## Findings that steer Steps 3–8
+## Findings that steer Steps 3-8
 
 - Reuse the current handler names when refactoring so the header wiring
   in `prompt-dropdown.ts` L246-249 does not need to change.
@@ -77,8 +77,8 @@ export/import envelope. Plan 12 needs a **new** schema file, e.g.
 
 Static reading shows every button has an `onclick`. If the user still
 sees no reaction, the likely causes are (a) the deployed extension zip
-predates this wiring — plan 12 Step 2 will confirm by exercising the
+predates this wiring - plan 12 Step 2 will confirm by exercising the
 current build, and (b) the pill span sits inside the dropdown scroll
 container; a stale build could have wrapped it under a `pointer-events:
 none` overlay. To confirm we need the injected UI, which only mounts
-inside Lovable app tabs — see notes-02.
+inside Lovable app tabs - see notes-02.

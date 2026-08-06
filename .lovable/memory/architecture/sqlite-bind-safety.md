@@ -4,7 +4,7 @@
 
 ## Four layers
 
-### 1. Entry-point validation — `src/background/handlers/handler-guards.ts`
+### 1. Entry-point validation - `src/background/handlers/handler-guards.ts`
 
 | Helper | Purpose |
 |---|---|
@@ -21,11 +21,11 @@ Adopted by every SQLite-backed handler:
 - `kv-handler`, `grouped-kv-handler`, `file-storage-handler`, `project-api-handler`
 - `logging-handler`, `user-script-log-handler`, `error-handler`
 
-### 2. SDK contract — `standalone-scripts/marco-sdk/src/kv.ts`
+### 2. SDK contract - `standalone-scripts/marco-sdk/src/kv.ts`
 
 The SDK always sends a `projectId` (defaulting to `"RiseupMacroSdk"` for the SDK self-namespace). This eliminates the page-load-time crash that the SDK runtime self-test used to trigger.
 
-### 3. Global Proxy net — `src/background/sqlite-bind-safety.ts`
+### 3. Global Proxy net - `src/background/sqlite-bind-safety.ts`
 
 ```ts
 export class BindError extends Error {
@@ -38,7 +38,7 @@ export function assertBindable<T extends ReadonlyArray<unknown>>(sql: string, pa
 export function wrapDatabaseWithBindSafety(db: SqlJsDatabase): SqlJsDatabase;
 ```
 
-`wrapDatabaseWithBindSafety` returns a `Proxy` that intercepts `db.run`, `db.exec`, and `db.prepare(sql).bind(params) / .run(params)` — every other method passes through. When any param is `undefined`, it throws a typed `BindError` that names the **param index**, the **inferred column name** (parsed from `INSERT (col, …) VALUES …`, `UPDATE … SET col = ?`, `WHERE col = ?`), and a 120-char **SQL preview**.
+`wrapDatabaseWithBindSafety` returns a `Proxy` that intercepts `db.run`, `db.exec`, and `db.prepare(sql).bind(params) / .run(params)` - every other method passes through. When any param is `undefined`, it throws a typed `BindError` that names the **param index**, the **inferred column name** (parsed from `INSERT (col, …) VALUES …`, `UPDATE … SET col = ?`, `WHERE col = ?`), and a 120-char **SQL preview**.
 
 Wired at the manager boundary so all current and future handlers benefit:
 
@@ -47,16 +47,16 @@ Wired at the manager boundary so all current and future handlers benefit:
 
 Direct internal references (`flush`, `export`) keep operating on the raw instance, so persistence is unaffected.
 
-### 4. Errors-panel hookup — `src/background/message-router.ts` (v2.168.0)
+### 4. Errors-panel hookup - `src/background/message-router.ts` (v2.168.0)
 
 `buildErrorResponse` now special-cases `BindError`:
 
 - Detected via `error instanceof BindError`.
 - Routed through `logBgError(BgLogTag.SQLITE_BIND, "SQLITE_BIND_ERROR", …, { contextDetail })`.
 - The `contextDetail` string contains `messageType=… paramIndex=… column="…" sql="…"` so the Errors panel row carries everything an operator needs to triage without opening DevTools.
-- Non-BindError throws still go through the original `logCaughtError(BgLogTag.MESSAGE_ROUTER, …)` path — unchanged.
+- Non-BindError throws still go through the original `logCaughtError(BgLogTag.MESSAGE_ROUTER, …)` path - unchanged.
 
-This guarantees that if any future refactor lets `undefined` slip past Layers 1–2 and trip the Proxy in Layer 3, the operator sees a visual signal in the Errors panel — not a silent console-only entry.
+This guarantees that if any future refactor lets `undefined` slip past Layers 1-2 and trip the Proxy in Layer 3, the operator sees a visual signal in the Errors panel - not a silent console-only entry.
 
 ## Mental model
 
@@ -81,7 +81,7 @@ sql.js
 1. Validate every required payload field at the top: `const projectId = requireProjectId(raw.projectId); if (!projectId) return missingFieldError("projectId", "myop");`.
 2. For optional columns: `bindOpt(value)`. For required NOT NULL columns where the caller may omit: `bindReq(value, "(unknown)")`.
 3. Never pass raw `undefined` into a bind array.
-4. If a `BindError` ever appears in the Errors panel, treat it as a P0 — the entry-point guards missed something. The `Context` column tells you exactly which messageType + column to fix.
+4. If a `BindError` ever appears in the Errors panel, treat it as a P0 - the entry-point guards missed something. The `Context` column tells you exactly which messageType + column to fix.
 
 ## Cross-references
 

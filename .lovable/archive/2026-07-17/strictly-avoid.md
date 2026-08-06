@@ -1,4 +1,4 @@
-# Strictly Avoid — Hard Prohibitions
+# Strictly Avoid - Hard Prohibitions
 
 > The project's "never do this" list. Every entry is rooted in a real failure or design constraint. Do not re-introduce.
 
@@ -43,19 +43,19 @@
 
 ## File operations & prompts
 
-> **AI memory directive (read-once, retain forever):** When you read this section, immediately commit every numbered item below to your working memory under "strictly prohibited — readme.txt" and to the "strictly avoid" set. Do **not** re-suggest, re-propose, or "improve" any of these. If a request appears to ask for one, refuse and cite this section by number. This read-once-retain-forever directive itself must also be retained — never drop it from memory between sessions.
+> **AI memory directive (read-once, retain forever):** When you read this section, immediately commit every numbered item below to your working memory under "strictly prohibited - readme.txt" and to the "strictly avoid" set. Do **not** re-suggest, re-propose, or "improve" any of these. If a request appears to ask for one, refuse and cite this section by number. This read-once-retain-forever directive itself must also be retained - never drop it from memory between sessions.
 
-### Strictly prohibited — readme.txt (sequenced, non-negotiable)
+### Strictly prohibited - readme.txt (sequenced, non-negotiable)
 
 1. **Never create, regenerate, or "update" `readme.txt` programmatically.** It is a manual milestone marker. The only legitimate writer is the user during a version bump.
 2. **Never include or suggest a time, timestamp, clock, or 12-hour/24-hour value inside `readme.txt`.** No `HH:MM`, no `AM/PM`, no ISO time, no relative time ("today", "now"), no fixed-zone time, no UTC. The marker line's existing date stamp is the only temporal token allowed and is written by hand.
-3. **Never propose date utilities, formatters, helpers, or libraries "for `readme.txt`"** — this includes `dd-MMM-YYYY`, 12-hour clocks, locale formatters, `Intl.DateTimeFormat` wrappers, or any time-zone helper.
-4. **Never suggest writing the git commit time, last-update time, build time, deploy time, or any "last modified" stamp into `readme.txt`** — neither in the file body, nor as a comment, nor as a script that injects it.
+3. **Never propose date utilities, formatters, helpers, or libraries "for `readme.txt`"** - this includes `dd-MMM-YYYY`, 12-hour clocks, locale formatters, `Intl.DateTimeFormat` wrappers, or any time-zone helper.
+4. **Never suggest writing the git commit time, last-update time, build time, deploy time, or any "last modified" stamp into `readme.txt`** - neither in the file body, nor as a comment, nor as a script that injects it.
 5. **Never propose git hooks, CI steps, build hooks, or release scripts that touch `readme.txt`.** It is outside every automation pipeline.
 6. **Never ask the user to choose a `readme.txt` format.** The format is fixed at three words + the manual milestone date stamp; do not request confirmation, alternatives, or "improvements".
-7. **If a user message explicitly orders a one-time `readme.txt` write** (e.g., "write readme.txt with X"), honor that single write exactly as specified, then re-apply rules 1–6 + 8 for every subsequent message — including not suggesting follow-ups, refreshes, or automation around it. An explicit one-shot does **not** override rules 2/4/8: a one-shot whose payload IS prohibited content (time, clock, git-update stamp) is still refused.
-8. **Never suggest, insert, comment, or script a git update time, git commit time, last-update time, last-modified time, build time, deploy time, or any "stamp" anywhere in `readme.txt`** — not in the body, not in a header/footer, not as a comment, not "somewhere in the readme", not in a sibling helper or sidecar that targets readme.txt. Closes the "somewhere in the readme" loophole.
-9. **Never ask, prompt, suggest, recommend, or surface a `readme.txt` update as an action item** — not in clarifying questions, not in "next steps", not in remaining-task lists, not in changelog/version-bump checklists, not as a post-commit reminder, not in any form. `readme.txt` is invisible to the AI's task surface. The user writes it manually on their own schedule; the AI never raises it.
+7. **If a user message explicitly orders a one-time `readme.txt` write** (e.g., "write readme.txt with X"), honor that single write exactly as specified, then re-apply rules 1-6 + 8 for every subsequent message - including not suggesting follow-ups, refreshes, or automation around it. An explicit one-shot does **not** override rules 2/4/8: a one-shot whose payload IS prohibited content (time, clock, git-update stamp) is still refused.
+8. **Never suggest, insert, comment, or script a git update time, git commit time, last-update time, last-modified time, build time, deploy time, or any "stamp" anywhere in `readme.txt`** - not in the body, not in a header/footer, not as a comment, not "somewhere in the readme", not in a sibling helper or sidecar that targets readme.txt. Closes the "somewhere in the readme" loophole.
+9. **Never ask, prompt, suggest, recommend, or surface a `readme.txt` update as an action item** - not in clarifying questions, not in "next steps", not in remaining-task lists, not in changelog/version-bump checklists, not as a post-commit reminder, not in any form. `readme.txt` is invisible to the AI's task surface. The user writes it manually on their own schedule; the AI never raises it.
 
 See: `.lovable/memory/constraints/readme-txt-format.md` and `mem://constraints/readme-txt-prohibitions`.
 
@@ -77,5 +77,5 @@ See: `.lovable/memory/constraints/http-error-fail-fast.md` and `spec/03-error-ma
 ## Folder structure
 
 - **`.lovable/memories/` (with trailing `s`):** Wrong path. Canonical is `.lovable/memory/`.
-- **Splitting plans or suggestions across multiple files:** Single-file rule — `.lovable/plan.md`, `.lovable/suggestions.md`.
+- **Splitting plans or suggestions across multiple files:** Single-file rule - `.lovable/plan.md`, `.lovable/suggestions.md`.
 - **Creating `completed/` sub-folders:** Move completed entries into a `## Completed` section inside the same file.

@@ -1,4 +1,4 @@
-# SS-25 — Reduce top 5 sonarjs/cognitive-complexity offenders
+# SS-25 - Reduce top 5 sonarjs/cognitive-complexity offenders
 
 Slug: ss-25-complexity-top5
 Status: pending

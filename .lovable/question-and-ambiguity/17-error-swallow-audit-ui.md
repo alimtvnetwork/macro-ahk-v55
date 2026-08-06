@@ -1,4 +1,4 @@
-# 17 — Error-swallowing audit UI: data source & route
+# 17 - Error-swallowing audit UI: data source & route
 
 ## Context
 User asked: "Add a dedicated UI page to view the error-swallowing audit
@@ -27,7 +27,7 @@ No such audit currently exists in the repo:
   `vscode://file/<absPath>:<line>` and shows a relative-path label.
 - If the JSON is missing, render an empty-state explaining how to
   generate it (deferred script).
-- Pros: pure presentation work — matches the user's "UI page" wording
+- Pros: pure presentation work - matches the user's "UI page" wording
   and the "keep work in frontend/presentation" rule. Future-proof; the
   scanner can land later without UI churn.
 - Cons: page shows empty state until the audit script exists.
@@ -38,7 +38,7 @@ No such audit currently exists in the repo:
   presentation; violates the Suggestions/Planning convention.
 
 ## Recommendation
-**Option B.** The user explicitly asked for a "UI page" — that is
+**Option B.** The user explicitly asked for a "UI page" - that is
 presentation work. The scanner is a separate, larger workstream that
 should be tracked in `plan.md`, not bundled into a UI request. The page
 will consume a documented JSON contract and degrade gracefully to a

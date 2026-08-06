@@ -6,14 +6,14 @@ type: feature
 
 # Workspace move endpoint v2
 
-Updated: 2026-07-23. **Status: PENDING-VERIFY** — coded from a partial user-captured preflight; first live call must confirm verb + body.
+Updated: 2026-07-23. **Status: PENDING-VERIFY** - coded from a partial user-captured preflight; first live call must confirm verb + body.
 
 ## Endpoint
 
 ```
 PUT https://api.lovable.dev/workspaces/{targetWorkspaceId}/memberships/{currentUserId}
 Headers: Authorization: Bearer <jwt>, x-castle-request-token: <token>, Content-Type: application/json
-Body: {}      (assumed; may require workspace_id or role — verify)
+Body: {}      (assumed; may require workspace_id or role - verify)
 Credentials: include
 ```
 
@@ -39,7 +39,7 @@ Credentials: include
 - Do NOT resurrect `PUT /projects/{id}/move-to-workspace` as the primary move call. It stays in the registry only as a rollback lever for one release.
 - Do NOT remove the `x-castle-request-token` header. Server returns `403 castle_denied` without it.
 - Do NOT add retry beyond the single 401 auth-refresh (see `mem://constraints/no-retry-policy`).
-- Do NOT decode the JWT with `decodeJwtPayload()` from `auth-jwt-utils.ts` for user id extraction — that helper truncates `sub` to 30 chars. Use a dedicated non-truncating decoder.
+- Do NOT decode the JWT with `decodeJwtPayload()` from `auth-jwt-utils.ts` for user id extraction - that helper truncates `sub` to 30 chars. Use a dedicated non-truncating decoder.
 
 ## Verification checklist (first live call)
 

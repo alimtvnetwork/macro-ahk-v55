@@ -40,18 +40,18 @@ Ran ESLint with a scratch config (`/tmp/eslint-15.config.mjs`) that extends the 
 
 ## Cluster analysis
 
-1. `standalone-scripts/macro-controller/src/ui/*` — UI modals, dropdowns, and panels: ~180 offenders across 15 files. Refactor pattern = Shell + Wire + A11y + Teardown (SS-02 pattern 1).
-2. `src/background/recorder/**` — recorder UI mounts + async step executors + selector helpers: covers every file called out in `issues/open/10-*` (dropzone-overlay, hover-highlighter, http-request-step, live-dom-replay, recorder-toolbar, selector-*). Pattern = async pipeline (SS-02 pattern 2) + guard clauses (pattern 3).
-3. `src/background/recorder/step-library/**` — bundle import/export + group runner: 50+ offenders. Pattern = table dispatch (SS-02 pattern 5) + config-object params (pattern 4).
+1. `standalone-scripts/macro-controller/src/ui/*` - UI modals, dropdowns, and panels: ~180 offenders across 15 files. Refactor pattern = Shell + Wire + A11y + Teardown (SS-02 pattern 1).
+2. `src/background/recorder/**` - recorder UI mounts + async step executors + selector helpers: covers every file called out in `issues/open/10-*` (dropzone-overlay, hover-highlighter, http-request-step, live-dom-replay, recorder-toolbar, selector-*). Pattern = async pipeline (SS-02 pattern 2) + guard clauses (pattern 3).
+3. `src/background/recorder/step-library/**` - bundle import/export + group runner: 50+ offenders. Pattern = table dispatch (SS-02 pattern 5) + config-object params (pattern 4).
 4. `src/lib/sqlite-bundle.ts` and adjacent shared libs: 23 offenders. Pattern = extract per-statement helpers.
 5. Tests (`__tests__/`): ~400 offenders. Pattern = `arrange/act/assert` helper extraction (SS-05 point 5).
 
 ## Refactor sequencing (feeds Plan 30 Steps 6-9)
 
-- Step 6 (live-dom-replay) — covered in SS-03; hotspot rank 4-5 by cognitive complexity.
-- Step 7 (recorder toolbar + overlays) — SS-04; ~30 offenders across the three files.
-- Step 8 (http step + selectors + logging-handler test) — SS-05; ~40 offenders.
-- Step 9 (long tail) — the remaining 1.2k+ files clustered in `ui/*`, `step-library/*`, `sqlite-bundle.ts`, tests. Split into micro-PRs by folder to keep review surface small.
+- Step 6 (live-dom-replay) - covered in SS-03; hotspot rank 4-5 by cognitive complexity.
+- Step 7 (recorder toolbar + overlays) - SS-04; ~30 offenders across the three files.
+- Step 8 (http step + selectors + logging-handler test) - SS-05; ~40 offenders.
+- Step 9 (long tail) - the remaining 1.2k+ files clustered in `ui/*`, `step-library/*`, `sqlite-bundle.ts`, tests. Split into micro-PRs by folder to keep review surface small.
 
 ## Risk callouts
 
@@ -61,8 +61,8 @@ Ran ESLint with a scratch config (`/tmp/eslint-15.config.mjs`) that extends the 
 
 ## Artifacts
 
-- `/tmp/eslint-15.json` — raw ESLint JSON (not committed).
-- `.lovable/tmp/lint-15-inventory.txt` — human-readable per-file listing (not committed by policy; regenerate on demand).
+- `/tmp/eslint-15.json` - raw ESLint JSON (not committed).
+- `.lovable/tmp/lint-15-inventory.txt` - human-readable per-file listing (not committed by policy; regenerate on demand).
 - Scratch config: `/tmp/eslint-15.config.mjs`.
 
 ## Exit criteria

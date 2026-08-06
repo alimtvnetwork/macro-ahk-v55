@@ -1,4 +1,4 @@
-# React UI Unification — Migration Checklist
+# React UI Unification - Migration Checklist
 
 **Created**: 2026-03-15
 **Updated**: 2026-03-16
@@ -10,11 +10,11 @@
 ## Phase 1: Foundation ✅
 
 ### Step 1: PlatformAdapter Interface ✅
-- [x] Create `src/platform/platform-adapter.ts` — core interface (`sendMessage`, `storage`, `tabs`, `getExtensionUrl`)
-- [x] Create `src/platform/chrome-adapter.ts` — real `chrome.*` implementation with retry logic
-- [x] Create `src/platform/preview-adapter.ts` — mock implementation with in-memory storage + stub data
-- [x] Create `src/platform/index.ts` — factory with `getPlatform()` auto-detection
-- [x] Create `src/platform/chrome-api-types.ts` — ambient `chrome` namespace for preview build
+- [x] Create `src/platform/platform-adapter.ts` - core interface (`sendMessage`, `storage`, `tabs`, `getExtensionUrl`)
+- [x] Create `src/platform/chrome-adapter.ts` - real `chrome.*` implementation with retry logic
+- [x] Create `src/platform/preview-adapter.ts` - mock implementation with in-memory storage + stub data
+- [x] Create `src/platform/index.ts` - factory with `getPlatform()` auto-detection
+- [x] Create `src/platform/chrome-api-types.ts` - ambient `chrome` namespace for preview build
 - [x] Verify preview build passes (`tsc --noEmit`)
 
 ### Step 2: Move Shared Types to `src/shared/` ✅
@@ -38,11 +38,11 @@
 - [x] Create `src/styles/extension-theme.css` with Dark+ design tokens (HSL variables)
 - [x] Update `chrome-extension/tailwind.config.js` with semantic token mappings
 - [x] Refactor `src/popup/popup.css` to use token references (no raw hex)
-- [x] Create `src/options/options.css` — tokenized Dark+ stylesheet
+- [x] Create `src/options/options.css` - tokenized Dark+ stylesheet
 
 ### React Popup PoC ✅
-- [x] Create `src/popup/PopupApp.tsx` — React popup with header, status cards, health ping, project selector
-- [x] Create `src/popup/popup-entry.tsx` — React mount point
+- [x] Create `src/popup/PopupApp.tsx` - React popup with header, status cards, health ping, project selector
+- [x] Create `src/popup/popup-entry.tsx` - React mount point
 - [x] Uses `getPlatform().sendMessage()` for all data fetching
 
 ---
@@ -57,7 +57,7 @@
 - [x] Update `vite.config.extension.ts` entry to `src/background/index.ts`
 - [x] Simplify `manualChunks` to match `/src/background/` and `/src/shared/`
 - [x] Exclude `src/background/` from `tsconfig.app.json` (needs `@types/chrome`)
-- **Note**: `chrome-extension/vite.config.ts` manualChunks still works — catches both shim and canonical paths
+- **Note**: `chrome-extension/vite.config.ts` manualChunks still works - catches both shim and canonical paths
 
 ### Step 6: Move Content Scripts to `src/content-scripts/` ✅
 - [x] Move `chrome-extension/src/content-scripts/` → `src/content-scripts/`
@@ -77,7 +77,7 @@
 - [x] Wire into extension Vite config
 
 ### Step 8: Convert Options Page to React ✅
-- [x] Create `src/options/OptionsApp.tsx` — sidebar + section routing + top bar + footer
+- [x] Create `src/options/OptionsApp.tsx` - sidebar + section routing + top bar + footer
 - [x] Port all 4 sections: ProjectsSection, ScriptsLibrary, DiagnosticsPanel, AboutSection
 - [x] Port ProjectEditor with URL rules, scripts, cookies, variables editors
 - [x] Create Toast shared component
@@ -85,10 +85,10 @@
 - [x] Update `vite.config.extension.ts` to point options entry to React `src/options/options.html`
 
 ### Step 9: Delete Legacy Plain HTML/TS/CSS ✅
-- [x] Deleted `chrome-extension/src/popup/` — 13 files (popup.html, popup.ts, popup.css, popup-status.ts, popup-utils.ts, popup-actions.ts, popup-debug-panel.ts, popup-force-inject.ts, popup-injection-results.ts, popup-panel-reveal.ts, popup-scripts.ts, popup-sqlite-bundle.ts, popup-action-log.ts)
-- [x] Deleted `chrome-extension/src/options/` — 25 files (options.html, options.ts, options.css, and all options-*.ts modules)
+- [x] Deleted `chrome-extension/src/popup/` - 13 files (popup.html, popup.ts, popup.css, popup-status.ts, popup-utils.ts, popup-actions.ts, popup-debug-panel.ts, popup-force-inject.ts, popup-injection-results.ts, popup-panel-reveal.ts, popup-scripts.ts, popup-sqlite-bundle.ts, popup-action-log.ts)
+- [x] Deleted `chrome-extension/src/options/` - 25 files (options.html, options.ts, options.css, and all options-*.ts modules)
 - [x] Updated `chrome-extension/vite.config.ts` popup/options entries to point to React HTML files in `src/`
-- **Note**: Re-export shims in `chrome-extension/src/shared/` kept — still needed for background shim chain
+- **Note**: Re-export shims in `chrome-extension/src/shared/` kept - still needed for background shim chain
 
 ---
 
@@ -109,7 +109,7 @@
 ### Step 11: Migrate `src/lib/message-client.ts` ✅
 - [x] Replace custom chrome detection with `getPlatform().sendMessage()`
 - [x] Remove duplicate mock response data (now in `preview-adapter.ts`)
-- [x] All 10 consumer files unchanged — `sendMessage` signature preserved as thin wrapper
+- [x] All 10 consumer files unchanged - `sendMessage` signature preserved as thin wrapper
 
 ### Step 12: Update Documentation & Memory ✅
 - [x] Update `plan.md` with UI unification progress

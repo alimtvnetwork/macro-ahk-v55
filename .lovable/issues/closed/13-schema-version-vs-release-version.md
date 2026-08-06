@@ -20,8 +20,8 @@ Two compounding bugs:
 2. No safeguard in `scripts/compile-instruction.mjs` to detect/correct a polluted source `SchemaVersion` before emitting `dist/instruction.json` (canonical + camelCase compat).
 
 ## Fix
-1. **`scripts/bump-version.mjs`** — added word boundary: `/(\b[Vv]ersion:\s*\")[\d.]+(\")/ ` so only standalone `Version`/`version` fields are touched.
-2. **`scripts/compile-instruction.mjs`** — added `pinSchemaVersion()` + `loadCurrentSchemaVersion()` reading from `standalone-scripts/types/instruction/primitives/schema-version.json`. If source `SchemaVersion` matches the release `MAJOR.MINOR`, the compiler force-pins the emitted `SchemaVersion` to the current schema (`"1.0"`) while preserving `Version` as the release.
+1. **`scripts/bump-version.mjs`** - added word boundary: `/(\b[Vv]ersion:\s*\")[\d.]+(\")/ ` so only standalone `Version`/`version` fields are touched.
+2. **`scripts/compile-instruction.mjs`** - added `pinSchemaVersion()` + `loadCurrentSchemaVersion()` reading from `standalone-scripts/types/instruction/primitives/schema-version.json`. If source `SchemaVersion` matches the release `MAJOR.MINOR`, the compiler force-pins the emitted `SchemaVersion` to the current schema (`"1.0"`) while preserving `Version` as the release.
 3. **All instruction sources** synced to `Version: "2.242.0"` and `SchemaVersion: "1.0"` (7 files).
 
 ## Other Changes in This Loop
@@ -32,6 +32,6 @@ Two compounding bugs:
 - `readme.txt` left untouched (per Core: SP-1..SP-7 readme.txt prohibitions).
 
 ## Learning / Do-Not-Repeat
-- Never write a regex that touches `Version` without `\b` — it WILL hit `SchemaVersion`/`ApiVersion`/etc.
+- Never write a regex that touches `Version` without `\b` - it WILL hit `SchemaVersion`/`ApiVersion`/etc.
 - The compiler must defend the schema contract, not trust source files.
 - `SchemaVersion` = compile-time contract version (rarely changes); `Version` = release version (bumps every change set). They are independent fields.

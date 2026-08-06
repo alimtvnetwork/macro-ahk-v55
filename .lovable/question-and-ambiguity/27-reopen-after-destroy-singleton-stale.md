@@ -1,4 +1,4 @@
-# 27 — Re-open after destroy: stale MacroController singleton
+# 27 - Re-open after destroy: stale MacroController singleton
 
 ## Symptom
 After the user closes the extension panel (destroy) inside a Lovable project,
@@ -27,5 +27,5 @@ removing the DOM. `destroy()` already nulls `_instance` and resets
 
 ## Why not also tear down in `runIdempotentCheck`?
 Version mismatch path already forces a full re-bootstrap by removing the
-marker — the IIFE re-executes from scratch. Only the user-initiated destroy
+marker - the IIFE re-executes from scratch. Only the user-initiated destroy
 path was leaving the singleton behind.

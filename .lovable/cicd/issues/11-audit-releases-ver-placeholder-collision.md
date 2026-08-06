@@ -1,4 +1,4 @@
-# CI/CD Issue 11 — Audit Releases mangled `VERSION.txt` into `<tag>SION.txt`
+# CI/CD Issue 11 - Audit Releases mangled `VERSION.txt` into `<tag>SION.txt`
 
 ## Pipeline / Workflow
 
@@ -32,11 +32,11 @@ EXPECTED="${PAT//VER/$VER}"   # replaces EVERY occurrence of "VER"
 
 For the literal `VERSION.txt`, the inner substring `VER` also matched, so the
 expected filename became `${tag}SION.txt` (e.g. `v3.24.0SION.txt`). The asset
-was always present — only the audit's expected name was wrong.
+was always present - only the audit's expected name was wrong.
 
 ## Status
 
-✅ Resolved — 2026-05-26
+✅ Resolved - 2026-05-26
 
 ## Fix
 

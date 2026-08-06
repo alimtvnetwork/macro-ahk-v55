@@ -34,11 +34,11 @@ Background source files have moved from `chrome-extension/src/background/` to `s
 ## Pending Test Coverage (v1.17.0+)
 
 React UI components introduced in v1.17.0 do not yet have dedicated tests:
-- `src/options/OptionsApp.tsx` — sidebar navigation, section routing, Framer Motion transitions
-- `src/options/sections/ProjectsSection.tsx` — project CRUD, import/export
-- `src/options/sections/ProjectEditor.tsx` — form state, save logic, editor sub-components
-- `src/options/sections/DiagnosticsPanel.tsx` — auto-refresh, event log
-- `src/options/sections/ScriptsLibrary.tsx` — script management
-- `src/popup/PopupApp.tsx` — status cards, health ping, project selector
+- `src/options/OptionsApp.tsx` - sidebar navigation, section routing, Framer Motion transitions
+- `src/options/sections/ProjectsSection.tsx` - project CRUD, import/export
+- `src/options/sections/ProjectEditor.tsx` - form state, save logic, editor sub-components
+- `src/options/sections/DiagnosticsPanel.tsx` - auto-refresh, event log
+- `src/options/sections/ScriptsLibrary.tsx` - script management
+- `src/popup/PopupApp.tsx` - status cards, health ping, project selector
 
 These should be added as part of the React UI unification (S-021).

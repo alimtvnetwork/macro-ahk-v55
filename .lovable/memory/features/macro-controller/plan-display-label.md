@@ -3,14 +3,14 @@ name: plan-display-label
 description: Canonical formatter `formatPlanDisplayLabel(plan)` is the single source of truth for human-readable wire-plan labels (badge, hover card, Credit Totals modal, CSV export)
 type: feature
 ---
-# Plan display label — canonical formatter (v3.95.0+)
+# Plan display label - canonical formatter (v3.95.0+)
 
 `formatPlanDisplayLabel(plan)` in
 `standalone-scripts/macro-controller/src/credit-balance-update/plan-mapper.ts`
 is the **only** function allowed to translate a wire `plan` string into
 user-facing text. Every UI surface that renders a plan MUST delegate to
-it — do NOT reintroduce inline regexes, `toUpperCase()`, or `ws.plan ||
-'—'` patterns.
+it - do NOT reintroduce inline regexes, `toUpperCase()`, or `ws.plan ||
+'-'` patterns.
 
 ## Mapping
 
@@ -23,22 +23,22 @@ it — do NOT reintroduce inline regexes, `toUpperCase()`, or `ws.plan ||
 | `cancelled` / `canceled` | `Cancelled` |
 | `business`       | `Business`     |
 | `enterprise`     | `Enterprise`   |
-| empty / null     | `''` (caller picks fallback, typically `—`) |
+| empty / null     | `''` (caller picks fallback, typically `-`) |
 | unknown          | the raw token verbatim (so support spots new tiers) |
 
 ## Required call sites
 
-- `ws-list-renderer.ts → resolveTierBadgeLabel()` — workspace dropdown badge.
-- `ws-hover-card.ts → planChipHtml()` and `buildSubHeader()` — hover card.
-- `ui/credit-totals-modal.ts` — both the modal Plan cell and the CSV Plan
+- `ws-list-renderer.ts → resolveTierBadgeLabel()` - workspace dropdown badge.
+- `ws-hover-card.ts → planChipHtml()` and `buildSubHeader()` - hover card.
+- `ui/credit-totals-modal.ts` - both the modal Plan cell and the CSV Plan
   column (`generateCsv`).
 
 ## Forbidden patterns (regression markers)
 
-- `ws.plan.toUpperCase()` — always wrong for display.
-- `ws.plan || '—'` — bypasses the formatter; produces inconsistent labels.
+- `ws.plan.toUpperCase()` - always wrong for display.
+- `ws.plan || '-'` - bypasses the formatter; produces inconsistent labels.
 - Inline `/^ktlo_(\d+)$/` or `/^pro_(\d+)$/` regex anywhere outside
-  `plan-mapper.ts` — duplicate logic, will drift.
+  `plan-mapper.ts` - duplicate logic, will drift.
 
 ## Sort / filter exception
 

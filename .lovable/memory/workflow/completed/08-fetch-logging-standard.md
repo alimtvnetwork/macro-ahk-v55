@@ -8,7 +8,7 @@
 Overhauled all `fetch()` calls across both `macro-looping.js` and `combo.js` to follow a mandatory logging standard. Every API request now logs full diagnostic information before and after the call.
 
 ## Root Cause
-Debugging workspace detection failures (issues #04–#07) was severely hampered by vague logs that omitted URL, auth method, response status, and body content. The `resp.json()` call also crashed on empty 200 bodies.
+Debugging workspace detection failures (issues #04-#07) was severely hampered by vague logs that omitted URL, auth method, response status, and body content. The `resp.json()` call also crashed on empty 200 bodies.
 
 ## Changes
 
@@ -27,7 +27,7 @@ Debugging workspace detection failures (issues #04–#07) was severely hampered 
 - Error body (first 500 chars) on non-2xx responses
 
 ### Empty Body Handling
-- **Rule**: NEVER use `resp.json()` — always `resp.text()` + `JSON.parse()`
+- **Rule**: NEVER use `resp.json()` - always `resp.text()` + `JSON.parse()`
 - **Rationale**: `resp.json()` throws on empty bodies (HTTP 200/204 with no content)
 
 ## Files Changed

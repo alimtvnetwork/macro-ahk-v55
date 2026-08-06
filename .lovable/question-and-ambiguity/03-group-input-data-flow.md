@@ -1,4 +1,4 @@
-# 03 — Import flow for per-group JSON input data
+# 03 - Import flow for per-group JSON input data
 
 ## Task
 > Add an import flow to let me paste or upload JSON input data and
@@ -19,8 +19,8 @@ Open points:
    - (c) Per-run: ephemeral, never persisted.
 
 2. **Persistence**
-   - Add a new `StepGroupInputs` table in sql.js — invasive schema change.
-   - Use a sibling `localStorage` namespace keyed by `StepGroupId` —
+   - Add a new `StepGroupInputs` table in sql.js - invasive schema change.
+   - Use a sibling `localStorage` namespace keyed by `StepGroupId` -
      cheap, preview-friendly, mirrors how the panel persists today.
 
 3. **Application semantics**
@@ -33,10 +33,10 @@ Open points:
 - **Scope (a)**: Per-group. Matches the user's wording "the selected
   group" exactly.
 - **Persistence**: Sibling `localStorage` bag at
-  `marco.step-library.inputs.v1` — `Record<StepGroupId, JsonObject>`.
+  `marco.step-library.inputs.v1` - `Record<StepGroupId, JsonObject>`.
   Keeps the schema migration out of scope; the runner can pick it up
   via a context accessor when wired.
-- **Application semantics**: Three sources accepted in the dialog —
+- **Application semantics**: Three sources accepted in the dialog -
   paste textarea, file upload (`.json`, ≤ 1 MB), and a "Load from
   current value" prefill. Saved JSON object becomes the group's input
   bag. Cleared via an explicit "Clear" button.
@@ -54,4 +54,4 @@ Open points:
 - Reuses semantic tokens; no new colors.
 - Future runner wiring: when the executor reads `GroupPath`, it can
   resolve the bag for `rootGroupId` from this same storage key. Not
-  done here — out of scope per "presentation only" rule for UI tasks.
+  done here - out of scope per "presentation only" rule for UI tasks.

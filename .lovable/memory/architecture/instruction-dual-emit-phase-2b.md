@@ -8,14 +8,14 @@ type: feature
 
 `scripts/compile-instruction.mjs` emits **two physical files** per project on every compile:
 
-- `dist/instruction.json`        — pure PascalCase (canonical, what every Phase 2a-migrated reader consumes).
-- `dist/instruction.compat.json` — pure camelCase (transitional snapshot, recursively converted from the canonical tree).
+- `dist/instruction.json`        - pure PascalCase (canonical, what every Phase 2a-migrated reader consumes).
+- `dist/instruction.compat.json` - pure camelCase (transitional snapshot, recursively converted from the canonical tree).
 
 Both files are required by `scripts/check-standalone-dist.mjs` for all four shipping projects (`marco-sdk`, `macro-controller`, `xpath`, `payment-banner-hider`).
 
 ## Canonical key set
 
-The PascalCase key set is defined in `standalone-scripts/types/instruction/**/*.ts` and the full mapping table is documented in `mem://standards/pascalcase-json-keys`. Do not duplicate it here — that file is the authoritative source.
+The PascalCase key set is defined in `standalone-scripts/types/instruction/**/*.ts` and the full mapping table is documented in `mem://standards/pascalcase-json-keys`. Do not duplicate it here - that file is the authoritative source.
 
 ## Last camelCase reader (the only thing keeping `compat.json` alive)
 
@@ -25,19 +25,19 @@ The vite `copyProjectScripts` plugin in `vite.config.extension.ts` reads `instru
 2. Delete the `instruction.compat.json` emit from `scripts/compile-instruction.mjs`.
 3. Remove `instruction.compat.json` from the required-files lists in `scripts/check-standalone-dist.mjs`.
 
-After Phase 2c the allowlist contains only build-tooling self-references (compile-instruction, check-standalone-dist, generate-seed-manifest, the migration checker) — none of which actually consume camelCase keys.
+After Phase 2c the allowlist contains only build-tooling self-references (compile-instruction, check-standalone-dist, generate-seed-manifest, the migration checker) - none of which actually consume camelCase keys.
 
 ## Collision guard
 
-If two source keys map to the same camelCase name (e.g. `Foo` + `foo` on the same object), the compiler throws with the JSON path, both keys, and a rename hint. Do not silently dedupe — fix the source `instruction.ts`.
+If two source keys map to the same camelCase name (e.g. `Foo` + `foo` on the same object), the compiler throws with the JSON path, both keys, and a rename hint. Do not silently dedupe - fix the source `instruction.ts`.
 
 ## CI enforcement
 
 `scripts/check-pascalcase-instruction-migration.mjs` runs as the `pascalcase-instruction-migration` preflight job in `.github/workflows/ci.yml` (also listed in `build-extension`'s `needs:`). Three checks, one pass, no deps:
 
-- **CHECK A** — every `standalone-scripts/<name>/src/instruction.ts` contains only PascalCase object-literal keys. Allowlist: `config`, `theme` for free-form `ConfigSeedIds` binding names.
-- **CHECK B** — `instruction.compat.json` is read only from the documented allowlist (`vite.config.extension.ts` + the dual-emit pipeline scripts).
-- **CHECK C** — every file that reads canonical `instruction.json` uses PascalCase property access on instruction-tree receivers (`instruction`, `instructionManifest`, `instructionJson`, `projectInstruction`, …). Bare `manifest` is intentionally **excluded** — it collides with the user-facing `ProjectManifest` export schema (deliberately camelCase per the third-party-boundary exemption).
+- **CHECK A** - every `standalone-scripts/<name>/src/instruction.ts` contains only PascalCase object-literal keys. Allowlist: `config`, `theme` for free-form `ConfigSeedIds` binding names.
+- **CHECK B** - `instruction.compat.json` is read only from the documented allowlist (`vite.config.extension.ts` + the dual-emit pipeline scripts).
+- **CHECK C** - every file that reads canonical `instruction.json` uses PascalCase property access on instruction-tree receivers (`instruction`, `instructionManifest`, `instructionJson`, `projectInstruction`, …). Bare `manifest` is intentionally **excluded** - it collides with the user-facing `ProjectManifest` export schema (deliberately camelCase per the third-party-boundary exemption).
 
 All violations emit `::error file=…,line=…::` annotations so they show up inline on PR diffs.
 

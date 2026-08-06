@@ -1,4 +1,4 @@
-# Project Overview — Marco / Macro Controller Chrome Extension
+# Project Overview - Marco / Macro Controller Chrome Extension
 
 **Owner:** Riseup Asia LLC
 **Current version:** v2.166.0
@@ -19,20 +19,20 @@ A Chromium-only browser-automation extension built for the Marco platform. Injec
 | `standalone-scripts/marco-sdk/` | Frozen `window.marco` SDK + `Projects.RiseupMacroSdk` self-namespace |
 | `standalone-scripts/macro-controller/` | Workspace UI controller injected into matched tabs |
 | `standalone-scripts/xpath/` | XPath recorder/picker |
-| `src/` (React) | Preview UI (popup + options) — dark-only theme |
+| `src/` (React) | Preview UI (popup + options) - dark-only theme |
 | `spec/` | Numbered specifications, organised 00-standards … 17-app-issues |
 | `.lovable/` | Memory, plan, suggestions, prompts, issues |
 
 ## Hard constraints
 
 - **No Supabase**, anywhere. Storage = sql.js + OPFS + chrome.storage.local.
-- **Dark-only theme** — no light mode, no toggle.
-- **No retry / no exponential backoff** — sequential fail-fast only.
+- **Dark-only theme** - no light mode, no toggle.
+- **No retry / no exponential backoff** - sequential fail-fast only.
 - **Read-only folders:** `skipped/`, `.release/`.
-- **No CI notifications** — never email/notify on build events.
+- **No CI notifications** - never email/notify on build events.
 - **Zero ESLint warnings/errors** project-wide.
 - **No `unknown`** outside `CaughtError`; defensive `?.` / `??` everywhere.
-- **Unified versioning** — `manifest.json`, `src/shared/constants.ts`, every standalone-script `instruction.ts` and `shared-state.ts` must agree.
+- **Unified versioning** - `manifest.json`, `src/shared/constants.ts`, every standalone-script `instruction.ts` and `shared-state.ts` must agree.
 
 ## Authoritative files
 

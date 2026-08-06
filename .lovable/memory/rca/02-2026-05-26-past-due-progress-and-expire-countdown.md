@@ -1,4 +1,4 @@
-# RCA-02 — `past_due` progress bar broken & expire countdown missing
+# RCA-02 - `past_due` progress bar broken & expire countdown missing
 
 **Date:** 2026-05-26
 **Version target:** v3.29.0
@@ -14,7 +14,7 @@ today still has 176.8 spendable credits (200 rollover − 43.2 used, full 20
 billing, 0 daily). The dropdown row shows the badge/pill correctly per the
 Issue 117 fix path BUT (a) the segmented credit progress bar is visually
 empty or wildly off, and (b) the label still says "Refill 31d" which is
-misleading — past-due means refill is uncertain; what the user needs to see
+misleading - past-due means refill is uncertain; what the user needs to see
 is **how long they have been past-due**, since grants will be lost the day
 the subscription is canceled or grants expire.
 
@@ -26,7 +26,7 @@ when in `pro_0` mode, producing per-segment percentages that don't share a
 denominator. When the renderer stacks them in a fixed-width bar the daily
 segment (0 / 5) renders nothing, the rollover segment (156.8 / 200) takes
 ~78% of the bar, and the billing segment (20 / 20) takes 100% of the
-remainder — which **visually overflows** the bar so the layout clamps to
+remainder - which **visually overflows** the bar so the layout clamps to
 empty in flex containers. The bar must use a single denominator (`total_granted`
 = 225) for all three segments + a "used" remainder segment.
 
@@ -66,16 +66,16 @@ primary axis and treat credit numbers as orthogonal display data.
 - Renderer: shared-denominator progress bar + `Expire` / `Passed Nd` pair.
 - Filter: `marco-ws-filter-expiring` chip with `daysPassed × available` sort.
 - Hover card: Past-due-since + Grants-live-until + at-risk amount lines.
-- Tests: ≥16 new (see spec §7 task 10–11).
+- Tests: ≥16 new (see spec §7 task 10-11).
 - Invariants: 5 new (see spec §8).
 
 ## 5. Cross-mistakes to clean while here
 
 - `workspace-status.ts` comment at line ~158 ("past_due → about-to-expire")
-  contradicts the v3.24.0 code change and Issue 117 — rewrite.
+  contradicts the v3.24.0 code change and Issue 117 - rewrite.
 - `status-explainer.ts` debug ladder still emits "About To Refill" for
-  past_due — rewrite to emit "Past-Due Expiring (Nd passed)".
-- Memory `pro-zero-credit-balance` references v3.11.1 only — append a
+  past_due - rewrite to emit "Past-Due Expiring (Nd passed)".
+- Memory `pro-zero-credit-balance` references v3.11.1 only - append a
   v3.29.0 note pointing to this RCA.
 
 ## 6. Verification plan

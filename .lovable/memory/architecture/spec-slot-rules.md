@@ -6,7 +6,7 @@ type: constraint
 
 ## Slot allocation (authoritative as of 2026-04-22)
 
-- **01–20: Foundations only.** Universal, project-agnostic specs. **No app-specific content** in this range. Vacant slots (currently 13, 15, 16, 18, 19, 20) are reserved for future foundations.
+- **01-20: Foundations only.** Universal, project-agnostic specs. **No app-specific content** in this range. Vacant slots (currently 13, 15, 16, 18, 19, 20) are reserved for future foundations.
 - **21+: App content.** App-specific specs.
   - `spec/21-app/` remains the **app wrapper** (NOT renamed).
   - Inside it, the chrome-extension feature is renamed `02-features/chrome-extension/` → `01-chrome-extension/` (promoted to primary feature within the wrapper). Other features (`devtools-and-injection`, `misc-features`) stay under `02-features/`.
@@ -16,7 +16,7 @@ type: constraint
 
 ## Why these rules
 
-- Macro-controller is the largest spec set after chrome-extension (32 files, multiple subfolders) and is referenced by many other specs — top-level placement makes it discoverable.
+- Macro-controller is the largest spec set after chrome-extension (32 files, multiple subfolders) and is referenced by many other specs - top-level placement makes it discoverable.
 - Chrome-extension stays inside `21-app/` because it's the app shell itself; promoting it to slot 21 directly was rejected to keep `21-app/` as a stable wrapper.
 - Strict 01-20 foundations rule prevents app content from polluting universal slots.
 

@@ -1,17 +1,17 @@
-# CI/CD Issues — Index
+# CI/CD Issues - Index
 
 > Single summary of every CI/CD failure (build, lint, typecheck, test runner, GitHub Actions, release pipeline). Per-issue files live in `.lovable/cicd-issues/XX-name.md`.
 >
-> **⚡ Fast triage:** read [`cicd-profile.md`](./cicd-profile.md) FIRST — 30-second decision tree for "CI not running" / "build broken" / "release didn't fire". Avoids scope-creep edits on repo-side problems.
+> **⚡ Fast triage:** read [`cicd-profile.md`](./cicd-profile.md) FIRST - 30-second decision tree for "CI not running" / "build broken" / "release didn't fire". Avoids scope-creep edits on repo-side problems.
 >
-> **Rule:** check this index before opening a new file — do not duplicate.
+> **Rule:** check this index before opening a new file - do not duplicate.
 > **Lifecycle:** CI/CD issues stay in this folder even after resolution (they recur). Status flips to `✅ Resolved`. Do **not** move to `.lovable/solved-issues/`.
 
 ---
 
 ## Active
 
-_None — all known CI/CD issues resolved._
+_None - all known CI/CD issues resolved._
 
 ## Resolved
 
@@ -34,7 +34,7 @@ _None — all known CI/CD issues resolved._
 
 ## Referenced specs
 
-- [`02 — Chrome Extension CI/CD`](../spec/2026-spec/02-ci-cd-spec-for-chrome-extensions/readme.md) — generic Manifest V3 CI/CD, release artifact, installer, probing, and no-committed-ZIP standard.
+- [`02 - Chrome Extension CI/CD`](../spec/2026-spec/02-ci-cd-spec-for-chrome-extensions/readme.md) - generic Manifest V3 CI/CD, release artifact, installer, probing, and no-committed-ZIP standard.
 
 
 ---

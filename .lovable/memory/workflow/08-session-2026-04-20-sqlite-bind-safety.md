@@ -1,4 +1,4 @@
-# Session 2026-04-20 — SQLite bind safety + SDK self-test round-trip (v2.162.0 → v2.166.0)
+# Session 2026-04-20 - SQLite bind safety + SDK self-test round-trip (v2.162.0 → v2.166.0)
 
 ## Versions shipped
 
@@ -13,8 +13,8 @@
 ## What changed
 
 ### New files
-- `src/background/handlers/handler-guards.ts` — single source of truth for input validation + bind coercion.
-- `src/background/sqlite-bind-safety.ts` — `assertBindable(sql, params)` + `BindError` + `wrapDatabaseWithBindSafety(db)` Proxy.
+- `src/background/handlers/handler-guards.ts` - single source of truth for input validation + bind coercion.
+- `src/background/sqlite-bind-safety.ts` - `assertBindable(sql, params)` + `BindError` + `wrapDatabaseWithBindSafety(db)` Proxy.
 
 ### Refactored handlers (handler-guards adopted)
 - `src/background/handlers/kv-handler.ts`
@@ -26,13 +26,13 @@
 - `src/background/handlers/error-handler.ts`
 
 ### DB managers (Proxy wired)
-- `src/background/db-manager.ts` — `buildManager()` returns wrapped `logsDb` + `errorsDb`.
-- `src/background/project-db-manager.ts` — `getProjectDb()` returns a wrapped instance.
+- `src/background/db-manager.ts` - `buildManager()` returns wrapped `logsDb` + `errorsDb`.
+- `src/background/project-db-manager.ts` - `getProjectDb()` returns a wrapped instance.
 
 ### SDK
-- `standalone-scripts/marco-sdk/src/kv.ts` — always sends `projectId`.
-- `standalone-scripts/marco-sdk/src/self-test.ts` — added async `runKvRoundTrip()` (set → get → verify-equals → delete → verify-cleared); split helpers to satisfy zero-warning lint.
-- `standalone-scripts/marco-sdk/src/index.ts` — version literals updated.
+- `standalone-scripts/marco-sdk/src/kv.ts` - always sends `projectId`.
+- `standalone-scripts/marco-sdk/src/self-test.ts` - added async `runKvRoundTrip()` (set → get → verify-equals → delete → verify-cleared); split helpers to satisfy zero-warning lint.
+- `standalone-scripts/marco-sdk/src/index.ts` - version literals updated.
 
 ### Version-bump fan-out (every release)
 - `chrome-extension/manifest.json` (`version` + `version_name`)
@@ -54,8 +54,8 @@
 On every matched page load, DevTools shows two PASS lines from the SDK self-test:
 
 ```
-[sdkSelfTest] PASS — Projects.RiseupMacroSdk v2.166.0 (5 checks)
-[sdkSelfTest:kv-roundtrip] PASS — set/get/delete/verify round-trip OK (4 checks)
+[sdkSelfTest] PASS - Projects.RiseupMacroSdk v2.166.0 (5 checks)
+[sdkSelfTest:kv-roundtrip] PASS - set/get/delete/verify round-trip OK (4 checks)
 ```
 
 If a SQLite handler ever binds `undefined` again, the Errors panel will show:
@@ -68,8 +68,8 @@ via bindOpt() or supply a fallback via bindReq() before binding. SQL: ...
 ## What's next (handed to next AI session)
 
 1. Manual reload of the extension to confirm both PASS lines + clean Errors panel (suggested follow-up actions in `.lovable/suggestions.md`).
-2. Audit the remaining 8 SQLite-backed handlers (`prompt`, `library`, `settings`, `project`, `project-config`, `script-config`, `updater`, `run-stats`) for `handler-guards` adoption — listed in `suggestions.md`.
-3. Add vitest coverage for `assertBindable` + `BindError` and for the handler-guards regression suite — listed in `suggestions.md`.
+2. Audit the remaining 8 SQLite-backed handlers (`prompt`, `library`, `settings`, `project`, `project-config`, `script-config`, `updater`, `run-stats`) for `handler-guards` adoption - listed in `suggestions.md`.
+3. Add vitest coverage for `assertBindable` + `BindError` and for the handler-guards regression suite - listed in `suggestions.md`.
 4. Optionally extend the self-test round-trip to cover files and grouped-kv.
 
 ## Cross-references

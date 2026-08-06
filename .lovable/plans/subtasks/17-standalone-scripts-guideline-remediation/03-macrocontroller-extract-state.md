@@ -5,13 +5,13 @@ Created: 2026-07-17
 Parent: 17-standalone-scripts-guideline-remediation
 ---
 
-# SS-03 — Extract controller state (P0-09 cluster 1)
+# SS-03 - Extract controller state (P0-09 cluster 1)
 
 Root cause: `core/MacroController.ts` is imported by 18+ leaf modules because it exports both the class AND the enums/ids/state shape those leaves need. Any leaf that imports one gets the whole class + its dependency chain, forming the cycles.
 
 ## Extraction
 
-New file: `standalone-scripts/macro-controller/src/core/controller-state.ts`. Pure value module — no class, no side effects, no imports from `ui/**` or `db/**`.
+New file: `standalone-scripts/macro-controller/src/core/controller-state.ts`. Pure value module - no class, no side effects, no imports from `ui/**` or `db/**`.
 
 Move OUT of `MacroController.ts`:
 

@@ -3,11 +3,11 @@
 Use this skeleton when the user types `next` (or `next N`).
 
 ## Required shape
-1. **Reasoning (1–2 sentences)** — why these tasks are next.
-2. **Time estimate** — rough minutes per task or batch total.
-3. **Execute** — actually do the work in the same turn (never just announce).
-4. **Files changed** — bullet list.
-5. **Remaining items** — flat numbered list `1. 2. 3. ...` with stable numbering.
+1. **Reasoning (1-2 sentences)** - why these tasks are next.
+2. **Time estimate** - rough minutes per task or batch total.
+3. **Execute** - actually do the work in the same turn (never just announce).
+4. **Files changed** - bullet list.
+5. **Remaining items** - flat numbered list `1. 2. 3. ...` with stable numbering.
 
 ## Hard rules
 - Always DO the next task(s); never stage-only.

@@ -20,11 +20,11 @@ Stored on `StoredProject.cookies[]`. The legacy `cookieRules[]` (name/domain/mat
 
 The per-project namespace (`RiseupAsiaMacroExt.Projects.<CodeName>.cookies`) provides:
 
-- `cookies.getByRole("session")` — role-based lookup (recommended)
-- `cookies.getSessionToken()` — shortcut for session role
-- `cookies.get("cookieName")` — literal cookie name lookup (falls back if no role match)
-- `cookies.getAll()` — all cookies via extension bridge
-- `cookies.bindings` — frozen array of declared bindings
+- `cookies.getByRole("session")` - role-based lookup (recommended)
+- `cookies.getSessionToken()` - shortcut for session role
+- `cookies.get("cookieName")` - literal cookie name lookup (falls back if no role match)
+- `cookies.getAll()` - all cookies via extension bridge
+- `cookies.bindings` - frozen array of declared bindings
 
 Role-based lookup resolves the `role` field to find the matching `cookieName`, then delegates to `window.marco.cookies.get(cookieName)`.
 

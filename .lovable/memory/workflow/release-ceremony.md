@@ -11,7 +11,7 @@ Triggered by the user saying `release`, `bump version`, `major bump`, `major rel
 ## Required flow
 
 1. Read the current release version from the latest `v*` git tag
-   (`git describe --tags --abbrev=0`). NEVER read `version.json` for this —
+   (`git describe --tags --abbrev=0`). NEVER read `version.json` for this -
    it is a build-time artifact regenerated from the tag by
    `scripts/write-version-from-tag.mjs`.
 2. Compute the requested bump. MINOR: `X.Y.Z` to `X.(Y+1).0`. MAJOR: `X.Y.Z`

@@ -26,7 +26,7 @@ On initial injection, workspace detection can fail silently (Tier 1 API miss + T
 
 ## Related Docs
 
-- `standalone-scripts/macro-controller/src/startup.ts` — implementation
-- `/spec/22-app-issues/25-startup-workspace-name-missing.md` — Startup workspace name missing RCA
-- `/spec/22-app-issues/check-button/` — Check button issues and protocol
-- `/spec/21-app/02-features/chrome-extension/60-check-button-spec.md` — Check button spec
+- `standalone-scripts/macro-controller/src/startup.ts` - implementation
+- `/spec/22-app-issues/25-startup-workspace-name-missing.md` - Startup workspace name missing RCA
+- `/spec/22-app-issues/check-button/` - Check button issues and protocol
+- `/spec/21-app/02-features/chrome-extension/60-check-button-spec.md` - Check button spec

@@ -11,10 +11,10 @@ A `⚙️` icon in the panel header opens a floating modal for editing two
 
 | Key                              | Used by                                         |
 |----------------------------------|-------------------------------------------------|
-| `expiryGracePeriodDays`          | `workspace-status.ts` — Expired→FullyExpired escalation |
-| `refillWarningThresholdDays`     | `workspace-status.ts` — About-To-Refill pill window     |
+| `expiryGracePeriodDays`          | `workspace-status.ts` - Expired→FullyExpired escalation |
+| `refillWarningThresholdDays`     | `workspace-status.ts` - About-To-Refill pill window     |
 
-## Persistence model — chrome.storage.local override
+## Persistence model - chrome.storage.local override
 
 Per user choice. Storage key: `marco_settings_overrides_v1`.
 

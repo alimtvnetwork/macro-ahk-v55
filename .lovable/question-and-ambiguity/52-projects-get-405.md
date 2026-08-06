@@ -1,4 +1,4 @@
-# Q52 — Projects modal: how to resolve HTTP 405 on `GET /projects/{projectId}`
+# Q52 - Projects modal: how to resolve HTTP 405 on `GET /projects/{projectId}`
 
 **Context**: macro-controller Projects modal → Export CSV. The per-project enrichment pass calls `marco.api.projects.get(projectId)` which is registered as `GET /projects/{projectId}` in `standalone-scripts/marco-sdk/src/api-registry.ts:165`. The server returns **HTTP 405 Method Not Allowed**, so `gitRepo` / `gitBranch` / `lastCommunication` columns end up empty and the activity log fills with errors.
 

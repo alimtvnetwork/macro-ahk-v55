@@ -1,9 +1,9 @@
-# 54 — Logo prompt file numbering
+# 54 - Logo prompt file numbering
 
 **Date:** 2026-05-22
 **Context:** User spec for `Logo Creation Instruction` said save to
 `.lovable/prompts/02-logo-create.md`, but slot `02` is already occupied
-by `02-write-memory.md` (and slots 01–05 are all taken).
+by `02-write-memory.md` (and slots 01-05 are all taken).
 
 ## Options
 
@@ -15,7 +15,7 @@ by `02-write-memory.md` (and slots 01–05 are all taken).
 
 ## Decision
 
-**Chose A** — saved as `.lovable/prompts/06-logo-create.md` and
+**Chose A** - saved as `.lovable/prompts/06-logo-create.md` and
 updated the index. Noted the renumber in the file's Actionable Items §8a.
 The "02" in the user's spec appears to be illustrative of the sequence
 pattern (01, 02, 03...) for the `Projects/` folder, not a strict slot
@@ -23,4 +23,4 @@ assignment in `.lovable/prompts/`.
 
 ## Reversal cost
 
-Trivial — `git mv` to renumber if user objects.
+Trivial - `git mv` to renumber if user objects.

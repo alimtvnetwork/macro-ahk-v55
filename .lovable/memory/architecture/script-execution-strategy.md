@@ -16,7 +16,7 @@ When MAIN world injection fails (CSP block or Osano-style interference):
 - Uses the `userScripts` permission and `chrome.userScripts.execute()` API
 - Executes raw code strings in a dedicated `MARCO_FALLBACK` world with its own CSP
 - World configured once during service worker boot via `configureUserScriptWorld()`
-- Fully MV3-compliant — no eval, no unsafe-eval in extension CSP
+- Fully MV3-compliant - no eval, no unsafe-eval in extension CSP
 
 ### 2. Blob URL injection (Chrome < 135, legacy fallback)
 - Creates a `Blob([code])`, generates `URL.createObjectURL`, sets as `script.src`

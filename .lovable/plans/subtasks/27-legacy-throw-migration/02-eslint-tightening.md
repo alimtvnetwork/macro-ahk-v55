@@ -1,4 +1,4 @@
-# SS-02 — ESLint tightening for `no-restricted-syntax`
+# SS-02 - ESLint tightening for `no-restricted-syntax`
 
 Slug: eslint-tightening
 Parent: 27-legacy-throw-migration
@@ -7,7 +7,7 @@ Created: 2026-07-19
 
 ## Purpose
 
-Once every PROD file is migrated (Plan 27 steps 4–13), the `no-restricted-syntax` rule in `eslint.config.js` must widen from the current per-directory allowlist to a repo-wide ban with a small, explicitly documented exemption glob.
+Once every PROD file is migrated (Plan 27 steps 4-13), the `no-restricted-syntax` rule in `eslint.config.js` must widen from the current per-directory allowlist to a repo-wide ban with a small, explicitly documented exemption glob.
 
 ## Current state (as of v4.265.0)
 

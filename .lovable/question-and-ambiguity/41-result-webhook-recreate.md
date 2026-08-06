@@ -1,13 +1,13 @@
-# 41 — Recreate missing `result-webhook.ts`
+# 41 - Recreate missing `result-webhook.ts`
 
 **Date (KL):** 2026-04-29
-**Trigger:** Build failed via `check-step-library-files.mjs` — `src/background/recorder/step-library/result-webhook.ts` missing (ENOENT). No git history for the file (worktree-only loss).
+**Trigger:** Build failed via `check-step-library-files.mjs` - `src/background/recorder/step-library/result-webhook.ts` missing (ENOENT). No git history for the file (worktree-only loss).
 
 ## Decision (no user choice required)
 
 Reconstructed the module from already-committed signals:
 
-1. **Importer signatures** — exact named imports/types pulled from
+1. **Importer signatures** - exact named imports/types pulled from
    `BatchRunDialog.tsx`, `WebhookSettingsDialog.tsx`, `ReproBuildErrorPanel.tsx`,
    and `__tests__/webhook-fixtures.ts` enumerated every required public symbol.
 2. **Project-memory invariants** drove the implementation choices:
@@ -31,7 +31,7 @@ Reconstructed the module from already-committed signals:
   `clearDeliveryLog`, `repairDeliveryLog` (returns `{ Removed, Kept, Errors }`).
 - Migration: `migrateWebhookDeliveryResult(input: unknown): WebhookDeliveryResult`.
 - Payload builders: `buildGroupRunPayload`, `buildBatchCompletePayload`.
-- Dispatch: `dispatchWebhook(event, payload, options?)` — single-attempt fetch
+- Dispatch: `dispatchWebhook(event, payload, options?)` - single-attempt fetch
   with `AbortController` timeout from `cfg.TimeoutMs`; appends one entry to the
   rolling 20-entry log; returns the recorded result.
 

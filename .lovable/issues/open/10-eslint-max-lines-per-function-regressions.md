@@ -33,7 +33,7 @@ pnpm run lint
 - src/background/recorder/selector-comparison.ts
 - src/background/recorder/selector-history.ts
 - src/background/recorder/selector-tester.ts
-- (plus additional files beyond line 37 of the uploaded lint report — to be enumerated in Plan 30 Step 1)
+- (plus additional files beyond line 37 of the uploaded lint report - to be enumerated in Plan 30 Step 1)
 
 ## Status
 

@@ -5,13 +5,13 @@
 
 ## Completed Items
 
-### Immediate Workstream (all 6 items — verified 2026-04-05)
-1. Swagger UI / API Explorer — sidebar accessible
-2. Storage Browser — Session, Cookies, IndexedDB with 4 category cards
-3. Prompt Seeding — version-aware reseed logic
-4. Overflow Menus — OptionsSidebar + ProjectDetailView
-5. Project Files & Storage — file tree, editor, drag-drop
-6. ZIP Export/Import — merge and replace-all modes
+### Immediate Workstream (all 6 items - verified 2026-04-05)
+1. Swagger UI / API Explorer - sidebar accessible
+2. Storage Browser - Session, Cookies, IndexedDB with 4 category cards
+3. Prompt Seeding - version-aware reseed logic
+4. Overflow Menus - OptionsSidebar + ProjectDetailView
+5. Project Files & Storage - file tree, editor, drag-drop
+6. ZIP Export/Import - merge and replace-all modes
 
 ### UI Polish (Tasks 4.1, 4.2)
 - Task 4.1: Tailwind CSS hover micro-interactions on interactive elements

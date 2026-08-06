@@ -36,7 +36,7 @@ Files most likely touched: `standalone-scripts/macro-controller/src/ui/plan-task
 11. Add light-theme values for every new token so the strip frame, dropdown, library, editor, and popovers render readable in light mode; verify against the user-supplied light-mode screenshot when it arrives.
 12. Convert the Repeat row to the same "inline ≤ 50, overflow under `More ▾`" pattern already used by Plan; share the popover component (`plan-more-popover.ts`) via a role prop.
 13. Add a "Reset to default" action inside `PromptEditor` that restores the seeded content for the current role/slug and re-runs the drift guard; guarded by a confirm dialog.
-14. Update `seed-plan-next.ts` so the seeded default carries the required-tokens list as data (not a runtime regex) and `PromptEditor` reads from that manifest — single source of truth.
+14. Update `seed-plan-next.ts` so the seeded default carries the required-tokens list as data (not a runtime regex) and `PromptEditor` reads from that manifest - single source of truth.
 15. Add integration tests: (a) Plan chip → editor open → save with token removed → rejected; (b) Next chip → add new → appears in dropdown; (c) Import invalid JSON → schema errors shown with pointer; (d) AI guideline markdown contains every required token.
 16. Add a Playwright E2E `tests/e2e/prompt-chip-editor.spec.ts` that clicks the Plan gear, edits the body, saves, closes the strip, reopens, and verifies persistence via the DB bridge.
 17. Add a Playwright E2E for light-theme readability: navigate with `?theme=light`, screenshot strip + dropdown + library + editor, run pixelmatch against dark baseline to confirm contrast token switch (no visual regressions in dark).

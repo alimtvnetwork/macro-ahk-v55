@@ -1,6 +1,6 @@
 ---
 name: Sibling-discovery configuration
-description: scripts/install.config.sh + decide_sibling_discovery() — repo-level default for §4 sibling-repo discovery, with strict-mode lockout enforced unconditionally
+description: scripts/install.config.sh + decide_sibling_discovery() - repo-level default for §4 sibling-repo discovery, with strict-mode lockout enforced unconditionally
 type: feature
 ---
 
@@ -13,16 +13,16 @@ user or config tries to enable it.
 
 ## Files
 
-- `scripts/install.config.sh` — sourced by `install.sh` on startup if present.
+- `scripts/install.config.sh` - sourced by `install.sh` on startup if present.
   Holds the project-level defaults: `SIBLING_DISCOVERY_ENABLED`,
   `SIBLING_NAME_PATTERN`, `SIBLING_PROBE_DEPTH`, `SIBLING_PARALLELISM`,
   `SIBLING_PROBE_TIMEOUT_SECS`. For this repo:
   pattern `macro-ahk-v{N}`, depth 20, parallelism 8, timeout 5 s,
   enabled = 0 (off by default per spec §4).
-- `scripts/install.sh` — built-in fallbacks (matching the config) so the
+- `scripts/install.sh` - built-in fallbacks (matching the config) so the
   installer still works when downloaded standalone via curl with no config
   file beside it.
-- `decide_sibling_discovery()` in `install.sh` — single source of truth
+- `decide_sibling_discovery()` in `install.sh` - single source of truth
   for whether discovery runs, called once in `main()` after mode is known.
 
 ## Priority order (lowest → highest)
@@ -32,7 +32,7 @@ user or config tries to enable it.
 3. Environment variables of the same names.
 4. `--enable-sibling-discovery` CLI flag.
 5. `--no-sibling-discovery` CLI flag.
-6. **Strict-mode lockout** — overrides everything (spec §4 rule 6).
+6. **Strict-mode lockout** - overrides everything (spec §4 rule 6).
 
 Strict mode = URL-pinned (release-asset URL) OR explicit `--version vX.Y.Z`
 (but NOT `--version latest`).
@@ -49,13 +49,13 @@ Strict mode = URL-pinned (release-asset URL) OR explicit `--version vX.Y.Z`
 | `skipped-cli`      | Discovery-mode but `--no-sibling-discovery` won |
 
 `SIBLING_DECISION_REASON` is a human-readable explanation, surfaced in the
-`--dry-run` plan as `Sibling discovery: <state> — <reason>`.
+`--dry-run` plan as `Sibling discovery: <state> - <reason>`.
 
 ## Why a separate config file (vs hardcoding in install.sh)
 
 Forks and downstream consumers of the generic installer pattern (per
 `mem://constraints/generic-installer-contract`) only need to swap
-`install.config.sh` to change the sibling-discovery defaults — they don't
+`install.config.sh` to change the sibling-discovery defaults - they don't
 have to fork the installer logic. The in-script fallbacks ensure
 single-file `curl … | bash` installs still behave identically when no
 config file ships alongside.
@@ -63,14 +63,14 @@ config file ships alongside.
 ## Tests
 
 - Unit (decision matrix): `tests/installer/resolver.test.sh` "§4 sibling-
-  discovery decision matrix" group — 9 assertions covering the priority
+  discovery decision matrix" group - 9 assertions covering the priority
   order, including the strict-mode lockout against both config-on and
   `--enable-sibling-discovery`.
 - Dry-run plan: same suite, "Dry-run plan shows sibling-discovery
-  decision" group — confirms the plan surfaces the decision + reason.
+  decision" group - confirms the plan surfaces the decision + reason.
 - Integration: the existing `mock-server.test.sh` suite uses the default
   (off) config; it does not yet exercise live HEAD probes because §4
-  probing isn't implemented in `install.sh` itself — only the **decision**
+  probing isn't implemented in `install.sh` itself - only the **decision**
   is. When probing lands, add cases that set `MOCK_SIBLINGS=...` and
   assert the chosen sibling.
 
@@ -82,4 +82,4 @@ config file ships alongside.
 2. Mirror the config + decision logic in `scripts/install.ps1`
    (PowerShell uses `install.config.ps1`).
 3. Wire AC-10 / AC-11 / AC-13 cases in `mock-server.test.sh` once probing
-   exists — the mock already responds to `MOCK_SIBLINGS=repo-v3:200,…`.
+   exists - the mock already responds to `MOCK_SIBLINGS=repo-v3:200,…`.

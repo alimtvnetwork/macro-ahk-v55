@@ -52,7 +52,7 @@ chrome-extension/dist/
 │           └── script-manifest.json
 ```
 
-## instruction.ts — Project Load Manifest
+## instruction.ts - Project Load Manifest
 
 Each standalone script has `src/instruction.ts` that compiles to `dist/instruction.json`.
 Defines the load order for injection:
@@ -66,8 +66,8 @@ Defines the load order for injection:
 ## SQLite as Source of Truth
 
 Scripts store **file paths** (not embedded code) in SQLite:
-- `FilePath TEXT` — relative path like `projects/scripts/macro-controller/macro-looping.js`
-- `IsAbsolute INTEGER` — 0 for relative (resolved via `chrome.runtime.getURL()`), 1 for absolute
+- `FilePath TEXT` - relative path like `projects/scripts/macro-controller/macro-looping.js`
+- `IsAbsolute INTEGER` - 0 for relative (resolved via `chrome.runtime.getURL()`), 1 for absolute
 - `Settings` table stores the extension base path for resolving relative paths
 - Fallback: embedded `Code` field used if file path fetch fails
 
@@ -88,11 +88,11 @@ Scripts declare dependencies via `script-manifest.json` and `instruction.json`:
 
 ## Rules
 
-- **TypeScript source is canonical** — edit `src/`, never compiled output
-- **01-macro-looping.js is legacy/OFF-LIMITS** — build and seeding automation must never touch it
+- **TypeScript source is canonical** - edit `src/`, never compiled output
+- **01-macro-looping.js is legacy/OFF-LIMITS** - build and seeding automation must never touch it
 - **dist/ artifacts** are the sole runtime inputs for seeding and deploy
-- **instruction.ts** is the project manifest — defines what files to load and in what order
-- **SQLite stores file paths** — code is fetched at injection time, not embedded
+- **instruction.ts** is the project manifest - defines what files to load and in what order
+- **SQLite stores file paths** - code is fetched at injection time, not embedded
 # Memory: architecture/script-source-of-truth
 Updated: 2026-03-22
 
@@ -154,9 +154,9 @@ chrome-extension/dist/
 
 ## Rules
 
-- **TypeScript source is canonical** — edit `src/`, never compiled output
+- **TypeScript source is canonical** - edit `src/`, never compiled output
 - **dist/ artifacts are runtime inputs** for seeding and deploy
-- **01-macro-looping.js is legacy/off-limits** — do not modify in build automation
-- **xpath.js is fully self-contained** — no imports from macro-controller
+- **01-macro-looping.js is legacy/off-limits** - do not modify in build automation
+- **xpath.js is fully self-contained** - no imports from macro-controller
 - **New scripts** just need `src/` folder, `script-manifest.json`, and `build:<name>` npm script
 - `build:macro` was renamed to `build:macro-controller` (matches folder name for auto-discovery)

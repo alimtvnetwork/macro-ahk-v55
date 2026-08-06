@@ -4,14 +4,14 @@ description: All errors in macro-controller must use RiseupAsiaMacroExt.Logger.e
 type: preference
 ---
 
-## NamespaceLogger (T1 — Implemented)
+## NamespaceLogger (T1 - Implemented)
 
 - **File**: `standalone-scripts/marco-sdk/src/logger.ts`
-- **Class**: `NamespaceLogger` — static methods: `error(fn, msg, error?)`, `warn(fn, msg)`, `info(fn, msg)`, `debug(fn, msg)`
+- **Class**: `NamespaceLogger` - static methods: `error(fn, msg, error?)`, `warn(fn, msg)`, `info(fn, msg)`, `debug(fn, msg)`
 - **Prefix**: `[RiseupAsia] [fnName] message`
 - **error()** includes stack trace via `formatError()` when Error object provided
 - **Exposed on**: `RiseupAsiaMacroExt.Logger` (set in SDK index.ts)
-- **Wired in**: `marco-sdk/src/index.ts` — imported and assigned to namespace root
+- **Wired in**: `marco-sdk/src/index.ts` - imported and assigned to namespace root
 
 ## Rules
 - R1: Every `catch` block MUST log (use Logger.error for unexpected, Logger.warn for recoverable, Logger.debug for intentional fallbacks)
@@ -20,7 +20,7 @@ type: preference
 
 ## Remaining Tasks
 - T2: Update `globals.d.ts` with full namespace + Logger types
-- T3: Fix 16 swallowed errors (S1–S16)
+- T3: Fix 16 swallowed errors (S1-S16)
 - T4: Eliminate `any` types (5 files)
 - T5: Migrate controller `log(msg, 'error')` calls to `Logger.error()`
 - T6: Build verification

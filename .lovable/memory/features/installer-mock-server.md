@@ -14,7 +14,7 @@ Zero-dependency Node HTTP server at
 ## Why this exists
 
 The unit-level resolver suite (`resolver.test.sh`) shadows `curl` with
-shell mocks — fast but it can't catch real HTTP / ZIP / extraction
+shell mocks - fast but it can't catch real HTTP / ZIP / extraction
 bugs. The mock server lets `scripts/install.sh` reach a live HTTP
 endpoint over loopback and exercises the full pipeline (resolve →
 download → unzip → manifest check → `VERSION` write).
@@ -41,15 +41,15 @@ behavior is unchanged when the vars are unset.
 
 ## Mock server env vars
 
-- `MOCK_LATEST_TAG` — tag returned by the latest API (default `v2.224.0`)
-- `MOCK_API_FAIL=1` — `/releases/latest` returns 503 (test exit-5 path)
-- `MOCK_API_FAIL=timeout` — never responds (forces curl timeout)
-- `MOCK_SIBLINGS=repo-v3:200,repo-v4:404` — wires HEAD probe outcomes
-- `MOCK_MISSING_ASSETS=v9.9.9,v0.0.1` — those tags' ZIPs return 404
+- `MOCK_LATEST_TAG` - tag returned by the latest API (default `v2.224.0`)
+- `MOCK_API_FAIL=1` - `/releases/latest` returns 503 (test exit-5 path)
+- `MOCK_API_FAIL=timeout` - never responds (forces curl timeout)
+- `MOCK_SIBLINGS=repo-v3:200,repo-v4:404` - wires HEAD probe outcomes
+- `MOCK_MISSING_ASSETS=v9.9.9,v0.0.1` - those tags' ZIPs return 404
   (test exit-4 path)
-- `MOCK_PORT=0` — ephemeral port (default); `start-mock.sh` writes the
+- `MOCK_PORT=0` - ephemeral port (default); `start-mock.sh` writes the
   resolved port to `MOCK_PORT_FILE` and prints `MOCK_BASE=...` for `eval`
-- `MOCK_LOG=1` — logs every request to stderr
+- `MOCK_LOG=1` - logs every request to stderr
 
 ## Lifecycle pattern in tests
 
@@ -64,7 +64,7 @@ kill "${MOCK_PID}"; wait "${MOCK_PID}" 2>/dev/null
 
 The integration suite covers AC-3 / AC-4 / AC-5 / AC-7 / AC-8 / AC-9
 end-to-end (real ZIPs, real `unzip`, real `manifest.json` check).
-Sibling-discovery ACs (10/11/13) are **not yet wired** — when §4
+Sibling-discovery ACs (10/11/13) are **not yet wired** - when §4
 sibling probing lands in `install.sh`, add cases that call `start-mock.sh`
 with `MOCK_SIBLINGS=...` and assert the chosen sibling.
 
@@ -74,11 +74,11 @@ In `main()`, `URL_PINNED=1` was set inside `$(resolve_version ...)`
 (subshell) and lost on return. The strict-mode banner + "(pinned via
 release URL)" summary tag silently fell into the discovery branch.
 Fixed by re-probing `version_from_url` in the parent shell before the
-`resolve_version` call. The mock-server suite caught this — the unit
+`resolve_version` call. The mock-server suite caught this - the unit
 suite couldn't, because it called `resolve_version` directly.
 
 ## Run
 
-- `npm run test:installer` — both suites
-- `npm run test:installer:resolver` — unit only
-- `npm run test:installer:mock` — integration only
+- `npm run test:installer` - both suites
+- `npm run test:installer:resolver` - unit only
+- `npm run test:installer:mock` - integration only

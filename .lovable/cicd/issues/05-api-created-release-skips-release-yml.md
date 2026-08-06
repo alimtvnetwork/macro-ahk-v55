@@ -1,4 +1,4 @@
-# CI/CD Issue 05 — API-created GitHub Release skips `release.yml` (only stamped installer + source archives appear)
+# CI/CD Issue 05 - API-created GitHub Release skips `release.yml` (only stamped installer + source archives appear)
 
 ## Pipeline / Workflow
 
@@ -40,7 +40,7 @@ webhook events**. Our `release.yml` only listened to:
 - `workflow_dispatch`
 
 None of these fired, so `release.yml` never ran. The `release-watcher.yml`
-safety net (which watches `.gitmap/release/v*.json`) also did not recover —
+safety net (which watches `.gitmap/release/v*.json`) also did not recover -
 either the descriptor commit and the API release call were concurrent, or the
 watcher's tag-fetch happened before the API tag became visible to the cloned
 worktree.
@@ -50,13 +50,13 @@ stamped installer assets, and the canonical asset pipeline never executed.
 
 ## Status
 
-✅ Resolved — 2026-05-18
+✅ Resolved - 2026-05-18
 
 ## Fix
 
 Added `on: release: types: [published, created, edited, released]` to
-`release.yml`. The `release` event fires for **every** publish path — REST
-API, GitHub web UI, `gh release create`, external tooling — and is the only
+`release.yml`. The `release` event fires for **every** publish path - REST
+API, GitHub web UI, `gh release create`, external tooling - and is the only
 trigger that reliably catches server-side tag creation.
 
 The `setup` job now resolves the version from `github.event.release.tag_name`,

@@ -12,6 +12,6 @@ type: feature
 - Multiple named presets with dropdown selector + New/Delete
 - Auto-save on Apply, Close, and Cancel; auto-load on panel open
 - Active preset name stored as `_activePattern` key
-- localStorage `ml_rename_history` NOT migrated — only presets use IndexedDB
+- localStorage `ml_rename_history` NOT migrated - only presets use IndexedDB
 - Error logs must include exact DB name, store, key, and reason
 - Spec: `spec/21-app/02-features/macro-controller/ts-migration-v2/07-rename-persistence-indexeddb.md`

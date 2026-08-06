@@ -15,13 +15,13 @@ Scope: `plan-task-ui.ts`, `task-next-ui.ts`, `prompt-library-modal.ts`. Maps eve
 | Export | Test file(s) | Cases covered | Gaps |
 |---|---|---|---|
 | `taskNextState` (mutable module state) | `__tests__/task-next-ui-teardown.test.ts`, `task-next-queue.test.ts` | cancelled flag toggled by keydown; queue progress tracked | no reset helper documented; no assertion that `queue` starts undefined |
-| `loadTaskNextSettings` | none | — | positive load, malformed JSON, missing keys, storage throw |
-| `saveTaskNextSettings` | none | — | writes exact shape; storage throw -> logError |
-| `findNextTasksPrompt(deps)` | none directly | — | positive DOM find; missing element returns null; multiple candidates picks first |
-| `findAddToTasksButton` | none | — | positive/negative DOM lookup |
+| `loadTaskNextSettings` | none | - | positive load, malformed JSON, missing keys, storage throw |
+| `saveTaskNextSettings` | none | - | writes exact shape; storage throw -> logError |
+| `findNextTasksPrompt(deps)` | none directly | - | positive DOM find; missing element returns null; multiple candidates picks first |
+| `findAddToTasksButton` | none | - | positive/negative DOM lookup |
 | `dequeueTaskNextPrompt` | `task-next-queue.test.ts` | prefers persisted splitter queue before legacy fallback (65); fail-fast on read failure (72) | empty queue returns fallback marker; malformed queue row |
 | `runTaskNextLoop(deps, count)` | `task-next-queue.test.ts` | count===1 delegates path (39); cancellation (48) | count=0 no-op; count<0 rejected; paste throw -> abort |
-| `dispatchTaskNextSubmit` | none | — | positive: dispatches submit event; negative: no button -> false; button disabled -> false |
+| `dispatchTaskNextSubmit` | none | - | positive: dispatches submit event; negative: no button -> false; button disabled -> false |
 | `runTaskNextQueue(deps, count)` | `task-next-queue.test.ts` | iterates 0..n-1 with awaited idle gate (43); cancellation inside loop and idle gate (48); fail-fast on paste/submit/timeout (53); mixes queue + fallback per cycle (77); resolveCyclePrompt per iteration (85); logError on drain failure (89) | count===1 fast-path parity with runTaskNextLoop; queue exhausted mid-run |
 | `setupTaskNextCancelHandler` | `task-next-ui-teardown.test.ts` | one listener regardless of call count (24); cancelled only when running (34); removes on pagehide (48); reinstallable after reset (64) | none critical |
 | `__resetTaskNextCancelHandlerForTests` | teardown test (64) | reset path | test-only helper, sufficient |

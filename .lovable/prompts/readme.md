@@ -9,7 +9,7 @@ re-deriving it from chat history.
 
 - One row per prompt file, in numeric order.
 - The **Tags** column lists every trigger phrase or short alias the
-  user has used to invoke the prompt — so a future AI can `grep` for
+  user has used to invoke the prompt - so a future AI can `grep` for
   any of those phrases and land on the right file.
 - Status: `active` (currently in force) / `superseded` (replaced by a
   newer version) / `archived` (one-shot, no longer needed).
@@ -22,16 +22,16 @@ re-deriving it from chat history.
 | 04 | [04-no-questions.md](./prompts/04-no-questions.md) | No-Questions Mode (40-task window) | `no question`, `not ques for 40`, `no-questions mode` | active |
 | 05 | [05-read-memory.md](./prompts/05-read-memory.md) | Read Memory | `read memory`, `recall memory`, `revise memory`, `revise prompt` | active |
 | 06 | [06-logo-create.md](./prompts/06-logo-create.md) | Logo Create (Projects/ scaffold, SVG + raster + palette + favicon + README) | `create logo`, `make logo`, `logo`, `create icon`, `make icon`, `logo create` | active |
-| 07 | [07-proofread.md](./prompts/07-proofread.md) | Proofread (DO NOT ACT — rewrite only) | `proofread`, `proof read`, `rewrite`, `rewrite next`, `next` (in proofread mode) | active |
+| 07 | [07-proofread.md](./prompts/07-proofread.md) | Proofread (DO NOT ACT - rewrite only) | `proofread`, `proof read`, `rewrite`, `rewrite next`, `next` (in proofread mode) | active |
 | 08 | [08-bump-version.md](./prompts/08-bump-version.md) | Bump Version (minor bump + changelog + README pin) | `bump version`, `bump minor`, `pre-bump`, `version bump`, `release bump` | active |
 | 09 | [09-coding-guidelines.md](./prompts/09-coding-guidelines.md) | Coding Guidelines (verbatim, 15 rules) | `coding guidelines`, `read coding guidelines` | active |
 | 10 | [10-lowercase-readme-and-sequence.md](./prompts/10-lowercase-readme-and-sequence.md) | Lowercase Readme + `NN-kebab.md` Convention | `lowercase readme`, `sequence slugs`, `file naming convention` | active |
 | 11 | [11-explain-like-layman.md](./prompts/11-explain-like-layman.md) | Explain Like I'm a Layman (v1) | `explain like layman`, `explain like i'm five`, `eli5`, `eli-layman` | active |
-| 12 | [12-next-steps-v7.md](./prompts/12-next-steps-v7.md) | Next ${N} Steps (v7) — single-task append (Issue 126) | `next 1`, `next 2`, `next 3`, `next 4`, `next 5`, `next 8`, `next n steps`, `next n tasks` | active |
-| 13 | [13-plan-steps-v7.md](./prompts/13-plan-steps-v7.md) | Plan ${N} (v7) — Evidence Enforcement, single-task append (Issue 126) | `plan 2`, `plan 3`, `plan 5`, `plan 8`, `plan 10`, `plan 12`, `plan 14`, `plan 15`, `plan 18`, `plan 20`, `plan 22`, `plan 25`, `plan 28`, `plan 30`, `plan 32`, `plan 35`, `plan 38`, `plan 40`, `plan 42`, `plan 45`, `plan 48`, `plan 50`, `plan 52`, `plan 55`, `plan 58`, `plan 60`, `plan 70`, `plan 80`, `plan 100`, `plan 150`, `plan 200` | active |
-| 14 | [14-release.md](./prompts/14-release.md) | Release (bump version + changelog + readme pin + aggregate prompts) — mirror of `standalone-scripts/prompts/22-release/prompt.md` | `release`, `bump version`, `bump version + add changelog + pin to root readme` | active |
-| 16 | [16-visual-design-proposal.md](./prompts/16-visual-design-proposal.md) | Visual Design Proposal (4-5 rendered directions, no implementation) — mirror of `standalone-scripts/prompts/33-visual-design-proposal/prompt.md` | `visual design`, `design proposal`, `visualize designs`, `propose designs`, `4-5 designs` | active |
-| 17 | [17-insults-explain.md](./prompts/17-insults-explain.md) | Insults : Explain Root Cause (v1.1) — mirror of `standalone-scripts/prompts/34-insults-explain/prompt.md` | `add insults prompt`, `insults`, `explain root cause`, `why have you done this` | active |
+| 12 | [12-next-steps-v7.md](./prompts/12-next-steps-v7.md) | Next ${N} Steps (v7) - single-task append (Issue 126) | `next 1`, `next 2`, `next 3`, `next 4`, `next 5`, `next 8`, `next n steps`, `next n tasks` | active |
+| 13 | [13-plan-steps-v7.md](./prompts/13-plan-steps-v7.md) | Plan ${N} (v7) - Evidence Enforcement, single-task append (Issue 126) | `plan 2`, `plan 3`, `plan 5`, `plan 8`, `plan 10`, `plan 12`, `plan 14`, `plan 15`, `plan 18`, `plan 20`, `plan 22`, `plan 25`, `plan 28`, `plan 30`, `plan 32`, `plan 35`, `plan 38`, `plan 40`, `plan 42`, `plan 45`, `plan 48`, `plan 50`, `plan 52`, `plan 55`, `plan 58`, `plan 60`, `plan 70`, `plan 80`, `plan 100`, `plan 150`, `plan 200` | active |
+| 14 | [14-release.md](./prompts/14-release.md) | Release (bump version + changelog + readme pin + aggregate prompts) - mirror of `standalone-scripts/prompts/22-release/prompt.md` | `release`, `bump version`, `bump version + add changelog + pin to root readme` | active |
+| 16 | [16-visual-design-proposal.md](./prompts/16-visual-design-proposal.md) | Visual Design Proposal (4-5 rendered directions, no implementation) - mirror of `standalone-scripts/prompts/33-visual-design-proposal/prompt.md` | `visual design`, `design proposal`, `visualize designs`, `propose designs`, `4-5 designs` | active |
+| 17 | [17-insults-explain.md](./prompts/17-insults-explain.md) | Insults : Explain Root Cause (v1.1) - mirror of `standalone-scripts/prompts/34-insults-explain/prompt.md` | `add insults prompt`, `insults`, `explain root cause`, `why have you done this` | active |
 ## Dropdown-shipped subset (canonical, v3.59.x)
 
 These 8 prompts are exposed in the macro-controller chat-box dropdown

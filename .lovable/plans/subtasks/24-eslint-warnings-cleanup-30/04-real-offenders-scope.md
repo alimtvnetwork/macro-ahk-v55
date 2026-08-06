@@ -23,12 +23,12 @@ Uploaded log came from sibling repo `macro-ahk-v55`. This repo's actual `pnpm li
 | 10 | `mountHoverHighlighter` | `RecorderVisualisationPanel.tsx:43` (333) + `RecorderStepDetail.tsx:53` (282) | max-lines |
 | 11 | Sweep `background/recorder/**` residual | `live-dom-replay.ts:180` (cog 44), `step-wait.ts:99` (cog 26 + collapsible-if), `url-tab-click.ts:315` (cog 24 + collapsible-if), `http-request-step.ts:96`, `selector-history.ts`, `url-matches-backfill.ts:54`, `step-library/{replay-bridge,result-webhook,input-source,export-bundle}.ts` | mixed |
 
-Steps 12-18 already generic sweeps — remain valid.
+Steps 12-18 already generic sweeps - remain valid.
 
 ## Deferred sub-targets pulled out as their own SS files
 
 - SS-04: `StepGroupLibraryPanel.tsx` decomposition (biggest single file: 5 warnings, 1174+226-line functions).
-- SS-05: `step-library/import-bundle.ts` (max-lines 224 + cog 70) — pairs with export/csv-mapping siblings.
+- SS-05: `step-library/import-bundle.ts` (max-lines 224 + cog 70) - pairs with export/csv-mapping siblings.
 - SS-06: `KeywordEventsPanel.tsx` (13 issues across 3 rule kinds; the sole 3-rule offender).
 
 Create those SS files when the corresponding step starts; do not pre-write empty stubs.
@@ -44,6 +44,6 @@ Delete both directives as part of step 2 wrap-up (single-line edits, no logic ch
 
 ## Non-lint but adjacent
 
-- 2 `react-refresh/only-export-components` warnings in `RunResultsSummaryPanel.tsx` — split file into component + helpers module.
-- 2 `react-hooks/exhaustive-deps` warnings in `TokenSeederStatusIndicator.tsx` — resolve during step 13 (options sweep part 1).
+- 2 `react-refresh/only-export-components` warnings in `RunResultsSummaryPanel.tsx` - split file into component + helpers module.
+- 2 `react-hooks/exhaustive-deps` warnings in `TokenSeederStatusIndicator.tsx` - resolve during step 13 (options sweep part 1).
 - 1 `@typescript-eslint/no-explicit-any` still present after removing the unused disable (or not; verify after removal). Assign to step 24.

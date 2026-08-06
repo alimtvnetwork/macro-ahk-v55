@@ -1,4 +1,4 @@
-# 45 — "Add more CI/CD e2e tests to test our features"
+# 45 - "Add more CI/CD e2e tests to test our features"
 
 **Date (KL):** 2026-05-07
 **Mode:** No-Questions (window open).
@@ -8,10 +8,10 @@
 
 Three plausible meanings:
 
-1. **CI script-level tests** — `node --test` suites under `scripts/__tests__/`
+1. **CI script-level tests** - `node --test` suites under `scripts/__tests__/`
    covering CI gates (`check-version-sync`, `check-changelog-entry`, etc.).
-2. **Playwright extension e2e tests** — new specs under `tests/e2e/`.
-3. **GitHub Actions workflow integration tests** — running ci.yml against
+2. **Playwright extension e2e tests** - new specs under `tests/e2e/`.
+3. **GitHub Actions workflow integration tests** - running ci.yml against
    synthetic repos via `act` or workflow_dispatch sims.
 
 ## Options & trade-offs

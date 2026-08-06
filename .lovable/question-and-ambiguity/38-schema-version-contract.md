@@ -1,4 +1,4 @@
-# Ambiguity #38 — SchemaVersion contract location & shape
+# Ambiguity #38 - SchemaVersion contract location & shape
 
 **Task:** Add a check that `SchemaVersion` matches the expected pattern/range
 defined by the instruction compiler so incompatible versions fail early.
@@ -10,13 +10,13 @@ defined by the instruction compiler so incompatible versions fail early.
 
 ### A. Where does the "expected pattern/range" live?
 The instruction compiler (`scripts/compile-instruction.mjs`) is intentionally
-dep-free and does NOT define a SchemaVersion constant — every project's
+dep-free and does NOT define a SchemaVersion constant - every project's
 `src/instruction.ts` hard-codes its own `SchemaVersion: "1.0"` literal.
 Three options:
 
 1. Hard-code `["1.0"]` inside `validate-instruction-schema.mjs`.
    - Pros: zero new files, minimal change.
-   - Cons: contract drift waiting to happen — the runtime
+   - Cons: contract drift waiting to happen - the runtime
      (`manifest-seeder.ts SUPPORTED_SCHEMA_VERSIONS`, per `mem://`) and the
      validator would diverge on every bump.
 2. Add a constant inside `compile-instruction.mjs` and have the validator
@@ -47,7 +47,7 @@ webhook-result schema-version policy (`scripts/audit-webhook-results.mjs`)
 and let us drop deprecated versions cleanly.
 
 ### D. Should the compiler also enforce this?
-No — the validator is the gate. The compiler is dep-free and doesn't
+No - the validator is the gate. The compiler is dep-free and doesn't
 currently parse/validate the source literal beyond JSON serialisation.
 If a source file declares `SchemaVersion: "2.0"` before the contract is
 bumped, validation fails CI (verified by mutation scenario 3).
@@ -55,6 +55,6 @@ bumped, validation fails CI (verified by mutation scenario 3).
 ## Validator output (mutation matrix verified)
 - numeric `1.0` literal → "expected SchemaVersion string (one of [1.0]), got number"
 - string `"1"` (no dot) → "does not match required pattern /^\\d+\\.\\d+$/"
-- string `"2.0"` → "is not supported by this build … did you mean \"1.0\"? — bump …/schema-version.{ts,json}"
+- string `"2.0"` → "is not supported by this build … did you mean \"1.0\"? - bump …/schema-version.{ts,json}"
 - string `"1.1"` → same, with did-you-mean → "1.0"
 - happy path (`"1.0"` × 7 projects × 2 artifacts) → ✅ exit 0

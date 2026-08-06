@@ -1,4 +1,4 @@
-# 63 — Prompts import/export + LLM authoring guideline (deferred from v4.1.0)
+# 63 - Prompts import/export + LLM authoring guideline (deferred from v4.1.0)
 
 **Context.** User request 2026-06-24 included: "add import/export facilities
 for the prompts, two ways. So one is that it needs to have a LLM guideline
@@ -8,7 +8,7 @@ create the prompt and create a JSON so that I can import, export it."
 **Why deferred.** v4.1.0 release prioritised the urgent UX fix (Split→Plan
 rename, no-submit, expanded presets). Import/export touches `prompt-manager`,
 SQLite cache, IndexedDB `JsonCopy/HtmlCopy`, plus a schema + LLM-facing
-guideline doc — too large to bundle safely with the urgent release.
+guideline doc - too large to bundle safely with the urgent release.
 
 ## Options (recommendation = A)
 
@@ -35,7 +35,7 @@ Minimal: textarea on Options → paste/copy JSON. No file picker, no schema.
 Tiny click-to-copy on each row in the prompt dropdown.
 
 - **Pros:** trivial.
-- **Cons:** no bulk export, no import at all — doesn't satisfy the request.
+- **Cons:** no bulk export, no import at all - doesn't satisfy the request.
 
 ## Plan when picked up
 1. Author `.lovable/prompts/_authoring-guide-for-llms.md` (schema + 2

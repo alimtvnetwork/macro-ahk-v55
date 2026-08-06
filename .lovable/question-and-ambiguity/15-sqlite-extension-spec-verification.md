@@ -1,19 +1,19 @@
-# 15 — SQLite ↔ Chrome Extension spec verification
+# 15 - SQLite ↔ Chrome Extension spec verification
 
 **Asked:** 2026-06-19  •  **Status:** open (logged under No-Questions Mode)
 
 ## User request
 
-Verify the spec documents — end to end — how a Chrome extension works
+Verify the spec documents - end to end - how a Chrome extension works
 with the SQLite databases: which plugin, every step, integration
 between layers. Confirm the spec is "done properly."
 
 ## Current state in repo
 
-- `spec/05-split-db-architecture/` — has `00-overview.md`,
+- `spec/05-split-db-architecture/` - has `00-overview.md`,
   `01-fundamentals.md`, `02-features/`, `03-issues/`, acceptance
   criteria + changelog. Covers the split-DB model.
-- `spec/23-database/` — only `00-overview.md`, `diagrams/`, `images/`,
+- `spec/23-database/` - only `00-overview.md`, `diagrams/`, `images/`,
   `readme.md`. **Thin.** No step-by-step "extension → SQLite" wire-up.
 - `docs/diagrams/sqlite-bundle-erd.mmd`, `sqlite-bundle-flow.mmd` exist
   but are not linked from a narrative.
@@ -41,12 +41,12 @@ There is **no single spec file** that walks through:
 - **A. Author `spec/23-database/01-extension-sqlite-integration.md`**
   as the canonical end-to-end guide and link the existing diagrams
   into it. *Recommended.* Pros: closes the gap exactly where the user
-  pointed. Cons: ~1–2 turns of focused work, needs code spelunking to
+  pointed. Cons: ~1-2 turns of focused work, needs code spelunking to
   confirm the engine + VFS choice.
 - **B. Extend `spec/05-split-db-architecture/01-fundamentals.md`** with
   the wire-up. Pros: keeps split-DB content co-located. Cons: that
   folder is about *splitting* the DB, not about how the extension
-  talks to it — semantic mismatch.
+  talks to it - semantic mismatch.
 - **C. Defer.** Pros: nothing. Cons: leaves the user's reported gap
   open and violates "go deep" rule from `12-next-steps-v7.md`.
 

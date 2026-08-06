@@ -1,4 +1,4 @@
-# Session 2026-04-20 — Handler Audit (v2.167.0)
+# Session 2026-04-20 - Handler Audit (v2.167.0)
 
 > **Goal:** Audit prompt-handler, library-handler, settings-handler, project-handler, project-config-handler, script-config-handler, updater-handler, and run-stats-handler for `handler-guards` adoption. Drive the audit by relying on the new SQLite Proxy (v2.165.0) to surface any latent undefined-bind sites with precise column names.
 
@@ -6,9 +6,9 @@
 
 | Handler                     | SQLite? | Risk surface                                                     | Action |
 |-----------------------------|---------|------------------------------------------------------------------|--------|
-| `settings-handler.ts`       | ❌       | chrome.storage.local only                                        | None — out of scope |
+| `settings-handler.ts`       | ❌       | chrome.storage.local only                                        | None - out of scope |
 | `project-handler.ts`        | ❌       | chrome.storage.local; per-project SQLite goes through wrapper    | None |
-| `project-config-handler.ts` | ✅       | `m.project / m.section / m.key` already validated; values via `?? ""` | None — already guarded |
+| `project-config-handler.ts` | ✅       | `m.project / m.section / m.key` already validated; values via `?? ""` | None - already guarded |
 | `script-config-handler.ts`  | ❌       | chrome.storage.local only                                        | None |
 | `run-stats-handler.ts`      | ❌       | chrome.storage.local only                                        | None |
 | `prompt-handler.ts`         | ✅ many  | `handleSavePrompt` UPDATE took raw `prompt.name/text/version`; `handleDeletePrompt` / `handleReorderPrompts` had no entry validation; `Number(promptIds[i])` could become NaN | **Hardened** |
@@ -37,13 +37,13 @@
 
 ## Out-of-Scope Files
 
-The remaining handlers (`settings-handler`, `project-handler`, `script-config-handler`, `run-stats-handler`) do not perform any SQLite writes — they persist exclusively to `chrome.storage.local`. They cannot trigger a `BindError` and therefore need no `handler-guards` adoption. `project-config-handler` already validates its required fields at the top of every handler.
+The remaining handlers (`settings-handler`, `project-handler`, `script-config-handler`, `run-stats-handler`) do not perform any SQLite writes - they persist exclusively to `chrome.storage.local`. They cannot trigger a `BindError` and therefore need no `handler-guards` adoption. `project-config-handler` already validates its required fields at the top of every handler.
 
 ## Defence-in-Depth Status After v2.167.0
 
-1. **Layer 1 — Entry-point validation (`handler-guards.ts`):** Adopted by 10 SQLite-backed handlers (was 7).
-2. **Layer 2 — SDK-side defaulting (KV namespace):** Unchanged from v2.162.0.
-3. **Layer 3 — `wrapDatabaseWithBindSafety` Proxy:** Unchanged. Still the safety net of last resort, now exercised by every handler.
+1. **Layer 1 - Entry-point validation (`handler-guards.ts`):** Adopted by 10 SQLite-backed handlers (was 7).
+2. **Layer 2 - SDK-side defaulting (KV namespace):** Unchanged from v2.162.0.
+3. **Layer 3 - `wrapDatabaseWithBindSafety` Proxy:** Unchanged. Still the safety net of last resort, now exercised by every handler.
 
 ## Verification
 

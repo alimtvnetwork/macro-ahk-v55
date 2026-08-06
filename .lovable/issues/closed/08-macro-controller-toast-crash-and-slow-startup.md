@@ -4,7 +4,7 @@ Created: 2026-07-17
 
 # Macro Controller: Toast Crash + Slow Startup
 
-## Issue 1: `o.toast is not a function` (Critical) — FIXED
+## Issue 1: `o.toast is not a function` (Critical) - FIXED
 
 ### Symptoms
 ```
@@ -30,28 +30,28 @@ Restructured `window.marco.notify` in SDK template from a plain function to a cl
 
 ---
 
-## Issue 2: Slow Script Loading (Performance) — FIXED
+## Issue 2: Slow Script Loading (Performance) - FIXED
 
 ### Symptoms
 - 2-5s blank/stale panel before UI appears
-- "UI recovery failed — forcing full re-bootstrap" on re-injection
+- "UI recovery failed - forcing full re-bootstrap" on re-injection
 
 ### Root Cause
 
 The bootstrap was a **serial waterfall**: UI creation waited for token resolution (up to 4s) + API calls before rendering anything.
 
 ```
-[OLD — serial]
+[OLD - serial]
 ensureTokenReady(4000ms max)     ← polls every 250ms
   └─► fetchLoopCreditsAsync      ← HTTP round-trip
   └─► Tier 1 mark-viewed fetch   ← another HTTP round-trip
   └─► createUI()                 ← UI only now appears
 ```
 
-### Fix Applied — UI-First Strategy (v7.42+)
+### Fix Applied - UI-First Strategy (v7.42+)
 
 ```
-[NEW — UI-first]
+[NEW - UI-first]
 createUI()                       ← UI visible at t=0
 startWorkspaceObserver()         ← observer starts immediately
 ensureTokenReady(2000ms)         ← reduced from 4s, async background
@@ -63,7 +63,7 @@ ensureTokenReady(2000ms)         ← reduced from 4s, async background
 **File**: `standalone-scripts/macro-controller/src/startup.ts` (bootstrap function)
 
 ### Changes
-1. `createUI()` moved before any async work — panel renders at t=0
+1. `createUI()` moved before any async work - panel renders at t=0
 2. Token timeout reduced from 4000ms → 2000ms
 3. No UI timeout fallback needed (UI already rendered)
 4. Loading toast changed from "initializing..." to "loading workspace..."

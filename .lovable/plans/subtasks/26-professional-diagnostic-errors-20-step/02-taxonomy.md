@@ -59,7 +59,7 @@ Total initial slots: ~96 (well above the 151 audited sites because each `HTTP_RE
 1. **No profanity, no "oops", no "WTF"**, no bare "Failed".
 2. `humanTemplate` MUST state: (a) what was attempted, (b) why it failed, (c) next fix step (either in the template or in `nextFixHint`).
 3. `humanTemplate` uses `{placeholder}` variables that MUST all appear in `requiredContextKeys`.
-4. `requiredContextKeys` MUST list every variable needed to triage the error (role, slug, url, status, wsId, projectId, ruleId, expected, actual — as appropriate to the area).
+4. `requiredContextKeys` MUST list every variable needed to triage the error (role, slug, url, status, wsId, projectId, ruleId, expected, actual - as appropriate to the area).
 5. Templates for user-facing toasts are professional English, ≤ 240 chars body + separate footer with the code in monospace.
 
 ## Codes are frozen

@@ -27,11 +27,11 @@ No static analysis plugin was configured for code quality rules (function size, 
 
 ## Learning
 - **Always consider the runtime consumption model** when enabling static analysis rules. Code that appears dead at compile time may be consumed by injected scripts, SDK exports, or cross-project imports.
-- **Discuss rules with the user first** before enforcing — the AI listed all rules for review before integrating.
+- **Discuss rules with the user first** before enforcing - the AI listed all rules for review before integrating.
 
 ## What Not to Repeat
 - Don't enable dead-code/unused rules in projects with dynamic script injection without first checking for false positives.
-- Don't assume all SonarJS rules are appropriate — tune per project architecture.
+- Don't assume all SonarJS rules are appropriate - tune per project architecture.
 
 ## Files Changed
 - `eslint.config.js`

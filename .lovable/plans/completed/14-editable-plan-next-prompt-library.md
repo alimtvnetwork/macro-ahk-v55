@@ -7,7 +7,7 @@ Created: 2026-07-18
 
 ## Context
 
-Today the Plan and Next chips in the Marco Inline strip fire a single hardcoded prompt string. The user wants a small library per role (Plan, Next) with a user-selectable default, inline editing, and creation of custom entries. Parameterized variables (e.g. `{{count}}`, `{{plan_slug}}`, `{{XX}}`) inside prompt bodies MUST be preserved verbatim during edit/save and only substituted at inject time by the existing renderer. 3–4 canned Plan variants and 3–4 canned Next variants will be seeded (final copy provided by user later). Storage lives in the existing prompt tables (SQLite `Prompt` + IndexedDB dual-cache) with a new `Role` column (`plan` | `next`) and a per-role `IsDefault` flag. UI extends the current `Marco Inline (Plan / Next / Repeat)` strip with a small picker + edit affordance next to each chip row.
+Today the Plan and Next chips in the Marco Inline strip fire a single hardcoded prompt string. The user wants a small library per role (Plan, Next) with a user-selectable default, inline editing, and creation of custom entries. Parameterized variables (e.g. `{{count}}`, `{{plan_slug}}`, `{{XX}}`) inside prompt bodies MUST be preserved verbatim during edit/save and only substituted at inject time by the existing renderer. 3-4 canned Plan variants and 3-4 canned Next variants will be seeded (final copy provided by user later). Storage lives in the existing prompt tables (SQLite `Prompt` + IndexedDB dual-cache) with a new `Role` column (`plan` | `next`) and a per-role `IsDefault` flag. UI extends the current `Marco Inline (Plan / Next / Repeat)` strip with a small picker + edit affordance next to each chip row.
 
 Files most likely involved:
 - `standalone-scripts/macro-controller/src/ui/three-strip.ts` (or the current Plan/Next strip module)
@@ -47,7 +47,7 @@ Prior related work: plan 09 (three-strip decoupled flow, completed), plan 12 (pr
 24. Author unit tests for `plan-next-prompt-editor` (blocks save on token mismatch, blocks delete of last row per role, calls `upsertPrompt` with correct payload).
 25. Author regression test asserting that both chip inject paths call `getDefaultPromptForRole` and never contain the raw seed strings inline (prevents future drift).
 26. Author an e2e (Playwright) test under `src/test/e2e/plan-next-prompt-library.spec.ts`: open Marco Inline, open Plan picker, edit default, save, fire Plan chip, assert injected body matches edited body with `{{tokens}}` intact. Same flow for Next.
-27. Answer the user's meta question in `changelog.md`: previous plan 13 shipped 10 unit tests but no Playwright e2e; this plan closes that gap. Also confirm 30-step scope is executable in one focused iteration (estimate: 6–9 hours; can be split by block if desired).
+27. Answer the user's meta question in `changelog.md`: previous plan 13 shipped 10 unit tests but no Playwright e2e; this plan closes that gap. Also confirm 30-step scope is executable in one focused iteration (estimate: 6-9 hours; can be split by block if desired).
 28. Add `.lovable/verification/2026-07-18-plan-next-prompt-library.md` capturing before/after screenshots of the strip, the picker, and the editor.
 29. Update `readme.md` "Prompts" section with a short paragraph on Plan/Next prompt library + how to edit and how tokens are preserved.
 30. Rollup: bump version (minor) across manifest / version.json / constants / instruction.ts files, append changelog + release notes, run `npx eslint standalone-scripts --max-warnings=0`, run full vitest, run the new e2e, and move this file to `.lovable/plans/completed/14-editable-plan-next-prompt-library.md` flipping `Status: pending` → `completed`.
@@ -94,9 +94,9 @@ Delivered mapping (plan step → landing release / file):
 - Step 21 (IDB dual-cache mirror): v4.67.0, `src/ui/prompt-io-db-bridge.ts` + `prompt-cache.ts`.
 - Step 22 (lint boundaries): held throughout; every touched module stays ≤ 60 lines/function.
 - Steps 23-25 (unit tests + regression tests): 26 tests in v4.64.0 → 1237 project-wide by v4.71.0; role-parity regression covered by `prompt-export-role-parity.test.ts`.
-- Step 26 (Playwright e2e): not shipped in this plan — units + component tests exercise the same code paths; e2e deferred to plan-15 to avoid holding the release. Called out here explicitly rather than silently dropped.
+- Step 26 (Playwright e2e): not shipped in this plan - units + component tests exercise the same code paths; e2e deferred to plan-15 to avoid holding the release. Called out here explicitly rather than silently dropped.
 - Step 27 (meta answer in changelog): covered in `changelog.md` v4.71.0 and v4.72.0 notes.
-- Step 28 (verification file with screenshots): deferred with step 26 — requires the Chrome regression pass; will be filed under `.lovable/verification/` when v4.73.0 is loaded manually.
+- Step 28 (verification file with screenshots): deferred with step 26 - requires the Chrome regression pass; will be filed under `.lovable/verification/` when v4.73.0 is loaded manually.
 - Step 29 (root readme "Prompts" paragraph): landed inline with the v4.66.0 readme pin update.
 - Step 30 (rollup): version bumped 4.63 → 4.73 (10 minor pins), changelog + release notes updated every turn, `readme.md` pinned to v4.73.0. Lint + full vitest green on each release; manual Chrome regression + Playwright e2e are the two open items rolled forward.
 

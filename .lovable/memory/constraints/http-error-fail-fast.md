@@ -32,6 +32,6 @@ Repeated 4xx/5xx fanout has historically caused Lovable platform throttling and 
 
 ## Cross-refs
 
-- `mem://constraints/no-retry-policy` — sequential fail-fast (general)
-- `mem://constraints/webhook-fail-fast` — webhook single-attempt rule
-- `spec/03-error-manage/01-error-resolution/` — error resolution guide
+- `mem://constraints/no-retry-policy` - sequential fail-fast (general)
+- `mem://constraints/webhook-fail-fast` - webhook single-attempt rule
+- `spec/03-error-manage/01-error-resolution/` - error resolution guide

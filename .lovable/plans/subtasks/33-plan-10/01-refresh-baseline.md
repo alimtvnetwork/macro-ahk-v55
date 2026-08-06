@@ -1,4 +1,4 @@
-# Subtask 01 — Refresh ESLint baseline
+# Subtask 01 - Refresh ESLint baseline
 
 Slug: 01-refresh-baseline
 Parent: 33-plan-10

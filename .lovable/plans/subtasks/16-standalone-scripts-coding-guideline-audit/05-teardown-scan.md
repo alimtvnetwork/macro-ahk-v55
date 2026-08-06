@@ -6,14 +6,14 @@ Created: 2026-07-27
 
 ## Rule
 
-`mem://standards/timer-and-observer-teardown`: every `setInterval`/`setTimeout`/`MutationObserver`/`addEventListener` needs a paired teardown and a `pagehide` shutdown. Tick UIs must pause on `document.hidden`. Reinstall loops must use finite backoff (no unbounded retry — cross-check with No-Retry Policy).
+`mem://standards/timer-and-observer-teardown`: every `setInterval`/`setTimeout`/`MutationObserver`/`addEventListener` needs a paired teardown and a `pagehide` shutdown. Tick UIs must pause on `document.hidden`. Reinstall loops must use finite backoff (no unbounded retry - cross-check with No-Retry Policy).
 
 ## Grep sweeps
 
 - `rg -n 'setInterval\(' standalone-scripts/**/src`
 - `rg -n 'setTimeout\(' standalone-scripts/**/src`
 - `rg -n 'new MutationObserver' standalone-scripts/**/src`
-- `rg -n "addEventListener\('(pagehide|visibilitychange)'" standalone-scripts/**/src` — count of matches per file; files with timers but zero teardown listeners are automatic P1.
+- `rg -n "addEventListener\('(pagehide|visibilitychange)'" standalone-scripts/**/src` - count of matches per file; files with timers but zero teardown listeners are automatic P1.
 
 ## Output shape
 

@@ -1,4 +1,4 @@
-# 18 — Pre-commit scanner: husky hook vs npm `check:` script
+# 18 - Pre-commit scanner: husky hook vs npm `check:` script
 
 ## Context
 User asked: "Implement an automated pre-commit scan that flags empty
@@ -20,7 +20,7 @@ npm scripts (~30 such checks in package.json, e.g.
 - Cons: introduces a new dev toolchain (husky + lint-staged in
   devDeps), a `prepare` script, and a hooks dir; the user's
   internal git tooling (per Lovable rules: "Never run stateful git
-  commands") is managed by the platform — adding an unsupported
+  commands") is managed by the platform - adding an unsupported
   hook layer risks breakage and divergence from the existing
   `check:*` convention. Scope creep.
 
@@ -46,7 +46,7 @@ unit tests under `scripts/__tests__/` to mirror the pattern of
 
 ## Decision
 Proceeding with Option B. Will:
-1. Add `scripts/check-no-swallowed-errors.mjs` — flags
+1. Add `scripts/check-no-swallowed-errors.mjs` - flags
    `} catch {}` / `} catch (e) {}` / empty catch bodies and
    `.catch(() => {})` / `.catch(() => null)` etc. across `src/`
    and `standalone-scripts/`.

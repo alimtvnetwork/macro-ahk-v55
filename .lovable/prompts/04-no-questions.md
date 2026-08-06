@@ -6,7 +6,7 @@
 > **Activated:** 2026-04-26 (window opened by user)
 > **Last refreshed by user:** 2026-04-28 (this prompt persisted to disk)
 > **Window size:** 40 tasks
-> **Status:** ACTIVE — see `.lovable/question-and-ambiguity/task-counter.md` for current count.
+> **Status:** ACTIVE - see `.lovable/question-and-ambiguity/task-counter.md` for current count.
 
 This file is the **verbatim, persistent capture** of the user's
 No-Questions Mode spec. It supersedes ad-hoc memory of the rule and
@@ -38,11 +38,11 @@ The matching memory pointer lives at
 
 ### 2. Content requirements (every ambiguity file)
 
-- **Task context** — what feature or spec the ambiguity relates to.
-- **Specific question** — the exact point of uncertainty.
-- **Inferred decision** — what assumption was made to proceed.
-- **Impact** — how the decision affects the implementation.
-- **Suggested clarification** — what the user should confirm when
+- **Task context** - what feature or spec the ambiguity relates to.
+- **Specific question** - the exact point of uncertainty.
+- **Inferred decision** - what assumption was made to proceed.
+- **Impact** - how the decision affects the implementation.
+- **Suggested clarification** - what the user should confirm when
   reviewing.
 
 ### 3. Format
@@ -65,7 +65,7 @@ The matching memory pointer lives at
      context.
 2. Document the inference in the ambiguity log so the user can
    override it later.
-3. **Do not block progress** — complete the task with the inferred
+3. **Do not block progress** - complete the task with the inferred
    approach.
 
 ---

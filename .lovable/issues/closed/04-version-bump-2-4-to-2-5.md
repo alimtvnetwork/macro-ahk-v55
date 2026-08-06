@@ -22,8 +22,8 @@ Version bumped across all sync points:
 
 ## Note
 
-`AboutSection.tsx` was still at 2.3.0 (missed in previous bump) — corrected to 2.5.0.
-SDK instruction version was independent (1.3.0) — unified to match extension version.
+`AboutSection.tsx` was still at 2.3.0 (missed in previous bump) - corrected to 2.5.0.
+SDK instruction version was independent (1.3.0) - unified to match extension version.
 
 ## Trigger
 

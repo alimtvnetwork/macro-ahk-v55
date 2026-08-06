@@ -1,6 +1,6 @@
 ---
 name: Sourcemap strategy
-description: Dev builds use inline source maps; production builds (including releases) have NO source maps — enforced at build and release workflow level
+description: Dev builds use inline source maps; production builds (including releases) have NO source maps - enforced at build and release workflow level
 type: preference
 ---
 All Vite configs use conditional source maps:

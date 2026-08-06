@@ -2,7 +2,7 @@
 Updated: 2026-03-22
 
 ## Enriched Error Toasts
-The `showToast` function accepts an extended `ToastOpts` with a `requestDetail` field containing `{ method, url, headers, body, status, responseBody }`. When the copy button (📋) is clicked, the full request/response context is included in the clipboard text — including a redacted bearer token (first 12 chars + `...REDACTED`). Headers are redacted in diagnostic logs to protect sensitive authentication data. The copy text prefix includes the version number: `[MacroLoop v1.56.0 ERROR @ HH:MM:SS]`.
+The `showToast` function accepts an extended `ToastOpts` with a `requestDetail` field containing `{ method, url, headers, body, status, responseBody }`. When the copy button (📋) is clicked, the full request/response context is included in the clipboard text - including a redacted bearer token (first 12 chars + `...REDACTED`). Headers are redacted in diagnostic logs to protect sensitive authentication data. The copy text prefix includes the version number: `[MacroLoop v1.56.0 ERROR @ HH:MM:SS]`.
 
 ## Toast Anti-Freeze (v1.56)
 - Max visible toasts reduced from 5 → 3

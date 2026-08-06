@@ -1,4 +1,4 @@
-# 56 — Windows `ERROR: Build failed` is opaque (no Rollup error surfaced)
+# 56 - Windows `ERROR: Build failed` is opaque (no Rollup error surfaced)
 
 **Date (KL):** 2026-05-25
 **Reporter:** user via `.\run.ps1 -d`
@@ -9,14 +9,14 @@
 `.\run.ps1 -d` reaches **[3/4] Building extension…** and ends with:
 
 ```
-[copy-icons] WARN — icon-16.png missing …
-[copy-icons] WARN — icon-48.png missing …
+[copy-icons] WARN - icon-16.png missing …
+[copy-icons] WARN - icon-48.png missing …
   ERROR: Build failed
 ```
 
 Between the second `WARN` line and `ERROR: Build failed` there is **no Vite/Rollup
 error message**, only the two pre-existing `node:fs` / `node:crypto` externalization
-warnings from `sql.js` (which are harmless — they have been there for months and the
+warnings from `sql.js` (which are harmless - they have been there for months and the
 Linux build of the exact same `vite.config.extension.ts` completes successfully).
 
 ## Why we can't diagnose from the log
@@ -40,8 +40,8 @@ Linux build of the exact same `vite.config.extension.ts` completes successfully)
 
 **Option A.** Cheapest, safest, and produces the information needed to fix the
 underlying problem on the next run. Option C is rejected because the
-externalization warnings are not new — the Linux build emits them too and still
-finishes — so silencing them won't fix anything.
+externalization warnings are not new - the Linux build emits them too and still
+finishes - so silencing them won't fix anything.
 
 ## Action taken
 
@@ -49,11 +49,11 @@ finishes — so silencing them won't fix anything.
   stdout+stderr to `<PackageDir>\build.error.log` (overwritten each run) and,
   on non-zero exit, print the last 60 lines of that log with a clear banner
   so the user can paste the real Rollup error directly.
-- No change to Vite config — the build succeeds on Linux with the same config,
+- No change to Vite config - the build succeeds on Linux with the same config,
   so we must see the Windows-specific error before changing anything else.
 
 ## Next step for the user
 
 Re-run `.\run.ps1 -d`. When it fails, the script will now print the captured
-Rollup error (or memory-pressure crash, or plugin throw — whatever it is) and
+Rollup error (or memory-pressure crash, or plugin throw - whatever it is) and
 also leave it in `build.error.log` at the repo root.

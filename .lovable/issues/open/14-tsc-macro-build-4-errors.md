@@ -6,8 +6,8 @@ User request (verbatim):
 
 ## Errors
 
-- `ui/database-json-migrate.ts:196,211,222` — `.then((resp: ExtensionCallbackResponse) => ...)` incompatible with `runSqlBridge` return type `SqlBridgeResp` under `exactOptionalPropertyTypes`.
-- `ui/prompt-dropdown-io.ts:62` — `readUserAddedEntries` return type declares `entries` but returns `{ kept, defaultsSkipped }`.
+- `ui/database-json-migrate.ts:196,211,222` - `.then((resp: ExtensionCallbackResponse) => ...)` incompatible with `runSqlBridge` return type `SqlBridgeResp` under `exactOptionalPropertyTypes`.
+- `ui/prompt-dropdown-io.ts:62` - `readUserAddedEntries` return type declares `entries` but returns `{ kept, defaultsSkipped }`.
 
 ## DoD
 

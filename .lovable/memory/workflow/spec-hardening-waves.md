@@ -1,6 +1,6 @@
 ---
 name: Spec hardening waves
-description: Summary of v4..v7 hardening waves on spec/21-app/05-prompts/** — what each wave added and where to find it
+description: Summary of v4..v7 hardening waves on spec/21-app/05-prompts/** - what each wave added and where to find it
 type: feature
 ---
 
@@ -26,6 +26,6 @@ four hardening waves added operability + enforcement scaffolding.
 - INDEX.json + tooltip dict committed and current per push
 
 ## Where to look first
-- `spec/21-app/05-prompts/README.md` — subsystem entry
-- `spec/21-app/05-prompts/CONTRIBUTING.md` — author guide
-- `spec/21-app/05-prompts/99-spec-issues/README.md` — issue tracker map
+- `spec/21-app/05-prompts/README.md` - subsystem entry
+- `spec/21-app/05-prompts/CONTRIBUTING.md` - author guide
+- `spec/21-app/05-prompts/99-spec-issues/README.md` - issue tracker map

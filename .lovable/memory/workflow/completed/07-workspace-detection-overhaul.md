@@ -1,4 +1,4 @@
-# Plan: Workspace Detection Resilience Overhaul (v7.9.16–v7.9.25)
+# Plan: Workspace Detection Resilience Overhaul (v7.9.16-v7.9.25)
 
 **Status**: COMPLETED
 **Date Completed**: 2026-02-23
@@ -9,31 +9,31 @@ Multi-version effort to achieve reliable workspace detection in MacroLoop. Progr
 
 ## Issues Fixed (with RCA references)
 
-### 1. Workspace Name Shows Project Name (v7.9.16) — Issue #01
+### 1. Workspace Name Shows Project Name (v7.9.16) - Issue #01
 - **Root Cause**: DOM observer picked up project name from nav element
 - **Fix**: `isKnownWorkspaceName()` validation on all DOM-sourced names
 
-### 2. Status Bar Credit Display Mismatch (v7.9.17) — Issue #02
+### 2. Status Bar Credit Display Mismatch (v7.9.17) - Issue #02
 - **Root Cause**: Top-level bar used different credit formula than workspace items
 - **Fix**: Uses shared `calcTotalCredits`/`calcAvailableCredits` helpers
 
-### 3. Progress Bar Missing Granted + Stale Workspace (v7.9.18) — Issue #03
+### 3. Progress Bar Missing Granted + Stale Workspace (v7.9.18) - Issue #03
 - **Root Cause**: No 🎁 segment for `credits_granted`; API fallbacks didn't validate existing workspace name
 - **Fix**: Added segment; fallback paths use `isKnownWorkspaceName()`
 
-### 4. Workspace Detection 405 API Failure (v7.9.19) — Issue #04
+### 4. Workspace Detection 405 API Failure (v7.9.19) - Issue #04
 - **Root Cause**: `GET /projects/{id}` returns 405 Method Not Allowed
 - **Fix**: DOM-based fallback; removed blind `perWs[0]` default
 
-### 5. Replace GET with POST mark-viewed (v7.9.20) — Issue #05
+### 5. Replace GET with POST mark-viewed (v7.9.20) - Issue #05
 - **Root Cause**: GET endpoint broken; POST mark-viewed works and returns `workspace_id`
 - **Fix**: Switched to `POST /projects/{id}/mark-viewed`; built `wsById` O(1) dictionary
 
-### 6. workspaceFromApi Guard Never Activated (v7.9.22) — Issue #06
+### 6. workspaceFromApi Guard Never Activated (v7.9.22) - Issue #06
 - **Root Cause**: Guard flag declared but never set to `true`; DOM observer race condition always won
 - **Fix**: Guard SET in all authoritative paths; CHECKED in all 4 DOM setter paths; `__loopDiag()` diagnostic added
 
-### 7. Vague Fetch Logging / Empty Body Crash (v7.9.24) — Issue #07
+### 7. Vague Fetch Logging / Empty Body Crash (v7.9.24) - Issue #07
 - **Root Cause**: `resp.json()` crashed on empty 200 body; logs didn't include URL, auth, or response details
 - **Fix**: Mandatory `resp.text()` + `JSON.parse()`; comprehensive fetch logging standard
 
@@ -43,9 +43,9 @@ Multi-version effort to achieve reliable workspace detection in MacroLoop. Progr
 
 ## Final Architecture: 4-Tier Detection Hierarchy
 
-1. **Tier 1 — API**: `POST /projects/{id}/mark-viewed` → `workspace_id` → `wsById` lookup
-2. **Tier 2 — Project Dialog DOM**: Click `ProjectButtonXPath` → read `WorkspaceNameXPath` → validate
-3. **Tier 3 — Default**: `perWs[0]` (last resort only)
+1. **Tier 1 - API**: `POST /projects/{id}/mark-viewed` → `workspace_id` → `wsById` lookup
+2. **Tier 2 - Project Dialog DOM**: Click `ProjectButtonXPath` → read `WorkspaceNameXPath` → validate
+3. **Tier 3 - Default**: `perWs[0]` (last resort only)
 4. **Guard**: `state.workspaceFromApi` prevents DOM observers from overwriting verified data
 
 ## Principles Established

@@ -9,12 +9,12 @@ Updated: 2026-04-21
 
 ## Single-channel unified installer
 
-The repo ships **one installer pair**: `scripts/install.ps1` and `scripts/install.sh`. Behavior is determined entirely at runtime by where the script was downloaded from — no build-time stamping, no separate "pinned" file.
+The repo ships **one installer pair**: `scripts/install.ps1` and `scripts/install.sh`. Behavior is determined entirely at runtime by where the script was downloaded from - no build-time stamping, no separate "pinned" file.
 
 | Source URL | Resolved version | Behavior |
 |------------|------------------|----------|
-| `github.com/{repo}/releases/download/vX.Y.Z/install.{ps1,sh}` | `vX.Y.Z` (parsed from URL) | URL-pinned — yellow warning printed, summary shows "(pinned via release URL)" |
-| `raw.githubusercontent.com/{repo}/main/scripts/install.{ps1,sh}` | GitHub `latest` API | Auto-update — re-running upgrades to newest release |
+| `github.com/{repo}/releases/download/vX.Y.Z/install.{ps1,sh}` | `vX.Y.Z` (parsed from URL) | URL-pinned - yellow warning printed, summary shows "(pinned via release URL)" |
+| `raw.githubusercontent.com/{repo}/main/scripts/install.{ps1,sh}` | GitHub `latest` API | Auto-update - re-running upgrades to newest release |
 | Local clone, no URL context | GitHub `latest` API | Same as above |
 
 ## Resolution algorithm
@@ -31,7 +31,7 @@ resolve_version(override):
     3. Fall back to GitHub `latest` API.
 ```
 
-There is no hard-error path for "no version determinable" — the latest API is always a viable fallback.
+There is no hard-error path for "no version determinable" - the latest API is always a viable fallback.
 
 ## Exit-code contract
 
@@ -47,14 +47,14 @@ There is no hard-error path for "no version determinable" — the latest API is 
 
 ## Release-pipeline contract (`release.yml`)
 
-The "Package release assets" step only **copies** the installers verbatim — no `sed`, no sentinel substitution, no verification step. Files are dropped into `release-assets/` so `sha256sum *` and `softprops/action-gh-release` pick them up alongside the ZIPs.
+The "Package release assets" step only **copies** the installers verbatim - no `sed`, no sentinel substitution, no verification step. Files are dropped into `release-assets/` so `sha256sum *` and `softprops/action-gh-release` pick them up alongside the ZIPs.
 
 ## Release-notes contract
 
 The "Quick Install" section is split into two clearly labeled subsections:
 
-- 🔒 **Pinned to this release (recommended)** — `install.{ps1,sh}` from the release download URL. URL-pinning is implicit.
-- 🌊 **Latest channel (auto-update)** — `install.{ps1,sh}` from `raw.githubusercontent.com/.../main/`.
+- 🔒 **Pinned to this release (recommended)** - `install.{ps1,sh}` from the release download URL. URL-pinning is implicit.
+- 🌊 **Latest channel (auto-update)** - `install.{ps1,sh}` from `raw.githubusercontent.com/.../main/`.
 
 Pinned comes **first** because users on a specific release page typically want that exact version.
 

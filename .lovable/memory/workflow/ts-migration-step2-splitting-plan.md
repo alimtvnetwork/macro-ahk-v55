@@ -1,4 +1,4 @@
-# TS Migration Step 2 — Macro-Looping.ts Splitting Plan
+# TS Migration Step 2 - Macro-Looping.ts Splitting Plan
 
 **Source**: `standalone-scripts/macro-controller/src/macro-looping.ts` (4186 lines, 61 functions)
 **Goal**: Extract logically cohesive groups into individual files under `src/` and `src/ui/`
@@ -53,7 +53,7 @@ UI: about-modal, auto-attach, countdown, js-executor, menu-helpers, panel-layout
 - `destroyPanel()` (L1767)
 
 ### Segment E: Panel Creation (ui/panel-builder.ts) ~350 lines
-- `createUI()` (L1798) — main panel construction
+- `createUI()` (L1798) - main panel construction
 - `resetCheckButtonState()` (L1978)
 - `doRunCheck()` (L2044)
 
@@ -79,20 +79,20 @@ UI: about-modal, auto-attach, countdown, js-executor, menu-helpers, panel-layout
 
 ## Execution Order
 
-1. **Segment C** (workspace-observer) — self-contained, few deps
-2. **Segment D** (ui-updaters) — utility functions, widely referenced
-3. **Segment A** (ws-selection-ui) — depends on D
-4. **Segment B** (bulk-rename) — self-contained dialog
-5. **Segment F** (prompt-manager) — already partially extracted
-6. **Segment E** (panel-builder) — depends on D, F
-7. **Segment G** (force-move) — large block, some coupling
-8. **Segment H** (startup) — final bootstrap, depends on everything
+1. **Segment C** (workspace-observer) - self-contained, few deps
+2. **Segment D** (ui-updaters) - utility functions, widely referenced
+3. **Segment A** (ws-selection-ui) - depends on D
+4. **Segment B** (bulk-rename) - self-contained dialog
+5. **Segment F** (prompt-manager) - already partially extracted
+6. **Segment E** (panel-builder) - depends on D, F
+7. **Segment G** (force-move) - large block, some coupling
+8. **Segment H** (startup) - final bootstrap, depends on everything
 
 ---
 
 ## Constraints
 
-- All functions are inside the IIFE closure — they share closure state
+- All functions are inside the IIFE closure - they share closure state
 - Extraction requires passing shared state via imports from `shared-state.ts`
 - Some deeply nested functions (e.g., inside `renderBulkRenameDialog`) may stay nested
 - Each extraction must preserve the IIFE build output (single bundle)

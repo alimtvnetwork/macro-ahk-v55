@@ -2,7 +2,7 @@ Slug: issues-76-through-88-summary
 Status: closed
 Created: 2026-07-17
 
-# Solved Issues: Issues 76–88 Summary
+# Solved Issues: Issues 76-88 Summary
 
 **Resolved**: Various dates (2026-03-20 through 2026-03-27)
 
@@ -34,7 +34,7 @@ Created: 2026-07-17
 ## Issue 83: Dependency Globals + Auth Cookie Header
 - **Root Cause**: Globals not injected before dependent scripts; auth cookie stripped by browser
 - **Solution**: Fixed injection order; added proper cookie handling
-- **Learning**: Script dependency order is critical — document and enforce it
+- **Learning**: Script dependency order is critical - document and enforce it
 
 ## Issue 85: SDK Notifier, Config Seeding & DB Overhaul
 - **Root Cause**: Multiple related issues consolidated
@@ -54,4 +54,4 @@ Created: 2026-07-17
 ## Issue 88: IndexedDB Injection Cache
 - **Root Cause**: `resolveScriptCode()` falls back to stub when build artifacts missing
 - **Solution**: IndexedDB cache with auto-invalidation on deploy, manual invalidation button
-- **Learning**: Cache invalidation is harder than caching — always provide manual override
+- **Learning**: Cache invalidation is harder than caching - always provide manual override

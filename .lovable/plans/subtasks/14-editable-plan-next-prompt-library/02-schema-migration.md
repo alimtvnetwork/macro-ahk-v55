@@ -5,7 +5,7 @@ Created: 2026-07-18
 Parent: 14-editable-plan-next-prompt-library
 ---
 
-# SS-02 — SQLite schema migration for `Role` + `IsDefault`
+# SS-02 - SQLite schema migration for `Role` + `IsDefault`
 
 Goal: extend the `Prompt` table without breaking existing rows or requiring a version bump gate.
 

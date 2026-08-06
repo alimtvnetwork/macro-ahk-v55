@@ -8,12 +8,12 @@ type: feature
 
 ## Problem
 
-The popup banner classified `[WASM_FILE_MISSING_404]` failures with a dedicated fix block but the *evidence* (what HEAD actually returned) lived only in the SW console — often unreachable mid-failure.
+The popup banner classified `[WASM_FILE_MISSING_404]` failures with a dedicated fix block but the *evidence* (what HEAD actually returned) lived only in the SW console - often unreachable mid-failure.
 
 ## Capture pipeline
 
 1. `boot-diagnostics.ts` exports `WasmProbeResult` ({ url, status, contentLength, headError, ok, at }) plus `setWasmProbeResult()` / `getWasmProbeResult()` module state.
-2. `db-manager.ts → verifyWasmPresence()` builds a probe object up front and calls `setWasmProbeResult(probe)` on every exit branch — HEAD threw, 404, non-2xx, content-length 0, AND success. Errors continue to throw the existing `[WASM_FILE_MISSING_404]` tag so `classifyCause()` still picks `kind: "wasm-missing"`.
+2. `db-manager.ts → verifyWasmPresence()` builds a probe object up front and calls `setWasmProbeResult(probe)` on every exit branch - HEAD threw, 404, non-2xx, content-length 0, AND success. Errors continue to throw the existing `[WASM_FILE_MISSING_404]` tag so `classifyCause()` still picks `kind: "wasm-missing"`.
 3. `status-handler.ts` includes `wasmProbe: getWasmProbeResult()` in `StatusResponse`.
 4. `boot.ts → persistBootFailure()` embeds `wasmProbe: getWasmProbeResult()` in the `marco_last_boot_failure` payload, mirroring the existing `context` field. The probe survives SW restarts because the persisted record is the source of truth.
 5. `use-popup-data.ts` exposes `effectiveWasmProbe = status?.wasmProbe ?? persistedFailure?.wasmProbe ?? null` (live overlaid on persisted).

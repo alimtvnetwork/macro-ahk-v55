@@ -3,24 +3,24 @@ Updated: 2026-04-13
 
 ---
 name: No-retry policy for controller operations
-description: NEVER add retry/backoff logic to cycle, credit fetch, or auth recovery. Cycle failures are transient — the loop interval is the natural retry.
+description: NEVER add retry/backoff logic to cycle, credit fetch, or auth recovery. Cycle failures are transient - the loop interval is the natural retry.
 type: constraint
 ---
 
 ## Policy
 
 **ABSOLUTE RULE**: No retry logic, no exponential backoff, no retryCount, no recursive self-calls in:
-- `loop-cycle.ts` — if a cycle fails, log error, release lock, done. Next interval handles it.
-- `credit-fetch.ts` — single sequential recovery via `getBearerToken({ force: true })` then one more API call. No recursive `fetchLoopCredits(true)`.
-- `credit-balance.ts` — same sequential pattern. No recursive `fetchCreditBalance(wsId, true)`.
-- `shared-state-runtime.ts` — ControllerState must NOT have `retryCount`, `maxRetries`, `retryBackoffMs`, `lastRetryError`, or `__cycleRetryPending`.
+- `loop-cycle.ts` - if a cycle fails, log error, release lock, done. Next interval handles it.
+- `credit-fetch.ts` - single sequential recovery via `getBearerToken({ force: true })` then one more API call. No recursive `fetchLoopCredits(true)`.
+- `credit-balance.ts` - same sequential pattern. No recursive `fetchCreditBalance(wsId, true)`.
+- `shared-state-runtime.ts` - ControllerState must NOT have `retryCount`, `maxRetries`, `retryBackoffMs`, `lastRetryError`, or `__cycleRetryPending`.
 
 ## Why
 
 Retry logic caused:
 1. Exponential delays (2s + 4s + 8s) compounding with the 12s auth timeout
 2. Multiple competing token recovery paths racing and corrupting token state
-3. The persistent "Auth failed — no token after 12s" toast
+3. The persistent "Auth failed - no token after 12s" toast
 
 ## Reference Files
 
@@ -53,7 +53,7 @@ All runtime auth consumers MUST use `getBearerToken()` for token resolution. No 
 
 1. **Normal token read**: `const token = await getBearerToken()`
 2. **One forced refresh after 401/403**: `const token = await getBearerToken({ force: true })`
-3. **Cycle path**: fail this cycle immediately on auth error — no recovery, no second attempt
+3. **Cycle path**: fail this cycle immediately on auth error - no recovery, no second attempt
 
 `resolveToken()` remains available for diagnostic/display only. `recoverAuthOnce()` is deprecated.
 

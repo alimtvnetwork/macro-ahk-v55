@@ -5,32 +5,32 @@
 
 Hardened "explain it to me like I'm five / like a layman" prompt. Built
 to score 10/10 on Clarity, Actionability, Success Criteria, and
-Signal. Tone is intentionally aggressive — that is by design, not an
+Signal. Tone is intentionally aggressive - that is by design, not an
 accident.
 
 ## What I want
 
-Explain the concept I name **as if I am a complete layman** — zero
+Explain the concept I name **as if I am a complete layman** - zero
 prior knowledge, zero jargon assumed. I want to *actually understand
 it*, not be impressed.
 
 For the concept I give you, you MUST cover:
 
-1. **The plain-English idea** — one or two sentences, no jargon, the
+1. **The plain-English idea** - one or two sentences, no jargon, the
    "what is this really" version.
-2. **A real-world analogy** — something from everyday life (games,
+2. **A real-world analogy** - something from everyday life (games,
    money, sharing pizza, tug-of-war) that maps onto the concept.
-3. **Every sub-term defined** — define EACH technical word you use the
+3. **Every sub-term defined** - define EACH technical word you use the
    moment you use it. If you say "zero-sum game", "fair game", "value
    of the game", "Nash equilibrium", "pure strategy", you define each
    one, separately, in plain words.
-4. **The "why" behind each claim** — e.g. *why* the value of a game
+4. **The "why" behind each claim** - e.g. *why* the value of a game
    being zero does NOT automatically make it a fair game; *why* an
    equilibrium is only "pure" and what that excludes.
-5. **A visual** — include or describe a **GIF / animation / diagram**
+5. **A visual** - include or describe a **GIF / animation / diagram**
    that shows the idea moving. Save it (see Saving) and reference it
    inline so I can see the concept, not just read it.
-6. **A worked example** — walk one concrete example end-to-end with
+6. **A worked example** - walk one concrete example end-to-end with
    real numbers.
 7. **A one-line recap** I can remember forever.
 
@@ -51,14 +51,14 @@ For the concept I give you, you MUST cover:
 - Update the **root `readme.md`** so the new section/file is
   discoverable.
 - Do NOT scatter files elsewhere, do NOT save one file per sub-term,
-  and do NOT create duplicates — one topic = one Markdown file + its
+  and do NOT create duplicates - one topic = one Markdown file + its
   paired asset(s).
 
 ## Definition of done (non-negotiable)
 
 You are NOT done until ALL of these are true:
 - [ ] Every technical term that appears is defined, in plain words,
-  where it first appears — none left assumed.
+  where it first appears - none left assumed.
 - [ ] There is at least one everyday analogy AND one worked numeric
   example.
 - [ ] There is at least one visual (GIF / animation / diagram), saved
@@ -72,7 +72,7 @@ You are NOT done until ALL of these are true:
 ## Hard rules
 
 - **No undefined jargon. Ever.** If you use a term you didn't define
-  in plain words, you failed — start over.
+  in plain words, you failed - start over.
 - **Show, don't just tell.** A wall of text with no visual is a fail.
   The animation/diagram is mandatory, not optional polish.
 - **Depth over speed.** A fast, shallow "technically correct" answer

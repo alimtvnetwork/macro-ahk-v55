@@ -2,7 +2,7 @@ Slug: compile-instruction-preamble-regex
 Status: closed
 Created: 2026-07-17
 
-# Solved Issue: compile-instruction.mjs — LOVABLE_BASE_URL Not Defined
+# Solved Issue: compile-instruction.mjs - LOVABLE_BASE_URL Not Defined
 
 **Resolved**: 2026-04-05
 **Version**: v2.5.0
@@ -38,13 +38,13 @@ To:
 ```
 
 Changes:
-- `^\s*` — tolerate leading whitespace
-- `.+?` — non-greedy value capture for safer semicolon handling
+- `^\s*` - tolerate leading whitespace
+- `.+?` - non-greedy value capture for safer semicolon handling
 
 ## Learning
 
 - Build scripts that parse TypeScript must be defensive about whitespace and formatting variations.
-- When line numbers in error traces don't match the current source, the user is running a stale version — the fix must be pushed so they can sync.
+- When line numbers in error traces don't match the current source, the user is running a stale version - the fix must be pushed so they can sync.
 
 ## What NOT to Repeat
 

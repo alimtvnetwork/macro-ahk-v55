@@ -39,7 +39,7 @@ Floating panel anchored at the right-click coordinates with:
 
 Registered in `marco-sdk/src/api-registry.ts` under `memberships.search` and
 exposed as `marco.api.memberships.search(wsId, options)`. The query string is
-baked into the URL template — `resolveUrl()` only handles `{path}` params, not
+baked into the URL template - `resolveUrl()` only handles `{path}` params, not
 real query params, but the literal `?status=active&limit=20` survives the
 template substitution unchanged.
 
@@ -75,7 +75,7 @@ Timeout: 10 000 ms. **No retries** (per `mem://constraints/no-retry-policy`).
 
 5-minute TTL per workspace stored in a module-level `Record<string, CacheEntry>`
 inside `ws-members-fetch.ts`. The panel's `↻` button calls
-`clearMembersCache(wsId)` then re-fetches. Cache is process-local — survives
+`clearMembersCache(wsId)` then re-fetches. Cache is process-local - survives
 panel close/reopen but not page reload.
 
 ## Lifecycle
@@ -90,19 +90,19 @@ panel close/reopen but not page reload.
 
 ## Files
 
-- `standalone-scripts/marco-sdk/src/api-registry.ts` — `memberships.search` endpoint config
-- `standalone-scripts/marco-sdk/src/api.ts` — `memberships.search()` typed wrapper + `MarcoApiModule.memberships`
-- `standalone-scripts/macro-controller/src/globals.d.ts` — `MarcoSDKApiMemberships` interface added to `MarcoSDKApiModule`
-- `standalone-scripts/macro-controller/src/ws-members-fetch.ts` — fetch + sort + cache + types
-- `standalone-scripts/macro-controller/src/ws-members-panel.ts` — single-mount floating panel UI
-- `standalone-scripts/macro-controller/src/ws-context-menu.ts` — adds the "👥 Show Members" entry
+- `standalone-scripts/marco-sdk/src/api-registry.ts` - `memberships.search` endpoint config
+- `standalone-scripts/marco-sdk/src/api.ts` - `memberships.search()` typed wrapper + `MarcoApiModule.memberships`
+- `standalone-scripts/macro-controller/src/globals.d.ts` - `MarcoSDKApiMemberships` interface added to `MarcoSDKApiModule`
+- `standalone-scripts/macro-controller/src/ws-members-fetch.ts` - fetch + sort + cache + types
+- `standalone-scripts/macro-controller/src/ws-members-panel.ts` - single-mount floating panel UI
+- `standalone-scripts/macro-controller/src/ws-context-menu.ts` - adds the "👥 Show Members" entry
 
 ## Edge cases handled
 
 - Missing `display_name` → falls back to `username` → `email` → `user_id`
 - Missing `total_credits_used*` → coerced to 0 via `safeNumber()` (handles null, undefined, string)
 - Empty `members` array → "No active members." empty state
-- Server returns non-2xx → throws `Error('HTTP <status> — <bodyPreview>')`, panel renders error block
+- Server returns non-2xx → throws `Error('HTTP <status> - <bodyPreview>')`, panel renders error block
 - `marco.api.memberships` undefined (SDK not loaded) → throws explicit error
 - Panel closed mid-fetch → render is a no-op (`document.getElementById(PANEL_ID)` guard)
 - Right-click coordinates near viewport edge → `positionPanel()` clamps to ≥8 px margin

@@ -1,4 +1,4 @@
-# 13 — Tests for tooltip example text reacting to Padding changes
+# 13 - Tests for tooltip example text reacting to Padding changes
 
 ## Request
 > Add automated tests to verify the {n} and Separator tooltip example text
@@ -10,7 +10,7 @@ avoid manual Chrome testing, P Store in discuss-later mode. Never recommend
 as next."*
 
 The tooltip in `BulkRenameSequenceDialog` is **static text** (constants like
-`"Login 01"`) — it does NOT actually re-render based on the live `Padding`
+`"Login 01"`) - it does NOT actually re-render based on the live `Padding`
 state. Only the inline `SequenceFormulaExample` (added earlier) and the
 preview rows react to Padding. So the literal premise ("tooltip text updates
 when padding changes") is false in the current code.
@@ -40,7 +40,7 @@ when padding changes") is false in the current code.
 ## Recommendation
 **A.** Decline. If the user wants coverage anyway, **C** is the cleanest
 path because the assertion can live in a pure-function unit test
-(`renderSequenceName(input, index)`) rather than a React component test —
+(`renderSequenceName(input, index)`) rather than a React component test -
 side-stepping the Deferred-Workstreams ban.
 
 ## Decision

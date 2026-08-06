@@ -51,7 +51,7 @@ Resolved - 2026-07-27
   (delivering on the v5.12.0 memory promise).
 - Every build job regenerates `version.json` from
   `needs.setup.outputs.publish_tag` right after checkout.
-- Root `version.json` reset to the placeholder `0.0.0-dev` — future
+- Root `version.json` reset to the placeholder `0.0.0-dev` - future
   releases never require a version.json edit.
 
 ## Recovery for v5.12.1

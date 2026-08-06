@@ -29,12 +29,12 @@ standalone-scripts/macro-prompts/<slug>/
 ## Discovery rules
 
 - Slug = folder name; must match `info.json.Slug` exactly (CI guard).
-- Reserved slug prefix `System.*` (e.g. `System.SpecTighten`) — ships with extension; user-defined slugs MUST NOT start with `System.`.
+- Reserved slug prefix `System.*` (e.g. `System.SpecTighten`) - ships with extension; user-defined slugs MUST NOT start with `System.`.
 - Duplicate slugs → build fails with `Reason='DuplicateMacroSlug'`.
 
 ## Why a folder per macro
 
-- Variables[], Steps[], and body.md evolve independently — splitting avoids merge conflicts.
+- Variables[], Steps[], and body.md evolve independently - splitting avoids merge conflicts.
 - Allows fixtures (`__tests__/<slug>.spec.ts`) to live next to the macro definition.
 - Mirrors `standalone-scripts/prompts/` convention already used by single-shot prompts.
 

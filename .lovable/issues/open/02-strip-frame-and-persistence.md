@@ -1,4 +1,4 @@
-# Issue 02 — Plan/Next/Repeat strips scattered and lost on TS Macro close
+# Issue 02 - Plan/Next/Repeat strips scattered and lost on TS Macro close
 
 Status: open
 Created: 2026-07-16

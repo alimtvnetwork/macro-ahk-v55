@@ -11,9 +11,9 @@ Every job (setup, build-sdk, build-xpath, build-macro-controller, build-prompts,
 1. **pnpm content-addressable store** at `$(pnpm store path)` keyed on `**/pnpm-lock.yaml` + `**/package-lock.json` hash
 2. **node_modules** (root + `standalone-scripts/*/node_modules`) with per-job key prefix `nm-<job>-` plus shared restore-key fallback
 
-Install command is `pnpm install --prefer-offline --no-frozen-lockfile` — network-free when cached.
+Install command is `pnpm install --prefer-offline --no-frozen-lockfile` - network-free when cached.
 
-`fetch-depth: 1` on every checkout (was 0 only on setup) — shallow clones save bandwidth across all 6 jobs.
+`fetch-depth: 1` on every checkout (was 0 only on setup) - shallow clones save bandwidth across all 6 jobs.
 
 `pnpm/action-setup@v4` is invoked with `run_install: false` so caching steps run BEFORE install.
 

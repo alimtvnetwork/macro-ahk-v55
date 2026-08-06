@@ -1,4 +1,4 @@
-# CI/CD Issue 08 — Stale release tag cannot contain recovery fixes
+# CI/CD Issue 08 - Stale release tag cannot contain recovery fixes
 
 ## Pipeline / Workflow
 
@@ -60,7 +60,7 @@ over the inherited caller ref.
 
 ## Status
 
-✅ Resolved — 2026-05-19
+✅ Resolved - 2026-05-19
 
 ## Fix
 

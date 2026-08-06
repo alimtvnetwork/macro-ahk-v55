@@ -7,18 +7,18 @@ The project uses a structured script injection pipeline with cache gate and CSP 
 ## Pre-Pipeline
 - **User Trigger**: Run Scripts (normal) or Force Run (forceReload=true)
 - **Loading Toast**: spinner injected into tab immediately
-- **Cache Gate**: IndexedDB lookup by version key. HIT → skip Stages 0–3. Force Run → delete cache, rebuild.
+- **Cache Gate**: IndexedDB lookup by version key. HIT → skip Stages 0-3. Force Run → delete cache, rebuild.
 
 ## Pipeline Stages
-1. **Stage 0a: ensureBuiltinScriptsExist** — self-heal missing built-in scripts from bundled /scripts/
-2. **Stage 0b: prependDependencyScripts** — topological sort, prepend deps before dependents
-3. **Stage 1: resolveInjectionRequestScripts** — load code + config + theme from chrome.storage.local. Unresolvable = HARD ERROR.
+1. **Stage 0a: ensureBuiltinScriptsExist** - self-heal missing built-in scripts from bundled /scripts/
+2. **Stage 0b: prependDependencyScripts** - topological sort, prepend deps before dependents
+3. **Stage 1: resolveInjectionRequestScripts** - load code + config + theme from chrome.storage.local. Unresolvable = HARD ERROR.
 4. **Stage 2: Tab Environment Prep (parallel Promise.all)**
-   - 2a: `bootstrapNamespaceRoot()` — creates `window.RiseupAsiaMacroExt = { Projects: {} }` in MAIN world (NO fallback). CSP blocked → DEGRADED.
-   - 2b: `ensureRelayInjected()` — content script relay in ISOLATED world
-   - 2c: `seedTokensIntoTab()` — bearer token with 2-min TTL
-5. **Stage 3: Wrap + Prepare** — CSS check → sequential or batch mode. IIFE wrapping + SDK preamble. Batch payload cached in IndexedDB.
-6. **Stage 4: Execute — 4-tier CSP fallback**:
+   - 2a: `bootstrapNamespaceRoot()` - creates `window.RiseupAsiaMacroExt = { Projects: {} }` in MAIN world (NO fallback). CSP blocked → DEGRADED.
+   - 2b: `ensureRelayInjected()` - content script relay in ISOLATED world
+   - 2c: `seedTokensIntoTab()` - bearer token with 2-min TTL
+5. **Stage 3: Wrap + Prepare** - CSS check → sequential or batch mode. IIFE wrapping + SDK preamble. Batch payload cached in IndexedDB.
+6. **Stage 4: Execute - 4-tier CSP fallback**:
    - Tier 1: MAIN World Blob injection (primary)
    - Tier 2: USER_SCRIPT world via chrome.userScripts.execute (Chrome 135+)
    - Tier 3: ISOLATED World Blob injection

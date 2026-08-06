@@ -1,5 +1,5 @@
 ---
-name: Open Lovable Tabs — per-tab workspace mapping
+name: Open Lovable Tabs - per-tab workspace mapping
 description: Macro Controller panel lists open Lovable tabs and resolves each tab's workspace via injection map or single-attempt background→page probe (no retry, parallel, 600ms timeout, fail-fast)
 type: feature
 ---
@@ -11,13 +11,13 @@ type: feature
 
 ## Contract (must hold)
 
-1. **Transport** — MAIN-world panel never calls `chrome.tabs.*` directly. All traffic flows panel → `window.postMessage` → content-script → `chrome.runtime` → background, and back (mem://architecture/message-relay-system, mem://architecture/injection-context-awareness).
-2. **No retry** — every probe is single-attempt, fail-fast, parallel across tabs (`Promise.all`). No retry queue, no exponential backoff (mem://constraints/no-retry-policy).
-3. **Hard timeout** — `PROBE_TIMEOUT_MS = 600`. On timeout the row renders a short reason; the panel never blocks.
-4. **No new permissions** — only existing `chrome.tabs.sendMessage` + `chrome.tabs.query` with `LOVABLE_TAB_PATTERNS`.
-5. **Read-only responder** — page-side responder snapshots `state.workspaceName` / cached id / `extractProjectIdFromUrl()`; MUST NOT mutate state or trigger re-detection.
-6. **URL patterns single source** — `src/shared/lovable-tab-patterns.ts` is the only `LOVABLE_TAB_PATTERNS` definition; auto-injector, cookie-watcher, auth-health, config-auth, and open-tabs handler all import from it (v2.249.0 dedupe).
-7. **No Explicit Unknown** — `OpenLovableTabInfo.bindingSource` is the union `'injection' | 'probe' | 'none'`; `detectedWorkspaceSource` is `'api' | 'cache' | 'dom' | 'none' | null`.
+1. **Transport** - MAIN-world panel never calls `chrome.tabs.*` directly. All traffic flows panel → `window.postMessage` → content-script → `chrome.runtime` → background, and back (mem://architecture/message-relay-system, mem://architecture/injection-context-awareness).
+2. **No retry** - every probe is single-attempt, fail-fast, parallel across tabs (`Promise.all`). No retry queue, no exponential backoff (mem://constraints/no-retry-policy).
+3. **Hard timeout** - `PROBE_TIMEOUT_MS = 600`. On timeout the row renders a short reason; the panel never blocks.
+4. **No new permissions** - only existing `chrome.tabs.sendMessage` + `chrome.tabs.query` with `LOVABLE_TAB_PATTERNS`.
+5. **Read-only responder** - page-side responder snapshots `state.workspaceName` / cached id / `extractProjectIdFromUrl()`; MUST NOT mutate state or trigger re-detection.
+6. **URL patterns single source** - `src/shared/lovable-tab-patterns.ts` is the only `LOVABLE_TAB_PATTERNS` definition; auto-injector, cookie-watcher, auth-health, config-auth, and open-tabs handler all import from it (v2.249.0 dedupe).
+7. **No Explicit Unknown** - `OpenLovableTabInfo.bindingSource` is the union `'injection' | 'probe' | 'none'`; `detectedWorkspaceSource` is `'api' | 'cache' | 'dom' | 'none' | null`.
 
 ## Resolution waterfall (per tab)
 
@@ -43,20 +43,20 @@ Background handler classifies every probe failure with `Reason` + `ReasonDetail`
 
 ## Files
 
-- `src/shared/lovable-tab-patterns.ts` — single source of truth for `LOVABLE_TAB_PATTERNS`.
-- `src/background/handlers/open-tabs-handler.ts` — parallel probe + `emitProbeFailure()` classifier.
-- `src/background/bg-logger.ts` — `BgLogTag.OPEN_TABS`.
-- `src/content-scripts/message-relay.ts` — `PROBE_DETECTED_WORKSPACE` bridge with 600 ms timeout.
-- `standalone-scripts/macro-controller/src/page-workspace-responder.ts` — MAIN-world read-only responder.
-- `standalone-scripts/macro-controller/src/ui/section-open-tabs.ts` — three-tier label renderer.
+- `src/shared/lovable-tab-patterns.ts` - single source of truth for `LOVABLE_TAB_PATTERNS`.
+- `src/background/handlers/open-tabs-handler.ts` - parallel probe + `emitProbeFailure()` classifier.
+- `src/background/bg-logger.ts` - `BgLogTag.OPEN_TABS`.
+- `src/content-scripts/message-relay.ts` - `PROBE_DETECTED_WORKSPACE` bridge with 600 ms timeout.
+- `standalone-scripts/macro-controller/src/page-workspace-responder.ts` - MAIN-world read-only responder.
+- `standalone-scripts/macro-controller/src/ui/section-open-tabs.ts` - three-tier label renderer.
 
 ## Out of scope
 
 - Persisting probe results across panel openings (always fresh).
-- Auto-binding a tab to a stored project on probe success — panel is informational only.
+- Auto-binding a tab to a stored project on probe success - panel is informational only.
 - Per-tab probe latency histograms.
 
 ## Deferred (per mem://preferences/deferred-workstreams)
 
-- `page-workspace-responder.test.ts` — React/component-style unit tests are deferred.
-- Relay 600 ms timeout test — deferred for the same reason.
+- `page-workspace-responder.test.ts` - React/component-style unit tests are deferred.
+- Relay 600 ms timeout test - deferred for the same reason.

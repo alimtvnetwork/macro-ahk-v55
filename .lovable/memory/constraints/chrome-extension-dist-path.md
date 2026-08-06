@@ -1,6 +1,6 @@
 ---
 name: chrome-extension dist path
-description: Chrome extension build output is chrome-extension/ itself — NOT chrome-extension/dist/. Release/CI scripts must never reference the legacy dist/ subpath.
+description: Chrome extension build output is chrome-extension/ itself - NOT chrome-extension/dist/. Release/CI scripts must never reference the legacy dist/ subpath.
 type: constraint
 ---
 ## Rule
@@ -22,7 +22,7 @@ Authoritative sources:
 3. `cd chrome-extension/dist && zip -r ../../release-assets/marco-extension-${VER}.zip .`
 
 Because that subfolder does not exist, the `cp` failed under `set -eo pipefail`
-and the extension zip was never produced — or, when the earlier steps were
+and the extension zip was never produced - or, when the earlier steps were
 tolerated, the `cd` succeeded into an empty/incidental path and produced an
 empty zip. Either way, `marco-extension-{VER}.zip` was missing from the
 GitHub Release page.

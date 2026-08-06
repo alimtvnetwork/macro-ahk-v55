@@ -4,12 +4,12 @@
 
 # <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows8/windows8-original.svg" alt="Windows" width="28" height="28" align="center" /> Marco Chrome Extension
 
-> **Browser automation for workspace management, credit monitoring, and AI-driven macro execution** — built as a Manifest V3 Chrome extension with a modular standalone script architecture.
+> **Browser automation for workspace management, credit monitoring, and AI-driven macro execution** - built as a Manifest V3 Chrome extension with a modular standalone script architecture.
 
 &#x200B;<!-- Build & Release --> [![CI](https://img.shields.io/github/actions/workflow/status/alimtvnetwork/macro-ahk-v55/ci.yml.svg?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/alimtvnetwork/macro-ahk-v55/actions/workflows/ci.yml) <!-- Repo activity --> [![Issues](https://img.shields.io/github/issues/alimtvnetwork/macro-ahk-v55.svg?label=Issues&style=flat-square&logo=github)](https://github.com/alimtvnetwork/macro-ahk-v55/issues) [![Pull Requests](https://img.shields.io/github/issues-pr/alimtvnetwork/macro-ahk-v55.svg?label=Pull%20Requests&style=flat-square&logo=github)](https://github.com/alimtvnetwork/macro-ahk-v55/pulls) [![Repo Size](https://img.shields.io/github/repo-size/alimtvnetwork/macro-ahk-v55.svg?label=Repo%20Size&style=flat-square&logo=github)](https://github.com/alimtvnetwork/macro-ahk-v55)
 &#x200B;<!-- Community --> <!-- (intentionally empty, see mem://constraints/no-static-mockup-badges) --> <!-- Code-quality --> [![Security Issues](https://img.shields.io/github/issues-search/alimtvnetwork/macro-ahk-v55.svg?query=is%3Aissue%20label%3Asecurity&label=Security%20Issues&style=flat-square&logo=github)](https://github.com/alimtvnetwork/macro-ahk-v55/issues?q=is%3Aissue+label%3Asecurity) [![Dependency PRs](https://img.shields.io/github/issues-pr-raw/alimtvnetwork/macro-ahk-v55.svg?label=Dependency%20PRs&style=flat-square&logo=dependabot)](https://github.com/alimtvnetwork/macro-ahk-v55/pulls?q=is%3Apr+label%3Adependencies) <!-- Stack & standards --> [![License](https://img.shields.io/github/license/alimtvnetwork/macro-ahk-v55.svg?label=License&style=flat-square)](#license)
 
-<img src="docs/assets/marco-extension-hero.png" alt="Marco Chrome Extension — Projects view inside the options page" width="820" />
+<img src="docs/assets/marco-extension-hero.png" alt="Marco Chrome Extension - Projects view inside the options page" width="820" />
 
 Built and maintained by **[Md. Alim Ul Karim](https://alimkarim.com)** · **[Riseup Asia LLC](https://riseup-asia.com)** · **[xProduct](https://the-xproduct.com)** (home of the **xProgramming** language).
 
@@ -23,27 +23,27 @@ Marco is a **Windows-first** project. For quick local testing, start with the ex
 
 ### 📦 Download-only (unpack into current folder)
 
-For quick local testing — downloads the release ZIP **into the current folder as a backup** and extracts it as a flat folder (no `v`, no version suffix). The ZIP is kept next to the extracted folder so you can re-extract or archive it; only the extracted folder is overwritten on re-run. No `$HOME` install, no profile changes, no auto-update wiring.
+For quick local testing - downloads the release ZIP **into the current folder as a backup** and extracts it as a flat folder (no `v`, no version suffix). The ZIP is kept next to the extracted folder so you can re-extract or archive it; only the extracted folder is overwritten on re-run. No `$HOME` install, no profile changes, no auto-update wiring.
 
-**Windows · PowerShell — latest into `.\marco-extension`:**
+**Windows · PowerShell - latest into `.\marco-extension`:**
 
 ```powershell
 irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/download-extension.ps1 | iex
 ```
 
-**Windows · PowerShell — pin a version + custom folder name (env-var form, works with `irm | iex`):**
+**Windows · PowerShell - pin a version + custom folder name (env-var form, works with `irm | iex`):**
 
 ```powershell
 $env:MARCO_DL_VERSION='v5.14.0'; $env:MARCO_DL_FOLDER='marco'; irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/download-extension.ps1 | iex
 ```
 
-**Windows · PowerShell — run a local clone with explicit flags:**
+**Windows · PowerShell - run a local clone with explicit flags:**
 
 ```powershell
 .\scripts\download-extension.ps1 -Version v5.14.0 -FolderName marco-extension
 ```
 
-**Windows · PowerShell — source checkout without full-history clone:**
+**Windows · PowerShell - source checkout without full-history clone:**
 
 ```powershell
 irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/clone-repo.ps1 | iex
@@ -81,7 +81,7 @@ curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.1
 
 **Pinned version:** `v5.14.0` &nbsp;•&nbsp; **Macro Controller:** `v5.14.0`
 
-> **v2.243.0 release-asset fix (historical):** the previous release pipeline pointed at a legacy `chrome-extension/dist/` subfolder that no longer exists (the unpacked extension is built into `chrome-extension/` itself — see `vite.config.extension.ts` and `powershell.json → distDir`). That mismatch caused `marco-extension-{VER}.zip` to be silently absent from the GitHub Releases page. The workflow now zips `chrome-extension/` directly and fails fast if the extension zip is missing or `< 10 KiB`. RCA: [`mem://constraints/chrome-extension-dist-path`](.lovable/memory/constraints/chrome-extension-dist-path.md).
+> **v2.243.0 release-asset fix (historical):** the previous release pipeline pointed at a legacy `chrome-extension/dist/` subfolder that no longer exists (the unpacked extension is built into `chrome-extension/` itself - see `vite.config.extension.ts` and `powershell.json → distDir`). That mismatch caused `marco-extension-{VER}.zip` to be silently absent from the GitHub Releases page. The workflow now zips `chrome-extension/` directly and fails fast if the extension zip is missing or `< 10 KiB`. RCA: [`mem://constraints/chrome-extension-dist-path`](.lovable/memory/constraints/chrome-extension-dist-path.md).
 
 > Jump straight to your platform: **[🪟 Install on Windows (PowerShell)](#-install-on-windows-powershell)** &nbsp;•&nbsp; **[🐧 Install on Linux / macOS (Bash)](#-install-on-linux--macos-bash)** &nbsp;•&nbsp; **[Full Quick Start](#quick-start)**
 
@@ -89,7 +89,7 @@ curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.1
 
 ## About Marco
 
-Marco started as a small itch. **Alim** wanted to automate a few repetitive things on Chrome using **AutoHotkey** — just keystrokes and clicks at first. One script led to another, and soon he was recording flows, parameterizing them, and wiring them into proper programs. What began as a Windows-only AHK helper grew into a full browser-side automation runtime: a Manifest V3 Chrome extension with a modular standalone-script architecture, deterministic XPath replay, credit-aware loop control, and an AutoHotkey sidecar that still drives the Windows side.
+Marco started as a small itch. **Alim** wanted to automate a few repetitive things on Chrome using **AutoHotkey** - just keystrokes and clicks at first. One script led to another, and soon he was recording flows, parameterizing them, and wiring them into proper programs. What began as a Windows-only AHK helper grew into a full browser-side automation runtime: a Manifest V3 Chrome extension with a modular standalone-script architecture, deterministic XPath replay, credit-aware loop control, and an AutoHotkey sidecar that still drives the Windows side.
 
 In short: Marco is the project that came out of taking "let me just automate this one thing" seriously.
 
@@ -99,7 +99,7 @@ Marco is one of several operational systems that share the **xProduct** runtime 
 
 ## Quick Start
 
-Pick your platform — each section is a self-contained install path with the recommended one-liner, flags, and a link to the deeper reference.
+Pick your platform - each section is a self-contained install path with the recommended one-liner, flags, and a link to the deeper reference.
 
 ### 🪟 Install on Windows (PowerShell)
 
@@ -111,7 +111,7 @@ irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.14.0/ins
 
 ```
 
-- 🔒 Pinned to `v5.14.0` — see [Pinned to a specific release](#-pinned-to-a-specific-release) to change versions
+- 🔒 Pinned to `v5.14.0` - see [Pinned to a specific release](#-pinned-to-a-specific-release) to change versions
 - 🌊 Want auto-update? Use the [latest channel](#-latest-channel-auto-update) one-liner
 - 📁 Custom install folder? See [Custom Directory Install](#custom-directory-install)
 - 🚩 Full flag list, exit codes, checksum behavior → [Installer Options](#installer-options)
@@ -126,7 +126,7 @@ curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.1
 
 ```
 
-- 🔒 Pinned to `v5.14.0` — see [Pinned to a specific release](#-pinned-to-a-specific-release) for other tags
+- 🔒 Pinned to `v5.14.0` - see [Pinned to a specific release](#-pinned-to-a-specific-release) for other tags
 - 🌊 Auto-update channel → [latest channel](#-latest-channel-auto-update)
 - 📁 Custom install folder? See [Custom Directory Install](#custom-directory-install)
 - 🚩 Full flag list, exit codes, checksum behavior → [Installer Options](#installer-options)
@@ -140,7 +140,7 @@ The unified installer auto-derives the pinned version from its download URL. Use
 #### 🔒 Pinned to a specific release
 
 ```powershell
-# PowerShell (Windows) — replace v4.109.0 with any released tag
+# PowerShell (Windows) - replace v4.109.0 with any released tag
 irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.14.0/install.ps1 | iex
 ```
 
@@ -161,17 +161,17 @@ curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/sc
 
 #### 📁 Latest into the current folder (one-liner, no version)
 
-Since **v4.154.0** the Bash installer defaults its target to `$(pwd)/marco-extension` — the plain curl-pipe one-liner drops the extension into whatever directory you ran it from, never into `$HOME`. PowerShell has the same behavior via `-InstallDir (Join-Path $PWD 'marco-extension')`.
+Since **v4.154.0** the Bash installer defaults its target to `$(pwd)/marco-extension` - the plain curl-pipe one-liner drops the extension into whatever directory you ran it from, never into `$HOME`. PowerShell has the same behavior via `-InstallDir (Join-Path $PWD 'marco-extension')`.
 
 ```bash
-# Bash (Linux / macOS) — installs to ./marco-extension under the CURRENT directory
+# Bash (Linux / macOS) - installs to ./marco-extension under the CURRENT directory
 cd ~/projects/my-workspace
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh | sh
 # → ~/projects/my-workspace/marco-extension/
 ```
 
 ```powershell
-# PowerShell (Windows) — installs to .\marco-extension under the current folder
+# PowerShell (Windows) - installs to .\marco-extension under the current folder
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.ps1))) -InstallDir (Join-Path $PWD 'marco-extension')
 ```
 
@@ -199,7 +199,7 @@ curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/sc
 .\install.ps1 -InstallDir "D:\marco-extension"
 ```
 
-**Linux / macOS — `scripts/install.sh --install-dir` examples:**
+**Linux / macOS - `scripts/install.sh --install-dir` examples:**
 
 All four spellings are equivalent. Pick whichever reads best in your shell; the canonical flag is `--install-dir`.
 
@@ -210,7 +210,7 @@ All four spellings are equivalent. Pick whichever reads best in your shell; the 
 # Canonical, equals-joined (useful in pipelines / CI vars)
 ./install.sh --install-dir=/opt/marco-extension
 
-# Path containing spaces — quote it (either form works)
+# Path containing spaces - quote it (either form works)
 ./install.sh --install-dir "$HOME/Marco Tools/marco-extension"
 ./install.sh --install-dir="$HOME/Marco Tools/marco-extension"
 
@@ -218,7 +218,7 @@ All four spellings are equivalent. Pick whichever reads best in your shell; the 
 ./install.sh --dir ./tmp/marco-extension
 ./install.sh -d /var/tmp/marco-extension
 
-# Pipe form — pass flags after `bash -s --`
+# Pipe form - pass flags after `bash -s --`
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh \
   | bash -s -- --install-dir "$HOME/marco-extension"
 ```
@@ -230,22 +230,22 @@ Precedence: **CLI flag > default (`$(pwd)/marco-extension`)**. Relative paths re
 
 ### Installer Options
 
-> 📘 **Full reference:** [`docs/installer-guide.md`](docs/installer-guide.md) — CLI flags, exit codes, checksum behavior, warnings glossary, and troubleshooting.
+> 📘 **Full reference:** [`docs/installer-guide.md`](docs/installer-guide.md) - CLI flags, exit codes, checksum behavior, warnings glossary, and troubleshooting.
 
-The installers (`install.ps1`, `install.sh`) conform to the [Generic Installer Behavior spec](spec/14-update/01-generic-installer-behavior.md). Behavior is determined by **how the installer was invoked**, not by build-time stamping. Both installers read shared defaults from [`scripts/installer-contract.json`](scripts/installer-contract.json) (CI-enforced — they cannot drift).
+The installers (`install.ps1`, `install.sh`) conform to the [Generic Installer Behavior spec](spec/14-update/01-generic-installer-behavior.md). Behavior is determined by **how the installer was invoked**, not by build-time stamping. Both installers read shared defaults from [`scripts/installer-contract.json`](scripts/installer-contract.json) (CI-enforced - they cannot drift).
 
 #### Strict mode vs Discovery mode
 
 | Mode | Triggered when | Banner shown | API call? | Sibling discovery? |
 |------|----------------|--------------|-----------|--------------------|
-| 🔒 **Strict** | The script was downloaded from a `releases/download/vX.Y.Z/` URL **OR** invoked with `--version vX.Y.Z` (any explicit semver) | `🔒 Strict mode — pinned to vX.Y.Z` | No — installs that exact version, never falls back | **Never** (locked out by spec §4 rule 6) |
-| 🌊 **Discovery** | No version override **and** no release-asset URL hint, **OR** `--version latest` | `🌊 Discovery mode — resolved vX.Y.Z` | Yes — `GET /repos/{owner}/{repo}/releases/latest` | Optional, off by default — opt in via config (see below) |
+| 🔒 **Strict** | The script was downloaded from a `releases/download/vX.Y.Z/` URL **OR** invoked with `--version vX.Y.Z` (any explicit semver) | `🔒 Strict mode - pinned to vX.Y.Z` | No - installs that exact version, never falls back | **Never** (locked out by spec §4 rule 6) |
+| 🌊 **Discovery** | No version override **and** no release-asset URL hint, **OR** `--version latest` | `🌊 Discovery mode - resolved vX.Y.Z` | Yes - `GET /repos/{owner}/{repo}/releases/latest` | Optional, off by default - opt in via config (see below) |
 
-**Strict mode is fail-fast.** If the pinned release ZIP is missing, the installer exits 4 — it will *not* silently fall back to a different version, the main branch, or a sibling repo. Discovery mode tolerates more (latest API + optional sibling probing + main-branch fallback once §4 lands).
+**Strict mode is fail-fast.** If the pinned release ZIP is missing, the installer exits 4 - it will *not* silently fall back to a different version, the main branch, or a sibling repo. Discovery mode tolerates more (latest API + optional sibling probing + main-branch fallback once §4 lands).
 
 #### Common flags
 
-**Windows (PowerShell — `install.ps1`):**
+**Windows (PowerShell - `install.ps1`):**
 
 | Flag | Description | Example |
 |------|-------------|---------|
@@ -254,16 +254,16 @@ The installers (`install.ps1`, `install.sh`) conform to the [Generic Installer B
 | `-Repo` | Override GitHub `owner/repo` | `-Repo alimtvnetwork/macro-ahk-v55` |
 | `-Help` | Print usage and exit 0 | `-Help` |
 
-**Linux / macOS (Bash — `install.sh`):**
+**Linux / macOS (Bash - `install.sh`):**
 
 | Flag | Short | Description | Example |
 |------|-------|-------------|---------|
 | `--version <ver>` | `-v` | Force a specific version (`vX.Y.Z[-pre]`) or `latest`. Anything else exits 3. | `--version v4.109.0` |
 | `--install-dir <path>` | `--dir`, `-d` | Target directory. **Default since v4.154.0: `$(pwd)/marco-extension`** (was `~/marco-extension`). `--install-dir` matches PowerShell's `-InstallDir`. | `--install-dir ~/marco-extension/v4.109.0` |
 | `--repo <o/r>` | `-r` | Override GitHub `owner/repo` | `--repo alimtvnetwork/macro-ahk-v55` |
-| `--dry-run` | — | Resolve the install plan, print it, exit 0 — **nothing is downloaded or extracted**. Useful for CI smoke tests and debugging. | `--dry-run --version v4.109.0` |
-| `--no-sibling-discovery` | — | Disable §4 sibling-repo probing for this run (overrides `install.config.sh`). Strict mode would skip it anyway. | `--no-sibling-discovery` |
-| `--enable-sibling-discovery` | — | Force-enable sibling probing for this run. **Still blocked by strict mode** (spec §4 rule 6). | `--enable-sibling-discovery` |
+| `--dry-run` | - | Resolve the install plan, print it, exit 0 - **nothing is downloaded or extracted**. Useful for CI smoke tests and debugging. | `--dry-run --version v4.109.0` |
+| `--no-sibling-discovery` | - | Disable §4 sibling-repo probing for this run (overrides `install.config.sh`). Strict mode would skip it anyway. | `--no-sibling-discovery` |
+| `--enable-sibling-discovery` | - | Force-enable sibling probing for this run. **Still blocked by strict mode** (spec §4 rule 6). | `--enable-sibling-discovery` |
 | `--help` | `-h` | Print full usage with the spec link, then exit 0 | `--help` |
 
 #### Exit codes
@@ -279,7 +279,7 @@ The installer follows a fixed exit-code contract (see [spec §3](spec/14-update/
 | `5` | Network or tooling error | API unreachable in discovery mode, or neither `curl` nor `wget` is on `PATH` |
 | `6` | Invalid archive or **checksum mismatch** | ZIP extracted to no files, `manifest.json` missing, or SHA-256 doesn't match `checksums.txt` |
 
-Code `2` is reserved for future use. CI scripts can rely on these — they're covered by [`tests/installer/resolver.test.sh`](tests/installer/resolver.test.sh) (46 cases) and [`tests/installer/mock-server.test.sh`](tests/installer/mock-server.test.sh) (62 cases). Drift between the two installers is prevented by [`scripts/check-installer-contract.mjs`](scripts/check-installer-contract.mjs).
+Code `2` is reserved for future use. CI scripts can rely on these - they're covered by [`tests/installer/resolver.test.sh`](tests/installer/resolver.test.sh) (46 cases) and [`tests/installer/mock-server.test.sh`](tests/installer/mock-server.test.sh) (62 cases). Drift between the two installers is prevented by [`scripts/check-installer-contract.mjs`](scripts/check-installer-contract.mjs).
 
 #### Checksum verification (since v2.227.0)
 
@@ -288,15 +288,15 @@ Every release ships a `checksums.txt` file. The installer fetches it from the sa
 | Outcome | What you see | Action |
 |---|---|---|
 | ✅ Match | `✓ checksum OK (sha256=…)` | Install continues |
-| ❌ Mismatch | `✗ checksum MISMATCH — expected …, got …` | **Exit 6.** Re-download — do not retry blindly. |
-| ⚠️ Missing `checksums.txt` | `⚠ checksums.txt not found — skipping integrity check` | Continues (back-compat with pre-v2.227.0 releases) |
-| ⚠️ No SHA tool (Bash only) | `⚠ no sha256sum/shasum/openssl available — skipping` | Continues. Install `coreutils` to enable. |
+| ❌ Mismatch | `✗ checksum MISMATCH - expected …, got …` | **Exit 6.** Re-download - do not retry blindly. |
+| ⚠️ Missing `checksums.txt` | `⚠ checksums.txt not found - skipping integrity check` | Continues (back-compat with pre-v2.227.0 releases) |
+| ⚠️ No SHA tool (Bash only) | `⚠ no sha256sum/shasum/openssl available - skipping` | Continues. Install `coreutils` to enable. |
 
 Bash uses `sha256sum` → `shasum -a 256` → `openssl dgst -sha256` (first available wins). PowerShell uses the built-in `Get-FileHash`. See [`docs/installer-guide.md` §5](docs/installer-guide.md#5-checksum-verification-sha-256) for the full rundown.
 
 #### Main-branch fallback (since v2.226.0)
 
-In **discovery mode**, if the GitHub API responds `200 OK` with zero releases (or `404 Not Found` for `/releases/latest`), the installer falls back to `archive/refs/heads/<MAIN_BRANCH>.tar.gz` and records the version as `<branch>@HEAD`. You'll see the `🌿 Discovery mode — main branch (no releases found)` banner. **Network failures (5xx, DNS error) still exit 5** — the installer never silently falls through to `main` if the user might have wanted a real release.
+In **discovery mode**, if the GitHub API responds `200 OK` with zero releases (or `404 Not Found` for `/releases/latest`), the installer falls back to `archive/refs/heads/<MAIN_BRANCH>.tar.gz` and records the version as `<branch>@HEAD`. You'll see the `🌿 Discovery mode - main branch (no releases found)` banner. **Network failures (5xx, DNS error) still exit 5** - the installer never silently falls through to `main` if the user might have wanted a real release.
 
 #### Sibling-repo discovery (advanced)
 
@@ -317,14 +317,14 @@ Override priority (lowest → highest):
 3. Environment variables of the same name
 4. `--enable-sibling-discovery` CLI flag
 5. `--no-sibling-discovery` CLI flag
-6. **Strict-mode lockout — beats everything** (spec §4 rule 6)
+6. **Strict-mode lockout - beats everything** (spec §4 rule 6)
 
-Use `--dry-run` to inspect the resolved decision without installing — the plan prints `Sibling discovery: <state> — <reason>`.
+Use `--dry-run` to inspect the resolved decision without installing - the plan prints `Sibling discovery: <state> - <reason>`.
 
 #### Examples
 
 ```bash
-# Preview what would happen with the latest release — no network writes:
+# Preview what would happen with the latest release - no network writes:
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh \
   | bash -s -- --dry-run
 
@@ -386,7 +386,7 @@ Marco is a Chrome extension that automates workspace management workflows throug
 | Feature | Description |
 |---------|-------------|
 | **Script Injection Engine** | Injects IIFE-compiled scripts into page context (MAIN world) with dependency resolution and load ordering |
-| **Macro Controller** | Core automation controller — XPath utilities, auth panel, token resolution, UI overlays |
+| **Macro Controller** | Core automation controller - XPath utilities, auth panel, token resolution, UI overlays |
 | **Credit Monitoring** | Real-time credit balance checking with workspace-level tracking and retry-on-refresh policy |
 | **Workspace Management** | Automated workspace switching, transfer dialogs, and multi-workspace operations |
 | **Loop Engine** | Configurable automation loops with delay, retry, and condition-based stopping |
@@ -396,6 +396,23 @@ Marco is a Chrome extension that automates workspace management workflows throug
 | **Self-Healing Storage** | Two-stage builtin script guard that detects and repairs corrupted script storage |
 | **Build-Aware Cache** | Injection cache invalidation tied to build version, preventing runtime drift |
 
+--- 
+
+## AI and Development
+
+This project is optimized for AI-assisted development. All project memory, rules, and plans live in the [.lovable/](./.lovable/) folder.
+
+Before contributing, AIs **must** read the authoritative read-list at [.lovable/what-to-read.md](./.lovable/what-to-read.md).
+
+### Project Structure
+
+- `src/`: Main extension source (React/TypeScript).
+- `standalone-scripts/`: Injectable automation runtimes.
+- `spec/`: Detailed technical specifications.
+- `scripts/`: Build and automation tools.
+- `.lovable/`: Project memory and AI instructions.
+
+---
 ### Script Architecture
 
 The extension uses a **declarative, instruction-driven** architecture. Each standalone script defines its own `instruction.ts` manifest that declares:
@@ -413,7 +430,7 @@ Scripts are compiled to **IIFE bundles** (no module imports at runtime) and inje
 |--------|---------|---------|
 | **Marco SDK** | Shared SDK providing `require()`, messaging, and utility functions | Always loaded |
 | **XPath** | XPath query utilities for DOM element selection | Enabled |
-| **Macro Controller** | Core controller — auth, UI, credit checking, workspace automation | Enabled |
+| **Macro Controller** | Core controller - auth, UI, credit checking, workspace automation | Enabled |
 
 ---
 
@@ -425,22 +442,22 @@ Marco captures every chat submission you make into a Lovable project (paste, Rep
 
 **Where to find it:** Menu → `📖 Chat History`.
 
-**What it shows:** The most recent submissions for the current project — source (`paste` / `repeat` / `next-chip` / `plan-chip`), character count, timestamp in your local timezone, and a 240-char body preview.
+**What it shows:** The most recent submissions for the current project - source (`paste` / `repeat` / `next-chip` / `plan-chip`), character count, timestamp in your local timezone, and a 240-char body preview.
 
 **Actions:**
-- **Copy JSON** — clipboard-copies a schema-versioned envelope: `{ schemaVersion: 1, projectId, exportedAt, entryCount, entries[] }`. Safe to paste into a gist or an issue for support.
-- **Delete** — removes the SQLite row and the OPFS blob atomically (OPFS-first so an interrupted delete never leaves an orphan blob).
-- **Refresh** — re-reads the store.
+- **Copy JSON** - clipboard-copies a schema-versioned envelope: `{ schemaVersion: 1, projectId, exportedAt, entryCount, entries[] }`. Safe to paste into a gist or an issue for support.
+- **Delete** - removes the SQLite row and the OPFS blob atomically (OPFS-first so an interrupted delete never leaves an orphan blob).
+- **Refresh** - re-reads the store.
 
 **Storage model:**
-- **SQLite** (`ProjectChatSubmit` table): one metadata row per submission — `Id`, `ProjectId`, `ProjectName`, `Source`, `FileId`, `CharCount`, `CreatedAt`, `MetaJson`.
+- **SQLite** (`ProjectChatSubmit` table): one metadata row per submission - `Id`, `ProjectId`, `ProjectName`, `Source`, `FileId`, `CharCount`, `CreatedAt`, `MetaJson`.
 - **OPFS** (`chat-submits/<projectId>/<fileId>.txt`): the raw submission text. Kept out of SQLite so the DB bundle stays lean.
 
 **Retention:** A rolling window of 300 submissions per project (default). Excess oldest rows and their OPFS blobs are pruned automatically on every capture. Override per-project by setting `Project.ChatSubmitCap.<projectId>` (integer between 10 and 5000) in `chrome.storage.local`.
 
-**Verbose gate:** When per-project **verbose logging** is OFF (the default), the OPFS body is stored as `[redacted]` — but `CharCount` remains true so analytics stay honest. Enable verbose logging in Options → Debugging Switch to capture full text.
+**Verbose gate:** When per-project **verbose logging** is OFF (the default), the OPFS body is stored as `[redacted]` - but `CharCount` remains true so analytics stay honest. Enable verbose logging in Options → Debugging Switch to capture full text.
 
-**Rename backfill:** When Lovable renames a project, `ProjectName` back-fills across every historical row for that project on the next submission — no stale names in your history.
+**Rename backfill:** When Lovable renames a project, `ProjectName` back-fills across every historical row for that project on the next submission - no stale names in your history.
 
 ---
 
@@ -454,7 +471,7 @@ The popup provides real-time control over script injection and diagnostics:
 |---------|--------------|
 | **Run** | Clears DOM markers, injects all enabled scripts from the active project |
 | **Toggle** | Enables/disables the active project (persists across sessions) |
-| **Per-Script Toggle** | Enable/disable individual scripts — state persists across restarts |
+| **Per-Script Toggle** | Enable/disable individual scripts - state persists across restarts |
 | **Re-inject** | Clears existing injections, re-injects all enabled scripts fresh |
 | **Logs** | Copies session logs + errors as JSON to clipboard |
 | **Export** | Downloads ZIP with logs, errors, and SQLite database |
@@ -483,16 +500,16 @@ Granular visual feedback per script:
 
 ### Authentication
 
-- **Zero-network resolution** — JWTs resolved from local storage waterfall before any network calls
-- **2-step recovery** — Auth Bridge attempts cached token, then page extraction
-- **Extension context invalidation** — Detected and explained via help tooltips when extension reloads
+- **Zero-network resolution** - JWTs resolved from local storage waterfall before any network calls
+- **2-step recovery** - Auth Bridge attempts cached token, then page extraction
+- **Extension context invalidation** - Detected and explained via help tooltips when extension reloads
 
 ### Logging & Export
 
-- **SQLite persistence** — Unlimited storage with structured queries
-- **OPFS fallback** — Origin Private File System for crash-resilient writes
-- **Diagnostics ZIP** — Human-readable `logs.txt` + raw data for debugging
-- **Error synchronization** — Error counts broadcast across extension contexts in real-time
+- **SQLite persistence** - Unlimited storage with structured queries
+- **OPFS fallback** - Origin Private File System for crash-resilient writes
+- **Diagnostics ZIP** - Human-readable `logs.txt` + raw data for debugging
+- **Error synchronization** - Error counts broadcast across extension contexts in real-time
 
 ---
 
@@ -541,23 +558,23 @@ Popup / Options UI
 - `chrome.storage.local.set({ PascalKey: ... })` writes against project payloads.
 
 **Enforcement layers:**
-1. **Runtime guard** — `assertNoPascalCaseStorageMigration()` in `src/background/storage-migration.ts` throws before any out-of-range migration executes.
-2. **CI check** — `pnpm run check:no-storage-pascalcase-rewrite` (wired into `build` + `build:dev`) scans `src/` and `standalone-scripts/` for violations.
-3. **Memory rule** — `mem://constraints/no-storage-pascalcase-migration` blocks the agent from re-proposing it.
+1. **Runtime guard** - `assertNoPascalCaseStorageMigration()` in `src/background/storage-migration.ts` throws before any out-of-range migration executes.
+2. **CI check** - `pnpm run check:no-storage-pascalcase-rewrite` (wired into `build` + `build:dev`) scans `src/` and `standalone-scripts/` for violations.
+3. **Memory rule** - `mem://constraints/no-storage-pascalcase-migration` blocks the agent from re-proposing it.
 
 **Permitted migration behavior:**
 - Additive, backward-compatible changes only (new optional fields, new top-level keys).
 - Bump `CURRENT_STORAGE_SCHEMA_VERSION` **and** `MAX_ALLOWED_STORAGE_SCHEMA_VERSION` together when adding a new migration.
-- Identity-only PascalCase compat snapshots emitted *in-memory* (e.g. `compile-instruction` dual-emit) are fine — the persisted shape must remain camelCase.
+- Identity-only PascalCase compat snapshots emitted *in-memory* (e.g. `compile-instruction` dual-emit) are fine - the persisted shape must remain camelCase.
 - Read-side normalization (accept both shapes, write camelCase) is fine.
 - Deletions/renames of persisted keys require a written RFC and explicit user sign-off.
 
 ### Performance Optimizations
 
 - **DomCache** with TTL for repeated DOM queries
-- **Merged MutationObservers** — single observer, multiple handlers
+- **Merged MutationObservers** - single observer, multiple handlers
 - **API call deduplication** via `CreditAsyncState`
-- **Dirty-flag UI updates** — `updateUILight()` skips unchanged elements
+- **Dirty-flag UI updates** - `updateUILight()` skips unchanged elements
 - **Batched localStorage writes** via `LogFlushState`
 
 ---
@@ -610,7 +627,7 @@ pnpm run build:extension        # 4. Chrome extension (copies all artifacts)
 .\run.ps1         # Production build (no source maps)
 ```
 
-The `run.ps1` orchestrator is modular — 8 dot-sourced modules in `build/ps-modules/`:
+The `run.ps1` orchestrator is modular - 8 dot-sourced modules in `build/ps-modules/`:
 
 | Module | Purpose |
 |--------|---------|
@@ -623,7 +640,7 @@ The `run.ps1` orchestrator is modular — 8 dot-sourced modules in `build/ps-mod
 
 ### Built Extension Layout (`chrome-extension/`)
 
-The build pipeline emits the load-unpacked artifact directly to `./chrome-extension/` at the repo root (per `powershell.json → distDir = "chrome-extension"`). This is the folder you point Chrome's **Load unpacked** at — *not* `dist/`, which is reserved for the Lovable preview / web-app build.
+The build pipeline emits the load-unpacked artifact directly to `./chrome-extension/` at the repo root (per `powershell.json → distDir = "chrome-extension"`). This is the folder you point Chrome's **Load unpacked** at - *not* `dist/`, which is reserved for the Lovable preview / web-app build.
 
 ```
 chrome-extension/
@@ -663,7 +680,7 @@ applied to `extension_pages` is:
 script-src 'self'; object-src 'self'
 ```
 
-That default **forbids `WebAssembly.instantiate()`** — the browser will
+That default **forbids `WebAssembly.instantiate()`** - the browser will
 fetch `sql-wasm.wasm` successfully (HTTP 200, correct byte length) and
 then refuse to compile it with:
 
@@ -677,7 +694,7 @@ Symptoms: the popup boots into the `BootFailureBanner` with
 `Failed step: db-init` and a misleading "WASM is corrupted" hint, even
 though the WASM is fine.
 
-The fix is one line in `manifest.json` — add `'wasm-unsafe-eval'` to the
+The fix is one line in `manifest.json` - add `'wasm-unsafe-eval'` to the
 `script-src` directive of `extension_pages`:
 
 ```json
@@ -696,7 +713,7 @@ Two independent guards live in this repo and run on every build, and you
 can also run them by hand any time you touch `manifest.json`:
 
 ```bash
-# 1. Source-manifest preflight — runs BEFORE Vite, fails the build if
+# 1. Source-manifest preflight - runs BEFORE Vite, fails the build if
 #    the source manifest's CSP is missing or doesn't allow Wasm.
 pnpm run check:manifest
 
@@ -724,7 +741,7 @@ After running `pnpm run build:extension`, follow the printed checklist:
 1. Open `chrome://extensions`
 2. Find **Marco Macro Extension** vX.Y.Z, click the reload icon
 3. Open the extension popup (toolbar icon)
-4. Confirm the `BootFailureBanner` is **gone** — no `WASM load (wasm)`
+4. Confirm the `BootFailureBanner` is **gone** - no `WASM load (wasm)`
    failure, no CSP `CompileError`. If the banner is still there, open
    *Inspect views → service worker → Console* on `chrome://extensions`
    for the actual error.
@@ -739,7 +756,7 @@ After running `pnpm run build:extension`, follow the printed checklist:
 4. Add Vite config (`vite.config.{name}.ts`)
 5. The build pipeline auto-discovers and deploys it
 
-The `instruction.ts` is the **sole manifest** — no separate configuration files needed. It declares script metadata, dependencies, files, and injection behavior in a single TypeScript file that compiles to `instruction.json`.
+The `instruction.ts` is the **sole manifest** - no separate configuration files needed. It declares script metadata, dependencies, files, and injection behavior in a single TypeScript file that compiles to `instruction.json`.
 
 ### Dynamic Script Loading
 
@@ -765,7 +782,7 @@ Pushing a `v*` tag triggers release mode and:
 8. Generates categorized release notes from commit history with Bash + PowerShell install commands
 9. Creates or updates the GitHub Release page with all assets attached
 
-**No email or notification is sent** — check the [Releases page](https://github.com/alimtvnetwork/macro-ahk-v55/releases) for status.
+**No email or notification is sent** - check the [Releases page](https://github.com/alimtvnetwork/macro-ahk-v55/releases) for status.
 
 **For maintainers:** the canonical release procedure (tag-push ritual, recovery via `workflow_dispatch`, forbidden paths) is documented in [`spec/21-app/02-features/chrome-extension/release-procedure.md`](spec/21-app/02-features/chrome-extension/release-procedure.md).
 
@@ -791,7 +808,7 @@ The `v*` tag triggers `.github/workflows/release.yml`, which reads `version.json
 
 | Asset | Description |
 |-------|-------------|
-| `marco-extension-v{VER}.zip` | Chrome extension — load unpacked in `chrome://extensions` |
+| `marco-extension-v{VER}.zip` | Chrome extension - load unpacked in `chrome://extensions` |
 | `macro-controller-v{VER}.zip` | Standalone macro controller scripts |
 | `marco-sdk-v{VER}.zip` | Marco SDK |
 | `xpath-v{VER}.zip` | XPath utility scripts |
@@ -818,7 +835,7 @@ curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v{VE
 
 ## Project Structure
 
-A monorepo with three primary trees: **runtime code** (extension + standalone scripts), **specifications** (`spec/` — v3.5.0 layout), and **build/CI tooling**.
+A monorepo with three primary trees: **runtime code** (extension + standalone scripts), **specifications** (`spec/` - v3.5.0 layout), and **build/CI tooling**.
 
 ```
 .
@@ -831,7 +848,7 @@ A monorepo with three primary trees: **runtime code** (extension + standalone sc
 │   ├── shared/                     # Cross-context constants (incl. EXTENSION_VERSION)
 │   └── test/                       # Unit + regression tests (Vitest)
 │
-├── chrome-extension/               # Built MV3 extension — load unpacked from here
+├── chrome-extension/               # Built MV3 extension - load unpacked from here
 │   └── (generated by `pnpm run build:extension`; git-ignored output)
 │
 ├── standalone-scripts/             # Injectable IIFE bundles, each with its own instruction.ts
@@ -844,9 +861,9 @@ A monorepo with three primary trees: **runtime code** (extension + standalone sc
 │   │   └── dist/                   # Compiled IIFE + assets + instruction.json
 │   └── prompts/                    # AI prompt markdown files
 │
-├── spec/                           # 📚 Specification tree — Spec Authoring Guide v3.5.0 layout
+├── spec/                           # 📚 Specification tree - Spec Authoring Guide v3.5.0 layout
 │   ├── 00-overview.md              # Master index of the entire spec tree
-│   ├── 01-spec-authoring-guide/    # ───── FOUNDATIONS (slots 01–20, universal) ─────
+│   ├── 01-spec-authoring-guide/    # ───── FOUNDATIONS (slots 01-20, universal) ─────
 │   ├── 02-coding-guidelines/       # 26 engineering rules (TS, Go, PHP, Rust, C#, AI-opt, CI/CD)
 │   ├── 03-error-manage/            # Error management patterns + AppError package
 │   ├── 04-database-conventions/    # Schema patterns
@@ -858,7 +875,7 @@ A monorepo with three primary trees: **runtime code** (extension + standalone sc
 │   ├── 10-research/                # 🟡 stub
 │   ├── 11-powershell-integration/  # PowerShell installer + integration specs
 │   ├── 12-cicd-pipeline-workflows/ # CI/CD specs (incl. repo-rename script)
-│   ├── 14-update/                  # 🟡 stub — update mechanism
+│   ├── 14-update/                  # 🟡 stub - update mechanism
 │   ├── 17-consolidated-guidelines/ # 🟡 stub
 │   │   #  Slots 13, 15, 16, 18, 19, 20 reserved for future foundations.
 │   │
@@ -886,7 +903,7 @@ A monorepo with three primary trees: **runtime code** (extension + standalone sc
 │   │   └── 01-overview-legacy/
 │   │
 │   ├── validation-reports/         # Time-stamped audits (e.g., reorganization-audit, deepdive)
-│   ├── .spec-folder-registry.json  # Authoritative folder list — protects sparse dirs from auto-cleanup
+│   ├── .spec-folder-registry.json  # Authoritative folder list - protects sparse dirs from auto-cleanup
 │   └── 99-consistency-report.md    # Root-level structural health report
 │
 ├── scripts/                        # 🛠️  Build helpers, validators & install scripts
@@ -922,7 +939,7 @@ A monorepo with three primary trees: **runtime code** (extension + standalone sc
 └── .github/workflows/              # CI/CD pipelines (release.yml, ci.yml)
 ```
 
-> **Spec-tree layout authority:** `spec/01-spec-authoring-guide/` is the source of truth. Slots **01–20 are reserved for foundations only** (no app-specific content). App content lives at slot **21+**. The `.spec-folder-registry.json` + `pnpm run check:spec-folders` guards against auto-cleanup pruning sparse folders. Validation reports under `spec/validation-reports/` document migrations and audits.
+> **Spec-tree layout authority:** `spec/01-spec-authoring-guide/` is the source of truth. Slots **01-20 are reserved for foundations only** (no app-specific content). App content lives at slot **21+**. The `.spec-folder-registry.json` + `pnpm run check:spec-folders` guards against auto-cleanup pruning sparse folders. Validation reports under `spec/validation-reports/` document migrations and audits.
 
 ### `spec/2026-spec/` audit verification
 
@@ -950,7 +967,7 @@ Snapshot hash: `b79ef8f879b41da70a4d78b4b34bc558f843656a2c6fd7466d6098daf2b52c03
 
 ---
 
-## For AI Agents — What To Read First
+## For AI Agents - What To Read First
 
 > Onboarding map for any AI session (including the next instance of yourself).
 > Primary entry point: [`.lovable/README.md`](./.lovable/README.md).
@@ -973,23 +990,23 @@ Snapshot hash: `b79ef8f879b41da70a4d78b4b34bc558f843656a2c6fd7466d6098daf2b52c03
 
 **What the onboarding map covers (so you don't have to re-derive it):**
 
-- §1 — Project orientation reading order
-- §2 — Canonical JSON contracts (config, prompts, theme, instruction, templates) + their generators and CI guards
-- §3 — Adding a new prompt (slug folder + `info.json` + aggregator)
-- §4 — Adding a new config key (validator + seeded JSON + test + version bump)
-- §5 — Adding a new standalone script (scaffold + injection + spec + memory)
-- §6 — Where tests live + how to add them next to a new feature/fix
-- §6.1 — Unit test template (Vitest, RTL, chrome-API mocking)
-- §6.2 — End-to-end feature workflow (spec → plan → code → test → memory → version)
-- §6.3 — Adding a new spec (slot picker + authoring-guide template + CI guard)
-- §7 — Folder cheat-sheet
-- §8 — Hard rules when touching JSON / generated files
+- §1 - Project orientation reading order
+- §2 - Canonical JSON contracts (config, prompts, theme, instruction, templates) + their generators and CI guards
+- §3 - Adding a new prompt (slug folder + `info.json` + aggregator)
+- §4 - Adding a new config key (validator + seeded JSON + test + version bump)
+- §5 - Adding a new standalone script (scaffold + injection + spec + memory)
+- §6 - Where tests live + how to add them next to a new feature/fix
+- §6.1 - Unit test template (Vitest, RTL, chrome-API mocking)
+- §6.2 - End-to-end feature workflow (spec → plan → code → test → memory → version)
+- §6.3 - Adding a new spec (slot picker + authoring-guide template + CI guard)
+- §7 - Folder cheat-sheet
+- §8 - Hard rules when touching JSON / generated files
 
 
 
 ### Canonical JSON contracts (Macro Controller)
 
-All runtime JSON is **generated from source** — edit the source, not the JSON.
+All runtime JSON is **generated from source** - edit the source, not the JSON.
 
 | JSON (output) | Source of truth | Generator |
 |---------------|-----------------|-----------|
@@ -1006,8 +1023,8 @@ CI guards: `check-prompt-info-casing.mjs`, `check-instruction-json-casing.mjs`,
 
 1. Create `standalone-scripts/prompts/<NN-slug>/` (next free numeric prefix).
 2. Add **two** files:
-   - `prompt.md` — full prompt body
-   - `info.json` — `{ name, slug, id: "default-<slug>", version, order, isDefault, category }`
+   - `prompt.md` - full prompt body
+   - `info.json` - `{ name, slug, id: "default-<slug>", version, order, isDefault, category }`
 3. Run `node scripts/aggregate-prompts.mjs` (also wired into the build).
 4. Bump the patch version across **all five** pinning points (`manifest.json`,
    `src/shared/constants.ts`, `standalone-scripts/macro-controller/src/instruction.ts`,
@@ -1049,12 +1066,12 @@ CI guards: `check-prompt-info-casing.mjs`, `check-instruction-json-casing.mjs`,
 
 The project enforces strict engineering standards (26 rules documented in `spec/02-coding-guidelines/engineering-standards.md`):
 
-- **Zero ESLint warnings/errors** — SonarJS plugin enforced across all code
-- **All errors include exact file path, missing item, and reasoning** — optimized for AI-assisted diagnosis
-- **Unified versioning** — manifest, `constants.ts`, and standalone scripts always in sync
-- **ASCII-safe console output** — no Unicode symbols in build output
-- **Dark-only theme** — no light mode, no toggle
-- **Constant naming convention** — `ID_`, `SEL_`, `CLS_`, `MSG_` prefixes in SCREAMING_SNAKE_CASE
+- **Zero ESLint warnings/errors** - SonarJS plugin enforced across all code
+- **All errors include exact file path, missing item, and reasoning** - optimized for AI-assisted diagnosis
+- **Unified versioning** - manifest, `constants.ts`, and standalone scripts always in sync
+- **ASCII-safe console output** - no Unicode symbols in build output
+- **Dark-only theme** - no light mode, no toggle
+- **Constant naming convention** - `ID_`, `SEL_`, `CLS_`, `MSG_` prefixes in SCREAMING_SNAKE_CASE
 
 ---
 
@@ -1103,7 +1120,7 @@ to do" list live in `.lovable/memory/features/release-pipeline-repo-url-agnostic
 
 ## Troubleshooting
 
-### `vite:load-fallback` ENOENT — module cannot be loaded
+### `vite:load-fallback` ENOENT - module cannot be loaded
 
 **Symptom.** A development build fails partway through with output similar to:
 
@@ -1148,7 +1165,7 @@ fail-fast guards so the failure surface is clear *before* Vite starts:
 
 ### Manual cache clear (when to run it)
 
-You should not normally need to clear caches by hand — the prebuild guard
+You should not normally need to clear caches by hand - the prebuild guard
 does it for you. Run a manual clear only when:
 
 - You **switched git branches** with very different dependency or source
@@ -1158,7 +1175,7 @@ does it for you. Run a manual clear only when:
   subsequent build still references the old path.
 - You **interrupted a previous build** (Ctrl+C, crashed terminal) and the
   partial cache may now be inconsistent.
-- A teammate reports the same ENOENT that you cannot reproduce — clearing
+- A teammate reports the same ENOENT that you cannot reproduce - clearing
   ensures both of you are starting from the same state.
 
 Manual command:
@@ -1171,7 +1188,7 @@ pnpm run build:dev
 
 ### Reproduction helper
 
-If the ENOENT recurs, use the bundled repro entry point — it prints the
+If the ENOENT recurs, use the bundled repro entry point - it prints the
 resolved path for `result-webhook` *before* invoking the same dev build:
 
 ```bash
@@ -1261,7 +1278,7 @@ renumbered. Deprecated entries keep their number and set `replacedBy`.
 
 | Code | Severity | What it means | Next fix |
 |---|---|---|---|
-| `HEALTH_CHECK_E001` | warn | Prompt health check found issues for {role}: {issueCount} issue(s) — {issueSummary}. | Run Repair prompts to auto-fix, or edit the row manually. |
+| `HEALTH_CHECK_E001` | warn | Prompt health check found issues for {role}: {issueCount} issue(s) - {issueSummary}. | Run Repair prompts to auto-fix, or edit the row manually. |
 | `HEALTH_AUTO_REPAIR_E001` | error | Prompt auto-repair failed at stage={stage}: {reason}. | Open the ⚙ gear on the affected chip and run "🩹 Repair prompts". |
 
 ### HISTORY

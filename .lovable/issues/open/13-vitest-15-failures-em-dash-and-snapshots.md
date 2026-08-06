@@ -20,7 +20,7 @@ Test Files  4 failed | 482 passed (486)
 
 1. **Em-dash regression in retry notes** (1 test)
    - `src/background/recorder/__tests__/retry-step.test.ts:99`
-   - Source emits `Retry of step #42 — from toast` (em dash).
+   - Source emits `Retry of step #42 - from toast` (em dash).
    - Test asserts `Retry of step #42, from toast` (ASCII comma).
    - Violates `mem://~user` "Never use em dashes" + `.lovable/prompts/14-release.md` "No em dashes".
    - Fix location: the note-builder that prefixes retry drafts (likely `src/background/recorder/retry-step.ts` or wherever the "Retry of step #N" string is composed).
@@ -31,14 +31,14 @@ Test Files  4 failed | 482 passed (486)
    - Either the snapshots are stale (regenerate after review) or the emitter added/renamed a field. Must diff before choosing.
 
 3. **`macro-controller-recovery.test.ts:132` extMatch null** (1 test)
-   - `src/test/regression/macro-controller-recovery.test.ts:132` — `expect(extMatch).not.toBeNull()` failed.
+   - `src/test/regression/macro-controller-recovery.test.ts:132` - `expect(extMatch).not.toBeNull()` failed.
    - Suggests the regex in that test no longer matches the current controller-recovery source (likely a comment or version string removed by a refactor).
 
 4. **Startup.ts "Passive attach, no visible UI" comment removed** (1 test)
    - `expect('/**\n * MacroLoop Controller, Startu...').toContain('Passive attach, no visible UI')` failed.
    - A doc comment was stripped from `standalone-scripts/macro-controller/src/startup.ts` (or its equivalent) during a refactor. Either restore the comment or update the assertion.
 
-Note lines 1843 + 2452: em dash appears in an unrelated stdout dump for `MacroLoop Controller — Startup` — that comment itself uses an em dash, which is a separate hygiene fix.
+Note lines 1843 + 2452: em dash appears in an unrelated stdout dump for `MacroLoop Controller - Startup` - that comment itself uses an em dash, which is a separate hygiene fix.
 
 ## Expected
 

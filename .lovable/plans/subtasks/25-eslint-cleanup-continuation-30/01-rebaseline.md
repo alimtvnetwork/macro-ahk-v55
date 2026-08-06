@@ -1,4 +1,4 @@
-# SS-01 — Re-baseline ESLint against current tree
+# SS-01 - Re-baseline ESLint against current tree
 
 Slug: ss-01-rebaseline
 Status: pending
@@ -19,7 +19,7 @@ Produce a current, authoritative ESLint offender ranking so Steps 9-25 target re
    - "Top 25 offenders by `max-lines-per-function` line count" (file + function + line count).
    - "Top 10 offenders by `sonarjs/cognitive-complexity` score".
    - Diff-from-baseline-24 section (net delta per rule).
-4. Do NOT modify source files in this subtask — reporting only.
+4. Do NOT modify source files in this subtask - reporting only.
 
 ## Verification
 

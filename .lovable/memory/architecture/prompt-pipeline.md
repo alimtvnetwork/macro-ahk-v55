@@ -15,7 +15,7 @@ PascalCase `info.json` migration completed 2026-04-24 across all 14 prompt folde
 ## Pipeline
 
 1. **Source**: `prompts/<NN-slug>/{info.json, prompt.md}` (in `standalone-scripts/`).
-2. **Aggregator**: `scripts/aggregate-prompts.mjs` reads each folder, calls `.trim()` on `prompt.md`, emits `chrome-extension/prompts/macro-prompts.json` (camelCase array — runtime contract).
+2. **Aggregator**: `scripts/aggregate-prompts.mjs` reads each folder, calls `.trim()` on `prompt.md`, emits `chrome-extension/prompts/macro-prompts.json` (camelCase array - runtime contract).
 3. **Runtime seed**: `src/background/handlers/prompt-handler.ts` inserts the aggregated JSON into the SQLite `Prompts` table (PascalCase columns).
 4. **Export**: `src/lib/sqlite-bundle.ts` writes the `Prompts` table back into `marco-backup.db` inside the bundle zip.
 5. **Resolver** (test contract): `resolvePromptBySlug(db, slug)` returns `Prompts.Text`. The byte-equality assertion is `Text === trimEnd(readFile(prompt.md))`.
@@ -27,7 +27,7 @@ PascalCase `info.json` migration completed 2026-04-24 across all 14 prompt folde
 
 ## Files of interest
 
-- `scripts/aggregate-prompts.mjs` — aggregator (PascalCase reader as of 2026-04-24).
-- `src/background/handlers/prompt-handler.ts` — runtime seeder + DDL.
-- `src/lib/sqlite-bundle.ts` — export/import.
-- `src/hooks/use-prompts.ts` — `PromptEntry` TS type.
+- `scripts/aggregate-prompts.mjs` - aggregator (PascalCase reader as of 2026-04-24).
+- `src/background/handlers/prompt-handler.ts` - runtime seeder + DDL.
+- `src/lib/sqlite-bundle.ts` - export/import.
+- `src/hooks/use-prompts.ts` - `PromptEntry` TS type.

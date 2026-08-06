@@ -1,4 +1,4 @@
-# .lovable/ — AI Entry Index
+# .lovable/ - AI Entry Index
 
 Read this file first. Then `MAP.md` for path-level detail. Then targeted files only when needed.
 
@@ -76,12 +76,12 @@ Convention: `NN-<slug>.md`, versioned inline (`version: X.Y`). Every prompt refe
 
 - Plans: `plans/pending/XX-<slug>.md` -> `mv` to `plans/completed/XX-<slug>.md`, flip `Status:` frontmatter. Subtasks under `plans/subtasks/XX-<slug>/NN-<subslug>.md`.
 - Issues: `issues/open/` → `issues/closed/` on resolution.
-- CI/CD incidents: `cicd/issues/` (resolved kept — they recur).
+- CI/CD incidents: `cicd/issues/` (resolved kept - they recur).
 - Ambiguity log: `question-and-ambiguity/` (No-Questions Mode).
 
 ## Also see
 
-- `plan.md` — living roadmap.
-- `coding-guidelines.md` — function size, naming, error handling.
-- `memory/index.md` — full memory index (always in context).
-- `MAP.md` — path-to-purpose map for the whole `.lovable/` tree.
+- `plan.md` - living roadmap.
+- `coding-guidelines.md` - function size, naming, error handling.
+- `memory/index.md` - full memory index (always in context).
+- `MAP.md` - path-to-purpose map for the whole `.lovable/` tree.

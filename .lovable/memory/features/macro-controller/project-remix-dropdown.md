@@ -8,10 +8,10 @@ type: feature
 
 Two new UI surfaces for the macro-controller's project-remix flow:
 
-1. **Header split-button** — `🔀 Remix ▾` in the panel title bar (between
+1. **Header split-button** - `🔀 Remix ▾` in the panel title bar (between
    version and auth badge). Main button opens the configuration modal; the
    ▾ arrow opens a 2-item dropdown.
-2. **Right-click context menu** — adds `🔀 Remix Project…` and
+2. **Right-click context menu** - adds `🔀 Remix Project…` and
    `⏭️ Remix Next` entries below `👥 Show Members` (only when the page has
    a project_id in URL).
 
@@ -55,7 +55,7 @@ The SDK wrapper accepts camelCase from callers and converts internally.
 | `Foo_V3`      | `Foo_V4`    | Underscore separator preserved |
 | `prompt-perfect-V6` (collision) | `prompt-perfect-V7`, then V8, … | Auto-increments through `existingNames` set up to `maxCollisionIncrements` |
 
-Regex: `^(.*?)([-_ ]?)([Vv])(\d+)$` — captures base + separator + V/v + number.
+Regex: `^(.*?)([-_ ]?)([Vv])(\d+)$` - captures base + separator + V/v + number.
 
 ## Collision pre-check
 
@@ -101,7 +101,7 @@ Constants live in `constants.ts` (`DEFAULT_REMIX_*`).
 5. Success → toast `🔀 Remixed → "name"` + opens `redirect_url` in new tab
 6. Error → inline error block in modal, popup stays open
 
-## Lifecycle (Remix Next — automated)
+## Lifecycle (Remix Next - automated)
 
 1. User clicks ▾ → `⏭️ Remix Next` or right-click → `⏭️ Remix Next`
 2. `actionRemixNext()` shows toast `🔀 Resolving next name…`
@@ -113,7 +113,7 @@ Constants live in `constants.ts` (`DEFAULT_REMIX_*`).
 
 ## Edge cases handled
 
-- Missing `projectId` (extension running outside a project page) → split-button shows toast "Remix unavailable — project/workspace not detected"; context-menu hides Remix entries entirely
+- Missing `projectId` (extension running outside a project page) → split-button shows toast "Remix unavailable - project/workspace not detected"; context-menu hides Remix entries entirely
 - Empty project name in modal → inline error "Project name cannot be empty.", focus returns to input
 - Server returns non-2xx → modal shows HTTP status + truncated body preview
 - Collision storm (>50 increments) → throws clear error surfaced via toast

@@ -1,7 +1,7 @@
-# Macro Controller — CQ Audit Report
+# Macro Controller - CQ Audit Report
 **Date**: 2026-03-31  
 **Scope**: `standalone-scripts/macro-controller/src/`  
-**Compiler**: `tsc --noEmit` — CLEAN ✅
+**Compiler**: `tsc --noEmit` - CLEAN ✅
 
 ---
 
@@ -20,7 +20,7 @@
 
 ---
 
-## CQ13 — Justified C-style `for` Exceptions (13)
+## CQ13 - Justified C-style `for` Exceptions (13)
 
 All require index-based API access or reverse iteration:
 
@@ -40,7 +40,7 @@ All require index-based API access or reverse iteration:
 
 ---
 
-## CQ16 — Fully Resolved ✅
+## CQ16 - Fully Resolved ✅
 
 All 60 nested named function violations have been resolved across 25+ files:
 - Message-listener closures → module-scope functions with context interfaces

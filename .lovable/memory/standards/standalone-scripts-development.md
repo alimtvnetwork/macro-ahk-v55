@@ -3,12 +3,12 @@ Updated: 2026-03-21
 
 ## Build Architecture
 
-Standalone scripts use a **root-level build configuration** — no per-folder `tsconfig.json` or `vite.config.ts`. Each script folder contains only `src/` (TypeScript source) and `dist/` (compiled output).
+Standalone scripts use a **root-level build configuration** - no per-folder `tsconfig.json` or `vite.config.ts`. Each script folder contains only `src/` (TypeScript source) and `dist/` (compiled output).
 
 ### Root-Level Config Files
-- `tsconfig.macro.json` — TypeScript config for macro-controller (strict, noEmit)
-- `vite.config.macro.ts` — Vite IIFE build config, outputs to `standalone-scripts/macro-controller/dist/`
-- `npm run build:macro` — Runs `tsc --noEmit` then `vite build`
+- `tsconfig.macro.json` - TypeScript config for macro-controller (strict, noEmit)
+- `vite.config.macro.ts` - Vite IIFE build config, outputs to `standalone-scripts/macro-controller/dist/`
+- `npm run build:macro` - Runs `tsc --noEmit` then `vite build`
 
 ### Folder Structure
 ```

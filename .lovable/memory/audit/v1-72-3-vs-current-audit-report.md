@@ -1,12 +1,12 @@
 ---
-name: v1.72.3 vs Current — Root Cause Analysis & Fix Reference
+name: v1.72.3 vs Current - Root Cause Analysis & Fix Reference
 description: Comprehensive RCA for broken prompts, injection, and next buttons with fix recipes for future regressions
 type: feature
 ---
 
-# v1.72.3 vs Current — Root Cause Analysis & Fix Reference
+# v1.72.3 vs Current - Root Cause Analysis & Fix Reference
 
-**Status:** ✅ ALL RESOLVED — 985/985 tests passing (88/88 files)  
+**Status:** ✅ ALL RESOLVED - 985/985 tests passing (88/88 files)  
 **Date:** 2026-04-06  
 **Baseline:** `v1.72.3-working-code/` (last known working)  
 **Current:** `src/` (v2.5.0)
@@ -37,7 +37,7 @@ Between v1.72.3 (working) and the current codebase (v2.5.0), three categories of
 | **Next button broken** | Task Next loop doesn't fire | `BgLogTag` undefined crash in `prompt-chain-handler.ts` kills chain execution | Added `import { BgLogTag }` |
 | **Injection silent failure** | Scripts not injecting into pages | Variable `batchable` renamed to `orderedScripts` but old name still referenced; `codeSource` property missing | Fixed variable name; added `codeSource` assignment |
 
-**Key insight:** All three failures share one root cause pattern — **code was refactored/split but dependencies were not carried forward.** The `BgLogTag` enum was available implicitly in the old monolithic structure but became `undefined` after module splitting.
+**Key insight:** All three failures share one root cause pattern - **code was refactored/split but dependencies were not carried forward.** The `BgLogTag` enum was available implicitly in the old monolithic structure but became `undefined` after module splitting.
 
 ---
 
@@ -73,7 +73,7 @@ User clicks Task Next → Macro Controller sends prompt chain execution
 In v1.72.3, `prompt-handler.ts` did NOT use `BgLogTag` at all. Error handling used plain `console.warn`:
 
 ```typescript
-// v1.72.3 — prompt-handler.ts line 243
+// v1.72.3 - prompt-handler.ts line 243
 } catch (err) {
     console.warn("[prompts] Migration error:", err);
 }
@@ -82,7 +82,7 @@ In v1.72.3, `prompt-handler.ts` did NOT use `BgLogTag` at all. Error handling us
 In the current code, this was upgraded to structured logging:
 
 ```typescript
-// Current — prompt-handler.ts line 247
+// Current - prompt-handler.ts line 247
 } catch (err) {
     logCaughtError(BgLogTag.PROMPTS, "Migration error", err);
 }
@@ -93,8 +93,8 @@ The `logCaughtError` import was added, but the `BgLogTag` import was **forgotten
 ### Same Pattern in prompt-chain-handler.ts
 
 v1.72.3 had no `BgLogTag` usage. Current code added:
-- Line 132: `logBgWarnError(BgLogTag.MARCO, ...)` — chain step warning
-- Line 138: `logCaughtError(BgLogTag.MARCO, ...)` — chain step failure
+- Line 132: `logBgWarnError(BgLogTag.MARCO, ...)` - chain step warning
+- Line 138: `logCaughtError(BgLogTag.MARCO, ...)` - chain step failure
 
 Both crash because `BgLogTag` wasn't imported until we fixed it.
 
@@ -114,7 +114,7 @@ const orderedScripts = [...scripts].sort((a, b) => { ... });
 if (batchable.length > 0) {  // ← 💥 ReferenceError: batchable is not defined
 ```
 
-**Why it worked in v1.72.3:** The file was structured differently — the variable was consistently named throughout. During refactoring to the current handler architecture, the rename was incomplete.
+**Why it worked in v1.72.3:** The file was structured differently - the variable was consistently named throughout. During refactoring to the current handler architecture, the rename was incomplete.
 
 **Fix:** Changed all `batchable` references to `orderedScripts`.
 
@@ -153,8 +153,8 @@ This didn't crash (undefined is falsy), but it meant injection diagnostics could
 
 1. `BgLogTag` is defined in `src/background/bg-logger.ts` as a TypeScript enum
 2. During the module splitting phase, `logCaughtError()` and `logBgWarnError()` were imported from `bg-logger.ts`
-3. `BgLogTag` was passed as an argument to these functions but **never imported** — the developer assumed it was available globally or via re-export
-4. TypeScript compiles enums to objects — accessing `.PROMPTS` on `undefined` is a runtime crash, not a compile error (if the type was loosely defined)
+3. `BgLogTag` was passed as an argument to these functions but **never imported** - the developer assumed it was available globally or via re-export
+4. TypeScript compiles enums to objects - accessing `.PROMPTS` on `undefined` is a runtime crash, not a compile error (if the type was loosely defined)
 
 ### All 31 Affected Files (Fixed)
 
@@ -184,7 +184,7 @@ Every file in `src/background/` and `src/background/handlers/` that called `logC
 | `prompt-cache.ts` | 138 lines | 296 lines (expanded with UISnapshot) |
 | `task-next-ui.ts` | 307 lines | 407 lines (expanded) |
 
-**Key insight:** The prompt-manager monolith was split into 7 files. The **logic is functionally equivalent** — the prompt loading pipeline, dropdown rendering, paste-into-editor, and Task Next loop all preserved their behavior. The breakage came from the **background handler side**, not the macro controller UI side.
+**Key insight:** The prompt-manager monolith was split into 7 files. The **logic is functionally equivalent** - the prompt loading pipeline, dropdown rendering, paste-into-editor, and Task Next loop all preserved their behavior. The breakage came from the **background handler side**, not the macro controller UI side.
 
 ### Injection System
 
@@ -236,7 +236,7 @@ if (orderedScripts.length > 0) {
 codeSource: scriptDef.source ?? "storage"
 ```
 
-**Location:** `src/background/handlers/injection-handler.ts` — in the `PreparedInjectionScript` construction.
+**Location:** `src/background/handlers/injection-handler.ts` - in the `PreparedInjectionScript` construction.
 
 ### Fix 4: Test Mock Updates
 
@@ -264,27 +264,27 @@ codeSource: scriptDef.source ?? "storage"
 
 1. **Check background console** for `TypeError` mentioning `BgLogTag`
 2. If yes → `BgLogTag` import missing in `prompt-chain-handler.ts`
-3. If no → Check chain execution in `prompt-chain-handler.ts` — is `handleRunChain` registered?
+3. If no → Check chain execution in `prompt-chain-handler.ts` - is `handleRunChain` registered?
 4. If registered → Check if prompt text is being resolved (the chain loads prompt by ID from DB)
 
 ### Symptom: Scripts not injecting into pages
 
 1. **Check** `injection-handler.ts` for any `ReferenceError` (variable rename issue)
-2. **Check** `PreparedInjectionScript` construction — all interface fields must be populated
-3. **Check** `injection-cache.ts` — stale cache can serve old/missing scripts
-4. **Check** content script registration in `manifest.json` — `content_scripts` array
+2. **Check** `PreparedInjectionScript` construction - all interface fields must be populated
+3. **Check** `injection-cache.ts` - stale cache can serve old/missing scripts
+4. **Check** content script registration in `manifest.json` - `content_scripts` array
 
 ### Symptom: Prompts load but paste doesn't work
 
-1. The `prompt-injector.ts` content script is **unchanged** — issue is likely DOM selector mismatch
+1. The `prompt-injector.ts` content script is **unchanged** - issue is likely DOM selector mismatch
 2. Check if Lovable's editor DOM changed (class names, structure)
 3. Test with `findTiptapEditor()` selectors manually in DevTools console
 4. The fallback chain: `.tiptap.ProseMirror` → `.ProseMirror[contenteditable='true']` → `form [contenteditable='true']` → `textarea`
 
 ### General: After any module split or refactor
 
-1. **Run full test suite:** `npx vitest run` — must be 985/985
-2. **Grep for implicit dependencies:** `grep -rn 'BgLogTag' src/background/ | grep -v 'import'` — should return zero lines that aren't import statements
+1. **Run full test suite:** `npx vitest run` - must be 985/985
+2. **Grep for implicit dependencies:** `grep -rn 'BgLogTag' src/background/ | grep -v 'import'` - should return zero lines that aren't import statements
 3. **Check variable renames:** Search for old variable names across the codebase
 4. **Verify interface compliance:** Any `interface` with required fields must have all fields assigned
 
@@ -306,36 +306,36 @@ codeSource: scriptDef.source ?? "storage"
 
 ## Architecture Comparison
 
-### v1.72.3 (Working) — Monolithic prompt-manager
+### v1.72.3 (Working) - Monolithic prompt-manager
 
 ```
 macro-controller/src/ui/
-├── prompt-manager.ts     (885 lines — all prompt logic)
-├── prompt-cache.ts       (138 lines — IndexedDB cache)
-├── prompt-utils.ts       (185 lines — paste helpers)
-├── save-prompt.ts        (611 lines — save/edit UI)
-└── task-next-ui.ts       (307 lines — Task Next loop)
+├── prompt-manager.ts     (885 lines - all prompt logic)
+├── prompt-cache.ts       (138 lines - IndexedDB cache)
+├── prompt-utils.ts       (185 lines - paste helpers)
+├── save-prompt.ts        (611 lines - save/edit UI)
+└── task-next-ui.ts       (307 lines - Task Next loop)
 ```
 
-### Current (v2.5.0) — Split modules
+### Current (v2.5.0) - Split modules
 
 ```
 macro-controller/src/ui/
-├── prompt-manager.ts           (24 lines — barrel re-export)
-├── prompt-loader.ts            (428 lines — loading, caching, config)
-├── prompt-dropdown.ts          (642 lines — dropdown rendering)
-├── prompt-injection.ts         (350 lines — creation modal, paste)
-├── prompt-cache.ts             (296 lines — IndexedDB + UISnapshot)
-├── prompt-utils.ts             (193 lines — paste helpers)
-├── save-prompt.ts              (258 lines — save/edit refactored)
-├── save-prompt-dropdown.ts     (new — dropdown split)
-├── save-prompt-html-converter.ts (new — HTML conversion)
-├── save-prompt-prompt-list.ts  (new — prompt list split)
-├── save-prompt-task-next.ts    (new — task next split)
-└── task-next-ui.ts             (407 lines — expanded)
+├── prompt-manager.ts           (24 lines - barrel re-export)
+├── prompt-loader.ts            (428 lines - loading, caching, config)
+├── prompt-dropdown.ts          (642 lines - dropdown rendering)
+├── prompt-injection.ts         (350 lines - creation modal, paste)
+├── prompt-cache.ts             (296 lines - IndexedDB + UISnapshot)
+├── prompt-utils.ts             (193 lines - paste helpers)
+├── save-prompt.ts              (258 lines - save/edit refactored)
+├── save-prompt-dropdown.ts     (new - dropdown split)
+├── save-prompt-html-converter.ts (new - HTML conversion)
+├── save-prompt-prompt-list.ts  (new - prompt list split)
+├── save-prompt-task-next.ts    (new - task next split)
+└── task-next-ui.ts             (407 lines - expanded)
 ```
 
-**The split is clean and backward-compatible** — `prompt-manager.ts` re-exports everything, so existing imports still work. The functional behavior is equivalent. The bugs were in the **background service worker**, not the macro controller UI layer.
+**The split is clean and backward-compatible** - `prompt-manager.ts` re-exports everything, so existing imports still work. The functional behavior is equivalent. The bugs were in the **background service worker**, not the macro controller UI layer.
 
 ---
 

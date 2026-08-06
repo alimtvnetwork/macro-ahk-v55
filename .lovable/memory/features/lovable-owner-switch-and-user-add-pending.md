@@ -1,6 +1,6 @@
 ---
 name: Lovable Owner Switch + Lovable User Add (pending specs)
-description: Two deferred Chrome-extension scripts spec'd 2026-04-24 — promote workspace members to Owner / bulk-add members; share lovable-common-xpath module
+description: Two deferred Chrome-extension scripts spec'd 2026-04-24 - promote workspace members to Owner / bulk-add members; share lovable-common-xpath module
 type: feature
 ---
 
@@ -10,7 +10,7 @@ Updated: 2026-04-24
 
 ## Status
 
-📋 **Pending — spec-only, do NOT implement until user explicitly schedules.**
+📋 **Pending - spec-only, do NOT implement until user explicitly schedules.**
 
 ## What was captured
 
@@ -40,7 +40,7 @@ login/profile/sign-out XPaths and default delays.
 
 - Both scripts run inside an incognito-by-default Chrome window, drive the
   Lovable login UI by XPath, then read the Lovable session cookie to derive
-  a bearer token (same path as Macro Controller —
+  a bearer token (same path as Macro Controller -
   `mem://auth/unified-auth-contract`).
 - Per-project SQLite tables created on first load via core SDK migration.
   PascalCase enforced (`mem://architecture/storage/database-naming-convention`).
@@ -51,19 +51,19 @@ login/profile/sign-out XPaths and default delays.
 
 ## Coding rules that apply (all already in memory)
 
-- `mem://standards/class-based-standalone-scripts` — single default class entry
-- `mem://standards/no-css-important` — never `!important`
-- `mem://standards/standalone-scripts-css-in-own-file` — no inline `<style>`
+- `mem://standards/class-based-standalone-scripts` - single default class entry
+- `mem://standards/no-css-important` - never `!important`
+- `mem://standards/standalone-scripts-css-in-own-file` - no inline `<style>`
 - `mem://standards/no-error-swallowing` + `mem://standards/error-logging-via-namespace-logger.md`
 - `mem://standards/blank-line-before-return`
 - `mem://standards/no-type-casting` + `mem://standards/unknown-usage-policy`
-- `mem://standards/code-quality-improvement` — no magic strings
+- `mem://standards/code-quality-improvement` - no magic strings
 - `mem://standards/no-unjustified-raf`
-- `mem://standards/pre-write-check` — mandatory before first source file
-- `mem://standards/formatting-and-logic` — function-length budget
+- `mem://standards/pre-write-check` - mandatory before first source file
+- `mem://standards/formatting-and-logic` - function-length budget
 
 ## Tracking
 
-`.lovable/plan.md` ⏳ Pending — Next Up rows added under the Owner Switch /
+`.lovable/plan.md` ⏳ Pending - Next Up rows added under the Owner Switch /
 User Add tasks. Do not auto-recommend implementation; user explicitly said
 "we will do it later".
