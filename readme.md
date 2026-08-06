@@ -317,6 +317,22 @@ Override priority (lowest → highest):
 3. Environment variables of the same name
 4. `--enable-sibling-discovery` CLI flag
 5. `--no-sibling-discovery` CLI flag
+
+---
+
+## Development & Project Memory
+
+This project uses a strict memory and specification system. AI agents working on this repo MUST follow the authoritative read-list.
+
+- **Authoritative Read-List:** [.lovable/what-to-read.md](.lovable/what-to-read.md)
+- **Folder Structure:**
+  - `.lovable/memory/`: Topic-based persistent memory.
+  - `.lovable/plans/`: Prioritized roadmap and task tracking.
+  - `.lovable/spec/`: Detailed technical specifications and commands.
+  - `spec/`: High-level product and coding specs.
+  - `standalone-scripts/`: Modular automation scripts and prompt sources.
+
+See [.lovable/what-to-read.md](.lovable/what-to-read.md) for the mandatory onboarding sequence.
 6. **Strict-mode lockout - beats everything** (spec §4 rule 6)
 
 Use `--dry-run` to inspect the resolved decision without installing - the plan prints `Sibling discovery: <state> - <reason>`.
