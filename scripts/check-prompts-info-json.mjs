@@ -20,7 +20,7 @@ const REQUIRED = [
   ["updatedAt",  "string"],
 ];
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const SEMVER_RE = /^\d+\.\d+\.\d+$/;
+const SEMVER_RE = /^[0-9]+\.[0-9]+\.[0-9]+([.-].+)?$/;
 const ISO_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/;
 
 function typeOf(v) {

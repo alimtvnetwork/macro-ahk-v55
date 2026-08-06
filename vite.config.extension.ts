@@ -58,7 +58,7 @@ function runNodeScriptSafe(label: string, nodeArgs: string[], cwd: string): void
 
 const EXT_DIR = __dirname;
 const VERSION_JSON_PATH = resolve(EXT_DIR, "version.json");
-const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
+const SEMVER_PATTERN = /^[0-9]+\.[0-9]+\.[0-9]+([.-].+)?$/;
 // NOTE: The unpacked Chrome extension is written DIRECTLY into ./chrome-extension/
 // at the repo root (load-unpacked target). This replaces the legacy ./dist/ output.
 // dist/ is reserved for the Lovable preview / web-app build (`vite build` without
@@ -71,7 +71,7 @@ function readRootVersion(): string {
 
     if (typeof parsed.version !== "string" || !SEMVER_PATTERN.test(parsed.version)) {
         throw new Error(
-            `[copy-manifest] Invalid version.json at ${VERSION_JSON_PATH}; expected version to match X.Y.Z.`,
+            `[copy-manifest] Invalid version.json at ${VERSION_JSON_PATH}; expected version to match SEMVER.`,
         );
     }
 
