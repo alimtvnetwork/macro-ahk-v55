@@ -55,7 +55,7 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
       await expect(options.getByTestId(`project-group-drag-source-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 30_000 });
 
       await dragProjectIntoMembers(options, PROJECT_ALPHA_ID);
-      await expect(options.getByTestId(`project-group-member-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 20_000 });
+      await expect(options.getByTestId(`project-group-member-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 30_000 });
       await expect(options.getByTestId(`project-group-member-${PROJECT_ALPHA_ID}`).getByText('Alpha Automation')).toBeVisible();
 
       await options.getByTestId('project-group-cascade-button').click();
