@@ -31,9 +31,7 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
       const extensionId = await getExtensionId(context);
       await seedCrossProjectSyncState(context);
 
-      const options = await context.newPage();
-      await options.goto(`${optionsUrl(extensionId)}#library`);
-      await options.waitForLoadState('domcontentloaded');
+      const options = await openOptions(context, extensionId);
       await seedCrossProjectSyncStateFromPage(options);
       await waitForReadyOptions(options);
 
