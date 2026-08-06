@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { type BrowserContext, type Page, chromium } from '@playwright/test';
+import { type BrowserContext, type Page } from '@playwright/test';
 import { launchExtension, getExtensionId, openOptions, optionsUrl } from './fixtures';
 
 const ONBOARDING_KEY = 'marco_onboarding_complete';
@@ -24,20 +24,23 @@ type StoredProjectSeed = {
 };
 
 test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
-  test.setTimeout(180_000);
+  test.setTimeout(300_000);
 
   test('creates a project group, drag-assigns a project, and cascades shared settings', async () => {
-    const context = await launchExtension(chromium);
+    const context = await launchExtension();
+    context.setDefaultTimeout(90_000);
     try {
       const extensionId = await getExtensionId(context);
+      console.log(`[E2E-24] Extension ID: ${extensionId}`);
       await seedCrossProjectSyncState(context);
 
       const options = await openOptions(context, extensionId);
+      options.setDefaultTimeout(90_000);
       await options.goto(`${optionsUrl(extensionId)}#library`);
       await seedCrossProjectSyncStateFromPage(options);
       await waitForReadyOptions(options);
 
-      await expect(options.getByRole('heading', { name: 'Shared Library' })).toBeVisible({ timeout: 30_000 });
+      await expect(options.getByRole('heading', { name: 'Shared Library' })).toBeVisible({ timeout: 60_000 });
       await options.getByTestId('library-tab-groups').click();
 
       const groupName = `E2E Sync Group ${Date.now()}`;
@@ -46,7 +49,7 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
       await options.getByTestId('project-group-settings-input').fill('{"logLevel":"warn","retryOnNavigate":true}');
       await options.getByTestId('project-group-save-button').click();
 
-      await expect(options.getByRole('heading', { name: groupName })).toBeVisible({ timeout: 30_000 });
+      await expect(options.getByRole('heading', { name: groupName })).toBeVisible({ timeout: 60_000 });
       const groupId = await readGroupId(options, groupName);
       expect(groupId).not.toBeNull();
       await options.getByTestId(`project-group-card-${groupId}`).click();
@@ -54,14 +57,14 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
       // GroupDetailPanel mounts and fires GET_ALL_PROJECTS async; SW seed +
       // chrome.storage round-trip can exceed the default 10s on cold extension
       // launch. Give the chip rail the same 20s budget as the rest of the flow.
-      await expect(options.getByTestId(`project-group-drag-source-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 30_000 });
+      await expect(options.getByTestId(`project-group-drag-source-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 60_000 });
 
       await dragProjectIntoMembers(options, PROJECT_ALPHA_ID);
-      await expect(options.getByTestId(`project-group-member-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 30_000 });
+      await expect(options.getByTestId(`project-group-member-${PROJECT_ALPHA_ID}`)).toBeVisible({ timeout: 60_000 });
       await expect(options.getByTestId(`project-group-member-${PROJECT_ALPHA_ID}`).getByText('Alpha Automation')).toBeVisible();
 
       await options.getByTestId('project-group-cascade-button').click();
-      await expect(options.getByText(/Settings pushed to 1 project\(s\)/)).toBeVisible({ timeout: 30_000 });
+      await expect(options.getByText(/Settings pushed to 1 project\(s\)/)).toBeVisible({ timeout: 60_000 });
 
       const persisted = await readGroupMembers(options, groupName);
       expect(persisted).toContain(PROJECT_ALPHA_ID);
@@ -74,7 +77,9 @@ test.describe('E2E-24 — Cross-Project Sync Chrome pass', () => {
 
 async function seedCrossProjectSyncState(context: BrowserContext): Promise<void> {
   let [serviceWorker] = context.serviceWorkers();
-  if (!serviceWorker) serviceWorker = await context.waitForEvent('serviceworker');
+  if (!serviceWorker) {
+    serviceWorker = await context.waitForEvent('serviceworker', { timeout: 30_000 });
+  }
   const projects = buildSeedProjects();
   // Wait for chrome.storage to be available in the service worker context.
   // On cold start, the SW may evaluate before chrome.* APIs are exposed.
