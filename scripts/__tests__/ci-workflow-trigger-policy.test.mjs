@@ -228,8 +228,9 @@ test("AHK sidecar clone is shallow and canonical-owner guarded", () => {
     const script = readFileSync(CLONE_AHK_SCRIPT, "utf8");
 
     assert.equal(pkg.scripts["clone:ahk"], "node scripts/clone-ahk.mjs", "clone:ahk must use the guarded helper, not raw git clone");
-    assert.match(script, /const CANONICAL_REPO = "aukgit\/macro-ahk-v55"/, "clone helper must use the canonical repo owner");
-    assert.match(script, /const STALE_REPO = "alimtvnetwork\/macro-ahk-v55"/, "clone helper must recognize the stale repo owner");
+    assert.match(script, /const CANONICAL_REPO = "alimtvnetwork\/macro-ahk-v55"/, "clone helper must use the canonical repo owner");
+    assert.match(script, /const STALE_REPO = "aukgit\/macro-ahk-v55"/, "clone helper must recognize the stale repo owner");
+    assert.match(script, /resolveRepoSlug\(/, "clone helper must resolve the slug at runtime so a rename auto-heals");
     assert.match(script, /"--depth=1"/, "clone helper must use a shallow clone to avoid large transfers");
     assert.match(script, /"--filter=blob:none"/, "clone helper must use partial clone filtering to reduce GitHub transfer size");
     assert.match(script, /"--no-tags"/, "clone helper must avoid fetching tags for the sidecar clone");

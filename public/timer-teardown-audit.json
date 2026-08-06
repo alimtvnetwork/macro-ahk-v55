@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-06-05T16:05:51.416Z",
-  "totalFindings": 31,
+  "generatedAt": "2026-08-06T17:55:34.761Z",
+  "totalFindings": 33,
   "findings": [
     {
       "file": "src/background/spa-reinject.ts",
@@ -34,6 +34,12 @@
     },
     {
       "file": "src/components/options/recorder/recorder-export.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
+      "teardowns": 0
+    },
+    {
+      "file": "src/components/options/webhook-settings/delivery-log-utils.ts",
       "installer": "\\bsetTimeout\\s*\\(",
       "installs": 1,
       "teardowns": 0
@@ -186,6 +192,12 @@
       "file": "src/popup/components/SqliteBundleActions.tsx",
       "installer": "\\bsetTimeout\\s*\\(",
       "installs": 2,
+      "teardowns": 0
+    },
+    {
+      "file": "src/test/support/act-helpers.ts",
+      "installer": "\\bsetTimeout\\s*\\(",
+      "installs": 1,
       "teardowns": 0
     }
   ]

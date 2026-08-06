@@ -181,4 +181,5 @@ CI workflow only needs `contents: read`.
 | `spec-gates.yml` | pull_request | Enforces spec link checks and structural gates |
 | `spec-governance-quarterly.yml` | schedule | Quarterly spec drift / governance review |
 | `spec-audit.yml` | push + pull_request | Blind-AI spec audit (structure, links, drift) |
+| `tag-and-release.yml` | workflow_dispatch | Creates the `v<version>` tag server-side so `release.yml` triggers without a local tag push |
 
