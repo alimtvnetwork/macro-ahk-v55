@@ -1,0 +1,1 @@
+- Consolidated hard prohibitions. See: .lovable/memory/constraints/01-rules.md
