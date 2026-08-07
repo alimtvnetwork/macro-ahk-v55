@@ -111,6 +111,23 @@ test("skips .github/workflows and .gitmap prefixes", () => {
   }
 });
 
+test("skips repository metadata and archived GitHub workflow snapshots", () => {
+  const dir = makeFixture();
+  try {
+    mkdirSync(join(dir, ".lovable", "plan"), { recursive: true });
+    mkdirSync(join(dir, ".old-github/.github/workflows"), { recursive: true });
+    writeFileSync(join(dir, ".lovable/plan/release.md"), "The vi.func guard failed\n");
+    writeFileSync(
+      join(dir, ".old-github/.github/workflows/ci.yml"),
+      "- name: Guard against vi.func\n",
+    );
+    const res = runChecker(dir);
+    assert.equal(res.status, 0, res.stderr || res.stdout);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test("skips changelog.md basename", () => {
   const dir = makeFixture();
   try {
