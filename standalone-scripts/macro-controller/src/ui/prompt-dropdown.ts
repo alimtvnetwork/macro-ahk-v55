@@ -110,10 +110,11 @@ function measureSubMenuWidth(sub: HTMLElement): number {
   return width;
 }
 
-function hasRightSpaceForMenu(row: HTMLElement, width: number): boolean {
+function hasRightSpaceForMenu(row: HTMLElement, measuredWidth: number): boolean {
   const PAD = 8;
   const rowRect = row.getBoundingClientRect();
-  return (window.innerWidth - rowRect.right - PAD) >= width;
+  const rightSpace = window.innerWidth - rowRect.right - PAD;
+  return rightSpace >= measuredWidth;
 }
 
 function anchorSubMenuRight(row: HTMLElement, sub: HTMLElement): void {
