@@ -1,5 +1,17 @@
 # Changelog
 
+## [v5.24.0] 2026-08-07 CI Archive Scanner Fix and Release Prompt Parity
+
+### Fixed
+- `scripts/check-vi-func.mjs`: the guard scanned every directory, so the archived `.old-github/.github/workflows/ci.yml` snapshot tripped the `vi.func` preflight and failed `Preflight - No Nested Template Literals` on `main`. `.lovable` and `.old-github` are now in `SKIP_DIRS`, and real source violations still fail.
+- `.lovable/prompts/14-release.md`: re-synced byte-for-byte with `standalone-scripts/prompts/22-release/prompt.md`. The blank-line drift between the two broke the `default-prompt-content` contract test (`Object.is` equality) and failed `pnpm run test:quiet` in the `Setup - Lint - Test` job.
+
+### Added
+- `scripts/__tests__/check-vi-func.test.mjs`: regression test proving archived workflow text and `.lovable` notes cannot fail the guard.
+
+### Issues
+- [01-5-24-0-git-tag-skipped](.lovable/release/issues/01-5-24-0-git-tag-skipped.md) the sandbox cannot run git commands, so the `v5.24.0` commit and tag must be created through **Actions > Tag and Release**.
+
 ## [v5.23.0] 2026-08-06 Workflow YAML Validation and Tag Recovery
 
 ### Fixed
