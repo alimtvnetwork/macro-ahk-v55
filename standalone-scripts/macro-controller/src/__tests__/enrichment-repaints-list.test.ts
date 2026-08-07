@@ -20,7 +20,7 @@ import { resolve } from 'node:path';
 const SRC = resolve(__dirname, '..', 'credit-fetch.ts');
 
 function getSchedulePostParseEnrichmentSource(): string {
-    const full = readFileSync(SRC, 'utf8');
+    const full = readFileSync(SRC, 'utf8').replace(/\r\n/g, '\n');
     const start = full.indexOf('export function schedulePostParseEnrichment');
     expect(start, 'schedulePostParseEnrichment must exist').toBeGreaterThan(-1);
     const rest = full.slice(start);

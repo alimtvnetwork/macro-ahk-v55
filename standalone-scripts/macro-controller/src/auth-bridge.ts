@@ -28,23 +28,23 @@ import { Label } from './types';
 
 // CQ11: Encapsulate bridge outcome in singleton class
 class BridgeOutcomeState {
-  private _attempted = false;
-  private _success = false;
+  private _hasAttempted = false;
+  private _isSuccess = false;
   private _source = '';
   private _error = '';
 
-  get(): { attempted: boolean; success: boolean; source: string; error: string } {
+  get(): { hasAttempted: boolean; isSuccess: boolean; source: string; error: string } {
     return {
-      attempted: this._attempted,
-      success: this._success,
+      hasAttempted: this._hasAttempted,
+      isSuccess: this._isSuccess,
       source: this._source,
       error: this._error,
     };
   }
 
-  record(success: boolean, source: string, error?: string): void {
-    this._attempted = true;
-    this._success = success;
+  record(isSuccess: boolean, source: string, error?: string): void {
+    this._hasAttempted = true;
+    this._isSuccess = isSuccess;
     this._source = source;
     this._error = error || '';
   }
@@ -53,8 +53,8 @@ class BridgeOutcomeState {
 const bridgeOutcomeState = new BridgeOutcomeState();
 
 export function getLastBridgeOutcome(): {
-  attempted: boolean;
-  success: boolean;
+  hasAttempted: boolean;
+  isSuccess: boolean;
   source: string;
   error: string;
 } {
@@ -62,11 +62,11 @@ export function getLastBridgeOutcome(): {
 }
 
 function recordBridgeOutcome(
-  success: boolean,
+  isSuccess: boolean,
   source: string,
   error?: string,
 ): void {
-  bridgeOutcomeState.record(success, source, error);
+  bridgeOutcomeState.record(isSuccess, source, error);
 }
 
 // ============================================
@@ -78,8 +78,8 @@ export interface AuthDebugSnapshot {
   hasResolvedToken: boolean;
   sessionCookieNames: string[];
   bridgeOutcome: {
-    attempted: boolean;
-    success: boolean;
+    hasAttempted: boolean;
+    isSuccess: boolean;
     source: string;
     error: string;
   };
@@ -213,18 +213,18 @@ function handleAttemptResult(
  * v7.41: Distinguishes timeout vs. explicit relay errors.
  */
 export function requestTokenFromExtension(
-  forceRefresh: boolean,
+  isForceRefresh: boolean,
   onDone: (token: string, source: string) => void,
 ): void {
-  const messageType = forceRefresh ? 'REFRESH_TOKEN' : 'GET_TOKEN';
+  const messageType = isForceRefresh ? 'REFRESH_TOKEN' : 'GET_TOKEN';
 
-  _requestTokenFromExtensionAttempt(forceRefresh, function (firstAttempt: ExtensionBridgeAttemptResult) {
+  _requestTokenFromExtensionAttempt(isForceRefresh, function (firstAttempt: ExtensionBridgeAttemptResult) {
     if (handleAttemptResult(firstAttempt, messageType, onDone)) return;
 
     // Retry once on timeout (handles MV3 service worker cold-start)
     log(Label.ExtensionBridge + messageType + ' timed out — retrying once...', 'warn');
 
-    _requestTokenFromExtensionAttempt(forceRefresh, function (secondAttempt: ExtensionBridgeAttemptResult) {
+    _requestTokenFromExtensionAttempt(isForceRefresh, function (secondAttempt: ExtensionBridgeAttemptResult) {
       if (handleAttemptResult(secondAttempt, messageType, onDone)) return;
 
       recordBridgeOutcome(false, 'none', secondAttempt.errorMessage || 'timeout (2 attempts)');
@@ -238,7 +238,7 @@ export function requestTokenFromExtension(
 // ============================================
 
 interface BridgeAttemptCtx {
-  settled: boolean;
+  isSettled: boolean;
   timeoutRef: ReturnType<typeof setTimeout> | null;
   requestId: string;
   startedAt: number;
@@ -252,8 +252,8 @@ interface BridgeAttemptCtxFull extends BridgeAttemptCtx {
 }
 
 function finishBridgeAttempt(ctx: BridgeAttemptCtxFull, result: ExtensionBridgeAttemptResult): void {
-  if (ctx.settled) return;
-  ctx.settled = true;
+  if (ctx.isSettled) return;
+  ctx.isSettled = true;
   window.removeEventListener('message', ctx._onResponse!);
   if (ctx.timeoutRef) clearTimeout(ctx.timeoutRef);
   ctx.onDone(result);
@@ -277,14 +277,14 @@ function handleBridgeResponse(ctx: BridgeAttemptCtxFull, event: MessageEvent): v
 }
 
 function _requestTokenFromExtensionAttempt(
-  forceRefresh: boolean,
+  isForceRefresh: boolean,
   onDone: (result: ExtensionBridgeAttemptResult) => void,
 ): void {
-  const messageType = forceRefresh ? 'REFRESH_TOKEN' : 'GET_TOKEN';
+  const messageType = isForceRefresh ? 'REFRESH_TOKEN' : 'GET_TOKEN';
   const requestId = 'tok-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
 
   const ctx: BridgeAttemptCtxFull = {
-    settled: false, timeoutRef: null, requestId, startedAt: Date.now(), messageType, onDone,
+    isSettled: false, timeoutRef: null, requestId, startedAt: Date.now(), messageType, onDone,
   };
 
   ctx._onResponse = function(event: MessageEvent) { handleBridgeResponse(ctx, event); };
@@ -323,7 +323,7 @@ function unwrapRelayPayload(rawPayload: unknown): Record<string, unknown> {
 // ============================================
 
 interface RelayPingCtx {
-  settled: boolean;
+  isSettled: boolean;
   timer: ReturnType<typeof setTimeout>;
   pingId: string;
   resolve: (value: boolean) => void;
@@ -350,8 +350,8 @@ function handleRelayPong(ctx: RelayPingCtx, event: MessageEvent): void {
   const payload = unwrapRelayPayload((event.data as { payload?: unknown }).payload);
   const errorMsg = typeof payload.errorMessage === 'string' ? payload.errorMessage : '';
 
-  if (!ctx.settled) {
-    ctx.settled = true;
+  if (!ctx.isSettled) {
+    ctx.isSettled = true;
     clearTimeout(ctx.timer);
     window.removeEventListener('message', ctx._onPong!);
     ctx.resolve(!isTransportFailure(errorMsg));
@@ -363,10 +363,10 @@ export function isRelayActive(): Promise<boolean> {
     const pingId = 'relay-ping-' + Date.now();
 
     const ctx: RelayPingCtx = {
-      settled: false,
+      isSettled: false,
       timer: setTimeout(function () {
-        if (!ctx.settled) {
-          ctx.settled = true;
+        if (!ctx.isSettled) {
+          ctx.isSettled = true;
           window.removeEventListener('message', ctx._onPong!);
           resolve(false);
         }
@@ -390,11 +390,11 @@ export function isRelayActive(): Promise<boolean> {
 export function wakeBridge(): Promise<boolean> {
   return new Promise(function (resolve) {
     const pingId = 'wake-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
-    let settled = false;
+    let isSettled = false;
 
     function finish(alive: boolean): void {
-      if (settled) return;
-      settled = true;
+      if (isSettled) return;
+      isSettled = true;
       window.removeEventListener('message', onResponse);
       if (timer) clearTimeout(timer);
       resolve(alive);

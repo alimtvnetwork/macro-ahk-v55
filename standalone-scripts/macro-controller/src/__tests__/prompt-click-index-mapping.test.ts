@@ -25,7 +25,7 @@ const source = readFileSync(SOURCE_PATH, 'utf8');
 describe('Issue #90 — prompt click index mapping', () => {
   it('renderPromptItem stamps every item with data-prompt-idx', () => {
     const renderMatch = source.match(
-      /function renderPromptItem\([\s\S]*?\n\}\n/,
+      /function renderPromptItem\([\s\S]*?\n\}/,
     );
     expect(renderMatch, 'renderPromptItem function block').toBeTruthy();
     const body = renderMatch![0];

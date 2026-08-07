@@ -48,6 +48,8 @@ export interface XPathCapturePayload {
      * persists the step as `StepKindId.UrlTabClick` instead of plain `Click`.
      */
     readonly UrlTabClickHint?: CaptureClickContext;
+    /** The typed or selected value, if applicable. */
+    readonly Value?: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -160,12 +162,20 @@ export function buildStepDraftFromCapture(
     assertCapturePayload(payload);
     const selectors = buildCaptureSelectors(payload, anchorSelectorId);
     const urlTabParams = deriveUrlTabClickParams(payload);
+    
+    let stepKind = urlTabParams === null ? inferStepKind(payload.TagName) : StepKindId.UrlTabClick;
+    let paramsJson = urlTabParams === null ? null : JSON.stringify(urlTabParams);
+
+    if (urlTabParams === null && (stepKind === StepKindId.Type || stepKind === StepKindId.Select) && payload.Value !== undefined) {
+        paramsJson = JSON.stringify({ Value: payload.Value });
+    }
+
     return {
-        StepKindId: urlTabParams === null ? inferStepKind(payload.TagName) : StepKindId.UrlTabClick,
+        StepKindId: stepKind,
         VariableName: payload.SuggestedVariableName,
         Label: buildLabel(payload),
         InlineJs: null,
-        ParamsJson: urlTabParams === null ? null : JSON.stringify(urlTabParams),
+        ParamsJson: paramsJson,
         IsBreakpoint: false,
         Selectors: selectors,
     };

@@ -27,6 +27,7 @@ import { registerShortcutCommands } from "./shortcut-command-handler";
 import { registerSpaReinject } from "./spa-reinject";
 import { registerUrlTriggers } from "./url-trigger";
 import { startHotReload } from "./hot-reload";
+import { startNewTabTracker } from "./recorder/new-tab-tracker";
 import { MessageType } from "../shared/messages";
 import { logCaughtError, BgLogTag} from "./bg-logger";
 import { EXTENSION_VERSION } from "../shared/constants";
@@ -141,6 +142,7 @@ const registrations: Array<[string, () => void]> = [
     ["url-trigger", registerUrlTriggers],
     ["keepalive", registerKeepalive],
     ["hot-reload", startHotReload],
+    ["new-tab-tracker", startNewTabTracker],
 ];
 
 for (const [label, register] of registrations) {

@@ -36,6 +36,7 @@ import {
     type PersistedSelector,
     type PersistedStep,
 } from "../recorder/step-persistence";
+import { getRecentlyOpenedTabUrl } from "../recorder/new-tab-tracker";
 
 interface CaptureRequest {
     /** Optional override; falls back to the active session's ProjectSlug. */
@@ -116,16 +117,41 @@ async function persistOneCapture(
     projectSlug: string,
     payload: XPathCapturePayload,
 ): Promise<PersistedCaptureResult> {
+    // Wait 200ms to see if a tab opens (Spec 19.1.4: "tabs.onCreated event fires within 200ms")
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    let finalPayload = payload;
+    
+    // Type casting because CapturedAt is injected by content script but isn't typed in XPathCapturePayload
+    const capturedAtStr = (payload as any).CapturedAt;
+    if (capturedAtStr) {
+        const capturedAtMs = new Date(capturedAtStr).getTime();
+        const openedUrl = getRecentlyOpenedTabUrl(capturedAtMs);
+        if (openedUrl) {
+            finalPayload = {
+                ...payload,
+                UrlTabClickHint: {
+                    ...(payload.UrlTabClickHint || {
+                        Tag: payload.TagName,
+                        LocationOrigin: "",
+                        WindowOpenCalled: false,
+                    }),
+                    OpenedTabUrl: openedUrl,
+                }
+            };
+        }
+    }
+
     let anchorSelectorId: number | null = null;
-    if (payload.XPathRelative !== null && payload.AnchorXPath !== null) {
+    if (finalPayload.XPathRelative !== null && finalPayload.AnchorXPath !== null) {
         const mgr = await initProjectDb(projectSlug);
         anchorSelectorId = findAnchorSelectorId(
             mgr.getDb(),
-            payload.AnchorXPath,
+            finalPayload.AnchorXPath,
         );
     }
 
-    const draft = buildStepDraftFromCapture(payload, anchorSelectorId);
+    const draft = buildStepDraftFromCapture(finalPayload, anchorSelectorId);
     const { step, selectors } = await insertStep(projectSlug, draft);
     return { step, selectors };
 }

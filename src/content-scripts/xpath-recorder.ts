@@ -24,12 +24,15 @@ import {
 } from "./xpath-anchor-strategies";
 import { suggestVariableName } from "./xpath-label-suggester";
 import { enqueueCapture, flushNow } from "./xpath-capture-coalescer";
+import { mountRecorderToolbar, type RecorderToolbarHandle, type RecorderToolbarOptions } from "../background/recorder/recorder-toolbar";
+import type { RecordingPhase, RecordingSession } from "../background/recorder/recorder-session-types";
 
 /* ------------------------------------------------------------------ */
 /*  State                                                              */
 /* ------------------------------------------------------------------ */
 
 let isActive = true;
+let toolbarHandle: RecorderToolbarHandle | null = null;
 
 /* ------------------------------------------------------------------ */
 /*  XPath Generation — Priority Strategy                               */
@@ -74,7 +77,7 @@ function isExcludedElement(element: Element): boolean {
 /* ------------------------------------------------------------------ */
 
 /** Builds the Phase-06 XPATH_CAPTURED payload for the background worker. */
-export function buildCapturePayload(target: Element): {
+export function buildCapturePayload(target: Element, value?: string): {
     type: "XPATH_CAPTURED";
     XPathFull: string;
     XPathRelative: string | null;
@@ -83,12 +86,21 @@ export function buildCapturePayload(target: Element): {
     SuggestedVariableName: string;
     TagName: string;
     Text: string;
+    Value?: string;
     CapturedAt: string;
 } {
     const generated = generateXPath(target);
     const anchor = findAutoAnchor(target);
     const relative = anchor === null ? null : buildRelativeXPath(target, anchor);
     const anchorXPath = anchor === null ? null : generateXPath(anchor).xpath;
+
+    const urlTabClickHint = {
+        Tag: target.tagName.toLowerCase(),
+        Target: target.getAttribute("target") ?? undefined,
+        Href: (target as HTMLAnchorElement).href ?? undefined,
+        LocationOrigin: window.location.origin,
+        WindowOpenCalled: false,
+    };
 
     return {
         type: "XPATH_CAPTURED",
@@ -99,6 +111,8 @@ export function buildCapturePayload(target: Element): {
         SuggestedVariableName: suggestVariableName(target),
         TagName: target.tagName.toLowerCase(),
         Text: target.textContent?.trim().slice(0, 100) ?? "",
+        Value: value,
+        UrlTabClickHint: urlTabClickHint,
         CapturedAt: new Date().toISOString(),
     };
 }
@@ -113,15 +127,71 @@ function onElementClick(event: MouseEvent): void {
 
     const target = event.target as Element;
     if (isExcludedElement(target)) return;
-
-    event.preventDefault();
-    event.stopPropagation();
+    
+    // Do not preventDefault or stopPropagation here, otherwise the user
+    // cannot interact with the page normally while recording.
 
     const payload = buildCapturePayload(target);
-    // PERF-R6: batch/coalesce captures instead of one sendMessage per click.
     enqueueCapture(payload);
 
     highlightElement(target);
+}
+
+const inputDebounceMap = new WeakMap<Element, number>();
+
+function onElementInput(event: Event): void {
+    if (isActive === false) return;
+    const target = event.target as Element;
+    if (isExcludedElement(target)) return;
+
+    const value = (target as HTMLInputElement | HTMLTextAreaElement).value;
+    if (value === undefined) return;
+
+    // Debounce input events to avoid spamming the backend on every keystroke.
+    const existingTimer = inputDebounceMap.get(target);
+    if (existingTimer !== undefined) {
+        window.clearTimeout(existingTimer);
+    }
+
+    const timerId = window.setTimeout(() => {
+        inputDebounceMap.delete(target);
+        const payload = buildCapturePayload(target, (target as HTMLInputElement).value);
+        enqueueCapture(payload);
+        highlightElement(target);
+    }, 500);
+
+    inputDebounceMap.set(target, timerId);
+}
+
+function onElementChange(event: Event): void {
+    if (isActive === false) return;
+    const target = event.target as Element;
+    if (isExcludedElement(target)) return;
+
+    const value = (target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
+    if (value === undefined) return;
+
+    const existingTimer = inputDebounceMap.get(target);
+    if (existingTimer !== undefined) {
+        window.clearTimeout(existingTimer);
+        inputDebounceMap.delete(target);
+    }
+
+    const payload = buildCapturePayload(target, value);
+    enqueueCapture(payload);
+    highlightElement(target);
+}
+
+function onElementKeydown(event: KeyboardEvent): void {
+    if (isActive === false) return;
+    const target = event.target as Element;
+    if (isExcludedElement(target)) return;
+
+    if (event.key === "Enter") {
+        const payload = buildCapturePayload(target, "{Enter}");
+        enqueueCapture(payload);
+        highlightElement(target);
+    }
 }
 
 /* ------------------------------------------------------------------ */
@@ -181,17 +251,55 @@ function highlightElement(element: Element): void {
 /** Starts the XPath recorder. */
 function startRecorder(): void {
     document.addEventListener("click", onElementClick, true);
+    document.addEventListener("input", onElementInput, true);
+    document.addEventListener("change", onElementChange, true);
+    document.addEventListener("keydown", onElementKeydown, true);
     console.log("[Marco] XPath recorder started");
+
+    if (typeof chrome !== "undefined" && chrome.storage) {
+        chrome.storage.local.get("marco.recorder.session", (data) => {
+            const session = data["marco.recorder.session"] as RecordingSession | undefined;
+            const projectSlug = session?.ProjectSlug || "default";
+            
+            toolbarHandle = mountRecorderToolbar({
+                ProjectSlug: projectSlug,
+                NewSessionId: () => `sess-${Date.now().toString(36)}`,
+                Now: () => new Date().toISOString(),
+                OnPhaseChange: (phase, nextSession) => {
+                    // Sync back to background
+                    chrome.storage.local.set({ "marco.recorder.session": nextSession });
+                }
+            });
+            
+            // Sync the toolbar to the current session state
+            if (session) {
+                if (session.Phase === "Recording") toolbarHandle.Start();
+                else if (session.Phase === "Paused") {
+                    toolbarHandle.Start();
+                    toolbarHandle.Pause();
+                }
+            }
+        });
+    }
 }
 
 /** Stops the XPath recorder. Tears down listeners + outstanding timers. */
 function stopRecorder(): void {
     isActive = false;
     document.removeEventListener("click", onElementClick, true);
+    document.removeEventListener("input", onElementInput, true);
+    document.removeEventListener("change", onElementChange, true);
+    document.removeEventListener("keydown", onElementKeydown, true);
     clearAllHighlights();
     window.removeEventListener("pagehide", onPageHide);
     // PERF-R6: drain any queued captures before teardown.
     void flushNow();
+    
+    if (toolbarHandle) {
+        toolbarHandle.Destroy();
+        toolbarHandle = null;
+    }
+    
     console.log("[Marco] XPath recorder stopped");
 }
 

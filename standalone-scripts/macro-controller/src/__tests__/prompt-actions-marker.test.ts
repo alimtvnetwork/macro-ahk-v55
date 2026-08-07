@@ -17,11 +17,11 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
 const SOURCE_PATH = resolve(__dirname, '..', 'ui', 'prompt-dropdown.ts');
-const source = readFileSync(SOURCE_PATH, 'utf8');
+const source = readFileSync(SOURCE_PATH, 'utf8').replace(/\r\n/g, '\n');
 
 describe('prompt actions span marker', () => {
   it('renderPromptItem stamps actions span with data-prompt-actions', () => {
-    const render = source.match(/function renderPromptItem\([\s\S]*?\n\}\n/);
+    const render = source.match(/function renderPromptItem\([\s\S]*?\n\}/);
     expect(render, 'renderPromptItem block').toBeTruthy();
     expect(render![0]).toMatch(
       /setAttribute\(\s*['"]data-prompt-actions['"]/,

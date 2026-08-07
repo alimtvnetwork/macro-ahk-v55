@@ -60,7 +60,7 @@ describe('prompt editor: ↺ Reset to default', () => {
     const seedBody = getSeedBodyForSlug('plan-default')!;
     expect(textarea.value).not.toBe(seedBody);
     resetBtn.click();
-    expect(textarea.value).toBe(seedBody);
+    expect(textarea.value.replace(/\r\n/g, '\n')).toBe(seedBody.replace(/\r\n/g, '\n'));
   });
 
   it('fires an input event so the drift-guard chip strip re-evaluates and re-enables Save', () => {

@@ -137,19 +137,27 @@ describe('aggregateCreditTotals', () => {
   });
 });
 
+function expectedNextMidnightFor(d: Date): string {
+  const next = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 0, 0, 0, 0);
+  return next.toISOString();
+}
+
 describe('computeNextLocalMidnight', () => {
   it('returns next local midnight as UTC ISO when now is mid-day UTC', () => {
-    const result = computeNextLocalMidnight(new Date('2026-05-25T12:00:00Z'));
-    expect(result).toBe('2026-05-26T00:00:00.000Z');
+    const d = new Date('2026-05-25T12:00:00Z');
+    const result = computeNextLocalMidnight(d);
+    expect(result).toBe(expectedNextMidnightFor(d));
   });
 
   it('keeps the same next local midnight when now is before UTC midnight', () => {
-    const result = computeNextLocalMidnight(new Date('2026-05-25T15:30:00Z'));
-    expect(result).toBe('2026-05-26T00:00:00.000Z');
+    const d = new Date('2026-05-25T15:30:00Z');
+    const result = computeNextLocalMidnight(d);
+    expect(result).toBe(expectedNextMidnightFor(d));
   });
 
   it('rolls forward after local midnight', () => {
-    const result = computeNextLocalMidnight(new Date('2026-05-26T00:30:00Z'));
-    expect(result).toBe('2026-05-27T00:00:00.000Z');
+    const d = new Date('2026-05-26T00:30:00Z');
+    const result = computeNextLocalMidnight(d);
+    expect(result).toBe(expectedNextMidnightFor(d));
   });
 });

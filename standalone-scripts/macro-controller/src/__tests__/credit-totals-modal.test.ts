@@ -84,7 +84,11 @@ describe('formatCount', () => {
 
 describe('formatLocalReset', () => {
   it('renders ISO timestamp as a short local clock', () => {
-    expect(formatLocalReset('2026-05-26T00:00:00.000Z')).toBe('Tue 00:00');
+    const d = new Date('2026-05-26T00:00:00.000Z');
+    const weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()];
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    expect(formatLocalReset('2026-05-26T00:00:00.000Z')).toBe(`${weekday} ${hh}:${mm}`);
   });
   it('returns em-dash for invalid input', () => {
     expect(formatLocalReset('')).toBe('—');

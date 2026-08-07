@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { aggregateCreditTotals, FREE_DAILY_CAP } from '../credit-totals';
+import { aggregateCreditTotals, computeNextLocalMidnight, FREE_DAILY_CAP } from '../credit-totals';
 import type { WorkspaceCredit } from '../types';
 
 function ws(partial: Partial<WorkspaceCredit>): WorkspaceCredit {
@@ -115,7 +115,7 @@ describe('Issue 123 — FREE-tier exclusion + mixed lists', () => {
     expect(r.granted).toBe(0);
     expect(r.totalCount).toBe(0);
     expect(r.missingCount).toBe(0);
-    expect(r.resetAtLocal).toMatch(/T00:00:00\.000Z$/);
+    expect(r.resetAtLocal).toBe(computeNextLocalMidnight(new Date('2026-05-29T12:00:00Z')));
   });
 
   it('FREE row with NaN billing fields does not pollute missingCount', () => {

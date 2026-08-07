@@ -158,62 +158,47 @@ export class ChainRunner {
 
       // Skip past any sub-steps of a condition in the flat array
       if (step.type === "condition") {
-        const subCount = step.then.length + step.else.length;
-        flatIdx += subCount;
+        flatIdx += step.then.length + step.else.length;
       }
 
       flatIdx++;
     }
   }
 
-  // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity
-  private async executeCondition(step: Extract<ChainStep, { type: "condition" }>, conditionFlatIdx: number): Promise<void> {
-    const result = await evaluateCondition(step.check);
-    const branch = result ? step.then : step.else;
-    const skipBranch = result ? step.else : step.then;
-
-    // Find indices in flat array for sub-steps
-    const subIdx = conditionFlatIdx + 1;
-
-    // Execute the chosen branch
-    const thenLen = step.then.length;
-    const elseLen = step.else.length;
-
-    if (result) {
-      // Execute then, skip else
-      for (let i = 0; i < thenLen; i++) {
-        if (this.abortController?.signal.aborted) return;
-        await this.waitIfPaused();
-        this.setStepStatus(subIdx + i, "running");
-        try {
-          await this.executeSingleStep(branch[i]);
-          this.setStepStatus(subIdx + i, "done");
-        } catch (err) {
-          this.setStepStatus(subIdx + i, "error");
-          throw err;
-        }
-      }
-      for (let i = 0; i < elseLen; i++) {
-        this.setStepStatus(subIdx + thenLen + i, "skipped");
-      }
-    } else {
-      // Skip then, execute else
-      for (let i = 0; i < thenLen; i++) {
-        this.setStepStatus(subIdx + i, "skipped");
-      }
-      for (let i = 0; i < elseLen; i++) {
-        if (this.abortController?.signal.aborted) return;
-        await this.waitIfPaused();
-        this.setStepStatus(subIdx + thenLen + i, "running");
-        try {
-          await this.executeSingleStep(skipBranch[i]);
-          this.setStepStatus(subIdx + thenLen + i, "done");
-        } catch (err) {
-          this.setStepStatus(subIdx + thenLen + i, "error");
-          throw err;
-        }
+  private async executeBranchSteps(branch: ChainStep[], startIdx: number): Promise<void> {
+    for (let i = 0; i < branch.length; i++) {
+      if (this.abortController?.signal.aborted) return;
+      await this.waitIfPaused();
+      this.setStepStatus(startIdx + i, "running");
+      try {
+        await this.executeSingleStep(branch[i]);
+        this.setStepStatus(startIdx + i, "done");
+      } catch (err) {
+        this.setStepStatus(startIdx + i, "error");
+        throw err;
       }
     }
+  }
+
+  private skipBranchSteps(count: number, startIdx: number): void {
+    for (let i = 0; i < count; i++) {
+      this.setStepStatus(startIdx + i, "skipped");
+    }
+  }
+
+  private async executeCondition(step: Extract<ChainStep, { type: "condition" }>, conditionFlatIdx: number): Promise<void> {
+    const isTrue = await evaluateCondition(step.check);
+    const subIdx = conditionFlatIdx + 1;
+    const elseStartIdx = subIdx + step.then.length;
+
+    if (isTrue) {
+      await this.executeBranchSteps(step.then, subIdx);
+      this.skipBranchSteps(step.else.length, elseStartIdx);
+      return;
+    }
+    
+    this.skipBranchSteps(step.then.length, subIdx);
+    await this.executeBranchSteps(step.else, elseStartIdx);
   }
 
   private async executeSingleStep(step: ChainStep): Promise<void> {

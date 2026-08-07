@@ -227,19 +227,20 @@ async function seedScriptsFromManifest(
                     stored.push(buildStoredScript(scriptDef, project, manifest));
                     changed = true;
                     seeded++;
+                    continue;
+                }
+
+                // Refresh if stale
+                const current = stored[idx];
+                if (isScriptStale(current, scriptDef, project, manifest)) {
+                    console.log("[manifest-seeder:scripts] ↻ REFRESH %s (seedId=%s, was stale)",
+                        scriptDef.File, scriptDef.SeedId);
+                    stored[idx] = refreshStoredScript(current, scriptDef, project, manifest);
+                    changed = true;
+                    seeded++;
                 } else {
-                    // Refresh if stale
-                    const current = stored[idx];
-                    if (isScriptStale(current, scriptDef, project, manifest)) {
-                        console.log("[manifest-seeder:scripts] ↻ REFRESH %s (seedId=%s, was stale)",
-                            scriptDef.File, scriptDef.SeedId);
-                        stored[idx] = refreshStoredScript(current, scriptDef, project, manifest);
-                        changed = true;
-                        seeded++;
-                    } else {
-                        console.log("[manifest-seeder:scripts] = SKIP %s (seedId=%s, up-to-date)",
-                            scriptDef.File, scriptDef.SeedId);
-                    }
+                    console.log("[manifest-seeder:scripts] = SKIP %s (seedId=%s, up-to-date)",
+                        scriptDef.File, scriptDef.SeedId);
                 }
             } catch (err) {
                 const seedErrorMessage = `[seedScriptsFromManifest] Failed to seed script ${scriptDef.File} for ${project.Name}: ${err}`;
@@ -390,18 +391,19 @@ async function seedConfigsFromManifest(
                     stored.push(buildStoredConfig(configDef, configJson));
                     changed = true;
                     seeded++;
-                } else {
-                    const current = stored[idx];
-                    if (current.name !== configDef.File || current.json !== configJson) {
-                        stored[idx] = {
-                            ...current,
-                            name: configDef.File,
-                            json: configJson,
-                            updatedAt: new Date().toISOString(),
-                        };
-                        changed = true;
-                        seeded++;
-                    }
+                    continue;
+                }
+
+                const current = stored[idx];
+                if (current.name !== configDef.File || current.json !== configJson) {
+                    stored[idx] = {
+                        ...current,
+                        name: configDef.File,
+                        json: configJson,
+                        updatedAt: new Date().toISOString(),
+                    };
+                    changed = true;
+                    seeded++;
                 }
             } catch (err) {
                 const seedErrorMessage = `[seedConfigsFromManifest→fetchConfigJson] Failed to seed config ${configDef.File} for ${project.Name}: ${err}`;

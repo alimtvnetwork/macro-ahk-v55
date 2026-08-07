@@ -24,7 +24,7 @@ export interface AuthStrategyResult {
     /** Tier number (1-5) */
     tier: number;
     /** Whether this strategy produced a valid token */
-    success: boolean;
+    isSuccess: boolean;
     /** Time taken in milliseconds */
     durationMs: number;
     /** Additional detail (error message, cookie name, etc.) */
@@ -85,16 +85,16 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
             tabUrl,
         );
         if (cookie !== null) {
-            return { success: true, detail: "Session cookie found" };
+            return { isSuccess: true, detail: "Session cookie found" };
         }
         const refreshCookie = await readCookieValueFromCandidates(
             "lovable-session-id.refresh",
             tabUrl,
         );
         if (refreshCookie !== null) {
-            return { success: true, detail: "Refresh cookie found (no session cookie)" };
+            return { isSuccess: true, detail: "Refresh cookie found (no session cookie)" };
         }
-        return { success: false, detail: "No auth cookies found" };
+        return { isSuccess: false, detail: "No auth cookies found" };
     });
     strategies.push(s1);
 
@@ -102,7 +102,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
     const s2 = await timedStrategy("localStorage JWT scan", 2, async () => {
         const tabs = await getActivePlatformTabs();
         if (tabs.length === 0) {
-            return { success: false, detail: "No platform tabs available" };
+            return { isSuccess: false, detail: "No platform tabs available" };
         }
 
         for (const tab of tabs) {
@@ -132,21 +132,21 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
                 });
                 const scanResult = result?.[0]?.result;
                 if (typeof scanResult === "string" && scanResult.startsWith("found:")) {
-                    return { success: true, detail: `JWT in ${scanResult.slice(6)} (tabId=${tab.id})` };
+                    return { isSuccess: true, detail: `JWT in ${scanResult.slice(6)} (tabId=${tab.id})` };
                 }
             } catch (tabErr) {
                 logBgWarnError(BgLogTag.AUTH_HEALTH, `chrome.scripting.executeScript JWT scan failed for tabId=${tab.id} (url=${tab.url ?? "?"}) — tab may be discarded, restricted (chrome://, devtools), or closed mid-scan`, tabErr instanceof Error ? tabErr : new Error(String(tabErr)));
             }
         }
-        return { success: false, detail: `Scanned ${tabs.length} tab(s) — no JWT found` };
+        return { isSuccess: false, detail: `Scanned ${tabs.length} tab(s) — no JWT found` };
     });
     strategies.push(s2);
-    if (s2.success && !resolvedVia) resolvedVia = s2.name;
+    if (s2.isSuccess && !resolvedVia) resolvedVia = s2.name;
 
     // ── Strategy 3: Signed URL token scan ──
     const s3 = await timedStrategy("Signed URL token", 3, async () => {
         if (!tabUrl) {
-            return { success: false, detail: "No active tab URL" };
+            return { isSuccess: false, detail: "No active tab URL" };
         }
 
         try {
@@ -155,7 +155,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
                 ?? parsed.searchParams.get("lovable_token");
 
             if (typeof token === "string" && token.startsWith("eyJ") && token.split(".").length === 3) {
-                return { success: true, detail: "JWT found in active URL" };
+                return { isSuccess: true, detail: "JWT found in active URL" };
             }
         } catch (urlErr) {
             // Malformed tab URL — strategy result already returns success=false below;
@@ -168,20 +168,20 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
             );
         }
 
-        return { success: false, detail: "No signed URL token found" };
+        return { isSuccess: false, detail: "No signed URL token found" };
     });
     strategies.push(s3);
-    if (s3.success && !resolvedVia) resolvedVia = s3.name;
+    if (s3.isSuccess && !resolvedVia) resolvedVia = s3.name;
 
     // ── Strategy 4: Network auth-token exchange (disabled) ──
     const s4 = await timedStrategy("Auth-token exchange", 4, async () => {
         const detail = projectId
             ? `Disabled — cookie/localStorage-only mode (no call to ${AUTH_API_BASE}/projects/${projectId}/auth-token)`
             : `Disabled — cookie/localStorage-only mode (no call to ${AUTH_API_BASE}/projects/{id}/auth-token)`;
-        return { success: false, detail };
+        return { isSuccess: false, detail };
     });
     strategies.push(s4);
-    if (s4.success && !resolvedVia) resolvedVia = s4.name;
+    if (s4.isSuccess && !resolvedVia) resolvedVia = s4.name;
 
     // ── Strategy 5: Cross-tab session cookie scan ──
     const s5 = await timedStrategy("Cross-tab cookie scan", 5, async () => {
@@ -194,14 +194,14 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
                 const isExpired = sessionCookie.expirationDate !== undefined &&
                     sessionCookie.expirationDate < Date.now() / 1000;
                 if (isExpired) {
-                    return { success: false, detail: `Cookie "${sessionCookie.name}" expired` };
+                    return { isSuccess: false, detail: `Cookie "${sessionCookie.name}" expired` };
                 }
-                return { success: true, detail: `Cookie "${sessionCookie.name}" (domain=${sessionCookie.domain})` };
+                return { isSuccess: true, detail: `Cookie "${sessionCookie.name}" (domain=${sessionCookie.domain})` };
             }
             const count = Array.isArray(cookies) ? cookies.length : 0;
-            return { success: false, detail: `${count} cookies scanned — no session cookie` };
+            return { isSuccess: false, detail: `${count} cookies scanned — no session cookie` };
         } catch (e) {
-            return { success: false, detail: (e as Error).message };
+            return { isSuccess: false, detail: (e as Error).message };
         }
     });
     strategies.push(s5);
@@ -209,15 +209,15 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
     const totalMs = Math.round(performance.now() - t0);
 
     // Determine overall status
-    const anySuccess = strategies.some(s => s.success);
-    const allFailed = strategies.every(s => !s.success);
+    const anySuccess = strategies.some(s => s.isSuccess);
+    const allFailed = strategies.every(s => !s.isSuccess);
     const status: AuthHealthResponse["status"] = allFailed
         ? "unauthenticated"
         : (resolvedVia ? "authenticated" : "degraded");
 
     // If no strategy explicitly resolved, but cookies exist, it's degraded
     if (!resolvedVia && anySuccess) {
-        resolvedVia = strategies.find(s => s.success)?.name ?? null;
+        resolvedVia = strategies.find(s => s.isSuccess)?.name ?? null;
     }
 
     return {
@@ -236,7 +236,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
 async function timedStrategy(
     name: string,
     tier: number,
-    strategyRunner: () => Promise<{ success: boolean; detail: string }>,
+    strategyRunner: () => Promise<{ isSuccess: boolean; detail: string }>,
 ): Promise<AuthStrategyResult> {
     const t0 = performance.now();
     try {
@@ -244,7 +244,7 @@ async function timedStrategy(
         return {
             name,
             tier,
-            success: result.success,
+            isSuccess: result.isSuccess,
             durationMs: Math.round(performance.now() - t0),
             detail: result.detail,
         };
@@ -252,7 +252,7 @@ async function timedStrategy(
         return {
             name,
             tier,
-            success: false,
+            isSuccess: false,
             durationMs: Math.round(performance.now() - t0),
             detail: `Exception: ${(e as Error).message}`,
         };

@@ -51,6 +51,8 @@ import { SelectorKindId } from "../../recorder-db-schema";
 import type { StepRow } from "./db";
 import type { LeafStepExecutor, LeafStepContext } from "./run-group-runner";
 import { StepKindId } from "./schema";
+import { executeUrlTabClick } from "../url-tab-click";
+import { ChromeTabsAdapter } from "../chrome-tabs-adapter";
 
 const SOURCE_FILE = "src/background/recorder/step-library/replay-bridge.ts";
 
@@ -83,6 +85,10 @@ export function createLiveReplayExecutor(opts: ReplayBridgeOptions): LeafStepExe
 async function executeLeaf(
     step: StepRow, _ctx: LeafStepContext, opts: ReplayBridgeOptions,
 ): Promise<FailureReport | null> {
+    if (step.StepKindId === StepKindId.UrlTabClick) {
+        return executeUrlTabClickLeaf(step, opts);
+    }
+
     let input: ReplayStepInput;
     try {
         input = stepRowToReplayInput(step);
@@ -97,6 +103,58 @@ async function executeLeaf(
     if (result === undefined) return logEmptyResultsFailure(step, opts);
     if (result.Ok) return null;
     return result.FailureReport ?? logMissingReportFailure(step, result.Error, opts);
+}
+
+async function executeUrlTabClickLeaf(step: StepRow, opts: ReplayBridgeOptions): Promise<FailureReport | null> {
+    if (!step.ParamsJson) {
+        return logFailure({
+            Phase: "Replay", Error: new Error("Missing ParamsJson for UrlTabClick"),
+            StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
+            Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
+            ReasonDetail: `UrlTabClick step #${step.StepId} has no ParamsJson.`,
+            Verbose: opts.Verbose ?? false, Now: opts.Now,
+        });
+    }
+
+    let params: any;
+    try {
+        params = JSON.parse(step.ParamsJson);
+    } catch (err) {
+        return logFailure({
+            Phase: "Replay", Error: err,
+            StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
+            Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
+            ReasonDetail: `UrlTabClick step #${step.StepId} has invalid ParamsJson.`,
+            Verbose: opts.Verbose ?? false, Now: opts.Now,
+        });
+    }
+
+    try {
+        const result = await executeUrlTabClick({
+            Params: params,
+            Tabs: new ChromeTabsAdapter(),
+            NowMs: () => opts.Now ? opts.Now().getTime() : Date.now(),
+        });
+
+        if (result.Kind === "error") {
+            return logFailure({
+                Phase: "Replay", Error: new Error(result.Result.Detail),
+                StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
+                Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
+                ReasonDetail: result.Result.Detail,
+                Verbose: opts.Verbose ?? false, Now: opts.Now,
+            });
+        }
+        return null;
+    } catch (err) {
+        return logFailure({
+            Phase: "Replay", Error: err,
+            StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
+            Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
+            ReasonDetail: `executeUrlTabClick threw: ${(err as Error).message}`,
+            Verbose: opts.Verbose ?? false, Now: opts.Now,
+        });
+    }
 }
 
 function logTranslationFailure(step: StepRow, err: unknown, opts: ReplayBridgeOptions): FailureReport {

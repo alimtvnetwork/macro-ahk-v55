@@ -211,8 +211,13 @@ export function FloatingController(props: FloatingControllerProps): JSX.Element 
     };
 
     const cyclePrimary = () => {
-        if (isIdle) { if (onStart !== undefined) { void onStart(); } return; }
-        void (isRecording ? onPause() : onResume());
+        if (!isIdle) {
+            void (isRecording ? onPause() : onResume());
+            return;
+        }
+        if (onStart !== undefined) {
+            void onStart();
+        }
     };
 
     const primaryAriaLabel = isIdle

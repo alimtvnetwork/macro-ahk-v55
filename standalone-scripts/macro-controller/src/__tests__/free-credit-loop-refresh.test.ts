@@ -22,8 +22,14 @@ import { resolve } from 'node:path';
 
 // Plan-17 step 13: processWorkspaceData moved to `loop-cycle-fallback.ts`;
 // contract still applies to that module.
-const LOOP_CYCLE = readFileSync(resolve(__dirname, '../loop-cycle-fallback.ts'), 'utf-8');
-const CREDIT_FETCH = readFileSync(resolve(__dirname, '../credit-fetch.ts'), 'utf-8');
+const LOOP_CYCLE = readFileSync(
+  resolve(__dirname, '../loop-cycle-fallback.ts'),
+  'utf-8',
+).replace(/\r\n/g, '\n');
+const CREDIT_FETCH = readFileSync(
+  resolve(__dirname, '../credit-fetch.ts'),
+  'utf-8',
+).replace(/\r\n/g, '\n');
 
 describe('Free Credit refresh during running loop (v3.40.2)', () => {
   it('credit-fetch.ts exports schedulePostParseEnrichment', () => {

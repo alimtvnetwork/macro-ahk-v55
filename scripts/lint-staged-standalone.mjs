@@ -99,15 +99,19 @@ for (const f of lintTargets) console.log(`  ·  ${f}`);
 /* ---------------------------------------------------------------- */
 
 const eslintArgs = ["eslint", "--max-warnings=0", "--no-warn-ignored", ...lintTargets];
-const eslintResult = spawnSync("npx", eslintArgs, {
+const isWin = process.platform === "win32";
+const eslintResult = spawnSync(isWin ? "npx.cmd" : "npx", eslintArgs, {
     cwd: REPO_ROOT,
     stdio: "inherit",
     env: process.env,
+    shell: isWin,
 });
 
 if (eslintResult.status !== 0) {
     console.error("");
-    console.error(`[pre-commit] FAIL — ESLint reported errors or warnings (exit ${eslintResult.status}).`);
+    const exitCodeStr = eslintResult.status === null ? "null (ENOENT or crash)" : eslintResult.status;
+    console.error(`[pre-commit] FAIL — ESLint reported errors or warnings (exit ${exitCodeStr}).`);
+    if (eslintResult.error) console.error(eslintResult.error);
     console.error("[pre-commit] Fix the diagnostics above, re-stage, and commit again.");
     console.error("[pre-commit] Bypass (audited in git log): git commit --no-verify");
     process.exit(eslintResult.status ?? 1);
