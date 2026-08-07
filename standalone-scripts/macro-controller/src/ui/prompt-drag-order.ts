@@ -22,7 +22,7 @@ const MIGRATION_REV_KEY = 'marco.promptOrder.rev';
  * slug list changes materially. `runPromptOrderMigrations` will rewrite each
  * user's saved order in-place instead of purging via a fresh STORAGE_KEY.
  */
-const CURRENT_MIGRATION_REV = 4;
+const CURRENT_MIGRATION_REV = 5;
 
 runPromptOrderMigrations();
 

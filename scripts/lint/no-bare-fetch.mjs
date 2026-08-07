@@ -106,7 +106,9 @@ function walk(dir, files = []) {
 }
 
 function relPath(absPath) {
-    return absPath.startsWith(ROOT + "/") ? absPath.slice(ROOT.length + 1) : absPath;
+    const normalizedAbs = absPath.replace(/\\/g, '/');
+    const normalizedRoot = ROOT.replace(/\\/g, '/');
+    return normalizedAbs.startsWith(normalizedRoot + "/") ? normalizedAbs.slice(normalizedRoot.length + 1) : normalizedAbs;
 }
 
 function getScanRoots() {

@@ -98,42 +98,53 @@ function keepTaskNextSubInView(promptsDropdown: HTMLElement, taskNextSub: HTMLEl
  *
  * Sets `data-task-next-anchor` to `right` or `below` for tests / debuggers.
  */
-function anchorTaskNextSub(row: HTMLElement, sub: HTMLElement, host: HTMLElement): void {
-  const GAP = 6;
-  const PAD = 8;
-  const MIN_SUB_WIDTH = 180;
-
-  // Measure natural width by briefly forcing the menu visible off-screen.
+function measureSubMenuWidth(sub: HTMLElement): number {
   const prevVisibility = sub.style.visibility;
   sub.style.visibility = 'hidden';
   sub.style.position = 'fixed';
   sub.style.left = '-9999px';
   sub.style.top = '0px';
   sub.style.display = 'block';
-  const measuredWidth = Math.max(sub.getBoundingClientRect().width || 0, MIN_SUB_WIDTH);
+  const width = Math.max(sub.getBoundingClientRect().width || 0, 180);
   sub.style.visibility = prevVisibility;
+  return width;
+}
 
+function hasRightSpaceForMenu(row: HTMLElement, width: number): boolean {
+  const PAD = 8;
   const rowRect = row.getBoundingClientRect();
-  const rightSpace = window.innerWidth - rowRect.right - PAD;
-  const fitsRight = rightSpace >= measuredWidth;
+  return (window.innerWidth - rowRect.right - PAD) >= width;
+}
 
-  if (fitsRight) {
-    sub.style.position = 'fixed';
-    sub.style.left = (rowRect.right + GAP) + 'px';
-    sub.style.top = rowRect.top + 'px';
-    sub.style.margin = '0';
-    sub.setAttribute('data-task-next-anchor', 'right');
-    return;
-  }
+function anchorSubMenuRight(row: HTMLElement, sub: HTMLElement): void {
+  const GAP = 6;
+  const rowRect = row.getBoundingClientRect();
+  sub.style.position = 'fixed';
+  sub.style.left = (rowRect.right + GAP) + 'px';
+  sub.style.top = rowRect.top + 'px';
+  sub.style.margin = '0';
+  sub.setAttribute('data-task-next-anchor', 'right');
+}
 
-  // Fallback: stack below the row inside the dropdown column.
+function anchorSubMenuBelow(sub: HTMLElement, host: HTMLElement): void {
   sub.style.position = 'static';
   sub.style.left = '';
   sub.style.top = '';
   sub.style.margin = '0 6px 6px 6px';
   sub.setAttribute('data-task-next-anchor', 'below');
-  // Keep the stacked menu visible inside the scrollable prompts dropdown.
   keepTaskNextSubInView(host, sub);
+}
+
+function anchorTaskNextSub(row: HTMLElement, sub: HTMLElement, host: HTMLElement): void {
+  const width = measureSubMenuWidth(sub);
+  const isRightAnchored = hasRightSpaceForMenu(row, width);
+  
+  if (isRightAnchored) {
+    anchorSubMenuRight(row, sub);
+    return;
+  }
+  
+  anchorSubMenuBelow(sub, host);
 }
 
 
@@ -1060,7 +1071,10 @@ function renderPromptItem(
     };
   }
   item.appendChild(actions);
-  attachDragHandlers(item, p, () => renderPromptsDropdown(ctx, taskNextDeps));
+  attachDragHandlers(item, p, () => {
+    _memSnapshot = null;
+    renderPromptsDropdown(ctx, taskNextDeps);
+  });
   return item;
 }
 

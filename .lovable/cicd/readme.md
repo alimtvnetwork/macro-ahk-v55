@@ -11,7 +11,9 @@
 
 ## Active
 
-_None - all known CI/CD issues resolved._
+| # | File | Title | Pipeline | Status | Resolved |
+|---|---|---|---|---|---|
+| 15 | [`15-macro-controller-missing-iife.md`](./issues/15-macro-controller-missing-iife.md) | Macro-Controller Missing IIFE in E2E Tests | `.github/workflows/ci.yml` | 🔴 Active | - |
 
 ## Resolved
 

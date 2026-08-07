@@ -2623,6 +2623,12 @@ jobs:
           name: chrome-extension-dist
           path: dist/
 
+      - name: Download Macro Controller dist
+        uses: actions/download-artifact@v4
+        with:
+          name: macro-controller-dist
+          path: standalone-scripts/macro-controller/dist/
+
       - name: Install Playwright browsers (chromium + system deps)
         run: pnpm exec playwright install --with-deps chromium
 
@@ -2708,6 +2714,12 @@ jobs:
           name: chrome-extension-dist
           path: dist/
 
+      - name: Download Macro Controller dist
+        uses: actions/download-artifact@v4
+        with:
+          name: macro-controller-dist
+          path: standalone-scripts/macro-controller/dist/
+
       - name: Install Playwright browsers (chromium + system deps)
         run: pnpm exec playwright install --with-deps chromium
 
@@ -2783,6 +2795,12 @@ jobs:
         with:
           name: chrome-extension-dist
           path: dist/
+
+      - name: Download Macro Controller dist
+        uses: actions/download-artifact@v4
+        with:
+          name: macro-controller-dist
+          path: standalone-scripts/macro-controller/dist/
 
       - name: Install Playwright browsers (explicit, pre-test)
         run: npx playwright install --with-deps chromium
