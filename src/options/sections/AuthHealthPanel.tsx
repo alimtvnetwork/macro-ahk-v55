@@ -51,7 +51,7 @@ export function AuthHealthPanel() {
             "",
             "── Strategies ──",
             ...data.strategies.map(s =>
-                `  [Tier ${s.tier}] ${s.name.padEnd(32)} ${s.success ? "✓" : "✗"}  ${String(s.durationMs).padStart(5)}ms  ${s.detail}`
+                `  [Tier ${s.tier}] ${s.name.padEnd(32)} ${s.isSuccess ? "✓" : "✗"}  ${String(s.durationMs).padStart(5)}ms  ${s.detail}`
             ),
             "",
             "=== End Report ===",
@@ -122,18 +122,18 @@ export function AuthHealthPanel() {
                                     ? Math.min(100, Math.round((s.durationMs / data.totalMs) * 100))
                                     : 0;
                                 return (
-                                    <tr key={s.tier} className={s.success ? "diag-auth-row-ok" : "diag-auth-row-fail"}>
+                                    <tr key={s.tier} className={s.isSuccess ? "diag-auth-row-ok" : "diag-auth-row-fail"}>
                                         <td className="diag-auth-tier">T{s.tier}</td>
                                         <td className="diag-auth-name">{s.name}</td>
-                                        <td className={s.success ? "diag-msg-ok" : "diag-msg-fail"}>
-                                            {s.success ? "✓" : "✗"}
+                                        <td className={s.isSuccess ? "diag-msg-ok" : "diag-msg-fail"}>
+                                            {s.isSuccess ? "✓" : "✗"}
                                         </td>
                                         <td className="diag-auth-timing">
                                             <div className="diag-auth-timing-cell">
                                                 <span>{s.durationMs}ms</span>
                                                 <div className="diag-auth-bar-track">
                                                     <div
-                                                        className={`diag-auth-bar-fill ${s.success ? "diag-auth-bar-ok" : "diag-auth-bar-fail"}`}
+                                                        className={`diag-auth-bar-fill ${s.isSuccess ? "diag-auth-bar-ok" : "diag-auth-bar-fail"}`}
                                                         style={{ width: `${barWidth}%` }}
                                                     />
                                                 </div>
