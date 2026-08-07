@@ -29,6 +29,8 @@ const SKIP_DIRS = new Set([
   "dist",
   "build",
   ".git",
+  ".lovable",
+  ".old-github",
   ".next",
   ".turbo",
   "coverage",
