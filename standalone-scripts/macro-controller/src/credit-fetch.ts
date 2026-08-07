@@ -104,9 +104,9 @@ function isAuthFailure(status: number): boolean {
 
 function buildAuthFailureDetail(): string {
   const snapshot = getAuthDebugSnapshot();
-  const bridgeText = !snapshot.bridgeOutcome.attempted
+  const bridgeText = !snapshot.bridgeOutcome.hasAttempted
     ? 'not attempted'
-    : (snapshot.bridgeOutcome.success
+    : (snapshot.bridgeOutcome.isSuccess
       ? 'success via ' + snapshot.bridgeOutcome.source
       : 'failed' + (snapshot.bridgeOutcome.error ? ' — ' + snapshot.bridgeOutcome.error : ''));
 

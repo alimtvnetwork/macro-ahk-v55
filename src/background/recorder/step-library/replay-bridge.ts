@@ -106,25 +106,25 @@ async function executeLeaf(
 }
 
 async function executeUrlTabClickLeaf(step: StepRow, opts: ReplayBridgeOptions): Promise<FailureReport | null> {
-    if (!step.ParamsJson) {
+    if (!step.PayloadJson) {
         return logFailure({
-            Phase: "Replay", Error: new Error("Missing ParamsJson for UrlTabClick"),
+            Phase: "Replay", Error: new Error("Missing PayloadJson for UrlTabClick"),
             StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
             Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
-            ReasonDetail: `UrlTabClick step #${step.StepId} has no ParamsJson.`,
+            ReasonDetail: `UrlTabClick step #${step.StepId} has no PayloadJson.`,
             Verbose: opts.Verbose ?? false, Now: opts.Now,
         });
     }
 
     let params: any;
     try {
-        params = JSON.parse(step.ParamsJson);
+        params = JSON.parse(step.PayloadJson);
     } catch (err) {
         return logFailure({
             Phase: "Replay", Error: err,
             StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
             Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
-            ReasonDetail: `UrlTabClick step #${step.StepId} has invalid ParamsJson.`,
+            ReasonDetail: `UrlTabClick step #${step.StepId} has invalid PayloadJson.`,
             Verbose: opts.Verbose ?? false, Now: opts.Now,
         });
     }
@@ -136,12 +136,12 @@ async function executeUrlTabClickLeaf(step: StepRow, opts: ReplayBridgeOptions):
             NowMs: () => opts.Now ? opts.Now().getTime() : Date.now(),
         });
 
-        if (result.Kind === "error") {
+        if (result.Reason !== "Ok") {
             return logFailure({
-                Phase: "Replay", Error: new Error(result.Result.Detail),
+                Phase: "Replay", Error: new Error(result.Detail || result.Reason),
                 StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",
                 Selectors: [], SourceFile: SOURCE_FILE, Reason: "Unknown",
-                ReasonDetail: result.Result.Detail,
+                ReasonDetail: result.Detail || result.Reason,
                 Verbose: opts.Verbose ?? false, Now: opts.Now,
             });
         }

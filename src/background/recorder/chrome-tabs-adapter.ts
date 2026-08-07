@@ -2,23 +2,23 @@ import type { TabsAdapter, TabRef } from "./url-tab-click";
 
 export class ChromeTabsAdapter implements TabsAdapter {
     async listTabs(): Promise<ReadonlyArray<TabRef>> {
-        const tabs = await chrome.tabs.query({});
-        return tabs.map(t => ({
+        const tabs = await (chrome.tabs as any).query({});
+        return tabs.map((t: any) => ({
             Id: t.id!,
             Url: t.url || t.pendingUrl || "",
         }));
     }
 
     async focusTab(id: number): Promise<void> {
-        await chrome.tabs.update(id, { active: true });
-        const tab = await chrome.tabs.get(id);
+        await (chrome.tabs as any).update(id, { active: true });
+        const tab = await (chrome.tabs as any).get(id);
         if (tab.windowId) {
-            await chrome.windows.update(tab.windowId, { focused: true });
+            await (chrome as any).windows.update(tab.windowId, { focused: true });
         }
     }
 
     async createTab(url: string): Promise<TabRef> {
-        const tab = await chrome.tabs.create({ url, active: true });
+        const tab = await (chrome.tabs as any).create({ url, active: true });
         return { Id: tab.id!, Url: tab.url || tab.pendingUrl || "" };
     }
 

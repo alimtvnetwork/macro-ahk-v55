@@ -16,7 +16,7 @@ const recentTabs: RecentTab[] = [];
 export function startNewTabTracker(): void {
     if (typeof chrome === "undefined" || !chrome.tabs) return;
 
-    chrome.tabs.onCreated.addListener((tab) => {
+    (chrome.tabs as any).onCreated.addListener((tab: any) => {
         if (tab.url && tab.url !== "" && tab.id) {
             recentTabs.push({ tabId: tab.id, url: tab.url, timestamp: Date.now() });
             trimRecentTabs();
@@ -24,7 +24,7 @@ export function startNewTabTracker(): void {
     });
 
     // Often tabs are created with pendingUrl or no URL, then immediately updated
-    chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    (chrome.tabs as any).onUpdated.addListener((tabId: any, changeInfo: any, tab: any) => {
         if (changeInfo.url && changeInfo.url !== "") {
             recentTabs.push({ tabId, url: changeInfo.url, timestamp: Date.now() });
             trimRecentTabs();

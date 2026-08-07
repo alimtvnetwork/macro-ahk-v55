@@ -78,7 +78,7 @@ function detectBindingsSource(): boolean {
 
 export function updateBridgeRow(deps: AuthDiagDeps, bridgeRow: DiagRowElements): void {
   const bridge = deps.getLastBridgeOutcome();
-  const isNotAttempted = !bridge.attempted;
+  const isNotAttempted = !bridge.hasAttempted;
 
   if (isNotAttempted) {
     bridgeRow.iconEl.textContent = '⚪';
@@ -87,7 +87,7 @@ export function updateBridgeRow(deps: AuthDiagDeps, bridgeRow: DiagRowElements):
     return;
   }
 
-  if (bridge.success) {
+  if (bridge.isSuccess) {
     bridgeRow.iconEl.textContent = '✅';
     bridgeRow.valEl.textContent = 'OK via ' + bridge.source;
     bridgeRow.valEl.style.color = '#4ade80';
@@ -220,7 +220,7 @@ export function updateRefreshRow(refreshRow: DiagRowElements): void {
     return;
   }
 
-  if (outcome.success) {
+  if (outcome.isSuccess) {
     refreshRow.iconEl.textContent = '✅';
     refreshRow.valEl.textContent = 'OK @ ' + outcome.time + ' via ' + outcome.source;
     refreshRow.valEl.style.color = '#4ade80';

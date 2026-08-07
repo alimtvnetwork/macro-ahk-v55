@@ -20,14 +20,14 @@ export interface JwtInfo {
 
 export interface RefreshOutcomeState {
   time: string;
-  success: boolean;
+  isSuccess: boolean;
   source: string;
   error: string;
 }
 
 // CQ11: Singleton for refresh outcome tracking
 class RefreshOutcomeTracker {
-  private _outcome: RefreshOutcomeState = { time: '', success: false, source: '', error: '' };
+  private _outcome: RefreshOutcomeState = { time: '', isSuccess: false, source: '', error: '' };
 
   get outcome(): RefreshOutcomeState {
     return this._outcome;
@@ -45,7 +45,7 @@ export function recordRefreshOutcome(isSuccess: boolean, source: string, error?:
   const now = new Date();
   refreshOutcomeTracker.outcome = {
     time: now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-    success: isSuccess,
+    isSuccess: isSuccess,
     source,
     error: error || '',
   };
