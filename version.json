@@ -1,8 +1,8 @@
 {
-  "version": "5.23.0",
+  "version": "5.24.0",
   "generatedFrom": "existing-version.json",
   "note": "This file is a build-time artifact derived from the git tag by scripts/write-version-from-tag.mjs. The release version is the git tag (vX.Y.Z), not this file. Do not hand-edit the 'version' field. See .lovable/spec/commands/05-tag-is-single-source-of-truth-for-version.md.",
   "timezonePolicy": "UTC storage; user-local rendering",
-  "generatedAt": "2026-08-07T16:07:38.872Z",
-  "releaseDate": "2026-08-06"
+  "generatedAt": "2026-08-07T16:19:39.646Z",
+  "releaseDate": "2026-08-07"
 }
