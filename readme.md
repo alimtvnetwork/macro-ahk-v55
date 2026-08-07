@@ -34,13 +34,13 @@ irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/d
 **Windows · PowerShell - pin a version + custom folder name (env-var form, works with `irm | iex`):**
 
 ```powershell
-$env:MARCO_DL_VERSION='v5.23.0'; $env:MARCO_DL_FOLDER='marco'; irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/download-extension.ps1 | iex
+$env:MARCO_DL_VERSION='v5.24.0'; $env:MARCO_DL_FOLDER='marco'; irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/download-extension.ps1 | iex
 ```
 
 **Windows · PowerShell - run a local clone with explicit flags:**
 
 ```powershell
-.\scripts\download-extension.ps1 -Version v5.23.0 -FolderName marco-extension
+.\scripts\download-extension.ps1 -Version v5.24.0 -FolderName marco-extension
 
 ```
 
@@ -50,7 +50,7 @@ $env:MARCO_DL_VERSION='v5.23.0'; $env:MARCO_DL_FOLDER='marco'; irm https://raw.g
 irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/clone-repo.ps1 | iex
 ```
 
-After it finishes, load the resulting folder via `chrome://extensions → Load unpacked`. The `marco-extension-v5.23.0.zip` backup sits next to it.
+After it finishes, load the resulting folder via `chrome://extensions → Load unpacked`. The `marco-extension-v5.24.0.zip` backup sits next to it.
 
 ### 🪟 Windows · PowerShell installer (latest)
 
@@ -64,23 +64,23 @@ irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/i
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v55/main/scripts/install.sh | bash
 ```
 
-> **[v5.23.0] 2026-08-06 Workflow YAML Validation and Tag Recovery**
+> **[v5.24.0] 2026-08-07 CI Archive Scanner Fix and Release Prompt Parity**
 
 ```powershell
 ## Windows · PowerShell
-irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.23.0/install.ps1 | iex
+irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.24.0/install.ps1 | iex
 
 
 ```
 
 ```bash
 ## macOS · Linux · Bash
-curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.23.0/install.sh | bash
+curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.24.0/install.sh | bash
 
 
 ```
 
-**Pinned version:** `v5.23.0` &nbsp;•&nbsp; **Macro Controller:** `v5.23.0`
+**Pinned version:** `v5.24.0` &nbsp;•&nbsp; **Macro Controller:** `v5.24.0`
 
 > **v2.243.0 release-asset fix (historical):** the previous release pipeline pointed at a legacy `chrome-extension/dist/` subfolder that no longer exists (the unpacked extension is built into `chrome-extension/` itself - see `vite.config.extension.ts` and `powershell.json → distDir`). That mismatch caused `marco-extension-{VER}.zip` to be silently absent from the GitHub Releases page. The workflow now zips `chrome-extension/` directly and fails fast if the extension zip is missing or `< 10 KiB`. RCA: [`mem://constraints/chrome-extension-dist-path`](.lovable/memory/constraints/chrome-extension-dist-path.md).
 
@@ -107,12 +107,12 @@ Pick your platform - each section is a self-contained install path with the reco
 **Recommended path.** Open **PowerShell** (Win + X → "Windows PowerShell" or "Terminal") and run:
 
 ```powershell
-irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.23.0/install.ps1 | iex
+irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.24.0/install.ps1 | iex
 
 
 ```
 
-- 🔒 Pinned to `v5.23.0` - see [Pinned to a specific release](#-pinned-to-a-specific-release) to change versions
+- 🔒 Pinned to `v5.24.0` - see [Pinned to a specific release](#-pinned-to-a-specific-release) to change versions
 - 🌊 Want auto-update? Use the [latest channel](#-latest-channel-auto-update) one-liner
 - 📁 Custom install folder? See [Custom Directory Install](#custom-directory-install)
 - 🚩 Full flag list, exit codes, checksum behavior → [Installer Options](#installer-options)
@@ -122,12 +122,12 @@ irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.23.0/ins
 Open your terminal and run:
 
 ```bash
-curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.23.0/install.sh | bash
+curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.24.0/install.sh | bash
 
 
 ```
 
-- 🔒 Pinned to `v5.23.0` - see [Pinned to a specific release](#-pinned-to-a-specific-release) for other tags
+- 🔒 Pinned to `v5.24.0` - see [Pinned to a specific release](#-pinned-to-a-specific-release) for other tags
 - 🌊 Auto-update channel → [latest channel](#-latest-channel-auto-update)
 - 📁 Custom install folder? See [Custom Directory Install](#custom-directory-install)
 - 🚩 Full flag list, exit codes, checksum behavior → [Installer Options](#installer-options)
@@ -142,12 +142,12 @@ The unified installer auto-derives the pinned version from its download URL. Use
 
 ```powershell
 ## PowerShell (Windows) - replace v4.109.0 with any released tag
-irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.23.0/install.ps1 | iex
+irm https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.24.0/install.ps1 | iex
 ```
 
 ```bash
 ## Bash (Linux / macOS)
-curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.23.0/install.sh | bash
+curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v55/releases/download/v5.24.0/install.sh | bash
 ```
 
 #### 🌊 Latest channel (auto-update)
@@ -250,7 +250,7 @@ The installers (`install.ps1`, `install.sh`) conform to the [Generic Installer B
 
 | Flag | Description | Example |
 |------|-------------|---------|
-| `-Version` | Pin a specific release (`vX.Y.Z[-pre]`) or `latest` | `-Version v5.23.0` |
+| `-Version` | Pin a specific release (`vX.Y.Z[-pre]`) or `latest` | `-Version v5.24.0` |
 | `-InstallDir` | Custom install directory | `-InstallDir D:\marco-extension\v3.6.1` |
 | `-Repo` | Override GitHub `owner/repo` | `-Repo alimtvnetwork/macro-ahk-v55` |
 | `-Help` | Print usage and exit 0 | `-Help` |
@@ -1145,7 +1145,7 @@ prevent recursive workflow runs. `release.yml` used to listen only on
 `push: tags: v*`, so a tag created by `tag-and-release.yml` landed on the
 remote and nothing built.
 
-**Fix (shipped in v5.23.0).** `release.yml` also accepts `workflow_call`,
+**Fix (shipped in the current release line).** `release.yml` also accepts `workflow_call`,
 and `tag-and-release.yml` calls it directly after creating the tag. One
 run of **Actions > Tag and Release** now produces the tag *and* the
 published release with all assets. Never re-wire this back to an implicit
