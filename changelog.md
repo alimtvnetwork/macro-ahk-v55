@@ -1,5 +1,22 @@
 # Changelog
 
+## [v5.25.0] 2026-08-07 Release Trigger Cleanup and Published-Asset Gate
+
+### Fixed
+- **`release.yml` fired up to five runs per tag.** A bare `create:` trigger (which also fires on BRANCH creation, so the `release/v5.24.0` branch started a build) plus five subscribed `release:` types fanned one tag out into duplicate runs that the `release-${{ github.ref }}` concurrency group then cancelled. Those cancelled runs are what made the Actions tab look like the release pipeline never triggered. Triggers are now `push: tags: v*`, `release: types: [published]`, `workflow_dispatch`, and `workflow_call`, resolving to exactly one run per tag.
+
+### Added
+- `scripts/check-release-assets.mjs`: final step of the `release` job. Queries the published release through the GitHub API and fails the run when `marco-extension-<tag>.zip`, `prompts-<tag>.zip`, `macro-controller-<tag>.zip`, the SDK or XPath bundles, either installer, `checksums.txt` or `VERSION.txt` is missing or below its size floor. Releases v5.9.0 through v5.22.0 published pages with zero assets and nothing in the pipeline noticed.
+- `scripts/__tests__/ci-workflow-trigger-policy.test.mjs`: asserts the single-run trigger policy and that the published-asset gate is wired in.
+- `.lovable/memory/rca/06-release-published-without-assets.md`: full root cause analysis of the zero-asset releases, including the standing rule that a release fix is verified through the Actions API (run, jobs, asset list), never through a workflow file diff.
+- `.lovable/memory/constraints/release-workflow-triggers.md`: the trigger policy as a hard constraint.
+
+### Changed
+- `.lovable/what-to-read.md`: new "Before touching CI/CD or cutting a release" reading section.
+
+### Issues
+- [01-5-25-0-git-tag-skipped](.lovable/release/issues/01-5-25-0-git-tag-skipped.md) the sandbox cannot run git commands, so the `v5.25.0` commit and tag must be created through **Actions > Tag and Release**.
+
 ## [v5.24.0] 2026-08-07 CI Archive Scanner Fix and Release Prompt Parity
 
 ### Fixed

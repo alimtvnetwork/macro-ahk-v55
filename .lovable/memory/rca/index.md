@@ -5,3 +5,5 @@
 - [02-5-19-0-remote-tag-missing](../release/issues/02-5-19-0-remote-tag-missing.md) — Tag missing from remote preflight (2026-08-06)
 - [01-5-19-0-git-tag-skipped](../release/issues/01-5-19-0-git-tag-skipped.md) — Git tag skipped due to sandbox limits (2026-08-06)
 - [04-action-download-resolution-hardening](./04-action-download-resolution-hardening.md) - Removed 30 third-party `uses:` steps to shrink action-download outage surface (2026-08-06)
+- [05-ci-not-triggering-and-not-releasing](./05-ci-not-triggering-and-not-releasing.md) - GITHUB_TOKEN push suppression and workflow parser rejection (2026-08-06)
+- [06-release-published-without-assets](./06-release-published-without-assets.md) - v5.9.0 to v5.22.0 published zero-asset releases; three causes, plus the rule to verify releases through the Actions API instead of a file diff (2026-08-07)

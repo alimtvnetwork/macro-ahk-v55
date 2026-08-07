@@ -45,6 +45,8 @@
 - **`next` command**: Always DO the next task in the same turn. End with a flat numbered list.
 - **"next prompt" / "plan prompt"**: Edits the button BODY text in `standalone-scripts/prompts/`.
 - **CI push trigger unfiltered**: `.github/workflows/ci.yml` MUST use bare `on: push:`.
+- **Release triggers**: `release.yml` fires ONCE per tag. No bare `create:`, `release:` types = `published` only. See [release-workflow-triggers](.lovable/memory/constraints/release-workflow-triggers.md).
+- **Verify releases through the API**: never claim a CI/release fix from a file diff. Check the run, its jobs, and the release asset list. See [RCA 06](.lovable/memory/rca/06-release-published-without-assets.md).
 - **Loop iteration cap 250**: Hard-capped at 250 iterations for all loops.
 - **Em dashes banned**: Never use em dashes (-) in any output. Use commas, colons, or parentheses.
 

@@ -206,17 +206,29 @@ test("E2E-23 only runs in its dedicated retry-enabled CI job", () => {
     );
 });
 
-test("Release Build catches every GitHub release and tag creation path", () => {
+test("Release Build fires exactly once per tag", () => {
     assert.ok(existsSync(RELEASE_WORKFLOW), `Workflow missing at ${RELEASE_WORKFLOW}`);
     const src = readFileSync(RELEASE_WORKFLOW, "utf8");
 
     assert.match(src, /push:\s*\n\s*tags:\s*\n\s*- "v\*"/, "release.yml must run on pushed v* tags");
-    assert.match(src, /\n\s*create:\s*\n/, "release.yml must run on tag create events");
-    assert.match(src, /\n\s*release:\s*\n\s*types:/, "release.yml must run on GitHub Release events");
+    assert.doesNotMatch(src, /^\s{2}create:\s*$/m, "release.yml must NOT use a bare create: trigger, it also fires on branch creation");
+    assert.match(
+        src,
+        /\n\s*release:\s*\n\s*types:\s*\n\s*- published\s*\n/,
+        "release.yml must subscribe to the published release event only, extra types fan one tag out into duplicate cancelled runs",
+    );
+    assert.doesNotMatch(src, /- prereleased/, "release.yml must not subscribe to prereleased");
+    assert.doesNotMatch(src, /- created\s*\n/, "release.yml must not subscribe to the created release event");
     assert.match(src, /\n\s*workflow_dispatch:\s*\n\s*inputs:/, "release.yml must keep manual recovery dispatch");
     assert.match(src, /\n\s*workflow_call:\s*\n\s*inputs:/, "release.yml must remain callable by the tagging workflow");
     assert.match(src, /RELEASE_TAG_NAME: \$\{\{ github\.event\.release\.tag_name \|\| '' \}\}/, "release.yml must read the release event tag name");
     assert.match(src, /GITHUB_REF_TYPE:-/, "release.yml must recognize create-event tag refs");
+});
+
+test("Release Build verifies the published release actually carries assets", () => {
+    const src = readFileSync(RELEASE_WORKFLOW, "utf8");
+    assert.match(src, /node scripts\/check-release-assets\.mjs/, "release.yml must run the published-asset gate");
+    assert.match(src, /RELEASE_TAG: \$\{\{ needs\.setup\.outputs\.publish_tag \}\}/, "asset gate must receive the publish tag");
 });
 
 test("Tag and Release directly calls Release Build and supports safe tag recovery", () => {

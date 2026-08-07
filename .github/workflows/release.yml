@@ -41,14 +41,15 @@ on:
   push:
     tags:
       - "v*"
-  create:
+  # NOTE, trigger policy (see .lovable/memory/constraints/release-workflow-triggers.md):
+  # exactly ONE Release Build run per tag. A bare `create:` trigger also fires on
+  # BRANCH creation (a `release/v5.24.0` branch started a pointless run), and
+  # subscribing to several `release:` types fans a single tag out into 5 runs that
+  # the `release-${{ github.ref }}` concurrency group then cancels. Cancelled runs
+  # on the Actions tab are what looked like "CI never triggers, nothing releases".
   release:
     types:
-      - created
-      - edited
-      - prereleased
       - published
-      - released
   workflow_dispatch:
     inputs:
       version:
@@ -965,5 +966,15 @@ jobs:
             --notes-file release-assets/RELEASE_NOTES.md \
             --title "Marco Extension $TAG"
           echo "Forced rich body onto release $TAG"
+
+      # ── Final gate: the published release MUST carry the built assets ──
+      # Releases v5.9.0 through v5.22.0 published a page with zero assets and
+      # nothing failed, because no step ever inspected the finished release.
+      # See .lovable/memory/rca/06-release-published-without-assets.md.
+      - name: Verify published release assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ needs.setup.outputs.publish_tag }}
+        run: node scripts/check-release-assets.mjs
 
 
