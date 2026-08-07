@@ -1,0 +1,18 @@
+{
+  "version": "5.24.0",
+  "branch": "release/v5.24.0",
+  "sourceBranch": "main",
+  "commit": "f3be934ac5368749e1aae47243531fd0c6007142",
+  "tag": "v5.24.0",
+  "assets": [],
+  "changelog": [
+    "`scripts/check-vi-func.mjs`: the guard scanned every directory, so the archived `.old-github/.github/workflows/ci.yml` snapshot tripped the `vi.func` preflight and failed `Preflight - No Nested Template Literals` on `main`. `.lovable` and `.old-github` are now in `SKIP_DIRS`, and real source violations still fail.",
+    "`.lovable/prompts/14-release.md`: re-synced byte-for-byte with `standalone-scripts/prompts/22-release/prompt.md`. The blank-line drift between the two broke the `default-prompt-content` contract test (`Object.is` equality) and failed `pnpm run test:quiet` in the `Setup - Lint - Test` job.",
+    "`scripts/__tests__/check-vi-func.test.mjs`: regression test proving archived workflow text and `.lovable` notes cannot fail the guard.",
+    "[01-5-24-0-git-tag-skipped](.lovable/release/issues/01-5-24-0-git-tag-skipped.md) the sandbox cannot run git commands, so the `v5.24.0` commit and tag must be created through **Actions \u003e Tag and Release**."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-08-07T16:31:19Z",
+  "isLatest": false
+}
