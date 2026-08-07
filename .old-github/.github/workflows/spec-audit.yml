@@ -1,0 +1,38 @@
+name: spec-audit
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  blind-ai-spec-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Acceptance blocks
+        run: node scripts/audit/check-acceptance.mjs
+      - name: Dangling links
+        run: node scripts/audit/check-dangling-links.mjs
+      - name: Numeric constants source-of-truth
+        run: node scripts/audit/check-must-constants.mjs
+      - name: Constant divergence
+        run: node scripts/audit/check-constant-divergence.mjs
+      - name: MUST owner memory refs
+        run: node scripts/audit/check-must-memory-refs.mjs
+      - name: Cross-folder owner refs
+        run: node scripts/audit/check-cross-folder-owners.mjs
+      - name: Quarantine graduation plans
+        run: node scripts/audit/check-quarantine.mjs
+      - name: Pitfalls coverage
+        run: node scripts/audit/check-pitfalls.mjs
+      - name: Score floor
+        run: node scripts/audit/check-score-floor.mjs
+      - name: Score snapshot lock
+        run: node scripts/audit/check-score-snapshot.mjs
+      - name: No bare fetch
+        run: node scripts/lint/no-bare-fetch.mjs
+      - name: Audit footer lint
+        run: node scripts/audit/check-footer-lint.mjs
