@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 import { Timings } from "../constants/timing";
 /**
  * Step Executors — Spec 21
@@ -22,15 +23,15 @@ export async function executeInjectPrompt(step: StepInjectPrompt): Promise<void>
     const id = `inject_${Date.now()}`;
     const handler = (event: MessageEvent) => {
       if (event.data?.type === "PROMPT_INJECT_RESPONSE" && event.data?.requestId === id) {
-        window.removeEventListener("message", handler);
+        window.removeEventListener(Events.MESSAGE, handler);
         if (event.data.success) resolve();
         else reject(new Error(event.data.error ?? "Prompt injection failed"));
       }
     };
-    window.addEventListener("message", handler);
+    window.addEventListener(Events.MESSAGE, handler);
     window.postMessage({ type: "INJECT_PROMPT_BY_SLUG", slug: step.slug, requestId: id }, "*");
     setTimeout(() => {
-      window.removeEventListener("message", handler);
+      window.removeEventListener(Events.MESSAGE, handler);
       reject(new Error(`Timeout injecting prompt "${step.slug}"`));
     }, Timings.TIMEOUT_VERY_LONG);
   });
@@ -126,15 +127,15 @@ export async function executeRunScript(step: StepRunScript): Promise<void> {
     const id = `run_${Date.now()}`;
     const handler = (event: MessageEvent) => {
       if (event.data?.type === "RUN_SCRIPT_RESPONSE" && event.data?.requestId === id) {
-        window.removeEventListener("message", handler);
+        window.removeEventListener(Events.MESSAGE, handler);
         if (event.data.success) resolve();
         else reject(new Error(event.data.error ?? "Script execution failed"));
       }
     };
-    window.addEventListener("message", handler);
+    window.addEventListener(Events.MESSAGE, handler);
     window.postMessage({ type: "RUN_SCRIPT_BY_SLUG", slug: step.slug, requestId: id }, "*");
     setTimeout(() => {
-      window.removeEventListener("message", handler);
+      window.removeEventListener(Events.MESSAGE, handler);
       reject(new Error(`Timeout running script "${step.slug}"`));
     }, 30000);
   });

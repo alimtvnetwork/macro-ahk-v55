@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /* eslint-disable @typescript-eslint/no-explicit-any -- chrome runtime detection via globalThis */
 import type { ScriptEntry } from "@/shared/project-types";
 import type { InjectScriptsResponse, InjectionResult } from "@/shared/injection-types";
@@ -268,7 +269,7 @@ function formatSkipReason(reason?: string): string {
       input.type = "file";
       input.accept = ".zip";
       input.style.display = "none";
-      input.addEventListener("change", handleFileSelected);
+      input.addEventListener(Events.CHANGE, handleFileSelected);
       document.body.appendChild(input);
       fileInputRef.current = input;
     }

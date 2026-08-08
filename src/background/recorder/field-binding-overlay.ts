@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * Marco Extension — Hover Field-Binding Overlay
  *
@@ -167,8 +168,8 @@ function buildColumnButton(col: string, sampleRow: FieldRow | undefined, onClick
     colPreview.className = "col-preview";
     colPreview.textContent = sampleRow?.[col] ?? "";
     btn.appendChild(colPreview);
-    btn.addEventListener("mousedown", (e) => { e.preventDefault(); });
-    btn.addEventListener("click", () => { onClick(col); });
+    btn.addEventListener(Events.MOUSEDOWN, (e) => { e.preventDefault(); });
+    btn.addEventListener(Events.CLICK, () => { onClick(col); });
 
     return btn;
 }
@@ -179,12 +180,12 @@ function buildTemplateInput(state: State): HTMLInputElement {
     templateInput.className = "template-input";
     templateInput.placeholder = "{{First}} {{Last}}";
     templateInput.spellcheck = false;
-    templateInput.addEventListener("input", () => {
+    templateInput.addEventListener(Events.INPUT, () => {
         state.template = templateInput.value;
         refreshPreview(state);
     });
-    templateInput.addEventListener("mousedown", (e) => { e.stopPropagation(); });
-    templateInput.addEventListener("click", (e) => { e.stopPropagation(); });
+    templateInput.addEventListener(Events.MOUSEDOWN, (e) => { e.stopPropagation(); });
+    templateInput.addEventListener(Events.CLICK, (e) => { e.stopPropagation(); });
     state.templateInput = templateInput;
 
     return templateInput;
@@ -225,8 +226,8 @@ function buildBindButton(state: State): HTMLButtonElement {
     btn.type = "button";
     btn.className = "btn btn-primary";
     btn.textContent = "Bind";
-    btn.addEventListener("mousedown", (e) => { e.preventDefault(); e.stopPropagation(); });
-    btn.addEventListener("click", (e) => { e.stopPropagation(); commitTemplate(state); });
+    btn.addEventListener(Events.MOUSEDOWN, (e) => { e.preventDefault(); e.stopPropagation(); });
+    btn.addEventListener(Events.CLICK, (e) => { e.stopPropagation(); commitTemplate(state); });
     state.bindBtn = btn;
 
     return btn;
@@ -237,8 +238,8 @@ function buildClearButton(state: State): HTMLButtonElement {
     btn.type = "button";
     btn.className = "btn btn-secondary";
     btn.textContent = "Clear";
-    btn.addEventListener("mousedown", (e) => { e.preventDefault(); e.stopPropagation(); });
-    btn.addEventListener("click", (e) => {
+    btn.addEventListener(Events.MOUSEDOWN, (e) => { e.preventDefault(); e.stopPropagation(); });
+    btn.addEventListener(Events.CLICK, (e) => {
         e.stopPropagation();
         state.template = "";
         if (state.templateInput !== null) { state.templateInput.value = ""; }
@@ -469,7 +470,7 @@ function attachOverlayListeners(state: State): { move: (e: MouseEvent) => void; 
     const move = (e: MouseEvent): void => onMove(state, e);
     const click = (e: MouseEvent): void => onClick(state, e);
     document.addEventListener("mousemove", move, true);
-    document.addEventListener("click", click, true);
+    document.addEventListener(Events.CLICK, click, true);
 
     return { move, click };
 }
@@ -493,7 +494,7 @@ export function mountFieldBindingOverlay(
             if (destroyed) { return; }
             destroyed = true;
             document.removeEventListener("mousemove", handlers.move, true);
-            document.removeEventListener("click", handlers.click, true);
+            document.removeEventListener(Events.CLICK, handlers.click, true);
             state.host.remove();
         },
     };

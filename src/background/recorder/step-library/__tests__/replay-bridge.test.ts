@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * replay-bridge.test.ts, covers the StepRow → ReplayStepInput
  * translator and the LeafStepExecutor it powers.
@@ -145,7 +146,7 @@ describe("createLiveReplayExecutor", () => {
         document.body.innerHTML = `<button id="go">Go</button>`;
         const btn = document.getElementById("go") as HTMLButtonElement;
         let clicked = 0;
-        btn.addEventListener("click", () => { clicked++; });
+        btn.addEventListener(Events.CLICK, () => { clicked++; });
 
         const exec = createLiveReplayExecutor({ Doc: document });
         const failure = await exec(makeStep({

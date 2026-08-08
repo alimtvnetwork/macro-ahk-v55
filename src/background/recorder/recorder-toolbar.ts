@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * Marco Extension — Shadow-Root Recorder Toolbar
  *
@@ -290,9 +291,9 @@ function createToolbarActions(
 function wireToolbarButtons(
     nodes: ToolbarNodes, actions: ToolbarActions, sessionRef: SessionRef,
 ): void {
-    nodes.startBtn.addEventListener("click", () => actions.start());
-    nodes.stopBtn.addEventListener("click",  () => actions.stop());
-    nodes.pauseBtn.addEventListener("click", () => {
+    nodes.startBtn.addEventListener(Events.CLICK, () => actions.start());
+    nodes.stopBtn.addEventListener(Events.CLICK,  () => actions.stop());
+    nodes.pauseBtn.addEventListener(Events.CLICK, () => {
         const phase = sessionRef.current.Phase;
         if (phase === "Recording") { actions.pause();
 

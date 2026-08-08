@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * Marco Extension — Keyword Event playback tests
  */
@@ -30,8 +31,8 @@ describe("runKeywordEvent", () => {
     it("dispatches keydown+keyup for each Key step", async () => {
         const target = document.createElement("div");
         const events: string[] = [];
-        target.addEventListener("keydown", (e) => events.push(`down:${e.key}`));
-        target.addEventListener("keyup", (e) => events.push(`up:${e.key}`));
+        target.addEventListener(Events.KEYDOWN, (e) => events.push(`down:${e.key}`));
+        target.addEventListener(Events.KEYUP, (e) => events.push(`up:${e.key}`));
 
         const ev = makeEvent([
             { Kind: "Key", Id: "s1", Combo: "Enter" },
@@ -46,7 +47,7 @@ describe("runKeywordEvent", () => {
     it("waits the specified duration between steps", async () => {
         const target = document.createElement("div");
         const seen: string[] = [];
-        target.addEventListener("keydown", (e) => seen.push(e.key));
+        target.addEventListener(Events.KEYDOWN, (e) => seen.push(e.key));
 
         const ev = makeEvent([
             { Kind: "Key", Id: "s1", Combo: "A" },

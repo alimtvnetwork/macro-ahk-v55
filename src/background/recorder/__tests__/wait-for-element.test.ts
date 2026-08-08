@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 // @vitest-environment jsdom
 
 /**
@@ -96,7 +97,7 @@ describe("executeReplay, WaitFor gate", () => {
         document.body.innerHTML = `<button id="go">Go</button>`;
         const btn = document.getElementById("go")!;
         // Click handler injects the awaited element asynchronously.
-        btn.addEventListener("click", () => {
+        btn.addEventListener(Events.CLICK, () => {
             setTimeout(() => {
                 document.body.insertAdjacentHTML("beforeend", `<div id="loaded"></div>`);
             }, 0);

@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 import { ClickTrailEntryKind } from "../types/enums";
 
 /**
@@ -156,8 +157,8 @@ export function attachClickTrail(): void {
     if (isAttached) return;
     isAttached = true;
 
-    document.addEventListener("click", handleClick, { capture: true, passive: true });
-    document.addEventListener("keydown", handleKeyDown, { capture: true, passive: true });
+    document.addEventListener(Events.CLICK, handleClick, { capture: true, passive: true });
+    document.addEventListener(Events.KEYDOWN, handleKeyDown, { capture: true, passive: true });
     window.addEventListener("popstate", handlePopState);
 
     recordTrail({ kind: "mount", label: `popup mounted @ ${location.pathname}` });

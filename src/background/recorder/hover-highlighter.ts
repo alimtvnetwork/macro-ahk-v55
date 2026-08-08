@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 import { HighlighterMode } from "../../types/enums";
 
 export interface HoverHighlighterHandle {
@@ -320,8 +321,8 @@ function handleReplayEnd(state: InternalState, schedulePaint: () => void): void 
 
 function attachHighlighterListeners(doc: Document, handlers: HighlighterHandlers): void {
     doc.addEventListener("mousemove", handlers.onMouseMove, { passive: true });
-    doc.addEventListener("keydown", handlers.onKeyDown, { passive: true });
-    doc.addEventListener("keyup", handlers.onKeyUp, { passive: true });
+    doc.addEventListener(Events.KEYDOWN, handlers.onKeyDown, { passive: true });
+    doc.addEventListener(Events.KEYUP, handlers.onKeyUp, { passive: true });
     doc.addEventListener("wheel", handlers.onWheel, { passive: true });
     doc.addEventListener("replay:step:start", handlers.onReplayStart);
     doc.addEventListener("replay:step:end", handlers.onReplayEnd);
@@ -329,8 +330,8 @@ function attachHighlighterListeners(doc: Document, handlers: HighlighterHandlers
 
 function detachHighlighterListeners(doc: Document, handlers: HighlighterHandlers): void {
     doc.removeEventListener("mousemove", handlers.onMouseMove);
-    doc.removeEventListener("keydown", handlers.onKeyDown);
-    doc.removeEventListener("keyup", handlers.onKeyUp);
+    doc.removeEventListener(Events.KEYDOWN, handlers.onKeyDown);
+    doc.removeEventListener(Events.KEYUP, handlers.onKeyUp);
     doc.removeEventListener("wheel", handlers.onWheel);
     doc.removeEventListener("replay:step:start", handlers.onReplayStart);
     doc.removeEventListener("replay:step:end", handlers.onReplayEnd);

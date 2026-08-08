@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * Marco Extension, Keyword Event target resolution tests
  *
@@ -84,8 +85,8 @@ describe("runKeywordEvent, target routing", () => {
         const other = document.querySelector("#other") as HTMLInputElement;
         const seenLogin: string[] = [];
         const seenOther: string[] = [];
-        login.addEventListener("keydown", (e) => seenLogin.push(e.key));
-        other.addEventListener("keydown", (e) => seenOther.push(e.key));
+        login.addEventListener(Events.KEYDOWN, (e) => seenLogin.push(e.key));
+        other.addEventListener(Events.KEYDOWN, (e) => seenOther.push(e.key));
 
         const result = await runKeywordEvent(
             mkEvent({ Kind: "Selector", Selector: "#login" }),
@@ -101,8 +102,8 @@ describe("runKeywordEvent, target routing", () => {
         focused.focus();
         const seenBody: string[] = [];
         const seenFocused: string[] = [];
-        document.body.addEventListener("keydown", (e) => seenBody.push(e.key), true);
-        focused.addEventListener("keydown", (e) => seenFocused.push(e.key));
+        document.body.addEventListener(Events.KEYDOWN, (e) => seenBody.push(e.key), true);
+        focused.addEventListener(Events.KEYDOWN, (e) => seenFocused.push(e.key));
 
         await runKeywordEvent(mkEvent({ Kind: "Body" }));
         // Body capture sees it; the focused input does not (no ancestor reach).
@@ -116,8 +117,8 @@ describe("runKeywordEvent, target routing", () => {
         const override = document.querySelector("#override") as HTMLInputElement;
         const seenCfg: string[] = [];
         const seenOverride: string[] = [];
-        config.addEventListener("keydown", (e) => seenCfg.push(e.key));
-        override.addEventListener("keydown", (e) => seenOverride.push(e.key));
+        config.addEventListener(Events.KEYDOWN, (e) => seenCfg.push(e.key));
+        override.addEventListener(Events.KEYDOWN, (e) => seenOverride.push(e.key));
 
         await runKeywordEvent(
             mkEvent({ Kind: "Selector", Selector: "#config" }),

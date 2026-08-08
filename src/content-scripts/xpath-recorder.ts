@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * Marco Extension — Content Script: XPath Recorder
  *
@@ -253,10 +254,10 @@ function highlightElement(element: Element): void {
 
 /** Starts the XPath recorder. */
 function startRecorder(): void {
-    document.addEventListener("click", onElementClick, true);
-    document.addEventListener("input", onElementInput, true);
-    document.addEventListener("change", onElementChange, true);
-    document.addEventListener("keydown", onElementKeydown, true);
+    document.addEventListener(Events.CLICK, onElementClick, true);
+    document.addEventListener(Events.INPUT, onElementInput, true);
+    document.addEventListener(Events.CHANGE, onElementChange, true);
+    document.addEventListener(Events.KEYDOWN, onElementKeydown, true);
     console.log("[Marco] XPath recorder started");
 
     if (typeof chrome !== "undefined" && chrome.storage) {
@@ -301,10 +302,10 @@ function startRecorder(): void {
 /** Stops the XPath recorder. Tears down listeners + outstanding timers. */
 function stopRecorder(): void {
     isActive = false;
-    document.removeEventListener("click", onElementClick, true);
-    document.removeEventListener("input", onElementInput, true);
-    document.removeEventListener("change", onElementChange, true);
-    document.removeEventListener("keydown", onElementKeydown, true);
+    document.removeEventListener(Events.CLICK, onElementClick, true);
+    document.removeEventListener(Events.INPUT, onElementInput, true);
+    document.removeEventListener(Events.CHANGE, onElementChange, true);
+    document.removeEventListener(Events.KEYDOWN, onElementKeydown, true);
     clearAllHighlights();
     window.removeEventListener("pagehide", onPageHide);
     // PERF-R6: drain any queued captures before teardown.

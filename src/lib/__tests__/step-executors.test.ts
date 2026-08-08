@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * Unit tests for step-executors.ts — Spec 21
  *
@@ -21,7 +22,7 @@ describe("executeClickButton", () => {
     const btn = document.createElement("button");
     btn.id = "test-btn";
     const clickSpy = vi.fn();
-    btn.addEventListener("click", clickSpy);
+    btn.addEventListener(Events.CLICK, clickSpy);
     document.body.appendChild(btn);
 
     await executeClickButton({ type: "click_button", selector: "#test-btn" });

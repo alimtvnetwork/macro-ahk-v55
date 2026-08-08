@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * Marco Extension — Content Script: Message Relay
  *
@@ -390,7 +391,7 @@ function probeDetectedWorkspaceFromPage(
     const finish = (payload: unknown, ok: boolean, error?: string): void => {
         if (settled) return;
         settled = true;
-        window.removeEventListener("message", onReply);
+        window.removeEventListener(Events.MESSAGE, onReply);
         sendResponse({ isOk: ok, payload: payload, errorMessage: error });
     };
 
@@ -405,7 +406,7 @@ function probeDetectedWorkspaceFromPage(
             typeof data.errorMessage === "string" ? data.errorMessage : undefined);
     };
 
-    window.addEventListener("message", onReply);
+    window.addEventListener(Events.MESSAGE, onReply);
     window.postMessage({
         source: PROBE_REQUEST_SOURCE,
         type: PROBE_TYPE,
@@ -429,7 +430,7 @@ function initMessageRelay(): void {
     (window as unknown as Record<string, unknown>).__marcoRelayActive = true;
 
     // Page → Background
-    window.addEventListener("message", handlePageMessage);
+    window.addEventListener(Events.MESSAGE, handlePageMessage);
 
     // Background → Page
     chrome.runtime.onMessage.addListener(handleBackgroundMessage);

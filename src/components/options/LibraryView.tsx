@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * Marco Extension — Library View (Cross-Project Sync)
  *
@@ -833,9 +834,9 @@ export function LibraryView() {
         setPromoteOpen(true);
       }
     };
-    window.addEventListener("keydown", handler);
+    window.addEventListener(Events.KEYDOWN, handler);
 
-    return () => window.removeEventListener("keydown", handler);
+    return () => window.removeEventListener(Events.KEYDOWN, handler);
   }, [activeTab, safePage, totalPages]);
 
   const linksForAsset = (assetId: number) => links.filter(l => l.SharedAssetId === assetId);

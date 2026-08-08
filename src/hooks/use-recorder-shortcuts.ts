@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * Marco Extension — Recorder Keyboard Shortcuts
  *
@@ -84,8 +85,8 @@ export function useRecorderShortcuts(args: UseRecorderShortcutsArgs): void {
             }
         };
 
-        window.addEventListener("keydown", onKey);
+        window.addEventListener(Events.KEYDOWN, onKey);
 
-        return () => window.removeEventListener("keydown", onKey);
+        return () => window.removeEventListener(Events.KEYDOWN, onKey);
     }, [phase, onResume, onPause, onStop]);
 }

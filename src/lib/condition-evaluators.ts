@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * Condition Evaluators — Spec 21
  *
@@ -39,17 +40,17 @@ async function getKvValue(key: string): Promise<string | null> {
 
     const handler = (event: MessageEvent) => {
       if (event.data?.type === "KV_GET_RESPONSE" && event.data?.requestId === id) {
-        window.removeEventListener("message", handler);
+        window.removeEventListener(Events.MESSAGE, handler);
         resolve(event.data?.value ?? null);
       }
     };
 
-    window.addEventListener("message", handler);
+    window.addEventListener(Events.MESSAGE, handler);
     window.postMessage({ type: "KV_GET", key, requestId: id }, "*");
 
     // Timeout after 3s
     setTimeout(() => {
-      window.removeEventListener("message", handler);
+      window.removeEventListener(Events.MESSAGE, handler);
       resolve(null);
     }, 3000);
   });

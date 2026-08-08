@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * Marco Extension — First-Attach Toast
  *
@@ -117,7 +118,7 @@ function toastPagePayload(origin: string): void {
         let timeoutId: ReturnType<typeof window.setTimeout> | null = null;
         function cleanup(): void {
             if (timeoutId !== null) { window.clearTimeout(timeoutId); timeoutId = null; }
-            r.removeEventListener("click", onClick);
+            r.removeEventListener(Events.CLICK, onClick);
             window.removeEventListener("pagehide", cleanup);
             if (r.isConnected) r.remove();
         }
@@ -132,7 +133,7 @@ function toastPagePayload(origin: string): void {
                 cleanup();
             }
         }
-        r.addEventListener("click", onClick);
+        r.addEventListener(Events.CLICK, onClick);
         window.addEventListener("pagehide", cleanup, { once: true });
         timeoutId = window.setTimeout(cleanup, 30_000);
     }
@@ -152,7 +153,7 @@ function bridgePagePayload(): void {
     (window as unknown as { __marcoToastBridge?: boolean }).__marcoToastBridge = true;
 
     const cleanup = (): void => {
-        window.removeEventListener("message", onMessage);
+        window.removeEventListener(Events.MESSAGE, onMessage);
         window.removeEventListener("pagehide", cleanup);
         (window as unknown as { __marcoToastBridge?: boolean }).__marcoToastBridge = false;
     };
@@ -170,7 +171,7 @@ function bridgePagePayload(): void {
         }
     };
 
-    window.addEventListener("message", onMessage);
+    window.addEventListener(Events.MESSAGE, onMessage);
     window.addEventListener("pagehide", cleanup, { once: true });
 }
 

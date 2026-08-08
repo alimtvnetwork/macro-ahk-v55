@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * Marco Extension — Hotkey Chord Capture
  *
@@ -92,9 +93,9 @@ export function HotkeyChordCapture(props: HotkeyChordCaptureProps): JSX.Element 
         if (!active) { return; }
         const box = boxRef.current;
         if (box === null) { return; }
-        box.addEventListener("keydown", onKeyDown);
+        box.addEventListener(Events.KEYDOWN, onKeyDown);
 
-        return () => box.removeEventListener("keydown", onKeyDown);
+        return () => box.removeEventListener(Events.KEYDOWN, onKeyDown);
     }, [active, onKeyDown]);
 
     /**

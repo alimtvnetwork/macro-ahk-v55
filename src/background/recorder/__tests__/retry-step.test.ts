@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 // @vitest-environment jsdom
 
 /**
@@ -49,7 +50,7 @@ describe("retryStep", () => {
     it("succeeds when the target now exists in the DOM", async () => {
         document.body.innerHTML = `<button id="go">Go</button>`;
         const onClick = vi.fn();
-        document.getElementById("go")!.addEventListener("click", onClick);
+        document.getElementById("go")!.addEventListener(Events.CLICK, onClick);
 
         const step: ReplayStepInput = {
             StepId: 7, Index: 2, Kind: "Click",

@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { VariantProps, cva } from "class-variance-authority";
@@ -86,9 +87,9 @@ const SidebarProvider = React.forwardRef<
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener(Events.KEYDOWN, handleKeyDown);
 
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener(Events.KEYDOWN, handleKeyDown);
   }, [toggleSidebar]);
 
   // We add a state so that we can do data-state="expanded" or "collapsed".

@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * Draggable + Resizable Overlay Panel — Spec 15 T-5
  *
@@ -91,11 +92,11 @@ function useDrag(
         const onUp = () => {
             dragging.current = false;
             document.removeEventListener("mousemove", onMove);
-            document.removeEventListener("mouseup", onUp);
+            document.removeEventListener(Events.MOUSEUP, onUp);
         };
 
         document.addEventListener("mousemove", onMove);
-        document.addEventListener("mouseup", onUp);
+        document.addEventListener(Events.MOUSEUP, onUp);
     }, [geo, setGeo]);
 }
 
@@ -131,11 +132,11 @@ function useResize(
         const onUp = () => {
             resizing.current = false;
             document.removeEventListener("mousemove", onMove);
-            document.removeEventListener("mouseup", onUp);
+            document.removeEventListener(Events.MOUSEUP, onUp);
         };
 
         document.addEventListener("mousemove", onMove);
-        document.addEventListener("mouseup", onUp);
+        document.addEventListener(Events.MOUSEUP, onUp);
     }, [geo, setGeo]);
 }
 

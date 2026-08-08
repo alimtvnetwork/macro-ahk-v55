@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 /**
  * Marco Extension — React Options: Projects Section
  *
@@ -93,7 +94,7 @@ export function ProjectsSection() {
         const fileInput = document.createElement("input");
         fileInput.type = "file";
         fileInput.accept = ".json";
-        fileInput.addEventListener("change", async () => {
+        fileInput.addEventListener(Events.CHANGE, async () => {
             const file = fileInput.files?.[0];
             if (!file) return;
             try {

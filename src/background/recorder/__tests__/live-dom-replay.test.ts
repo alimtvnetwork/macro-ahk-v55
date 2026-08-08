@@ -1,3 +1,4 @@
+import { Events } from "@/constants/events";
 // @vitest-environment jsdom
 
 /**
@@ -44,7 +45,7 @@ describe("executeReplay", () => {
         document.body.innerHTML = `<button id="go">Go</button>`;
         const btn = document.getElementById("go")!;
         const onClick = vi.fn();
-        btn.addEventListener("click", onClick);
+        btn.addEventListener(Events.CLICK, onClick);
 
         const steps: ReplayStepInput[] = [{
             StepId: 1, Index: 1, Kind: "Click",
@@ -60,7 +61,7 @@ describe("executeReplay", () => {
         document.body.innerHTML = `<input id="email" />`;
         const input = document.getElementById("email") as HTMLInputElement;
         const onInput = vi.fn();
-        input.addEventListener("input", onInput);
+        input.addEventListener(Events.INPUT, onInput);
 
         const steps: ReplayStepInput[] = [{
             StepId: 2, Index: 1, Kind: "Type",
@@ -82,7 +83,7 @@ describe("executeReplay", () => {
         document.body.innerHTML = `<select id="x"><option>A</option><option>B</option></select>`;
         const sel = document.getElementById("x") as HTMLSelectElement;
         const onChange = vi.fn();
-        sel.addEventListener("change", onChange);
+        sel.addEventListener(Events.CHANGE, onChange);
 
         const steps: ReplayStepInput[] = [{
             StepId: 3, Index: 1, Kind: "Select",
@@ -123,7 +124,7 @@ describe("executeReplay", () => {
         const a = document.getElementById("a") as HTMLInputElement;
         const b = document.getElementById("b") as HTMLButtonElement;
         const clicked = vi.fn();
-        b.addEventListener("click", clicked);
+        b.addEventListener(Events.CLICK, clicked);
 
         const steps: ReplayStepInput[] = [
             { StepId: 10, Index: 1, Kind: "Type",  Selectors: cssSelector(10, "#a"), Value: "hi" },
@@ -195,7 +196,7 @@ describe("executeReplay, persisted per-step wait bridge", () => {
 
         // Inject the awaited element only AFTER the click handler fires ,
         // proves that the executor actually polled, not just lucked out.
-        btn.addEventListener("click", () => {
+        btn.addEventListener(Events.CLICK, () => {
             queueMicrotask(() => {
                 const element = document.createElement("div");
                 element.id = "after";
