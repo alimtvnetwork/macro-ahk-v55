@@ -2006,6 +2006,7 @@ jobs:
       - build-lovable-owner-switch
       - build-lovable-user-add
       - build-lovable-dashboard
+      - build-prompt-manager
 
     strategy:
       # Don't short-circuit the other legs when one project fails —
