@@ -119,7 +119,7 @@ async function executeUrlTabClickLeaf(step: StepRow, opts: ReplayBridgeOptions):
         });
     }
 
-    let params: any;
+    let params: Record<string, unknown>;
     try {
         params = JSON.parse(step.PayloadJson);
     } catch (err) {

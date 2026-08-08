@@ -284,7 +284,7 @@ async function tryStrategy3SignedUrl(hint?: string, url?: string): Promise<{ tok
     return null;
 }
 
-async function tryStrategy4Exchange(projectId: string, sessionLookup: any, refreshLookup: any): Promise<{ token: string; refreshed: boolean; cookieName: string } | null> {
+async function tryStrategy4Exchange(projectId: string, sessionLookup: chrome.cookies.Cookie | null | { value: string | null }, refreshLookup: chrome.cookies.Cookie | null | { value: string | null }): Promise<{ token: string; refreshed: boolean; cookieName: string } | null> {
     const exchangeToken = await fetchAuthTokenFromSessionExchange(projectId, sessionLookup.value !== null || refreshLookup.value !== null);
     if (exchangeToken !== null) {
         console.log("[config-auth] GET_TOKEN: exchanged opaque session cookie for JWT");

@@ -16,7 +16,7 @@ const recentTabs: RecentTab[] = [];
 export function startNewTabTracker(): void {
     if (typeof chrome === "undefined" || !chrome.tabs) return;
 
-    (chrome.tabs as any).onCreated.addListener((tab: any) => {
+    chrome.tabs.onCreated.addListener((tab) => {
         if (tab.url && tab.url !== "" && tab.id) {
             recentTabs.push({ tabId: tab.id, url: tab.url, timestamp: Date.now() });
             trimRecentTabs();
@@ -25,7 +25,7 @@ export function startNewTabTracker(): void {
     });
 
     // Often tabs are created with pendingUrl or no URL, then immediately updated
-    (chrome.tabs as any).onUpdated.addListener((tabId: any, changeInfo: any, tab: any) => {
+    chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         if (changeInfo.url && changeInfo.url !== "") {
             recentTabs.push({ tabId, url: changeInfo.url, timestamp: Date.now() });
             trimRecentTabs();
@@ -39,7 +39,7 @@ async function maybeInjectRecorder(tabId: number): Promise<void> {
         chrome.storage.local.get("marco.recorder.session", data => resolve(data["marco.recorder.session"] as string | undefined));
     });
     // Check if recording is active
-    if (sessionStr && typeof sessionStr === 'object' && (sessionStr as any).Phase === "Recording") {
+    if (sessionStr && typeof sessionStr === 'object' && (sessionStr as Record<string, unknown>).Phase === "Recording") {
         try {
             await chrome.scripting.executeScript({
                 target: { tabId },

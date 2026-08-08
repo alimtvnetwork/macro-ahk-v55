@@ -330,7 +330,7 @@ export function UpdaterEntryCard({
                 <div key={step.id} className="rounded-md border border-border/50 p-3 bg-background space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] text-muted-foreground font-mono w-4 shrink-0">{i + 1}</span>
-                    <Select value={step.type} onValueChange={(v) => onUpdateStep(step.id, "type", v as any)}>
+                    <Select value={step.type} onValueChange={(v) => onUpdateStep(step.id, "type", v as UpdaterStep["type"])}>
                       <SelectTrigger className="h-7 text-xs w-[120px]"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {STEP_TYPES.map((t) => (
@@ -346,7 +346,7 @@ export function UpdaterEntryCard({
                   <div className="grid grid-cols-2 gap-2 pl-6">
                     <div className="space-y-1">
                       <LabelType className="text-[10px]">Resource Type</LabelType>
-                      <Select value={step.resourceType ?? ""} onValueChange={(v) => onUpdateStep(step.id, "resourceType", v as any || undefined)}>
+                      <Select value={step.resourceType ?? ""} onValueChange={(v) => onUpdateStep(step.id, "resourceType", (v as UpdaterStep["resourceType"]) || undefined)}>
                         <SelectTrigger className="h-7 text-xs"><SelectValue placeholder="None" /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="" className="text-xs">None</SelectItem>
