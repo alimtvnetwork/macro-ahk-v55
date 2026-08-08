@@ -51,8 +51,8 @@ async function persistLogEntry(
             projectId: context.projectId,
             configId: context.configId,
         } as MessageRequest);
-    } catch { // allow-swallow: diagnostics must never break injection paths
-        // Diagnostics must never break injection paths.
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 }
 
@@ -81,8 +81,8 @@ export async function persistInjectionError(
             configId: context.configId,
             scriptFile: context.scriptFile,
         } as MessageRequest);
-    } catch { // allow-swallow: diagnostics must never break injection paths
-        // Diagnostics must never break injection paths.
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 }
 
@@ -109,8 +109,8 @@ export async function mirrorDiagnosticToTab(
             },
             args: [message, level],
         });
-    } catch { // allow-swallow: tab console mirroring is best-effort only
-        // Tab console mirroring is best-effort only.
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 }
 
@@ -173,7 +173,7 @@ export async function mirrorPipelineLogsToTab(
             },
             args: [lines, groupTitle],
         });
-    } catch { // allow-swallow: tab pipeline mirroring is best-effort only
-        // Best-effort only.
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 }

@@ -33,7 +33,9 @@ function handleDelegateTimeout(): boolean {
   const elapsed = state.delegateStartTime ? (Date.now() - state.delegateStartTime) / 1000 : 0;
   const isTimedOut = elapsed > 60;
 
-  if (!isTimedOut) {
+  const isMissingIsTimedOut = !isTimedOut;
+
+  if (isMissingIsTimedOut) {
     releaseCycleLock();
     log('SKIP: Waiting for API move (' + Math.floor(elapsed) + 's)', 'skip');
 
@@ -77,7 +79,8 @@ export function runCycle(): void {
 }
 
 function _checkLoopPreconditions(): boolean {
-  if (!state.running) {
+  const isMissingRunning = !state.running;
+  if (isMissingRunning) {
     state.__cycleInFlight = false;
     state.__cycleRetryPending = false;
     log('SKIP: Loop not running', 'skip');
@@ -110,35 +113,39 @@ function _performCycleTasks(): void {
 
   checkAndActOnCreditBalance()
     .then(function (apiSucceeded: boolean) {
-      if (apiSucceeded) {
-        log('Step 1: ✅ Credit balance API succeeded', 'success');
-        mc().updateUI();
-        releaseCycleLock();
+    if (apiSucceeded) {
+      log('Step 1: ✅ Credit balance API succeeded', 'success');
+      mc().updateUI();
+      releaseCycleLock();
 
-        return;
-      }
+      return;
+    }
 
-      if (!BALANCE_CONFIG.fallbackToXPath) {
-        log('Step 1: Credit balance API failed and XPath fallback disabled - skipping', 'warn');
-        releaseCycleLock();
+    const isMissingFallbackToXPath = !BALANCE_CONFIG.fallbackToXPath;
 
-        return;
-      }
+    if (isMissingFallbackToXPath) {
+      log('Step 1: Credit balance API failed and XPath fallback disabled - skipping', 'warn');
+      releaseCycleLock();
 
-      log('Step 1: Credit balance API failed - falling back to full workspace API...', 'warn');
-      doCycleFetchFallback();
-    })
+      return;
+    }
+
+    log('Step 1: Credit balance API failed - falling back to full workspace API...', 'warn');
+    doCycleFetchFallback();
+  })
     .catch(function (err: Error) {
-      logError('runCycle', 'Credit balance check error - falling back to workspace API', err);
+    logError('runCycle', 'Credit balance check error - falling back to workspace API', err);
 
-      if (!BALANCE_CONFIG.fallbackToXPath) {
-        releaseCycleLock();
+    const isMissingFallbackToXPath = !BALANCE_CONFIG.fallbackToXPath;
 
-        return;
-      }
+    if (isMissingFallbackToXPath) {
+      releaseCycleLock();
 
-      doCycleFetchFallback();
-    });
+      return;
+    }
+
+    doCycleFetchFallback();
+  });
 }
 
 // Wire runCycle into the fallback module so the soft-cooldown retry inside

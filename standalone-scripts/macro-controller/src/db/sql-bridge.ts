@@ -191,7 +191,8 @@ export async function runLoggedQuery(
     project: string = DB_NAME
 ): Promise<ServiceResult<SqlBridgeResp, Error>> {
     const resp = await runSql(legacy, sql, project);
-    if (!resp.isOk) {
+    const isMissingIsOk = !resp.isOk;
+    if (isMissingIsOk) {
         logError(contextInfo, `Database query failed: ${resp.errorMessage || 'Unknown error'}`, { sql, project });
         return new ServiceResult<SqlBridgeResp, Error>(false, resp, new Error(resp.errorMessage || 'unknown error'));
     }

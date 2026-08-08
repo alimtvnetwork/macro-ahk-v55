@@ -96,10 +96,14 @@ try {
   const hasProjects = hasRoot && root!.Projects !== null && root!.Projects !== undefined;
   const hasMacroController = hasProjects && !!root!.Projects.MacroController;
   if (hasMacroController) {
-    if (!root.Projects.MacroController.meta) root.Projects.MacroController.meta = {};
+    const isMissingMeta = !root.Projects.MacroController.meta;
+    if (isMissingMeta) root.Projects.MacroController.meta = {};
     root.Projects.MacroController.meta.version = VERSION;
   }
-} catch (_e) { logDebug('shared-state', 'SDK namespace not yet registered — version set at injection time'); }
+} catch (_e) {
+  logError("AutoCatch", "Unhandled exception", _e);
+  logDebug('shared-state', 'SDK namespace not yet registered — version set at injection time');
+}
 
 // ============================================
 // Panel colors

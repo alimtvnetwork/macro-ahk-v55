@@ -168,7 +168,8 @@ describe('per-area migration — referenced codes stay in-area', () => {
     const allowed = new Set<ErrorArea>(allowedAreas);
     for (const code of codes) {
       const entry = ERROR_CODES[code];
-      if (!entry) continue; // covered by suite A
+      const isMissingEntry = !entry;
+      if (isMissingEntry) continue; // covered by suite A
       expect(
         allowed.has(entry.area),
         `${path} emits ${code} whose area="${entry.area}" is not in allowedAreas=[${allowedAreas.join(', ')}]`,

@@ -91,7 +91,8 @@ function hydrate(): void {
   try {
     if (typeof localStorage === 'undefined') return;
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
+    const isMissingRaw = !raw;
+    if (isMissingRaw) return;
     const o = JSON.parse(raw) as Partial<SplitterState>;
     if (typeof o.bigText === 'string') state.bigText = o.bigText;
     if (typeof o.stepCount === 'number') state.stepCount = clamp(o.stepCount, STEP_MIN, STEP_MAX);
@@ -245,7 +246,8 @@ async function waitForCompletion(maxMs: number): Promise<void> {
     if (state.cancelled) return;
     const btn = findAddToTasksButton();
     const processing = isReturnButtonVisible() || !btn || (btn as HTMLButtonElement).disabled;
-    if (!processing) return;
+    const isMissingProcessing = !processing;
+    if (isMissingProcessing) return;
     await sleep(POLL_MS);
   }
 }
@@ -255,7 +257,8 @@ async function waitForCompletion(maxMs: number): Promise<void> {
 function readEditorText(): string {
   try {
     const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
-    if (!target) return '';
+    const isMissingTarget = !target;
+    if (isMissingTarget) return '';
     if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) return target.value || '';
     return (target.textContent || '');
   } catch (e) { log('TaskSplitter: readEditorText failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); return ''; }
@@ -267,7 +270,8 @@ async function breakIntoSteps(): Promise<void> {
     return;
   }
   const text = readEditorText().trim();
-  if (!text) {
+  const isMissingText = !text;
+  if (isMissingText) {
     showPasteToast('❌ Task Splitter: type your instruction in the Lovable chat box first', true);
     return;
   }
@@ -288,7 +292,8 @@ async function sendSplitterPromptAndQueue(text: string, expectedN: number): Prom
   const prompt = getSplitterPrompt({ rawInstruction: text, n: expectedN });
   log('TaskSplitter: sending split JSON prompt (' + prompt.length + ' chars, n=' + expectedN + ')', 'info');
   const ok = await pasteAndSubmit(prompt);
-  if (!ok) { showPasteToast('❌ Task Splitter: paste/submit failed', true); return; }
+  const isMissingOk = !ok;
+  if (isMissingOk) { showPasteToast('❌ Task Splitter: paste/submit failed', true); return; }
   showPasteToast('✂ Task Splitter: split sent — waiting for JSON reply', false);
   const idle = await waitForLovableIdle({ isCancelled: function () { return state.cancelled; } });
   if (idle !== 'idle') { showPasteToast('❌ Task Splitter: idle wait ' + idle, true); return; }
@@ -315,6 +320,7 @@ async function parseAndEnqueueLatestReply(expectedN: number): Promise<void> {
     log('TaskSplitter: enqueued ' + added.length + '/' + expectedN + ' tasks for project ' + projectId, 'info');
     showPasteToast('✅ Task Splitter: queued ' + added.length + ' tasks', false);
   } catch (caught: CaughtError) {
+    logError("AutoCatch", "Unhandled exception", caught);
     reportSplitterParseFailure(caught, expectedN);
   }
 }
@@ -332,13 +338,15 @@ function reportSplitterParseFailure(caught: CaughtError, expectedN: number): voi
 
 async function sendOneStep(): Promise<boolean> {
   const perText = resolvePerStepPromptText();
-  if (!perText) {
+  const isMissingPerText = !perText;
+  if (isMissingPerText) {
     logError('TaskSplitter', 'per-step prompt not found (slug="' + state.perStepPromptSlug + '" / auto next-${N}-steps)');
     showPasteToast('❌ Task Splitter: per-step prompt not found', true);
     return false;
   }
   const ok = await pasteAndSubmit(perText);
-  if (!ok) { showPasteToast('❌ Task Splitter: paste/submit failed', true); return false; }
+  const isMissingOk = !ok;
+  if (isMissingOk) { showPasteToast('❌ Task Splitter: paste/submit failed', true); return false; }
   state.completed++;
   notify();
   showPasteToast('▶ Task Splitter: ' + state.completed + '/' + state.stepCount, false);
@@ -359,7 +367,8 @@ async function runAuto(): Promise<void> {
   try {
     while (state.completed < state.stepCount && !state.cancelled) {
       const ok = await sendOneStep();
-      if (!ok) break;
+      const isMissingOk = !ok;
+      if (isMissingOk) break;
       if (state.completed >= state.stepCount) break;
       // Wait for Lovable to finish, then fixed delay
       await waitForCompletion(MAX_WAIT_MS);
@@ -387,7 +396,8 @@ async function runAuto(): Promise<void> {
 }
 
 function stopAuto(): void {
-  if (!state.running) return;
+  const isMissingRunning = !state.running;
+  if (isMissingRunning) return;
   state.cancelled = true;
   notify();
 }
@@ -438,7 +448,8 @@ function populatePromptSelect(sel: HTMLSelectElement, currentSlug: string, autoL
   const seenParents = new Set<string>();
   for (const e of entries) {
     const slug = e.slug || '';
-    if (!slug) continue;
+    const isMissingSlug = !slug;
+    if (isMissingSlug) continue;
     const o = document.createElement('option');
     o.value = slug;
     const label = e.parentTitle && e.variantValue

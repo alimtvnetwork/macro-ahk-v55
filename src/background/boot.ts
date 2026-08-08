@@ -250,6 +250,7 @@ async function persistBootFailure(step: string, err: unknown): Promise<void> {
         };
         await chrome.storage.local.set({ marco_last_boot_failure: payload });
     } catch (storageErr) {
+        logError("AutoCatch", "Unhandled exception", storageErr);
         // Storage may be unavailable during catastrophic boot failure.
         logSampledDebug(
             BgLogTag.BOOT,
@@ -323,6 +324,7 @@ function clearAllLogsAndErrors(): void {
         logsDb.run("DELETE FROM Logs");
         logsDb.run("DELETE FROM Sessions");
     } catch (logsErr) {
+        logError("AutoCatch", "Unhandled exception", logsErr);
         logSampledDebug(
             BgLogTag.BOOT,
             "clearAllLogsAndErrors:logs",
@@ -335,6 +337,7 @@ function clearAllLogsAndErrors(): void {
         const errorsDb = getErrorsDb();
         errorsDb.run("DELETE FROM Errors");
     } catch (errorsErr) {
+        logError("AutoCatch", "Unhandled exception", errorsErr);
         logSampledDebug(
             BgLogTag.BOOT,
             "clearAllLogsAndErrors:errors",
@@ -404,6 +407,7 @@ async function precacheStableScripts(): Promise<void> {
             await cacheScriptCode(path, code);
             cacheResults.push(path + " (cached " + code.length + " chars)");
         } catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
             cacheResults.push(path + " (error: " + (err instanceof Error ? err.message : String(err)) + ") — halting remaining warms");
             break;
         }

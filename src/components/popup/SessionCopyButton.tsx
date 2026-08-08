@@ -178,6 +178,9 @@ export function SessionCopyButton() {
         });
         report = fileReport.report;
       } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
         // Fallback to legacy SQLite-only report (no session selection)
         const data = await sendMessage<SessionLogsResponse>({
           type: "GET_SESSION_LOGS",

@@ -76,6 +76,7 @@ export class ChainRunner {
         this.setStatus("completed");
       }
     } catch (err) {
+      logError("AutoCatch", "Unhandled exception", err);
       if (this.state.status !== "cancelled") {
         this.state.error = err instanceof Error ? err.message : String(err);
         this.state.completedAt = new Date().toISOString();

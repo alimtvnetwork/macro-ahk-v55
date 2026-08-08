@@ -57,7 +57,7 @@ beforeEach(() => {
 describe('openPromptHistoryPanel', () => {
   it('renders one row per revision with restore button and preview', async () => {
     const toast = vi.fn();
-    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, [makeRev(), makeRev({ Id: 11, Body: 'older body {{n}}'))] });
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, [makeRev(), makeRev({ Id: 11, Body: 'older body {{n}}' })]));
     await openPromptHistoryPanel(
       { role: 'plan', slug: 'plan-default' },
       { listRevisions, toast },
@@ -75,7 +75,7 @@ describe('openPromptHistoryPanel', () => {
   });
 
   it('resolves slug from getDefaultPromptForRole when input.slug omitted', async () => {
-    const getDefault = vi.fn().mockResolvedValue(new DbResult(true, { Slug: 'next-default') });
+    const getDefault = vi.fn().mockResolvedValue(new DbResult(true, { Slug: 'next-default' }));
     const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, []));
     await openPromptHistoryPanel({ role: 'next' }, { getDefault, listRevisions });
     expect(getDefault).toHaveBeenCalledWith('next');

@@ -31,6 +31,9 @@ export function ScriptsLibrary() {
             });
             setScripts(response.scripts ?? []);
         } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
             setScripts([]);
         } finally {
             setIsLoading(false);

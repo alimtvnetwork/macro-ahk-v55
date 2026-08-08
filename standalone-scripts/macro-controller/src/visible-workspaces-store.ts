@@ -24,8 +24,7 @@ export function publishVisibleWorkspaces(rows: ReadonlyArray<WorkspaceCredit>): 
         try {
             cb(rows);
         } catch (_e: unknown) {
-            // Listeners must not break the renderer. Errors surface via
-            // the namespace logger inside the listener itself.
+            logError("AutoCatch", "Unhandled exception", _e);
         }
     }
 }
@@ -34,7 +33,9 @@ export function subscribeVisibleWorkspaces(cb: Listener): () => void {
     listeners.add(cb);
     // Push the current snapshot immediately so late subscribers stay in sync.
     if (lastRows.length > 0) {
-        try { cb(lastRows); } catch (_e: unknown) { /* see publish */ }
+        try { cb(lastRows); } catch (_e: unknown) {
+            logError("AutoCatch", "Unhandled exception", _e);
+        }
     }
     return function unsubscribe(): void {
         listeners.delete(cb);

@@ -1,3 +1,4 @@
+import { DomainConstants } from "../../constants/domain";
 import type { JsonValue } from "@/background/handlers/handler-types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getPlatform } from "@/platform";
@@ -468,13 +469,13 @@ function CookiesPanel() {
   const platform = getPlatform();
   const [cookies, setCookies] = useState<CookieEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [domain, setDomain] = useState("lovable.dev");
+  const [domain, setDomain] = useState(DomainConstants.PRIMARY_DOMAIN);
   const [nameFilter, setNameFilter] = useState("");
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorName, setEditorName] = useState("");
   const [editorValue, setEditorValue] = useState("");
-  const [editorDomain, setEditorDomain] = useState("lovable.dev");
+  const [editorDomain, setEditorDomain] = useState(DomainConstants.PRIMARY_DOMAIN);
   const [editorPath, setEditorPath] = useState("/");
   const [editorSecure, setEditorSecure] = useState(true);
   const [editorHttpOnly, setEditorHttpOnly] = useState(true);
@@ -504,7 +505,7 @@ function CookiesPanel() {
   const openEditor = (entry?: CookieEntry) => {
     setEditorName(entry?.name ?? "");
     setEditorValue(entry?.value ?? "");
-    setEditorDomain(entry?.domain.replace(/^\./, "") ?? "lovable.dev");
+    setEditorDomain(entry?.domain.replace(/^\./, "") ?? DomainConstants.PRIMARY_DOMAIN);
     setEditorPath(entry?.path ?? "/");
     setEditorSecure(entry?.secure ?? true);
     setEditorHttpOnly(entry?.httpOnly ?? true);

@@ -63,7 +63,8 @@ export function buildRefillBadgeHtml(ws: WorkspaceCredit): string {
 export function resolveStatusPill(
   ws: WorkspaceCredit, config: ReturnType<typeof getWorkspaceLifecycleConfig>,
 ): { pillHtml: string; suppressTier: boolean } {
-  if (!config.enableWorkspaceStatusLabels) return { pillHtml: '', suppressTier: false };
+  const isMissingEnableWorkspaceStatusLabels = !config.enableWorkspaceStatusLabels;
+  if (isMissingEnableWorkspaceStatusLabels) return { pillHtml: '', suppressTier: false };
   const wsTier = ws.tier || WsTierValueType.FREE;
   const status = getEffectiveStatus(ws, config);
   const pillHtml = buildStatusPillHtml(status, ws);
@@ -108,7 +109,8 @@ export function buildTierBadgeHtml(ws: WorkspaceCredit): string {
   } else if (isExpiredTier(wsTier)) {
     tierBadge += buildLegacyExpiredBadge(ws);
   }
-  if (!config.enableWorkspaceStatusLabels) {
+  const isMissingEnableWorkspaceStatusLabels = !config.enableWorkspaceStatusLabels;
+  if (isMissingEnableWorkspaceStatusLabels) {
     tierBadge += buildRefillBadgeHtml(ws);
   }
   return tierBadge;

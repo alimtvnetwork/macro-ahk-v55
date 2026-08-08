@@ -134,7 +134,8 @@ export function resolveSelection(
     const allInProject = src.listGroups(projectId);
     const partitioned = partitionSelection(selected, allInProject, projectId);
     if ("Reason" in partitioned) return partitioned;
-    if (!includeDescendants) {
+    const isMissingIncludeDescendants = !includeDescendants;
+    if (isMissingIncludeDescendants) {
         return { Ok: true, Ids: dedupeSorted(partitioned.SeedIds) };
     }
     return expandDescendants(partitioned.SeedIds, allInProject);
@@ -444,8 +445,8 @@ function writeSnapshot(
     try {
         return populateSnapshotDb(dst, src, projectId, projectRow, effectiveIds, preflight);
     } catch (err) {
-        try { dst.exec("ROLLBACK;"); } catch { // allow-swallow: ROLLBACK after a failed COMMIT, outer err is returned; rethrowing would mask it.
-            /* ignore */
+        try { dst.exec("ROLLBACK;"); } catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
         }
         return {
             Reason: "InternalError",
@@ -519,7 +520,8 @@ function orderGroupsByAncestry(rows: ReadonlyArray<StepGroupRow>): StepGroupRow[
                 break;
             }
         }
-        if (!progressed) {
+        const isMissingProgressed = !progressed;
+        if (isMissingProgressed) {
             // Should be impossible — depth triggers prevent cycles —
             // but make it deterministic in case the DB was hand-edited.
             for (const r of remaining.values()) out.push(r);

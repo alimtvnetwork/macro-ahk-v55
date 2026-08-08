@@ -30,7 +30,8 @@ export function addLoopJsHistoryEntry(code: string, success: boolean, resultText
   const timeStr = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
   const entry = { time: timeStr, code: code, success: success, result: resultText };
   const isDuplicate = loopJsHistory.length > 0 && loopJsHistory[0].code === code;
-  if (!isDuplicate) {
+  const isMissingIsDuplicate = !isDuplicate;
+  if (isMissingIsDuplicate) {
     loopJsHistory.unshift(entry);
     if (loopJsHistory.length > LOOP_JS_HISTORY_MAX) loopJsHistory.pop();
     logSub('JS history updated: ' + loopJsHistory.length + ' entries');
@@ -41,7 +42,8 @@ export function addLoopJsHistoryEntry(code: string, success: boolean, resultText
 
 export function renderLoopJsHistory(): void {
   const el = document.getElementById('loop-js-history');
-  if (!el) return;
+  const isMissingEl = !el;
+  if (isMissingEl) return;
   if (loopJsHistory.length === 0) {
     el.innerHTML = '<span style="color:#64748b;font-size:10px;">No commands yet</span>';
     return;
@@ -96,12 +98,14 @@ export function navigateLoopJsHistory(direction: string): void {
 
 export function executeJs(): void {
   const textbox = document.getElementById(IDS.JS_EXECUTOR);
-  if (!textbox) {
+  const isMissingTextbox = !textbox;
+  if (isMissingTextbox) {
     logError('unknown', 'JS textbox element not found');
     return;
   }
   const code = (textbox as HTMLTextAreaElement).value.trim();
-  if (!code) {
+  const isMissingCode = !code;
+  if (isMissingCode) {
     log('No code to execute', 'warn');
     return;
   }

@@ -209,7 +209,8 @@ export function showChatHistoryModal(): void {
   document.body.appendChild(container);
 
   const projectId = extractProjectIdFromUrl();
-  if (!projectId) {
+  const isMissingProjectId = !projectId;
+  if (isMissingProjectId) {
     status.textContent = 'No Lovable project detected in the current URL.';
     logError(SCOPE, 'showChatHistoryModal: no projectId in URL');
     return;

@@ -14,7 +14,8 @@ export async function handleSetDefault(
   refs.status.textContent = 'Setting default...';
   try {
     const ok = await setDefaultPromptForRole(row.Id, row.Role);
-    if (!ok) {
+    const isMissingOk = !ok;
+    if (isMissingOk) {
       refs.status.textContent = 'Failed to set default.';
       return;
     }
@@ -36,21 +37,29 @@ export async function handleDelete(
     return;
   }
   const ok = window.confirm('Delete prompt "' + row.Name + '"?');
-  if (!ok) return;
+  const isMissingOk = !ok;
+  if (isMissingOk) return;
   refs.status.textContent = 'Deleting...';
   try {
     const res = await deletePromptById(row.Id);
-    if (!res.ok) {
+    const isMissingOk = !res.ok;
+    if (isMissingOk) {
       const reason = res.error ?? 'unknown';
       const msgText = 'Cannot delete "' + row.Name + '": ' + reason;
       refs.status.textContent = 'Delete blocked: ' + reason;
       logError(LOG_SCOPE, 'delete blocked', res);
-      try { showToast(msgText, 'error'); } catch { /* jsdom: no-op */ }
-      try { window.alert(msgText); } catch { /* jsdom: no-op */ }
+      try { showToast(msgText, 'error'); } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+      }
+      try { window.alert(msgText); } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+      }
       return;
     }
     refs.status.textContent = 'Deleted.';
-    try { showToast('Deleted prompt "' + row.Slug + '"', 'success'); } catch { /* jsdom: no-op */ }
+    try { showToast('Deleted prompt "' + row.Slug + '"', 'success'); } catch (err) {
+      logError("AutoCatch", "Unhandled exception", err);
+    }
     await renderAllRoles(refs);
     void (async (): Promise<void> => {
       try {
@@ -91,7 +100,8 @@ export async function handleDuplicate(
       body: row.Body,
       role: row.Role,
     });
-    if (!result.ok) {
+    const isMissingOk = !result.ok;
+    if (isMissingOk) {
       refs.status.textContent = 'Failed to duplicate: ' + (result.error ?? 'unknown');
       return;
     }
@@ -119,7 +129,8 @@ export async function handleResetToDefault(
     return;
   }
   const ok = window.confirm('Reset "' + row.Name + '" (' + row.Slug + ') to its shipped default body?\n\nThis discards the current edits to the body.');
-  if (!ok) return;
+  const isMissingOk = !ok;
+  if (isMissingOk) return;
   refs.status.textContent = 'Resetting to default: ' + row.Slug + ' ...';
   try {
     const result = await upsertPrompt({
@@ -128,7 +139,8 @@ export async function handleResetToDefault(
       replaceKey: row.ReplaceKey, replaceValues: row.ReplaceValues,
       previousBody: row.Body, previousReplaceKey: row.ReplaceKey,
     });
-    if (!result.ok) {
+    const isMissingOk = !result.ok;
+    if (isMissingOk) {
       logError(LOG_SCOPE, 'reset-to-default upsertPrompt failed for slug=' + row.Slug, new Error(result.error ?? 'unknown'));
       refs.status.textContent = 'Reset failed: ' + (result.error ?? 'unknown error');
       showToast('❌ Reset failed for ' + row.Slug, TOAST_ERROR);

@@ -52,7 +52,8 @@ export function showWsMembersBulkPanel(wsIds: string[], x: number, y: number): v
 
 function renderShell(x: number, y: number): void {
   let panel = document.getElementById(PANEL_ID);
-  if (!panel) {
+  const isMissingPanel = !panel;
+  if (isMissingPanel) {
     panel = document.createElement('div');
     panel.id = PANEL_ID;
     document.body.appendChild(panel);
@@ -121,7 +122,8 @@ function attachRowListeners(body: HTMLElement, union: AggregatedMember[]): void 
   body.querySelectorAll('.bulk-member-row').forEach(row => {
     const userId = row.getAttribute('data-user-id')!;
     const member = union.find(m => m.userId === userId);
-    if (!member) return;
+    const isMissingMember = !member;
+    if (isMissingMember) return;
 
     row.addEventListener('contextmenu', (e: Event) => {
         const mouseEvent = e as MouseEvent;
@@ -217,7 +219,8 @@ function renderMemberRow(m: AggregatedMember, totalWs: number): string {
 
 function renderFooter(): void {
   const footer = document.getElementById('bulk-members-footer');
-  if (!footer) return;
+  const isMissingFooter = !footer;
+  if (isMissingFooter) return;
 
   footer.innerHTML = `
     <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -242,7 +245,7 @@ function renderFooter(): void {
       if (btn) btn.disabled = emails.length === 0;
     }
   });
-  
+
   document.getElementById('bulk-chip-input-container')!.appendChild(chipInput);
 
   const inviteBtn = document.getElementById('bulk-invite-btn') as HTMLButtonElement;

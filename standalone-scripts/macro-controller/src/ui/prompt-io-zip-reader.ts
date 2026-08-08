@@ -111,7 +111,8 @@ function decodeUtf8(bytes: Uint8Array): string {
 
 function parseManifest(map: ZipFileMap): PromptsBundleV1 {
   const manifestBytes = map.files.get('manifest.json');
-  if (!manifestBytes) throwDiagnostic('PROMPT_IO_ZIP_E005', { entryCount: map.files.size });
+  const isMissingManifestBytes = !manifestBytes;
+  if (isMissingManifestBytes) throwDiagnostic('PROMPT_IO_ZIP_E005', { entryCount: map.files.size });
   const raw = JSON.parse(decodeUtf8(manifestBytes)) as unknown;
   // Manifest entries have their bodies stripped: inject empty text
   // placeholders so validatePromptsBundle passes, then we rehydrate.
@@ -132,7 +133,8 @@ function rehydrateBody(entry: PromptEntry, index: number, map: ZipFileMap): Prom
   const slug = sanitizeSlug(slugSource, index + 1);
   const bodyBytes = map.files.get(`entries/${slug}.md`);
   const hasBody = bodyBytes !== undefined;
-  if (!hasBody) throwDiagnostic('PROMPT_IO_ZIP_E007', { slug, promptName: entry.name });
+  const isMissingHasBody = !hasBody;
+  if (isMissingHasBody) throwDiagnostic('PROMPT_IO_ZIP_E007', { slug, promptName: entry.name });
   return { ...entry, text: decodeUtf8(bodyBytes as Uint8Array) };
 }
 

@@ -66,6 +66,7 @@ async function invalidateJsonCopy(): Promise<void> {
     const { clearPromptCache } = await import('../ui/prompt-cache');
     await clearPromptCache();
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'legacy-read-memory-cache',
       reason: err instanceof Error ? err.message : String(err),
@@ -89,6 +90,7 @@ export async function migrateRemoveLegacyReadMemoryDuplicates(): Promise<void> {
       'success',
     );
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'legacy-read-memory',
       reason: err instanceof Error ? err.message : String(err),

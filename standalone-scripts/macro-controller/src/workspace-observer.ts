@@ -36,7 +36,8 @@ function mc() { return MacroController.getInstance(); }
  * See: spec/22-app-issues/workspace-name-binding-bug.md (RCA-3)
  */
 export function isKnownWorkspaceName(name: string): boolean {
-  if (!name) return false;
+  const isMissingName = !name;
+  if (isMissingName) return false;
   const perWs = loopCreditState.perWorkspace || [];
   // Issue 84 Fix 1: When workspace list is not yet loaded, allow the name through
   // so that fetchWorkspaceNameFromNav() and the observer can set an early workspace
@@ -181,7 +182,8 @@ export function fetchWorkspaceNameFromNav(): boolean {
   try {
     let el: Node | null = null;
     if (hasXpath) el = getByXPath(navXpath);
-    if (!el) el = autoDiscoverWorkspaceNavElement();
+    const isMissingEl = !el;
+    if (isMissingEl) el = autoDiscoverWorkspaceNavElement();
 
     if (el) {
       const name = (el.textContent || '').trim();
@@ -279,7 +281,9 @@ const wsObserverState = new WorkspaceObserverState();
 export function startWorkspaceObserver(): void {
   const navEl = resolveNavElement();
 
-  if (!navEl) {
+  const isMissingNavEl = !navEl;
+
+  if (isMissingNavEl) {
     scheduleObserverRetry();
     return;
   }
@@ -316,7 +320,9 @@ function resolveNavElement(): Node | Element | null {
     if (navEl) logSub('Workspace nav element found via XPath', 1);
   }
 
-  if (!navEl) {
+  const isMissingNavEl = !navEl;
+
+  if (isMissingNavEl) {
     if (hasXpath) {
       log('WorkspaceNavXPath configured but element not found — trying auto-discovery', 'warn');
     } else {
@@ -346,7 +352,8 @@ function scheduleObserverRetry(): void {
 
 /** Apply the workspace name read during observer initialization. */
 function applyInitialObserverName(name: string): void {
-  if (!name) return;
+  const isMissingName = !name;
+  if (isMissingName) return;
   if (name === state.workspaceName) {
     logSub('Workspace name already set: ' + name, 1);
     return;
@@ -422,9 +429,11 @@ function handleObserverMutation(navEl: Node | Element): void {
 export function triggerCreditCheckOnWorkspaceChange(): void {
   log('Workspace changed — checking free credit...', 'check');
 
+  const isMissingRunning = !state.running;
+
   // Issue 82 policy: NEVER open project dialog when loop is stopped.
   // Dialog interaction when stopped is only permitted via explicit user actions (Check, Credits).
-  if (!state.running) {
+  if (isMissingRunning) {
     log('Skipping dialog-based credit check — loop is stopped (Issue 82 policy)', 'skip');
     mc().updateUI();
     return;
@@ -436,7 +445,8 @@ export function triggerCreditCheckOnWorkspaceChange(): void {
   }
 
   const opened = ensureProjectDialogOpen();
-  if (!opened) {
+  const isMissingOpened = !opened;
+  if (isMissingOpened) {
     log('Could not open project dialog for credit check', 'warn');
     return;
   }

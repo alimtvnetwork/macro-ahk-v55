@@ -388,7 +388,8 @@ export async function waitForSelector(
     const pollMs = Math.max(10, deps.pollIntervalMs ?? POLL_INTERVAL_MS);
 
     const validation = validateSelector(config.Selector, config.Kind, { doc: deps.doc ?? null });
-    if (!validation.Ok) {
+    const isMissingOk = !validation.Ok;
+    if (isMissingOk) {
         return { Ok: false, Reason: "InvalidSelector", DurationMs: 0, Detail: validation.Reason };
     }
     return pollUntilSatisfied(config, deps, now, sleep, pollMs);

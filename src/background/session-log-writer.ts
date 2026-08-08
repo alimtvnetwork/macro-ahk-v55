@@ -72,7 +72,8 @@ let flushTimerId: ReturnType<typeof setTimeout> | null = null;
 /* ------------------------------------------------------------------ */
 
 async function ensureSessionDir(): Promise<FileSystemDirectoryHandle | null> {
-    if (!sessionId) return null;
+    const isMissingSessionId = !sessionId;
+    if (isMissingSessionId) return null;
     if (sessionDir) return sessionDir;
 
     try {
@@ -99,7 +100,8 @@ export async function initSessionLogDir(sid: string, ver: string): Promise<void>
     sessionInitPromise = (async () => {
         try {
             const dir = await ensureSessionDir();
-            if (!dir) return;
+            const isMissingDir = !dir;
+            if (isMissingDir) return;
 
             // Seed files directly during init to avoid waiting on our own init promise
             const seeds = new Map<string, string>([
@@ -158,13 +160,16 @@ async function appendToFile(filename: string, text: string): Promise<void> {
     }
 
     const dir = await ensureSessionDir();
-    if (!dir) return;
+    const isMissingDir = !dir;
+    if (isMissingDir) return;
 
     const existing = pendingWrites.get(filename) ?? [];
     existing.push(text);
     pendingWrites.set(filename, existing);
 
-    if (!flushScheduled) {
+    const isMissingFlushScheduled = !flushScheduled;
+
+    if (isMissingFlushScheduled) {
         flushScheduled = true;
         // Microtask-batch: flush after current call stack clears
         flushTimerId = setTimeout(() => {
@@ -182,7 +187,8 @@ async function flushPending(): Promise<void> {
     }
     flushScheduled = false;
     const dir = await ensureSessionDir();
-    if (!dir) return;
+    const isMissingDir = !dir;
+    if (isMissingDir) return;
 
     const entries = Array.from(pendingWrites.entries());
     pendingWrites.clear();
@@ -190,7 +196,8 @@ async function flushPending(): Promise<void> {
     for (const [filename, chunks] of entries) {
         try {
             let handle = fileHandleCache.get(filename);
-            if (!handle) {
+            const isMissingHandle = !handle;
+            if (isMissingHandle) {
                 handle = await dir.getFileHandle(filename, { create: true });
                 fileHandleCache.set(filename, handle);
             }
@@ -271,7 +278,8 @@ export function writeErrorEntry(msg: ErrorLine): void {
 /** Reads all session log files and builds a comprehensive report string. */
 export async function buildSessionReport(sid?: string): Promise<string> {
     const targetSid = sid ?? sessionId;
-    if (!targetSid) {
+    const isMissingTargetSid = !targetSid;
+    if (isMissingTargetSid) {
         return "[session-log-writer] No active session.";
     }
 
@@ -328,7 +336,8 @@ async function tryReadSessionDir(sid: string): Promise<{ ok: true; report: strin
                     sections.push(text);
                 }
                 found.push(`${absDir}/${filename}`);
-            } catch {
+            } catch (err) {
+                logError("AutoCatch", "Unhandled exception", err);
                 missing.push(`${absDir}/${filename}`);
             }
         }
@@ -379,7 +388,8 @@ export async function pruneOldSessionLogs(maxAgeDays = 7): Promise<number> {
                 if (file.lastModified < cutoff) {
                     toDelete.push(name);
                 }
-            } catch {
+            } catch (err) {
+                logError("AutoCatch", "Unhandled exception", err);
                 // No events.log at "opfs-root/session-logs/{name}/events.log" → stale dir, mark for deletion
                 toDelete.push(name);
             }
@@ -409,7 +419,8 @@ export interface OpfsStatusData {
 
 export async function getOpfsSessionStatus(): Promise<OpfsStatusData> {
     const sid = sessionId;
-    if (!sid) {
+    const isMissingSid = !sid;
+    if (isMissingSid) {
         return { sessionId: null, dirExists: false, files: [], healthy: false };
     }
 
@@ -427,7 +438,8 @@ export async function getOpfsSessionStatus(): Promise<OpfsStatusData> {
                 const fh = await dir.getFileHandle(fname);
                 const file = await fh.getFile();
                 files.push({ name: fname, absolutePath: `${absBase}/${fname}`, sizeBytes: file.size, exists: true });
-            } catch {
+            } catch (err) {
+                logError("AutoCatch", "Unhandled exception", err);
                 files.push({ name: fname, absolutePath: `${absBase}/${fname}`, sizeBytes: 0, exists: false });
             }
         }
@@ -473,9 +485,13 @@ export async function listSessionsWithTimestamps(): Promise<SessionInfo[]> {
                         const fh = await dir.getFileHandle(fname);
                         const file = await fh.getFile();
                         if (file.lastModified > latestMs) latestMs = file.lastModified;
-                    } catch { /* file may not exist */ } // allow-swallow: missing log file is expected
+                    } catch (err) {
+                        logError("AutoCatch", "Unhandled exception", err);
+                    } // allow-swallow: missing log file is expected
                 }
-            } catch { /* dir unreadable */ } // allow-swallow: unreadable session dir is skipped
+            } catch (err) {
+                logError("AutoCatch", "Unhandled exception", err);
+            } // allow-swallow: unreadable session dir is skipped
 
             results.push({
                 id: sid,
@@ -546,7 +562,8 @@ export async function browseOpfsSessions(): Promise<{
                             sizeBytes,
                             lastModified: new Date(file.lastModified).toISOString(),
                         });
-                    } catch {
+                    } catch (err) {
+                        logError("AutoCatch", "Unhandled exception", err);
                         files.push({
                             name: fileName,
                             absolutePath: `${absoluteDirPath}/${fileName}`,
@@ -555,14 +572,14 @@ export async function browseOpfsSessions(): Promise<{
                         });
                     }
                 }
-            } catch { // allow-swallow: directory exists but can't be read; report empty file list
-                // Directory exists but can't be read
+            } catch (err) {
+                logError("AutoCatch", "Unhandled exception", err);
             }
 
             sessions.push({ sessionId: sid, absolutePath: absoluteDirPath, files, totalSizeBytes });
         }
-    } catch { // allow-swallow: OPFS root or session-logs dir doesn't exist
-        // OPFS root or session-logs dir doesn't exist
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 
     sessions.sort((a, b) => Number(b.sessionId) - Number(a.sessionId));

@@ -159,7 +159,8 @@ function buildRejectedLine(err: DiagnosticError): string {
 
 function buildNextFixLine(err: DiagnosticError): string {
   const hint = err.entry.nextFixHint;
-  if (!hint) return '';
+  const isMissingHint = !hint;
+  if (isMissingHint) return '';
   // The hint can itself reference {placeholders}. Interpolate the same way
   // DiagnosticError does for its message.
   const interpolated = hint.replace(/(^|[^{])\{([a-zA-Z_][a-zA-Z0-9_]*)\}/g,
@@ -201,7 +202,8 @@ export const _forTests = { assertProfessionalWording, FORBIDDEN_WORDS };
  */
 export function previewToast(code: string, context: DiagnosticContext): DiagnosticToast {
   const entry = getErrorCodeEntry(code);
-  if (!entry) {
+  const isMissingEntry = !entry;
+  if (isMissingEntry) {
     throw new Error('[DIAGNOSTIC_META_E001] Unknown error code "' + code + '".');
   }
   return formatDiagnosticToast(code, context);

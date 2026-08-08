@@ -99,7 +99,8 @@ async function handleCommitted(
         return;
     }
     const isReload = details.transitionType === "reload";
-    if (!isReload) {
+    const isMissingIsReload = !isReload;
+    if (isMissingIsReload) {
         return;
     }
     // Force re-eval on refresh — user explicitly requested a fresh page.
@@ -124,7 +125,8 @@ async function handleActivated(
     }
     const url = tab.url ?? "";
     const hasUrl = url.length > 0;
-    if (!hasUrl) {
+    const isMissingHasUrl = !hasUrl;
+    if (isMissingHasUrl) {
         return;
     }
     await runGate(info.tabId, url, "activate");
@@ -258,6 +260,7 @@ async function injectSentinel(
             args: buildSentinelArgs(decision),
         });
     } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
         handleSentinelError(tabId, decision, err);
     }
 }
@@ -350,8 +353,8 @@ function writeSentinelInPage(
             const host = document.body ?? document.documentElement;
             host.appendChild(element);
         }
-    } catch { // allow-swallow: page may be mid-navigation / detached; sentinel element write is best-effort and re-runs on next decision.
-        // Page may be mid-navigation; safe to drop.
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 }
 

@@ -197,8 +197,8 @@ function applyV6Up(logsDb: SqlJsDatabase, _errorsDb: SqlJsDatabase): void {
         if (existing.length > 0 && (existing[0].values[0][0] as number) === 0) {
             logsDb.run("INSERT INTO UpdateSettings (AutoCheckIntervalMinutes, HasUserConfirmBeforeUpdate, HasChangelogFromVersionInfo, CacheExpiryMinutes) VALUES (1440, 0, 1, 10080)");
         }
-    } catch { // allow-swallow: UpdateSettings table may not exist yet on first-run; seed re-attempts on next migration pass
-        // table missing
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
     console.log("[migration] v6: Added updater settings, caching, and changelog columns");
 }
@@ -431,7 +431,9 @@ function runRenameStatementsIfSourceColumnsExist(db: SqlJsDatabase, statements: 
         const sql = pending.shift()!;
         const renameMatch = sql.match(/^ALTER TABLE\s+(\w+)\s+RENAME COLUMN\s+(\w+)\s+TO\s+(\w+)$/i);
 
-        if (!renameMatch) {
+        const isMissingRenameMatch = !renameMatch;
+
+        if (isMissingRenameMatch) {
             runIgnoringDuplicates(db, [sql]);
             continue;
         }

@@ -109,7 +109,8 @@ export async function persistRemixNewProject(input: PersistRemixInput): Promise<
         return false;
     }
     const kv = getKv();
-    if (!kv) {
+    const isMissingKv = !kv;
+    if (isMissingKv) {
         logError('RemixNewProjectCache',
             'marco.kv unavailable — skipping cache for sourceProjectId=' + input.sourceProjectId);
         return false;
@@ -134,12 +135,15 @@ export async function persistRemixNewProject(input: PersistRemixInput): Promise<
 export async function readRemixNewProject(
     sourceProjectId: string,
 ): Promise<RemixNewProjectRow | null> {
-    if (!sourceProjectId) return null;
+    const isMissingSourceProjectId = !sourceProjectId;
+    if (isMissingSourceProjectId) return null;
     const kv = getKv();
-    if (!kv) return null;
+    const isMissingKv = !kv;
+    if (isMissingKv) return null;
     try {
         const raw = await kv.get(buildKey(sourceProjectId));
-        if (!raw) return null;
+        const isMissingRaw = !raw;
+        if (isMissingRaw) return null;
         return JSON.parse(raw) as RemixNewProjectRow;
     } catch (err: unknown) {
         logError('RemixNewProjectCache',
@@ -150,9 +154,11 @@ export async function readRemixNewProject(
 
 /** Drop a cached pointer (used after the new tab has loaded). */
 export async function clearRemixNewProject(sourceProjectId: string): Promise<void> {
-    if (!sourceProjectId) return;
+    const isMissingSourceProjectId = !sourceProjectId;
+    if (isMissingSourceProjectId) return;
     const kv = getKv();
-    if (!kv) return;
+    const isMissingKv = !kv;
+    if (isMissingKv) return;
     try {
         await kv.delete(buildKey(sourceProjectId));
     } catch (err: unknown) {

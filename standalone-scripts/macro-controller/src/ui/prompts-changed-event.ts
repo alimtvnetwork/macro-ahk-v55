@@ -24,9 +24,12 @@ export function dispatchPromptsChanged(detail: PromptsChangedDetail = {}): void 
   if (typeof document === 'undefined') return;
   try {
     document.dispatchEvent(new CustomEvent(PROMPTS_CHANGED_EVENT, { detail }));
-  } catch {
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     // Older jsdom environments without CustomEvent fall back to a plain Event.
-    try { document.dispatchEvent(new Event(PROMPTS_CHANGED_EVENT)); } catch { /* noop */ }
+    try { document.dispatchEvent(new Event(PROMPTS_CHANGED_EVENT)); } catch (err) {
+      logError("AutoCatch", "Unhandled exception", err);
+    }
   }
 }
 

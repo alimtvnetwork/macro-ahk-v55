@@ -30,7 +30,8 @@ export function wireImportDropZone(
     e.preventDefault();
     if (importBtn.disabled) return;
     const file = e.dataTransfer?.files && e.dataTransfer.files[0];
-    if (!file) return;
+    const isMissingFile = !file;
+    if (isMissingFile) return;
     renderSelectedFileInfo(refs, file);
     void handleImportFile(refs, file, fileInput, importBtn, renderAllRoles, 'drop');
   };
@@ -69,7 +70,8 @@ export function wireImportExport(
   });
   fileInput.addEventListener('change', () => {
     const file = fileInput.files && fileInput.files[0];
-    if (!file) return;
+    const isMissingFile = !file;
+    if (isMissingFile) return;
     renderSelectedFileInfo(refs, file);
     void handleImportFile(refs, file, fileInput, importBtn, renderAllRoles, 'click');
   });
@@ -90,7 +92,8 @@ export function wirePreviewImport(
   });
   previewFileInput.addEventListener('change', () => {
     const file = previewFileInput.files && previewFileInput.files[0];
-    if (!file) return;
+    const isMissingFile = !file;
+    if (isMissingFile) return;
     renderSelectedFileInfo(refs, file);
     void computeAndRenderPreview(refs, file, previewFileInput, importBtn, fileInput, (r, f, fi, ib, o) => handleImportFile(r, f, fi, ib, renderAllRoles, o));
   });

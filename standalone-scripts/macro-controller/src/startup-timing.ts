@@ -30,7 +30,8 @@ export function timingEnd(
   detail?: string,
 ): void {
   const p = _pending.get(phase);
-  if (!p) return;
+  const isMissingP = !p;
+  if (isMissingP) return;
   _pending.delete(phase);
   _entries.push({
     phase,
@@ -110,8 +111,8 @@ export function logTimingSummary(): void {
       ?.RiseupAsiaMacroExt?.Projects?.MacroController?.meta;
     const ver = ext?.version || '?';
     lines.push('│  Version: v' + ver + '                                                    │'.substring(0, 55) + '│');
-  } catch { // allow-swallow: optional version probe for console banner; missing globals just omit the version line.
-    // Version unavailable — skip
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
   }
 
   lines.push('└─────────────────────────────────────────────────────────────────┘');

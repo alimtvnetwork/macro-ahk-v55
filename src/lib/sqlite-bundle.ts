@@ -770,7 +770,10 @@ function readVariablesTable(db: Database): Map<string, Record<string, unknown>> 
     const rawValue = rowObject["Value"];
     let parsed: unknown = null;
     if (rawValue != null) {
-      try { parsed = JSON.parse(String(rawValue)); } catch { parsed = String(rawValue); }
+      try { parsed = JSON.parse(String(rawValue)); } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+        parsed = String(rawValue);
+      }
     }
     const map = out.get(projectUid) ?? {};
     map[name] = parsed;

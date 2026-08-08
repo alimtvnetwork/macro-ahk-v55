@@ -52,7 +52,8 @@ function progressColor(pct: number): string {
 /** Update inline countdown text element if present. */
 function updateInlineCountdown(secs: number): void {
   const inlineEl = document.getElementById('marco-countdown-text');
-  if (!inlineEl) return;
+  const isMissingInlineEl = !inlineEl;
+  if (isMissingInlineEl) return;
   inlineEl.textContent = secs + 's';
   inlineEl.style.color = countdownColor(secs);
 }
@@ -60,7 +61,8 @@ function updateInlineCountdown(secs: number): void {
 /** Update progress bar element if present. */
 function updateProgressBar(secs: number): void {
   const barEl = document.getElementById('marco-progress-bar');
-  if (!barEl) return;
+  const isMissingBarEl = !barEl;
+  if (isMissingBarEl) return;
   const totalSec = Math.floor(TIMING.LOOP_INTERVAL / 1000);
   const pct = totalSec > 0 ? Math.max(0, Math.min(100, ((totalSec - secs) / totalSec) * 100)) : 0;
   barEl.style.width = pct + '%';
@@ -85,7 +87,8 @@ export function startCountdownTick(ctx: CountdownCtx) {
   stopCountdownTick(ctx);
   ctx.lastCountdownVal = -1;
   ctx.countdownTickId = trackedSetInterval('UI.countdownTick', function() {
-    if (!state.running) { stopCountdownTick(ctx); return; }
+    const isMissingRunning = !state.running;
+    if (isMissingRunning) { stopCountdownTick(ctx); return; }
     const secs = state.countdown;
     if (secs === ctx.lastCountdownVal) return;
     ctx.lastCountdownVal = secs;

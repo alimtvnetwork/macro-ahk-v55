@@ -112,6 +112,7 @@ export function usePopupData() {
             setErrors(errorsRes.errors ?? []);
             setFatalError(null);
         } catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
             const message = err instanceof Error ? err.message : String(err);
             setFatalError(message);
         } finally {

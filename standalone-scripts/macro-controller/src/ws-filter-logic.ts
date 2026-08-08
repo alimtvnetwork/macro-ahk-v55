@@ -43,7 +43,8 @@ export function readFilterState(filter: string, dataAttrActive: string): WsFilte
 }
 
 export function isCurrentWorkspace(ws: WorkspaceCredit, currentName: string): boolean {
-  if (!currentName) return false;
+  const isMissingCurrentName = !currentName;
+  if (isMissingCurrentName) return false;
   if (ws.fullName === currentName || ws.name === currentName) return true;
   const lcn = currentName.toLowerCase();
   return (ws.fullName || '').toLowerCase().indexOf(lcn) !== -1 ||
@@ -51,7 +52,8 @@ export function isCurrentWorkspace(ws: WorkspaceCredit, currentName: string): bo
 }
 
 export function matchesTextFilter(ws: WorkspaceCredit, filter: string): boolean {
-  if (!filter) return true;
+  const isMissingFilter = !filter;
+  if (isMissingFilter) return true;
   return ws.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ||
     ws.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
 }

@@ -95,7 +95,8 @@ async function hasDefaultForRole(role: PromptRole): Promise<boolean> {
     const sql = 'SELECT 1 FROM Prompt WHERE Role = ' + sqlLit(role)
         + ' AND IsDefault = 1 LIMIT 1';
     const resp = await rawSql('QUERY', sql);
-    if (!resp.isOk) return false;
+    const isMissingIsOk = !resp.isOk;
+    if (isMissingIsOk) return false;
     return Array.isArray(resp.rows) && resp.rows.length > 0;
 }
 
@@ -103,7 +104,8 @@ async function promoteSeedDefault(role: PromptRole, slug: string): Promise<boole
     const sql = 'UPDATE Prompt SET IsDefault = 1 WHERE Slug = '
         + sqlLit(slug) + ' AND Role = ' + sqlLit(role);
     const resp = await rawSql('SCHEMA', sql);
-    if (!resp.isOk) {
+    const isMissingIsOk = !resp.isOk;
+    if (isMissingIsOk) {
         const message = resp.errorMessage ?? '?';
         logDiagnosticFromCode('SEED_PROMOTE_E001', { role, slug, reason: message });
         emitPromptSeedEvent({ event: 'seed.promote-default', role, slug, outcome: 'failed', detail: message });
@@ -130,7 +132,8 @@ function initTelemetry(): Map<PromptRole, RoleTelemetry> {
 function tallyInsertCounts(existing: Set<string>, tel: Map<PromptRole, RoleTelemetry>): void {
     for (const row of PLAN_NEXT_SEED_ROWS) {
         const bucket = tel.get(row.role);
-        if (!bucket) continue;
+        const isMissingBucket = !bucket;
+        if (isMissingBucket) continue;
         if (existing.has(row.slug)) bucket.skipped += 1;
         else bucket.inserted += 1;
     }
@@ -156,6 +159,7 @@ function persistTelemetry(tel: RoleTelemetry[]): void {
         const payload = { at: new Date().toISOString(), roles: tel };
         localStorage.setItem(StorageKeyType.LastSeedTelemetry, JSON.stringify(payload));
     } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
         const reason = err instanceof Error ? err.message : String(err);
         logDiagnosticFromCode('SEED_TELEMETRY_E001', { reason }, err);
     }
@@ -222,7 +226,8 @@ function isManagedPlanPromptDrift(slug: string, body: string): boolean {
 }
 
 function isBundledDefaultDrift(row: typeof PLAN_NEXT_SEED_ROWS[number], body: string): boolean {
-    if (!row.isDefault) return false;
+    const isMissingIsDefault = !row.isDefault;
+    if (isMissingIsDefault) return false;
     if (normalizePromptBody(body) === normalizePromptBody(row.body)) return false;
     if (row.slug === 'plan-default') return isManagedPlanDefault(body);
     if (row.slug === 'next-default') return isManagedNextDefault(body);
@@ -306,7 +311,8 @@ async function applyLegacyBodyUpgrade(
     match: UpgradeMatch,
 ): Promise<boolean> {
     const updateResp = await rawSql('SCHEMA', buildBodyUpdateSql(row));
-    if (!updateResp.isOk) {
+    const isMissingIsOk = !updateResp.isOk;
+    if (isMissingIsOk) {
         emitLegacyUpgradeFailure(row, match, updateResp.errorMessage ?? '?');
         return false;
     }
@@ -322,7 +328,8 @@ async function upgradeLegacyBodyForRow(row: typeof PLAN_NEXT_SEED_ROWS[number]):
     if (currentBody === null) { emitLegacySkip(row, 'row-missing'); return false; }
     if (currentBody === row.body) { emitLegacySkip(row, 'already-current'); return false; }
     const match = resolveUpgradeMatch(row, currentBody);
-    if (!match.isMatch) {
+    const isMissingIsMatch = !match.isMatch;
+    if (isMissingIsMatch) {
         emitLegacySkip(row, match.detail, currentBody.length);
         return false;
     }
@@ -366,7 +373,9 @@ async function writeSeedAuditRow(params: {
     try {
         const mod = await import('../shared-state');
         version = typeof mod.VERSION === 'string' ? mod.VERSION : '';
-    } catch { /* version is best-effort */ }
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+    }
     const sql = 'INSERT INTO PromptSeedAudit '
         + '(SeededAt, AppVersion, InsertedTotal, SkippedTotal, PromotedTotal, UpgradedTotal, Reason, TelemetryJson) VALUES ('
         + [
@@ -380,7 +389,8 @@ async function writeSeedAuditRow(params: {
             sqlLit(JSON.stringify(params.telemetry)),
         ].join(', ') + ')';
     const resp = await rawSql('SCHEMA', sql);
-    if (!resp.isOk) {
+    const isMissingIsOk = !resp.isOk;
+    if (isMissingIsOk) {
         const message = resp.errorMessage ?? '?';
         logDiagnosticFromCode('SEED_AUDIT_E001', { reason: message });
         emitPromptSeedEvent({ event: 'seed.audit-write', outcome: 'failed', detail: message });
@@ -405,7 +415,8 @@ export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> 
         const existing = await selectExistingSlugs();
         tallyInsertCounts(existing, tel);
         const insertResp = await rawSql('SCHEMA', buildInsertOrIgnoreSql(Date.now()));
-        if (!insertResp.isOk) {
+        const isMissingIsOk = !insertResp.isOk;
+        if (isMissingIsOk) {
             const message = 'insert-or-ignore failed: ' + (insertResp.errorMessage ?? 'unknown');
             logDiagnosticFromCode('SEED_INSERT_E001', {
                 role: 'all', reason: message, boot: 'true', dbVersion: DB_NAME,

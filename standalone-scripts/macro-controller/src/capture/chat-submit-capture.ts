@@ -50,7 +50,8 @@ function truncateForOpfs(text: string): string {
 }
 
 function bodyForDisk(text: string, isVerbose: boolean): string {
-  if (!isVerbose) return REDACTED_PLACEHOLDER;
+  const isMissingIsVerbose = !isVerbose;
+  if (isMissingIsVerbose) return REDACTED_PLACEHOLDER;
   return truncateForOpfs(text);
 }
 
@@ -63,14 +64,16 @@ async function persistCapture(
   isVerbose: boolean,
 ): Promise<CaptureChatSubmitResult> {
   const fileId = await saveEntry(projectId, bodyForDisk(text, isVerbose));
-  if (!fileId) {
+  const isMissingFileId = !fileId;
+  if (isMissingFileId) {
     return { isCaptured: false, projectId, fileId: null, reason: 'opfs-save-failed' };
   }
   const isRowInserted = await insertChatSubmit({
     projectId, projectName, source, fileId,
     charCount: text.length, createdAt: Date.now(), metaJson,
   });
-  if (!isRowInserted) {
+  const isMissingIsRowInserted = !isRowInserted;
+  if (isMissingIsRowInserted) {
     return { isCaptured: false, projectId, fileId, reason: 'db-insert-failed' };
   }
   // Fire-and-forget: enforcer failures are logged internally and must
@@ -91,7 +94,8 @@ export async function captureChatSubmit(input: CaptureChatSubmitInput): Promise<
   installChatSubmitRenameBackfill();
   notifyIfProjectRenamed();
   const { projectId, projectName } = resolveProjectIdentity();
-  if (!projectId) {
+  const isMissingProjectId = !projectId;
+  if (isMissingProjectId) {
     logError(SCOPE, `captureChatSubmit: no projectId (source=${input.source}, chars=${trimmed.length})`);
     return { isCaptured: false, projectId: null, fileId: null, reason: 'no-project-id' };
   }

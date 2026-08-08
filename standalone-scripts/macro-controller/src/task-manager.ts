@@ -42,7 +42,8 @@ export class TaskQueueManager {
   setStopped(stopped: boolean): void { this._isStopped = stopped; }
 
   static getInstance(): TaskQueueManager {
-    if (!TaskQueueManager._instance) {
+    const isMissing_instance = !TaskQueueManager._instance;
+    if (isMissing_instance) {
       TaskQueueManager._instance = new TaskQueueManager();
     }
     return TaskQueueManager._instance;

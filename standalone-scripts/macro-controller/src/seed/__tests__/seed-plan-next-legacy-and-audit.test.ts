@@ -77,7 +77,9 @@ beforeEach(() => {
     captured.length = 0;
     responsesQueue = [];
     (logDiagnosticFromCode as unknown as Mock).mockClear();
-    try { localStorage.removeItem('marco_last_seed_telemetry'); } catch { /* jsdom */ }
+    try { localStorage.removeItem('marco_last_seed_telemetry'); } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+    }
 });
 
 describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {

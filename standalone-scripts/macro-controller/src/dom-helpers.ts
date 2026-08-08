@@ -1,3 +1,4 @@
+import { DomainConstants } from "./constants/domain";
 /**
  * DOM Helper Functions — Extracted from macro-looping.ts (Step 2)
  * Phase 6: for-of conversions, newline-before-return, curly braces (CQ13–CQ16)
@@ -27,13 +28,15 @@ export function isOnProjectPage(): boolean {
     const isSupportedHost = (
       host === 'localhost'
       || host.endsWith('.localhost')
-      || host === 'lovable.dev'
-      || host.endsWith('.lovable.dev')
+      || host === DomainConstants.PRIMARY_DOMAIN
+      || host.endsWith(DomainConstants.PRIMARY_DOMAIN_DOT)
       || host.endsWith('.lovable.app')
       || host.endsWith('.lovableproject.com')
     );
 
-    if (!isSupportedHost) {
+    const isMissingIsSupportedHost = !isSupportedHost;
+
+    if (isMissingIsSupportedHost) {
       return false;
     }
 
@@ -54,20 +57,26 @@ export function isUserTypingInPrompt(): boolean {
   const promptXpath = CONFIG.PROMPT_ACTIVE_XPATH;
   const isEnabled = promptXpath && promptXpath.indexOf('__') !== 0;
 
-  if (!isEnabled) {
+  const isMissingIsEnabled = !isEnabled;
+
+  if (isMissingIsEnabled) {
     return false;
   }
 
   try {
     const promptEl = getByXPath(promptXpath);
 
-    if (!promptEl) {
+    const isMissingPromptEl = !promptEl;
+
+    if (isMissingPromptEl) {
       return false;
     }
 
     const activeEl = document.activeElement;
 
-    if (!activeEl) {
+    const isMissingActiveEl = !activeEl;
+
+    if (isMissingActiveEl) {
       return false;
     }
 
@@ -90,7 +99,9 @@ export function isUserTypingInPrompt(): boolean {
 export function checkSystemBusy(): boolean {
   const progressEl = findElement(ML_ELEMENTS.PROGRESS);
 
-  if (!progressEl) {
+  const isMissingProgressEl = !progressEl;
+
+  if (isMissingProgressEl) {
     logSub('Progress bar element NOT found in DOM', 1);
 
     return false;
@@ -110,7 +121,9 @@ export function checkSystemBusy(): boolean {
     return false;
   }
 
-  if (!isVisible) {
+  const isMissingIsVisible = !isVisible;
+
+  if (isMissingIsVisible) {
     logSub('Progress bar exists but has 0 size — treating as NO credit', 1);
 
     return false;
@@ -146,7 +159,9 @@ export function pollForDialogReady(): Promise<void> {
       function () {
         const mainEl = getByXPath(mainXpath);
 
-        if (!mainEl) {
+        const isMissingMainEl = !mainEl;
+
+        if (isMissingMainEl) {
           return null;
         }
 
@@ -180,7 +195,9 @@ export function pollForDialogReady(): Promise<void> {
 export function closeProjectDialog(): void {
   let btn = getByXPath(CONFIG.PROJECT_BUTTON_XPATH);
 
-  if (!btn) {
+  const isMissingBtn = !btn;
+
+  if (isMissingBtn) {
     const fallbackBtn = findElement(ML_ELEMENTS.PROJECT_BUTTON);
 
     if (fallbackBtn) {
@@ -250,7 +267,9 @@ function tryClickVisibleButton(btn: Element, buttonIndex: number): boolean | nul
                   computedStyle.visibility !== 'hidden' &&
                   computedStyle.display !== 'none';
 
-  if (!isVisible) {
+  const isMissingIsVisible = !isVisible;
+
+  if (isMissingIsVisible) {
     log('Button ' + buttonIndex + ' is not visible, skipping...', 'skip');
     return null;
   }
@@ -291,7 +310,8 @@ export function clickProjectButton(): boolean {
  * Highlight an element with a temporary CSS outline.
  */
 export function highlightElement(el: HTMLElement, color: string): void {
-  if (!el) {
+  const isMissingEl = !el;
+  if (isMissingEl) {
     return;
   }
 

@@ -52,7 +52,8 @@ function getSdk(op: string): MarcoSDKApiModule {
  */
 export async function fetchWorkspaceProjectNames(wsId: string, force = false): Promise<Set<string>> {
   const op = 'fetchWorkspaceProjectNames';
-  if (!wsId) throwDiagnostic('REMIX_FETCH_E002', { argument: 'wsId', op });
+  const isMissingWsId = !wsId;
+  if (isMissingWsId) throwDiagnostic('REMIX_FETCH_E002', { argument: 'wsId', op });
   const existing = cache[wsId];
   const isForceFetch = force;
   const hasCachedEntry = existing !== undefined && existing !== null;
@@ -69,7 +70,8 @@ export async function fetchWorkspaceProjectNames(wsId: string, force = false): P
   const url = '/workspaces/' + wsId + '/projects';
   log('[Remix] GET ' + url, 'delegate');
   const resp = await api.projects.list(wsId, { baseUrl: CREDIT_API_BASE });
-  if (!resp.ok) {
+  const isMissingOk = !resp.ok;
+  if (isMissingOk) {
     const preview = JSON.stringify(resp.data).substring(0, 200);
     logError('Remix', 'projects.list HTTP ' + resp.status + ': ' + preview);
     throwDiagnostic('REMIX_FETCH_E003', { status: resp.status, url, op, preview });
@@ -118,7 +120,9 @@ export async function submitRemix(opts: {
     includeCustomKnowledge: opts.includeCustomKnowledge,
   }, { baseUrl: CREDIT_API_BASE });
 
-  if (!resp.ok) {
+  const isMissingOk = !resp.ok;
+
+  if (isMissingOk) {
     const preview = JSON.stringify(resp.data).substring(0, 250);
     logError('Remix', 'remix.init HTTP ' + resp.status + ': ' + preview);
     throwDiagnostic('REMIX_FETCH_E003', { status: resp.status, url, op, preview });

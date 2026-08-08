@@ -37,7 +37,8 @@ export function hideImportSpinner(importBtn: HTMLButtonElement, originalLabel: s
 }
 
 export function restoreFocusToImportButton(refs: ModalRefs): void {
-  if (!refs.root.isConnected) return;
+  const isMissingIsConnected = !refs.root.isConnected;
+  if (isMissingIsConnected) return;
   const btn = refs.root.querySelector<HTMLButtonElement>('[data-testid="library-import"]');
   if (btn) btn.focus();
 }
@@ -123,7 +124,9 @@ export async function handleImportFile(
     logLibraryImportFailure('validation', 'name=' + file.name + ' size=' + String(file.size) + ' type=' + file.type + ' headline=' + invalid.headline);
     showToast(IMPORT_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
     refs.lastImportFailed = true;
-    try { fileInput.value = ''; } catch { /* ignore */ }
+    try { fileInput.value = ''; } catch (err) {
+      logError("AutoCatch", "Unhandled exception", err);
+    }
     focusErrorBanner(refs);
     return;
   }
@@ -142,19 +145,21 @@ export async function handleImportFile(
   try {
     const text = await file.text();
     const parsed = await executeImportParse(refs, text, file);
-    if (!parsed) {
+    const isMissingParsed = !parsed;
+    if (isMissingParsed) {
       focusAfter = 'banner';
       return;
     }
-    
+
     const { summary, results } = await executeImportDb(refs, parsed, renderAllRoles);
-    
+
     refs.status.textContent = (retrying ? 'Retry succeeded. ' : '') + summary;
     refs.lastImportFailed = false;
     clearImportErrorBanner(refs);
     renderPartialImportErrors(refs, results.errors, parsed.errors);
     if (origin === 'drop') focusAfter = 'import';
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     logLibraryImportFailure('thrown', 'threw during read/parse for name=' + file.name, err);
     const reason = extractImportErrorReason(err);
     refs.status.textContent = IMPORT_FAILED_PREFIX + reason;

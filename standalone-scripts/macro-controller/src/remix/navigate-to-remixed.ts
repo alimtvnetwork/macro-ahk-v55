@@ -1,3 +1,4 @@
+import { DomainConstants } from "../constants/domain";
 /**
  * MacroLoop Controller — Remix navigation helper (Issue 129 Step 7)
  *
@@ -36,9 +37,11 @@ export function normalizeRedirectUrl(
     redirectUrl: string,
     origin: string,
 ): string | null {
-    if (!redirectUrl) return null;
+    const isMissingRedirectUrl = !redirectUrl;
+    if (isMissingRedirectUrl) return null;
     const trimmed = redirectUrl.trim();
-    if (!trimmed) return null;
+    const isMissingTrimmed = !trimmed;
+    if (isMissingTrimmed) return null;
     try {
         const url = new URL(trimmed, origin);
         if (ALLOWED_PROTOCOLS.indexOf(url.protocol) === -1) return null;
@@ -71,9 +74,10 @@ export function navigateActiveTabToRemixedProject(
         logError('RemixNav', 'navigate refused: window.location unavailable');
         return false;
     }
-    const origin = w.location.origin || 'https://lovable.dev';
+    const origin = w.location.origin || DomainConstants.PRIMARY_URL;
     const absolute = normalizeRedirectUrl(redirectUrl, origin);
-    if (!absolute) {
+    const isMissingAbsolute = !absolute;
+    if (isMissingAbsolute) {
         logError('RemixNav',
             'navigate refused: rejected URL "' + redirectUrl + '" (origin=' + origin + ')');
         return false;

@@ -123,7 +123,8 @@ export async function handleGetScriptInfo(
     const scriptName = request.scriptName;
 
     const folder = resolveScriptFolder(scriptName);
-    if (!folder) {
+    const isMissingFolder = !folder;
+    if (isMissingFolder) {
         return { isOk: false, errorMessage: `Unknown script: ${scriptName}` };
     }
 
@@ -131,7 +132,9 @@ export async function handleGetScriptInfo(
         const instruction = await fetchInstruction(folder);
         const outputFile = getPrimaryOutputFile(instruction);
 
-        if (!outputFile) {
+        const isMissingOutputFile = !outputFile;
+
+        if (isMissingOutputFile) {
             return { isOk: false, errorMessage: `No scripts declared in instruction.json for ${folder}` };
         }
 
@@ -144,8 +147,8 @@ export async function handleGetScriptInfo(
             const headRes = ServiceResult.wrapFetch(await fetch(scriptUrl, { method: "HEAD" }));
             const cl = headRes.headers.get("content-length");
             if (cl) sizeBytes = parseInt(cl, 10);
-        } catch { // allow-swallow: HEAD probe for script size is optional metadata; null sentinel is acceptable
-            // size unavailable
+        } catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
         }
 
         return {
@@ -175,7 +178,8 @@ export async function handleHotReloadScript(
     const scriptName = request.scriptName;
 
     const folder = resolveScriptFolder(scriptName);
-    if (!folder) {
+    const isMissingFolder = !folder;
+    if (isMissingFolder) {
         return { isOk: false, errorMessage: `Unknown script: ${scriptName}` };
     }
 
@@ -183,7 +187,9 @@ export async function handleHotReloadScript(
         const instruction = await fetchInstruction(folder);
         const outputFile = getPrimaryOutputFile(instruction);
 
-        if (!outputFile) {
+        const isMissingOutputFile = !outputFile;
+
+        if (isMissingOutputFile) {
             return { isOk: false, errorMessage: `No scripts declared in instruction.json for ${folder}` };
         }
 

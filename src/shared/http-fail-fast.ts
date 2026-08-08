@@ -50,7 +50,9 @@ const emitHttpFailFastEvent = (err: { status: number; method: string; url: strin
         };
         window.dispatchEvent(new CustomEvent(HTTP_FAIL_FAST_EVENT, { detail }));
     // allow-swallow: event dispatch is best-effort UI surfacing; no listener is a valid state
-    } catch { /* intentionally empty */ }
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+    }
 };
 
 export interface HttpCallContext {
@@ -144,7 +146,8 @@ export const httpFailFast = async (response: Response, context: HttpCallContext)
     try {
         const text = await response.clone().text();
         bodySnippet = truncateBody(text);
-    } catch {
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
         bodySnippet = null;
     }
 

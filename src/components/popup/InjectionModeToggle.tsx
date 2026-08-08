@@ -44,6 +44,9 @@ export function InjectionModeToggle() {
         settings: { forceLegacyInjection: checked },
       });
     } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
       setForceLegacy(!checked);
     }
   }, []);

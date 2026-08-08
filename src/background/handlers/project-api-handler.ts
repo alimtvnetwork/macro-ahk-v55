@@ -74,8 +74,11 @@ export async function handleProjectApi(payload: ProjectApiMessage): Promise<Reco
         ? m.method : "GET").toUpperCase();
     const params = m.params || {};
 
-    if (!slug) return { ...missingFieldError("project", "projectApi") };
-    if (!endpoint) return { ...missingFieldError("endpoint", "projectApi") };
+    const isMissingSlug = !slug;
+
+    if (isMissingSlug) return { ...missingFieldError("project", "projectApi") };
+    const isMissingEndpoint = !endpoint;
+    if (isMissingEndpoint) return { ...missingFieldError("endpoint", "projectApi") };
 
     // Ensure project DB is initialized
     if (!hasProjectDb(slug)) {
@@ -212,7 +215,8 @@ function handleSchemaCommand(
     switch (command) {
         case "createTable": {
             const tableName = requireField(params.tableName);
-            if (!tableName) throw new Error("createTable: missing or invalid 'tableName'");
+            const isMissingTableName = !tableName;
+            if (isMissingTableName) throw new Error("createTable: missing or invalid 'tableName'");
             const columns = Array.isArray(params.columns) ? params.columns as ColumnDef[] : null;
             if (!columns || columns.length === 0) {
                 throw new Error("createTable: missing or empty 'columns' array");
@@ -223,7 +227,8 @@ function handleSchemaCommand(
         }
         case "dropTable": {
             const tableName = requireField(params.tableName);
-            if (!tableName) throw new Error("dropTable: missing or invalid 'tableName'");
+            const isMissingTableName = !tableName;
+            if (isMissingTableName) throw new Error("dropTable: missing or invalid 'tableName'");
             dropUserTable(db, tableName);
             void markAndFlush(slug);
             return { dropped: tableName };
@@ -248,7 +253,8 @@ function handleRawSqlCommand(
     params: Record<string, unknown>,
 ): Record<string, unknown> {
     const sql = requireField(params.sql);
-    if (!sql) throw new Error("rawSql: missing or invalid 'sql' parameter");
+    const isMissingSql = !sql;
+    if (isMissingSql) throw new Error("rawSql: missing or invalid 'sql' parameter");
 
     const statements = classifyRawSql(sql);
     if (isRawSqlReadMethod(method)) {

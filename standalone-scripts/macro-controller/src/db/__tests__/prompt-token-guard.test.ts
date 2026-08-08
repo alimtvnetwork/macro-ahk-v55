@@ -40,6 +40,7 @@ describe('assertParamTokensUnchanged', () => {
             assertParamTokensUnchanged('hi {{count}}', 'hi {{n}}');
             throw new Error('should have thrown');
         } catch (e) {
+            logError("AutoCatch", "Unhandled exception", e);
             expect(e).toBeInstanceOf(ParamTokenMismatch);
             const err = e as ParamTokenMismatch;
             expect(err.added).toEqual(['n']);

@@ -26,7 +26,10 @@ function resolveProjectId(): string {
     // Pattern 3: id-preview--{uuid}
     const altMatch = href.match(/id-preview--([a-f0-9-]{36})/i);
     if (altMatch) return altMatch[1];
-  } catch (_e) { logDebug('resolveProjectId', 'URL parse failed: ' + (_e instanceof Error ? _e.message : String(_e))); }
+  } catch (_e) {
+    logError("AutoCatch", "Unhandled exception", _e);
+    logDebug('resolveProjectId', 'URL parse failed: ' + (_e instanceof Error ? _e.message : String(_e)));
+  }
   return '_default';
 }
 
@@ -97,7 +100,10 @@ export function invalidateCacheOnProjectSwitch(): void {
       // Just update the tracker; each project has its own scoped keys
       localStorage.setItem(StorageKeyType.WsLastProject, currentPid);
     }
-  } catch (_e) { logWarn('invalidateCacheOnProjectSwitch', 'localStorage write failed: ' + (_e instanceof Error ? _e.message : String(_e))); }
+  } catch (_e) {
+    logError("AutoCatch", "Unhandled exception", _e);
+    logWarn('invalidateCacheOnProjectSwitch', 'localStorage write failed: ' + (_e instanceof Error ? _e.message : String(_e)));
+  }
 }
 
 /**
@@ -120,5 +126,8 @@ export function migrateLegacyCache(): void {
         localStorage.removeItem('marco_last_workspace_id');
       }
     }
-  } catch (_e) { logWarn('migrateLegacyCache', 'localStorage read/write failed: ' + (_e instanceof Error ? _e.message : String(_e))); }
+  } catch (_e) {
+    logError("AutoCatch", "Unhandled exception", _e);
+    logWarn('migrateLegacyCache', 'localStorage read/write failed: ' + (_e instanceof Error ? _e.message : String(_e)));
+  }
 }

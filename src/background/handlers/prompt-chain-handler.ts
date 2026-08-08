@@ -152,8 +152,8 @@ async function clearPendingArg(correlationId: string): Promise<void> {
         } else {
             await chrome.storage.session.set({ [PROMPT_ARGS_KEY]: map });
         }
-    } catch { // allow-swallow: best-effort cleanup of session-storage pending args; next sweep will retry
-        // ignore
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 }
 
@@ -219,11 +219,15 @@ export async function handleExecuteChainStep(payload: MessageRequest): Promise<{
 
         const result = await resultPromise;
 
-        if (!result.success) {
+        const isMissingSuccess = !result.success;
+
+        if (isMissingSuccess) {
             throw new Error("Could not find or inject into the editor — is the chat input visible?");
         }
 
-        if (!result.verified) {
+        const isMissingVerified = !result.verified;
+
+        if (isMissingVerified) {
             logBgWarnError(BgLogTag.MARCO, `Step ${step.stepIndex + 1}: prompt may be truncated`);
         }
 

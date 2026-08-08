@@ -66,7 +66,8 @@ export async function disconnectGithubRepo(
     return { status: 'error', message: 'missing wsId or projectId' };
   }
   const sdk = getSdk();
-  if (!sdk) {
+  const isMissingSdk = !sdk;
+  if (isMissingSdk) {
     logError('GitsyncDisconnect', 'marco.api.call unavailable for ws=' + wsId + ' pid=' + pid);
     return { status: 'error', message: 'sdk_unavailable' };
   }
@@ -88,7 +89,8 @@ export async function disconnectGithubRepo(
     log('[GitsyncDisconnect] HTTP 404 ws=' + wsId + ' pid=' + pid + ' → already not_linked', 'info');
     return { status: 'not_linked' };
   }
-  if (!resp.ok) {
+  const isMissingOk = !resp.ok;
+  if (isMissingOk) {
     logError('GitsyncDisconnect',
       'HTTP ' + resp.status + ' for ws=' + wsId + ' pid=' + pid
       + ' bodyPreview=' + JSON.stringify(resp.data).substring(0, 200));
@@ -116,13 +118,15 @@ export async function confirmAndDisconnectGithubRepo(
     ?? (typeof window !== 'undefined' && typeof window.confirm === 'function'
       ? window.confirm.bind(window)
       : null);
-  if (!askFn) {
+  const isMissingAskFn = !askFn;
+  if (isMissingAskFn) {
     logError('GitsyncDisconnect.confirm', 'window.confirm unavailable — refusing to disconnect ws='
       + wsId + ' pid=' + pid);
     return { status: 'error', message: 'confirm_unavailable' };
   }
   const ok = askFn(message);
-  if (!ok) {
+  const isMissingOk = !ok;
+  if (isMissingOk) {
     log('[GitsyncDisconnect] user cancelled ws=' + wsId + ' pid=' + pid, 'info');
     return { status: 'cancelled' };
   }

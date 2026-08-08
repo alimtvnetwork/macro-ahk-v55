@@ -56,7 +56,8 @@ export function readSeedStatusSnapshot(): SeedStatusSnapshot | null {
   try {
     if (typeof localStorage === 'undefined') return null;
     const raw = localStorage.getItem(StorageKeyType.SeedStatusSnapshot);
-    if (!raw) return null;
+    const isMissingRaw = !raw;
+    if (isMissingRaw) return null;
     const parsed = JSON.parse(raw) as SeedStatusSnapshot;
     if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.stages)) return null;
     inMemorySnapshot = parsed;

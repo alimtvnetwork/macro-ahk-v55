@@ -124,8 +124,10 @@ loadConfig();
 /** Check if a log at the given level should be emitted */
 export function shouldLog(level?: string): boolean {
   const config = logConfigState.config;
-  if (!config.enabled) { return false; }
-  if (!level) { return true; }
+  const isMissingEnabled = !config.enabled;
+  if (isMissingEnabled) { return false; }
+  const isMissingLevel = !level;
+  if (isMissingLevel) { return true; }
   const normalized = level.toLowerCase();
   if (config.levels[normalized] === undefined) { return true; }
 

@@ -1,3 +1,4 @@
+import { DomainConstants } from "../../constants/domain";
 /**
  * project-id-from-url — unit tests (plan 13 step 5).
  *
@@ -49,7 +50,7 @@ describe('extractProjectIdFromString', () => {
   });
 
   it('returns null for non-project URLs', () => {
-    expect(extractProjectIdFromString('https://lovable.dev/dashboard')).toBeNull();
+    expect(extractProjectIdFromString(DomainConstants.DASHBOARD_URL)).toBeNull();
     expect(extractProjectIdFromString('about:blank')).toBeNull();
   });
 

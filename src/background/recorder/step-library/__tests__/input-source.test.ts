@@ -148,7 +148,8 @@ describe("fetchInputSource, network paths", () => {
         );
         const r = await fetchInputSource({ config: config, fetchImpl });
         expect(r.Ok).toBe(false);
-        if (!r.Ok) expect(r.Error).toContain("Expected a JSON object");
+        const isMissingOk = !r.Ok;
+        if (isMissingOk) expect(r.Error).toContain("Expected a JSON object");
     });
 
     it("rejects malformed JSON responses", async () => {
@@ -157,7 +158,8 @@ describe("fetchInputSource, network paths", () => {
         );
         const r = await fetchInputSource({ config: config, fetchImpl });
         expect(r.Ok).toBe(false);
-        if (!r.Ok) expect(r.Error).toContain("not valid JSON");
+        const isMissingOk = !r.Ok;
+        if (isMissingOk) expect(r.Error).toContain("not valid JSON");
     });
 
     it("returns Ok=false on HTTP error and propagates Continue flag", async () => {
@@ -169,7 +171,8 @@ describe("fetchInputSource, network paths", () => {
             fetchImpl,
         });
         expect(r.Ok).toBe(false);
-        if (!r.Ok) {
+        const isMissingOk = !r.Ok;
+        if (isMissingOk) {
             expect(r.Status).toBe(500);
             expect(r.Continue).toBe(true);
         }
@@ -186,7 +189,8 @@ describe("fetchInputSource, network paths", () => {
             fetchImpl,
         });
         expect(r.Ok).toBe(false);
-        if (!r.Ok) expect(r.Error).toContain("timed out after 1500");
+        const isMissingOk = !r.Ok;
+        if (isMissingOk) expect(r.Error).toContain("timed out after 1500");
     });
 });
 

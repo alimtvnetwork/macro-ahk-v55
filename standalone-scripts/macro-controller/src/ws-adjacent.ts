@@ -67,7 +67,9 @@ function findCurrentWorkspaceIndex(
     }
   }
 
-  if (!currentName) {
+  const isMissingCurrentName = !currentName;
+
+  if (isMissingCurrentName) {
     return 0;
   }
 
@@ -197,7 +199,9 @@ async function handleAdjacentAuthFailure(
   const recoveredToken = await recoverAuthOnce();
   const refreshedToken = recoveredToken || resolveToken();
 
-  if (!refreshedToken) {
+  const isMissingRefreshedToken = !refreshedToken;
+
+  if (isMissingRefreshedToken) {
     handleNoTokenFailure();
 
     return;
@@ -216,7 +220,9 @@ async function doFetchWorkspacesForMove(
 ): Promise<void> {
   const token = resolveToken();
 
-  if (!token) {
+  const isMissingToken = !token;
+
+  if (isMissingToken) {
     if (isRetry) {
       handleNoTokenFailure();
 
@@ -227,7 +233,9 @@ async function doFetchWorkspacesForMove(
     const recoveredToken = await recoverAuthOnce();
     const refreshedToken = recoveredToken || resolveToken();
 
-    if (!refreshedToken) {
+    const isMissingRefreshedToken = !refreshedToken;
+
+    if (isMissingRefreshedToken) {
       handleNoTokenFailure();
 
       return;
@@ -247,14 +255,18 @@ async function doFetchWorkspacesForMove(
     return;
   }
 
-  if (!resp.ok) {
+  const isMissingOk = !resp.ok;
+
+  if (isMissingOk) {
     throwDiagnostic('WS_CONTEXT_ADJACENT_E001', { status: resp.status, op: 'fetchWorkspaces' });
   }
 
   const data = resp.data as Record<string, unknown>;
   const isParseOk = parseLoopApiResponse(data);
 
-  if (!isParseOk) {
+  const isMissingIsParseOk = !isParseOk;
+
+  if (isMissingIsParseOk) {
     logError('moveToAdjacentWorkspace', 'Failed to parse workspace data');
     updateLoopMoveStatus('error', 'Failed to parse workspaces');
     clearDelegationState();
@@ -315,7 +327,9 @@ export async function moveToAdjacentWorkspace(direction: string): Promise<void> 
 
   let token = resolveToken();
 
-  if (!token) {
+  const isMissingToken = !token;
+
+  if (isMissingToken) {
     log('moveToAdjacentWorkspace: no token — recovering before initial fetch', 'warn');
 
     try {
@@ -327,7 +341,9 @@ export async function moveToAdjacentWorkspace(direction: string): Promise<void> 
       return;
     }
 
-    if (!token) {
+    const isMissingToken = !token;
+
+    if (isMissingToken) {
       handleNoTokenFailure();
 
       return;

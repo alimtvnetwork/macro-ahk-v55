@@ -234,7 +234,8 @@ async function executeInMainWorld(code: string): Promise<string> {
     staleScripts.forEach(function(element) { element.remove(); });
 
     const target = document.body ?? document.documentElement;
-    if (!target) {
+    const isMissingTarget = !target;
+    if (isMissingTarget) {
         URL.revokeObjectURL(url);
         throw new Error("No HTML target available for MAIN blob script injection");
     }
@@ -356,7 +357,9 @@ async function attemptUserScriptFallback(
     // Check if legacy injection is forced via settings
     const isForceLegacy = await isLegacyInjectionForced();
 
-    if (!isForceLegacy) {
+    const isMissingIsForceLegacy = !isForceLegacy;
+
+    if (isMissingIsForceLegacy) {
         // Ensure USER_SCRIPT world exists before execute() to avoid cold-start race.
         await configureUserScriptWorld();
 
@@ -534,7 +537,8 @@ async function executeBlobInjection(code: string): Promise<string> {
     staleScripts.forEach(function(element) { element.remove(); });
 
     const target = document.body ?? document.documentElement;
-    if (!target) {
+    const isMissingTarget = !target;
+    if (isMissingTarget) {
         URL.revokeObjectURL(url);
         throw new Error("No HTML target available for ISOLATED script tag injection");
     }

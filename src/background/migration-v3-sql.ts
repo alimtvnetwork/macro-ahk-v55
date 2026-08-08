@@ -63,7 +63,8 @@ export function migrateSessionsToIntegerPk(db: SqlJsDatabase): void {
     let oldRows;
     try {
         oldRows = db.exec("SELECT id, started_at, ended_at, version, user_agent, notes FROM Sessions_old ORDER BY started_at");
-    } catch {
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
         oldRows = db.exec("SELECT Id, StartedAt, EndedAt, Version, UserAgent, Notes FROM Sessions_old ORDER BY StartedAt");
     }
 
@@ -85,7 +86,8 @@ export function migrateSessionsToIntegerPk(db: SqlJsDatabase): void {
         for (const [oldId, newId] of idMapping) {
             try {
                 db.run("UPDATE Logs SET SessionId = ? WHERE SessionId = ?", [newId, oldId]);
-            } catch {
+            } catch (err) {
+                logError("AutoCatch", "Unhandled exception", err);
                 db.run("UPDATE Logs SET session_id = ? WHERE session_id = ?", [newId, oldId]);
             }
         }

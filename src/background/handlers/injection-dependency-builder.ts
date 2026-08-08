@@ -20,10 +20,12 @@ import { resolveInjectionOrder, type ProjectNode } from "../dependency-resolver"
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity
 export async function prependDependencyScripts(callerScripts: ScriptEntry[], allProjects: StoredProject[]): Promise<ScriptEntry[]> {
     const activeId = getActiveProjectId();
-    if (!activeId) return callerScripts;
+    const isMissingActiveId = !activeId;
+    if (isMissingActiveId) return callerScripts;
 
     const activeProject = allProjects.find((p) => p.id === activeId);
-    if (!activeProject) return callerScripts;
+    const isMissingActiveProject = !activeProject;
+    if (isMissingActiveProject) return callerScripts;
 
     const globalProjects = allProjects.filter(
         (p) => p.isGlobal === true && p.id !== activeId,
@@ -69,7 +71,9 @@ export async function prependDependencyScripts(callerScripts: ScriptEntry[], all
 
     const resolution = resolveInjectionOrder(nodes);
 
-    if (!resolution.isSuccess) {
+    const isMissingIsSuccess = !resolution.isSuccess;
+
+    if (isMissingIsSuccess) {
         logBgWarnError(BgLogTag.INJECTION_DEPS, `Dependency resolution failed: ${resolution.errorMessage}`);
         return [...collectGlobalScripts(globalProjects), ...callerScripts];
     }
@@ -122,7 +126,8 @@ export async function prependDependencyScripts(callerScripts: ScriptEntry[], all
         if (!isScriptEntryLike(script)) return script;
 
         const scriptKey = getScriptIdentity(script);
-        if (!scriptKey) return script;
+        const isMissingScriptKey = !scriptKey;
+        if (isMissingScriptKey) return script;
 
         const projectId = scriptKeyToProjectId.get(scriptKey);
         const projectRank = projectId !== undefined

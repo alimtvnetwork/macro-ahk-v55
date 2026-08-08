@@ -93,7 +93,9 @@ function verifyControllerInjection(): boolean {
     return false;
   }
 
-  if (!uiContainer) {
+  const isMissingUiContainer = !uiContainer;
+
+  if (isMissingUiContainer) {
     logError('unknown', '❌ Controller UI container NOT found in DOM (id=\' + IDS.CONTAINER + \') — aborting');
     state.running = false;
     nsCallTyped(NS_UPDATE_START_STOP, false);
@@ -115,7 +117,8 @@ function logInjectionPosition(xpathTarget: Node | null, uiContainer: HTMLElement
 }
 
 function startLoopTimers(): void {
-  if (!state.running) {
+  const isMissingRunning = !state.running;
+  if (isMissingRunning) {
     log('Loop was stopped during initial check — not starting timers', 'warn');
     return;
   }
@@ -141,7 +144,8 @@ async function handleAuthAndStartCheck(): Promise<void> {
 
   refreshBearerTokenFromBestSource(function(authToken: string, authSource: string) {
     logAuthResult(authToken, authSource);
-    if (!state.running) { log('Loop was stopped during auth resolution — aborting', 'warn'); return; }
+    const isMissingRunning = !state.running;
+    if (isMissingRunning) { log('Loop was stopped during auth resolution — aborting', 'warn'); return; }
 
     log('Step 2: Running initial workspace check...', 'check');
     let checkPromise;
@@ -203,7 +207,8 @@ export function startLoop(direction: LoopDirectionType | string): boolean {
 // stopLoop
 // ============================================
 export function stopLoop(): boolean {
-  if (!state.running) return false;
+  const isMissingRunning = !state.running;
+  if (isMissingRunning) return false;
 
   state.running = false;
   state.isDelegating = false;
@@ -243,7 +248,8 @@ function refreshStatusStopped(): void {
 
 function triggerBackgroundCreditFetch(): void {
   const token = resolveToken();
-  if (!token) return;
+  const isMissingToken = !token;
+  if (isMissingToken) return;
 
   logSub('No workspace + no credits — triggering background credit fetch', 1);
   fetchLoopCreditsAsync(false).then(function() {
@@ -267,7 +273,8 @@ function refreshStatusRunning(): void {
 
   logSub('Workspace auto-check: opening dialog for credit check...', 1);
   const opened = ensureProjectDialogOpen();
-  if (!opened) {
+  const isMissingOpened = !opened;
+  if (isMissingOpened) {
     logSub('Workspace auto-check: could not open project dialog', 1);
     mc().updateUILight();
     return;
@@ -279,7 +286,8 @@ function refreshStatusRunning(): void {
 }
 
 function readDialogCreditStatus(gotNavName: boolean): void {
-  if (!gotNavName) {
+  const isMissingGotNavName = !gotNavName;
+  if (isMissingGotNavName) {
     const oldName = state.workspaceName;
     mc().workspaces.fetchName();
     const nameChanged = oldName && state.workspaceName && oldName !== state.workspaceName;
@@ -301,7 +309,8 @@ function readDialogCreditStatus(gotNavName: boolean): void {
 // refreshStatus — Workspace auto-check
 // ============================================
 export function refreshStatus(): void {
-  if (!state.running) {
+  const isMissingRunning = !state.running;
+  if (isMissingRunning) {
     refreshStatusStopped();
     emitCreditPollTick();
     return;

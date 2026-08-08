@@ -67,7 +67,9 @@ function getSdkUtils(): SdkUtils | null {
     if (w.marco && w.marco.utils) {
       return w.marco.utils;
     }
-  } catch { /* not available */ } // allow-swallow: SDK probe — absence is the expected case in unit/isolated contexts; caller handles null.
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
+  } // allow-swallow: SDK probe — absence is the expected case in unit/isolated contexts; caller handles null.
 
   return null;
 }

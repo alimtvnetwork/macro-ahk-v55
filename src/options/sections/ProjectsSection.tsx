@@ -50,6 +50,9 @@ export function ProjectsSection() {
             });
             setProjects(response.projects ?? []);
         } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
             setProjects([]);
         } finally {
             setIsLoading(false);
@@ -78,6 +81,9 @@ export function ProjectsSection() {
             });
             downloadFile(response.json, response.filename, "application/json");
         } catch (err) {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
             const msg = err instanceof Error ? err.message : String(err);
             setToast({ message: `Export failed: ${msg}`, variant: "error" });
         }
@@ -96,6 +102,9 @@ export function ProjectsSection() {
                 await loadProjects();
                 setToast({ message: "Project imported successfully", variant: "success" });
             } catch (err) {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
                 const msg = err instanceof Error ? err.message : String(err);
                 setToast({ message: `Import failed: ${msg}`, variant: "error" });
             }
@@ -108,6 +117,9 @@ export function ProjectsSection() {
             await platform.sendMessage({ type: "EXPORT_SQLITE_BUNDLE" });
             setToast({ message: "SQLite bundle exported", variant: "success" });
         } catch (err) {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
             const msg = err instanceof Error ? err.message : String(err);
             setToast({ message: `Export failed: ${msg}`, variant: "error" });
         }
@@ -129,6 +141,9 @@ export function ProjectsSection() {
             await loadProjects();
             setToast({ message: `SQLite bundle imported (${importMode})`, variant: "success" });
         } catch (err) {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
             const msg = err instanceof Error ? err.message : String(err);
             setToast({ message: `Import failed: ${msg}`, variant: "error" });
         }

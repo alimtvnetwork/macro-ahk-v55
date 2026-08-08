@@ -151,8 +151,8 @@ async function _autoSave(inputs: RenameInputsResult): Promise<void> {
     const store = getRenamePresetStore();
     const preset = _readUiToPreset(inputs);
     await store.savePreset(_activePresetName, preset);
-  } catch { // allow-swallow: auto-save is best-effort; user will see explicit save errors on manual save
-    // silent
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
   }
 }
 
@@ -175,7 +175,8 @@ function _cloneActivePreset(
   }
 
   store.loadPreset(sourceName).then(function (src) {
-    if (!src) {
+    const isMissingSrc = !src;
+    if (isMissingSrc) {
       showToast('Source preset "' + sourceName + '" not found', 'warn');
       return;
     }
@@ -330,7 +331,8 @@ function _createRenameTitleBar(panel: HTMLElement, count: number): HTMLElement {
     e.preventDefault();
   };
   const onDragMouseMove = function(e: MouseEvent) {
-    if (!isDragging) return;
+    const isMissingIsDragging = !isDragging;
+    if (isMissingIsDragging) return;
     panel.style.left = (e.clientX - dragOffX) + 'px';
     panel.style.top = (e.clientY - dragOffY) + 'px';
     panel.style.right = 'auto';
@@ -516,7 +518,8 @@ function _wireStartNumInput(
   updatePreview: () => void,
 ): void {
   const el = document.getElementById(id) as HTMLInputElement | null;
-  if (!el) { return; }
+  const isMissingEl = !el;
+  if (isMissingEl) { return; }
   // v2.192.0: clamp on every keystroke so preview + persistence never see
   // NaN, negatives, or decimals. Empty string is treated as 0 in-memory but
   // not echoed back during typing — the user keeps typing freely. On blur

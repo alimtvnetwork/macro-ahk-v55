@@ -43,7 +43,7 @@ export interface RuleZeroCheck {
     actualN: number | null;
     /** Human-readable reason. Non-empty on both pass and fail for logging. */
     reason: string;
-    /**
+}
 /** Frontmatter line: `Steps: 5` or `Steps: {{n}}`. First match wins. */
 const RE_FRONTMATTER_STEPS = /^\s*steps\s*:\s*(\S.*?)\s*$/im;
 

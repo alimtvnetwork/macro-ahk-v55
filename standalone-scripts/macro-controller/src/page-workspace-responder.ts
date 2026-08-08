@@ -45,7 +45,8 @@ export function registerPageWorkspaceResponder(): void {
         if (event.source !== window) return;
 
         const data = event.data as Record<string, unknown> | null;
-        if (!data) return;
+        const isMissingData = !data;
+        if (isMissingData) return;
         if (data.source !== REQUEST_SOURCE) return;
         if (data.type !== REQUEST_TYPE) return;
 

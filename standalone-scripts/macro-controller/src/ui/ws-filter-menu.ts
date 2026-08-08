@@ -174,6 +174,7 @@ function persistCompactMode(active: boolean): void {
   try {
     localStorage.setItem('ml_compact_mode', active ? 'true' : 'false');
   } catch (ex: unknown) {
+    logError("AutoCatch", "Unhandled exception", ex);
     logSub('Failed to persist compact mode: ' + (ex instanceof Error ? ex.message : String(ex)), 1);
   }
 }
@@ -254,7 +255,8 @@ function buildCreditSortRows(populate: () => void): HTMLElement[] {
   function syncVisualState(activeMode: CreditSortModeType): void {
     for (const { id, mode } of CREDIT_SORT_ROW_IDS) {
       const el = document.getElementById(id);
-      if (!el) continue;
+      const isMissingEl = !el;
+      if (isMissingEl) continue;
       const isActive = mode === activeMode;
       el.setAttribute(DataAttrType.Active, isActive ? 'true' : 'false');
       const chip = el.querySelector('.marco-credit-sort-chip') as HTMLElement | null;
@@ -375,7 +377,8 @@ export function buildWsFilterMenuButton(deps: WsFilterMenuDeps): HTMLElement {
     e.preventDefault();
     e.stopPropagation();
     try {
-      if (!popover) {
+      const isMissingPopover = !popover;
+      if (isMissingPopover) {
         popover = buildPopover(deps);
         wrap.appendChild(popover);
       }

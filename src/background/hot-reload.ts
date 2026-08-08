@@ -97,7 +97,9 @@ async function pollBuildMeta(): Promise<void> {
         const currentBuildId = meta.buildId ?? null;
         const hasBuildId = currentBuildId !== null;
 
-        if (!hasBuildId) {
+        const isMissingHasBuildId = !hasBuildId;
+
+        if (isMissingHasBuildId) {
             return;
         }
 
@@ -123,7 +125,7 @@ async function pollBuildMeta(): Promise<void> {
             );
             chrome.runtime.reload();
         }
-    } catch { // allow-swallow: build-meta.json polling is dev-only best-effort; missing file/network errors are expected in deploy windows
-        // ignored
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 }

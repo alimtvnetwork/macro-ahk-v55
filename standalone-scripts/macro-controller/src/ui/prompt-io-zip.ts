@@ -42,7 +42,8 @@ function buildCrcTable(): Uint32Array {
 }
 
 function crc32(bytes: Uint8Array): number {
-  if (!CRC_TABLE) CRC_TABLE = buildCrcTable();
+  const isMissingCRC_TABLE = !CRC_TABLE;
+  if (isMissingCRC_TABLE) CRC_TABLE = buildCrcTable();
   let c = 0xffffffff;
   for (let i = 0; i < bytes.length; i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
   return (c ^ 0xffffffff) >>> 0;

@@ -27,7 +27,9 @@ export function buildFriendlyImportError(
     const first = (rawErrors[0] ?? '').trim();
     const safeName = filename && filename.trim() ? filename.trim() : 'the selected file';
 
-    if (!first) {
+    const isMissingFirst = !first;
+
+    if (isMissingFirst) {
         return {
             headline: 'Could not read ' + safeName + '.',
             hint: HINT_DEFAULT,

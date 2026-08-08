@@ -1,3 +1,4 @@
+import { DomainConstants } from "../constants/domain";
 /**
  * Marco Extension — Auth Health Handler
  *
@@ -48,7 +49,7 @@ export interface AuthHealthResponse {
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
 
-const AUTH_API_BASE = "https://api.lovable.dev";
+const AUTH_API_BASE = DomainConstants.API_URL;
 
 import { LOVABLE_TAB_PATTERNS as PLATFORM_TAB_PATTERNS } from "../shared/lovable-tab-patterns";
 
@@ -77,6 +78,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
         tabUrl = tab?.url ?? null;
         projectId = extractProjectId(tabUrl);
     } catch (queryErr) {
+        logError("AutoCatch", "Unhandled exception", queryErr);
         logBgWarnError(BgLogTag.AUTH_HEALTH, "chrome.tabs.query({active,currentWindow}) failed — proceeding with tabUrl=null and projectId=null; downstream strategies will skip URL-dependent checks", queryErr instanceof Error ? queryErr : new Error(String(queryErr)));
     }
 
@@ -137,6 +139,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
                     return { isSuccess: true, detail: `JWT in ${scanResult.slice(6)} (tabId=${tab.id})` };
                 }
             } catch (tabErr) {
+                logError("AutoCatch", "Unhandled exception", tabErr);
                 logBgWarnError(BgLogTag.AUTH_HEALTH, `chrome.scripting.executeScript JWT scan failed for tabId=${tab.id} (url=${tab.url ?? "?"}) — tab may be discarded, restricted (chrome://, devtools), or closed mid-scan`, tabErr instanceof Error ? tabErr : new Error(String(tabErr)));
             }
         }
@@ -147,7 +150,8 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
 
     // ── Strategy 3: Signed URL token scan ──
     const s3 = await timedStrategy("Signed URL token", 3, async () => {
-        if (!tabUrl) {
+        const isMissingTabUrl = !tabUrl;
+        if (isMissingTabUrl) {
             return { isSuccess: false, detail: "No active tab URL" };
         }
 
@@ -160,6 +164,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
                 return { isSuccess: true, detail: "JWT found in active URL" };
             }
         } catch (urlErr) {
+            logError("AutoCatch", "Unhandled exception", urlErr);
             // Malformed tab URL — strategy result already returns success=false below;
             // log at warn level so a recurring pattern surfaces in diagnostics without
             // promoting a single bad URL to an error.
@@ -188,7 +193,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
     // ── Strategy 5: Cross-tab session cookie scan ──
     const s5 = await timedStrategy("Cross-tab cookie scan", 5, async () => {
         try {
-            const cookies = await _chrome.cookies!.getAll({ domain: "lovable.dev" });
+            const cookies = await _chrome.cookies!.getAll({ domain: DomainConstants.PRIMARY_DOMAIN });
             const sessionCookie = (cookies as Array<{ name: string; domain: string; expirationDate?: number }>).find(
                 (c) => c.name.includes("session") || c.name.includes("auth"),
             );
@@ -273,6 +278,7 @@ async function getActivePlatformTabs(): Promise<PlatformTab[]> {
             const tabs = await _chrome.tabs!.query({ url: pattern });
             if (Array.isArray(tabs)) results.push(...tabs);
         } catch (queryErr) {
+            logError("AutoCatch", "Unhandled exception", queryErr);
             logBgWarnError(BgLogTag.AUTH_HEALTH, `chrome.tabs.query({url:"${pattern}"}) failed — pattern skipped, other platform tabs (if any) still scanned`, queryErr instanceof Error ? queryErr : new Error(String(queryErr)));
         }
     }
@@ -286,7 +292,8 @@ async function getActivePlatformTabs(): Promise<PlatformTab[]> {
 }
 
 function extractProjectId(url: string | null): string | null {
-    if (!url) return null;
+    const isMissingUrl = !url;
+    if (isMissingUrl) return null;
     const match = url.match(/\/projects\/([a-f0-9-]{36})/);
     return match?.[1] ?? null;
 }

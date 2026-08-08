@@ -1,3 +1,4 @@
+import { DomainConstants } from "../constants/domain";
 /**
  * Marco Extension — API Explorer Handler
  *
@@ -98,7 +99,7 @@ const ENDPOINT_OVERRIDES: Partial<Record<MessageType, EndpointOverride>> = {
     [MessageType.STORAGE_COOKIES_LIST]: {
         category: "Storage Browser",
         description: "Lists browser cookies (filtered by domain/name when provided).",
-        exampleRequest: { type: MessageType.STORAGE_COOKIES_LIST, domain: "lovable.dev" },
+        exampleRequest: { type: MessageType.STORAGE_COOKIES_LIST, domain: DomainConstants.PRIMARY_DOMAIN },
     },
     [MessageType.GET_OPTIONS_BOOTSTRAP]: {
         category: "Scripts & Configs",
@@ -536,13 +537,13 @@ function inferExampleRequest(type: MessageType): Record<string, unknown> {
         case MessageType.STORAGE_SESSION_CLEAR:
             return { type, prefix: "marco_" };
         case MessageType.STORAGE_COOKIES_LIST:
-            return { type, domain: "lovable.dev" };
+            return { type, domain: DomainConstants.PRIMARY_DOMAIN };
         case MessageType.STORAGE_COOKIES_SET:
             return {
                 type,
                 name: "marco_test_cookie",
                 value: "hello",
-                domain: "lovable.dev",
+                domain: DomainConstants.PRIMARY_DOMAIN,
                 path: "/",
                 secure: true,
                 sameSite: "lax",
@@ -550,7 +551,7 @@ function inferExampleRequest(type: MessageType): Record<string, unknown> {
         case MessageType.STORAGE_COOKIES_DELETE:
             return { type, name: "marco_test_cookie", url: "https://lovable.dev/" };
         case MessageType.STORAGE_COOKIES_CLEAR:
-            return { type, domain: "lovable.dev" };
+            return { type, domain: DomainConstants.PRIMARY_DOMAIN };
         default:
             return { type };
     }

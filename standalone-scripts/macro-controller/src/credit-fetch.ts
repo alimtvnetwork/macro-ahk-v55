@@ -70,14 +70,16 @@ async function apiFetchWorkspaces(): Promise<SdkApiResponse> {
   // when MacroController runs before the marco-sdk has finished injecting
   // (load-order race). See mem://standards/verbose-logging-and-failure-diagnostics.
   const sdk = window.marco;
-  if (!sdk) {
+  const isMissingSdk = !sdk;
+  if (isMissingSdk) {
     throwDiagnostic('CREDIT_FETCH_E001', {
       missingApi: 'window.marco',
       readinessStage: 'sdk-root',
       op: 'apiFetchWorkspaces',
     });
   }
-  if (!sdk.api) {
+  const isMissingApi = !sdk.api;
+  if (isMissingApi) {
     throwDiagnostic('CREDIT_FETCH_E001', {
       missingApi: 'window.marco.api',
       readinessStage: 'sdk-api',
@@ -162,7 +164,9 @@ async function handleAuthRecovery(
 
   const newToken = await getBearerToken({ force: true });
 
-  if (!newToken) {
+  const isMissingNewToken = !newToken;
+
+  if (isMissingNewToken) {
     logError('Credit API', 'Auth recovery failed — no retry');
     emitAuthFailureToast(status, statusText);
 
@@ -182,7 +186,9 @@ function logCreditPreflight(token: string, isRetry?: boolean): void {
   log('Credit API: GET /user/workspaces' + (isRetry ? ' (RETRY after recovery)' : ''), 'check');
   logSub('Auth: ' + (token ? 'Bearer ' + token.substring(0, 12) + '...REDACTED' : 'cookies only (no bearer)'), 1);
 
-  if (!token) {
+  const isMissingToken = !token;
+
+  if (isMissingToken) {
     const preflight = getAuthDebugSnapshot();
     logSub('Auth preflight: no bearer. Session cookie names=' + preflight.sessionCookieNames.join(', '), 1);
     logSub('Auth preflight flow: ' + preflight.flow, 1);
@@ -262,7 +268,8 @@ async function processSuccessData(
   autoDetectFn?: (token: string) => Promise<void>,
 ): Promise<void> {
   const isParseOk = parseLoopApiResponse(data);
-  if (!isParseOk) return;
+  const isMissingIsParseOk = !isParseOk;
+  if (isMissingIsParseOk) return;
 
   const freshToken = resolveToken();
   nsWrite('_internal.resolvedToken', freshToken);
@@ -311,33 +318,36 @@ export function fetchLoopCredits(
 
     apiFetchWorkspaces()
       .then(async function (resp: SdkApiResponse): Promise<Record<string, unknown> | undefined> {
-        if (!resp.ok) {
-          if (isAuthFailure(resp.status) && !isRetry) {
-            const recovered = await handleAuthRecovery(token, resp.status, '');
-            if (!recovered) { mc().updateUI(); return undefined; }
-            fetchLoopCredits(true, autoDetectFn);
+      const isMissingOk = !resp.ok;
+      if (isMissingOk) {
+        if (isAuthFailure(resp.status) && !isRetry) {
+          const recovered = await handleAuthRecovery(token, resp.status, '');
+          const isMissingRecovered = !recovered;
+          if (isMissingRecovered) { mc().updateUI(); return undefined; }
+          fetchLoopCredits(true, autoDetectFn);
 
-            return undefined;
-          }
-
-          handleNonAuthError(resp);
-          throwDiagnostic('CREDIT_FETCH_E002', {
-            status: resp.status,
-            url: CREDIT_API_BASE + ApiPathType.UserWorkspaces,
-            op: 'fetchLoopCredits',
-            isRetry: isRetry === true,
-          });
+          return undefined;
         }
 
-        const data = resp.data as Record<string, unknown>;
-        logSub('Credit API: response received, data keys=' + Object.keys(data).join(','), 1);
+        handleNonAuthError(resp);
+        throwDiagnostic('CREDIT_FETCH_E002', {
+          status: resp.status,
+          url: CREDIT_API_BASE + ApiPathType.UserWorkspaces,
+          op: 'fetchLoopCredits',
+          isRetry: isRetry === true,
+        });
+      }
 
-        return data;
-      })
+      const data = resp.data as Record<string, unknown>;
+      logSub('Credit API: response received, data keys=' + Object.keys(data).join(','), 1);
+
+      return data;
+    })
       .then(async function (data: Record<string, unknown> | undefined) {
-        if (!data) return;
-        await processSuccessData(data, autoDetectFn);
-      })
+      const isMissingData = !data;
+      if (isMissingData) return;
+      await processSuccessData(data, autoDetectFn);
+    })
       .catch(function (err: Error) {
         logError('Credit API failed', '' + err.message);
         logSub('Token source: ' + getLastTokenSource(), 1);
@@ -375,7 +385,9 @@ export function fetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
 
   const promise = doFetchLoopCreditsAsync(isRetry);
 
-  if (!isRetry) {
+  const isMissingIsRetry = !isRetry;
+
+  if (isMissingIsRetry) {
     creditAsyncState.inFlight = promise.finally(function () { creditAsyncState.inFlight = null; });
 
     return creditAsyncState.inFlight;
@@ -406,7 +418,9 @@ async function handleAsyncAuthFailure(resp: SdkApiResponse, token: string): Prom
 
   const newToken = await getBearerToken({ force: true });
 
-  if (!newToken) {
+  const isMissingNewToken = !newToken;
+
+  if (isMissingNewToken) {
     emitAuthFailureToast(resp.status, '');
     throwDiagnostic('CREDIT_FETCH_E003', {
       status: resp.status,
@@ -425,7 +439,9 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
 
   log('Credit API (async): GET /user/workspaces' + (isRetry ? ' (RETRY after recovery)' : ''), 'check');
 
-  if (!token) {
+  const isMissingToken = !token;
+
+  if (isMissingToken) {
     const preflightDetail = buildAuthFailureDetail().replace(/\n/g, ' | ');
     log('Credit API (async): still no bearer after preflight; proceeding with cookie credentials only', 'warn');
     logSub('Auth preflight detail: ' + preflightDetail, 1);
@@ -433,7 +449,9 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
 
   const resp = await apiFetchWorkspaces();
 
-  if (!resp.ok) {
+  const isMissingOk = !resp.ok;
+
+  if (isMissingOk) {
     if (isAuthFailure(resp.status) && !isRetry) {
       return handleAsyncAuthFailure(resp, token);
     }

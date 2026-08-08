@@ -1,3 +1,4 @@
+import { DomainConstants } from "../constants/domain";
 /**
  * Marco Extension — Injection Condition Evaluator
  *
@@ -84,7 +85,7 @@ async function checkCookieCondition(
 
     try {
         const cookie = await chrome.cookies.get({
-            url: "https://lovable.dev",
+            url: DomainConstants.PRIMARY_URL,
             name: cookieName!,
         });
 

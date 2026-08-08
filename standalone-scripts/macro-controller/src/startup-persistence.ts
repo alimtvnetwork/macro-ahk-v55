@@ -26,7 +26,9 @@ function tryReinjectUI(createUI: () => void): void {
   const hasMarker = !!document.getElementById(IDS.SCRIPT_MARKER);
   const hasContainer = !!document.getElementById(IDS.CONTAINER);
 
-  if (!hasMarker) {
+  const isMissingHasMarker = !hasMarker;
+
+  if (isMissingHasMarker) {
     log('Marker removed by SPA navigation, re-placing', 'warn');
     const newMarker = document.createElement('div');
     newMarker.id = IDS.SCRIPT_MARKER;
@@ -35,7 +37,9 @@ function tryReinjectUI(createUI: () => void): void {
     document.body.appendChild(newMarker);
   }
 
-  if (!hasContainer) {
+  const isMissingHasContainer = !hasContainer;
+
+  if (isMissingHasContainer) {
     log('UI container removed by SPA navigation, re-creating', 'warn');
     resetRedockState();
     createUI();
@@ -60,7 +64,8 @@ function attachVisibilityHandler(createUI: () => void): () => void {
   function onVisibilityChange(): void {
     if (document.visibilityState !== 'visible') return;
     const isPresent = !!document.getElementById(IDS.SCRIPT_MARKER) && !!document.getElementById(IDS.CONTAINER);
-    if (!isPresent) {
+    const isMissingIsPresent = !isPresent;
+    if (isMissingIsPresent) {
       log('visibilitychange: UI missing — re-injecting', 'check');
       tryReinjectUI(createUI);
     }
@@ -115,7 +120,8 @@ export function setupPersistenceObserver(createUI: () => void): () => void {
   // forces every direct-child mutation through our callback.
   const scopedTarget = document.querySelector('main') || document.querySelector('#root');
   const observeTarget = scopedTarget || document.body;
-  if (!scopedTarget) {
+  const isMissingScopedTarget = !scopedTarget;
+  if (isMissingScopedTarget) {
     log('Persistence observer: no <main> or #root found — falling back to document.body (higher mutation volume)', 'warn');
   }
   observer.observe(observeTarget, { childList: true });

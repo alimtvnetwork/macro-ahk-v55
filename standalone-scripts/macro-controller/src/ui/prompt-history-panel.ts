@@ -182,10 +182,12 @@ function captureLastImportFailure(key: string, detail: string): void {
 
 function renderLastImportError(): void {
     const host = _lastImportErrorEl;
-    if (!host) return;
+    const isMissingHost = !host;
+    if (isMissingHost) return;
     while (host.firstChild) host.removeChild(host.firstChild);
     const err = _lastImportError;
-    if (!err) {
+    const isMissingErr = !err;
+    if (isMissingErr) {
         host.style.display = 'none';
         return;
     }
@@ -642,7 +644,8 @@ function installRovingTabindex(toolbar: HTMLElement): void {
     if (controls.length === 0) return;
     for (let i = 0; i < controls.length; i += 1) {
         const btn = controls[i];
-        if (!btn) continue;
+        const isMissingBtn = !btn;
+        if (isMissingBtn) continue;
         btn.setAttribute('type', 'button');
         btn.tabIndex = i === 0 ? 0 : -1;
         btn.addEventListener('keydown', (ev: KeyboardEvent) => {
@@ -658,7 +661,8 @@ function installRovingTabindex(toolbar: HTMLElement): void {
             else if (key === 'Home') nextIdx = 0;
             else if (key === 'End') nextIdx = controls.length - 1;
             const next = controls[nextIdx];
-            if (!next) return;
+            const isMissingNext = !next;
+            if (isMissingNext) return;
             for (const c of controls) c.tabIndex = -1;
             next.tabIndex = 0;
             next.focus();
@@ -776,7 +780,8 @@ interface RestorePreImage {
 }
 
 function buildPreImage(currentRow: PromptRow | undefined): RestorePreImage | null {
-    if (!currentRow) return null;
+    const isMissingCurrentRow = !currentRow;
+    if (isMissingCurrentRow) return null;
     return {
         id: currentRow.Id,
         body: currentRow.Body,
@@ -830,7 +835,8 @@ async function handleRestoreUpdate(
             replaceKey: preImage.replaceKey,
             replaceValues: preImage.replaceValues,
         });
-        if (!revert.ok) {
+        const isMissingOk = !revert.ok;
+        if (isMissingOk) {
             const reason = revert.error ?? 'unknown';
             reportHistoryFailure(
                 'HISTORY_UNDO_E001',
@@ -866,7 +872,8 @@ function handleRestoreInsert(
     undoToast(successMsg, async () => {
         clearPendingRestoreUndo();
         const del = await deleteFn(newId);
-        if (!del.ok) {
+        const isMissingOk = !del.ok;
+        if (isMissingOk) {
             const reason = del.error ?? 'unknown';
             reportHistoryFailure(
                 'HISTORY_UNDO_E001',
@@ -899,7 +906,8 @@ async function handleRestore(
         'Restore "' + rev.Name + '" from ' + formatWhen(rev.CreatedAt) + '?\n\n'
         + 'The current body will itself be recorded as a new revision, so you can undo this restore later from the same history panel.',
     );
-    if (!proceed) return;
+    const isMissingProceed = !proceed;
+    if (isMissingProceed) return;
 
     const listResult = await listByRole(role);
     if (!listResult.ok || !listResult.value) {
@@ -925,7 +933,8 @@ async function handleRestore(
         replaceKey: rev.ReplaceKey,
         replaceValues,
     });
-    if (!upsertResult.ok) {
+    const isMissingOk = !upsertResult.ok;
+    if (isMissingOk) {
         const reason = upsertResult.error ?? 'unknown';
         reportHistoryFailure(
             'HISTORY_RESTORE_E001',
@@ -1141,11 +1150,13 @@ export function parseRevisionImportPayload(
         return new DbResult(false, undefined, 'Invalid JSON: ' + (err instanceof Error ? err.message : String(err)));
     }
     const envelope = validateImportEnvelope(parsed, expectedSlug, expectedRole);
-    if (!envelope.ok) return new DbResult(false, undefined, envelope.error);
+    const isMissingOk = !envelope.ok;
+    if (isMissingOk) return new DbResult(false, undefined, envelope.error);
     const rows: ImportedRevisionInput[] = [];
     for (let i = 0; i < envelope.revisions.length; i += 1) {
         const coerced = coerceImportRow(envelope.revisions[i], i, expectedSlug, expectedRole);
-        if (!coerced.ok) return new DbResult(false, undefined, coerced.error);
+        const isMissingOk = !coerced.ok;
+        if (isMissingOk) return new DbResult(false, undefined, coerced.error);
         rows.push(coerced.row);
     }
     return { ok: true, rows, sourceSlug: expectedSlug, sourceRole: expectedRole };
@@ -1174,7 +1185,8 @@ function validateImportFile(
     const looksLikeJson = /\.json$/i.test(file.name)
         || file.type === 'application/json'
         || file.type === '';
-    if (!looksLikeJson) {
+    const isMissingLooksLikeJson = !looksLikeJson;
+    if (isMissingLooksLikeJson) {
         const detail = 'name=' + file.name + ' type=' + file.type;
         captureLastImportFailure('wrong-type', 'rejected non-JSON file: ' + detail + ' slug=' + slug + ' role=' + role);
         reportHistoryFailure(
@@ -1196,14 +1208,16 @@ async function writeImportedRevisions(
 ): Promise<void> {
     const snapshotResult = await getMaxRevisionId();
     const sinceId = snapshotResult.ok && typeof snapshotResult.value === 'number' ? snapshotResult.value : 0;
-    if (!snapshotResult.ok) {
+    const isMissingOk = !snapshotResult.ok;
+    if (isMissingOk) {
         logHistoryDiagnostic(
             'HISTORY_INTERNAL_E001',
             { stage: 'max-rev-id', reason: 'getMaxRevisionId failed before import: ' + (snapshotResult.error ?? '?') },
         );
     }
     const write = await insertImportedRevisions(slug, rows);
-    if (!write.ok) {
+    const isMissingOk = !write.ok;
+    if (isMissingOk) {
         const reason = write.error ?? '?';
         reportHistoryFailure(
             'HISTORY_IMPORT_E002',
@@ -1219,7 +1233,8 @@ async function writeImportedRevisions(
     if (snapshotResult.ok && count > 0) {
         undoToast(successMsg, async () => {
             const del = await deleteImportedRevisionsAfter(slug, sinceId);
-            if (!del.ok) {
+            const isMissingOk = !del.ok;
+            if (isMissingOk) {
                 const reason = del.error ?? 'unknown';
                 reportHistoryFailure(
                     'HISTORY_UNDO_E001',
@@ -1243,7 +1258,8 @@ async function handleImportFile(
     deps: HistoryPanelDeps,
 ): Promise<void> {
     const file = input.files && input.files[0];
-    if (!file) return;
+    const isMissingFile = !file;
+    if (isMissingFile) return;
     const toast = deps.toast ?? showToast;
     if (!validateImportFile(file, slug, role, toast)) {
         input.value = '';

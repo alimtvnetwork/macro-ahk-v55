@@ -41,7 +41,9 @@ export function safeSetItem(key: string, value: string): boolean {
       (e.code === 22 || e.code === 1014 || e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED')
     );
 
-    if (!isQuotaError) {
+    const isMissingIsQuotaError = !isQuotaError;
+
+    if (isMissingIsQuotaError) {
       return false;
     }
 
@@ -65,7 +67,9 @@ function purgeBloatedKeys(): number {
   for (let i = localStorage.length - 1; i >= 0; i--) {
     const k = localStorage.key(i);
 
-    if (!k) {
+    const isMissingK = !k;
+
+    if (isMissingK) {
       continue;
     }
 
@@ -177,7 +181,8 @@ export function getDisplayProjectName(): string {
   // project UUID as a name (v3.93.1). Logging once per page so we can see which
   // upstream source is broken (almost always a stale PROJECT_NAME_XPATH).
   const pid = getProjectIdFromUrl();
-  if (!state._projectNameFallbackLogged) {
+  const isMissing_projectNameFallbackLogged = !state._projectNameFallbackLogged;
+  if (isMissing_projectNameFallbackLogged) {
     state._projectNameFallbackLogged = true;
     log(
       'getDisplayProjectName: no name resolved — customDisplayName=' + (state.customDisplayName ? 'set' : 'empty')
@@ -190,7 +195,6 @@ export function getDisplayProjectName(): string {
     );
   }
   return pid ? '⟳ ' + pid.substring(0, 8) + '…' : 'Unknown Project';
-
 }
 
 export function getLogStorageKey(): string {
@@ -307,6 +311,7 @@ export function clearAllLogs(): void {
     const key = getLogStorageKey();
     localStorage.removeItem(key);
   } catch (_e) {
+    logError("AutoCatch", "Unhandled exception", _e);
     logDebug('clearAllLogs', 'localStorage.removeItem failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 }
@@ -314,7 +319,8 @@ export function clearAllLogs(): void {
 function readSeedTelemetryBlock(): string[] {
   try {
     const raw = localStorage.getItem(StorageKeyType.LastSeedTelemetry);
-    if (!raw) return ['Seed Telemetry: (not run this session)', '---'];
+    const isMissingRaw = !raw;
+    if (isMissingRaw) return ['Seed Telemetry: (not run this session)', '---'];
     return ['=== Seed Telemetry ===', raw, '---'];
   } catch (e) {
     logError('formatLogsForExport', 'readSeedTelemetry failed', e);

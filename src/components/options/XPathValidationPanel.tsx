@@ -106,6 +106,9 @@ export function XPathValidationPanel() {
             });
             setResult(res);
         } catch (err) {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
             // In preview mode, generate mock results
             const mockResults: ValidationEntry[] = Object.entries(DEFAULT_XPATHS).map(([name, { xpath, selector }], i) => ({
                 name,

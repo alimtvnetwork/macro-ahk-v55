@@ -107,7 +107,8 @@ async function executeLeaf(
 }
 
 async function executeUrlTabClickLeaf(step: StepRow, opts: ReplayBridgeOptions): Promise<FailureReport | null> {
-    if (!step.PayloadJson) {
+    const isMissingPayloadJson = !step.PayloadJson;
+    if (isMissingPayloadJson) {
         return logFailure({
             Phase: "Replay", Error: new Error("Missing PayloadJson for UrlTabClick"),
             StepId: step.StepId, Index: step.OrderIndex, StepKind: "UrlTabClick",

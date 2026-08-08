@@ -44,31 +44,36 @@ describe("parseGroupInputJson", () => {
     it("rejects an empty string with a friendly hint", () => {
         const result = parseGroupInputJson("   ");
         expect(result.Ok).toBe(false);
-        if (!result.Ok) expect(result.Reason).toMatch(/empty/i);
+        const isMissingOk = !result.Ok;
+        if (isMissingOk) expect(result.Reason).toMatch(/empty/i);
     });
 
     it("rejects arrays at the top level", () => {
         const result = parseGroupInputJson('[1,2,3]');
         expect(result.Ok).toBe(false);
-        if (!result.Ok) expect(result.Reason).toMatch(/array/);
+        const isMissingOk = !result.Ok;
+        if (isMissingOk) expect(result.Reason).toMatch(/array/);
     });
 
     it("rejects scalars at the top level", () => {
         const result = parseGroupInputJson('"hello"');
         expect(result.Ok).toBe(false);
-        if (!result.Ok) expect(result.Reason).toMatch(/string/);
+        const isMissingOk = !result.Ok;
+        if (isMissingOk) expect(result.Reason).toMatch(/string/);
     });
 
     it("rejects null at the top level", () => {
         const result = parseGroupInputJson('null');
         expect(result.Ok).toBe(false);
-        if (!result.Ok) expect(result.Reason).toMatch(/null/);
+        const isMissingOk = !result.Ok;
+        if (isMissingOk) expect(result.Reason).toMatch(/null/);
     });
 
     it("surfaces a line/column hint for malformed JSON when available", () => {
         const result = parseGroupInputJson('{ "Email": }');
         expect(result.Ok).toBe(false);
-        if (!result.Ok) expect(result.Reason).toMatch(/parse error/i);
+        const isMissingOk = !result.Ok;
+        if (isMissingOk) expect(result.Reason).toMatch(/parse error/i);
     });
 });
 

@@ -21,21 +21,27 @@ export async function buildInjectedScriptStatus(
 ): Promise<InjectionStatus> {
     const hasProject = project !== null;
 
-    if (!hasProject) {
+    const isMissingHasProject = !hasProject;
+
+    if (isMissingHasProject) {
         return {};
     }
 
     const activeTabId = await readActiveTabId();
     const hasActiveTab = activeTabId !== null;
 
-    if (!hasActiveTab) {
+    const isMissingHasActiveTab = !hasActiveTab;
+
+    if (isMissingHasActiveTab) {
         return buildNotLoadedStatus(project!.scripts);
     }
 
     const record = getTabInjections()[activeTabId!];
     const hasRecord = record !== undefined;
 
-    if (!hasRecord) {
+    const isMissingHasRecord = !hasRecord;
+
+    if (isMissingHasRecord) {
         return buildNotLoadedStatus(project!.scripts);
     }
 

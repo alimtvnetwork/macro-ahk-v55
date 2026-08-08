@@ -155,7 +155,8 @@ function findFirstDriftAfter(
     const idx = outcomes.findIndex((o) => o.RunId === lastSuccess.RunId);
     if (idx === -1) return null;
     for (let i = idx + 1; i < outcomes.length; i++) {
-        if (!outcomes[i].IsOk) return outcomes[i];
+        const isMissingIsOk = !outcomes[i].IsOk;
+        if (isMissingIsOk) return outcomes[i];
     }
     return null;
 }
@@ -168,7 +169,8 @@ function countFailuresFrom(
     if (idx === -1) return 0;
     let n = 0;
     for (let i = idx; i < outcomes.length; i++) {
-        if (!outcomes[i].IsOk) n += 1;
+        const isMissingIsOk = !outcomes[i].IsOk;
+        if (isMissingIsOk) n += 1;
     }
     return n;
 }

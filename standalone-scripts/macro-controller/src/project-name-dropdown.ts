@@ -164,7 +164,8 @@ export function buildProjectNameCaret(
   arrow.onclick = function (e: Event): void {
     e.stopPropagation();
     const ctx = getCtx();
-    if (!ctx) {
+    const isMissingCtx = !ctx;
+    if (isMissingCtx) {
       return;
     }
     showProjectNameDropdown(arrow, ctx, handlers);

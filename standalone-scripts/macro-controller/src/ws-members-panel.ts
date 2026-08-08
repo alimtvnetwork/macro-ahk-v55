@@ -33,7 +33,8 @@ const CSS_BG = 'background:';
 
 /** Copy text via Clipboard API with legacy textarea fallback; toast on result. */
 function copyToClipboard(value: string, label: string): void {
-  if (!value) {
+  const isMissingValue = !value;
+  if (isMissingValue) {
     showToast('⚠️ Nothing to copy', 'info');
     return;
   }
@@ -57,6 +58,7 @@ function copyToClipboard(value: string, label: string): void {
     document.body.removeChild(ta);
     if (ok) onOk(); else onFail('execCommand returned false');
   } catch (err: unknown) {
+    logError("AutoCatch", "Unhandled exception", err);
     onFail(err instanceof Error ? err.message : String(err));
   }
 }
@@ -75,7 +77,8 @@ function slugify(s: string): string {
 
 /** Build a CSV blob for the loaded members and trigger a browser download. */
 function exportMembersCsv(wsName: string, members: WorkspaceMember[]): void {
-  if (!members.length) {
+  const isMissingLength = !members.length;
+  if (isMissingLength) {
     showToast('⚠️ No members to export', 'info');
     return;
   }
@@ -116,6 +119,7 @@ function exportMembersCsv(wsName: string, members: WorkspaceMember[]): void {
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     showToast('📄 Exported ' + members.length + ' members → ' + filename, 'success');
   } catch (err: unknown) {
+    logError("AutoCatch", "Unhandled exception", err);
     const msg = err instanceof Error ? err.message : String(err);
     showToast('❌ CSV export failed: ' + msg, 'error');
   }
@@ -458,8 +462,9 @@ function findFooter(el: HTMLElement): HTMLElement | null {
 
 function swapFooter(el: HTMLElement, expanded: boolean): void {
   const footer = findFooter(el);
-  if (!footer) return;
-  
+  const isMissingFooter = !footer;
+  if (isMissingFooter) return;
+
   footer.innerHTML = expanded ? footerFormHtml() : footerCollapsedHtml();
   if (expanded) {
     const chipContainer = footer.querySelector('#marco-chip-input-container');
@@ -475,7 +480,6 @@ function swapFooter(el: HTMLElement, expanded: boolean): void {
     });
     if (chipContainer) chipContainer.appendChild(chipInput);
   }
-
 }
 
 // v3.4.3 (task 14) — Member action menu (Promote / Demote / Remove) anchored to ⋯
@@ -558,7 +562,8 @@ function openMemberActionMenu(
   label: string,
 ): void {
   closeMemberActionMenu();
-  if (!userId) return;
+  const isMissingUserId = !userId;
+  if (isMissingUserId) return;
   const menu = document.createElement('div');
   menu.id = MEMBER_MENU_ID;
   const rect = anchor.getBoundingClientRect();
@@ -634,6 +639,7 @@ function submitInvite(el: HTMLElement, wsId: string, wsName: string, form: HTMLF
         await inviteMember(wsId, email, role);
         results.success++;
       } catch (e: unknown) {
+        logError("AutoCatch", "Unhandled exception", e);
         results.fail++;
       }
     }
@@ -653,7 +659,8 @@ function submitInvite(el: HTMLElement, wsId: string, wsName: string, form: HTMLF
 function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): void {
   el.onclick = function (e: MouseEvent): void {
     const target = (e.target as HTMLElement | null)?.closest('[data-marco-action]') as HTMLElement | null;
-    if (!target) return;
+    const isMissingTarget = !target;
+    if (isMissingTarget) return;
     const action = target.getAttribute('data-marco-action');
     if (action === 'close') {
       e.stopPropagation();
@@ -709,7 +716,8 @@ function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): vo
   }
   const submitHandler = function (e: Event): void {
     const target = e.target as HTMLElement | null;
-    if (!target) return;
+    const isMissingTarget = !target;
+    if (isMissingTarget) return;
     if (target.getAttribute('data-marco-action') !== 'add-member-submit') return;
     e.preventDefault();
     e.stopPropagation();
@@ -730,7 +738,8 @@ function attachDismissHandlers(el: HTMLElement): void {
 
   const outside = function (e: MouseEvent): void {
     const t = e.target as Node | null;
-    if (!t) return;
+    const isMissingT = !t;
+    if (isMissingT) return;
     if (el.contains(t)) return;
     hideWsMembersPanel();
   };
@@ -749,7 +758,8 @@ function attachDismissHandlers(el: HTMLElement): void {
 
 function detachDismissHandlers(): void {
   const el = document.getElementById(PANEL_ID);
-  if (!el) return;
+  const isMissingEl = !el;
+  if (isMissingEl) return;
   const store = el as HTMLElement & PanelHandlerStore;
   if (store._marcoMembersOutsideClick) {
     document.removeEventListener('mousedown', store._marcoMembersOutsideClick, true);
@@ -812,7 +822,8 @@ function silentRefresh(el: HTMLElement, wsId: string, wsName: string): void {
 
 /** Open the members panel for a workspace at the given screen coords. */
 export function showWsMembersPanel(wsId: string, wsName: string, x: number, y: number): void {
-  if (!wsId) return;
+  const isMissingWsId = !wsId;
+  if (isMissingWsId) return;
   const el = ensurePanelEl();
   // Reset attach state + page-size before re-rendering for a different workspace.
   detachDismissHandlers();

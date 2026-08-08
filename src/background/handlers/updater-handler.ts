@@ -112,7 +112,8 @@ export function bindUpdaterDbManager(manager: DbManager): void {
 }
 
 function getDb(): SqlJsDatabase {
-    if (!dbManager) throw new Error("[updater] DbManager not bound");
+    const isMissingDbManager = !dbManager;
+    if (isMissingDbManager) throw new Error("[updater] DbManager not bound");
     return dbManager.getLogsDb();
 }
 
@@ -216,11 +217,14 @@ export function handleDeleteUpdater(updaterId: number): void {
  */
 export async function handleCheckForUpdate(updaterId: number): Promise<UpdateCheckResult> {
     const entry = handleGetUpdater(updaterId);
-    if (!entry) {
+    const isMissingEntry = !entry;
+    if (isMissingEntry) {
         return { updaterId, name: "Unknown", currentVersion: null, latestVersion: null, hasUpdate: false, errorMessage: "Updater not found" };
     }
 
-    if (!entry.VersionInfoUrl) {
+    const isMissingVersionInfoUrl = !entry.VersionInfoUrl;
+
+    if (isMissingVersionInfoUrl) {
         return { updaterId, name: entry.Name, currentVersion: entry.CurrentVersion, latestVersion: null, hasUpdate: false, errorMessage: "No VersionInfoUrl configured" };
     }
 
@@ -350,8 +354,8 @@ export function linkUpdaterToCategory(updaterId: number, categoryName: string): 
             [updaterId, categoryId],
         );
         dbManager?.markDirty();
-    } catch { // allow-swallow: UNIQUE constraint violation means link already exists — idempotent insert
-        // already linked
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 }
 

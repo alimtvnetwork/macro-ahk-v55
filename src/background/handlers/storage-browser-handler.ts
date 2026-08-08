@@ -30,12 +30,14 @@ export function bindStorageBrowserDbManager(manager: DbManager): void {
 }
 
 function getDb(): SqlJsDatabase {
-    if (!dbManager) throw new Error("[storage-browser] DbManager not bound");
+    const isMissingDbManager = !dbManager;
+    if (isMissingDbManager) throw new Error("[storage-browser] DbManager not bound");
     return dbManager.getLogsDb();
 }
 
 function getErrorsDb(): SqlJsDatabase {
-    if (!dbManager) throw new Error("[storage-browser] DbManager not bound");
+    const isMissingDbManager = !dbManager;
+    if (isMissingDbManager) throw new Error("[storage-browser] DbManager not bound");
     return dbManager.getErrorsDb();
 }
 
@@ -331,6 +333,7 @@ export async function handleStorageClearAll(): Promise<{ isOk: true; cleared: st
             db.run(`DELETE FROM ${table}`);
             cleared.push(table);
         } catch (tableErr) {
+            logError("AutoCatch", "Unhandled exception", tableErr);
             // Table may not exist in this schema version. Debug-only because
             // BROWSABLE_TABLES intentionally lists tables across multiple DBs.
             logSampledDebug(

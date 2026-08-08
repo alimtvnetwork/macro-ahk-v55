@@ -72,6 +72,9 @@ export function DefaultDatabasesStatus({ projectSlug }: DefaultDatabasesStatusPr
           loading: false,
         });
       } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
         updated.push({ name: def.databaseName, exists: false, rowCount: 0, loading: false });
       }
     }

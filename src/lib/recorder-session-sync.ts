@@ -203,7 +203,10 @@ function installTransport(): void {
             if (e.key !== RECORDER_SESSION_STORAGE_KEY) { return; }
             try {
                 dispatch(e.newValue === null ? null : parseSession(JSON.parse(e.newValue)));
-            } catch { dispatch(null); }
+            } catch (err) {
+                logError("AutoCatch", "Unhandled exception", err);
+                dispatch(null);
+            }
         };
         localBusListener = (e: Event) => {
             const detail = (e as CustomEvent<RecordingSession>).detail;

@@ -34,8 +34,8 @@ function findButton(xpath: string, ariaLabel: string): HTMLElement | null {
         if (node instanceof HTMLElement) {
             return node;
         }
-    } catch {
-        // fall through to aria-label scan
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
     const all = document.querySelectorAll<HTMLElement>('button[aria-label="' + ariaLabel + '"]');
     return all.length > 0 ? all[0] : null;

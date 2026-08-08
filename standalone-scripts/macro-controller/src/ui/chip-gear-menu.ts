@@ -283,11 +283,13 @@ async function runReseedAndOpen(role: PromptRole, force: boolean): Promise<void>
       'Force reset will overwrite the "plan-default" and "next-default" prompt bodies with the shipped canonical text. '
       + 'Any edits you made to those two rows will be lost. Custom prompts you added are untouched.\n\nProceed?'
     );
-    if (!ok) return;
+    const isMissingOk = !ok;
+    if (isMissingOk) return;
   }
   showToast(force ? '⚠️ Forcing default reset…' : '🔄 Re-seeding defaults…', 'info');
   const result = await reseedPromptsOnDemand({ force });
-  if (!result.ok) {
+  const isMissingOk = !result.ok;
+  if (isMissingOk) {
     const reason = result.error ?? 'unknown';
     reportGearFailure(
       'SEED_RESEED_E001',
@@ -315,7 +317,8 @@ async function runRepairAndOpen(role: PromptRole): Promise<void> {
   const { buildRepairReport, stashRepairReport, showRepairReportModal } = await import('./repair-report-modal');
   const report = buildRepairReport(result);
   stashRepairReport(report);
-  if (!result.isHealthy) {
+  const isMissingIsHealthy = !result.isHealthy;
+  if (isMissingIsHealthy) {
     const durationMs = Date.now() - startedAt;
     reportGearFailure(
       'REPAIR_RUN_E001',
@@ -339,16 +342,19 @@ async function runRepairAndOpen(role: PromptRole): Promise<void> {
 
 async function editSpecific(role: PromptRole, roleLabel: string): Promise<void> {
   const picked = await pickPromptFromRole({ role, roleLabel, title: 'Edit which ' + roleLabel + ' prompt?', confirmLabel: 'Edit' });
-  if (!picked) return;
+  const isMissingPicked = !picked;
+  if (isMissingPicked) return;
   await openPromptEditor({ role, promptId: picked.Id });
 }
 
 async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
   const picked = await pickPromptFromRole({ role, roleLabel, title: 'Set active ' + roleLabel + ' prompt', confirmLabel: 'Set active' });
-  if (!picked) return;
+  const isMissingPicked = !picked;
+  if (isMissingPicked) return;
   if (picked.IsDefault === 1) { showToast('Already active', 'info'); return; }
   const res = await setDefaultPromptForRole(picked.Id, role);
-  if (!res.ok) {
+  const isMissingOk = !res.ok;
+  if (isMissingOk) {
     const reason = res.error ?? 'unknown';
     reportGearFailure(
       'DB_WRITE_E003',
@@ -369,7 +375,8 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
 
 async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> {
   const picked = await pickPromptFromRole({ role, roleLabel, title: 'Delete which custom ' + roleLabel + ' prompt?', excludeDefault: true, confirmLabel: 'Delete' });
-  if (!picked) return;
+  const isMissingPicked = !picked;
+  if (isMissingPicked) return;
   const { confirmDialog } = await import('./confirm-dialog');
   const ok = await confirmDialog({
     title: 'Delete prompt?',
@@ -378,9 +385,11 @@ async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> 
     cancelLabel: 'Cancel',
     destructive: true,
   });
-  if (!ok) return;
+  const isMissingOk = !ok;
+  if (isMissingOk) return;
   const res = await deletePromptById(picked.Id);
-  if (!res.ok) {
+  const isMissingOk = !res.ok;
+  if (isMissingOk) {
     const reason = res.error ?? 'unknown';
     reportGearFailure(
       'DB_WRITE_E004',

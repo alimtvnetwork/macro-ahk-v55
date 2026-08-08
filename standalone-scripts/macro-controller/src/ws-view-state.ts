@@ -18,7 +18,8 @@ class WsListViewState {
   }
 
   static getInstance(): WsListViewState {
-    if (!WsListViewState.instance) {
+    const isMissingInstance = !WsListViewState.instance;
+    if (isMissingInstance) {
       WsListViewState.instance = new WsListViewState();
     }
     return WsListViewState.instance;

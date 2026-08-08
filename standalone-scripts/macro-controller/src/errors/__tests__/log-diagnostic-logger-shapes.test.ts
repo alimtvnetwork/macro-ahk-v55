@@ -137,6 +137,7 @@ describe('logDiagnosticFromCode — rejected logger shapes fall back cleanly', (
         try {
           logDiagnosticFromCode('PROMPT_EDIT_E001', CTX);
         } catch (e) {
+          logError("AutoCatch", "Unhandled exception", e);
           threw = e;
         }
 

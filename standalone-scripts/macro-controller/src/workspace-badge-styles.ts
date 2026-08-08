@@ -83,7 +83,8 @@ export function styleContainsRedPalette(style: BadgeStyle): boolean {
 export function diluteBadgeBg(bg: string, factor: number): string {
   if (bg === 'transparent') return 'transparent';
   const m = bg.match(/rgba\((\d+),(\d+),(\d+),([\d.]+)\)/);
-  if (!m) return bg;
+  const isMissingM = !m;
+  if (isMissingM) return bg;
   const a = Math.max(0.05, parseFloat(m[4]) * factor);
   return 'rgba(' + m[1] + ',' + m[2] + ',' + m[3] + ',' + a.toFixed(2) + ')';
 }

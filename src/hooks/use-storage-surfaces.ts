@@ -27,7 +27,8 @@ export function useSessionStorage() {
         type: "STORAGE_SESSION_LIST",
       });
       setEntries(result.entries ?? []);
-    } catch {
+    } catch (err) {
+      logError("AutoCatch", "Unhandled exception", err);
       setEntries([]);
     }
     setLoading(false);
@@ -63,7 +64,8 @@ export function useCookies() {
         type: "STORAGE_COOKIES_LIST",
       });
       setEntries(result.entries ?? []);
-    } catch {
+    } catch (err) {
+      logError("AutoCatch", "Unhandled exception", err);
       setEntries([]);
     }
     setLoading(false);
@@ -96,7 +98,8 @@ export function useLocalStorage() {
         type: "GET_DATA_STORE_ALL",
       });
       setEntries(result.entries ?? []);
-    } catch {
+    } catch (err) {
+      logError("AutoCatch", "Unhandled exception", err);
       setEntries([]);
     }
     setLoading(false);

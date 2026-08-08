@@ -54,6 +54,7 @@ async function invalidateJsonCopy(): Promise<void> {
     const { clearPromptCache } = await import('./prompt-cache');
     await clearPromptCache();
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'read-memory-admin-cache',
       reason: err instanceof Error ? err.message : String(err),
@@ -235,7 +236,8 @@ function buildPanel(): HTMLElement {
 
 async function renderBody(panel: HTMLElement, refresh: () => Promise<void>): Promise<void> {
   const body = panel.querySelector<HTMLElement>('[data-role="body"]');
-  if (!body) return;
+  const isMissingBody = !body;
+  if (isMissingBody) return;
   body.replaceChildren(buildLoadingState());
   const rows = await fetchReadMemoryRows();
   const parts: HTMLElement[] = [buildSubtitle(rows.length)];

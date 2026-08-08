@@ -82,6 +82,9 @@ export function InjectionErrorPanel() {
       });
       setErrors(res.errors ?? []);
     } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
       setErrors([]);
     }
     setLoading(false);
@@ -358,6 +361,9 @@ function ClearAllButton({ onCleared }: { onCleared: () => void }) {
       await sendMessage({ type: "CLEAR_ERRORS" });
       onCleared();
     } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
       // ignore
     }
     setClearing(false);

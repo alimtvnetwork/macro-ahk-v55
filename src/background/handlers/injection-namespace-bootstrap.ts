@@ -36,11 +36,13 @@ export async function bootstrapNamespaceRoot(tabId: number): Promise<void> {
             target: { tabId },
             func: () => {
                 const win = window as unknown as Record<string, unknown>;
-                if (!win.RiseupAsiaMacroExt) {
+                const isMissingRiseupAsiaMacroExt = !win.RiseupAsiaMacroExt;
+                if (isMissingRiseupAsiaMacroExt) {
                     win.RiseupAsiaMacroExt = { Projects: {} };
                 } else {
                     const ext = win.RiseupAsiaMacroExt as Record<string, unknown>;
-                    if (!ext.Projects) {
+                    const isMissingProjects = !ext.Projects;
+                    if (isMissingProjects) {
                         ext.Projects = {};
                     }
                 }
@@ -67,6 +69,7 @@ export async function bootstrapNamespaceRoot(tabId: number): Promise<void> {
                 world: "MAIN" as chrome.scripting.ExecutionWorld,
             });
         } catch (warnErr) {
+            logError("AutoCatch", "Unhandled exception", warnErr);
             logBgWarnError(BgLogTag.INJECTION, "MAIN-world bootstrap-warning script failed to inject (best-effort console banner suppressed)", warnErr);
         }
     }
@@ -123,10 +126,12 @@ export async function injectSettingsNamespace(tabId: number, allProjects: Stored
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity
 export async function injectProjectNamespaces(tabId: number, allProjects: StoredProject[]): Promise<void> {
     const activeId = getActiveProjectId();
-    if (!activeId) return;
+    const isMissingActiveId = !activeId;
+    if (isMissingActiveId) return;
 
     const activeProject = allProjects.find((p) => p.id === activeId);
-    if (!activeProject) return;
+    const isMissingActiveProject = !activeProject;
+    if (isMissingActiveProject) return;
 
     const projectIds = new Set<string>([activeId]);
 
@@ -154,6 +159,7 @@ export async function injectProjectNamespaces(tabId: number, allProjects: Stored
             ? configResult[STORAGE_KEY_ALL_CONFIGS]
             : [];
     } catch (cfgErr) {
+        logError("AutoCatch", "Unhandled exception", cfgErr);
         logBgWarnError(BgLogTag.INJECTION, `chrome.storage.local.get("${STORAGE_KEY_ALL_CONFIGS}") failed — proceeding with empty configs[]`, cfgErr);
     }
     void allConfigs;
@@ -166,7 +172,8 @@ export async function injectProjectNamespaces(tabId: number, allProjects: Stored
 
     for (const pid of projectIds) {
         const project = allProjects.find((p) => p.id === pid);
-        if (!project) continue;
+        const isMissingProject = !project;
+        if (isMissingProject) continue;
 
         const projectSlug = project.slug || slugify(project.name);
         const codeName = project.codeName || toCodeName(projectSlug);
@@ -177,11 +184,13 @@ export async function injectProjectNamespaces(tabId: number, allProjects: Stored
         }
 
         let nsScript = cachedScripts.get(pid);
-        if (!nsScript) {
+        const isMissingNsScript = !nsScript;
+        if (isMissingNsScript) {
             let fileCache: Array<{ name: string; data: string }> = [];
             try {
                 fileCache = getFilesByProject(pid, 50);
-            } catch {
+            } catch (err) {
+                logError("AutoCatch", "Unhandled exception", err);
                 fileCache = [];
             }
 

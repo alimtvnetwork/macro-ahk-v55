@@ -57,7 +57,9 @@ async function readAuthCookie(): Promise<ChromeCookie | null> {
     try {
         const [tab] = await _chr.tabs.query({ active: true, currentWindow: true });
         primaryUrl = tab?.url ?? null;
-    } catch { /* ignore */ } // allow-swallow: tabs.query rejects on restricted pages; primaryUrl is a heuristic, cookie fallback covers the miss.
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+    } // allow-swallow: tabs.query rejects on restricted pages; primaryUrl is a heuristic, cookie fallback covers the miss.
 
     const sessionCookie = await readCookieFromCandidates("lovable-session-id.id", primaryUrl);
 

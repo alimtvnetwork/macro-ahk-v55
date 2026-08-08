@@ -179,8 +179,8 @@ function ensureDefaultDatabases(db: SqlJsDatabase, slug: string): void { // esli
                     [def.databaseName, def.databaseKindId, def.description],
                 );
             }
-        } catch { // allow-swallow: ProjectDatabases table may not exist yet if MetaTables schema hasn't run
-            // ProjectDatabases table may not exist yet if MetaTables schema hasn't run
+        } catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
         }
     }
 
@@ -195,7 +195,8 @@ function buildCreateTableSql(
         "Id INTEGER PRIMARY KEY AUTOINCREMENT",
         ...tableDef.Columns.map((c) => {
             let col = `${c.Name} ${c.Type}`;
-            if (!c.Nullable) col += " NOT NULL";
+            const isMissingNullable = !c.Nullable;
+            if (isMissingNullable) col += " NOT NULL";
             if (c.Unique) col += " UNIQUE";
             if (c.Default !== undefined) col += ` DEFAULT ${c.Default}`;
             return col;
@@ -214,8 +215,8 @@ async function tryLoadDb(sql: SqlJs, slug: string, schema: string): Promise<SqlJ
         persistenceMode = "opfs";
         console.log(`[project-db] OPFS: ${slug}`);
         return db;
-    } catch { // allow-swallow: OPFS unavailable, falls through to chrome.storage
-        // OPFS unavailable
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 
     // Try chrome.storage.local
@@ -224,8 +225,8 @@ async function tryLoadDb(sql: SqlJs, slug: string, schema: string): Promise<SqlJ
         persistenceMode = "storage";
         console.log(`[project-db] storage: ${slug}`);
         return db;
-    } catch { // allow-swallow: storage failed, falls through to in-memory db
-        // storage failed
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 
     // In-memory fallback
@@ -242,7 +243,8 @@ async function tryLoadDb(sql: SqlJs, slug: string, schema: string): Promise<SqlJ
 
 export function getProjectDb(slug: string): SqlJsDatabase {
     const db = projectDbs.get(slug);
-    if (!db) throw new Error(`[project-db] Not initialized: ${slug}`);
+    const isMissingDb = !db;
+    if (isMissingDb) throw new Error(`[project-db] Not initialized: ${slug}`);
     return wrapDatabaseWithBindSafety(db);
 }
 
@@ -256,7 +258,8 @@ export function hasProjectDb(slug: string): boolean {
 
 export async function flushProjectDb(slug: string): Promise<void> {
     const db = projectDbs.get(slug);
-    if (!db) return;
+    const isMissingDb = !db;
+    if (isMissingDb) return;
 
     if (persistenceMode === "opfs") {
         const root = await navigator.storage.getDirectory();
@@ -301,7 +304,9 @@ export async function dropProjectDb(slug: string): Promise<void> {
         try {
             const root = await navigator.storage.getDirectory();
             await root.removeEntry(dbFileName(slug));
-        } catch { /* file may not exist */ } // allow-swallow: removeEntry is best-effort cleanup
+        } catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
+        } // allow-swallow: removeEntry is best-effort cleanup
     } else if (persistenceMode === "storage") {
         await chrome.storage.local.remove(storageKey(slug));
     }

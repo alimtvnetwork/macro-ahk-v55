@@ -1,3 +1,4 @@
+import { DomainConstants } from "../constants/domain";
 /**
  * Marco Extension — Cookie Change Watcher
  *
@@ -33,7 +34,7 @@ const REFRESH_COOKIE_NAMES = [
     "__Host-lovable-session-id.refresh",
 ] as const;
 const TARGET_COOKIE_DOMAIN_PARTS = [
-    "lovable.dev",
+    DomainConstants.PRIMARY_DOMAIN,
     "lovable.app",
     "lovableproject.com",
 ] as const;
@@ -95,7 +96,9 @@ async function handleCookieChange(
     const isRefreshCookie = REFRESH_COOKIE_NAMES.includes(cookieName as (typeof REFRESH_COOKIE_NAMES)[number]);
     const isRelevantCookie = isTargetDomain && (isSessionCookie || isRefreshCookie);
 
-    if (!isRelevantCookie) {
+    const isMissingIsRelevantCookie = !isRelevantCookie;
+
+    if (isMissingIsRelevantCookie) {
         return;
     }
 
@@ -252,7 +255,9 @@ async function broadcastToTargetTabs(
         const tabs = await chrome.tabs.query({ url: TARGET_TAB_PATTERNS });
         const hasTargetTabs = tabs.length > 0;
 
-        if (!hasTargetTabs) {
+        const isMissingHasTargetTabs = !hasTargetTabs;
+
+        if (isMissingHasTargetTabs) {
             return;
         }
 

@@ -107,7 +107,9 @@ export function formatRepairReportText(report: RepairReportSummary): string {
 export function stashRepairReport(report: RepairReportSummary): void {
   try {
     if (typeof window !== 'undefined') window.__marcoLastRepairReport = report;
-  } catch { /* window may be absent in tests */ }
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
+  }
   const text = formatRepairReportText(report);
   if (report.reseedAttempted && !report.reseedOk) {
     logDiagnosticFromCode('REPAIR_RESEED_E001', {
@@ -115,7 +117,8 @@ export function stashRepairReport(report: RepairReportSummary): void {
       reason: report.reseedError ?? 'unknown',
     });
   }
-  if (!report.isHealthy) {
+  const isMissingIsHealthy = !report.isHealthy;
+  if (isMissingIsHealthy) {
     logDiagnosticFromCode('REPAIR_RESIDUAL_E001', {
       finalCount: report.finalCount,
       fixedCount: report.fixed.length,
@@ -187,6 +190,7 @@ export function showRepairReportModal(report: RepairReportSummary): HTMLElement 
       void navigator.clipboard.writeText(formatRepairReportText(report));
       copyBtn.textContent = '✓ Copied';
     } catch (caught) {
+      logError("AutoCatch", "Unhandled exception", caught);
       const reason = toErrorMessage(caught);
       logDiagnosticFromCode('REPAIR_COPY_E001', { reason }, caught);
       copyBtn.textContent = 'Copy failed';

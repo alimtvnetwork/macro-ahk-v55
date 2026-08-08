@@ -152,7 +152,8 @@ function evaluateXPathAndSelector(
         if (selector) {
             selectorFound = document.querySelectorAll(selector).length;
         }
-    } catch { // allow-swallow: malformed CSS selector is reported as selectorFound=0 to the caller
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 
     return { xpathFound, selectorFound };

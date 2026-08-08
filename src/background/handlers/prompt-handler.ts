@@ -61,7 +61,8 @@ export function bindPromptDbManager(manager: DbManager): void {
 }
 
 function getDb(): SqlJsDatabase {
-    if (!dbManager) {
+    const isMissingDbManager = !dbManager;
+    if (isMissingDbManager) {
         throw new Error("[prompts] DbManager not bound. Call bindPromptDbManager() first.");
     }
     return dbManager.getLogsDb();
@@ -159,7 +160,8 @@ function ensurePromptsTable(): void {
 function ensureCategoryId(categoryName: string): string {
     const db = getDb();
     const trimmed = categoryName.trim();
-    if (!trimmed) return "";
+    const isMissingTrimmed = !trimmed;
+    if (isMissingTrimmed) return "";
 
     const existing = db.exec("SELECT Id FROM PromptsCategory WHERE Name = ?", [trimmed]);
     if (existing.length > 0 && existing[0].values.length > 0) {
@@ -186,7 +188,8 @@ function findExistingDefaultPromptId(slug: string | undefined, legacySlug: strin
 
 /** Links a prompt to a category via the junction table. */
 function linkPromptToCategory(promptId: string, categoryId: string): void {
-    if (!categoryId) return;
+    const isMissingCategoryId = !categoryId;
+    if (isMissingCategoryId) return;
     const db = getDb();
     try {
         db.run(

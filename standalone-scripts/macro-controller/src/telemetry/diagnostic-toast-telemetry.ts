@@ -81,7 +81,8 @@ export interface EmitDiagnosticToastInput {
 
 
 function redactRequestDetail(rd: RequestDetail | undefined): RequestDetailSnapshot | undefined {
-  if (!rd) return undefined;
+  const isMissingRd = !rd;
+  if (isMissingRd) return undefined;
   const snap: RequestDetailSnapshot = {};
   if (rd.op !== undefined) snap.op = rd.op;
   if (rd.method !== undefined) snap.method = rd.method;
@@ -183,9 +184,10 @@ export function emitDiagnosticToastEvent(input: EmitDiagnosticToastInput): Diagn
   };
   const rd = redactRequestDetail(input.opts?.requestDetail);
   if (rd) {
+    const isMissingCorrelationId = !rd.correlationId;
     // Ensure the snapshot always carries the same id as the event, even
     // when the caller-supplied requestDetail did not include one.
-    if (!rd.correlationId) rd.correlationId = correlationId;
+    if (isMissingCorrelationId) rd.correlationId = correlationId;
     evt.requestDetail = rd;
   }
   if (input.detail !== undefined) evt.detail = input.detail;
@@ -204,7 +206,8 @@ export function emitDiagnosticToastEvent(input: EmitDiagnosticToastInput): Diagn
 export function readDiagnosticToastTrace(): DiagnosticToastEvent[] {
   try {
     const raw = localStorage.getItem(StorageKeyType.DiagnosticToastTrace);
-    if (!raw) return [];
+    const isMissingRaw = !raw;
+    if (isMissingRaw) return [];
     const parsed = JSON.parse(raw) as unknown;
     return Array.isArray(parsed) ? (parsed as DiagnosticToastEvent[]) : [];
   } catch (err) {

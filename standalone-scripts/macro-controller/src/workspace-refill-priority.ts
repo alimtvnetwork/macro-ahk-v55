@@ -28,7 +28,8 @@ function resolvedAvailable(ws: WorkspaceCredit): number {
  */
 export function daysToRefillForWs(ws: WorkspaceCredit, nowMs?: number): number | null {
   const iso = ws.nextRefillAt || ws.billingPeriodEndAt || '';
-  if (!iso) return null;
+  const isMissingIso = !iso;
+  if (isMissingIso) return null;
   const d = daysUntil(iso, nowMs);
   return d < 0 ? null : d;
 }

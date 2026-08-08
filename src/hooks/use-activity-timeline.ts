@@ -98,7 +98,8 @@ export function useActivityTimeline(limit = 500) {
       // counts, badges, or the drawer list. See BENIGN_WARNING_PATTERNS.
       setLogs(mappedLogs.filter((e) => !isBenignWarning(e)));
       setErrors(mappedErrors.filter((e) => !isBenignWarning(e)));
-    } catch {
+    } catch (err) {
+      logError("AutoCatch", "Unhandled exception", err);
       // Preview mode — use empty arrays
       setLogs([]);
       setErrors([]);

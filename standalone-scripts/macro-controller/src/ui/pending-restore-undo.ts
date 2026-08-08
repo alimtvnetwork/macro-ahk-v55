@@ -75,7 +75,8 @@ function safeLocalStorage(): Storage | null {
 
 export function writePendingRestoreUndo(record: PendingRestoreUndo): void {
     const store = safeLocalStorage();
-    if (!store) return;
+    const isMissingStore = !store;
+    if (isMissingStore) return;
     try {
         store.setItem(STORAGE_KEY, JSON.stringify(record));
     } catch (err) {
@@ -85,7 +86,8 @@ export function writePendingRestoreUndo(record: PendingRestoreUndo): void {
 
 export function readPendingRestoreUndo(): PendingRestoreUndo | null {
     const store = safeLocalStorage();
-    if (!store) return null;
+    const isMissingStore = !store;
+    if (isMissingStore) return null;
     let raw: string | null = null;
     try {
         raw = store.getItem(STORAGE_KEY);
@@ -107,11 +109,12 @@ export function readPendingRestoreUndo(): PendingRestoreUndo | null {
 
 export function clearPendingRestoreUndo(): void {
     const store = safeLocalStorage();
-    if (!store) return;
+    const isMissingStore = !store;
+    if (isMissingStore) return;
     try {
         store.removeItem(STORAGE_KEY);
-    } catch {
-        /* no-op */
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 }
 
@@ -142,7 +145,8 @@ async function reverseInsert(p: InsertPayload): Promise<{ ok: boolean; error?: s
  */
 export function hydratePendingRestoreUndo(now: number = Date.now()): boolean {
     const record = readPendingRestoreUndo();
-    if (!record) return false;
+    const isMissingRecord = !record;
+    if (isMissingRecord) return false;
     const remaining = record.expiresAt - now;
     if (remaining <= 0) {
         clearPendingRestoreUndo();
@@ -157,7 +161,8 @@ export function hydratePendingRestoreUndo(now: number = Date.now()): boolean {
         const result = record.payload.kind === 'update'
             ? await reverseUpdate(record.payload)
             : await reverseInsert(record.payload);
-        if (!result.ok) {
+        const isMissingOk = !result.ok;
+        if (isMissingOk) {
             logError(LOG_SCOPE, 'reverse failed after refresh', result.error);
             showToast('❌ Undo failed: ' + (result.error ?? 'unknown'), 'error');
             return;

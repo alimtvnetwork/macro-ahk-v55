@@ -214,7 +214,8 @@ function buildCreditRefreshItem(wsId: string, wsName: string): HTMLElement {
 function appendRemixAndGithubItems(menu: HTMLElement, wsId: string): void {
   const projectId = extractProjectIdFromUrl();
   const projectName = getDisplayProjectName();
-  if (!projectId) { return; }
+  const isMissingProjectId = !projectId;
+  if (isMissingProjectId) { return; }
   menu.appendChild(buildCtxMenuItem('🔀 Remix Project…', function () {
     removeWsContextMenu();
     actionRemixManual({ projectId, workspaceId: wsId, currentProjectName: projectName });
@@ -452,7 +453,8 @@ function buildRenameInput(currentName: string): HTMLInputElement {
 }
 
 function commitRename(wsId: string, currentName: string, newName: string): void {
-  if (!newName) {
+  const isMissingNewName = !newName;
+  if (isMissingNewName) {
     log('[Rename] Empty name — cancelled', 'warn');
     populateLoopWorkspaceDropdown();
     return;
@@ -484,7 +486,8 @@ function commitRename(wsId: string, currentName: string, newName: string): void 
 
 function findNameDiv(wsId: string): HTMLElement | null {
   const listEl = document.getElementById(DomIdType.LoopWsList);
-  if (!listEl) return null;
+  const isMissingListEl = !listEl;
+  if (isMissingListEl) return null;
   const items = listEl.querySelectorAll(CSS_WS_ITEM);
   for (const item of Array.from(items)) {
     if (item.getAttribute(DataAttrType.WsId) !== wsId) continue;
@@ -499,7 +502,8 @@ function findNameDiv(wsId: string): HTMLElement | null {
  */
 export function startInlineRename(wsId: string, currentName: string): void {
   const nameDiv = findNameDiv(wsId);
-  if (!nameDiv) return;
+  const isMissingNameDiv = !nameDiv;
+  if (isMissingNameDiv) return;
 
   const wrap = document.createElement('div');
   wrap.style.cssText = 'display:flex;align-items:center;gap:3px;width:100%;';
@@ -520,7 +524,8 @@ export function startInlineRename(wsId: string, currentName: string): void {
       const ok = window.confirm(
         'Discard unsaved rename?\n\n"' + currentName + '" → "' + typed + '"',
       );
-      if (!ok) {
+      const isMissingOk = !ok;
+      if (isMissingOk) {
         input.focus();
         return;
       }

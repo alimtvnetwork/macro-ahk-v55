@@ -109,7 +109,8 @@ function shouldSkipProbe(
 ): boolean {
     const hasBindings = record.lastGoodBindings !== undefined
         && record.lastGoodBindings.length > 0;
-    if (!hasBindings) return true;
+    const isMissingHasBindings = !hasBindings;
+    if (isMissingHasBindings) return true;
 
     const injectionAge = Date.now() - new Date(record.timestamp).getTime();
     if (injectionAge < MIN_INJECTION_AGE_MS) return true;
@@ -165,7 +166,9 @@ async function probeAndReinject(tabId: number): Promise<void> {
     const record = getTabInjections()[tabId];
     const hasRecord = record !== undefined;
 
-    if (!hasRecord) {
+    const isMissingHasRecord = !hasRecord;
+
+    if (isMissingHasRecord) {
         return;
     }
 
@@ -220,7 +223,9 @@ async function reinjectFromSnapshot(tabId: number): Promise<void> {
     const bindings = record?.lastGoodBindings;
     const hasBindings = bindings !== undefined && bindings.length > 0;
 
-    if (!hasBindings) {
+    const isMissingHasBindings = !hasBindings;
+
+    if (isMissingHasBindings) {
         return;
     }
 
@@ -239,6 +244,7 @@ async function reinjectFromSnapshot(tabId: number): Promise<void> {
 
         logReinjectSuccess(tabId, sorted.length);
     } catch (error) {
+        logError("AutoCatch", "Unhandled exception", error);
         logReinjectError(tabId, error);
     }
 }

@@ -202,7 +202,10 @@ export async function runKeywordEventChain(
                 : pauseMs;
             if (effective > 0) {
                 try { await pause(effective, options.signal); }
-                catch { aborted = true; break; }
+                catch (err) {
+                    logError("AutoCatch", "Unhandled exception", err);
+                    aborted = true;break;
+                }
             }
         }
     }

@@ -55,7 +55,10 @@ function saveStateBeforeReinject(): void {
         available: loopCreditState.currentWs?.available || 0,
       });
       localStorage.setItem(REINJECT_KEYS.creditData, creditSnapshot);
-    } catch (_e) { logSub('Re-inject: credit snapshot save failed — ' + (_e instanceof Error ? _e.message : String(_e)), 1); }
+    } catch (_e) {
+      logError("AutoCatch", "Unhandled exception", _e);
+      logSub('Re-inject: credit snapshot save failed — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
+    }
     localStorage.setItem(REINJECT_KEYS.timestamp, String(Date.now()));
     log('Re-inject: state saved to localStorage', 'info');
   } catch (e) {
@@ -70,14 +73,18 @@ function saveStateBeforeReinject(): void {
 export function restoreReinjectState(): { restored: boolean; loopWasRunning: boolean } {
   try {
     const tsStr = localStorage.getItem(REINJECT_KEYS.timestamp);
-    if (!tsStr) return { restored: false, loopWasRunning: false };
+    const isMissingTsStr = !tsStr;
+    if (isMissingTsStr) return { restored: false, loopWasRunning: false };
 
     const ts = parseInt(tsStr, 10);
     const age = Date.now() - ts;
 
     // Clear all keys regardless
     Object.values(REINJECT_KEYS).forEach(function(k) {
-      try { localStorage.removeItem(k); } catch (_e) { logSub('Re-inject: failed to clear key ' + k + ' — ' + (_e instanceof Error ? _e.message : String(_e)), 1); }
+      try { localStorage.removeItem(k); } catch (_e) {
+        logError("AutoCatch", "Unhandled exception", _e);
+        logSub('Re-inject: failed to clear key ' + k + ' — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
+      }
     });
 
     if (age > 10000) {
@@ -99,7 +106,8 @@ export function restoreReinjectState(): { restored: boolean; loopWasRunning: boo
 export function checkAndRestoreReinjectState(): { restored: boolean; loopWasRunning: boolean; wsName: string; wsId: string } {
   try {
     const tsStr = localStorage.getItem(REINJECT_KEYS.timestamp);
-    if (!tsStr) return { restored: false, loopWasRunning: false, wsName: '', wsId: '' };
+    const isMissingTsStr = !tsStr;
+    if (isMissingTsStr) return { restored: false, loopWasRunning: false, wsName: '', wsId: '' };
 
     const ts = parseInt(tsStr, 10);
     const age = Date.now() - ts;
@@ -111,7 +119,10 @@ export function checkAndRestoreReinjectState(): { restored: boolean; loopWasRunn
 
     // Clear all keys
     Object.values(REINJECT_KEYS).forEach(function(k) {
-      try { localStorage.removeItem(k); } catch (_e) { logSub('Re-inject: failed to clear key ' + k + ' — ' + (_e instanceof Error ? _e.message : String(_e)), 1); }
+      try { localStorage.removeItem(k); } catch (_e) {
+        logError("AutoCatch", "Unhandled exception", _e);
+        logSub('Re-inject: failed to clear key ' + k + ' — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
+      }
     });
 
     if (age > 10000) {
@@ -212,7 +223,8 @@ function performVersionCheck(ctx: VersionCheckCtx): void {
   let resultPromise: Promise<ExtensionResponse> | undefined;
   try {
     resultPromise = sendToExtension('GET_SCRIPT_INFO', { scriptName: 'macroController' }) as Promise<ExtensionResponse> | undefined;
-  } catch {
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     resultPromise = undefined;
   }
   if (!resultPromise || typeof resultPromise.then !== 'function') {
@@ -355,7 +367,9 @@ function _handleReinject(reinjectBtn: HTMLElement, statusRow: HTMLElement): void
     return;
   }
 
-  if (!window.__marcoRelayActive) {
+  const isMissing__marcoRelayActive = !window.__marcoRelayActive;
+
+  if (isMissing__marcoRelayActive) {
     showToast('Message relay inactive — cannot re-inject', 'error');
     return;
   }

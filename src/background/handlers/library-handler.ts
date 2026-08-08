@@ -47,7 +47,8 @@ export function bindLibraryDbManager(manager: DbManager): void {
 }
 
 function getDb(): SqlJsDatabase {
-    if (!dbManager) throw new Error("[library] DbManager not bound\n  Path: src/background/handlers/library-handler.ts\n  Missing: DbManager binding\n  Reason: bindLibraryDbManager() was never called");
+    const isMissingDbManager = !dbManager;
+    if (isMissingDbManager) throw new Error("[library] DbManager not bound\n  Path: src/background/handlers/library-handler.ts\n  Missing: DbManager binding\n  Reason: bindLibraryDbManager() was never called");
     return dbManager.getLogsDb();
 }
 
@@ -70,6 +71,7 @@ function broadcastLibraryChanged(): void {
             logSampledDebug(BgLogTag.LIBRARY, "LIBRARY_CHANGED failed", "LIBRARY_CHANGED broadcast had no receiver", sendErr instanceof Error ? sendErr : String(sendErr));
         });
     } catch (broadcastErr) {
+        logError("AutoCatch", "Unhandled exception", broadcastErr);
         logBgWarnError(BgLogTag.LIBRARY, "broadcastLibraryChanged failed", broadcastErr instanceof Error ? broadcastErr : undefined);
     }
 }
@@ -96,6 +98,7 @@ function broadcastLibrarySynced(payload: Omit<LibrarySyncBroadcast, "type">): vo
             logSampledDebug(BgLogTag.LIBRARY, "LIBRARY_SYNC failed", "LIBRARY_SYNC_BROADCAST had no receiver", sendErr instanceof Error ? sendErr : String(sendErr));
         });
     } catch (broadcastErr) {
+        logError("AutoCatch", "Unhandled exception", broadcastErr);
         logBgWarnError(BgLogTag.LIBRARY, "broadcastLibrarySynced failed", broadcastErr instanceof Error ? broadcastErr : undefined);
     }
 }
@@ -192,7 +195,8 @@ function snapshotVersion(db: ReturnType<typeof getDb>, assetId: number, version:
 
 export async function handleSaveSharedAsset(payload: SaveAssetMsg): Promise<{ assetId: number } | HandlerErrorResponse> {
     const asset = payload?.asset;
-    if (!asset) return missingFieldError("asset", "LIBRARY_SAVE_ASSET");
+    const isMissingAsset = !asset;
+    if (isMissingAsset) return missingFieldError("asset", "LIBRARY_SAVE_ASSET");
     if (requireField(asset.Name) === null) return missingFieldError("asset.Name", "LIBRARY_SAVE_ASSET");
     if (requireField(asset.Type) === null) return missingFieldError("asset.Type", "LIBRARY_SAVE_ASSET");
     if (requireField(asset.Slug) === null) return missingFieldError("asset.Slug", "LIBRARY_SAVE_ASSET");
@@ -289,7 +293,8 @@ export async function handleGetAssetLinks(payload: LinkFilterMsg): Promise<{ lin
 
 export async function handleSaveAssetLink(payload: SaveLinkMsg): Promise<{ linkId: number } | HandlerErrorResponse> {
     const link = payload?.link;
-    if (!link) return missingFieldError("link", "LIBRARY_SAVE_LINK");
+    const isMissingLink = !link;
+    if (isMissingLink) return missingFieldError("link", "LIBRARY_SAVE_LINK");
     if (typeof link.SharedAssetId !== "number") return missingFieldError("link.SharedAssetId", "LIBRARY_SAVE_LINK");
     if (typeof link.ProjectId !== "number") return missingFieldError("link.ProjectId", "LIBRARY_SAVE_LINK");
 
@@ -476,7 +481,8 @@ export async function handleGetProjectGroups(): Promise<{ groups: ProjectGroup[]
 
 export async function handleSaveProjectGroup(payload: GroupMsg): Promise<{ groupId: number; cascadedCount: number } | HandlerErrorResponse> {
     const group = payload?.group;
-    if (!group) return missingFieldError("group", "LIBRARY_SAVE_GROUP");
+    const isMissingGroup = !group;
+    if (isMissingGroup) return missingFieldError("group", "LIBRARY_SAVE_GROUP");
     if (requireField(group.Name) === null) return missingFieldError("group.Name", "LIBRARY_SAVE_GROUP");
 
     const db = getDb();
@@ -607,7 +613,8 @@ export async function handleCascadeGroupSettings(payload: GroupIdMsg): Promise<{
     }
 
     const settingsJson = result[0].values[0][0] as string | null;
-    if (!settingsJson) {
+    const isMissingSettingsJson = !settingsJson;
+    if (isMissingSettingsJson) {
         return { cascadedCount: 0 };
     }
 
@@ -694,7 +701,10 @@ function exportAssets(db: SqlJsDatabase): LibraryExport["assets"] {
     while (stmt.step()) {
         const row = stmt.getAsObject() as SharedAsset;
         let content: JsonValue;
-        try { content = JSON.parse(row.ContentJson); } catch { content = row.ContentJson; }
+        try { content = JSON.parse(row.ContentJson); } catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
+            content = row.ContentJson;
+        }
         assets.push({ type: row.Type, slug: row.Slug, name: row.Name, version: row.Version, content });
     }
     stmt.free();
@@ -710,7 +720,10 @@ function exportGroups(db: SqlJsDatabase): LibraryExport["groups"] {
         const memberProjectIds = memberResult.length > 0 ? memberResult[0].values.map((v) => v[0] as string) : [];
         let sharedSettings: JsonValue = null;
         if (row.SharedSettingsJson) {
-            try { sharedSettings = JSON.parse(row.SharedSettingsJson); } catch { sharedSettings = row.SharedSettingsJson; }
+            try { sharedSettings = JSON.parse(row.SharedSettingsJson); } catch (err) {
+                logError("AutoCatch", "Unhandled exception", err);
+                sharedSettings = row.SharedSettingsJson;
+            }
         }
         groups.push({ name: row.Name, sharedSettings, memberProjectIds });
     }

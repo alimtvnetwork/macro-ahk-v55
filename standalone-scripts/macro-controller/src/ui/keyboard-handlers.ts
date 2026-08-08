@@ -1,3 +1,4 @@
+import { DomainConstants } from "../constants/domain";
 /**
  * MacroLoop Controller — Keyboard Handlers
  * Step 2g: Extracted from macro-looping.ts
@@ -51,13 +52,15 @@ function isOnProjectPageForShortcut(): boolean {
     const isSupportedHost = (
       host === 'localhost'
       || host.endsWith('.localhost')
-      || host === 'lovable.dev'
-      || host.endsWith('.lovable.dev')
+      || host === DomainConstants.PRIMARY_DOMAIN
+      || host.endsWith(DomainConstants.PRIMARY_DOMAIN_DOT)
       || host.endsWith('.lovable.app')
       || host.endsWith('.lovableproject.com')
     );
 
-    if (!isSupportedHost) return false;
+    const isMissingIsSupportedHost = !isSupportedHost;
+
+    if (isMissingIsSupportedHost) return false;
 
     const isSettings = path.includes('/settings');
     const isProjectPath = path.includes('/projects/');
@@ -165,7 +168,8 @@ function handleCtrlAltShortcut(e: KeyboardEvent, deps: KeyboardHandlerDeps): boo
 export function registerKeyboardHandlers(deps: KeyboardHandlerDeps): void {
   document.addEventListener('keydown', function(e: KeyboardEvent) {
     if (handleTaskNextShortcut(e, deps.taskNextDeps)) return;
-    if (!e.ctrlKey) return;
+    const isMissingCtrlKey = !e.ctrlKey;
+    if (isMissingCtrlKey) return;
     if (!e.altKey && !e.shiftKey) { handleCtrlOnlyShortcut(e, deps); return; }
     if (e.altKey && !e.shiftKey) { handleCtrlAltShortcut(e, deps); }
   });

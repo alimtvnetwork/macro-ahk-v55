@@ -11,12 +11,19 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { openPromptHistoryPanel } from '../prompt-history-panel';
 import type { PromptRevisionRow } from '../../db/prompt-revision-db';
 
-const rev = (over: Partial<PromptRevisionRow> = {}): PromptRevisionRow => ({
-    Id: 1, PromptId: 1, Slug: 'plan-default', Name: 'PlanTierType',
-    Body: 'body {{n}}', Role: 'plan', ReplaceKey: 'n',
-    ReplaceValues: '[]', CreatedAt: 1000, Reason: 'upsert',
-    ...over,
-}) as PromptRevisionRow;
+const rev = (over: Partial<PromptRevisionRow> = {}): PromptRevisionRow => (({
+    Id: 1,
+    PromptId: 1,
+    Slug: 'plan-default',
+    Name: 'PlanTierType',
+    Body: 'body {{n}}',
+    Role: 'plan',
+    ReplaceKey: 'n',
+    ReplaceValues: '[]',
+    CreatedAt: 1000,
+    Reason: 'upsert',
+    ...over
+}) as PromptRevisionRow);
 
 async function mount(): Promise<HTMLElement> {
     await openPromptHistoryPanel(
@@ -33,7 +40,8 @@ async function mount(): Promise<HTMLElement> {
         },
     );
     const toolbar = document.querySelector<HTMLElement>('[data-role="history-toolbar"]');
-    if (!toolbar) throw new Error('toolbar not rendered');
+    const isMissingToolbar = !toolbar;
+    if (isMissingToolbar) throw new Error('toolbar not rendered');
     return toolbar;
 }
 

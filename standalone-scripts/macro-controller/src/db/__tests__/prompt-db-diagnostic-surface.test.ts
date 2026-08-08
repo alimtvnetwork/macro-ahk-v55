@@ -47,7 +47,8 @@ beforeEach(() => {
 
 function pickWhere(): string | undefined {
     const call = logDiagnosticMock.mock.calls[0];
-    if (!call) return undefined;
+    const isMissingCall = !call;
+    if (isMissingCall) return undefined;
     const context = call[1] as { where?: string };
     return context.where;
 }

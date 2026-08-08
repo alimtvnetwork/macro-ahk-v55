@@ -51,9 +51,11 @@ function autoAttachDelay(ms: number) {
 }
 
 export function clickByXPath(xpath: string, label: string): boolean {
-  if (!xpath) { log('Auto-Attach: No XPath for ' + label, 'warn'); return false; }
+  const isMissingXpath = !xpath;
+  if (isMissingXpath) { log('Auto-Attach: No XPath for ' + label, 'warn'); return false; }
   const el = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-  if (!el) { log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn'); return false; }
+  const isMissingEl = !el;
+  if (isMissingEl) { log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn'); return false; }
   (el as HTMLElement).click();
   log('Auto-Attach: Clicked ' + label, 'info');
   return true;
@@ -62,7 +64,8 @@ export function clickByXPath(xpath: string, label: string): boolean {
 export function insertTextIntoElement(xpath: string, text: string, label: string): boolean {
   if (!xpath || !text) return false;
   const el = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as HTMLElement;
-  if (!el) { log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn'); return false; }
+  const isMissingEl = !el;
+  if (isMissingEl) { log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn'); return false; }
   el.focus();
   const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value') ||
                                 Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value');

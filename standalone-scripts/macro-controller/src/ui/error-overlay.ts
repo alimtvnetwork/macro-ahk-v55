@@ -526,7 +526,9 @@ function setupDrag(handle: HTMLElement, overlay: HTMLElement): void {
 function renderErrorList(): void {
   const list = overlayState.listEl;
 
-  if (!list) {
+  const isMissingList = !list;
+
+  if (isMissingList) {
     return;
   }
 
@@ -690,7 +692,9 @@ function handleClearAll(): void {
 function handleMinimize(): void {
   const overlay = overlayState.overlayEl;
 
-  if (!overlay) {
+  const isMissingOverlay = !overlay;
+
+  if (isMissingOverlay) {
     return;
   }
 
@@ -784,8 +788,8 @@ function bridgeErrorToExtension(message: string, stack?: string, source?: string
       stack: stack || '',
       scriptCode: source || 'overlay',
     });
-  } catch { // allow-swallow: Overlay is designed to work independently; extension unavailability is normal (e.g., non-target tab).
-    /* Extension unavailable — silently skip */
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
   }
 }
 

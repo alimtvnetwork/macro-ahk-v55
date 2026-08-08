@@ -340,7 +340,8 @@ function renderHealthChip(
 function computeHealthStatus(
     phase: RecordingPhase, stepCount: number, projectOk: boolean,
 ): SemanticSemantic11487e {
-    if (!projectOk) { return "error"; }
+    const isMissingProjectOk = !projectOk;
+    if (isMissingProjectOk) { return "error"; }
     if (phase === "Recording") { return stepCount > 0 ? "ok" : "warn"; }
     if (phase === "Paused") { return "warn"; }
     return "idle";

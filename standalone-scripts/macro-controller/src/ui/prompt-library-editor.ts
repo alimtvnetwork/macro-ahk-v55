@@ -79,7 +79,8 @@ export async function handleEditSave(refs: ModalRefs, row: PromptRow, payload: E
       replaceKey: payload.replaceKey,
       replaceValues: payload.replaceValues,
     });
-    if (!res.ok) {
+    const isMissingOk = !res.ok;
+    if (isMissingOk) {
       refs.status.textContent = 'Save failed: ' + (res.error ?? 'unknown');
       logError(LOG_SCOPE, 'edit save failed', res);
       return;

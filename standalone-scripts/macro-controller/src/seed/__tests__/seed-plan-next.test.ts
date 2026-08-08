@@ -37,7 +37,9 @@ import { seedPlanNextPrompts } from '../seed-plan-next';
 
 beforeEach(() => {
     captured.length = 0; responsesQueue = []; logCalls.length = 0;
-    try { localStorage.removeItem('marco_last_seed_telemetry'); } catch { /* jsdom */ }
+    try { localStorage.removeItem('marco_last_seed_telemetry'); } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+    }
 });
 
 describe('seedPlanNextPrompts', () => {

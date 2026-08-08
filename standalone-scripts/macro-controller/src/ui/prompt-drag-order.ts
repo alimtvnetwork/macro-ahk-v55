@@ -44,8 +44,8 @@ function runPromptOrderMigrations(): void {
     if (migrated.length > 0) savePromptOrder(migrated);
     for (const key of LEGACY_STORAGE_KEYS) localStorage.removeItem(key);
     localStorage.setItem(MIGRATION_REV_KEY, String(CURRENT_MIGRATION_REV));
-  } catch {
-    /* localStorage unavailable or JSON malformed; keep whatever is there */
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
   }
 }
 
@@ -53,12 +53,15 @@ function readLegacyOrder(): string[] {
   for (const key of LEGACY_STORAGE_KEYS) {
     try {
       const raw = localStorage.getItem(key);
-      if (!raw) continue;
+      const isMissingRaw = !raw;
+      if (isMissingRaw) continue;
       const parsed: unknown = JSON.parse(raw);
       if (Array.isArray(parsed)) {
         return parsed.filter((v): v is string => typeof v === 'string');
       }
-    } catch { /* try next key */ }
+    } catch (err) {
+      logError("AutoCatch", "Unhandled exception", err);
+    }
   }
   return [];
 }
@@ -135,7 +138,8 @@ export const DEFAULT_PROMPT_ORDER: readonly string[] = [
 export function loadPromptOrder(): string[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
+    const isMissingRaw = !raw;
+    if (isMissingRaw) return [];
     const parsed: unknown = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed.filter((v): v is string => typeof v === 'string') : [];
   } catch {
@@ -146,8 +150,8 @@ export function loadPromptOrder(): string[] {
 export function savePromptOrder(order: string[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
-  } catch {
-    /* storage may be full or blocked; ignore */
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
   }
 }
 
@@ -168,7 +172,8 @@ function loadDragTouched(): Set<string> {
   try {
     if (typeof localStorage === 'undefined') return new Set();
     const raw = localStorage.getItem(DRAG_TOUCHED_KEY);
-    if (!raw) return new Set();
+    const isMissingRaw = !raw;
+    if (isMissingRaw) return new Set();
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return new Set();
     return new Set(parsed.filter((v): v is string => typeof v === 'string'));
@@ -181,13 +186,17 @@ function saveDragTouched(set: Set<string>): void {
   try {
     if (typeof localStorage === 'undefined') return;
     localStorage.setItem(DRAG_TOUCHED_KEY, JSON.stringify([...set]));
-  } catch { /* ignore */ }
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
+  }
 }
 
 function clearDragTouched(): void {
   try {
     if (typeof localStorage !== 'undefined') localStorage.removeItem(DRAG_TOUCHED_KEY);
-  } catch { /* ignore */ }
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
+  }
 }
 
 export type SlugPositionSource = SlugPositionSourceType;
@@ -214,7 +223,9 @@ export function getSlugPositionSource(slug: string): SlugPositionInfo {
     if (typeof localStorage !== 'undefined') {
       migrationRev = Number(localStorage.getItem(MIGRATION_REV_KEY) ?? '0') || 0;
     }
-  } catch { /* ignore */ }
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
+  }
   const effective = saved.length > 0 ? saved : DEFAULT_PROMPT_ORDER.slice();
   const index = effective.indexOf(slug);
   let source: SlugPositionSource;
@@ -250,7 +261,9 @@ export function getPromptOrderSource(): PromptOrderSource {
     if (typeof localStorage !== 'undefined') {
       migrationRev = Number(localStorage.getItem(MIGRATION_REV_KEY) ?? '0') || 0;
     }
-  } catch { /* ignore */ }
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
+  }
   const usingSaved = saved.length > 0;
   return {
     source: usingSaved ? 'localStorage' : 'default',
@@ -320,7 +333,8 @@ function handleDragEnd(item: HTMLElement): void {
 }
 
 function handleDragOver(event: DragEvent, item: HTMLElement): void {
-  if (!dragState.draggingSlug) return;
+  const isMissingDraggingSlug = !dragState.draggingSlug;
+  if (isMissingDraggingSlug) return;
   event.preventDefault();
   if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
   clearDropIndicators(findDropdownRoot(item));
@@ -340,7 +354,8 @@ function clearItemIndicator(item: HTMLElement): void {
 }
 
 function clearDropIndicators(root: HTMLElement | null): void {
-  if (!root) return;
+  const isMissingRoot = !root;
+  if (isMissingRoot) return;
   root.querySelectorAll<HTMLElement>('[data-prompt-slug]').forEach(node => {
     node.style.borderTop = '';
     node.style.borderBottom = '';
@@ -362,7 +377,8 @@ function handleDrop(event: DragEvent, target: HTMLElement, onReorder: () => void
   if (!source || source === target) return;
   const insertBefore = shouldInsertBefore(event, target);
   const targetParent = target.parentElement;
-  if (!targetParent) return;
+  const isMissingTargetParent = !targetParent;
+  if (isMissingTargetParent) return;
   if (insertBefore) targetParent.insertBefore(source, target);
   else targetParent.insertBefore(source, target.nextSibling);
   markDragTouched(sourceSlug);

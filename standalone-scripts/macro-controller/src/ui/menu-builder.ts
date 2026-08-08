@@ -213,7 +213,8 @@ function _addExportSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLEl
   exportMenu.panel.appendChild(createMenuItem(menuCtx, '📋', 'Export CSV', 'Export all workspaces + credits as CSV', function() { exportWorkspacesAsCsv(); }));
   exportMenu.panel.appendChild(createMenuItem(menuCtx, '📥', 'Download Bundle', 'Download bundle (xpath-utils + macro-looping) as .js file', function() {
     void fetchBundleSource().then(function(bundle) {
-      if (!bundle) return;
+      const isMissingBundle = !bundle;
+      if (isMissingBundle) return;
       const now = new Date();
       const fullExport = buildBundleHeader(bundle, now) + bundle;
       downloadTextFile('automator-bundle-v' + VERSION + '-' + now.toISOString().replace(/[:.]/g, '-').substring(0, 19) + '.js', fullExport, 'application/javascript');
@@ -223,7 +224,8 @@ function _addExportSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLEl
   }));
   exportMenu.panel.appendChild(createMenuItem(menuCtx, '📋', 'JS Bundle', 'Copy bundle to clipboard', function() {
     void fetchBundleSource().then(function(bundle) {
-      if (!bundle) return;
+      const isMissingBundle = !bundle;
+      if (isMissingBundle) return;
       navigator.clipboard.writeText(bundle).then(function() {
         log('Copy JS: Copied to clipboard (' + bundle.length + ' chars)', 'success');
         showToast('JS bundle copied ✓', 'success');

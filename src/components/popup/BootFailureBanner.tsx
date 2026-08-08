@@ -127,7 +127,10 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       await navigator.clipboard.writeText(buildCurrentReport());
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch { // allow-swallow: clipboard denied; textarea fallback stays visible
+    } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+ // allow-swallow: clipboard denied; textarea fallback stays visible
     }
   };
 
@@ -137,7 +140,10 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       await navigator.clipboard.writeText(ctx.sql);
       setSqlCopied(true);
       setTimeout(() => setSqlCopied(false), 2000);
-    } catch { // allow-swallow: clipboard denied; snippet stays visible for manual copy
+    } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+ // allow-swallow: clipboard denied; snippet stays visible for manual copy
     }
   };
 
@@ -165,7 +171,10 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       setDownloaded(true);
       setTimeout(() => setDownloaded(false), 2000);
-    } catch { // allow-swallow: Blob/URL unavailable in sandbox; Copy report still works
+    } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+ // allow-swallow: Blob/URL unavailable in sandbox; Copy report still works
     }
   };
 

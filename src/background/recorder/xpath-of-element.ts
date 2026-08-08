@@ -38,8 +38,8 @@ function tryIdShortcut(el: Element, id: string): string | null {
         if (matches.length === 1 && matches[0] === el) {
             return `//*[@id='${escapeXPathLiteral(id)}']`;
         }
-    } catch { // allow-swallow: invalid CSS id chars throw on querySelectorAll; positional XPath path below is the intended fallback.
-        // Fall through to positional path.
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
     return null;
 }

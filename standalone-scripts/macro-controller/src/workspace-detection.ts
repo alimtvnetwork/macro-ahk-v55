@@ -231,7 +231,9 @@ async function processTier1Response(
     return;
   }
 
-  if (!resp.ok) {
+  const isMissingOk = !resp.ok;
+
+  if (isMissingOk) {
     log(fn + ': Tier 1 FAILED — HTTP ' + resp.status + ' — falling to passive fallback', 'warn');
 
     if (isAuthFailure(resp.status)) {
@@ -251,7 +253,9 @@ async function processTier1Response(
 
   const data = resp.data as Record<string, unknown> | null;
 
-  if (!data) {
+  const isMissingData = !data;
+
+  if (isMissingData) {
     log(fn + ': Tier 1 — empty response body — falling to passive fallback', 'warn');
     await fallbackDetect(fn, perWs, skipDialog);
 
@@ -264,7 +268,9 @@ async function processTier1Response(
   logSub('Tier 1 response keys: ' + Object.keys(data).join(', '), 1);
   logSub('Extracted workspace_id: "' + wsId + '"', 1);
 
-  if (!wsId) {
+  const isMissingWsId = !wsId;
+
+  if (isMissingWsId) {
     log(fn + ': Tier 1 — no workspace_id in response — falling to passive fallback', 'warn');
     logSub('Response (first 400 chars): ' + JSON.stringify(data).substring(0, 400), 1);
     await fallbackDetect(fn, perWs, skipDialog);
@@ -291,7 +297,8 @@ async function processTier1Response(
 /** Handle single-workspace case. Returns true if resolved. */
 function handleSingleWorkspace(fn: string, perWs: import('./types').WorkspaceCredit[]): boolean {
   if (perWs.length !== 1) return false;
-  if (!state.workspaceName) {
+  const isMissingWorkspaceName = !state.workspaceName;
+  if (isMissingWorkspaceName) {
     state.workspaceName = perWs[0].fullName || perWs[0].name;
     state.workspaceFromApi = true;
     loopCreditState.currentWs = perWs[0];
@@ -341,13 +348,17 @@ export async function autoDetectLoopCurrentWorkspace(
   const projectId = extractProjectIdFromUrl();
   const token = bearerToken || resolveToken();
 
-  if (!projectId) {
+  const isMissingProjectId = !projectId;
+
+  if (isMissingProjectId) {
     log(fn + ': No projectId in URL — skipping Tier 1, falling to passive fallback', 'info');
     await fallbackDetect(fn, perWs, skipDialog);
     return;
   }
 
-  if (!token) {
+  const isMissingToken = !token;
+
+  if (isMissingToken) {
     log(fn + ': No bearer token — skipping Tier 1, falling to passive fallback', 'info');
     await fallbackDetect(fn, perWs, skipDialog);
     return;

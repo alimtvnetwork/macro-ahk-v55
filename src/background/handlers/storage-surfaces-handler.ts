@@ -70,7 +70,8 @@ function resolveSetCookieUrl(input: {
     }
 
     const domain = (input.domain ?? "").trim();
-    if (!domain) {
+    const isMissingDomain = !domain;
+    if (isMissingDomain) {
         throw new Error("[Storage] Cookie set requires url or domain");
     }
 
@@ -128,7 +129,9 @@ export async function handleStorageSessionClear(
 ): Promise<{ isOk: true; cleared: number }> {
     const { prefix } = message as { prefix?: string };
 
-    if (!prefix) {
+    const isMissingPrefix = !prefix;
+
+    if (isMissingPrefix) {
         const raw = await chrome.storage.session.get(null);
         const total = Object.keys(raw).length;
         await chrome.storage.session.clear();
@@ -211,7 +214,8 @@ export async function handleStorageCookiesSet(
     }
 
     const cookie = await chrome.cookies.set(details);
-    if (!cookie) {
+    const isMissingCookie = !cookie;
+    if (isMissingCookie) {
         throw new Error("[Storage] Failed to set cookie");
     }
 

@@ -37,7 +37,10 @@ function useCopyReport(detail: HttpFailFastEventDetail | null): { copied: boolea
             if (timerRef.current !== null) clearTimeout(timerRef.current);
             timerRef.current = window.setTimeout(() => setCopied(false), 2000);
         // allow-swallow: clipboard denied; user can select text manually
-        } catch { /* intentionally empty */ }
+        } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+ /* intentionally empty */ }
     }, [detail]);
     return { copied, handleCopy };
 }

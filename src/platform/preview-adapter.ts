@@ -1,3 +1,4 @@
+import { DomainConstants } from "../constants/domain";
 /**
  * Marco — Preview (Dev) Platform Adapter
  *
@@ -492,7 +493,7 @@ function getMockResponse(message: MessagePayload): string | number | boolean | n
                 {
                     name: "lovable-session-id.id",
                     value: "sess_preview_token",
-                    domain: ".lovable.dev",
+                    domain: DomainConstants.PRIMARY_DOMAIN_DOT,
                     path: "/",
                     secure: true,
                     httpOnly: true,
@@ -503,7 +504,7 @@ function getMockResponse(message: MessagePayload): string | number | boolean | n
                 {
                     name: "lovable-session-id.refresh",
                     value: "refresh_preview_token",
-                    domain: ".lovable.dev",
+                    domain: DomainConstants.PRIMARY_DOMAIN_DOT,
                     path: "/",
                     secure: true,
                     httpOnly: true,

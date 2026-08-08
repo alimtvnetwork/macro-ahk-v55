@@ -73,6 +73,9 @@ export function EndpointAccordionItem({ endpoint }: Props) {
       const response = await sendMessage<unknown>(message as any);
       setResponseJson(toPrettyJson(response));
     } catch (error) {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', error);
+
       setResponseJson(toPrettyJson({
         IsOk: false,
         ErrorMessage: error instanceof Error ? error.message : "Request failed",

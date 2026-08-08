@@ -51,7 +51,8 @@ function isBuiltinScript(script: StoredScript): boolean {
  */
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity -- cache-check + multi-candidate fetch with diagnostics
 async function resolveScriptCode(script: StoredScript): Promise<ResolvedCode> {
-    if (!script.filePath) {
+    const isMissingFilePath = !script.filePath;
+    if (isMissingFilePath) {
         if (isBuiltinScript(script)) {
             throw new Error(`Built-in script "${script.name}" is missing filePath\n  Path: chrome.storage.local script entry id="${script.id}"\n  Missing: filePath field on StoredScript\n  Reason: Built-in scripts MUST have a filePath pointing to dist/ — refusing embedded fallback to prevent stale code injection`);
         }
@@ -73,7 +74,9 @@ async function resolveScriptCode(script: StoredScript): Promise<ResolvedCode> {
             }
             return { code: cached, source: "cache" };
         }
-    } catch (err) { // allow-swallow: cache miss is the expected hot path; throttled to avoid console flooding during test runs
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+        // allow-swallow: cache miss is the expected hot path; throttled to avoid console flooding during test runs
         logBgWarnSampled(BgLogTag.SCRIPT_RESOLVER, `cache-lookup:${script.filePath}`, `Cache lookup failed for ${script.filePath} — falling back to fetch`, err);
     }
 
@@ -212,7 +215,8 @@ async function resolveDependencies(
             if (resolvedIds.has(depId)) continue;
 
             const depScript = findScript(allScripts, depId);
-            if (!depScript) {
+            const isMissingDepScript = !depScript;
+            if (isMissingDepScript) {
                 logBgWarnError(BgLogTag.SCRIPT_RESOLVER, `Dependency not found\n  Path: chrome.storage.local["${STORAGE_KEY_ALL_SCRIPTS}"]\n  Missing: Script with id="${depId}" (required by "${script.name}")\n  Reason: Dependency declared in script.dependencies but no matching script exists in storage`);
                 continue;
             }

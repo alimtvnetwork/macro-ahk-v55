@@ -77,7 +77,8 @@ export async function handleRecorderFieldBindingList(
     message: MessageRequest,
 ): Promise<{ bindings: ReadonlyArray<PersistedFieldBinding> }> {
     const req = message as unknown as ListRequest;
-    if (!req.projectSlug) {
+    const isMissingProjectSlug = !req.projectSlug;
+    if (isMissingProjectSlug) {
         throw new Error("RECORDER_FIELD_BINDING_LIST requires projectSlug");
     }
     const bindings = await listFieldBindings(req.projectSlug);

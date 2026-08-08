@@ -240,7 +240,8 @@ export function applyParamsJsonMigration(db: MigrationDb): void {
     const info = db.exec("PRAGMA table_info(Step)");
     const cols = info[0]?.values ?? [];
     const hasParamsJson = cols.some((row) => row[1] === "ParamsJson");
-    if (!hasParamsJson) {
+    const isMissingHasParamsJson = !hasParamsJson;
+    if (isMissingHasParamsJson) {
         db.run("ALTER TABLE Step ADD COLUMN ParamsJson TEXT");
     }
 }

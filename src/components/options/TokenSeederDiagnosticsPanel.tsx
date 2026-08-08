@@ -115,6 +115,9 @@ export function TokenSeederDiagnosticsPanel() {
             saveDiagnosticsCache(res);
             setNow(Date.now());
         } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
             setData(null);
         } finally {
             setLoading(false);

@@ -157,7 +157,8 @@ function findFirstFailureAfter(
         return outcomes.find((o) => !o.IsOk)?.At ?? null;
     }
     for (let i = lastSuccessIdx + 1; i < outcomes.length; i++) {
-        if (!outcomes[i].IsOk) { return outcomes[i].At; }
+        const isMissingIsOk = !outcomes[i].IsOk;
+        if (isMissingIsOk) { return outcomes[i].At; }
     }
     return null;
 }

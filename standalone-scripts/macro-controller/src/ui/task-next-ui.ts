@@ -172,14 +172,18 @@ function findButtonBySelectors(): HTMLElement | null {
   for (const selector of sendSelectors) {
     try {
       const el = document.querySelector(selector);
-      if (!el) continue;
+      const isMissingEl = !el;
+      if (isMissingEl) continue;
 
       const btn = el.tagName === 'BUTTON' ? el : el.closest('button');
       if (!btn || (btn as HTMLButtonElement).disabled) continue;
 
       log('Task Next: Found submit button via selector: ' + selector, 'info');
       return btn as HTMLElement;
-    } catch (e) { logSub('Task Next: querySelector failed for "' + selector + '": ' + (e instanceof Error ? e.message : String(e)), 1); }
+    } catch (e) {
+      logError("AutoCatch", "Unhandled exception", e);
+      logSub('Task Next: querySelector failed for "' + selector + '": ' + (e instanceof Error ? e.message : String(e)), 1);
+    }
   }
 
   return null;
@@ -207,7 +211,8 @@ export async function dequeueTaskNextPrompt(): Promise<TaskNextPromptResult> {
     const projectId = resolveTaskQueueProjectId();
     const queue = getPersistentTaskQueue();
     const item = await queue.dequeue(projectId);
-    if (!item) return { selection: null, failed: false };
+    const isMissingItem = !item;
+    if (isMissingItem) return { selection: null, failed: false };
     const remaining = await queue.count(projectId);
     log('Task Next: dequeued splitter task for project ' + projectId + ' (' + remaining + ' left)', 'info');
     return { selection: { text: item.text, source: 'queue', remaining }, failed: false };
@@ -410,7 +415,8 @@ async function runTaskNextCycle(
   const cycleStart = Date.now();
   const chosen = await resolveCyclePrompt(deps, legacyPromptText);
   if (chosen.remaining === -1) return 'paste-failed';
-  if (!chosen.text) return 'queue-empty';
+  const isMissingText = !chosen.text;
+  if (isMissingText) return 'queue-empty';
   const promptsCfg = deps.getPromptsConfig();
   const outcome = pasteIntoEditor(chosen.text, promptsCfg, deps.getByXPath);
   if (String(outcome) === 'failed') return 'paste-failed';

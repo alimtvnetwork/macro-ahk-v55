@@ -67,12 +67,15 @@ function createRefreshButton(onRefresh: () => void): HTMLButtonElement {
 function attachCopyDelegation(panel: HTMLElement): void {
     panel.addEventListener('click', function (e: Event): void {
         const target = e.target as HTMLElement | null;
-        if (!target) return;
+        const isMissingTarget = !target;
+        if (isMissingTarget) return;
         const btn = target.closest('[data-copy-url]') as HTMLElement | null;
-        if (!btn) return;
+        const isMissingBtn = !btn;
+        if (isMissingBtn) return;
         e.stopPropagation();
         const url = btn.getAttribute('data-copy-url') ?? '';
-        if (!url) return;
+        const isMissingUrl = !url;
+        if (isMissingUrl) return;
         void copyToClipboard(url, btn);
     });
 }
@@ -209,7 +212,8 @@ async function copyToClipboard(url: string, btn: HTMLElement): Promise<void> {
             ta.select();
             const ok = document.execCommand('copy');
             document.body.removeChild(ta);
-            if (!ok) throwDiagnostic('UI_COPY_E001', { reason: 'execCommand("copy") returned false', strategy: 'execCommand' });
+            const isMissingOk = !ok;
+            if (isMissingOk) throwDiagnostic('UI_COPY_E001', { reason: 'execCommand("copy") returned false', strategy: 'execCommand' });
         }
         btn.textContent = '✓ Copied';
         btn.style.background = '#065f46';

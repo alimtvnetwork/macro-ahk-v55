@@ -171,7 +171,8 @@ export { sendToExtension };
  */
 function tryLoadByMessage(type: string): Promise<PromptEntry[] | null> {
   return sendToExtension(type, {}).then(function(response: ExtensionResponse) {
-    if (!response) return null;
+    const isMissingResponse = !response;
+    if (isMissingResponse) return null;
     const prompts = normalizePromptEntries((response.prompts) as Partial<PromptEntry>[]);
     return prompts.length > 0 ? prompts : null;
   });

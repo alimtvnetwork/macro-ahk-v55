@@ -185,7 +185,8 @@ export async function handleDeleteAutomationChain(request: MessageRequest): Prom
     const raw = request as ChainMessage;
     const project = resolveProject(raw);
     const chainId = raw.chainId;
-    if (!chainId) {
+    const isMissingChainId = !chainId;
+    if (isMissingChainId) {
         return { isOk: false, errorMessage: "Missing chainId" };
     }
 
@@ -203,7 +204,8 @@ export async function handleToggleAutomationChain(request: MessageRequest): Prom
     const raw = request as ChainMessage;
     const project = resolveProject(raw);
     const chainId = raw.chainId;
-    if (!chainId) {
+    const isMissingChainId = !chainId;
+    if (isMissingChainId) {
         return { isOk: false, errorMessage: "Missing chainId" };
     }
 

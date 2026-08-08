@@ -35,17 +35,19 @@ const STATE_KEY = 'queue_state';
  */
 export async function loadTaskQueue(): Promise<TaskQueueState> {
   const projectId = extractProjectIdFromUrl();
-  if (!projectId) return { tasks: [], history: [], isPaused: false };
+  const isMissingProjectId = !projectId;
+  if (isMissingProjectId) return { tasks: [], history: [], isPaused: false };
 
   const store = getProjectKvStore('macro-controller');
   const stateData = await store.get<TaskQueueState>(SECTION, `${STATE_KEY}_${projectId}`);
-  
+
   if (stateData) {
-    if (!stateData.history) stateData.history = [];
+    const isMissingHistory = !stateData.history;
+    if (isMissingHistory) stateData.history = [];
     log(`[TaskQueue] Loaded ${stateData.tasks.length} tasks and ${stateData.history.length} history items for project ${projectId}`, 'info');
     return stateData;
   }
-  
+
   return { tasks: [], history: [], isPaused: false };
 }
 
@@ -54,7 +56,8 @@ export async function loadTaskQueue(): Promise<TaskQueueState> {
  */
 export async function saveTaskQueue(queueState: TaskQueueState): Promise<void> {
   const projectId = extractProjectIdFromUrl();
-  if (!projectId) return;
+  const isMissingProjectId = !projectId;
+  if (isMissingProjectId) return;
 
   const store = getProjectKvStore('macro-controller');
   await store.set(SECTION, `${STATE_KEY}_${projectId}`, queueState);
@@ -70,7 +73,8 @@ export async function saveTaskQueue(queueState: TaskQueueState): Promise<void> {
  */
 export async function addTaskToQueue(prompt: string, projectName: string): Promise<MacroTask | null> {
   const projectId = extractProjectIdFromUrl();
-  if (!projectId) return null;
+  const isMissingProjectId = !projectId;
+  if (isMissingProjectId) return null;
 
   const queueState = await loadTaskQueue();
   const newTask: MacroTask = {
@@ -84,7 +88,7 @@ export async function addTaskToQueue(prompt: string, projectName: string): Promi
 
   queueState.tasks.push(newTask);
   await saveTaskQueue(queueState);
-  
+
   log(`[TaskQueue] Added task to queue: ${prompt.substring(0, 30)}...`, 'success');
   return newTask;
 }
@@ -102,7 +106,8 @@ export async function updateTaskStatus(taskId: string, status: MacroTask['status
     
     // Move completed/failed to history
     if (status === 'completed' || status === 'failed') {
-      if (!queueState.history) queueState.history = [];
+      const isMissingHistory = !queueState.history;
+      if (isMissingHistory) queueState.history = [];
       queueState.history.unshift(task);
       if (queueState.history.length > 50) queueState.history.pop();
       queueState.tasks.splice(index, 1);

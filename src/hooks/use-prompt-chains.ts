@@ -96,6 +96,7 @@ export function usePromptChains() {
             const normalized = rawList.map((entry, index) => normalizeChain(entry, index));
             setChains(normalized);
         } catch (error) {
+            logError("AutoCatch", "Unhandled exception", error);
             setChains([]);
             setFatalError(toError(error, "Failed to load prompt chains"));
         } finally {

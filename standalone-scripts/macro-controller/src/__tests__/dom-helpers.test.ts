@@ -1,9 +1,10 @@
+import { DomainConstants } from "../constants/domain";
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock dependencies
 vi.mock('../shared-state', () => ({
   CONFIG: {
-    REQUIRED_DOMAIN: 'lovable.dev',
+    REQUIRED_DOMAIN: DomainConstants.PRIMARY_DOMAIN,
     PROMPT_ACTIVE_XPATH: '//div[@class="prompt"]',
     MAIN_PROGRESS_XPATH: '//div[@class="progress"]',
     PROJECT_BUTTON_XPATH: '//button[@class="project"]',
@@ -29,7 +30,7 @@ vi.mock('../logging', () => ({
 import { isOnProjectPage, isUserTypingInPrompt, checkSystemBusy, highlightElement } from '../dom-helpers';
 import { findElement, getByXPath } from '../xpath-utils';
 
- 
+
 describe('dom-helpers', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -54,7 +55,7 @@ describe('dom-helpers', () => {
 
     it('returns false for non-project URL', () => {
       Object.defineProperty(window, 'location', {
-        value: { href: 'https://lovable.dev/dashboard' },
+        value: { href: DomainConstants.DASHBOARD_URL },
         writable: true,
       });
       expect(isOnProjectPage()).toBe(false);

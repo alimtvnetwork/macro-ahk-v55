@@ -126,7 +126,8 @@ export function emitPromptSeedEvent(input: EmitInput): PromptSeedEvent {
 export function readPromptSeedTrace(): PromptSeedEvent[] {
   try {
     const raw = localStorage.getItem(StorageKeyType.PromptSeedTrace);
-    if (!raw) return [];
+    const isMissingRaw = !raw;
+    if (isMissingRaw) return [];
     const parsed = JSON.parse(raw) as unknown;
     return Array.isArray(parsed) ? (parsed as PromptSeedEvent[]) : [];
   } catch (err) {

@@ -78,7 +78,9 @@ function clearDelegationState(): void {
 export function updateLoopMoveStatus(statusState: string, message: string): void {
   const el = document.getElementById('loop-move-status');
 
-  if (!el) {
+  const isMissingEl = !el;
+
+  if (isMissingEl) {
     return;
   }
 
@@ -103,7 +105,9 @@ async function probeSessionWithToken(context: string, token: string): Promise<vo
   try {
     const resp = await window.marco!.api!.workspace.probe({ baseUrl: CREDIT_API_BASE });
 
-    if (!resp.ok) {
+    const isMissingOk = !resp.ok;
+
+    if (isMissingOk) {
       logError('unknown', LabelType.LogSessionCheck + context + '] ❌ Session probe failed: HTTP ' + resp.status + ' (auth: ' + authLabel + ')');
       showToast(context + ' failed — session also broken (HTTP ' + resp.status + '). Re-auth needed.', 'error');
 
@@ -144,7 +148,9 @@ export async function verifyWorkspaceSessionAfterFailure(context: string): Promi
     const recoveredToken = await recoverAuthOnce();
     const fallbackToken = recoveredToken || resolveToken();
 
-    if (!fallbackToken) {
+    const isMissingFallbackToken = !fallbackToken;
+
+    if (isMissingFallbackToken) {
       logError('unknown', LabelType.LogSessionCheck + context + '] Recovery failed — skipping unauthenticated session probe');
       showToast(context + ' failed — no bearer token available for session check', 'error', { noStop: true });
 
@@ -277,7 +283,9 @@ async function handleMoveAuthFailure(
     const recoveredToken = await recoverAuthOnce();
     const refreshedToken = recoveredToken || resolveToken();
 
-    if (!refreshedToken) {
+    const isMissingRefreshedToken = !refreshedToken;
+
+    if (isMissingRefreshedToken) {
       handleMoveNoToken();
 
       return;
@@ -351,10 +359,12 @@ async function executeMove(
   isRetry: boolean,
 ): Promise<void> {
   const token = await resolveMoveToken(isRetry);
-  if (!token) { handleMoveNoToken(); return; }
+  const isMissingToken = !token;
+  if (isMissingToken) { handleMoveNoToken(); return; }
 
   const currentUserId = extractUserIdFromBearer(token);
-  if (!currentUserId) {
+  const isMissingCurrentUserId = !currentUserId;
+  if (isMissingCurrentUserId) {
     logError('Move aborted', 'unable to extract user id (sub) from bearer for v2 endpoint');
     updateLoopMoveStatus('error', 'User id missing from token');
     showToast('Cannot move workspace: user id missing from token.', 'error', { noStop: true });
@@ -434,7 +444,8 @@ async function executeSwitchContext(
   isRetry: boolean,
 ): Promise<void> {
   const token = await resolveSwitchToken(isRetry);
-  if (!token) {
+  const isMissingToken = !token;
+  if (isMissingToken) {
     handleMoveNoToken();
     return;
   }
@@ -491,7 +502,9 @@ async function executeSwitchContext(
 export async function moveToWorkspace(targetWorkspaceId: string, targetWorkspaceName: string): Promise<void> {
   const isConfirmed = await confirmMove(targetWorkspaceName);
 
-  if (!isConfirmed) {
+  const isMissingIsConfirmed = !isConfirmed;
+
+  if (isMissingIsConfirmed) {
     log('Move cancelled by user', 'info');
     updateLoopMoveStatus('error', 'Move cancelled');
 
@@ -512,7 +525,9 @@ export async function moveToWorkspace(targetWorkspaceId: string, targetWorkspace
     token = '';
   }
 
-  if (!token) {
+  const isMissingToken = !token;
+
+  if (isMissingToken) {
     // Last-ditch: force a fresh refresh (skip TTL cache) before giving up.
     try {
       token = await getBearerToken({ force: true });
@@ -522,7 +537,9 @@ export async function moveToWorkspace(targetWorkspaceId: string, targetWorkspace
     }
   }
 
-  if (!token) {
+  const isMissingToken = !token;
+
+  if (isMissingToken) {
     handleMoveNoToken();
 
     return;

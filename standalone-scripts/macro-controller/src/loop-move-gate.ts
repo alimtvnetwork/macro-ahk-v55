@@ -89,7 +89,8 @@ export async function gatedMoveToWorkspace(
     const resumeTimeout = options.resumePollTimeoutMs ?? RESUME_POLL_TIMEOUT_MS;
     const resumeInterval = options.resumePollIntervalMs ?? RESUME_POLL_INTERVAL_MS;
     const resumeReady = await pollForResumeButton(resumeTimeout, resumeInterval);
-    if (!resumeReady) {
+    const isMissingResumeReady = !resumeReady;
+    if (isMissingResumeReady) {
         log(
             'LoopRun.queueFlip ws=' + targetWorkspaceId +
                 ' outcome=resume-missing (Resume button not visible after 15s)',

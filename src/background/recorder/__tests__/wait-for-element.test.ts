@@ -72,7 +72,8 @@ describe("waitForElement", () => {
             { Doc: document, Sleep: sleep, Now: now },
         );
         expect(out.Ok).toBe(false);
-        if (!out.Ok) {
+        const isMissingOk = !out.Ok;
+        if (isMissingOk) {
             expect(out.Reason).toBe("Timeout");
             expect(out.Detail).toContain("#missing");
         }

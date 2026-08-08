@@ -308,6 +308,7 @@ function renderResolvedPreview(state: State, preview: HTMLElement): void {
         preview.textContent = resolveFieldReferences(state.template, state.options.SampleRow);
         preview.dataset.error = "false";
     } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
         preview.textContent = err instanceof Error ? err.message : String(err);
         preview.dataset.error = "true";
     }
@@ -343,7 +344,10 @@ function emitBinding(state: State, tpl: string): void {
     let previewValue: string | null = null;
     if (state.options.SampleRow !== undefined) {
         try { previewValue = resolveFieldReferences(tpl, state.options.SampleRow); }
-        catch { previewValue = null; }
+        catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
+            previewValue = null;
+        }
     }
     state.options.OnBind({
         Target: state.hovered,

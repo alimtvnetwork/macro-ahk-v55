@@ -280,8 +280,10 @@ export async function updateStepVariableName(
 /* ------------------------------------------------------------------ */
 
 function validateStepDraft(draft: StepDraft): void {
-    if (!draft.VariableName) throw new Error("Step.VariableName is required");
-    if (!draft.LabelType) throw new Error("Step.LabelType is required");
+    const isMissingVariableName = !draft.VariableName;
+    if (isMissingVariableName) throw new Error("Step.VariableName is required");
+    const isMissingLabelType = !draft.LabelType;
+    if (isMissingLabelType) throw new Error("Step.LabelType is required");
     if (draft.Selectors.length === 0) {
         throw new Error("Step requires at least one selector draft");
     }

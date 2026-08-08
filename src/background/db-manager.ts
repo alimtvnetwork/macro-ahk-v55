@@ -113,6 +113,7 @@ async function runWasmHeadAttempt(
         probe.status = attemptStatus;
         probe.contentLength = attemptContentLength;
     } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
         attemptError = err instanceof Error ? err.message : String(err);
     }
     const durationMs = Math.round(performance.now() - attemptStart);

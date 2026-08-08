@@ -442,7 +442,10 @@ function buildTableEntry(
       const colInfo = el('div', 'marco-schema-table-cols',
         columns.map(column => column.Name + ' (' + column.Type + ')').join(', '));
       info.appendChild(colInfo);
-    } catch (_e) { logDebug('database-schema-tab', 'Column JSON parse failed: ' + (_e instanceof Error ? _e.message : String(_e))); }
+    } catch (_e) {
+      logError("AutoCatch", "Unhandled exception", _e);
+      logDebug('database-schema-tab', 'Column JSON parse failed: ' + (_e instanceof Error ? _e.message : String(_e)));
+    }
   }
 
   entry.appendChild(info);

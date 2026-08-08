@@ -277,7 +277,8 @@ function _importOverridesJson(
   input.accept = 'application/json,.json';
   input.onchange = function() {
     const file = input.files && input.files[0];
-    if (!file) return;
+    const isMissingFile = !file;
+    if (isMissingFile) return;
     file.text().then(function(text: string) {
       const parsed = JSON.parse(text) as { kind?: string; overrides?: Record<string, unknown> };
       if (parsed.kind !== 'macro-controller.settings-overrides' || !parsed.overrides) {
@@ -407,7 +408,9 @@ function _saveGeneralSettings(genResult: GeneralPanelResult, deps: SettingsDeps)
     } else {
       localStorage.removeItem('marco_custom_display_name');
     }
-  } catch { /* localStorage unavailable */ } // allow-swallow: localStorage throws in private browsing or when disabled; custom display name is non-critical.
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
+  } // allow-swallow: localStorage throws in private browsing or when disabled; custom display name is non-critical.
 
   const newChatXPath = genResult.inputs.pasteTargetXPath.value;
   if (newChatXPath) {

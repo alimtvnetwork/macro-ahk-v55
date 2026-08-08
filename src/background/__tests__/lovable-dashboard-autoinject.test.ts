@@ -1,3 +1,4 @@
+import { DomainConstants } from "../../constants/domain";
 /**
  * Issue 119 Step 8, Auto-injection regression test for `lovable-dashboard`.
  *
@@ -11,7 +12,7 @@ import { seedProjectsFromManifest } from "../manifest-seeder";
 import { evaluateUrlMatches } from "../project-matcher";
 import type { SeedManifest } from "../../shared/seed-manifest-types";
 
-const DASHBOARD_URL = "https://lovable.dev/dashboard";
+const DASHBOARD_URL = DomainConstants.DASHBOARD_URL;
 
 function manifest(): SeedManifest {
     return {

@@ -336,7 +336,8 @@ function orderByAncestry(rows: ReadonlyArray<StepGroupRow>): StepGroupRow[] {
                 break;
             }
         }
-        if (!progressed) {
+        const isMissingProgressed = !progressed;
+        if (isMissingProgressed) {
             for (const r of remaining.values()) out.push(r);
             break;
         }
@@ -526,7 +527,8 @@ function resolveNameConflicts(input: ResolveNameConflictsInput): NameConflictPla
     const collisions: string[] = [];
     for (const g of sourceGroups) {
         const isRoot = g.ParentStepGroupId === null || !sourceIdSet.has(g.ParentStepGroupId);
-        if (!isRoot) continue;
+        const isMissingIsRoot = !isRoot;
+        if (isMissingIsRoot) continue;
         const outcome = resolveRootNameConflict(g, destSiblingNamesLower, conflict);
         if ("Reason" in outcome) { return outcome; }
         applyRootOutcome(outcome, g, effectiveName, destSiblingNamesLower, renamedRoots, collisions);
@@ -637,8 +639,8 @@ function performAtomicMerge(ctx: AtomicMergeInput): StepGroupImportResult {
     } catch (err) {
         try {
             rawDest.exec("ROLLBACK;");
-        } catch { // allow-swallow: ROLLBACK after merge failure - original err is returned; rollback failure is secondary.
-            /* ignore - rollback failure is secondary to the original error */
+        } catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
         }
         return {
             Reason: "InternalError",

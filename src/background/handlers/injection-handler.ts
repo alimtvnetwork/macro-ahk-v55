@@ -553,7 +553,8 @@ async function ensureRelayInjected(tabId: number): Promise<void> {
             world: "ISOLATED",
             func: async () => {
                 const hasSentinel = !!(window as unknown as Record<string, unknown>).__marcoRelayActive;
-                if (!hasSentinel) return { status: "needs_injection" as const };
+                const isMissingHasSentinel = !hasSentinel;
+                if (isMissingHasSentinel) return { status: "needs_injection" as const };
 
                 try {
                     const ping = await chrome.runtime.sendMessage({ type: "__PING__" });
@@ -666,7 +667,9 @@ async function verifyPostInjectionGlobals(tabId: number): Promise<void> {
             verifyStack: string;
         } | undefined;
 
-        if (!r) return;
+        const isMissingR = !r;
+
+        if (isMissingR) return;
 
         const allOk = r.marcoSdk && r.extRoot && r.mcClass && r.mcInstance && r.uiContainer;
         const status = allOk ? "✅ VERIFIED" : "⚠️ INCOMPLETE";
@@ -680,7 +683,9 @@ async function verifyPostInjectionGlobals(tabId: number): Promise<void> {
             { "msg": `[data-marco-injected] marker  : ${r.markerEl ? "✅" : "⚠️ (not required)"}`, level: "log" },
         ];
 
-        if (!allOk) {
+        const isMissingAllOk = !allOk;
+
+        if (isMissingAllOk) {
             lines.push({ "msg": `── Stack at verification point ──`, level: "warn" });
             lines.push({ "msg": r.verifyStack, level: "warn" });
         }
@@ -704,7 +709,9 @@ async function verifyPostInjectionGlobals(tabId: number): Promise<void> {
             });
         }
 
-        if (!allOk) {
+        const isMissingAllOk = !allOk;
+
+        if (isMissingAllOk) {
             logBgWarnError(
                 BgLogTag.INJECTION,
                 `Post-injection verification INCOMPLETE on tab ${tabId}: ` +

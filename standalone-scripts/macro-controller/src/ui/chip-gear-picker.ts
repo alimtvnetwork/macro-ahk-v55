@@ -67,7 +67,8 @@ async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ re
   try {
     const seedMod = await import('../seed/seed-plan-next');
     const seedRes = await seedMod.seedPlanNextPrompts();
-    if (!seedRes.ok) {
+    const isMissingOk = !seedRes.ok;
+    if (isMissingOk) {
       seedReason = seedRes.error ?? 'seedPlanNextPrompts returned !ok';
       logError('ChipGearPicker', 'auto-seed before pick failed for ' + role, new Error(seedReason));
     }
@@ -124,7 +125,8 @@ export async function pickPromptFromRole(opts: PickPromptOptions): Promise<Promp
     seedReason: seeded.seedReason,
   };
   state.res = await retryOnContractError(opts.role, state);
-  if (!state.res.ok) return emitLoadFailure(opts, state);
+  const isMissingOk = !state.res.ok;
+  if (isMissingOk) return emitLoadFailure(opts, state);
   const rows = (state.res.value ?? []).filter((r) => !opts.excludeDefault || r.IsDefault !== 1);
   if (rows.length === 0) return emitEmptyToast(opts, state.seedReason);
   return await promptPickerModal(rows, opts);

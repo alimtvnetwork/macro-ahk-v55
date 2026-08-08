@@ -97,7 +97,8 @@ const SCHEME_HOST_RE = /^([a-z][a-z0-9+.-]*:\/\/)([^/?#]+)(.*)$/i;
 
 function splitForCaseFold(url: string): { readonly Lead: string; readonly Tail: string } {
     const match = SCHEME_HOST_RE.exec(url);
-    if (!match) return { Lead: "", Tail: url };
+    const isMissingMatch = !match;
+    if (isMissingMatch) return { Lead: "", Tail: url };
     const lead = (match[1] + match[2]).toLowerCase();
     return { Lead: lead, Tail: match[3] ?? "" };
 }
@@ -223,7 +224,8 @@ export function validateUrlTabClickParams(
         return { Reason: "BadParams", Detail: "TimeoutMs must be ≥ 0" };
     }
     const compiled = compileUrlPattern(params.UrlPattern, params.UrlMatch);
-    if (!compiled.Ok) return { Reason: "InvalidUrlPattern", Detail: compiled.Detail };
+    const isMissingOk = !compiled.Ok;
+    if (isMissingOk) return { Reason: "InvalidUrlPattern", Detail: compiled.Detail };
     return null;
 }
 

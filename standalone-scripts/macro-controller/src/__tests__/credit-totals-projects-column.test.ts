@@ -1,3 +1,4 @@
+import { DomainConstants } from "../constants/domain";
 /**
  * Credit Totals — project-count column + double-click navigation (Step 12).
  */
@@ -88,7 +89,7 @@ describe('buildBreakdownTable — projects column + double-click', () => {
     row.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
 
     expect(openSpy).toHaveBeenCalledTimes(1);
-    expect(openSpy).toHaveBeenCalledWith('https://lovable.dev/projects', '_blank', 'noopener');
+    expect(openSpy).toHaveBeenCalledWith(DomainConstants.PROJECTS_URL, '_blank', 'noopener');
 
     window.open = originalOpen;
   });

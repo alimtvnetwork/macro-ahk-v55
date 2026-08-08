@@ -1,3 +1,4 @@
+import { DomainConstants } from "../constants/domain";
 /**
  * MacroLoop Controller — Credit Totals Modal (Issue 116, Task 2)
  *
@@ -34,7 +35,8 @@ export function formatCount(n: number): string {
 
 /** Convert an ISO timestamp into a short local clock string ("Tue 00:00"). */
 export function formatLocalReset(iso: string): string {
-  if (!iso) return '—';
+  const isMissingIso = !iso;
+  if (isMissingIso) return '—';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '—';
   const weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()];
@@ -211,9 +213,11 @@ export interface FilterState {
 }
 
 function wsMatchesQuery(ws: WorkspaceCredit, q: string): boolean {
-  if (!q) return true;
+  const isMissingQ = !q;
+  if (isMissingQ) return true;
   const needle = q.trim().toLowerCase();
-  if (!needle) return true;
+  const isMissingNeedle = !needle;
+  if (isMissingNeedle) return true;
   const hay = (
     (ws.fullName || '') + ' ' +
     (ws.name || '') + ' ' +
@@ -233,7 +237,8 @@ export function applyFilters(
   if (!anyChipActive && !hasQuery) return workspaces;
   return workspaces.filter((ws) => {
     if (hasQuery && !wsMatchesQuery(ws, filters.query)) return false;
-    if (!anyChipActive) return true;
+    const isMissingAnyChipActive = !anyChipActive;
+    if (isMissingAnyChipActive) return true;
     const rem = resolveCreditSummary(ws).available;
     if (filters.low && rem < 100 && rem > 0) return true;
     if (filters.empty && rem <= 0) return true;
@@ -258,8 +263,14 @@ function buildChip(
     ';border:1px solid ' + (active ? cPrimaryLighter : 'rgba(124,58,237,0.35)') +
     ';color:' + fg +
     ';padding:2px 8px;border-radius:10px;font-size:10px;cursor:pointer;font-family:monospace;transition:background 120ms,color 120ms;';
-  btn.onmouseover = function () { if (!active) btn.style.background = 'rgba(124,58,237,0.15)'; };
-  btn.onmouseout = function () { if (!active) btn.style.background = 'transparent'; };
+  btn.onmouseover = function () {
+    const isMissingActive = !active;
+    if (isMissingActive) btn.style.background = 'rgba(124,58,237,0.15)';
+  };
+  btn.onmouseout = function () {
+    const isMissingActive = !active;
+    if (isMissingActive) btn.style.background = 'transparent';
+  };
   btn.onclick = function () { onToggle(); };
   return btn;
 }
@@ -366,7 +377,8 @@ function attachDragHandlers(ctx: TableCtx, row: HTMLElement, dispIdx: number): v
   row.draggable = isManualOrder;
   row.style.cursor = isManualOrder ? 'grab' : 'default';
   row.setAttribute('data-row-index', String(dispIdx));
-  if (!isManualOrder) return;
+  const isMissingIsManualOrder = !isManualOrder;
+  if (isMissingIsManualOrder) return;
 
   row.addEventListener('dragstart', (e: DragEvent) => {
     row.style.opacity = '0.4';
@@ -483,7 +495,7 @@ function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
   row.style.cssText = 'display:grid;grid-template-columns:1.6fr 0.7fr 0.5fr 0.7fr 0.7fr 0.7fr;gap:6px;padding:5px 8px;font-size:10px;color:#cbd5e1;border-bottom:1px solid rgba(124,58,237,0.08);font-variant-numeric:tabular-nums;';
   row.title = 'Double-click to open workspace projects';
   row.ondblclick = function (): void {
-    try { window.open('https://lovable.dev/projects', '_blank', 'noopener'); }
+    try { window.open(DomainConstants.PROJECTS_URL, '_blank', 'noopener'); }
     catch (err) { logError('creditTotalsModal.openProjects', 'window.open failed for https://lovable.dev/projects', err); }
   };
 
@@ -594,7 +606,9 @@ export function showCreditTotalsModal(): void {
   installA11yHandlers(panel);
   // Focus the panel so ESC works immediately.
   // allow-swallow: panel may not be focusable in headless test contexts; ESC still works via document-level listener
-  try { panel.focus(); } catch { /* intentionally empty */ }
+  try { panel.focus(); } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
+  }
 }
 
 /** ESC-to-close + focus trap. Idempotent; cleaned up by removeCreditTotalsModal. */

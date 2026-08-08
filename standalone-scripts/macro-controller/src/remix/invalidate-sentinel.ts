@@ -54,7 +54,8 @@ function removeDomSentinel(): boolean {
     try {
         if (typeof document === 'undefined') return false;
         const element = document.getElementById(MARCO_SENTINEL_DOM_ID);
-        if (!element) return false;
+        const isMissingElement = !element;
+        if (isMissingElement) return false;
         element.remove();
         return true;
     } catch (err: unknown) {

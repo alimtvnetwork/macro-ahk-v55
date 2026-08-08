@@ -218,6 +218,7 @@ function makeIoOptionRow(pop: HTMLElement, label: string, run: () => Promise<voi
         });
       }
     } catch (err) {
+      logError("AutoCatch", "Unhandled exception", err);
       showPasteToast('❌ ' + label + ' failed: ' + String(err), true);
     }
   };
@@ -326,6 +327,7 @@ async function runPromptImport(text: string, rerender: Rerender): Promise<void> 
     await loadPromptsFromJson();
     rerender();
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     showPasteToast('❌ Import failed: ' + String(err), true);
   }
 }
@@ -341,6 +343,7 @@ export async function dispatchImportFile(file: File, rerender: Rerender): Promis
     const text = new TextDecoder('utf-8').decode(bytes);
     await runPromptImport(text, rerender);
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     showPasteToast('❌ Import failed: ' + String(err), true);
   }
 }

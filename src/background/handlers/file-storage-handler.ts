@@ -41,7 +41,8 @@ export function bindFileStorageDbManager(manager: DbManager): void {
 }
 
 function getDb(): SqlJsDatabase {
-    if (!dbManager) throw new Error("[file-storage] DbManager not bound");
+    const isMissingDbManager = !dbManager;
+    if (isMissingDbManager) throw new Error("[file-storage] DbManager not bound");
     return dbManager.getLogsDb();
 }
 
@@ -70,8 +71,10 @@ export async function handleFileSave(
     const projectId = requireProjectId(raw.projectId);
     const filename = requireField(raw.filename);
     const dataBase64 = typeof raw.dataBase64 === "string" ? raw.dataBase64 : null;
-    if (!projectId) return missingFieldError("projectId", "file:save");
-    if (!filename) return missingFieldError("filename", "file:save");
+    const isMissingProjectId = !projectId;
+    if (isMissingProjectId) return missingFieldError("projectId", "file:save");
+    const isMissingFilename = !filename;
+    if (isMissingFilename) return missingFieldError("filename", "file:save");
     if (dataBase64 === null) return missingFieldError("dataBase64", "file:save");
 
     const db = getDb();
@@ -94,7 +97,8 @@ export async function handleFileGet(
 ): Promise<{ file: (FileEntry & { dataBase64: string }) | null } | HandlerErrorResponse> {
     const raw = request as MessageRequest & { fileId?: unknown };
     const fileId = requireField(raw.fileId);
-    if (!fileId) return missingFieldError("fileId", "file:get");
+    const isMissingFileId = !fileId;
+    if (isMissingFileId) return missingFieldError("fileId", "file:get");
 
     const db = getDb();
     const result = db.exec(
@@ -125,7 +129,8 @@ export async function handleFileList(
 ): Promise<{ files: FileEntry[] } | HandlerErrorResponse> {
     const raw = request as MessageRequest & { projectId?: unknown };
     const projectId = requireProjectId(raw.projectId);
-    if (!projectId) return missingFieldError("projectId", "file:list");
+    const isMissingProjectId = !projectId;
+    if (isMissingProjectId) return missingFieldError("projectId", "file:list");
 
     const db = getDb();
     const stmt = db.prepare(
@@ -153,7 +158,8 @@ export async function handleFileDelete(
 ): Promise<{ isOk: true } | HandlerErrorResponse> {
     const raw = request as MessageRequest & { fileId?: unknown };
     const fileId = requireField(raw.fileId);
-    if (!fileId) return missingFieldError("fileId", "file:delete");
+    const isMissingFileId = !fileId;
+    if (isMissingFileId) return missingFieldError("fileId", "file:delete");
 
     const db = getDb();
     db.run("DELETE FROM ProjectFiles WHERE Id = ?", [fileId]);

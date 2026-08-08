@@ -28,7 +28,8 @@ let isInstalled = false;
 let unsubscribe: (() => void) | null = null;
 
 async function handleRename(projectId: string, oldName: string | null, newName: string | null): Promise<void> {
-  if (!newName) {
+  const isMissingNewName = !newName;
+  if (isMissingNewName) {
     // A rename *to* null is meaningless for backfill (no better label
     // to persist). Log for visibility and skip — never overwrite a
     // known name with null.
@@ -36,7 +37,8 @@ async function handleRename(projectId: string, oldName: string | null, newName: 
     return;
   }
   const isRenamed = await renameProjectChatSubmits(projectId, newName);
-  if (!isRenamed) {
+  const isMissingIsRenamed = !isRenamed;
+  if (isMissingIsRenamed) {
     logError(SCOPE, `renameProjectChatSubmits failed (projectId=${projectId}, oldName=${oldName ?? 'null'}, newName=${newName})`);
   }
 }

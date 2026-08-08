@@ -61,6 +61,7 @@ export async function enforceSingleDefaultPerRole(role: PromptRole, keepId: numb
         logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role, keepId, stage: 'rawSql', reason });
         return new ServiceResult(false, undefined, message);
     } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
         const reason = err instanceof Error ? err.message : String(err);
         logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role, keepId, stage: 'threw', reason }, err);
     }

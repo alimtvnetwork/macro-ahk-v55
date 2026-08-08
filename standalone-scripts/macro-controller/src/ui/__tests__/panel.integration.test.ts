@@ -17,7 +17,9 @@ import { createCollapsibleSection } from '../section-collapsible';
 import type { DashboardSummary } from '../summary-bar/types';
 
 function clearLocalStorage(): void {
-    try { localStorage.clear(); } catch { /* jsdom */ }
+    try { localStorage.clear(); } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+    }
 }
 
 describe('Panel integration — Summary Bar + Auth Diagnostics relocation', () => {

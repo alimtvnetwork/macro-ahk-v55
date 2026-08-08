@@ -27,7 +27,10 @@ export function dispatchDelegateSignal(direction: string): void {
   log('DEPRECATED: Title signal set: ' + titleMarker, 'delegate');
   try {
     navigator.clipboard.writeText(signal).catch(function(err) { logSub('Clipboard write failed: ' + (err instanceof Error ? err.message : String(err)), 1); });
-  } catch (e) { logSub('Clipboard API unavailable: ' + (e instanceof Error ? e.message : String(e)), 1); }
+  } catch (e) {
+    logError("AutoCatch", "Unhandled exception", e);
+    logSub('Clipboard API unavailable: ' + (e instanceof Error ? e.message : String(e)), 1);
+  }
 }
 
 // ============================================
@@ -66,7 +69,8 @@ export function runCycleDomFallback(): void {
   }
 
   const clicked = ensureProjectDialogOpen();
-  if (!clicked) {
+  const isMissingClicked = !clicked;
+  if (isMissingClicked) {
     logError('DOM Fallback', 'project button not found');
     return;
   }

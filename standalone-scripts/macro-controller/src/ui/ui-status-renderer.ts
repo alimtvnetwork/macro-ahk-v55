@@ -44,9 +44,11 @@ export const statusRenderStats = statusRenderState.stats;
  * Update the status panel with current loop state, credit bars, and workspace info.
  * Uses a dirty-flag guard to skip innerHTML rebuilds when nothing changed.
  */
-export function updateStatus(): void { // eslint-disable-line max-lines-per-function
+export function updateStatus(): void {
+  // eslint-disable-line max-lines-per-function
   const el = document.getElementById(IDS.STATUS);
-  if (!el) return;
+  const isMissingEl = !el;
+  if (isMissingEl) return;
 
   // Clear skeleton placeholders on first real data hydration
   clearSkeletons(el);
@@ -178,10 +180,12 @@ export function updateQueueBadge(): void {
 }
 
 function buildCreditBarsHtml(): string {
-  if (!loopCreditState.lastCheckedAt) return '';
+  const isMissingLastCheckedAt = !loopCreditState.lastCheckedAt;
+  if (isMissingLastCheckedAt) return '';
 
   const cws = loopCreditState.currentWs;
-  if (!cws) return '';
+  const isMissingCws = !cws;
+  if (isMissingCws) return '';
 
   const summary = resolveCreditSummary(cws);
   const cacheKey = (loopCreditState.lastCheckedAt || 0) + '|'
@@ -239,7 +243,8 @@ function renderRunningStatus(statusLine: HTMLElement, progressContainer: HTMLEle
 }
 
 function buildDelegateText(): string {
-  if (!state.isDelegating) return '';
+  const isMissingIsDelegating = !state.isDelegating;
+  if (isMissingIsDelegating) return '';
   return state.forceDirection
     ? ' | FORCE ' + state.forceDirection.toUpperCase()
     : ' | SWITCHING...';
@@ -270,7 +275,8 @@ function renderProgressBar(progressContainer: HTMLElement): void {
   const pct = totalSec > 0 ? Math.max(0, Math.min(100, ((totalSec - state.countdown) / totalSec) * 100)) : 0;
   const barColor = pct > 80 ? '#ef4444' : pct > 50 ? '#f59e0b' : '#10b981';
   let barEl = document.getElementById('marco-progress-bar');
-  if (!barEl) {
+  const isMissingBarEl = !barEl;
+  if (isMissingBarEl) {
     progressContainer.innerHTML = '<div style="width:100%;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;">'
       + '<div id="marco-progress-bar" style="width:0%;height:100%;border-radius:3px;transition:width 0.8s linear;"></div></div>';
     barEl = document.getElementById('marco-progress-bar');
@@ -346,7 +352,8 @@ function ensureRecordChildren(el: HTMLElement): { dot: HTMLSpanElement; label: T
 
 export function updateRecordIndicator(): void {
   const el = document.getElementById(IDS.RECORD_INDICATOR);
-  if (!el) return;
+  const isMissingEl = !el;
+  if (isMissingEl) return;
 
   if (state.running) {
     el.style.display = 'flex';

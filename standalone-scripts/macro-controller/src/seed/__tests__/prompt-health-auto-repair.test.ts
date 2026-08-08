@@ -98,7 +98,7 @@ describe('runPromptHealthCheckWithAutoRepair', () => {
     });
 
     it('AR3: unhealthy -> reseed fails: loud second probe raises red toast', async () => {
-        reseedResult = new DbResult(false, undefined, 'db offline', mode: 'idempotent');
+        reseedResult = new DbResult(false, undefined, 'db offline', { mode: 'idempotent' });
         responsesQueue = [
             empty(), ok(healthyRow('next')),
             empty(), ok(healthyRow('next')),

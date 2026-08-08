@@ -93,7 +93,8 @@ export function isExpiredWs(ws: import('./types').WorkspaceCredit): boolean {
  */
 export function expiredDays(ws: import('./types').WorkspaceCredit): number | null {
   const iso = ws.subscriptionStatusChangedAt;
-  if (!iso) return null;
+  const isMissingIso = !iso;
+  if (isMissingIso) return null;
   const t = Date.parse(iso);
   if (!Number.isFinite(t)) return null;
   const ms = Date.now() - t;
@@ -108,7 +109,8 @@ export function expiredDays(ws: import('./types').WorkspaceCredit): number | nul
  */
 export function formatExpiryStartDate(ws: import('./types').WorkspaceCredit): string | null {
   const iso = ws.subscriptionStatusChangedAt;
-  if (!iso) return null;
+  const isMissingIso = !iso;
+  if (isMissingIso) return null;
   const t = Date.parse(iso);
   if (!Number.isFinite(t)) return null;
   const d = new Date(t);
@@ -273,7 +275,8 @@ function parseWorkspaceItem(rawItem: Record<string, unknown>, wsIdx: number): im
 function applyLifecycleOverrides(perWs: import('./types').WorkspaceCredit[]): void {
   // Default true — only opt-out disables the override.
   const enabled = getSettingsOverrides().enableCanceledCreditOverride !== false;
-  if (!enabled) {
+  const isMissingEnabled = !enabled;
+  if (isMissingEnabled) {
     log('Lifecycle overrides disabled via enableCanceledCreditOverride=false', 'info');
     return;
   }
@@ -417,7 +420,8 @@ export async function applyProOneEnrichment(): Promise<number> {
 // ============================================
 export function syncCreditStateFromApi(): void {
   const cws = loopCreditState.currentWs;
-  if (!cws) {
+  const isMissingCws = !cws;
+  if (isMissingCws) {
     logSub('syncCreditState: no currentWs — cannot determine credit', 1);
     return;
   }

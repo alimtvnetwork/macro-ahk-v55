@@ -1,3 +1,4 @@
+import { DomainConstants } from "../../../constants/domain";
 /**
  * Marco Extension — React Options: Cookie Bindings Editor
  */
@@ -45,7 +46,7 @@ export function CookieBindingsEditor({ bindings, onChange }: CookieBindingsEdito
                     </div>
                 ) : (
                     // eslint-disable-next-line max-lines-per-function
-                    bindings.map((binding, index) => (
+                    (bindings.map((binding, index) => (
                         <div key={index} className="cookie-binding-row">
                             <div className="cookie-binding-fields">
                                 <div className="cookie-field-group">
@@ -63,7 +64,7 @@ export function CookieBindingsEditor({ bindings, onChange }: CookieBindingsEdito
                                         className="form-input cookie-url"
                                         value={binding.url}
                                         onChange={(e) => handleUpdate(index, { url: e.target.value })}
-                                        placeholder="https://lovable.dev"
+                                        placeholder={DomainConstants.PRIMARY_URL}
                                     />
                                 </div>
                                 <div className="cookie-field-group">
@@ -96,7 +97,7 @@ export function CookieBindingsEditor({ bindings, onChange }: CookieBindingsEdito
                                 </button>
                             </div>
                         </div>
-                    ))
+                    )))
                 )}
             </div>
             <button className="btn btn-secondary btn-sm" onClick={handleAdd} style={{ marginTop: 8 }}>

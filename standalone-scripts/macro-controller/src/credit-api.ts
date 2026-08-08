@@ -28,7 +28,8 @@ export function assertNotLegacyCalcForProZero(plan: string | undefined, fnName: 
   if ((plan || '').toLowerCase() !== PRO_ZERO_PLAN_LITERAL) return;
   const isProd = typeof process !== 'undefined' && process?.env?.NODE_ENV === 'production';
   const ctx = { fnName, plan: PRO_ZERO_PLAN_LITERAL };
-  if (!isProd) {
+  const isMissingIsProd = !isProd;
+  if (isMissingIsProd) {
     throwDiagnostic('CREDIT_ASSERT_E001', ctx);
   }
   // In prod: CODE-RED log per file-path-error-logging memory (exact path + missing item + reason),

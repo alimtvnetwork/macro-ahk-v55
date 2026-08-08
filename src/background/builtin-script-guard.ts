@@ -213,7 +213,8 @@ async function seedMissingBuiltinsDirectly(
 
     for (const scriptName of missingNames) {
         const meta = BUILTIN_DIST_MAP[scriptName];
-        if (!meta) {
+        const isMissingMeta = !meta;
+        if (isMissingMeta) {
             logBgWarnError(BgLogTag.BUILTIN_GUARD_FALLBACK, `No dist map entry for "${scriptName}"\n  Path: BUILTIN_DIST_MAP["${scriptName}"]\n  Missing: Distribution mapping (folder, seedId, filePath)\n  Reason: Script name not registered in BUILTIN_DIST_MAP — skipping`);
             continue;
         }

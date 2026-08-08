@@ -320,7 +320,9 @@ export async function injectSingleScript(
 export async function executeInTab(tabId: number, code: string): Promise<{ path: string; domTarget?: string }> {
     const result = await injectWithCspFallback(tabId, code, "MAIN");
 
-    if (!result.isSuccess) {
+    const isMissingIsSuccess = !result.isSuccess;
+
+    if (isMissingIsSuccess) {
         throw new Error(result.errorMessage ?? "Injection failed in MAIN and ISOLATED worlds.");
     }
 
@@ -368,6 +370,7 @@ async function logInjectionSuccess(
                     stackTrace: `Injected version: ${injectedVersion}, Expected: ${EXTENSION_VERSION}, Source: ${codeSource ?? "unknown"}, Code length: ${script.code.length}`,
                 } as MessageRequest);
             } catch (logErr) {
+                logError("AutoCatch", "Unhandled exception", logErr);
                 logBgWarnError(BgLogTag.INJECTION, `handleLogError(LEGACY_SCRIPT_INJECTED) failed for "${script.name}" — telemetry suppressed but injection continues`, logErr);
             }
         }

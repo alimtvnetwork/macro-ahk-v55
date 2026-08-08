@@ -163,7 +163,8 @@ function renderBody(body: HTMLElement): void {
 
 export function removeProjectsModal(): void {
     const existing = document.getElementById(DIALOG_ID) as DraggableElement | null;
-    if (!existing) return;
+    const isMissingExisting = !existing;
+    if (isMissingExisting) return;
     if (existing.__cleanupDrag) existing.__cleanupDrag();
     state.refreshWorkspaceFilter = null;
     existing.remove();
@@ -292,7 +293,8 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
         });
     }
     const resp = await sdk.api.projects.list(wsId, { baseUrl: CREDIT_API_BASE });
-    if (!resp.ok) {
+    const isMissingOk = !resp.ok;
+    if (isMissingOk) {
         const preview = JSON.stringify(resp.data).substring(0, 160);
         logError('Projects', 'projects.list HTTP ' + resp.status + ' for ws=' + wsId + ': ' + preview);
         throwDiagnostic('UI_PROJECTS_LIST_E001', {
@@ -306,7 +308,8 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
     const out: ProjectEntry[] = [];
     for (const p of list) {
         const id = typeof p.id === 'string' ? p.id : '';
-        if (!id) continue;
+        const isMissingId = !id;
+        if (isMissingId) continue;
         const rawName = typeof p.name === 'string' ? p.name : '';
         out.push({
             id,
@@ -323,7 +326,8 @@ function attachRowClicks(body: HTMLElement): void {
     // eslint-disable-next-line sonarjs/cognitive-complexity
     body.addEventListener('click', function (e: Event): void {
         const target = e.target as HTMLElement | null;
-        if (!target) return;
+        const isMissingTarget = !target;
+        if (isMissingTarget) return;
 
         // Clear-all-filters action from the zero-results panel.
         const clearAll = target.closest('[data-clear-filters]') as HTMLElement | null;
@@ -356,7 +360,8 @@ function attachRowClicks(body: HTMLElement): void {
         const toggle = target.closest('[data-ws-toggle]') as HTMLElement | null;
         if (toggle) {
             const wsId = toggle.getAttribute('data-ws-toggle') ?? '';
-            if (!wsId) return;
+            const isMissingWsId = !wsId;
+            if (isMissingWsId) return;
             if (state.collapsed.has(wsId)) state.collapsed.delete(wsId);
             else state.collapsed.add(wsId);
             saveCollapsedState();
@@ -365,9 +370,11 @@ function attachRowClicks(body: HTMLElement): void {
         }
 
         const row = target.closest('[data-open-url]') as HTMLElement | null;
-        if (!row) return;
+        const isMissingRow = !row;
+        if (isMissingRow) return;
         const url = row.getAttribute('data-open-url') ?? '';
-        if (!url) return;
+        const isMissingUrl = !url;
+        if (isMissingUrl) return;
         try { window.open(url, '_blank', 'noopener'); }
         catch (err) { log('Projects: open tab failed: ' + String(err), 'warn'); }
     });
@@ -417,7 +424,8 @@ function applyProjectFilters(
     tabIndex: OpenTabIndex,
 ): WorkspaceBlock[] {
     return workspaceBlocks.map(function (b) {
-        if (!b.projects) return b;
+        const isMissingProjects = !b.projects;
+        if (isMissingProjects) return b;
         const projects = b.projects.filter(function (p) {
             if (q && !(
                 p.name.toLowerCase().includes(q)
@@ -886,7 +894,8 @@ function attachDrag(panel: HTMLElement, bar: HTMLElement, closeBtn: HTMLElement)
         e.preventDefault();
     };
     const onMove = function (e: MouseEvent): void {
-        if (!dragging) return;
+        const isMissingDragging = !dragging;
+        if (isMissingDragging) return;
         panel.style.left = (e.clientX - offX) + 'px';
         panel.style.top = (e.clientY - offY) + 'px';
         panel.style.right = 'auto';
@@ -961,7 +970,8 @@ function exportCsv(statusEl: HTMLElement): void {
 
     const tasks: Array<{ ws: WorkspaceCredit; project: ProjectEntry }> = [];
     for (const b of blocks) {
-        if (!b.projects) continue;
+        const isMissingProjects = !b.projects;
+        if (isMissingProjects) continue;
         for (const p of b.projects) tasks.push({ ws: b.ws, project: p });
     }
 
@@ -1118,7 +1128,8 @@ function downloadCsv(filename: string, csv: string): void {
 
 function setExportButtonDisabled(disabled: boolean): void {
     const btn = document.getElementById('marco-projects-export-btn') as HTMLButtonElement | null;
-    if (!btn) return;
+    const isMissingBtn = !btn;
+    if (isMissingBtn) return;
     btn.disabled = disabled;
     btn.style.opacity = disabled ? '0.5' : '1';
     btn.style.cursor = disabled ? 'wait' : 'pointer';

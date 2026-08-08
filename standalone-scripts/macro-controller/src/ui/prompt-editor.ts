@@ -89,6 +89,7 @@ async function collectRoleList(role: PromptRole, snapshot: RoleSnapshot): Promis
     }
     snapshot.roleListError = listed.ok ? '(empty)' : (listed.error ?? 'unknown');
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     snapshot.roleListThrew = err instanceof Error ? err.message : String(err);
   }
 }
@@ -107,7 +108,8 @@ function recordSlugOwner(
     return;
   }
   snapshot.slugOwnerRole = '(no-row)';
-  if (!bySlug.ok) snapshot.slugLookupError = bySlug.error ?? 'unknown';
+  const isMissingOk = !bySlug.ok;
+  if (isMissingOk) snapshot.slugLookupError = bySlug.error ?? 'unknown';
 }
 
 async function collectSlugOwner(
@@ -119,6 +121,7 @@ async function collectSlugOwner(
     const bySlug = await getPromptBySlug(slug);
     recordSlugOwner(bySlug as Parameters<typeof recordSlugOwner>[0], role, snapshot);
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     snapshot.slugLookupThrew = err instanceof Error ? err.message : String(err);
   }
 }
@@ -157,7 +160,8 @@ export interface OpenPromptEditorInput {
  */
 export async function openPromptEditor(input: OpenPromptEditorInput): Promise<void> {
   const rc = getRevalidateContext();
-  if (!rc) {
+  const isMissingRc = !rc;
+  if (isMissingRc) {
     reportEditorFailure(
       'PROMPT_EDIT_E002',
       { role: input.role, action: input.promptId !== undefined ? 'edit' : 'add' },
@@ -186,6 +190,7 @@ export async function openPromptEditor(input: OpenPromptEditorInput): Promise<vo
     if (templatePreview) modalOptions.templatePreview = templatePreview;
     openPromptCreationModal(rc.ctx, rc.taskNextDeps, editPrompt, prefill, modalOptions);
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     const reason = err instanceof Error ? err.message : String(err);
     reportEditorFailure(
       'PROMPT_EDIT_E003',
@@ -199,7 +204,8 @@ export async function openPromptEditor(input: OpenPromptEditorInput): Promise<vo
 function buildAddNewTemplatePrefill(role: PromptRole): OpenPromptEditorInput['prefill'] | undefined {
   if (role !== 'plan' && role !== 'next') return undefined;
   const seed = PLAN_NEXT_SEED_ROWS.find((r) => r.role === role && r.isDefault);
-  if (!seed) return undefined;
+  const isMissingSeed = !seed;
+  if (isMissingSeed) return undefined;
   const roleLabel = role === 'plan' ? 'PlanTierType' : 'Next';
   return {
     name: 'New ' + roleLabel + ' prompt',
@@ -212,7 +218,8 @@ function buildAddNewTemplatePrefill(role: PromptRole): OpenPromptEditorInput['pr
 function buildTemplatePreviewForRole(role: PromptRole): { body: string; slug?: string } | undefined {
   if (role !== 'plan' && role !== 'next') return undefined;
   const seed = PLAN_NEXT_SEED_ROWS.find((r) => r.role === role && r.isDefault);
-  if (!seed) return undefined;
+  const isMissingSeed = !seed;
+  if (isMissingSeed) return undefined;
   return { body: seed.body, slug: seed.slug };
 }
 
@@ -232,6 +239,7 @@ async function resolveRequiredTokensForRole(role: PromptRole): Promise<string[]>
       for (const t of extractParamTokens(result.value.Body)) tokens.add(t);
     }
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     const snap = await buildRoleDiagnosticSnapshot(role);
     const context: DiagnosticContext = {
       ...snap,
@@ -247,7 +255,8 @@ async function resolveRequiredTokensForRole(role: PromptRole): Promise<string[]>
 async function runPreflightSeed(role: PromptRole): Promise<void> {
   emitPromptSeedEvent({ event: 'editor.prefill.reseed', role, outcome: 'ok', detail: 'preflight' });
   const seed = await seedPlanNextPrompts();
-  if (!seed.ok) {
+  const isMissingOk = !seed.ok;
+  if (isMissingOk) {
     logDiagnosticFromCode('SEED_INSERT_E002', { role, reason: seed.error ?? 'seed failed' });
     emitPromptSeedEvent({ event: 'editor.prefill.reseed', role, outcome: 'failed', detail: seed.error ?? 'seed failed' });
   }
@@ -304,7 +313,8 @@ async function openWithDriftCheck(
     detail: isClean ? 'confirmed' : ('drift body=' + String(bodyMatches) + ' name=' + String(nameMatches)),
     metrics: { promptId: dbRow.Id },
   });
-  if (!isClean) {
+  const isMissingIsClean = !isClean;
+  if (isMissingIsClean) {
     logDiagnosticFromCode('PROMPT_EDIT_E004', {
       role, slug: dbRow.Slug, promptId: dbRow.Id,
       bodyMatches: String(bodyMatches), nameMatches: String(nameMatches),
@@ -393,6 +403,7 @@ export async function openDefaultPromptEditor(role: PromptRole): Promise<void> {
       '❌ No default prompt found for ' + role,
     );
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     await handleOpenDefaultError(role, seedRow, err);
   }
 }
@@ -422,7 +433,8 @@ async function tryInsertAndPromoteSeed(
       return null;
     }
     const promoted = await setDefaultPromptForRole(inserted.value, role);
-    if (!promoted.ok) {
+    const isMissingOk = !promoted.ok;
+    if (isMissingOk) {
       logDiagnosticFromCode('DB_WRITE_E003', {
         role, promptId: inserted.value, reason: promoted.error ?? 'setDefault failed',
       });
@@ -466,7 +478,8 @@ async function promoteExistingPromptId(
   detail: string,
 ): Promise<number> {
   const promoted = await setDefaultPromptForRole(promptId, role);
-  if (!promoted.ok) {
+  const isMissingOk = !promoted.ok;
+  if (isMissingOk) {
     logDiagnosticFromCode('DB_WRITE_E003', {
       role, promptId, reason: promoted.error ?? 'setDefault failed',
     });
@@ -484,7 +497,8 @@ async function tryAdoptSeedSlugRow(
   seedRow: { slug: string; name: string; body: string },
 ): Promise<number | null> {
   const lookup = await getPromptBySlug(seedRow.slug);
-  if (!lookup.ok) {
+  const isMissingOk = !lookup.ok;
+  if (isMissingOk) {
     logDiagnosticFromCode('DB_READ_E001', { role, slug: seedRow.slug, reason: lookup.error ?? 'slug lookup failed' });
   }
   if (!lookup.ok || !lookup.value) {
@@ -522,7 +536,8 @@ async function loadEditablePrompt(role: PromptRole, id: number): Promise<Editabl
     return null;
   }
   const row = listed.value.find((r: PromptRow) => r.Id === id);
-  if (!row) {
+  const isMissingRow = !row;
+  if (isMissingRow) {
     logDiagnosticFromCode('PROMPT_EDIT_E007', { role, promptId: id });
     return null;
   }

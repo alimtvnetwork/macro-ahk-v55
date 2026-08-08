@@ -64,7 +64,8 @@ function recordingExecutor(log: Array<{ id: number; path: ReadonlyArray<string> 
 }
 
 function asSuccess(r: RunGroupResult): RunGroupSuccess {
-    if (!r.Ok) {
+    const isMissingOk = !r.Ok;
+    if (isMissingOk) {
         throw new Error(`Expected success but got ${r.Reason}: ${r.ReasonDetail}`);
     }
     return r;

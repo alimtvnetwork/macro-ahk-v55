@@ -35,7 +35,8 @@ function groupEntriesByFolder(entries: LoaderPromptEntry[]): FolderGroups {
     const cat = p.category || '';
     if (cat.includes('/')) {
       const folderName = cat.split('/')[0];
-      if (!folders[folderName]) folders[folderName] = [];
+      const isMissingFolderName = !folders[folderName];
+      if (isMissingFolderName) folders[folderName] = [];
       folders[folderName].push(p);
     } else {
       rootItems.push(p);

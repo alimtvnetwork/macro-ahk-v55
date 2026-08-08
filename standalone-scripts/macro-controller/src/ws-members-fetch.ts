@@ -38,7 +38,8 @@ interface MarcoSdkShape {
 function getMemberships(op: string) {
   const sdk = (window as unknown as { marco?: MarcoSdkShape }).marco;
   const api = sdk?.api?.memberships;
-  if (!api) throwDiagnostic('WS_MEMBERS_FETCH_E001', { op });
+  const isMissingApi = !api;
+  if (isMissingApi) throwDiagnostic('WS_MEMBERS_FETCH_E001', { op });
   return api;
 }
 
@@ -54,7 +55,8 @@ export async function fetchWorkspaceMembers(wsId: string, limit = DEFAULT_MEMBER
 
   log('[Members] GET list wsId=' + wsId + ' limit=' + limit, 'delegate');
   const resp = await getMemberships('list').list(wsId, { limit, baseUrl: CREDIT_API_BASE });
-  if (!resp.ok) {
+  const isMissingOk = !resp.ok;
+  if (isMissingOk) {
     throwDiagnostic('WS_MEMBERS_FETCH_E002', {
       status: resp.status,
       wsId,
@@ -64,7 +66,7 @@ export async function fetchWorkspaceMembers(wsId: string, limit = DEFAULT_MEMBER
 
   const members = (resp.data.members || []) as WorkspaceMember[];
   const total = resp.data.total || members.length;
-  
+
   membersCache.set(wsId, { members, total, expires: now + CACHE_TTL });
   return { members, total };
 }
@@ -112,6 +114,7 @@ export async function fetchMembersForMany(
       bulkCache.set(id, res);
       results.push(res);
     } catch (e: unknown) {
+      logError("AutoCatch", "Unhandled exception", e);
       results.push({ wsId: id, wsName, members: [], error: e instanceof Error ? e.message : String(e) });
     }
   }

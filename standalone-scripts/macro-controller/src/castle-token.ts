@@ -41,7 +41,8 @@ const CASTLE_TIMEOUT_MS = 2_000;
 export async function getCastleRequestToken(): Promise<string> {
     const w = window as unknown as CastleGlobal;
     const castle = typeof w._castle === 'function' ? w._castle : null;
-    if (!castle) {
+    const isMissingCastle = !castle;
+    if (isMissingCastle) {
         log('Castle: window._castle missing — request will go without x-castle-request-token', 'warn');
         return '';
     }

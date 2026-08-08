@@ -54,6 +54,7 @@ export async function handleMessage(
         const response = await routeMessage(message, sender);
         sendResponse(response);
     } catch (routingError) {
+        logError("AutoCatch", "Unhandled exception", routingError);
         sendResponse(buildErrorResponse(routingError, messageType));
     }
 }
@@ -63,7 +64,8 @@ function extractMessageType(message: MessageRequest): string {
     const hasType = typeof message === "object"
         && message !== null
         && "type" in message;
-    if (!hasType) {
+    const isMissingHasType = !hasType;
+    if (isMissingHasType) {
         return "(unknown)";
     }
     const t = (message as { type?: string }).type;

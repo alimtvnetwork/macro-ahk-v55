@@ -47,7 +47,8 @@ function freshDb(): StepLibraryDb {
 }
 
 function asExpansionSuccess(r: ExpansionResult): ExpansionSuccess {
-    if (!r.Ok) throw new Error(`Expected expansion success, got ${r.Reason}: ${r.ReasonDetail}`);
+    const isMissingOk = !r.Ok;
+    if (isMissingOk) throw new Error(`Expected expansion success, got ${r.Reason}: ${r.ReasonDetail}`);
     return r;
 }
 

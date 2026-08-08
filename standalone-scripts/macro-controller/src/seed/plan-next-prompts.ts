@@ -118,6 +118,7 @@ export function getSeedBodyForSlug(slug: string): string | null {
 export function getRequiredTokensForRole(role: PromptRole): string[] {
     if (role === 'generic') return [];
     const defaultRow = PLAN_NEXT_SEED_ROWS.find(row => row.role === role && row.isDefault);
-    if (!defaultRow) return [];
+    const isMissingDefaultRow = !defaultRow;
+    if (isMissingDefaultRow) return [];
     return Array.from(new Set(extractParamTokens(defaultRow.body)));
 }

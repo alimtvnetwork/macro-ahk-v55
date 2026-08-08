@@ -108,13 +108,16 @@ export async function computeAndRenderPreview(
   handleImportFile: (r: ModalRefs, f: File, fi: HTMLInputElement, ib: HTMLButtonElement, o: PreviewTriggerType) => Promise<void>,
 ): Promise<void> {
   const panel = refs.previewPanel;
-  if (!panel) return;
+  const isMissingPanel = !panel;
+  if (isMissingPanel) return;
   const invalid = validateImportFile(file);
   if (invalid) {
     refs.status.textContent = 'Preview rejected: ' + invalid.headline;
     renderImportErrorBanner(refs, invalid.headline, invalid.hint);
     showToast(PREVIEW_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
-    try { previewFileInput.value = ''; } catch { /* ignore */ }
+    try { previewFileInput.value = ''; } catch (err) {
+      logError("AutoCatch", "Unhandled exception", err);
+    }
     return;
   }
   refs.status.textContent = 'Previewing ' + file.name + ' ...';
@@ -136,15 +139,20 @@ export async function computeAndRenderPreview(
     const preview = await previewPromptImport(parsed.valid, opts);
     renderPreviewPanel(refs, panel, preview, file, parsed.errors.length, () => {
       hidePreviewPanel(panel);
-      try { previewFileInput.value = ''; } catch { /* ignore */ }
+      try { previewFileInput.value = ''; } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+      }
       void handleImportFile(refs, file, fileInput, importBtn, 'click');
     }, () => {
       hidePreviewPanel(panel);
-      try { previewFileInput.value = ''; } catch { /* ignore */ }
+      try { previewFileInput.value = ''; } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+      }
       refs.status.textContent = 'Preview cancelled.';
     });
     refs.status.textContent = 'Preview ready for ' + file.name + '.';
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     logLibraryImportFailure('preview', 'threw during read/parse for name=' + file.name, err);
     const reason = extractImportErrorReason(err);
     refs.status.textContent = PREVIEW_FAILED_PREFIX + reason;

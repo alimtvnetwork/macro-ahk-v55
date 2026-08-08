@@ -57,7 +57,8 @@ function readMeta(db: SqlDatabaseRO): Map<string, string> {
 
 function requireMeta(meta: Map<string, string>, key: string): string {
   const value = meta.get(key);
-  if (!value) throwDiagnostic('PROMPT_IO_SQLITE_E001', { missingKey: key });
+  const isMissingValue = !value;
+  if (isMissingValue) throwDiagnostic('PROMPT_IO_SQLITE_E001', { missingKey: key });
   return value as string;
 }
 
@@ -71,7 +72,8 @@ function parseTags(raw: unknown): string[] | undefined {
 function rowToEntry(row: Record<string, unknown>): PromptEntry {
   const name = String(row.Name ?? '').trim();
   const text = typeof row.BodyMarkdown === 'string' ? row.BodyMarkdown : '';
-  if (!name) throwDiagnostic('PROMPT_IO_SQLITE_E002', { rowId: String(row.rowid ?? row.Slug ?? 'unknown') });
+  const isMissingName = !name;
+  if (isMissingName) throwDiagnostic('PROMPT_IO_SQLITE_E002', { rowId: String(row.rowid ?? row.Slug ?? 'unknown') });
   const entry: PromptEntry = { name, text };
   if (typeof row.Slug === 'string' && row.Slug.length > 0) entry.slug = row.Slug;
   if (typeof row.Category === 'string' && row.Category.length > 0) entry.category = row.Category;

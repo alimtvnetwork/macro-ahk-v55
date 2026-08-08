@@ -67,7 +67,8 @@ export function daysBetween(isoOrMs: string | number, nowMs?: number): number {
 
 /** Days until a future ISO timestamp. Returns -1 when invalid or in the past. */
 export function daysUntil(iso: string, nowMs?: number): number {
-  if (!iso) return -1;
+  const isMissingIso = !iso;
+  if (isMissingIso) return -1;
   const t = Date.parse(iso);
   if (!Number.isFinite(t)) return -1;
   const now = typeof nowMs === 'number' ? nowMs : Date.now();
@@ -81,7 +82,8 @@ export function daysUntil(iso: string, nowMs?: number): number {
  * Returns empty string for missing or unparseable input.
  */
 export function formatDateDDMMMYY(iso: string): string {
-  if (!iso) return '';
+  const isMissingIso = !iso;
+  if (isMissingIso) return '';
   const t = Date.parse(iso);
   if (!Number.isFinite(t)) return '';
   const d = new Date(t);
@@ -183,7 +185,8 @@ function resolveRefillStatus(
   ws: WorkspaceCredit, config: WorkspaceLifecycleConfig, nowMs?: number,
 ): WorkspaceStatus | null {
   const refillIso = pickRefillIso(ws);
-  if (!refillIso) return null;
+  const isMissingRefillIso = !refillIso;
+  if (isMissingRefillIso) return null;
   const dToRefill = daysUntil(refillIso, nowMs);
   if (dToRefill >= 0 && dToRefill <= config.refillWarningThresholdDays) {
     return buildStatus('about-to-refill', { refillIso, daysToRefill: dToRefill });
@@ -206,11 +209,13 @@ export function getEffectiveStatus(
   const tierExpired = isExpiredTier(ws.tier);
   const isFree = isFreeTier(ws.tier);
 
+  const isMissingIsFree = !isFree;
+
   // Free-plan workspaces never carry a real paid subscription. Stripe still
   // reports `canceled` on the downgrade event, but for display purposes a FREE
   // tier must never surface as Expired/Canceled — skip straight to the
   // refill/normal branches. (Issue: free-plan expiry suppression.)
-  if (!isFree) {
+  if (isMissingIsFree) {
     if (isCanceled) return resolveCanceledStatus(changedIso, daysSinceChange, grace);
     if (tierExpired && !isPastDue) return resolveTierExpiredStatus(changedIso, daysSinceChange, grace);
     if (isPastDue) return resolvePastDueStatus(changedIso, daysSinceChange);

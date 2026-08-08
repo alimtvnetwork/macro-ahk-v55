@@ -255,14 +255,16 @@ function _buildQueueHeader(listContainer: HTMLElement): HTMLElement { // eslint-
     const queueState = await loadTaskQueue();
     const currentPaused = queueState.isPaused || mgr.isPaused() || mgr.isStopped();
     const newPaused = !currentPaused;
-    
+
     queueState.isPaused = newPaused;
     mgr.setPaused(newPaused);
-    mgr.setStopped(false); 
-    
+    mgr.setStopped(false);
+
     await saveTaskQueue(queueState);
-    
-    if (!newPaused) {
+
+    const isMissingNewPaused = !newPaused;
+
+    if (isMissingNewPaused) {
       log(TASK_QUEUE_SCOPE + ' Resuming queue...', 'info');
       void mgr.startProcessing();
     } else {

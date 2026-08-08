@@ -60,7 +60,8 @@ function parseRow(raw: string): ProjectLockEvent | null {
  */
 export async function persistProjectLockEvent(ev: ProjectLockEvent): Promise<boolean> {
     const kv = getKv();
-    if (!kv) {
+    const isMissingKv = !kv;
+    if (isMissingKv) {
         logError(
             'LoopProjectLockEvent.persist',
             'marco.kv unavailable — cannot persist project-lock event for ws=' + ev.WorkspaceId,

@@ -39,7 +39,8 @@ function sortSearchParams(params: URLSearchParams): string {
     });
 
     const hasParams = entries.length > 0;
-    if (!hasParams) {
+    const isMissingHasParams = !hasParams;
+    if (isMissingHasParams) {
         return "";
     }
 

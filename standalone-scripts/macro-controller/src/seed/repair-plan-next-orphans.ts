@@ -53,7 +53,8 @@ export async function repairPlanNextOrphans(): Promise<OrphanRepairReport> {
 
 async function repairSingleOrphan(seedRow: typeof PLAN_NEXT_SEED_ROWS[number]): Promise<OrphanRepairEntry> {
   const lookup = await getPromptBySlug(seedRow.slug);
-  if (!lookup.ok) {
+  const isMissingOk = !lookup.ok;
+  if (isMissingOk) {
     logDiagnosticFromCode('SEED_ORPHAN_REPAIR_E001', {
       slug: seedRow.slug, fromRole: 'unknown', toRole: seedRow.role,
       stage: 'lookup', reason: lookup.error ?? 'getPromptBySlug returned !ok',
@@ -61,7 +62,8 @@ async function repairSingleOrphan(seedRow: typeof PLAN_NEXT_SEED_ROWS[number]): 
     return { slug: seedRow.slug, fromRole: 'unknown', toRole: seedRow.role, outcome: 'skipped-lookup-failed', reason: lookup.error ?? 'lookup failed' };
   }
   const existing = lookup.value;
-  if (!existing) return { slug: seedRow.slug, fromRole: 'absent', toRole: seedRow.role, outcome: 'skipped-missing' };
+  const isMissingExisting = !existing;
+  if (isMissingExisting) return { slug: seedRow.slug, fromRole: 'absent', toRole: seedRow.role, outcome: 'skipped-missing' };
   if (existing.Role === seedRow.role) return { slug: seedRow.slug, fromRole: existing.Role, toRole: seedRow.role, outcome: 'skipped-role-ok' };
   const saved = await upsertPrompt({
     id: existing.Id, slug: seedRow.slug, name: existing.Name || seedRow.name,
@@ -69,7 +71,8 @@ async function repairSingleOrphan(seedRow: typeof PLAN_NEXT_SEED_ROWS[number]): 
     previousReplaceKey: existing.ReplaceKey, replaceKey: existing.ReplaceKey,
     replaceValues: existing.ReplaceValues,
   });
-  if (!saved.ok) {
+  const isMissingOk = !saved.ok;
+  if (isMissingOk) {
     logDiagnosticFromCode('SEED_ORPHAN_REPAIR_E001', {
       slug: seedRow.slug, fromRole: existing.Role, toRole: seedRow.role,
       stage: 'upsert', reason: saved.error ?? 'upsertPrompt returned !ok',

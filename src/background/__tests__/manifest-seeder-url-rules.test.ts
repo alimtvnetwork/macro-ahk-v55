@@ -1,3 +1,4 @@
+import { DomainConstants } from "../../constants/domain";
 /**
  * Issue 119 — manifest-seeder preserves MatchRuleType.
  *
@@ -44,23 +45,23 @@ function makeProject(targets: Array<{ Pattern: string; MatchRuleType: UrlRuleMat
 describe("manifest-seeder URL extraction", () => {
     it("extractUrlMatches returns flat string[] (legacy)", () => {
         const p = makeProject([
-            { Pattern: "https://lovable.dev/dashboard", MatchRuleType: "exact" },
+            { Pattern: DomainConstants.DASHBOARD_URL, MatchRuleType: "exact" },
             { Pattern: "https://lovable.dev/projects/*", MatchRuleType: "glob" },
         ]);
         expect(extractUrlMatches(p)).toEqual([
-            "https://lovable.dev/dashboard",
+            DomainConstants.DASHBOARD_URL,
             "https://lovable.dev/projects/*",
         ]);
     });
 
     it("extractUrlMatchRules preserves MatchRuleType per entry", () => {
         const p = makeProject([
-            { Pattern: "https://lovable.dev/dashboard", MatchRuleType: "exact" },
+            { Pattern: DomainConstants.DASHBOARD_URL, MatchRuleType: "exact" },
             { Pattern: "https://lovable.dev/projects/*", MatchRuleType: "glob" },
             { Pattern: "^https://lovable\\.dev/p/[a-z0-9]+$", MatchRuleType: "regex" },
         ]);
         expect(extractUrlMatchRules(p)).toEqual([
-            { pattern: "https://lovable.dev/dashboard", matchType: "exact" },
+            { pattern: DomainConstants.DASHBOARD_URL, matchType: "exact" },
             { pattern: "https://lovable.dev/projects/*", matchType: "glob" },
             { pattern: "^https://lovable\\.dev/p/[a-z0-9]+$", matchType: "regex" },
         ]);

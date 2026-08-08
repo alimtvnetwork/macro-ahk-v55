@@ -43,7 +43,8 @@ export async function handleSdkAuthGetToken(): Promise<string | null> {
 /** AUTH_GET_SOURCE — returns the source that resolved the current auth token. */
 export async function handleSdkAuthGetSource(): Promise<string> {
     const result = await handleGetToken();
-    if (!result.token) {
+    const isMissingToken = !result.token;
+    if (isMissingToken) {
         return "none";
     }
 
@@ -131,7 +132,8 @@ export async function handleSdkConfigSet(
     payload: MessageRequest,
 ): Promise<{ isOk: boolean }> {
     const { key, value } = payload as MessageRequest & { key: string; value: JsonValue };
-    if (!key) return { isOk: false };
+    const isMissingKey = !key;
+    if (isMissingKey) return { isOk: false };
     const storageKey = `marco_config_${key}`;
     await chrome.storage.local.set({ [storageKey]: value });
     return { isOk: true };

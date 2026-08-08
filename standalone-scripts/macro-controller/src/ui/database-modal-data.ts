@@ -208,7 +208,9 @@ function buildWhereClause(tableName: string): Record<string, unknown> | undefine
   const filter = activeFilters[tableName];
   const hasFilter = filter !== null && filter !== undefined && filter.column !== '' && filter.value !== '';
 
-  if (!hasFilter) {
+  const isMissingHasFilter = !hasFilter;
+
+  if (isMissingHasFilter) {
     return undefined;
   }
 
@@ -232,7 +234,9 @@ function updateFilterColumns(
   const hasNoColumns = !filter || filter.columns.length === 0;
   const isDiscoveryNeeded = hasRows && hasNoColumns;
 
-  if (!isDiscoveryNeeded) {
+  const isMissingIsDiscoveryNeeded = !isDiscoveryNeeded;
+
+  if (isMissingIsDiscoveryNeeded) {
     return;
   }
 

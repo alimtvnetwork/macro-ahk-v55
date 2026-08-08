@@ -80,7 +80,8 @@ function appendUrlCandidate(
     candidates: Set<string>,
     rawUrl?: string | null,
 ): void {
-    if (!rawUrl) {
+    const isMissingRawUrl = !rawUrl;
+    if (isMissingRawUrl) {
         return;
     }
 
@@ -88,7 +89,9 @@ function appendUrlCandidate(
         const parsed = new URL(rawUrl);
         const isHttpUrl = parsed.protocol === "http:" || parsed.protocol === "https:";
 
-        if (!isHttpUrl) {
+        const isMissingIsHttpUrl = !isHttpUrl;
+
+        if (isMissingIsHttpUrl) {
             return;
         }
 

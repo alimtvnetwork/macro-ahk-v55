@@ -49,7 +49,8 @@ describe('prompt-library-modal drop-zone focus ring', () => {
         await tick();
         const zone = document.querySelector<HTMLDivElement>('[data-testid="library-drop-zone"]');
         expect(zone).not.toBeNull();
-        if (!zone) return;
+        const isMissingZone = !zone;
+        if (isMissingZone) return;
 
         expect(zone.style.outlineColor === '' || zone.style.outlineColor === 'transparent').toBe(true);
 

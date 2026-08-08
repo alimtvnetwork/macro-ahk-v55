@@ -70,7 +70,8 @@ async function forceResetDefaultBodies(): Promise<{ forced: number; error?: stri
       + ', UpdatedAt = ' + String(now)
       + ' WHERE Slug = ' + sqlLit(row.slug);
     const resp = await rawSql('SCHEMA', updateSql);
-    if (!resp.isOk) {
+    const isMissingIsOk = !resp.isOk;
+    if (isMissingIsOk) {
       const message = 'force update failed for ' + row.slug + ': ' + (resp.errorMessage ?? '?');
       logError('ReseedCommand', message);
       emitPromptSeedEvent({
@@ -100,7 +101,8 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
     // Always run the normal seeder first so missing rows are inserted and
     // legacy bodies get their non-destructive checksum upgrade.
     const seedResult = await seedPlanNextPrompts();
-    if (!seedResult.ok) {
+    const isMissingOk = !seedResult.ok;
+    if (isMissingOk) {
       emitPromptSeedEvent({
         event: EV_RESEED_COMPLETE, outcome: 'failed',
         detail: 'seedPlanNextPrompts: ' + (seedResult.error ?? '?'),
@@ -145,11 +147,13 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
  */
 export function installReseedCommandGlobal(): void {
   const w = window;
-  if (!w.__marcoReseedPrompts) {
+  const isMissing__marcoReseedPrompts = !w.__marcoReseedPrompts;
+  if (isMissing__marcoReseedPrompts) {
     w.__marcoReseedPrompts = reseedPromptsOnDemand;
     log('[ReseedCommand] window.__marcoReseedPrompts installed', 'info');
   }
-  if (!w.__marcoCheckPromptHealth) {
+  const isMissing__marcoCheckPromptHealth = !w.__marcoCheckPromptHealth;
+  if (isMissing__marcoCheckPromptHealth) {
     w.__marcoCheckPromptHealth = async () => {
       const { runPromptHealthCheck } = await import('./prompt-health-check');
       return runPromptHealthCheck();

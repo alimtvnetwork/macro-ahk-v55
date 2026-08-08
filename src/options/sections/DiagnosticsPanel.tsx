@@ -84,6 +84,9 @@ export function DiagnosticsPanel() {
             setData(statusRes);
             setMessages(msgRes.messages ?? []);
         } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
             setData(null);
         }
     }, [platform]);

@@ -67,7 +67,9 @@ const BOOT_FAST_PATH_TYPES = new Set<string>([
 function isBootFastPathMessage(message: unknown): boolean {
     const hasType = typeof message === "object" && message !== null && "type" in message;
 
-    if (!hasType) {
+    const isMissingHasType = !hasType;
+
+    if (isMissingHasType) {
         return false;
     }
 

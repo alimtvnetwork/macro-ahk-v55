@@ -60,12 +60,13 @@ export function setupGlobalErrorHandlers(): void {
   window.addEventListener('keydown', function (e) {
     if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'r') {
       e.preventDefault();
-      if (!state.running) {
+      const isMissingRunning = !state.running;
+      if (isMissingRunning) {
         log('Hotkey: Loop is not running — cannot resume queue', 'warn');
         showToast('Loop must be ON to resume queue', 'warn');
         return;
       }
-      
+
       const hasReturnButton = checkForReturnButton();
       if (hasReturnButton) {
         log('Hotkey: Cannot resume while "Return to Extension" button is present', 'warn');

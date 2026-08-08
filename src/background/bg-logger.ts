@@ -121,8 +121,8 @@ export function logBgError(
             configId: context?.configId,
             scriptFile: context?.scriptFile,
         } as MessageRequest).catch(() => { /* fall through to console.error */ }); // allow-swallow: DB/session not ready — console.error below preserves the error
-    } catch { // allow-swallow: handleLogError threw synchronously (DB not bound) — console.error below preserves the error
-        /* fall through */
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 
     // Step 3: Console.error LAST — always executes, preserves full stack trace

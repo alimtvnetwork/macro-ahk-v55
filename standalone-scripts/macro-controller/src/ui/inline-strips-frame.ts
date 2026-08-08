@@ -191,7 +191,8 @@ export function ensureInlineStripsFrame(formHost: HTMLElement): {
   body: HTMLElement;
 } | null {
   const parent = formHost.parentElement;
-  if (!parent) {
+  const isMissingParent = !parent;
+  if (isMissingParent) {
     log('InlineStripsFrame: form host has no parent — cannot mount frame', 'warn');
     return null;
   }
@@ -202,7 +203,9 @@ export function ensureInlineStripsFrame(formHost: HTMLElement): {
     parent.insertBefore(frame, formHost);
   }
 
-  if (!frame) {
+  const isMissingFrame = !frame;
+
+  if (isMissingFrame) {
     frame = buildFrame();
     parent.insertBefore(frame, formHost);
     // Re-apply group collapse when it toggles so body visibility stays synced.
@@ -219,7 +222,8 @@ export function ensureInlineStripsFrame(formHost: HTMLElement): {
   }
 
   const body = document.getElementById(FRAME_BODY_ID) as HTMLElement | null;
-  if (!body) {
+  const isMissingBody = !body;
+  if (isMissingBody) {
     log('InlineStripsFrame: body element missing after mount — DOM corrupted', 'error');
     return null;
   }

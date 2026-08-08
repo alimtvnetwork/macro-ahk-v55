@@ -1,3 +1,4 @@
+import { DomainConstants } from "../constants/domain";
 /**
  * Issue 129 Step 7 — Navigate active tab to remixed project.
  *
@@ -34,14 +35,14 @@ beforeEach(() => {
 
 describe('normalizeRedirectUrl', () => {
     it('resolves relative paths against origin', async () => {
-        installWindow('https://lovable.dev');
+        installWindow(DomainConstants.PRIMARY_URL);
         const { normalizeRedirectUrl } = await import('../remix/navigate-to-remixed');
-        expect(normalizeRedirectUrl('/projects/abc', 'https://lovable.dev'))
+        expect(normalizeRedirectUrl('/projects/abc', DomainConstants.PRIMARY_URL))
             .toBe('https://lovable.dev/projects/abc');
     });
 
     it('passes through absolute http(s) URLs', async () => {
-        installWindow('https://lovable.dev');
+        installWindow(DomainConstants.PRIMARY_URL);
         const { normalizeRedirectUrl } = await import('../remix/navigate-to-remixed');
         expect(normalizeRedirectUrl('https://lovable.dev/projects/x', 'https://x'))
             .toBe('https://lovable.dev/projects/x');
@@ -50,24 +51,24 @@ describe('normalizeRedirectUrl', () => {
     });
 
     it('rejects javascript:, data:, file:, blob: schemes', async () => {
-        installWindow('https://lovable.dev');
+        installWindow(DomainConstants.PRIMARY_URL);
         const { normalizeRedirectUrl } = await import('../remix/navigate-to-remixed');
-        expect(normalizeRedirectUrl('javascript:alert(1)', 'https://lovable.dev')).toBeNull();
-        expect(normalizeRedirectUrl('data:text/html,x', 'https://lovable.dev')).toBeNull();
-        expect(normalizeRedirectUrl('file:///etc/passwd', 'https://lovable.dev')).toBeNull();
+        expect(normalizeRedirectUrl('javascript:alert(1)', DomainConstants.PRIMARY_URL)).toBeNull();
+        expect(normalizeRedirectUrl('data:text/html,x', DomainConstants.PRIMARY_URL)).toBeNull();
+        expect(normalizeRedirectUrl('file:///etc/passwd', DomainConstants.PRIMARY_URL)).toBeNull();
     });
 
     it('rejects empty/blank input', async () => {
-        installWindow('https://lovable.dev');
+        installWindow(DomainConstants.PRIMARY_URL);
         const { normalizeRedirectUrl } = await import('../remix/navigate-to-remixed');
-        expect(normalizeRedirectUrl('', 'https://lovable.dev')).toBeNull();
-        expect(normalizeRedirectUrl('   ', 'https://lovable.dev')).toBeNull();
+        expect(normalizeRedirectUrl('', DomainConstants.PRIMARY_URL)).toBeNull();
+        expect(normalizeRedirectUrl('   ', DomainConstants.PRIMARY_URL)).toBeNull();
     });
 });
 
 describe('navigateActiveTabToRemixedProject', () => {
     it('calls window.location.assign with the absolute URL', async () => {
-        installWindow('https://lovable.dev');
+        installWindow(DomainConstants.PRIMARY_URL);
         const { navigateActiveTabToRemixedProject } = await import('../remix/navigate-to-remixed');
         const ok = navigateActiveTabToRemixedProject('/projects/new-1');
         expect(ok).toBe(true);
@@ -75,7 +76,7 @@ describe('navigateActiveTabToRemixedProject', () => {
     });
 
     it('returns false and does not assign when URL is rejected', async () => {
-        installWindow('https://lovable.dev');
+        installWindow(DomainConstants.PRIMARY_URL);
         const { navigateActiveTabToRemixedProject } = await import('../remix/navigate-to-remixed');
         const ok = navigateActiveTabToRemixedProject('javascript:alert(1)');
         expect(ok).toBe(false);
@@ -92,7 +93,7 @@ describe('navigateActiveTabToRemixedProject', () => {
 
 describe('navigateFromCachedRemix', () => {
     it('navigates using the RedirectUrl of a cached row', async () => {
-        installWindow('https://lovable.dev');
+        installWindow(DomainConstants.PRIMARY_URL);
         const { navigateFromCachedRemix } = await import('../remix/navigate-to-remixed');
         const ok = navigateFromCachedRemix({
             SourceProjectId: 's', NewProjectId: 'n',
@@ -104,7 +105,7 @@ describe('navigateFromCachedRemix', () => {
     });
 
     it('returns false for null row or missing RedirectUrl', async () => {
-        installWindow('https://lovable.dev');
+        installWindow(DomainConstants.PRIMARY_URL);
         const { navigateFromCachedRemix } = await import('../remix/navigate-to-remixed');
         expect(navigateFromCachedRemix(null)).toBe(false);
         expect(navigateFromCachedRemix({

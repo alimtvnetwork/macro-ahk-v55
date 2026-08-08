@@ -1,3 +1,4 @@
+import { DomainConstants } from "../constants/domain";
 /**
  * Issue 116 — Credit Totals component integration tests.
  *
@@ -108,7 +109,7 @@ describe('buildBreakdownTable — integration', () => {
     const table = buildBreakdownTable(SAMPLE);
     const firstRow = table.querySelector<HTMLElement>('[data-credit-totals-row]')!;
     firstRow.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
-    expect(openSpy).toHaveBeenCalledWith('https://lovable.dev/projects', '_blank', 'noopener');
+    expect(openSpy).toHaveBeenCalledWith(DomainConstants.PROJECTS_URL, '_blank', 'noopener');
   });
 
   it('drag-drop reorders rows when no sort is active', () => {

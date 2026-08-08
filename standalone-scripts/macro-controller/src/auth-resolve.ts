@@ -142,7 +142,9 @@ export function getBearerTokenFromSessionBridge(): string {
       const raw = localStorage.getItem(key) || '';
       const token = utils.extractBearerTokenFromUnknown(raw);
 
-      if (!token) {
+      const isMissingToken = !token;
+
+      if (isMissingToken) {
         if (raw.length >= 10) {
           log('resolveToken: ignoring non-usable value in localStorage[' + key + ']', 'warn');
         }
@@ -229,7 +231,8 @@ export function getSessionCookieNames(): string[] {
     const names: string[] = [];
     for (const projectKey of Object.keys(root.Projects)) {
       const project = root.Projects[projectKey];
-      if (!project) {
+      const isMissingProject = !project;
+      if (isMissingProject) {
         continue;
       }
       names.push(...extractSessionNamesFromProject(project));
@@ -284,7 +287,8 @@ export function getBearerTokenFromCookie(): string {
 
     const now = Date.now();
     const shouldLogDiagnostics = (now - cookieDiagState.lastAt) >= COOKIE_DIAGNOSTIC_COOLDOWN_MS;
-    if (!shouldLogDiagnostics) {
+    const isMissingShouldLogDiagnostics = !shouldLogDiagnostics;
+    if (isMissingShouldLogDiagnostics) {
       return '';
     }
 
@@ -316,7 +320,9 @@ function logCookieDiagnostics(
   log(fn + ': Cookie names visible: [' + cookieNames.join(', ') + ']', 'info');
   log(fn + ': Raw cookie string length: ' + rawCookie.length + ' chars', 'info');
 
-  if (!hasTargetCookie) {
+  const isMissingHasTargetCookie = !hasTargetCookie;
+
+  if (isMissingHasTargetCookie) {
     log(fn + ': Session cookie NOT found in document.cookie (expected: HttpOnly)', 'info');
     log(fn + ': Auth should resolve via Supabase localStorage scan or extension bridge', 'info');
   }
@@ -389,7 +395,8 @@ export function persistResolvedBearerToken(token: string): boolean {
 
 export function updateAuthBadge(hasToken: boolean, source: string): void {
   const badge = document.getElementById('loop-auth-badge');
-  if (!badge) {
+  const isMissingBadge = !badge;
+  if (isMissingBadge) {
     return;
   }
 
@@ -409,7 +416,9 @@ export function updateAuthBadge(hasToken: boolean, source: string): void {
 export function resolveToken(): string {
   const sessionToken = getBearerTokenFromSessionBridge();
 
-  if (!sessionToken) {
+  const isMissingSessionToken = !sessionToken;
+
+  if (isMissingSessionToken) {
     tokenSourceState.value = 'none';
 
     return '';

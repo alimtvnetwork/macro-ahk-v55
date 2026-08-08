@@ -127,7 +127,10 @@ export function createAuthDiagRow(deps: AuthDiagDeps): AuthDiagResult {
     const isHidden = diagBody.style.display === 'none';
     diagBody.style.display = isHidden ? 'flex' : 'none';
     col.toggle.textContent = isHidden ? '[-]' : '[+]';
-    try { localStorage.setItem('ml_collapse_auth_diag', isHidden ? 'expanded' : 'collapsed'); } catch (_e: unknown) { logSub('Failed to persist auth diag collapse state: ' + (_e instanceof Error ? _e.message : String(_e)), 1); }
+    try { localStorage.setItem('ml_collapse_auth_diag', isHidden ? 'expanded' : 'collapsed'); } catch (_e: unknown) {
+      logError("AutoCatch", "Unhandled exception", _e);
+      logSub('Failed to persist auth diag collapse state: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
+    }
   };
 
   const dimStyle = 'color:' + cPanelFgDim + ';';
@@ -184,7 +187,8 @@ export function createAuthDiagRow(deps: AuthDiagDeps): AuthDiagResult {
   if (!diagBody.hasAttribute('data-auth-diag-poll')) {
     diagBody.setAttribute('data-auth-diag-poll', '1');
     const authDiagPollId = trackedSetInterval('UI.authDiagPoll', function () {
-      if (!diagBody.isConnected) {
+      const isMissingIsConnected = !diagBody.isConnected;
+      if (isMissingIsConnected) {
         trackedClearInterval(authDiagPollId);
         return;
       }

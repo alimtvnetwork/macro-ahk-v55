@@ -52,7 +52,9 @@ const ROW_IDS = [
 describe('Credit-sort hamburger rows (v3.30.0)', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
-    try { localStorage.removeItem('ml_credit_sort_mode'); } catch { /* jsdom */ }
+    try { localStorage.removeItem('ml_credit_sort_mode'); } catch (err) {
+      logError("AutoCatch", "Unhandled exception", err);
+    }
     setLoopWsCreditSortMode('none');
   });
 

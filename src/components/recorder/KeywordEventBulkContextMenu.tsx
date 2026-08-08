@@ -849,6 +849,9 @@ function BulkImportDialog(props: BulkImportDialogProps): JSX.Element {
             setBundle(result);
             setFilename(file.name);
         } catch (err) {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
             setBundle(null);
             setError(err instanceof Error ? err.message : "Failed to read ZIP");
         } finally {

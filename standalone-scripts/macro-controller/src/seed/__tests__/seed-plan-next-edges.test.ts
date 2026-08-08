@@ -61,7 +61,9 @@ beforeEach(() => {
     responsesQueue = [];
     sendImpl = null;
     (logDiagnosticFromCode as unknown as Mock).mockClear();
-    try { localStorage.removeItem('marco_last_seed_telemetry'); } catch { /* jsdom */ }
+    try { localStorage.removeItem('marco_last_seed_telemetry'); } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+    }
 });
 
 describe('seedPlanNextPrompts — negative + idempotency edges', () => {

@@ -9,7 +9,8 @@ function payloadToMessage(payload: CreditFailureLogPayload): string {
 }
 
 export function sanitizeBearerPrefix(token: string | null): string | null {
-    if (!token) {
+    const isMissingToken = !token;
+    if (isMissingToken) {
         return null;
     }
     return token.substring(0, 12) + '…REDACTED';

@@ -6,7 +6,9 @@ const LOG_SCOPE = 'CreditBalanceUpdate.plan';
 export function mapPlanFromWire(wirePlan: string | null | undefined): PlanTierType {
     const normalized = (wirePlan || '').trim().toLowerCase();
 
-    if (!normalized) {
+    const isMissingNormalized = !normalized;
+
+    if (isMissingNormalized) {
         return PlanTierType.Unknown;
     }
 
@@ -62,7 +64,8 @@ export function shouldFetchCreditBalanceForPlan(plan: PlanTierType): boolean {
  */
 export function formatPlanDisplayLabel(wirePlan: string | null | undefined): string {
     const normalized = (wirePlan || '').trim().toLowerCase();
-    if (!normalized) return '';
+    const isMissingNormalized = !normalized;
+    if (isMissingNormalized) return '';
 
     const ktloTier = /^ktlo_(\d+)$/.exec(normalized);
     if (ktloTier) return 'Light ' + ktloTier[1];

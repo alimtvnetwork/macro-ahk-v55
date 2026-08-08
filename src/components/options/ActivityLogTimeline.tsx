@@ -266,6 +266,9 @@ function SessionHistoryPicker({
       });
       setSessions(result.sessions ?? []);
     } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
       setSessions([]);
     } finally {
       setLoading(false);

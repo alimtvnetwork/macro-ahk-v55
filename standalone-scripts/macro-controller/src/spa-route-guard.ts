@@ -151,8 +151,8 @@ function evaluateRouteChange(source: RouteChangeSourceType): void {
     log('[SpaRouteGuard] ' + label + ' via ' + source + ' (was=' + previous + ', now=' + (currentProjectId ?? '(none)') + ') — loop stopped', 'warn');
     try {
       showToast('Project route changed — loop stopped', 'info', { noStop: true });
-    } catch (_e: unknown) { // allow-swallow: toast UI may not be mounted at route-change time; loop-stop log above is the authoritative record.
-      // Toast UI may not be mounted yet — non-fatal.
+    } catch (_e: unknown) {
+      logError("AutoCatch", "Unhandled exception", _e);
     }
 
     // Re-resolve the workspace name from the REST API for the new project.

@@ -86,7 +86,9 @@ async function doubleConfirmAndMove(threshold: number): Promise<void> {
   }
   const resp = await window.marco.api.credits.fetchWorkspaces({ baseUrl: CREDIT_API_BASE });
 
-  if (!resp.ok) {
+  const isMissingOk = !resp.ok;
+
+  if (isMissingOk) {
     logError('Double-confirm API fetch failed', 'HTTP ' + resp.status);
 
     return;
@@ -145,7 +147,9 @@ async function handleFallbackAuthRecovery(
 
   const newToken = await recoverAuthOnce();
 
-  if (!newToken) {
+  const isMissingNewToken = !newToken;
+
+  if (isMissingNewToken) {
     logError('Cycle fallback', 'Recovery failed - skipping this cycle');
     showToast('Auth recovery failed - will retry next cycle', 'warn', { noStop: true });
     releaseCycleLock();
@@ -180,7 +184,9 @@ async function processWorkspaceData(
 
   const isParseOk = parseLoopApiResponse(data);
 
-  if (!isParseOk) {
+  const isMissingIsParseOk = !isParseOk;
+
+  if (isMissingIsParseOk) {
     logError('Cycle aborted', 'API response parse failed');
 
     return;
@@ -312,7 +318,9 @@ async function doCycleFetchWithToken(isRetryAttempt: boolean): Promise<void> {
       markBearerTokenExpired(LOG_SCOPE_LOOP_CYCLE);
     }
 
-    if (!resp.ok) {
+    const isMissingOk = !resp.ok;
+
+    if (isMissingOk) {
       throwDiagnostic('LOOP_FALLBACK_HTTP_E001', {
         status: resp.status,
         url: `${CREDIT_API_BASE}/user/workspaces`,
@@ -324,6 +332,7 @@ async function doCycleFetchWithToken(isRetryAttempt: boolean): Promise<void> {
     log('Cycle fallback API: response received', 'check');
     await processWorkspaceData(data);
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     handleCycleFetchError(err as Error, freshToken);
   } finally {
     releaseCycleLock();
@@ -337,7 +346,9 @@ async function doCycleFetchWithToken(isRetryAttempt: boolean): Promise<void> {
 export async function doCycleFetchFallback(): Promise<void> {
   const token = resolveToken();
 
-  if (!token) {
+  const isMissingToken = !token;
+
+  if (isMissingToken) {
     log('Cycle fallback: No token - attempting recovery before API call...', 'warn');
 
     try {

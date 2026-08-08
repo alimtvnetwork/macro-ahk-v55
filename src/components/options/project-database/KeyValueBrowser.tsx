@@ -73,6 +73,9 @@ export function KeyValueBrowser({ projectSlug }: KeyValueBrowserProps) {
         setNamespaces(uniqueNs);
       }
     } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
       setEntries([]);
     } finally {
       setLoading(false);

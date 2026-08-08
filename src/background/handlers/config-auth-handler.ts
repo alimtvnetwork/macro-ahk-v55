@@ -212,7 +212,7 @@ export async function handleGetToken(
         return { token: cachedSessionId, refreshed: false };
     }
 
-    const projectId = _projectId ?? await getActiveTabProjectId(tabUrlHint);
+    const projectId = _projectId ?? (await getActiveTabProjectId(tabUrlHint));
     const resolvedCookieNames = await resolveSessionCookieNamesFromProjects(projectId);
     const primaryUrl = await resolvePrimaryUrl(tabUrlHint);
 
@@ -348,18 +348,24 @@ export async function handleRefreshToken(
         console.log("[config-auth] REFRESH: found JWT directly in session cookie");
     }
 
+    const isMissingAuthToken = !authToken;
+
     // Strategy 2: Supabase localStorage JWT
-    if (!authToken) {
+    if (isMissingAuthToken) {
         authToken = await readSupabaseJwtFromPlatformTabs(tabUrlHint);
     }
 
+    const isMissingAuthToken = !authToken;
+
     // Strategy 3: Signed URL token fallback (no network)
-    if (!authToken) {
+    if (isMissingAuthToken) {
         authToken = await resolveSignedUrlTokenCandidate(tabUrlHint, primaryUrl);
     }
 
+    const isMissingAuthToken = !authToken;
+
     // Strategy 4: Opaque session-cookie exchange
-    if (!authToken) {
+    if (isMissingAuthToken) {
         authToken = await fetchAuthTokenFromSessionExchange(
             projectId,
             sessionId !== null || refreshToken !== null,
@@ -560,10 +566,12 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
                         // Priority 1: Supabase auth token (sb-*-auth-token)
                         for (let i = 0; i < len; i++) {
                             const key = localStorage.key(i);
-                            if (!key) continue;
+                            const isMissingKey = !key;
+                            if (isMissingKey) continue;
                             if (key.startsWith("sb-") && key.includes("-auth-token")) {
                                 const raw = localStorage.getItem(key);
-                                if (!raw) continue;
+                                const isMissingRaw = !raw;
+                                if (isMissingRaw) continue;
                                 try {
                                     const parsed = JSON.parse(raw);
                                     const token = parsed?.access_token
@@ -583,7 +591,8 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
                         const lovableKeys = ["lovable-auth-token", "lovable:token", "auth-token", "supabase.auth.token"];
                         for (let j = 0; j < lovableKeys.length; j++) {
                             const storedToken = localStorage.getItem(lovableKeys[j]);
-                            if (!storedToken) continue;
+                            const isMissingStoredToken = !storedToken;
+                            if (isMissingStoredToken) continue;
                             try {
                                 const p2 = JSON.parse(storedToken);
                                 const t2 = p2?.access_token ?? p2?.currentSession?.access_token ?? p2?.token;
@@ -627,7 +636,9 @@ async function getActiveTabProjectId(tabUrlHint?: string): Promise<string | null
     const tabUrl = await getActiveTabUrl();
     const hasUrl = tabUrl !== null && tabUrl.length > 0;
 
-    if (!hasUrl) {
+    const isMissingHasUrl = !hasUrl;
+
+    if (isMissingHasUrl) {
         return null;
     }
 
@@ -644,7 +655,8 @@ async function resolvePrimaryUrl(tabUrlHint?: string): Promise<string> {
 }
 
 function extractSignedUrlTokenFromUrl(url: string | null | undefined): string | null {
-    if (!url) return null;
+    const isMissingUrl = !url;
+    if (isMissingUrl) return null;
 
     try {
         const parsed = new URL(url);
@@ -813,7 +825,9 @@ async function discoverAuthCookieNames(primaryUrl: string): Promise<CookieDiscov
     const authLikeCookieNames = new Set<string>();
     const canListCookies = typeof chrome.cookies?.getAll === "function";
 
-    if (!canListCookies) {
+    const isMissingCanListCookies = !canListCookies;
+
+    if (isMissingCanListCookies) {
         return { checkedUrls, authLikeCookieNames: [] };
     }
 

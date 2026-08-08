@@ -56,7 +56,8 @@ function readSnippetByName(
         [name],
     );
     const values = result[0]?.values[0];
-    if (!values) {
+    const isMissingValues = !values;
+    if (isMissingValues) {
         throw new Error(`JsSnippet "${name}" not found after upsert`);
     }
     return rowToSnippet(values);

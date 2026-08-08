@@ -16,7 +16,7 @@ function notify(): void {
     try {
       cb(new Set(selectedIds));
     } catch (_e: unknown) {
-      // Listeners must not break producers
+      logError("AutoCatch", "Unhandled exception", _e);
     }
   }
 }

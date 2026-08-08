@@ -328,11 +328,13 @@ function _renderFresh(
   promptsDropdown.textContent = '';
 
   _appendHeaderAndSubmenu(promptsDropdown, entries, ctx, taskNextDeps);
-  
+
   // Append Search Bar
   promptsDropdown.appendChild(buildSearchInput(ctx, taskNextDeps));
 
-  if (!entries.length) {
+  const isMissingLength = !entries.length;
+
+  if (isMissingLength) {
     renderEmptyState(promptsDropdown, ctx, taskNextDeps);
     return;
   }
@@ -351,8 +353,9 @@ function _appendHeaderAndSubmenu(
 ): void {
   // Mark dropdown so the Tasks toggle can find the group from any descendant click.
   if (!container.hasAttribute('data-prompts-dropdown')) container.setAttribute('data-prompts-dropdown', '1');
+  const isMissingPosition = !container.style.position;
   // Ensure the container can host an absolutely-positioned right-anchored Tasks panel.
-  if (!container.style.position) container.style.position = 'relative';
+  if (isMissingPosition) container.style.position = 'relative';
   container.appendChild(buildDropdownHeader(ctx, taskNextDeps, () => renderPromptsDropdown(ctx, taskNextDeps)));
 
   // v4.x: PlanTierType Task submenu removed from this dropdown — it lives elsewhere
@@ -513,7 +516,8 @@ function _rebindPlanTaskSubmenus(container: HTMLElement, ctx: PromptContext): vo
 /** Re-attach the Load button handler in the dropdown header. */
 function _rebindHeader(container: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): void {
   const header = container.firstElementChild as HTMLElement;
-  if (!header) return;
+  const isMissingHeader = !header;
+  if (isMissingHeader) return;
   const oldLoadBtn = header.querySelector('span[title="Reload prompts from database"]') as HTMLElement | null;
   if (oldLoadBtn) {
     // Rebuild the whole header (5 pills) rather than reach into the extracted
@@ -600,7 +604,8 @@ function _rebindPromptItems(
       || (id && byId.get(id))
       || (idxAttr !== null ? filtered[parseInt(idxAttr, 10)] : undefined)
       || filtered[i];
-    if (!resolved) continue;
+    const isMissingResolved = !resolved;
+    if (isMissingResolved) continue;
     _bindSinglePromptItem(dom, resolved, container, promptsCfg, ctx, taskNextDeps);
   }
 }
@@ -617,7 +622,8 @@ function _bindSinglePromptItem(
 ): void {
   item.onmouseover = function() { (this as HTMLElement).style.background = cBtnMenuHover; };
   item.onmouseout = function() { (this as HTMLElement).style.background = 'transparent'; };
-  if (!p.text) return;
+  const isMissingText = !p.text;
+  if (isMissingText) return;
 
   const actionsSpan = (item.querySelector('[data-prompt-actions]') as HTMLElement)
     || (item.querySelector('span:last-child') as HTMLElement);
@@ -711,7 +717,8 @@ function renderEmptyState(container: HTMLElement, ctx: PromptContext, taskNextDe
  */
 function normalizeCategory(raw: string | undefined): string {
   const cat = (raw || '').trim().toLowerCase();
-  if (!cat) return '';
+  const isMissingCat = !cat;
+  if (isMissingCat) return '';
   if (cat.includes('audit') || cat.includes('spec') || cat.includes('proofread') || cat.includes('true feed') || cat.includes('true-feed')) {
     return 'audit';
   }
@@ -856,7 +863,8 @@ function _appendPresetCounts(taskNextSub: HTMLElement, promptsDropdown: HTMLElem
     queueBtn.onclick = async (e: Event) => {
       e.stopPropagation();
       const prompt = findNextTasksPrompt(taskNextDeps);
-      if (!prompt) {
+      const isMissingPrompt = !prompt;
+      if (isMissingPrompt) {
         showPasteToast('❌ "Next Tasks" prompt not found', true);
         return;
       }
@@ -951,7 +959,8 @@ function getPromptVariantValue(p: PromptEntry): number | null {
 
 function resolvePromptPasteText(p: PromptEntry): string {
   const variantValue = getPromptVariantValue(p);
-  if (!variantValue) return p.text;
+  const isMissingVariantValue = !variantValue;
+  if (isMissingVariantValue) return p.text;
   return substituteToken(p.text, p.replaceKey || REPLACE_KEY_DEFAULT, variantValue);
 }
 

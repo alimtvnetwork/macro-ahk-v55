@@ -101,6 +101,9 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
         setUserDbCount(userCreated);
       }
     } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
       // ProjectDatabases table may not exist yet — default to 0
       setUserDbCount(0);
     }
@@ -125,6 +128,9 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
         setTables(result.tables);
       }
     } catch (err) {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
       showError(err, "RefreshTables", { type: "PROJECT_API", project: projectSlug });
       setTables([]);
     } finally {

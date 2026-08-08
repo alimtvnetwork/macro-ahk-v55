@@ -117,7 +117,9 @@ export async function getChatBoxXPath(): Promise<string> {
                 return proj.settings.chatBoxXPath;
             }
         }
-    } catch { /* fall through to global */ } // allow-swallow: per-project chatBoxXPath lookup failed; fall through to global settings
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+    } // allow-swallow: per-project chatBoxXPath lookup failed; fall through to global settings
     const stored = await loadSettings();
     return stored.chatBoxXPath ?? DEFAULT_SETTINGS.chatBoxXPath;
 }

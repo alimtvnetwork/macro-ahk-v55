@@ -278,7 +278,8 @@ interface FetchPreflight {
 
 function preflight(deps: FetchInputDeps, config: InputSourceConfig): FetchPreflight {
     const continueOnFail = config.OnFailure === "ContinueWithLocal";
-    if (!config.Enabled) return { Skip: buildSkipResult("Input source disabled"), FetchImpl: null, ContinueOnFail: continueOnFail };
+    const isMissingEnabled = !config.Enabled;
+    if (isMissingEnabled) return { Skip: buildSkipResult("Input source disabled"), FetchImpl: null, ContinueOnFail: continueOnFail };
     if (config.Url.trim().length === 0) return { Skip: buildSkipResult("No URL configured"), FetchImpl: null, ContinueOnFail: continueOnFail };
     const fetchImpl = deps.fetchImpl ?? (typeof fetch === "function" ? fetch : null);
     if (fetchImpl === null) {
@@ -315,7 +316,8 @@ function handleResponse(
         return buildErrorResult({ url: config.Url, status: res.status, error: `HTTP ${res.status} ${res.statusText}`, durationMs, continueOnFail });
     }
     const parsed = parseResponseBag(text);
-    if (!parsed.Ok) {
+    const isMissingOk = !parsed.Ok;
+    if (isMissingOk) {
         return buildErrorResult({ url: config.Url, status: res.status, error: parsed.Reason, durationMs, continueOnFail });
     }
     return { Ok: true, Skipped: false, Bag: parsed.Bag, Status: res.status, DurationMs: durationMs, Url: config.Url };

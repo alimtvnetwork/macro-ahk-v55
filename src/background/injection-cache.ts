@@ -91,7 +91,8 @@ export async function cacheGet<T>(category: CacheCategory, subKey = ""): Promise
 
             request.onsuccess = () => {
                 const entry = request.result as CacheEntry<T> | undefined;
-                if (!entry) {
+                const isMissingEntry = !entry;
+                if (isMissingEntry) {
                     resolve(null);
                     return;
                 }
@@ -160,8 +161,8 @@ export async function cacheDelete(category: CacheCategory, subKey = ""): Promise
             request.onsuccess = () => resolve();
             request.onerror = () => resolve(); // best-effort
         });
-    } catch { // allow-swallow: IndexedDB cache delete is best-effort; stale entry will be re-validated on next read
-        // noop
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 }
 

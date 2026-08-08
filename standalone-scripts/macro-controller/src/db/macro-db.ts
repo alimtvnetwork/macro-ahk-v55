@@ -182,6 +182,7 @@ export async function migratePromptReplaceColumns(): Promise<void> {
     }
     await ensurePromptRoleDefaultIndex();
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', { column: 'batch', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -214,7 +215,8 @@ async function runOrphanRepairStage(stages: Stage[]): Promise<OrphanRepairReport
 async function runSeedPlanNextStage(stages: Stage[]): Promise<void> {
   const { seedPlanNextPrompts } = await import('../seed/seed-plan-next');
   const seedResult = await seedPlanNextPrompts();
-  if (!seedResult.ok) {
+  const isMissingOk = !seedResult.ok;
+  if (isMissingOk) {
     const reason = seedResult.error ?? UNKNOWN_ERROR;
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'seed-plan-next', reason });
     stages.push({ stage: 'seed-plan-next', status: 'failed', reason });
@@ -228,7 +230,8 @@ async function runAutoRepairStage(stages: Stage[]): Promise<void> {
   const health = await runPromptHealthCheckWithAutoRepair();
   const initialIssues = health.initialReport.issues.length;
   const finalIssues = health.finalReport.issues.length;
-  if (!health.isHealthy) {
+  const isMissingIsHealthy = !health.isHealthy;
+  if (isMissingIsHealthy) {
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: STAGE_AUTO_REPAIR, reason: 'residual issues=' + finalIssues });
     stages.push({ stage: STAGE_AUTO_REPAIR, status: 'failed', reason: 'residual issues=' + finalIssues, metrics: { initialIssues, finalIssues } });
     return;
@@ -285,6 +288,7 @@ export async function initMacroDb(): Promise<void> {
       stages.push({ stage: STAGE_SCHEMA_INIT, status: 'failed', reason });
     }
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     const reason = err instanceof Error ? err.message : String(err);
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'send-schema-init', reason }, err);
     stages.push({ stage: STAGE_SCHEMA_INIT, status: 'failed', reason });
@@ -303,14 +307,16 @@ export async function initMacroDb(): Promise<void> {
  * Save project metadata.
  */
 export async function saveProjectMetadata(projectId: string, name: string, url: string): Promise<void> {
-  if (!projectId) return;
-  
+  const isMissingProjectId = !projectId;
+  if (isMissingProjectId) return;
+
   const sql = `INSERT OR REPLACE INTO Projects (ProjectId, Name, Url, UpdatedAt) 
                VALUES ('${projectId.replace(/'/g, "''")}', '${name.replace(/'/g, "''")}', '${url.replace(/'/g, "''")}', CURRENT_TIMESTAMP)`;
-  
+
   try {
     await runSqlBridge('SCHEMA', sql);
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'saveProjectMetadata', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -333,6 +339,7 @@ export async function saveCommunication(projectId: string, prompt: string, respo
     await runSqlBridge('SCHEMA', sql);
     log('Communication saved to Macro DB', 'info');
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'saveCommunication', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -341,11 +348,12 @@ export async function saveCommunication(projectId: string, prompt: string, respo
  * Sync the entire task queue for a project to SQLite.
  */
 export async function syncTaskQueueToDb(projectId: string, tasks: DbTask[]): Promise<void> {
-  if (!projectId) return;
+  const isMissingProjectId = !projectId;
+  if (isMissingProjectId) return;
 
   // Clear existing queue for this project
   const deleteSql = `DELETE FROM TaskQueue WHERE ProjectId = '${projectId.replace(/'/g, "''")}'`;
-  
+
   const insertValues = tasks.map(t => {
     return `('${t.id}', '${t.projectId.replace(/'/g, "''")}', '${(t as { projectName?: string }).projectName ? (t as { projectName: string }).projectName.replace(/'/g, "''") : "Unknown"}', '${t.prompt.replace(/'/g, "''")}', '${t.status}', '${(t.error || '').replace(/'/g, "''")}', ${t.timestamp})`;
   }).join(',');
@@ -357,6 +365,7 @@ export async function syncTaskQueueToDb(projectId: string, tasks: DbTask[]): Pro
   try {
     await runSqlBridge('SCHEMA', sql);
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'syncTaskQueueToDb', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -368,13 +377,14 @@ export async function forceSyncQueueToDb(): Promise<void> {
   const { visualSyncConfirm } = await import('../ui/prompt-utils');
   const { loadTaskQueue } = await import('../task-queue');
   const { extractProjectIdFromUrl } = await import('../workspace-detection');
-  
+
   const projectId = extractProjectIdFromUrl();
-  if (!projectId) return;
+  const isMissingProjectId = !projectId;
+  if (isMissingProjectId) return;
 
   const queueState = await loadTaskQueue();
   // const projectName = state.projectNameFromApi || state.projectNameFromDom || 'Unknown Project';
-  
+
   log('[MacroDb] Force-syncing task queue to SQLite...', 'check');
   await syncTaskQueueToDb(projectId, queueState.tasks);
   visualSyncConfirm();
@@ -390,6 +400,7 @@ export async function purgeOldCommunications(days: number = 30): Promise<void> {
     await runSqlBridge('SCHEMA', sql);
     log(`[MacroDb] Purged communications older than ${days} days`, 'info');
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'purgeOldCommunications', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -435,6 +446,7 @@ export async function exportDatabaseDump(): Promise<void> {
       logDiagnosticFromCode('DB_MACRO_EXPORT_E001', { reason: resp?.errorMessage || 'no dump data' });
     }
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     logDiagnosticFromCode('DB_MACRO_EXPORT_E001', { reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }

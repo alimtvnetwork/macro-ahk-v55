@@ -29,12 +29,13 @@ interface MarcoSdkShape {
 }
 
 function getMemberships(mutation: string): MembershipsApi {
-  const sdk = (window as unknown as { marco?: MarcoSdkShape }).marco;
-  const api = sdk?.api?.memberships;
-  if (!api) {
-    throwDiagnostic('WS_MEMBERS_MUTATE_E003', { mutation });
-  }
-  return api;
+    const sdk = (window as unknown as { marco?: MarcoSdkShape }).marco;
+    const api = sdk?.api?.memberships;
+    const isMissingApi = !api;
+    if (isMissingApi) {
+      throwDiagnostic('WS_MEMBERS_MUTATE_E003', { mutation });
+    }
+    return api;
 }
 
 function previewBody(data: unknown): string {
@@ -43,47 +44,56 @@ function previewBody(data: unknown): string {
 
 /** POST /workspaces/{wsId}/memberships — invite by email. */
 export async function inviteMember(wsId: string, email: string, role: MemberRole): Promise<void> {
-  if (!wsId) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'invite', argument: 'wsId' });
-  if (!email) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'invite', argument: 'email' });
-  log('[Members] POST invite ' + email + ' (' + role + ') → ' + wsId, 'delegate');
-  const resp = await getMemberships('invite').invite(wsId, email, role, { baseUrl: CREDIT_API_BASE });
-  if (!resp.ok) {
-    const body = previewBody(resp.data);
-    logError('Members', 'invite HTTP ' + resp.status + ': ' + body);
-    throwDiagnostic('WS_MEMBERS_MUTATE_E002', { mutation: 'invite', status: resp.status, wsId, preview: body });
-  }
-  clearMembersCache(wsId);
-  log('[Members] ✅ invited ' + email, 'success');
+    const isMissingWsId = !wsId;
+    if (isMissingWsId) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'invite', argument: 'wsId' });
+    const isMissingEmail = !email;
+    if (isMissingEmail) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'invite', argument: 'email' });
+    log('[Members] POST invite ' + email + ' (' + role + ') → ' + wsId, 'delegate');
+    const resp = await getMemberships('invite').invite(wsId, email, role, { baseUrl: CREDIT_API_BASE });
+    const isMissingOk = !resp.ok;
+    if (isMissingOk) {
+      const body = previewBody(resp.data);
+      logError('Members', 'invite HTTP ' + resp.status + ': ' + body);
+      throwDiagnostic('WS_MEMBERS_MUTATE_E002', { mutation: 'invite', status: resp.status, wsId, preview: body });
+    }
+    clearMembersCache(wsId);
+    log('[Members] ✅ invited ' + email, 'success');
 }
 
 /** DELETE /workspaces/{wsId}/memberships/{userId} — remove a member. */
 export async function removeMember(wsId: string, userId: string): Promise<void> {
-  if (!wsId) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'remove', argument: 'wsId' });
-  if (!userId) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'remove', argument: 'userId' });
-  log('[Members] DELETE ' + userId + ' ← ' + wsId, 'delegate');
-  const resp = await getMemberships('remove').remove(wsId, userId, { baseUrl: CREDIT_API_BASE });
-  if (!resp.ok) {
-    const body = previewBody(resp.data);
-    logError('Members', 'remove HTTP ' + resp.status + ': ' + body);
-    throwDiagnostic('WS_MEMBERS_MUTATE_E002', { mutation: 'remove', status: resp.status, wsId, preview: body });
-  }
-  clearMembersCache(wsId);
-  log('[Members] ✅ removed ' + userId, 'success');
+    const isMissingWsId = !wsId;
+    if (isMissingWsId) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'remove', argument: 'wsId' });
+    const isMissingUserId = !userId;
+    if (isMissingUserId) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'remove', argument: 'userId' });
+    log('[Members] DELETE ' + userId + ' ← ' + wsId, 'delegate');
+    const resp = await getMemberships('remove').remove(wsId, userId, { baseUrl: CREDIT_API_BASE });
+    const isMissingOk = !resp.ok;
+    if (isMissingOk) {
+      const body = previewBody(resp.data);
+      logError('Members', 'remove HTTP ' + resp.status + ': ' + body);
+      throwDiagnostic('WS_MEMBERS_MUTATE_E002', { mutation: 'remove', status: resp.status, wsId, preview: body });
+    }
+    clearMembersCache(wsId);
+    log('[Members] ✅ removed ' + userId, 'success');
 }
 
 /** PATCH /workspaces/{wsId}/memberships/{userId} — change role (promote to owner). */
 export async function updateMemberRole(wsId: string, userId: string, role: MemberRole): Promise<void> {
-  if (!wsId) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'updateRole', argument: 'wsId' });
-  if (!userId) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'updateRole', argument: 'userId' });
-  log('[Members] PATCH role=' + role + ' ' + userId + ' @ ' + wsId, 'delegate');
-  const resp = await getMemberships('updateRole').updateRole(wsId, userId, role, { baseUrl: CREDIT_API_BASE });
-  if (!resp.ok) {
-    const body = previewBody(resp.data);
-    logError('Members', 'updateRole HTTP ' + resp.status + ': ' + body);
-    throwDiagnostic('WS_MEMBERS_MUTATE_E002', { mutation: 'updateRole', status: resp.status, wsId, preview: body });
-  }
-  clearMembersCache(wsId);
-  log('[Members] ✅ role=' + role + ' for ' + userId, 'success');
+    const isMissingWsId = !wsId;
+    if (isMissingWsId) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'updateRole', argument: 'wsId' });
+    const isMissingUserId = !userId;
+    if (isMissingUserId) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'updateRole', argument: 'userId' });
+    log('[Members] PATCH role=' + role + ' ' + userId + ' @ ' + wsId, 'delegate');
+    const resp = await getMemberships('updateRole').updateRole(wsId, userId, role, { baseUrl: CREDIT_API_BASE });
+    const isMissingOk = !resp.ok;
+    if (isMissingOk) {
+      const body = previewBody(resp.data);
+      logError('Members', 'updateRole HTTP ' + resp.status + ': ' + body);
+      throwDiagnostic('WS_MEMBERS_MUTATE_E002', { mutation: 'updateRole', status: resp.status, wsId, preview: body });
+    }
+    clearMembersCache(wsId);
+    log('[Members] ✅ role=' + role + ' for ' + userId, 'success');
 }
 
 /** 

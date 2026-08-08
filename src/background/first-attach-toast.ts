@@ -164,8 +164,8 @@ function bridgePagePayload(): void {
         if (o.type !== "MARCO_FIRST_ATTACH_ACTION") return;
         try {
             chrome.runtime.sendMessage(o);
-        } catch { // allow-swallow: SW asleep / port closed — single-attempt fail-fast per no-retry policy; user can retry from the toast
-            /* intentionally empty */
+        } catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
         }
     };
 

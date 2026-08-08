@@ -80,7 +80,9 @@ beforeEach(async () => {
     const cache = await import('../credit-balance-update/credit-balance-cache');
     cache.clearCreditBalanceUpdateMemoryCache();
     for (const id of ['ws_newfree_1', 'ws_pro_inline_1']) {
-        try { await cache.invalidateCreditBalanceUpdateCache(id); } catch (_e) { /* allow-swallow: jsdom may lack IDB */ }
+        try { await cache.invalidateCreditBalanceUpdateCache(id); } catch (_e) {
+            logError("AutoCatch", "Unhandled exception", _e);
+        }
     }
 });
 

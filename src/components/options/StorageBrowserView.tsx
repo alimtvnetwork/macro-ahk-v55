@@ -104,6 +104,9 @@ export function StorageBrowserView() {
       setTables(resp.tables ?? []);
       setDbSizeBytes(resp.dbSizeBytes ?? 0);
     } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
       setTables([]);
       setDbSizeBytes(0);
     } finally {
@@ -164,7 +167,10 @@ export function StorageBrowserView() {
         for (const k of keys) size += (sessionStorage.getItem(k) ?? "").length * 2;
         setSessionSize(size);
       }
-    } catch { setSessionCount(0); }
+    } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+ setSessionCount(0); }
 
     // Cookies
     try {
@@ -178,7 +184,10 @@ export function StorageBrowserView() {
       } else {
         setCookieCount(document.cookie ? document.cookie.split(";").length : 0);
       }
-    } catch { setCookieCount(0); }
+    } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+ setCookieCount(0); }
 
     // LocalStorage / chrome.storage.local
     try {
@@ -199,7 +208,10 @@ export function StorageBrowserView() {
         for (const k of keys) size += (localStorage.getItem(k) ?? "").length * 2;
         setLocalSize(size);
       }
-    } catch { setLocalCount(0); }
+    } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+ setLocalCount(0); }
   }, []);
 
   const tableItems = tables.filter(t => !t.isView);
@@ -470,6 +482,9 @@ function CssAssetsSection() {
       });
       setAssets(resp.assets ?? []);
     } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
       // Fallback: show known assets from manifest data
       setAssets([
         { scriptName: "macroController", cssFile: "macro-looping.css", templatesFile: "templates.json", version: "1.56.0" },

@@ -47,7 +47,8 @@ export function buildImportProgressElement(): {
 
 export function showImportProgress(refs: ModalRefs): void {
   const p = refs.importProgress;
-  if (!p) return;
+  const isMissingP = !p;
+  if (isMissingP) return;
   p.wrap.hidden = false;
   p.wrap.style.display = 'block';
   p.label.textContent = 'Preparing import…';
@@ -59,14 +60,16 @@ export function showImportProgress(refs: ModalRefs): void {
 
 export function hideImportProgress(refs: ModalRefs): void {
   const p = refs.importProgress;
-  if (!p) return;
+  const isMissingP = !p;
+  if (isMissingP) return;
   p.wrap.hidden = true;
   p.wrap.style.display = 'none';
 }
 
 export function updateImportProgress(refs: ModalRefs, progress: ImportProgress): void {
   const p = refs.importProgress;
-  if (!p) return;
+  const isMissingP = !p;
+  if (isMissingP) return;
   if (progress.phase === 'entries') {
     p.label.textContent = 'Committed ' + String(progress.entriesCommitted)
       + '/' + String(progress.totalEntries) + ' entries';
@@ -106,7 +109,8 @@ export function renderPartialImportErrors(
   parseErrors: readonly string[],
 ): void {
   const panel = refs.partialErrorsPanel;
-  if (!panel) return;
+  const isMissingPanel = !panel;
+  if (isMissingPanel) return;
   panel.textContent = '';
   const total = entryErrors.length + parseErrors.length;
   if (total === 0) {
@@ -159,7 +163,8 @@ export function renderPartialImportErrors(
 
 export function clearPartialImportErrors(refs: ModalRefs): void {
   const panel = refs.partialErrorsPanel;
-  if (!panel) return;
+  const isMissingPanel = !panel;
+  if (isMissingPanel) return;
   panel.textContent = '';
   panel.hidden = true;
   panel.style.display = 'none';

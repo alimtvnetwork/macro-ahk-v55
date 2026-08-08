@@ -210,7 +210,9 @@ async function doRebuildProjectSubmenu(): Promise<void> {
     const projects = projectData?.allProjects ?? [];
     const hasProjects = projects.length > 0;
 
-    if (!hasProjects) {
+    const isMissingHasProjects = !hasProjects;
+
+    if (isMissingHasProjects) {
         createNoProjectsMenuItem();
         return;
     }
@@ -323,7 +325,8 @@ async function handleMenuClick(
 
 async function handleRunScripts(tabId: number, forceReload = false): Promise<void> {
     const hasValidTab = tabId > 0;
-    if (!hasValidTab) return;
+    const isMissingHasValidTab = !hasValidTab;
+    if (isMissingHasValidTab) return;
 
     const scriptsData = await sendInternalMessage<{ scripts: Array<{ id: string; isEnabled: boolean; code?: string }> }>({
         type: MessageType.GET_ALL_SCRIPTS,
@@ -332,7 +335,9 @@ async function handleRunScripts(tabId: number, forceReload = false): Promise<voi
     const enabledScripts = (scriptsData?.scripts ?? []).filter((s) => s.isEnabled !== false);
     const hasScripts = enabledScripts.length > 0;
 
-    if (!hasScripts) return;
+    const isMissingHasScripts = !hasScripts;
+
+    if (isMissingHasScripts) return;
 
     await sendInternalMessage({
         type: MessageType.INJECT_SCRIPTS,
@@ -348,7 +353,8 @@ async function handleRunScripts(tabId: number, forceReload = false): Promise<voi
 
 async function handleReinjectScripts(tabId: number): Promise<void> {
     const hasValidTab = tabId > 0;
-    if (!hasValidTab) return;
+    const isMissingHasValidTab = !hasValidTab;
+    if (isMissingHasValidTab) return;
 
     // Remove existing markers before re-injecting
     try {

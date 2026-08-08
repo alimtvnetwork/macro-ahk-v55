@@ -54,7 +54,8 @@ const ROLES_TO_CHECK: PromptRole[] = ['plan', 'next'];
  * Pure function: no I/O, no side effects beyond mutating the passed array.
  */
 function inspectRow(role: PromptRole, slug: string, row: PromptRow | undefined, issues: PromptHealthIssue[]): void {
-  if (!row) {
+  const isMissingRow = !row;
+  if (isMissingRow) {
     issues.push({ role, slug, code: 'row-missing', detail: 'no default row for role=' + role });
     return;
   }
@@ -107,12 +108,14 @@ export async function runPromptHealthCheck(opts: RunHealthCheckOptions = {}): Pr
     const seedSlug = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault)?.slug ?? (role + '-default');
     try {
       const res = await getDefaultPromptForRole(role);
-      if (!res.ok) {
+      const isMissingOk = !res.ok;
+      if (isMissingOk) {
         issues.push({ role, slug: seedSlug, code: 'query-failed', detail: res.error ?? 'unknown query error' });
         continue;
       }
       inspectRow(role, seedSlug, res.value, issues);
     } catch (err) {
+      logError("AutoCatch", "Unhandled exception", err);
       const message = err instanceof Error ? err.message : String(err);
       issues.push({ role, slug: seedSlug, code: 'query-failed', detail: 'threw: ' + message });
     }
@@ -132,7 +135,7 @@ function publishReport(report: PromptHealthReport, silent: boolean): void {
   try {
     window.__marcoPromptHealthReport = report;
   } catch (_err) {
-    // window may be locked down in some sandboxes; safe to ignore.
+    logError("AutoCatch", "Unhandled exception", _err);
   }
 
   if (report.ok) {

@@ -127,9 +127,13 @@ const createUIState = new CreateUIState();
 function wireSummaryBarSubscription(summaryBar: SummaryBarHandle): void {
   subscribeVisibleWorkspaces(function (rows) {
     let config: ReturnType<typeof getWorkspaceLifecycleConfig> | null = null;
-    try { config = getWorkspaceLifecycleConfig(); } catch (_e: unknown) { config = null; }
+    try { config = getWorkspaceLifecycleConfig(); } catch (_e: unknown) {
+      logError("AutoCatch", "Unhandled exception", _e);
+      config = null;
+    }
     const resolver: DisplayKindResolver = function (ws) {
-      if (!config) { return 'normal'; }
+      const isMissingConfig = !config;
+      if (isMissingConfig) { return 'normal'; }
       try { return classifyWorkspaceDisplayStatus(ws, config).kind; }
       catch (_e: unknown) { return 'normal'; }
     };
@@ -172,7 +176,8 @@ function assemblePanelChildren(ui: HTMLElement, c: PanelChildren): void {
  
 export function createUI(deps: PanelBuilderDeps): void {
   let container = getByXPath(CONFIG.CONTROLS_XPATH);
-  if (!container) {
+  const isMissingContainer = !container;
+  if (isMissingContainer) {
     createUIState.increment();
     log('UI container not found at XPath: ' + CONFIG.CONTROLS_XPATH + ' — using immediate BODY fallback (floating panel)', 'warn');
     container = document.body;

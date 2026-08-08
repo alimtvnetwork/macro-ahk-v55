@@ -196,6 +196,7 @@ describe("service-worker-main chrome.action fallback", () => {
         try {
             (globalThis.chrome as { action: { setTitle: (info: { title: string }) => void } }).action.setTitle({ title: "x" });
         } catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
             thrownInTry = err as Error;
         }
         expect(thrownInTry).toBeInstanceOf(Error);

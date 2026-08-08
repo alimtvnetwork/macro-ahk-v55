@@ -47,7 +47,8 @@ export function runIdempotentCheck(): IdempotentResult {
   nsWrite('_internal.destroyed', false);
 
   const existingMarker = document.getElementById(IDS.SCRIPT_MARKER);
-  if (!existingMarker) return 'proceed';
+  const isMissingExistingMarker = !existingMarker;
+  if (isMissingExistingMarker) return 'proceed';
 
   const existingVersion = existingMarker.getAttribute('data-version') || '';
   const isVersionMismatch = existingVersion !== VERSION;
@@ -66,7 +67,10 @@ export function runIdempotentCheck(): IdempotentResult {
 
 function handleVersionMismatch(marker: HTMLElement, existingVersion: string): IdempotentResult {
   console.warn(LabelType.LogMacroloopV + VERSION + '] VERSION MISMATCH: existing=' + existingVersion + ' new=' + VERSION + ', forcing re-injection');
-  try { nsCallTyped('api.loop.stop'); } catch (e) { logSub('Version mismatch teardown: loop stop failed, ' + (e instanceof Error ? e.message : String(e)), 1); }
+  try { nsCallTyped('api.loop.stop'); } catch (e) {
+    logError("AutoCatch", "Unhandled exception", e);
+    logSub('Version mismatch teardown: loop stop failed, ' + (e instanceof Error ? e.message : String(e)), 1);
+  }
   marker.remove();
   const staleContainer = document.getElementById(IDS.CONTAINER);
   if (staleContainer) staleContainer.remove();
@@ -121,17 +125,23 @@ function attemptUiRecovery(marker: HTMLElement): IdempotentResult {
 
   // Recovery failed, force full re-bootstrap
   console.warn(LabelType.LogMacroloopV + VERSION + '] UI recovery failed, forcing full re-bootstrap');
-  try { nsCallTyped('api.loop.stop'); } catch (_e) { logSub('UI recovery fallback: loop stop failed, ' + (_e instanceof Error ? _e.message : String(_e)), 1); }
+  try { nsCallTyped('api.loop.stop'); } catch (_e) {
+    logError("AutoCatch", "Unhandled exception", _e);
+    logSub('UI recovery fallback: loop stop failed, ' + (_e instanceof Error ? _e.message : String(_e)), 1);
+  }
   marker.remove();
   return 'proceed';
 }
 
 
 function healAllManagers(existingController: RecoverableController | null): void {
-  if (!existingController) return;
+  const isMissingExistingController = !existingController;
+  if (isMissingExistingController) return;
+
+  const isMissingUi = !existingController.ui;
 
   // Self-heal UIManager
-  if (!existingController.ui) {
+  if (isMissingUi) {
     const savedUIFactory = nsReadTyped('_internal.createUIManager') as (() => unknown) | undefined;
     if (savedUIFactory && typeof existingController.registerUI === 'function') {
       console.warn(LabelType.LogMacroloopV + VERSION + '] Self-healing: auto-registering UIManager from persisted factory');
@@ -167,8 +177,12 @@ function healManager(
 ): void {
   if (typeof register !== 'function') return;
   let has = false;
-  try { has = !!getter(); } catch (_e) { logSub('Self-heal getter threw for ' + label + ': ' + (_e instanceof Error ? _e.message : String(_e)), 1); }
-  if (!has) {
+  try { has = !!getter(); } catch (_e) {
+    logError("AutoCatch", "Unhandled exception", _e);
+    logSub('Self-heal getter threw for ' + label + ': ' + (_e instanceof Error ? _e.message : String(_e)), 1);
+  }
+  const isMissingHas = !has;
+  if (isMissingHas) {
     const factory = nsReadTyped(nsKey as keyof import('./api-namespace').NsPathMap) as (() => unknown) | undefined;
     if (factory) {
       console.warn(LabelType.LogMacroloopV + VERSION + '] Self-healing: auto-registering ' + label + ' from persisted factory');

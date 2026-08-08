@@ -1,3 +1,4 @@
+import { DomainConstants } from "./constants/domain";
 /**
  * Macro Controller — Project Instruction Manifest
  *
@@ -45,8 +46,8 @@ const instruction: ProjectInstruction<MacroControllerSettings> = {
             { Pattern: "https://*.lovableproject.com/*", MatchRuleType: MatchRuleType.Glob },
         ],
         Cookies: [
-            { CookieName: "lovable-session-id.id", Url: "https://lovable.dev", Role: "session", Description: "Session ID — primary bearer token" },
-            { CookieName: "lovable-session-id.refresh", Url: "https://lovable.dev", Role: "refresh", Description: "Refresh token" },
+            { CookieName: "lovable-session-id.id", Url: DomainConstants.PRIMARY_URL, Role: "session", Description: "Session ID — primary bearer token" },
+            { CookieName: "lovable-session-id.refresh", Url: DomainConstants.PRIMARY_URL, Role: "refresh", Description: "Refresh token" },
         ],
         Settings: {
             IsolateScripts: true,

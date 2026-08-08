@@ -81,7 +81,8 @@ describe('multi-workspace unified-billing fan-out E2E', () => {
         const fanOut = await fanOutCreditEnrichment(workspaces, {
             requester: async (target): Promise<CreditFetchResult> => {
                 const balance = balanceByWorkspace[target.id];
-                if (!balance) throw new Error('no fixture for ' + target.id);
+                const isMissingBalance = !balance;
+                if (isMissingBalance) throw new Error('no fixture for ' + target.id);
                 overlayCreditBalanceOnWorkspace(target, balance);
                 return {
                     outcome: CreditFetchOutcomeType.ApiHit,

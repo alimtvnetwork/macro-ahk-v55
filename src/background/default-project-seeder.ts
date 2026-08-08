@@ -1,3 +1,4 @@
+import { DomainConstants } from "../constants/domain";
 /**
  * Marco Extension — Default Project Seeder
  *
@@ -231,25 +232,25 @@ function buildSdkCookieBindings(): CookieBinding[] {
     return [
         {
             cookieName: "lovable-session-id.id",
-            url: "https://lovable.dev",
+            url: DomainConstants.PRIMARY_URL,
             role: "session",
             description: "Primary session cookie — JWT bearer token for API auth",
         },
         {
             cookieName: "lovable-session-id.refresh",
-            url: "https://lovable.dev",
+            url: DomainConstants.PRIMARY_URL,
             role: "refresh",
             description: "Refresh token cookie — used to obtain a new session",
         },
         {
             cookieName: "__Secure-lovable-session-id.id",
-            url: "https://lovable.dev",
+            url: DomainConstants.PRIMARY_URL,
             role: "session",
             description: "Secure-prefixed session cookie alias",
         },
         {
             cookieName: "__Host-lovable-session-id.id",
-            url: "https://lovable.dev",
+            url: DomainConstants.PRIMARY_URL,
             role: "session",
             description: "Host-prefixed session cookie alias",
         },
@@ -291,13 +292,13 @@ function buildDefaultCookieBindings(): CookieBinding[] {
     return [
         {
             cookieName: "lovable-session-id.id",
-            url: "https://lovable.dev",
+            url: DomainConstants.PRIMARY_URL,
             role: "session",
             description: "Session ID — primary bearer token for API auth",
         },
         {
             cookieName: "lovable-session-id.refresh",
-            url: "https://lovable.dev",
+            url: DomainConstants.PRIMARY_URL,
             role: "refresh",
             description: "Refresh token — used to obtain a new session",
         },

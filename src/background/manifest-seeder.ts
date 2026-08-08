@@ -72,7 +72,8 @@ const SUPPORTED_SCHEMA_VERSIONS = { min: 2, max: 2 };
 export async function seedFromManifest(): Promise<SeedResult> {
     console.log("[manifest-seeder] Fetching seed-manifest.json from extension dist...");
     const manifest = await fetchManifest();
-    if (!manifest) {
+    const isMissingManifest = !manifest;
+    if (isMissingManifest) {
         logBgWarnError(BgLogTag.MANIFEST_SEEDER, "seed-manifest.json not found or invalid — skipping. " +
             "Ensure the build pipeline runs compile-instruction + generate-seed-manifest.");
         return { scripts: 0, configs: 0, projects: 0, errors: ["seed-manifest.json not found or invalid"] };
@@ -211,7 +212,8 @@ async function seedScriptsFromManifest(
     const errors: string[] = [];
 
     for (const project of manifest.Projects) {
-        if (!project.SeedOnInstall) {
+        const isMissingSeedOnInstall = !project.SeedOnInstall;
+        if (isMissingSeedOnInstall) {
             console.log("[manifest-seeder:scripts] Skipping %s (seedOnInstall=false)", project.Name);
             continue;
         }
@@ -243,6 +245,7 @@ async function seedScriptsFromManifest(
                         scriptDef.File, scriptDef.SeedId);
                 }
             } catch (err) {
+                logError("AutoCatch", "Unhandled exception", err);
                 const seedErrorMessage = `[seedScriptsFromManifest] Failed to seed script ${scriptDef.File} for ${project.Name}: ${err}`;
                 errors.push(seedErrorMessage);
                 logBgWarnError(BgLogTag.MANIFEST_SEEDER, seedErrorMessage);
@@ -378,7 +381,8 @@ async function seedConfigsFromManifest(
     const errors: string[] = [];
 
     for (const project of manifest.Projects) {
-        if (!project.SeedOnInstall) continue;
+        const isMissingSeedOnInstall = !project.SeedOnInstall;
+        if (isMissingSeedOnInstall) continue;
 
         for (const configDef of project.Configs) {
             try {
@@ -406,6 +410,7 @@ async function seedConfigsFromManifest(
                     seeded++;
                 }
             } catch (err) {
+                logError("AutoCatch", "Unhandled exception", err);
                 const seedErrorMessage = `[seedConfigsFromManifest→fetchConfigJson] Failed to seed config ${configDef.File} for ${project.Name}: ${err}`;
                 errors.push(seedErrorMessage);
                 // Use warn instead of error — config fetch failures are non-fatal
@@ -460,7 +465,8 @@ function resolveConfigSeedId(
     key: string | undefined,
     project: SeedProjectEntry,
 ): string | undefined {
-    if (!key) return undefined;
+    const isMissingKey = !key;
+    if (isMissingKey) return undefined;
     const config = project.Configs.find((c) => c.Key === key);
     return config?.SeedId;
 }
@@ -532,6 +538,7 @@ export async function seedProjectsFromManifest(
                 seeded++;
             }
         } catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
             const seedErrorMessage = `[seedProjectsFromManifest] Failed to seed project ${project.Name}: ${err}`;
             errors.push(seedErrorMessage);
             logBgWarnError(BgLogTag.MANIFEST_SEEDER, seedErrorMessage);

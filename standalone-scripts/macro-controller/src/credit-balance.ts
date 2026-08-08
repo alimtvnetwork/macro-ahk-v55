@@ -84,14 +84,15 @@ function isAuthFailure(status: number): boolean {
 // ============================================
 // eslint-disable-next-line max-lines-per-function -- linear API call with 3 diagnostic branches; splitting hurts readability
 export async function resolveWorkspaceId(): Promise<string | null> {
-
   if (creditBalanceState.resolvedWorkspaceId) {
     return creditBalanceState.resolvedWorkspaceId;
   }
 
   const projectId = extractProjectIdFromUrl();
 
-  if (!projectId) {
+  const isMissingProjectId = !projectId;
+
+  if (isMissingProjectId) {
     log('CreditBalance: No projectId in URL — cannot resolve workspace', 'warn');
 
     return null;
@@ -99,7 +100,9 @@ export async function resolveWorkspaceId(): Promise<string | null> {
 
   const token = resolveToken();
 
-  if (!token) {
+  const isMissingToken = !token;
+
+  if (isMissingToken) {
     log('CreditBalance: No bearer token — cannot resolve workspace', 'warn');
 
     return null;
@@ -112,7 +115,9 @@ export async function resolveWorkspaceId(): Promise<string | null> {
   try {
     const resp = await window.marco!.api!.workspace.resolveByProject(projectId, { baseUrl: CREDIT_API_BASE });
 
-    if (!resp.ok) {
+    const isMissingOk = !resp.ok;
+
+    if (isMissingOk) {
       if (isAuthFailure(resp.status)) {
         markBearerTokenExpired('credit-balance-ws');
       }
@@ -177,13 +182,16 @@ export async function fetchCreditBalance(
   workspaceId?: string,
   isRetry?: boolean,
 ): Promise<CreditBalanceResponse | null> {
-
   const wsId = workspaceId || creditBalanceState.resolvedWorkspaceId;
 
-  if (!wsId) {
+  const isMissingWsId = !wsId;
+
+  if (isMissingWsId) {
     const resolved = await resolveWorkspaceId();
 
-    if (!resolved) {
+    const isMissingResolved = !resolved;
+
+    if (isMissingResolved) {
       log('CreditBalance: No workspace ID — skipping API, will use fallback', 'warn');
 
       return null;
@@ -204,7 +212,9 @@ export async function fetchCreditBalance(
 
   const token = resolveToken();
 
-  if (!token) {
+  const isMissingToken = !token;
+
+  if (isMissingToken) {
     log('CreditBalance: No bearer token', 'warn');
 
     return null;
@@ -215,7 +225,9 @@ export async function fetchCreditBalance(
   try {
     const resp = await window.marco!.api!.credits.fetchBalance(wsId, { baseUrl: CREDIT_API_BASE });
 
-    if (!resp.ok) {
+    const isMissingOk = !resp.ok;
+
+    if (isMissingOk) {
       if (isAuthFailure(resp.status) && !isRetry) {
         markBearerTokenExpired('credit-balance');
         log('CreditBalance: Auth ' + resp.status + ' — recovering...', 'warn');
@@ -287,7 +299,8 @@ export async function fetchCreditBalance(
 // checkAndActOnCreditBalance — The main free-credit detection function
 // ============================================
 export async function checkAndActOnCreditBalance(): Promise<boolean> {
-  if (!BALANCE_CONFIG.enableApiDetection) {
+  const isMissingEnableApiDetection = !BALANCE_CONFIG.enableApiDetection;
+  if (isMissingEnableApiDetection) {
     log('CreditBalance: API detection disabled in config', 'skip');
 
     return false;
@@ -295,7 +308,9 @@ export async function checkAndActOnCreditBalance(): Promise<boolean> {
 
   const response = await fetchCreditBalance();
 
-  if (!response) {
+  const isMissingResponse = !response;
+
+  if (isMissingResponse) {
     log('CreditBalance: API failed — fallback to XPath if enabled', 'warn');
 
     return false;

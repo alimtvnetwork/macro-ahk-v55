@@ -56,12 +56,18 @@ export function SchemaVersionHistory({
           const parsed = JSON.parse(resp.value);
           setVersions(Array.isArray(parsed) ? parsed : []);
         } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
           setVersions([]);
         }
       } else {
         setVersions([]);
       }
     } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
       setVersions([]);
     } finally {
       setLoading(false);

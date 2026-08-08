@@ -191,6 +191,9 @@ export function PopupFooter({
       setCacheCleared(result.cleared ?? 0);
       setTimeout(() => setCacheCleared(null), 3000);
     } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
       setCacheCleared(-1);
       setTimeout(() => setCacheCleared(null), 3000);
     } finally {

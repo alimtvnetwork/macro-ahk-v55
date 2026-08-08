@@ -136,7 +136,10 @@ export function parseWithRecovery(content: string): unknown {
       }
       try {
         return JSON.parse(repaired);
-      } catch (_repairErr) { logSub('JSON repair also failed: ' + (_repairErr instanceof Error ? _repairErr.message : String(_repairErr)), 1); }
+      } catch (_repairErr) {
+        logError("AutoCatch", "Unhandled exception", _repairErr);
+        logSub('JSON repair also failed: ' + (_repairErr instanceof Error ? _repairErr.message : String(_repairErr)), 1);
+      }
     }
     throw e;
   }
@@ -148,7 +151,8 @@ export function parseWithRecovery(content: string): unknown {
 
 function _getOrCreateToastContainer(): HTMLElement {
   let container = document.getElementById(DomIdType.ToastStack);
-  if (!container) {
+  const isMissingContainer = !container;
+  if (isMissingContainer) {
     container = document.createElement('div');
     container.id = DomIdType.ToastStack;
     container.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);' +
@@ -506,15 +510,16 @@ export type PasteOutcome = PasteOutcomeType;
 export async function resolveDynamicVariables(text: string): Promise<string | null> {
   const variableRegex = /\{\{\?([^}]+)\}\}/g;
   const matches = Array.from(text.matchAll(variableRegex));
-  
+
   if (matches.length === 0) return text;
 
   // Deduplicate variables
   const uniqueVars = Array.from(new Set(matches.map(m => m[1].trim())));
-  
+
   // Show input modal
   const values = await showVariableInputModal(uniqueVars);
-  if (!values) return null; // User cancelled
+  const isMissingValues = !values;
+  if (isMissingValues) return null; // User cancelled
 
   let resolvedText = text;
   uniqueVars.forEach(v => {
@@ -616,7 +621,9 @@ export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, g
 
   const target = findPasteTarget(promptsCfg, getByXPath) as HTMLElement | null;
 
-  if (!target) {
+  const isMissingTarget = !target;
+
+  if (isMissingTarget) {
     log('Prompt paste: No editor target found — copying to clipboard instead', 'warn');
     navigator.clipboard.writeText(text).then(function() {
       log('Prompt copied to clipboard (no paste target)', 'success');
@@ -637,7 +644,8 @@ export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, g
       pasteIntoTextarea(target, text);
     } else {
       const ok = pasteIntoContentEditable(target, text);
-      if (!ok) return 'failed';
+      const isMissingOk = !ok;
+      if (isMissingOk) return 'failed';
     }
 
     log('Prompt injected: "' + text.substring(0, 80) + '..." (' + text.length + ' total chars)', 'success');
@@ -670,12 +678,13 @@ export function setupPromptCapture(promptsCfg: PromptsCfg, getByXPath: (xpath: s
     if (timer) clearTimeout(timer);
     timer = window.setTimeout(async () => {
       const projectId = extractProjectIdFromUrl();
-      if (!projectId) return;
-      
+      const isMissingProjectId = !projectId;
+      if (isMissingProjectId) return;
+
       // 1. Save to IndexedDB
       const store = getProjectKvStore('macro-controller');
       await store.set('last_prompt_capture', projectId, { text, timestamp: Date.now() });
-      
+
       // 2. Sync to SQLite
       await saveCommunication(projectId, text);
       logSub('Captured prompt synced to DB', 1);

@@ -1,3 +1,4 @@
+import { DomainConstants } from "../constants/domain";
 /**
  * Marco Extension — Auto-Injector
  *
@@ -66,10 +67,12 @@ const BLOCKED_PATHS = [
 function isProjectPageUrl(url: string): boolean {
     try {
         const parsed = new URL(url);
-        const isTargetDomain = parsed.hostname === "lovable.dev"
-            || parsed.hostname.endsWith(".lovable.dev");
+        const isTargetDomain = parsed.hostname === DomainConstants.PRIMARY_DOMAIN
+            || parsed.hostname.endsWith(DomainConstants.PRIMARY_DOMAIN_DOT);
 
-        if (!isTargetDomain) {
+        const isMissingIsTargetDomain = !isTargetDomain;
+
+        if (isMissingIsTargetDomain) {
             return true; // Non-platform URLs are handled by project URL rules
         }
 
@@ -219,7 +222,9 @@ export async function handleNavigationCompleted(
     // URL guard: skip non-project pages
     const isEligible = isProjectPageUrl(details.url);
 
-    if (!isEligible) {
+    const isMissingIsEligible = !isEligible;
+
+    if (isMissingIsEligible) {
         logUrlGuardSkip(details.tabId, details.url);
         return;
     }
@@ -395,6 +400,7 @@ async function injectSingleResolved(
             logInjectionError(resolved.injectable.id, result.errorMessage);
         }
     } catch (injectionError) {
+        logError("AutoCatch", "Unhandled exception", injectionError);
         logInjectionError(resolved.injectable.id, injectionError);
     }
 }

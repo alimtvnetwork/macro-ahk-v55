@@ -237,13 +237,15 @@ function _makeDraggable(panel: HTMLElement, handle: HTMLElement): void {
   });
 
   function onMove(e: MouseEvent): void {
-    if (!isDragging) return;
+    const isMissingIsDragging = !isDragging;
+    if (isMissingIsDragging) return;
     panel.style.left = (e.clientX - dragOffX) + 'px';
     panel.style.top = (e.clientY - dragOffY) + 'px';
     panel.style.right = 'auto';
   }
   function onUp(): void {
-    if (!isDragging) return;
+    const isMissingIsDragging = !isDragging;
+    if (isMissingIsDragging) return;
     isDragging = false;
     handle.style.cursor = 'grab';
   }

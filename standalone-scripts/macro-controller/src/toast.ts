@@ -85,8 +85,8 @@ function getNotify(): MarcoNotify | null {
     if (hasToast) {
       return notify!;
     }
-  } catch { // allow-swallow: SDK probe — absence is expected on non-target tabs and during load; caller handles null.
-    /* SDK not loaded */
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
   }
 
   return null;
@@ -187,6 +187,7 @@ class ToastManager {
       try {
         listener();
       } catch (_e) {
+        logError("AutoCatch", "Unhandled exception", _e);
         logDebug('ToastManager', 'Error change listener threw: ' + (_e instanceof Error ? _e.message : String(_e)));
       }
     }

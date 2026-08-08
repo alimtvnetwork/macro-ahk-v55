@@ -63,7 +63,8 @@ export async function handleRecorderJsSnippetList(
     message: MessageRequest,
 ): Promise<{ snippets: ReadonlyArray<JsSnippetRow> }> {
     const req = message as unknown as ListRequest;
-    if (!req.projectSlug) {
+    const isMissingProjectSlug = !req.projectSlug;
+    if (isMissingProjectSlug) {
         throw new Error("RECORDER_JS_SNIPPET_LIST requires projectSlug");
     }
     const snippets = await listJsSnippets(req.projectSlug);

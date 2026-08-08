@@ -53,7 +53,8 @@ if (typeof window !== "undefined") {
       configurable: true,
       value: matchMediaStub,
     });
-  } catch {
+  } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     (window as unknown as { matchMedia: typeof matchMediaStub }).matchMedia = matchMediaStub;
   }
 }
@@ -117,6 +118,6 @@ try {
     if (originalFetch) return originalFetch(input, init);
     throw new Error(`fetch shim: unexpected URL ${url}`);
   }) as typeof fetch;
-} catch {
-  // sql.js not installed or wasm missing — tests that need it will fail loudly.
+} catch (err) {
+  logError("AutoCatch", "Unhandled exception", err);
 }

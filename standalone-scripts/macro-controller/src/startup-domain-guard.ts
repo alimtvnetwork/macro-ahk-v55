@@ -1,3 +1,4 @@
+import { DomainConstants } from "./constants/domain";
 /**
  * MacroLoop Controller — Domain Guard
  * Extracted from macro-looping.ts (V2 Phase 02).
@@ -44,7 +45,7 @@ export function shouldInject(): boolean {
   }
 
   const isPageContext = (
-    currentHostname.indexOf('lovable.dev') !== -1 ||
+    currentHostname.indexOf(DomainConstants.PRIMARY_DOMAIN) !== -1 ||
     currentHostname.indexOf('lovable.app') !== -1 ||
     currentHostname.indexOf('lovableproject.com') !== -1 ||
     currentHostname === 'localhost'

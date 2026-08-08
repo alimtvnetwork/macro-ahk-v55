@@ -54,8 +54,12 @@ beforeEach(async () => {
     ctrl.__resetCreditFetchControllerForTests();
     const cache = await import('../credit-balance-update/credit-balance-cache');
     cache.clearCreditBalanceUpdateMemoryCache();
-    try { await cache.invalidateCreditBalanceUpdateCache('ws_net_1'); } catch (_e) { /* allow-swallow: jsdom may lack IDB */ }
-    try { await cache.invalidateCreditBalanceUpdateCache('ws_net_2'); } catch (_e) { /* allow-swallow: jsdom may lack IDB */ }
+    try { await cache.invalidateCreditBalanceUpdateCache('ws_net_1'); } catch (_e) {
+        logError("AutoCatch", "Unhandled exception", _e);
+    }
+    try { await cache.invalidateCreditBalanceUpdateCache('ws_net_2'); } catch (_e) {
+        logError("AutoCatch", "Unhandled exception", _e);
+    }
 });
 
 describe('credit-balance network-count contract', () => {

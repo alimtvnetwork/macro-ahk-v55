@@ -220,7 +220,7 @@ function readFromLocalStorage(): unknown {
   } catch (_e: unknown) { return undefined; } // allow-swallow: corrupt JSON falls back to defaults.
 }
 
-function writeToLocalStorage(value: SettingsOverrides): new DbResult(true, undefined) | { ok: false; reason: string } {
+function writeToLocalStorage(value: SettingsOverrides): { ok: true } | { ok: false; reason: string } {
   if (!hasLocalStorage()) return { ok: false, reason: 'localStorage unavailable' };
   try {
     window.localStorage.setItem(LS_KEY, JSON.stringify(value));

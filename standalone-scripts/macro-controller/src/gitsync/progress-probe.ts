@@ -111,13 +111,17 @@ export async function probeProgress(
 ): Promise<GitsyncProgressBody | null> {
     if (!wsId || !projectId || !jobId) {
         const missing: string[] = [];
-        if (!wsId) missing.push('wsId');
-        if (!projectId) missing.push('projectId');
-        if (!jobId) missing.push('jobId');
+        const isMissingWsId = !wsId;
+        if (isMissingWsId) missing.push('wsId');
+        const isMissingProjectId = !projectId;
+        if (isMissingProjectId) missing.push('projectId');
+        const isMissingJobId = !jobId;
+        if (isMissingJobId) missing.push('jobId');
         throwDiagnostic('GITSYNC_PROBE_E001', { missingArgs: missing.join(',') });
     }
     const sdk = getSdk();
-    if (!sdk) {
+    const isMissingSdk = !sdk;
+    if (isMissingSdk) {
         const reason = 'marco.api.call unavailable (SDK not injected)';
         logError('GitsyncProbe', 'probeProgress: ' + reason
             + ' [ws=' + wsId + ' pid=' + projectId + ' job=' + jobId + ']');
@@ -140,7 +144,8 @@ export async function probeProgress(
             + ' pid=' + projectId + ' → null', 'info');
         return null;
     }
-    if (!resp.ok) {
+    const isMissingOk = !resp.ok;
+    if (isMissingOk) {
         const preview = JSON.stringify(resp.data).substring(0, 200);
         logError('GitsyncProbe', 'probeProgress HTTP ' + resp.status
             + ' [ws=' + wsId + ' pid=' + projectId + ' job=' + jobId + ']'
@@ -159,7 +164,8 @@ export async function probeProgress(
 /* ------------------------------------------------------------------ */
 
 function isTerminal(body: GitsyncProgressBody | null): boolean {
-    if (!body) return false;
+    const isMissingBody = !body;
+    if (isMissingBody) return false;
     const s = body.status;
     return s === 'completed' || s === 'failed';
 }

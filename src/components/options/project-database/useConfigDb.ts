@@ -86,7 +86,10 @@ export function useConfigDb(projectSlug: string) {
           type: "PROJECT_CONFIG_UPDATE", project: projectSlug, section, key, value: editedValue,
         });
         if (resp.isOk) saved++; else failed++;
-      } catch { failed++; }
+      } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+        failed++;
+      }
     }
     setBulkSaving(false);
     if (failed > 0) { toast.warning(`Saved ${saved}, failed ${failed}`); }

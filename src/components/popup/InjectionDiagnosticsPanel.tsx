@@ -55,6 +55,9 @@ export function InjectionDiagnosticsPanel() {
       );
       setEvents(injectionLogs.slice(0, 30));
     } catch {
+        // TODO: Auto-injected by CatchAudit
+        logError('AutoCatch', 'Unhandled exception', err);
+
       setEvents([]);
     } finally {
       setLoading(false);

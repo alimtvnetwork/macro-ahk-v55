@@ -75,8 +75,8 @@ function sendNetworkEntry(entry: CapturedEntry): void {
             type: MESSAGE_TYPE_NETWORK_REQUEST,
             entry,
         });
-    } catch { // allow-swallow: extension context invalidated mid-flight; report is best-effort
-        // Extension context invalidated — silently ignore
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 }
 
@@ -251,8 +251,8 @@ function reportNetworkStatus(isOnline: boolean): void {
             type: MESSAGE_TYPE_NETWORK_STATUS,
             isOnline,
         });
-    } catch { // allow-swallow: extension context invalidated; status report is best-effort
-        // Extension context invalidated
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 }
 
@@ -305,7 +305,9 @@ let flushTimerId: ReturnType<typeof setInterval> | null = null;
 
 function onPageHide(): void {
     // Final best-effort flush before tearing down.
-    try { flushBuffer(); } catch { /* ignore */ } // allow-swallow: pagehide flush is best-effort
+    try { flushBuffer(); } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+    } // allow-swallow: pagehide flush is best-effort
     stopNetworkReporter();
 }
 

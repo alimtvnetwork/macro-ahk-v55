@@ -58,7 +58,8 @@ export interface WsDropdownResult {
 /** Scroll to and highlight the current workspace item in the list. */
 function scrollToCurrentItem(setLoopWsNavIndex: (v: number) => void, label: string): void {
   const listEl = document.getElementById(DomIdType.LoopWsList);
-  if (!listEl) return;
+  const isMissingListEl = !listEl;
+  if (isMissingListEl) return;
   const currentItem = listEl.querySelector('.loop-ws-item[data-ws-current="true"]');
   if (currentItem) {
     currentItem.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -92,7 +93,9 @@ function handleFocusCurrent(
     const currentName = state.workspaceName
       || (loopCreditState.currentWs ? (loopCreditState.currentWs.fullName || loopCreditState.currentWs.name) : '');
 
-    if (!currentName) {
+    const isMissingCurrentName = !currentName;
+
+    if (isMissingCurrentName) {
       logError('Focus Current', '❌ workspace still unknown after API detection');
       return;
     }
@@ -266,7 +269,8 @@ function _buildWsSearchInput(
   wsSearchInput.oninput = function() { populateLoopWorkspaceDropdown(); };
   wsSearchInput.onkeydown = function(e: KeyboardEvent) {
     const listEl = document.getElementById(DomIdType.LoopWsList);
-    if (!listEl) return;
+    const isMissingListEl = !listEl;
+    if (isMissingListEl) return;
     const items = listEl.querySelectorAll('.loop-ws-item');
     if (items.length === 0) return;
     if (e.key === 'ArrowDown') {

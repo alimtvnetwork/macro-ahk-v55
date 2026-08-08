@@ -119,7 +119,8 @@ export async function deleteHistoryEntry(
   // OPFS first (same reason as the window enforcer: rows can be
   // re-linked by FileId, orphan blobs cannot).
   const opfsRemoved = await deleteOpfsEntry(projectId, fileId);
-  if (!opfsRemoved) {
+  const isMissingOpfsRemoved = !opfsRemoved;
+  if (isMissingOpfsRemoved) {
     return { isDeleted: false, opfsRemoved: false, rowRemoved: false };
   }
   const rowRemoved = await deleteChatSubmit(id);

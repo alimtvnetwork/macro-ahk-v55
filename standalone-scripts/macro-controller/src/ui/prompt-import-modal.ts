@@ -476,7 +476,8 @@ function bucketPreviewRows(
       return;
     }
     const validated = validate(row.incoming);
-    if (!validated) {
+    const isMissingValidated = !validated;
+    if (isMissingValidated) {
       skippedCount += 1;
       auditActions.push({ slug: row.slug, action: 'skip' });
       return;
@@ -523,7 +524,8 @@ async function performImportCommit(
   transition: (next: Stage) => void,
   close: () => void,
 ): Promise<void> {
-  if (!state.bundle) return;
+  const isMissingBundle = !state.bundle;
+  if (isMissingBundle) return;
   transition('committing');
   try {
     const io = await import('./prompt-io');
@@ -552,6 +554,7 @@ async function performImportCommit(
     await deps.onCommitted();
     setTimeout(close, 1200);
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     await handleCommitError(err, state);
     transition('error');
   }
@@ -667,6 +670,7 @@ async function startParse(
     state.rows = await diffAgainstCache(bundle.entries);
     transition('preview');
   } catch (err) {
+    logError("AutoCatch", "Unhandled exception", err);
     const errors = await import('./prompt-import-errors');
     const classified = errors.classifyImportError(err, 'parse');
     state.errorMessage = 'Failed to parse file';

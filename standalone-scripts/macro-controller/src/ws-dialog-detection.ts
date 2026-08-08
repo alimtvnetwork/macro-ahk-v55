@@ -47,7 +47,8 @@ export function detectWorkspaceViaProjectDialog(callerFn?: string, perWs?: Works
   }
 
   const hasWorkspaces = perWs.length > 0;
-  if (!hasWorkspaces) {
+  const isMissingHasWorkspaces = !hasWorkspaces;
+  if (isMissingHasWorkspaces) {
     log(fn + ': No workspaces loaded — will still try to read workspace name from dialog XPath directly', 'warn');
   }
 
@@ -57,7 +58,8 @@ export function detectWorkspaceViaProjectDialog(callerFn?: string, perWs?: Works
   if (keepDialogOpen) logSub('keepDialogOpen=true — caller will close dialog after Step 3', 1);
 
   return findProjectButtonWithRetry(fn, 3, 1000).then(function(btn: Element | null) {
-    if (!btn) {
+    const isMissingBtn = !btn;
+    if (isMissingBtn) {
       logError('ws-dialog-detection', 'Project button NOT found after retries — cannot open dialog. XPath=' + CONFIG.PROJECT_BUTTON_XPATH);
       log(fn + LabelType.KeepingExistingWs + (state.workspaceName || '(none)'), 'warn');
       return Promise.resolve(null);
@@ -83,7 +85,9 @@ function tryFindProjectButton(ctx: ProjectBtnRetryCtx): void {
   ctx.attempt++;
   let btn: Element | null = getByXPath(CONFIG.PROJECT_BUTTON_XPATH) as Element | null;
 
-  if (!btn) {
+  const isMissingBtn = !btn;
+
+  if (isMissingBtn) {
     btn = findElement(ML_ELEMENTS.PROJECT_BUTTON);
     if (btn) { logSub('Project button found via fallback findElement (attempt ' + ctx.attempt + ')', 1); }
   }
@@ -219,12 +223,14 @@ function handlePollTimeout(
     state.workspaceName = cssFallback.matched.fullName || cssFallback.matched.name;
     loopCreditState.currentWs = cssFallback.matched;
     log(fn + ': ⚠️ Workspace detected via CSS fallback: "' + cssFallback.rawName + '" → ' + state.workspaceName, 'warn');
-    if (!keepDialogOpen) closeProjectDialogSafe(btn);
+    const isMissingKeepDialogOpen = !keepDialogOpen;
+    if (isMissingKeepDialogOpen) closeProjectDialogSafe(btn);
     resolve();
     return;
   }
   log(fn + ': CSS fallback also failed — preserving existing workspace', 'warn');
-  if (!keepDialogOpen) {
+  const isMissingKeepDialogOpen = !keepDialogOpen;
+  if (isMissingKeepDialogOpen) {
     closeDialogAndDefault(fn, btn, perWs, resolve);
   } else {
     resolve();
@@ -248,7 +254,9 @@ function pollForWorkspaceName(fn: string, btn: Element, perWs: WorkspaceCredit[]
       const chosen = resolveChosenWorkspace(fn, allNodes, perWs);
       applyChosenWorkspace(fn, chosen, allNodes, perWs);
 
-      if (!keepDialogOpen) {
+      const isMissingKeepDialogOpen = !keepDialogOpen;
+
+      if (isMissingKeepDialogOpen) {
         closeProjectDialogSafe(btn);
       } else {
         logSub('keepDialogOpen=true — leaving dialog open for Step 3 (progress bar)', 1);
@@ -282,7 +290,9 @@ function findWorkspaceNameViaCss(_fn: string, perWs: WorkspaceCredit[]): { match
         for (const candidate of nodeCandidates) {
           const matched = matchWorkspaceByName(candidate.name, perWs);
 
-          if (!matched) {
+          const isMissingMatched = !matched;
+
+          if (isMissingMatched) {
             continue;
           }
 
@@ -294,6 +304,7 @@ function findWorkspaceNameViaCss(_fn: string, perWs: WorkspaceCredit[]): { match
         }
       }
     } catch (e: unknown) {
+      logError("AutoCatch", "Unhandled exception", e);
       logSub('CSS fallback [' + (si + 1) + '/' + selectors.length + ']: "' + sel + '" → ERROR: ' + toErrorMessage(e), 2);
     }
   }
@@ -306,7 +317,8 @@ function findWorkspaceNameViaCss(_fn: string, perWs: WorkspaceCredit[]): { match
 // Close dialog and default helpers
 // ============================================
 function closeDialogAndDefault(fn: string, btn: Element, _perWs: WorkspaceCredit[], resolve: () => void): void {
-  if (!state.workspaceName) {
+  const isMissingWorkspaceName = !state.workspaceName;
+  if (isMissingWorkspaceName) {
     log(fn + ': No reliable workspace match — keeping workspace empty after fallback miss', 'warn');
   } else {
     log(fn + LabelType.KeepingExistingWs + state.workspaceName, 'warn');
@@ -323,6 +335,7 @@ export function closeProjectDialogSafe(btn: Element): void {
       reactClick(btn, CONFIG.PROJECT_BUTTON_XPATH);
     }
   } catch (e: unknown) {
+    logError("AutoCatch", "Unhandled exception", e);
     logSub('Error closing dialog: ' + toErrorMessage(e), 1);
   }
 }

@@ -1,3 +1,4 @@
+import { DomainConstants } from "../../constants/domain";
 /**
  * Marco Extension — Token Seeder
  *
@@ -91,7 +92,9 @@ export async function seedTokensIntoTab(tabId: number): Promise<void> {
     const tabUrl = await getTabUrl(tabId);
     const isSupportedTab = tabUrl !== null && isSupportedTargetUrl(tabUrl);
 
-    if (!isSupportedTab) {
+    const isMissingIsSupportedTab = !isSupportedTab;
+
+    if (isMissingIsSupportedTab) {
         return;
     }
 
@@ -101,7 +104,9 @@ export async function seedTokensIntoTab(tabId: number): Promise<void> {
 
     const hasTabAccess = await canAccessTabContents(tabId, tabUrl);
 
-    if (!hasTabAccess) {
+    const isMissingHasTabAccess = !hasTabAccess;
+
+    if (isMissingHasTabAccess) {
         return;
     }
 
@@ -181,8 +186,8 @@ function writeJwtToLocalStorage(
         localStorage.setItem(sessionKey, jwt);
         localStorage.setItem(sessionCookieKey, jwt);
         localStorage.setItem(marcoBearerKey, jwt);
-    } catch { // allow-swallow: localStorage unavailable on this origin; seeding is best-effort
-        // localStorage may be unavailable — fail silently
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 }
 
@@ -224,11 +229,13 @@ function scanSupabaseLocalStorageForJwt(): string | null {
 
         for (let i = 0; i < len; i++) {
             const key = localStorage.key(i);
-            if (!key) continue;
+            const isMissingKey = !key;
+            if (isMissingKey) continue;
 
             // Match Supabase auth token keys: sb-<ref>-auth-token
             const isSupabaseKey = key.startsWith("sb-") && key.includes("-auth-token");
-            if (!isSupabaseKey) continue;
+            const isMissingIsSupabaseKey = !isSupabaseKey;
+            if (isMissingIsSupabaseKey) continue;
 
             const raw = localStorage.getItem(key);
             if (!raw || raw.length < 20) continue;
@@ -253,8 +260,8 @@ function scanSupabaseLocalStorageForJwt(): string | null {
                 }
             }
         }
-    } catch { // allow-swallow: localStorage unavailable; caller falls back to null
-        // localStorage unavailable
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
     return null;
 }
@@ -264,7 +271,7 @@ function scanSupabaseLocalStorageForJwt(): string | null {
 /* ------------------------------------------------------------------ */
 
 function isSupportedTargetUrl(url: string): boolean {
-    return url.includes("lovable.dev")
+    return url.includes(DomainConstants.PRIMARY_DOMAIN)
         || url.includes("lovable.app")
         || url.includes("lovableproject.com")
         || url.includes("localhost");
@@ -290,14 +297,18 @@ async function canAccessTabContents(tabId: number, tabUrl: string): Promise<bool
     try {
         const hasPermission = await chrome.permissions.contains({ origins: [originPattern] });
 
-        if (!hasPermission) {
+        const isMissingHasPermission = !hasPermission;
+
+        if (isMissingHasPermission) {
             warnInaccessibleTabOnce(tabId, tabUrl, `Host permission is not granted for ${originPattern}.`, "PERMISSION_NOT_GRANTED");
             return false;
         }
 
         const canExecuteScript = await probeTabScriptingAccess(tabId, tabUrl);
 
-        if (!canExecuteScript) {
+        const isMissingCanExecuteScript = !canExecuteScript;
+
+        if (isMissingCanExecuteScript) {
             return false;
         }
 
@@ -466,7 +477,8 @@ async function getTabUrl(tabId: number): Promise<string | null> {
  *  Supports editor URLs and preview hostnames on lovable.app/lovableproject.com.
  */
 function extractProjectIdFromTabUrl(url: string | null): string | null {
-    if (!url) return null;
+    const isMissingUrl = !url;
+    if (isMissingUrl) return null;
 
     // Pattern 1: /projects/{id} (editor URL)
     const pathMatch = url.match(/\/projects\/([^/?#]+)/);
@@ -487,8 +499,8 @@ function extractProjectIdFromTabUrl(url: string | null): string | null {
         // Pattern 4: bare UUID subdomain: {uuid}.lovableproject.com
         const bareUuidLabelMatch = firstLabel.match(/^([a-f0-9-]{36})$/i);
         if (bareUuidLabelMatch) return bareUuidLabelMatch[1];
-    } catch { // allow-swallow: malformed URL; fallback regex checks below handle the parse failure
-        // Ignore malformed URLs and continue with fallback regex checks.
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
     }
 
     const subdomainMatch = url.match(/id-preview--([a-f0-9-]{36})\./i);

@@ -54,7 +54,10 @@ function deleteEach(ids: ReadonlyArray<number>, lib: UseStepLibraryApi): { delet
     let firstError: string | null = null;
     for (const id of ids) {
         try { lib.deleteGroup(id); deleted += 1; }
-        catch (err) { firstError = err instanceof Error ? err.message : String(err); break; }
+        catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
+            firstError = err instanceof Error ? err.message : String(err);break;
+        }
     }
     return { deleted, firstError };
 }

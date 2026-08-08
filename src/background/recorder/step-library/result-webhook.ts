@@ -167,10 +167,12 @@ function asEvent(v: unknown): WebhookEventKind {
 
 export function loadWebhookConfig(): WebhookConfig {
     const ls = safeLocalStorage();
-    if (!ls) return { ...DEFAULT_WEBHOOK_CONFIG };
+    const isMissingLs = !ls;
+    if (isMissingLs) return { ...DEFAULT_WEBHOOK_CONFIG };
     try {
         const raw = ls.getItem(CONFIG_STORAGE_KEY);
-        if (!raw) return { ...DEFAULT_WEBHOOK_CONFIG };
+        const isMissingRaw = !raw;
+        if (isMissingRaw) return { ...DEFAULT_WEBHOOK_CONFIG };
         const parsed: unknown = JSON.parse(raw);
         if (!isPlainRecord(parsed)) return { ...DEFAULT_WEBHOOK_CONFIG };
         const headers: WebhookHeader[] = Array.isArray(parsed.Headers)
@@ -210,7 +212,9 @@ export function saveWebhookConfig(config: WebhookConfig): WebhookConfig {
         SecretToken: typeof config.SecretToken === "string" ? config.SecretToken : "",
     };
     if (ls) {
-        try { ls.setItem(CONFIG_STORAGE_KEY, JSON.stringify(normalized)); } catch { /* quota or storage unavailable */ } // allow-swallow: localStorage quota / unavailable — config in-memory is authoritative this session
+        try { ls.setItem(CONFIG_STORAGE_KEY, JSON.stringify(normalized)); } catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
+        } // allow-swallow: localStorage quota / unavailable — config in-memory is authoritative this session
     }
     return normalized;
 }
@@ -310,10 +314,12 @@ function migrateFailure(input: Record<string, unknown>, c: CommonMigratedFields)
 
 function readLogRaw(): unknown[] {
     const ls = safeLocalStorage();
-    if (!ls) return [];
+    const isMissingLs = !ls;
+    if (isMissingLs) return [];
     try {
         const raw = ls.getItem(LOG_STORAGE_KEY);
-        if (!raw) return [];
+        const isMissingRaw = !raw;
+        if (isMissingRaw) return [];
         const parsed: unknown = JSON.parse(raw);
         return Array.isArray(parsed) ? parsed : [];
     } catch {
@@ -323,10 +329,13 @@ function readLogRaw(): unknown[] {
 
 function writeLog(entries: ReadonlyArray<WebhookDeliveryResult>): void {
     const ls = safeLocalStorage();
-    if (!ls) return;
+    const isMissingLs = !ls;
+    if (isMissingLs) return;
     try {
         ls.setItem(LOG_STORAGE_KEY, JSON.stringify(entries.slice(0, LOG_MAX_ENTRIES)));
-    } catch { /* quota or storage unavailable */ } // allow-swallow: delivery-log write is best-effort; loss of one log entry must not break the run
+    } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+    } // allow-swallow: delivery-log write is best-effort; loss of one log entry must not break the run
 }
 
 export function getDeliveryLog(): ReadonlyArray<WebhookDeliveryResult> {
@@ -335,8 +344,11 @@ export function getDeliveryLog(): ReadonlyArray<WebhookDeliveryResult> {
 
 export function clearDeliveryLog(): void {
     const ls = safeLocalStorage();
-    if (!ls) return;
-    try { ls.removeItem(LOG_STORAGE_KEY); } catch { /* ignore */ } // allow-swallow: clearing the delivery log is best-effort cleanup
+    const isMissingLs = !ls;
+    if (isMissingLs) return;
+    try { ls.removeItem(LOG_STORAGE_KEY); } catch (err) {
+        logError("AutoCatch", "Unhandled exception", err);
+    } // allow-swallow: clearing the delivery log is best-effort cleanup
 }
 
 export interface RepairReport {
@@ -478,7 +490,8 @@ function recordEntry<T extends WebhookDeliveryResult>(entry: T): T {
 }
 
 function checkSkipReason(config: WebhookConfig, event: WebhookEventKind): string | null {
-    if (!config.Enabled) return "Webhook disabled";
+    const isMissingEnabled = !config.Enabled;
+    if (isMissingEnabled) return "Webhook disabled";
     if (!config.Url || config.Url.trim().length === 0) return "URL empty";
     if (config.Events.length > 0 && !config.Events.includes(event)) {
         return `Event ${event} not subscribed`;
@@ -507,7 +520,8 @@ function buildHeaders(
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     for (const h of config.Headers) {
         const name = (h.Name ?? "").trim();
-        if (!name) continue;
+        const isMissingName = !name;
+        if (isMissingName) continue;
         headers[name] = substitute(h.Value ?? "", payload, event);
     }
     if (config.SecretToken && config.SecretToken.trim().length > 0) {

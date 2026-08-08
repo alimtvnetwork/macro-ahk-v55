@@ -1,3 +1,4 @@
+import { DomainConstants } from "../../constants/domain";
 import { ServiceResult } from '../../utils/result-wrapper';
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
@@ -168,7 +169,7 @@ describe("fetchAuthToken, integration", () => {
         ];
 
         const cookies = makeCookieStore([
-            { url: "https://lovable.dev", name: "lovable-session-id-v2", value: FAKE_JWT },
+            { url: DomainConstants.PRIMARY_URL, name: "lovable-session-id-v2", value: FAKE_JWT },
         ]);
 
         const { mod } = await setupTest({ tabs, cookies });
@@ -187,7 +188,7 @@ describe("fetchAuthToken, integration", () => {
         scriptResults.set(1, FAKE_JWT);
 
         const cookies = makeCookieStore([
-            { url: "https://lovable.dev", name: "lovable-session-id-v2", value: "session-opaque" },
+            { url: DomainConstants.PRIMARY_URL, name: "lovable-session-id-v2", value: "session-opaque" },
         ]);
 
         const { mod } = await setupTest({ tabs, scriptResults, cookies });
@@ -206,7 +207,7 @@ describe("fetchAuthToken, integration", () => {
         scriptResults.set(1, null);
 
         const cookies = makeCookieStore([
-            { url: "https://lovable.dev", name: "lovable-session-id-v2", value: "session-opaque" },
+            { url: DomainConstants.PRIMARY_URL, name: "lovable-session-id-v2", value: "session-opaque" },
         ]);
 
         const fetchResponses = new Map<string, { ok: boolean; status: number; json: unknown }>();
@@ -273,7 +274,7 @@ describe("handleGetToken, integration", () => {
         scriptResults.set(1, FAKE_JWT);
 
         const cookies = makeCookieStore([
-            { url: "https://lovable.dev", name: "lovable-session-id-v2", value: "val" },
+            { url: DomainConstants.PRIMARY_URL, name: "lovable-session-id-v2", value: "val" },
         ]);
 
         const { mod } = await setupTest({ tabs, scriptResults, cookies });
@@ -299,7 +300,7 @@ describe("handleGetToken, integration", () => {
 
         // Session cookie IS a JWT directly (some environments)
         const cookies = makeCookieStore([
-            { url: "https://lovable.dev", name: "lovable-session-id-v2", value: FAKE_JWT },
+            { url: DomainConstants.PRIMARY_URL, name: "lovable-session-id-v2", value: FAKE_JWT },
         ]);
 
         const { mod } = await setupTest({ tabs, scriptResults, cookies });
@@ -316,7 +317,7 @@ describe("handleGetToken, integration", () => {
         const scriptResults = new Map<number, unknown>();
         scriptResults.set(1, null);
         const cookies = makeCookieStore([
-            { url: "https://lovable.dev", name: "lovable-session-id-v2", value: "session-opaque" },
+            { url: DomainConstants.PRIMARY_URL, name: "lovable-session-id-v2", value: "session-opaque" },
         ]);
         const fetchResponses = new Map<string, { ok: boolean; status: number; json: unknown }>();
         fetchResponses.set(`/projects/${PROJECT_ID}/auth-token`, { ok: true, status: 200, json: { data: { access_token: FAKE_JWT } } });
@@ -356,8 +357,8 @@ describe("handleRefreshToken, integration", () => {
         scriptResults.set(1, FAKE_JWT);
 
         const cookies = makeCookieStore([
-            { url: "https://lovable.dev", name: "lovable-session-id-v2", value: "session-val" },
-            { url: "https://lovable.dev", name: "lovable-session-id.refresh", value: FAKE_REFRESH },
+            { url: DomainConstants.PRIMARY_URL, name: "lovable-session-id-v2", value: "session-val" },
+            { url: DomainConstants.PRIMARY_URL, name: "lovable-session-id.refresh", value: FAKE_REFRESH },
         ]);
 
         const { mod } = await setupTest({ tabs, scriptResults, cookies });
@@ -397,7 +398,7 @@ describe("Cookie resolution, URL candidates", () => {
 
         // Cookie is set on lovable.dev, not lovable.app
         const cookies = makeCookieStore([
-            { url: "https://lovable.dev", name: "lovable-session-id-v2", value: "session-from-dev", domain: ".lovable.dev" },
+            { url: DomainConstants.PRIMARY_URL, name: "lovable-session-id-v2", value: "session-from-dev", domain: DomainConstants.PRIMARY_DOMAIN_DOT },
         ]);
 
         const { mod } = await setupTest({ tabs, scriptResults, cookies });
@@ -416,8 +417,8 @@ describe("Cookie resolution, URL candidates", () => {
 
         // Both v2 and legacy cookies exist, v2 is a JWT, legacy is not
         const cookies = makeCookieStore([
-            { url: "https://lovable.dev", name: "lovable-session-id-v2", value: FAKE_JWT },
-            { url: "https://lovable.dev", name: "lovable-session-id.id", value: "not-jwt" },
+            { url: DomainConstants.PRIMARY_URL, name: "lovable-session-id-v2", value: FAKE_JWT },
+            { url: DomainConstants.PRIMARY_URL, name: "lovable-session-id.id", value: "not-jwt" },
         ]);
 
         const { mod } = await setupTest({ tabs, scriptResults, cookies });

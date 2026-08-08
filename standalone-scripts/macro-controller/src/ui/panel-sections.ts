@@ -213,7 +213,10 @@ function _buildToolsCollapsible(
     if (toolsMasterBody.style.display === 'none') {
       toolsMasterBody.style.display = '';
       toolsCol.toggle.textContent = '[-]';
-      try { localStorage.setItem('ml_collapse_tools_master', 'expanded'); } catch (_e) { logSub('Failed to persist tools collapse state: ' + (_e instanceof Error ? _e.message : String(_e)), 1); }
+      try { localStorage.setItem('ml_collapse_tools_master', 'expanded'); } catch (_e) {
+        logError("AutoCatch", "Unhandled exception", _e);
+        logSub('Failed to persist tools collapse state: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
+      }
     }
     if (_reinjectSection) {
       setTimeout(function() { _reinjectSection!.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);

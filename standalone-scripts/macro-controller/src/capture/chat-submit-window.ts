@@ -86,7 +86,8 @@ export async function enforceChatSubmitWindow(
     // Delete OPFS first — an orphan blob is worse than an orphan row
     // (the row can be re-linked by FileId; a blob has no back-pointer).
     const isOpfsGone = await deleteOpfsEntry(projectId, row.FileId);
-    if (!isOpfsGone) {
+    const isMissingIsOpfsGone = !isOpfsGone;
+    if (isMissingIsOpfsGone) {
       failed += 1;
       continue;
     }

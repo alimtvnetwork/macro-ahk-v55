@@ -60,6 +60,7 @@ export function useGroupInputsController(args: UseGroupInputsControllerArgs) {
         try {
             setText(await file.text());
         } catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
             toast({
                 variant: "destructive",
                 title: "Could not read file",

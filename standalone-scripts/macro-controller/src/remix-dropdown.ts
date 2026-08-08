@@ -177,7 +177,8 @@ export function buildHeaderRemixSplitButton(getCtx: () => RemixActionContext | n
   main.onclick = function (e: Event): void {
     e.stopPropagation();
     const ctx = getCtx();
-    if (!ctx) { showToast('Remix unavailable — project/workspace not detected', 'warn'); return; }
+    const isMissingCtx = !ctx;
+    if (isMissingCtx) { showToast('Remix unavailable — project/workspace not detected', 'warn'); return; }
     actionRemixManual(ctx);
   };
 
@@ -190,7 +191,8 @@ export function buildHeaderRemixSplitButton(getCtx: () => RemixActionContext | n
   arrow.onclick = function (e: Event): void {
     e.stopPropagation();
     const ctx = getCtx();
-    if (!ctx) { showToast('Remix unavailable — project/workspace not detected', 'warn'); return; }
+    const isMissingCtx = !ctx;
+    if (isMissingCtx) { showToast('Remix unavailable — project/workspace not detected', 'warn'); return; }
     showHeaderRemixDropdown(arrow, ctx);
   };
 

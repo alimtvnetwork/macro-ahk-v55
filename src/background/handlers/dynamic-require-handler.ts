@@ -61,7 +61,8 @@ export async function handleDynamicRequire(
 
     // --- Resolve requester project ---
     const requester = allProjects.find((p) => p.id === requesterProjectId);
-    if (!requester) {
+    const isMissingRequester = !requester;
+    if (isMissingRequester) {
         logDynamicLoad(requesterProjectId, target, "denied", "Requester project not found");
         return { isOk: false, errorMessage: `Requester project "${requesterProjectId}" not found` };
     }
@@ -77,7 +78,8 @@ export async function handleDynamicRequire(
 
     // --- Resolve target project + script ---
     const resolved = resolveTarget(target, allProjects);
-    if (!resolved) {
+    const isMissingResolved = !resolved;
+    if (isMissingResolved) {
         logDynamicLoad(requesterProjectId, target, "not_found", "Target project or script not found");
         return { isOk: false, errorMessage: `Cannot resolve target "${target}"` };
     }
@@ -96,7 +98,8 @@ export async function handleDynamicRequire(
     // --- Load script code ---
     try {
         const code = await loadScriptCode(targetProject.id, targetScript);
-        if (!code) {
+        const isMissingCode = !code;
+        if (isMissingCode) {
             logDynamicLoad(requesterProjectId, target, "error", "Script code is empty or not found");
             return { isOk: false, errorMessage: `Script code for "${target}" is empty or not found` };
         }
@@ -203,7 +206,8 @@ function logDynamicLoad(
         let version = "unknown";
         try {
             version = chrome.runtime.getManifest().version;
-        } catch { // allow-swallow: service worker context may lack manifest; "unknown" sentinel is the documented fallback
+        } catch (err) {
+            logError("AutoCatch", "Unhandled exception", err);
         }
 
 

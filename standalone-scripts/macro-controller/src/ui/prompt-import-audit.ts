@@ -93,7 +93,8 @@ function readFile(): ImportAuditFile {
     log('[ImportAudit] localStorage getItem failed: ' + String(err), 'warn');
     return emptyFile();
   }
-  if (!raw) return emptyFile();
+  const isMissingRaw = !raw;
+  if (isMissingRaw) return emptyFile();
   try {
     const parsed = JSON.parse(raw) as unknown;
     if (!parsed || typeof parsed !== 'object') throwDiagnostic('PROMPT_IO_AUDIT_E001', { actualType: parsed === null ? 'null' : typeof parsed });
@@ -172,7 +173,8 @@ export function finalizeImportAuditEntry(
 ): void {
   const file = readFile();
   const entry = file.entries.find((e) => e.id === id);
-  if (!entry) {
+  const isMissingEntry = !entry;
+  if (isMissingEntry) {
     log('[ImportAudit] finalize: entry not found id=' + id
       + ' (evicted?) status=' + outcome.status, 'warn');
     return;

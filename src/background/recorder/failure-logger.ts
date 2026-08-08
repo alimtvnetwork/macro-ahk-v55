@@ -381,7 +381,8 @@ function classifyZeroMatches(
     attempts: ReadonlyArray<SelectorAttempt>,
 ): { Reason: FailureReasonCode; ReasonDetail: string } | null {
     const anyEvaluated = attempts.some((a) => a.FailureReason !== "NotEvaluated");
-    if (!anyEvaluated) { return null; }
+    const isMissingAnyEvaluated = !anyEvaluated;
+    if (isMissingAnyEvaluated) { return null; }
     if (!attempts.every((a) => !a.Matched && a.MatchCount === 0)) { return null; }
     return {
         Reason: "ZeroMatches",

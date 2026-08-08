@@ -82,10 +82,12 @@ export async function getGitsyncCache(
 ): Promise<GitsyncCacheRow | null> {
   if (!wsId || !pid) return null;
   const kv = getKv();
-  if (!kv) return null;
+  const isMissingKv = !kv;
+  if (isMissingKv) return null;
   try {
     const raw = await kv.get(buildKey(wsId, pid));
-    if (!raw) return null;
+    const isMissingRaw = !raw;
+    if (isMissingRaw) return null;
     const parsed = JSON.parse(raw) as Partial<GitsyncCacheRow>;
     if (typeof parsed.ExpiresAt !== 'number' || typeof parsed.Status !== 'string') return null;
     if (parsed.ExpiresAt <= Date.now()) {
@@ -114,7 +116,8 @@ export function setGitsyncCache(
 ): void {
   if (!wsId || !pid) return;
   const kv = getKv();
-  if (!kv) {
+  const isMissingKv = !kv;
+  if (isMissingKv) {
     logError('GitsyncCache.write', 'marco.kv unavailable — skipping write for ws=' + wsId + ' pid=' + pid);
     return;
   }
@@ -140,7 +143,8 @@ export function setGitsyncCache(
 export function invalidateGitsyncCache(wsId: string, pid: string): void {
   if (!wsId || !pid) return;
   const kv = getKv();
-  if (!kv) return;
+  const isMissingKv = !kv;
+  if (isMissingKv) return;
   kv.delete(buildKey(wsId, pid)).catch(function (e: unknown): void {
     logError('GitsyncCache.invalidate', 'kv.delete failed for ws=' + wsId + ' pid=' + pid, e);
   });

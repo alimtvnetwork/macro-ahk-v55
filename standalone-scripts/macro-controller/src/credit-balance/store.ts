@@ -93,16 +93,19 @@ export function buildRow(
 export async function readCreditBalanceCache(
     workspaceId: string,
 ): Promise<CreditBalanceCacheRow | null> {
-    if (!workspaceId) {
+    const isMissingWorkspaceId = !workspaceId;
+    if (isMissingWorkspaceId) {
         return null;
     }
     const kv = getKv();
-    if (!kv) {
+    const isMissingKv = !kv;
+    if (isMissingKv) {
         return null;
     }
     try {
         const raw = await kv.get(buildKey(workspaceId));
-        if (!raw) {
+        const isMissingRaw = !raw;
+        if (isMissingRaw) {
             return null;
         }
         const parsed = JSON.parse(raw) as Partial<CreditBalanceCacheRow>;
@@ -110,7 +113,8 @@ export async function readCreditBalanceCache(
             typeof parsed.WorkspaceId === 'string' &&
             typeof parsed.FetchedAtMs === 'number' &&
             typeof parsed.TotalRemaining === 'number';
-        if (!hasShape) {
+        const isMissingHasShape = !hasShape;
+        if (isMissingHasShape) {
             return null;
         }
         return parsed as CreditBalanceCacheRow;
@@ -129,11 +133,13 @@ export async function readCreditBalanceCache(
  * the SQLite write happens in the background.
  */
 export function writeCreditBalanceCache(row: CreditBalanceCacheRow): void {
-    if (!row.WorkspaceId) {
+    const isMissingWorkspaceId = !row.WorkspaceId;
+    if (isMissingWorkspaceId) {
         return;
     }
     const kv = getKv();
-    if (!kv) {
+    const isMissingKv = !kv;
+    if (isMissingKv) {
         logError(
             'CreditBalanceCache.write',
             'marco.kv unavailable — skipping SQLite upsert for ws=' + row.WorkspaceId,
@@ -160,11 +166,13 @@ export function writeCreditBalanceCache(row: CreditBalanceCacheRow): void {
 
 /** Drop one workspace's cache row (debug / future "clear cache" UX). */
 export function clearCreditBalanceCache(workspaceId: string): void {
-    if (!workspaceId) {
+    const isMissingWorkspaceId = !workspaceId;
+    if (isMissingWorkspaceId) {
         return;
     }
     const kv = getKv();
-    if (!kv) {
+    const isMissingKv = !kv;
+    if (isMissingKv) {
         return;
     }
     kv.delete(buildKey(workspaceId)).catch(function (caught: unknown): void {

@@ -262,6 +262,7 @@ function forwardToBackground(
             handleRelayCallback(response, release, requestId, isSdkSource);
         });
     } catch (sendError) {
+        logError("AutoCatch", "Unhandled exception", sendError);
         handleRelaySendError(sendError, release, requestId, isSdkSource);
     }
 }
