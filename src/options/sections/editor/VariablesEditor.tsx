@@ -10,13 +10,14 @@ import type { JsonValue } from "@/background/handlers/handler-types";
 import { useState, useCallback, useMemo } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { MonacoCodeEditor } from "@/components/options/LazyMonacoCodeEditor";
+import { EditorMode } from "../../../types/enums";
 
 interface VariablesEditorProps {
     json: string;
     onChange: (json: string) => void;
 }
 
-type ViewMode = "tree" | "raw";
+type ViewMode = EditorMode;
 
 /* ------------------------------------------------------------------ */
 /*  Tree View                                                          */

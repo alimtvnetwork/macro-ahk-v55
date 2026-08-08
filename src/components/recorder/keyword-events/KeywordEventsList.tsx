@@ -21,6 +21,7 @@ import {
 import type { KeywordEvent, KeywordEventStep } from "@/hooks/use-keyword-events";
 import { KeywordEventBulkContextMenu } from "../KeywordEventBulkContextMenu";
 import { SortableKeywordEventCard } from "./SortableKeywordEventCard";
+import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 const NOOP_DRAG_HANDLER = (): void => { /* drag-reorder disabled while filtering */ };
 
@@ -45,7 +46,7 @@ export interface KeywordEventsListProps {
     readonly onRemoveEvent: (id: string) => void;
     readonly onAddStep: (eventId: string, step: Omit<KeywordEventStep, "Id">) => void;
     readonly onRemoveStep: (eventId: string, stepId: string) => void;
-    readonly onMoveStep: (eventId: string, stepId: string, dir: "up" | "down") => void;
+    readonly onMoveStep: (eventId: string, stepId: string, dir: DirectionEnum) => void;
     readonly onRemoveSteps: (eventId: string, stepIds: readonly string[]) => void;
     readonly onSetStepsEnabled: (eventId: string, stepIds: readonly string[], enabled: boolean) => void;
     readonly onRelabelSteps: (eventId: string, stepIds: readonly string[], labels: readonly string[]) => void;

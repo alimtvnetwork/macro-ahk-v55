@@ -32,10 +32,11 @@ import {
     dismissOriginForTab,
     persistDismissOrigin,
 } from "./dismissed-origins";
+import { ToastActionEnum } from "../types/enums";
 
 const MSG_TYPE = "MARCO_FIRST_ATTACH_ACTION";
 
-type ToastAction = "accept" | "dismiss-tab" | "dismiss-persist";
+type ToastAction = ToastActionEnum;
 
 interface ToastActionMessage {
     type: typeof MSG_TYPE;

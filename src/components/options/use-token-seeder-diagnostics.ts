@@ -14,6 +14,7 @@ import {
     loadDiagnosticsCache,
     saveDiagnosticsCache,
 } from "./token-seeder-diagnostics-cache";
+import { ErrorCategoryEnum } from "../../types/enums";
 
 export interface InaccessibleSeedTarget {
     tabId: number;
@@ -32,7 +33,7 @@ export interface TokenSeederDiagnostics {
     capturedAt: string;
 }
 
-export type ErrorCategory = "host-permission" | "scripting-blocked" | "restricted-scheme" | "other";
+export type ErrorCategory = ErrorCategoryEnum;
 
 export const CATEGORY_LABELS: Record<ErrorCategory, string> = {
     "host-permission": "Host permission",

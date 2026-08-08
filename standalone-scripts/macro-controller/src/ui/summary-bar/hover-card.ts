@@ -25,8 +25,9 @@ import {
     tFontMicro,
 } from '../../shared-state';
 import type { SummaryDetails } from './types';
+import { SummaryPillKindEnum } from "../../types/enums";
 
-export type SummaryPillKind = 'pro' | 'proCredits' | 'freeCredits';
+export type SummaryPillKind = SummaryPillKindEnum;
 
 const CARD_ID = 'marco-summary-hover-card';
 

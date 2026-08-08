@@ -1,3 +1,5 @@
+import { KindEnum2, WaitConditionEnum, Enum_4085bbd6, ReasonEnum3 } from "../../../types/enums";
+
 /**
  * Marco Extension — Post-Step Wait-For-Selector
  *
@@ -38,8 +40,8 @@ const POLL_INTERVAL_MS = 100;
 /*  Public types                                                       */
 /* ------------------------------------------------------------------ */
 
-export type SelectorKind = "Css" | "XPath";
-export type WaitCondition = "Appears" | "Disappears" | "Visible";
+export type SelectorKind = KindEnum2;
+export type WaitCondition = WaitConditionEnum;
 
 export interface WaitConfig {
     readonly Selector: string;
@@ -300,7 +302,7 @@ function evaluateCss(
 
 /** Returns the matching elements for a config in the current document. */
 export function evaluateSelector(
-    config: Pick<WaitConfig, "Selector" | "Kind">,
+    config: Pick<WaitConfig, Enum_4085bbd6>,
     deps: EvaluateDeps = {},
 ): ReadonlyArray<ElementLike> {
     const doc = deps.doc ?? (typeof document !== "undefined" ? document : null);
@@ -356,7 +358,7 @@ export type WaitOutcome =
     }
     | {
         readonly Ok: false;
-        readonly Reason: "Timeout" | "InvalidSelector";
+        readonly Reason: ReasonEnum3;
         readonly DurationMs: number;
         readonly Detail: string;
     };

@@ -40,6 +40,7 @@ import type { StepGroupRow } from "@/background/recorder/step-library/db";
 
 import { logError } from "../options-logger";
 import { DRAG_MIME } from "./constants";
+import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 export interface TreeNode {
     readonly Group: StepGroupRow;
@@ -64,7 +65,7 @@ export interface TreeNodeRowProps {
     readonly onRename: (group: StepGroupRow) => void;
     readonly onDelete: (group: StepGroupRow) => void;
     readonly onExportThis: (id: number) => void;
-    readonly onMove: (id: number, direction: "up" | "down") => void;
+    readonly onMove: (id: number, direction: DirectionEnum) => void;
     readonly onArchiveToggle: (group: StepGroupRow) => void;
     readonly onApplyInputs: (group: StepGroupRow) => void;
     readonly onImportCsvInputs: (group: StepGroupRow) => void;

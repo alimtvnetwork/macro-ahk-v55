@@ -41,7 +41,7 @@ import { sendToExtension } from './extension-relay';
 export interface OverlayError {
   readonly id: number;
   readonly timestamp: string;
-  readonly level: 'error' | 'warn';
+  readonly level: LevelEnum5;
   readonly message: string;
   readonly stack?: string | undefined;
   readonly source?: string | undefined;
@@ -53,6 +53,8 @@ export interface OverlayError {
 
 import { MAX_OVERLAY_ERRORS } from '../constants';
 import { DomId } from '../types';
+import { LevelEnum5 } from "../types/enums";
+
 class ErrorOverlayState {
   private _errors: OverlayError[] = [];
   private _nextId = 1;
@@ -135,7 +137,7 @@ class ErrorOverlayState {
     this._dragOffsetY = v;
   }
 
-  addError(level: 'error' | 'warn', message: string, stack?: string, source?: string): OverlayError {
+  addError(level: LevelEnum5, message: string, stack?: string, source?: string): OverlayError {
     const entry: OverlayError = {
       id: this._nextId++,
       timestamp: new Date().toLocaleTimeString('en-US', {
@@ -746,7 +748,7 @@ export function ensureErrorOverlay(): void {
  * Called from global error handlers and toast system.
  */
 export function pushOverlayError(
-  level: 'error' | 'warn',
+  level: LevelEnum5,
   message: string,
   stack?: string,
   source?: string,

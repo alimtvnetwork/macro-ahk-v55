@@ -1,3 +1,5 @@
+import { SplitterParseReasonEnum } from "../types/enums";
+
 /**
  * Task Splitter reply parser.
  *
@@ -6,11 +8,7 @@
  */
 
 export type SplitterParseReason =
-    | "JsonMissing"
-    | "JsonParseFailed"
-    | "SubtasksMissing"
-    | "WrongLength"
-    | "SubtaskInvalid";
+    SplitterParseReasonEnum;
 
 export interface SplitterParseFailure {
     readonly Reason: SplitterParseReason;

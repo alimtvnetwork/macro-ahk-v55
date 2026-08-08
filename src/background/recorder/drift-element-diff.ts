@@ -21,18 +21,12 @@
  */
 
 import type { DomContext } from "./failure-logger";
+import { DriftFieldNameEnum, DriftChangeKindEnum, DriftVerdictEnum } from "../../types/enums";
 
 export type DriftFieldName =
-    | "TagName"
-    | "Id"
-    | "ClassName"
-    | "AriaLabel"
-    | "Name"
-    | "Type"
-    | "TextSnippet"
-    | "OuterHtmlSnippet";
+    DriftFieldNameEnum;
 
-export type DriftChangeKind = "Unchanged" | "Added" | "Removed" | "Modified";
+export type DriftChangeKind = DriftChangeKindEnum;
 
 export interface DriftFieldDiff {
     readonly Field: DriftFieldName;
@@ -51,12 +45,7 @@ export interface DriftClassListDiff {
 }
 
 export type DriftVerdict =
-    | "Identical"             // Both DomContexts are byte-equal.
-    | "AttributeDrift"        // Same tag, same/missing id, only attrs/text changed.
-    | "RenamedIdentity"       // Tag matches but id or aria-label changed.
-    | "DifferentElement"      // Different tag — fallback resolved a *different* node.
-    | "PrimaryMissing"        // Primary side absent (no recorded snapshot to compare).
-    | "FallbackMissing";      // Fallback side absent (nothing matched at all).
+    DriftVerdictEnum;      // Fallback side absent (nothing matched at all).
 
 export interface DriftElementDiff {
     readonly Verdict: DriftVerdict;

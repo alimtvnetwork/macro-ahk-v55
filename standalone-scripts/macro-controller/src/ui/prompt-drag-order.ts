@@ -12,6 +12,7 @@
  */
 
 import type { PromptEntry } from '../types';
+import { SlugPositionSourceEnum, SourceEnum9 } from "../types/enums";
 
 const STORAGE_KEY = 'marco.promptOrder.v2';
 const DRAG_TOUCHED_KEY = 'marco.promptOrder.dragTouched.v2';
@@ -189,7 +190,7 @@ function clearDragTouched(): void {
   } catch { /* ignore */ }
 }
 
-export type SlugPositionSource = 'default' | 'migrated' | 'drag';
+export type SlugPositionSource = SlugPositionSourceEnum;
 
 export interface SlugPositionInfo {
   source: SlugPositionSource;
@@ -234,7 +235,7 @@ export function getEffectivePromptOrder(): string[] {
 }
 
 export interface PromptOrderSource {
-  source: 'localStorage' | 'default';
+  source: SourceEnum9;
   storageKey: string;
   migrationRev: number;
   currentRev: number;

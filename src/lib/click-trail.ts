@@ -1,3 +1,5 @@
+import { KindEnum1 } from "../types/enums";
+
 /**
  * Marco Extension — UI Click-Trail Recorder
  *
@@ -21,7 +23,7 @@ export interface ClickTrailEntry {
     /** ISO timestamp the event was captured at. */
     at: string;
     /** Event kind — "click", "route", "key", "mount". */
-    kind: "click" | "route" | "key" | "mount";
+    kind: KindEnum1;
     /** Short, human-readable label. */
     label: string;
     /** Optional CSS-like target descriptor. */

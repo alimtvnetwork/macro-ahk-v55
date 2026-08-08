@@ -37,12 +37,13 @@ import {
     STEP_GROUP_BUNDLE_FORMAT_VERSION,
     type StepGroupExportManifest,
 } from "./export-bundle";
+import { ConflictPolicyEnum, ImportReasonEnum, KindEnum7 } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
 /* ------------------------------------------------------------------ */
 
-export type ConflictPolicy = "Skip" | "Rename" | "Fail";
+export type ConflictPolicy = ConflictPolicyEnum;
 
 export interface RunStepGroupImportInit {
     /** Raw ZIP bytes (e.g. from `await file.arrayBuffer()` then `new Uint8Array(buf)`). */
@@ -67,21 +68,7 @@ export interface RunStepGroupImportInit {
 }
 
 export type ImportReason =
-    | "Ok"
-    | "BundleNotZip"
-    | "ManifestMissing"
-    | "ManifestMalformed"
-    | "ManifestVersionUnsupported"
-    | "DbFileMissing"
-    | "DbChecksumMismatch"
-    | "DbSchemaIncompatible"
-    | "DbCorrupt"
-    | "DestinationProjectMissing"
-    | "AttachParentMissing"
-    | "AttachParentWrongProject"
-    | "NameConflict"
-    | "RunGroupTargetMissing"
-    | "InternalError";
+    ImportReasonEnum;
 
 export interface ImportFailure {
     readonly Reason: Exclude<ImportReason, "Ok">;
@@ -562,7 +549,7 @@ function resolveNameConflicts(input: ResolveNameConflictsInput): NameConflictPla
 }
 
 type RootOutcome =
-    | { Kind: "Keep" | "Collision" | "Skip"; Name: string }
+    | { Kind: KindEnum7; Name: string }
     | { Kind: "Rename"; OldName: string; NewName: string }
     | ImportFailure;
 
@@ -590,7 +577,7 @@ function resolveRootNameConflict(
 }
 
 function applyRootOutcome(
-    outcome: { Kind: "Keep" | "Collision" | "Skip"; Name: string } | { Kind: "Rename"; OldName: string; NewName: string },
+    outcome: { Kind: KindEnum7; Name: string } | { Kind: "Rename"; OldName: string; NewName: string },
     g: StepGroupRow,
     effectiveName: Map<number, string>,
     destSiblingNamesLower: Set<string>,

@@ -22,6 +22,7 @@ import { logError } from '../error-utils';
 import { log } from '../logger';
 import { fetchAndPersist, type FetchAndPersistResult } from './fetcher';
 import { INTER_WS_GAP_MS } from './throttle';
+import { SourceEnum8 } from "../types/enums";
 
 /** Machine-readable reason attached to a `'skipped'` outcome. */
 export type BatchSkipReason = 'plan-not-eligible';
@@ -48,7 +49,7 @@ export interface BatchRefreshOptions {
     /** Bypass per-workspace 10s throttle (manual/shared force path). Default false. */
     readonly force?: boolean;
     /** Fetch source tag surfaced in telemetry. Default 'batch'. */
-    readonly source?: 'batch' | 'manual';
+    readonly source?: SourceEnum8;
 }
 
 
@@ -91,7 +92,7 @@ async function runOneWorkspace(
     counters: BatchCounters,
     results: BatchRefreshIterationResult[],
     force: boolean,
-    source: 'batch' | 'manual',
+    source: SourceEnum8,
 ): Promise<void> {
     counters.attempted += 1;
     try {
@@ -125,7 +126,7 @@ export async function batchRefreshProOneCreditBalances(
     const results: BatchRefreshIterationResult[] = [];
     const counters: BatchCounters = { fetched: 0, throttled: 0, failed: 0, skipped: 0, attempted: 0 };
     const force = options?.force === true;
-    const source: 'batch' | 'manual' = options?.source ?? 'batch';
+    const source: SourceEnum8 = options?.source ?? 'batch';
 
     const dispatchable = candidates.filter(function (c) { return c.dispatchable === true; });
 

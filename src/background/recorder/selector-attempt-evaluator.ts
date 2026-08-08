@@ -28,21 +28,16 @@
 
 import { SelectorKindId } from "../recorder-db-schema";
 import type { PersistedSelector } from "./step-persistence";
+import { AttemptFailureReasonEnum, AttemptStrategyEnum } from "../../types/enums";
 
 /**
  * Per-attempt outcome enum. Short, machine-readable codes — keep values
  * stable, downstream UI groups by string equality.
  */
 export type AttemptFailureReason =
-    | "Matched"               // Not a failure — kept so the union covers OK rows.
-    | "ZeroMatches"           // Expression evaluated cleanly but returned 0 nodes.
-    | "XPathSyntaxError"      // doc.evaluate threw.
-    | "CssSyntaxError"        // querySelector threw.
-    | "UnresolvedAnchor"      // XPathRelative pointed at a missing/cyclic anchor.
-    | "EmptyExpression"       // Stored expression is "" — recorder bug or stale data.
-    | "EvaluationThrew";      // Catch-all for unexpected DOM exceptions.
+    AttemptFailureReasonEnum;      // Catch-all for unexpected DOM exceptions.
 
-export type AttemptStrategy = "XPathFull" | "XPathRelative" | "Css" | "Aria" | "Unknown";
+export type AttemptStrategy = AttemptStrategyEnum;
 
 export interface EvaluatedAttempt {
     readonly SelectorId: number;

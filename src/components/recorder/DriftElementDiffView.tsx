@@ -27,6 +27,7 @@ import {
     formatDuration,
     type DriftTimeline,
 } from "@/background/recorder/drift-timeline";
+import { ToneEnum3, SideEnum } from "../../types/enums";
 
 interface DriftElementDiffViewProps {
     /** Recorded / expected element snapshot (or null when never captured). */
@@ -44,7 +45,7 @@ interface DriftElementDiffViewProps {
     readonly now?: Date;
 }
 
-const VERDICT_META: Readonly<Record<DriftVerdict, { label: string; tone: "warn" | "info" | "ok" | "error" }>> = {
+const VERDICT_META: Readonly<Record<DriftVerdict, { label: string; tone: ToneEnum3 }>> = {
     Identical: { label: "Identical", tone: "ok" },
     AttributeDrift: { label: "Attribute drift", tone: "warn" },
     RenamedIdentity: { label: "Renamed identity", tone: "warn" },
@@ -263,7 +264,7 @@ function ValueCell({
 }: {
     readonly value: string | null;
     readonly change: DriftChangeKind;
-    readonly side: "primary" | "fallback";
+    readonly side: SideEnum;
 }) {
     const empty = value === null || value === "";
     const highlight = changeClass(change, side);
@@ -278,7 +279,7 @@ function ValueCell({
     );
 }
 
-function changeClass(change: DriftChangeKind, side: "primary" | "fallback"): string {
+function changeClass(change: DriftChangeKind, side: SideEnum): string {
     if (change === "Unchanged") return "bg-muted/40 text-foreground";
     if (change === "Modified") {
         return side === "primary"

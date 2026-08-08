@@ -14,8 +14,9 @@ import { emitDiagnosticToastEvent } from '../telemetry/diagnostic-toast-telemetr
 import type { DiagnosticError } from './diagnostic-error';
 import type { ErrorSeverity } from './error-codes';
 import type { DiagnosticToast } from './format';
+import { ToastLevelEnum } from "../types/enums";
 
-export type ToastLevel = 'error' | 'warn' | 'info';
+export type ToastLevel = ToastLevelEnum;
 
 /**
  * Map the registry severity to the toast level surface. `fatal` and `error`

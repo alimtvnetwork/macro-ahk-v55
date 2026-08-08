@@ -17,6 +17,7 @@
 
 import { EXTENSION_VERSION, STORAGE_KEY_LAST_BUILD_ID } from "../shared/constants";
 import { logCaughtError, BgLogTag} from "./bg-logger";
+import { CacheCategoryEnum } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -39,12 +40,7 @@ export interface CacheEntry<T = unknown> {
 }
 
 export type CacheCategory =
-    | "scripts"      // StoredScript[]
-    | "configs"      // StoredConfig[]
-    | "projects"     // StoredProject[]
-    | "script_code"  // Individual script code by filePath
-    | "namespace"    // Pre-built namespace blobs
-    | "settings";    // Extension settings
+    CacheCategoryEnum;    // Extension settings
 
 /* ------------------------------------------------------------------ */
 /*  IndexedDB Lifecycle                                                */

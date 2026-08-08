@@ -37,6 +37,7 @@ import {
 } from "./state-manager";
 import { urlFingerprint } from "./url-fingerprint";
 import { logCaughtError, BgLogTag } from "./bg-logger";
+import { BranchEnum } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Sentinel constants                                                 */
@@ -157,7 +158,7 @@ const RESTRICTED_URL_PREFIXES: ReadonlyArray<string> = [
 
 interface RestrictionMatch {
     readonly restricted: boolean;
-    readonly branch: "empty" | "about-blank" | "prefix" | "allowed";
+    readonly branch: BranchEnum;
     readonly matchedPrefix: string | null;
 }
 

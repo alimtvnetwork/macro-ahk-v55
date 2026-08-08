@@ -31,6 +31,7 @@ import {
 import type { StepKindId } from "@/background/recorder/step-library/schema";
 
 import type { StepLibraryLoadError, UseStepLibraryApi } from "../use-step-library-types";
+import { StageEnum, DirectionEnum } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Shared types                                                       */
@@ -51,7 +52,7 @@ export interface BootstrapDeps {
         sqljs: SqlJsStatic,
         readResult: { Kind: "Empty" } | { Kind: "Bytes"; Bytes: Uint8Array },
     ) => Promise<OpenLibraryResultOk | { Kind: "Err"; Error: StepLibraryLoadError }>;
-    readonly classifyLoadError: (err: unknown, stage: "sqljs" | "storage-read" | "storage-write" | "other") => StepLibraryLoadError;
+    readonly classifyLoadError: (err: unknown, stage: StageEnum) => StepLibraryLoadError;
     readonly refreshFromDb: (
         lib: StepLibraryDb,
         projectId: number,
@@ -220,7 +221,7 @@ export interface LibraryMutations {
     readonly reorderSteps: UseStepLibraryApi["reorderSteps"];
 }
 
-function moveWithinArray(ids: readonly number[], id: number, direction: "up" | "down"): readonly number[] | null {
+function moveWithinArray(ids: readonly number[], id: number, direction: DirectionEnum): readonly number[] | null {
     const idx = ids.indexOf(id);
     if (idx === -1) return null;
     const swapWith = direction === "up" ? idx - 1 : idx + 1;

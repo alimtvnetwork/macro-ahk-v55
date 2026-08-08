@@ -28,6 +28,7 @@ import { createErrorModel, type ErrorModel } from "@/types/error-model";
 import { DEFAULT_PROJECT_DATABASES, DATABASE_KINDS, MAX_USER_DATABASES, validateNamespace, type NamespaceDatabaseRequest } from "@/types/default-databases";
 import { CreateDatabaseForm } from "./CreateDatabaseForm";
 import { DefaultDatabasesStatus } from "./DefaultDatabasesStatus";
+import { Type, FormatEnum1 } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -35,7 +36,7 @@ import { DefaultDatabasesStatus } from "./DefaultDatabasesStatus";
 
 interface ColumnDef {
   Name: string;
-  Type: "TEXT" | "INTEGER" | "REAL" | "BLOB" | "BOOLEAN";
+  Type: Type;
   Nullable?: boolean;
   Unique?: boolean;
   Default?: string;
@@ -203,7 +204,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
     URL.revokeObjectURL(url);
   };
 
-  const handleDownloadDocs = async (format: "markdown" | "prisma" | "both") => {
+  const handleDownloadDocs = async (format: FormatEnum1) => {
     setDownloadingDocs(true);
     try {
       const result = await sendMessage<{ isOk: boolean; markdown?: string; prisma?: string; errorMessage?: string }>({

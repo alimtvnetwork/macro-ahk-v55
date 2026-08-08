@@ -19,6 +19,7 @@ import type { StepGroupRow, StepRow } from "@/background/recorder/step-library/d
 import type { WaitConfig } from "@/background/recorder/step-library/step-wait";
 import { StepRowItem } from "./StepRowItem";
 import { SELECT_GROUP_FIRST_TOOLTIP } from "./constants";
+import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 interface LibraryStepPaneProps {
     readonly activeGroup: StepGroupRow | null;
@@ -29,7 +30,7 @@ interface LibraryStepPaneProps {
     readonly onOpenCsv: (group: StepGroupRow) => void;
     readonly onCreateStep: (group: StepGroupRow) => void;
     readonly onRunGroup: (group: StepGroupRow) => void;
-    readonly onStepMove: (stepId: number, direction: "up" | "down") => void;
+    readonly onStepMove: (stepId: number, direction: DirectionEnum) => void;
     readonly onStepDropReorder: (stepGroupId: number, sourceStepId: number, targetStepId: number) => void;
     readonly onStepToggleDisabled: (step: StepRow, nextDisabled: boolean) => void;
     readonly onStepEdit: (step: StepRow) => void;

@@ -36,6 +36,7 @@ import { CheckCircle2, FastForward, FolderTree, ListChecks, Timer, XCircle } fro
 
 import type { BatchGroupReport } from "@/background/recorder/step-library/run-batch";
 import { aggregate, formatDuration } from "./run-results-summary-aggregate";
+import { ToneEnum2 } from "../../types/enums";
 
 interface RunResultsSummaryPanelProps {
     /** Per-group reports from the just-completed batch. */
@@ -145,7 +146,7 @@ interface StatProps {
     readonly label: string;
     readonly value: number;
     readonly hint?: string;
-    readonly tone?: "default" | "success" | "muted";
+    readonly tone?: ToneEnum2;
 }
 
 function Stat({ icon, label, value, hint, tone = "default" }: StatProps) {

@@ -1,8 +1,10 @@
+import { ProjectLockReasonEnum } from "../types/enums";
+
 /**
  * project-lock — shared types (Issue 124 §2.4).
  */
 
-export type ProjectLockReason = 'api-423' | 'api-body-locked' | 'dom-banner';
+export type ProjectLockReason = ProjectLockReasonEnum;
 
 export interface ProjectLockEvent {
     readonly WorkspaceId: string;

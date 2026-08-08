@@ -4,6 +4,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { sendMessage } from "@/lib/message-client";
+import { SeverityFilterEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 export interface LogEntry {
     id: number;
@@ -16,7 +17,7 @@ export interface LogEntry {
     message?: string;
 }
 
-export type LogLevel = "all" | "info" | "warn" | "error";
+export type LogLevel = SeverityFilterEnum;
 
 // eslint-disable-next-line max-lines-per-function
 export function useLogViewer(limit = 200) {

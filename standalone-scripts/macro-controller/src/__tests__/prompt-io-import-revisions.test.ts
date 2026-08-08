@@ -40,8 +40,9 @@ vi.mock('../db/prompt-revision-db', () => ({
 
 import { performPromptImport } from '../ui/prompt-io';
 import type { BundleRevisionRow } from '../ui/prompt-bundle-types';
+import { RoleEnum4 } from "../types/enums";
 
-const entry = (slug: string, role: 'plan' | 'next' = 'plan') => ({
+const entry = (slug: string, role: RoleEnum4 = 'plan') => ({
     id: slug, title: slug, body: 'x {{n}} y', role, slug, updatedAt: 1,
 }) as unknown as Parameters<typeof performPromptImport>[0][number];
 

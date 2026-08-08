@@ -18,12 +18,13 @@ import {
     type ExecutionNextPreview,
     type NextNode,
 } from "@/background/recorder/execution-next-preview";
+import { BranchEnum2 } from "../../types/enums";
 
 interface ExecutionNextBadgeProps {
     readonly preview: ExecutionNextPreview;
 }
 
-function NodePill({ node, branch }: { node: NextNode; branch: "Default" | "Success" | "Failure" }) {
+function NodePill({ node, branch }: { node: NextNode; branch: BranchEnum2 }) {
     const variant = branch === "Failure" ? "destructive"
         : node.Kind === "End" ? "outline"
         : node.Kind === "Project" ? "default"

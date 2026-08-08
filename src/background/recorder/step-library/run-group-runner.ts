@@ -48,6 +48,7 @@
 import type { FailureReport } from "../failure-logger";
 import type { StepLibraryDb, StepGroupRow, StepRow } from "./db";
 import { StepKindId, MAX_RUN_GROUP_CALL_DEPTH } from "./schema";
+import { OutcomeEnum4, RunGroupFailureReasonEnum, Enum_4c6f84e9 } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -62,7 +63,7 @@ export interface RunStepTraceEntry {
     readonly OrderIndex: number;
     /** Names of every group from the root down to this step's group. */
     readonly GroupPath: ReadonlyArray<string>;
-    readonly Outcome: "Executed" | "Skipped" | "EnteredGroup" | "ExitedGroup" | "Failed";
+    readonly Outcome: OutcomeEnum4;
     /** ISO-8601 timestamp captured at entry (UTC). */
     readonly StartedAt: string;
     readonly DurationMs: number;
@@ -76,12 +77,7 @@ export interface RunStepTraceEntry {
  * no live DOM evaluation occurred — the runner aborted statically.
  */
 export type RunGroupFailureReason =
-    | "LeafStepFailed"        // executor returned/threw a FailureReport.
-    | "RunGroupCycle"         // group already on the active call stack.
-    | "RunGroupDepthExceeded" // call stack exceeded MAX_RUN_GROUP_CALL_DEPTH.
-    | "MissingTargetGroup"    // RunGroup step has no resolvable target.
-    | "MissingRootGroup"      // caller passed a rootGroupId that does not exist.
-    | "TargetNotInProject";   // target group lives in a different ProjectId.
+    RunGroupFailureReasonEnum;   // target group lives in a different ProjectId.
 
 export interface RunGroupFailure {
     readonly Ok: false;
@@ -623,7 +619,7 @@ export interface ExpandOptions {
  * preview cannot show a plan that the runner would refuse to execute.
  */
 function expansionFailure(
-    frame: Pick<ExpansionFrame, "plan" | "group">,
+    frame: Pick<ExpansionFrame, Enum_4c6f84e9>,
     reason: Exclude<RunGroupFailureReason, "LeafStepFailed">,
     detail: string,
     stepId: number | null,

@@ -39,6 +39,7 @@ import { AlertOctagon, AlertTriangle, FileWarning, RefreshCw, Info, ExternalLink
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { AuditSeverityEnum, BadgeEnum, ToneEnum } from "../../types/enums";
 
 const AUDIT_CLI_COMMAND = "node scripts/audit-error-swallow.mjs";
 
@@ -46,7 +47,7 @@ const AUDIT_CLI_COMMAND = "node scripts/audit-error-swallow.mjs";
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-export type AuditSeverity = "P0" | "P1" | "P2";
+export type AuditSeverity = AuditSeverityEnum;
 
 export interface AuditItem {
     readonly Id: string;
@@ -126,7 +127,7 @@ function validateReport(raw: any): AuditReport | string {
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-function severityMeta(severity: AuditSeverity): { label: string; badge: "destructive" | "default" | "outline"; Icon: typeof AlertOctagon; ring: string } {
+function severityMeta(severity: AuditSeverity): { label: string; badge: BadgeEnum; Icon: typeof AlertOctagon; ring: string } {
     if (severity === "P0") return { label: "P0 · Critical", badge: "destructive", Icon: AlertOctagon, ring: "border-destructive/60 bg-destructive/10" };
     if (severity === "P1") return { label: "P1 · High",     badge: "default",     Icon: AlertTriangle, ring: "border-amber-500/40 bg-amber-500/10" };
     return                        { label: "P2 · Medium",   badge: "outline",     Icon: FileWarning,   ring: "border-muted-foreground/30 bg-muted/20" };
@@ -516,7 +517,7 @@ function AuditSummaryPanel({ state, onReload }: { state: LoadState; onReload: ()
     );
 }
 
-function StatTile({ label, value, tone }: { label: string; value: number; tone: "default" | "destructive" | "warn" | "muted" }) {
+function StatTile({ label, value, tone }: { label: string; value: number; tone: ToneEnum }) {
     const toneClass =
         tone === "destructive" ? "border-destructive/60 bg-destructive/10 text-destructive"
         : tone === "warn"      ? "border-amber-500/40 bg-amber-500/10 text-amber-300"

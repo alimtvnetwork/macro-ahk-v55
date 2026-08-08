@@ -84,9 +84,6 @@ import { toast } from "sonner";
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-type AssetType = "prompt" | "script" | "chain" | "preset";
-type LinkState = "synced" | "pinned" | "detached";
-
 interface SharedAsset {
   Id: number;
   Type: AssetType;
@@ -123,6 +120,9 @@ interface ProjectGroup {
 /* ------------------------------------------------------------------ */
 
 import { SyncBadge } from "./SyncBadge";
+import { AssetType, ActionEnum, Enum_48fffa10 } from "../../types/enums";
+import { LinkState } from "../../../standalone-scripts/macro-controller/src/types/enums";
+
 export { SyncBadge };
 
 /* ------------------------------------------------------------------ */
@@ -280,7 +280,7 @@ export function PromoteDialog({ open, onOpenChange, onPromoted }: PromoteDialogP
     setPromoting(true);
     try {
       const result = await sendMessage<{
-        action: "created" | "identical" | "conflict";
+        action: ActionEnum;
         assetId?: number;
         existingVersion?: string;
       }>({
@@ -659,7 +659,7 @@ export function LibraryView() {
   const [promoteOpen, setPromoteOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<SharedAsset | null>(null);
   const [importExportLoading, setImportExportLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"assets" | "groups">("assets");
+  const [activeTab, setActiveTab] = useState<Enum_48fffa10>("assets");
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -899,7 +899,7 @@ export function LibraryView() {
       </div>
 
       {/* Top-level Assets / Groups tabs */}
-      <Tabs value={activeTab} onValueChange={v => setActiveTab(v as "assets" | "groups")}>
+      <Tabs value={activeTab} onValueChange={v => setActiveTab(v as Enum_48fffa10)}>
         <TabsList className="h-9">
           <TabsTrigger value="assets" className="text-xs px-3 gap-1.5" data-testid="library-tab-assets">
             <Library className="h-3.5 w-3.5" />

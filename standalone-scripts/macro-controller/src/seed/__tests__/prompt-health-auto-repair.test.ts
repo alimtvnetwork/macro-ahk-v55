@@ -31,7 +31,7 @@ vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
 }));
 
 const reseedCalls: Array<{ force?: boolean }> = [];
-let reseedResult: { ok: boolean; error?: string; mode: 'idempotent' | 'force' } = { ok: true, mode: 'idempotent' };
+let reseedResult: { ok: boolean; error?: string; mode: Mode4 } = { ok: true, mode: 'idempotent' };
 vi.mock('../reseed-command', () => ({
     reseedPromptsOnDemand: vi.fn(async (opts?: { force?: boolean }) => {
         reseedCalls.push({ force: opts?.force });
@@ -41,13 +41,14 @@ vi.mock('../reseed-command', () => ({
 
 import { runPromptHealthCheckWithAutoRepair } from '../prompt-health-auto-repair';
 import { PLAN_NEXT_SEED_ROWS } from '../plan-next-prompts';
+import { Mode4, RoleEnum4 } from "../../types/enums";
 
 interface Row {
     Id: number; Slug: string; Name: string; Body: string; Role: string;
     IsDefault: number; ReplaceKey: string; ReplaceValues: string;
     CreatedAt: number; UpdatedAt: number;
 }
-function healthyRow(role: 'plan' | 'next', overrides: Partial<Row> = {}): Row {
+function healthyRow(role: RoleEnum4, overrides: Partial<Row> = {}): Row {
     const seed = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault);
     if (!seed) throw new Error('seed row missing');
     return {

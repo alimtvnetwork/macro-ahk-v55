@@ -12,8 +12,10 @@ import { CookiesTable } from "./CookiesTable";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
+import { ActiveViewEnum } from "../../../types/enums";
+import { DatabaseEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
-type ActiveView = "logs" | "errors" | "datastore";
+type ActiveView = ActiveViewEnum;
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -117,7 +119,7 @@ export function DataBrowserPanel() {
             />
           ) : (
             <DataTable
-              activeDb={activeDb as "logs" | "errors"}
+              activeDb={activeDb as DatabaseEnum}
               onDbChange={handleDbChange}
               rows={browser.rows}
               isLoading={browser.loading}

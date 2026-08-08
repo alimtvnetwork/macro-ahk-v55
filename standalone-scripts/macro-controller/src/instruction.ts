@@ -15,10 +15,11 @@ import { InjectionRunAt } from "../../types/instruction/enums/injection-run-at";
 import { MatchType } from "../../types/instruction/enums/match-type";
 import { AssetInjectTarget } from "../../types/instruction/enums/asset-inject-target";
 import { VERSION } from "../../shared-version";
+import { LogLevelEnum } from "./types/enums";
 
 type MacroControllerSettings = {
     IsolateScripts: boolean;
-    LogLevel: "debug" | "info" | "warn" | "error";
+    LogLevel: LogLevelEnum;
     RetryOnNavigate: boolean;
 };
 

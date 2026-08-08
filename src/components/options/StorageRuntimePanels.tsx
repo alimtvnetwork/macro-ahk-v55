@@ -22,8 +22,9 @@ import {
   Plus,
   Eraser,
 } from "lucide-react";
+import { Enum_162dadd6 } from "../../types/enums";
 
-type RuntimeStorageSurface = "session" | "cookies" | "indexeddb";
+type RuntimeStorageSurface = Enum_162dadd6;
 
 interface SessionEntry {
   key: string;

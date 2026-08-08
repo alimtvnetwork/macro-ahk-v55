@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { getPlatform } from "../../../platform";
+import { RunAtEnum1 } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -17,7 +18,7 @@ interface ScriptRow {
     scriptName: string;
     scriptCode: string;
     order: number;
-    runAt: "document_start" | "document_idle" | "document_end";
+    runAt: RunAtEnum1;
     isEnabled: boolean;
     configId: string;
     configName: string;

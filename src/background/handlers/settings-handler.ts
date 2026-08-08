@@ -12,6 +12,8 @@ import type { MessageRequest, OkResponse } from "../../shared/messages";
 import { DEFAULT_CHATBOX_XPATH } from "../../shared/defaults";
 import { invalidateSettingsNsCache } from "../settings-ns-cache";
 import { setVerboseLogging } from "../recorder/verbose-logging";
+import { RunAtEnum1 } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { ThemeEnum } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -26,11 +28,11 @@ const STORAGE_KEY = "marco_extension_settings";
 export interface ExtensionSettings {
     autoRunOnPageLoad: boolean;
     showNotifications: boolean;
-    defaultRunAt: "document_start" | "document_idle" | "document_end";
+    defaultRunAt: RunAtEnum1;
     debugMode: boolean;
     maxCycleCount: number;
     idleTimeout: number;
-    theme: "system" | "light" | "dark";
+    theme: ThemeEnum;
     chatBoxXPath: string;
     /** When true, skips chrome.userScripts and forces Blob URL injection for debugging. */
     forceLegacyInjection: boolean;

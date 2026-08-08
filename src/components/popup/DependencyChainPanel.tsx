@@ -22,11 +22,12 @@ import {
   Copy,
   Check,
 } from "lucide-react";
+import { RoleEnum } from "../../types/enums";
 
 interface ChainEntry {
   scriptId: string;
   scriptName: string;
-  role: "global-dep" | "explicit-dep" | "target";
+  role: RoleEnum;
   order: number;
   resolved: boolean;
   fetched: boolean;

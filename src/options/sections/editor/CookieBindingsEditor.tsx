@@ -3,11 +3,12 @@
  */
 
 import { useCallback } from "react";
+import { RoleEnum1 } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 interface CookieBinding {
     cookieName: string;
     url: string;
-    role: "session" | "refresh" | "custom";
+    role: RoleEnum1;
     description?: string;
 }
 

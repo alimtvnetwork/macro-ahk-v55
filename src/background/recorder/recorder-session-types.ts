@@ -11,12 +11,13 @@
  */
 
 import type { FormSnapshot } from "./form-snapshot";
+import { PhaseEnum, RecordedStepKindEnum, SelectorStrategyEnum } from "../../types/enums";
 
-export type RecordingPhase = "Idle" | "Recording" | "Paused";
+export type RecordingPhase = PhaseEnum;
 
-export type RecordedStepKind = "Click" | "Type" | "Select" | "Submit" | "Wait" | "JsInline";
+export type RecordedStepKind = RecordedStepKindEnum;
 
-export type SelectorStrategy = "Id" | "TestId" | "RoleText" | "Positional";
+export type SelectorStrategy = SelectorStrategyEnum;
 
 export interface StepSelector {
     readonly XPathFull: string;

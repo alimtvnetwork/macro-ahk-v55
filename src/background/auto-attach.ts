@@ -15,6 +15,7 @@
 
 import type { StoredProject, ScriptEntry } from "../shared/project-types";
 import { isUrlMatch } from "./url-matcher";
+import { WorldEnum, SkipReasonEnum } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -29,7 +30,7 @@ export interface LibraryScriptForAttach {
         UrlMatches?: string[];
         AutoAttach?: boolean;
         RunAt?: ScriptEntry["runAt"];
-        World?: "MAIN" | "ISOLATED";
+        World?: WorldEnum;
         RequiredCookies?: string[];
         Dependencies?: string[];
         InjectionConditions?: {
@@ -42,14 +43,7 @@ export interface LibraryScriptForAttach {
 }
 
 export type SkipReason =
-    | "AUTOATTACH_SKIPPED_AUTOSTART_OFF"            // C1
-    | "AUTOATTACH_SKIPPED_OPT_OUT"                  // C4
-    | "AUTOATTACH_SKIPPED_URL_NO_MATCH"             // C2
-    | "AUTOATTACH_ALREADY_ATTACHED"                 // C8
-    | "AUTOATTACH_SKIPPED_INCOMPATIBLE_RUN_CONTEXT" // C5
-    | "AUTOATTACH_SKIPPED_COOKIE_BINDING_MISSING"   // C6
-    | "AUTOATTACH_SKIPPED_DEP_MISSING"              // C7
-    | "AUTOATTACH_SKIPPED_CONDITION_FAIL";          // C3
+    SkipReasonEnum;          // C3
 
 export interface AttachDecision {
     ok: boolean;

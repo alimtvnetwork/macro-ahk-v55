@@ -12,6 +12,7 @@
 
 import { useState, useRef, useCallback, useEffect, type ReactNode } from "react";
 import { GripVertical, Minus } from "lucide-react";
+import { Status8 } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types & Constants                                                  */
@@ -145,7 +146,7 @@ interface DraggableOverlayProps {
     children: ReactNode;
     headerExtra?: ReactNode;
     /** Status for the minimized badge: idle | running | error */
-    status?: "idle" | "running" | "error";
+    status?: Status8;
 }
 
 // eslint-disable-next-line max-lines-per-function

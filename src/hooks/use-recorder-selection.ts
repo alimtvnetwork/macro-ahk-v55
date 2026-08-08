@@ -18,6 +18,7 @@ import {
     subscribeSelection,
     type RecorderSelection,
 } from "@/background/recorder/recorder-selection-bus";
+import { SourceEnum2 } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 export interface UseRecorderSelectionResult {
     readonly selection: RecorderSelection;
@@ -25,7 +26,7 @@ export interface UseRecorderSelectionResult {
     readonly select: (next: { StepGroupId: number | null; StepId: number | null }) => void;
 }
 
-export function useRecorderSelection(source: "options" | "controller"): UseRecorderSelectionResult {
+export function useRecorderSelection(source: SourceEnum2): UseRecorderSelectionResult {
     const [selection, setLocal] = useState<RecorderSelection>(() => getSelection());
 
     useEffect(() => {

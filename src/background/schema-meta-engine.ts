@@ -11,6 +11,7 @@
  */
 
 import type { Database as SqlJsDatabase } from "sql.js";
+import { Type1, Type, OnDeleteEnum } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Meta table schemas                                                  */
@@ -63,7 +64,7 @@ CREATE TABLE IF NOT EXISTS MetaRelations (
 /* ------------------------------------------------------------------ */
 
 export interface ColumnValidation {
-    type: "string" | "number" | "date" | "regex" | "enum";
+    type: Type1;
     minLength?: number;
     maxLength?: number;
     min?: number;
@@ -79,7 +80,7 @@ export interface ColumnValidation {
 
 export interface JsonColumnDef {
     Name: string;
-    Type: "TEXT" | "INTEGER" | "REAL" | "BLOB" | "BOOLEAN";
+    Type: Type;
     Nullable?: boolean;
     Default?: string;
     Unique?: boolean;
@@ -91,8 +92,8 @@ export interface JsonRelationDef {
     SourceColumn: string;
     TargetTable: string;
     TargetColumn?: string;
-    OnDelete?: "CASCADE" | "SET NULL" | "NO ACTION" | "RESTRICT";
-    OnUpdate?: "CASCADE" | "SET NULL" | "NO ACTION" | "RESTRICT";
+    OnDelete?: OnDeleteEnum;
+    OnUpdate?: OnDeleteEnum;
     Description?: string;
 }
 

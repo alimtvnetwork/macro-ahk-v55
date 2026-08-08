@@ -5,6 +5,7 @@ import {
   ModalRefs, PREVIEW_FAILED_PREFIX, TOAST_ERROR,
 } from './prompt-library-types';
 import { logLibraryImportFailure, extractImportErrorReason, renderImportErrorBanner } from './prompt-library-error';
+import { OriginEnum2 } from "../types/enums";
 
 export function validateImportFile(file: File): { headline: string; hint: string } | null {
   const IMPORT_MAX_BYTES = 5 * 1024 * 1024;
@@ -104,7 +105,7 @@ export async function computeAndRenderPreview(
   previewFileInput: HTMLInputElement,
   importBtn: HTMLButtonElement,
   fileInput: HTMLInputElement,
-  handleImportFile: (r: ModalRefs, f: File, fi: HTMLInputElement, ib: HTMLButtonElement, o: 'click' | 'drop') => Promise<void>,
+  handleImportFile: (r: ModalRefs, f: File, fi: HTMLInputElement, ib: HTMLButtonElement, o: OriginEnum2) => Promise<void>,
 ): Promise<void> {
   const panel = refs.previewPanel;
   if (!panel) return;

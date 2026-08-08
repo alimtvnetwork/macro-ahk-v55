@@ -43,6 +43,7 @@ import {
 import type { StoredScript, StoredConfig } from "@/hooks/use-projects-scripts";
 import { MonacoCodeEditor } from "./LazyMonacoCodeEditor";
 import { toast } from "sonner";
+import { RunAtEnum1 } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -458,7 +459,7 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
       description: form.description.trim() || undefined,
       code: combinedCode,
       order: form.order,
-      runAt: primaryJs.runAt as "document_start" | "document_idle" | "document_end",
+      runAt: primaryJs.runAt as RunAtEnum1,
       configBinding: bindingStr,
     });
 

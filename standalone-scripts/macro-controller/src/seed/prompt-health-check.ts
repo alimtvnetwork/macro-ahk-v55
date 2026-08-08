@@ -31,19 +31,13 @@ import { PLAN_NEXT_SEED_ROWS } from './plan-next-prompts';
 import { logDiagnosticFromCode } from '../error-utils';
 import { showToast } from '../toast';
 import { emitPromptSeedEvent } from '../telemetry/prompt-seed-telemetry';
+import { CodeEnum1 } from "../types/enums";
 
 export interface PromptHealthIssue {
   role: PromptRole;
   slug: string;
   code:
-    | 'query-failed'
-    | 'row-missing'
-    | 'not-flagged-default'
-    | 'name-empty'
-    | 'body-empty'
-    | 'missing-required-token'
-    | 'replace-key-invalid'
-    | 'replace-values-invalid';
+    CodeEnum1;
   detail: string;
 }
 

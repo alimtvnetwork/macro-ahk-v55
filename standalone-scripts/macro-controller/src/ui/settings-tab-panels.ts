@@ -34,6 +34,8 @@ import {
 } from '../shared-state';
 import type { SettingsDeps, MakeFieldFn } from './settings-ui';
 import { CssFragment } from '../types';
+import { KindEnum6 } from "../types/enums";
+
 // ── Panel Results ──
 
 export interface XPathPanelResult {
@@ -779,7 +781,7 @@ function _buildPerWsAddRow(onAdded: () => void): HTMLElement {
   return row;
 }
 
-function _numField(initial: number | undefined, kind: 'grace' | 'refill'): HTMLInputElement {
+function _numField(initial: number | undefined, kind: KindEnum6): HTMLInputElement {
   const inp = document.createElement('input');
   inp.type = 'number';
   inp.min = '0';

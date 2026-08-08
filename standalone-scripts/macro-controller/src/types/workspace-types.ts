@@ -6,6 +6,7 @@
  */
 
 import type { WorkspaceCredit } from './credit-types';
+import { RenameStrategyEnum } from "./enums";
 
 export interface BulkRenameEntry {
   wsId: string;
@@ -13,7 +14,7 @@ export interface BulkRenameEntry {
   newName: string;
 }
 
-export type RenameStrategy = 'normal' | 'no-limit' | 'auth-retry' | 'rate-retry';
+export type RenameStrategy = RenameStrategyEnum;
 
 export interface BulkRenameResults {
   success: number;

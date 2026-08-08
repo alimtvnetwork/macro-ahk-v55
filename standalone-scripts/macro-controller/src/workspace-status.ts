@@ -15,19 +15,11 @@
 import type { WorkspaceCredit } from './types';
 import { isCanceledStatus, isPastDueStatus, isExpiredTier, isFreeTier } from './types/subscription-status';
 import type { WorkspaceLifecycleConfig } from './workspace-lifecycle-config';
+import { WorkspaceStatusKind } from "./types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Status kinds                                                       */
 /* ------------------------------------------------------------------ */
-
-export type WorkspaceStatusKind =
-  | 'fully-expired'
-  | 'expired-canceled'
-  | 'expired'
-  | 'about-to-expire'
-  | 'past-due-expiring'
-  | 'about-to-refill'
-  | 'normal';
 
 export interface WorkspaceStatus {
   kind: WorkspaceStatusKind;

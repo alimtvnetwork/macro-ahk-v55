@@ -32,14 +32,13 @@
 
 import { logError } from './error-utils';
 import { log } from './logger';
+import { GitsyncStatus } from "./types/enums";
 
 const KEY_PREFIX = 'MacroGitsyncCache:';
 
 export const GITSYNC_TTL_FOUND_MS = Number.MAX_SAFE_INTEGER;
 export const GITSYNC_TTL_NOT_LINKED_MS = 24 * 60 * 60 * 1000;
 export const GITSYNC_TTL_ERROR_MS = 5 * 60 * 1000;
-
-export type GitsyncStatus = 'found' | 'not_linked' | 'error';
 
 export interface GitsyncCacheRow {
   readonly WorkspaceId: string;

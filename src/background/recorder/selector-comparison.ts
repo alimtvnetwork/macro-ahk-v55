@@ -22,6 +22,7 @@ import { resolveStepSelector } from "./replay-resolver";
 import { SelectorKindId } from "../recorder-db-schema";
 import type { PersistedSelector } from "./step-persistence";
 import type { DomContext } from "./failure-logger";
+import { Enum_1b5148e6 } from "../../types/enums";
 
 const SELECTOR_KIND_NAMES: Readonly<Record<number, string>> = {
     1: "XPathFull",
@@ -98,7 +99,7 @@ function summariseComparison(
 
 type AttemptBase = Omit<
     SelectorAttemptComparison,
-    "Matched" | "MatchCount" | "Element" | "Error" | "ResolvedExpression"
+    Enum_1b5148e6
 >;
 
 function evaluateOne(

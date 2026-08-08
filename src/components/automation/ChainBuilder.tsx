@@ -22,6 +22,7 @@ import { Plus, Save, X } from "lucide-react";
 import { toast } from "sonner";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import { ContainerEnum, BranchLabelEnum } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Path-based step location                                           */
@@ -29,7 +30,7 @@ import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-ki
 
 interface StepLocation {
   /** "top" | "then" | "else" */
-  container: "top" | "then" | "else";
+  container: ContainerEnum;
   /** For then/else: the top-level index of the parent condition */
   conditionIndex?: number;
   /** Index within the container array */
@@ -50,7 +51,7 @@ function decodeId(id: string): StepLocation | null {
   const branchMatch = id.match(/^cond-(\d+)-(then|else)-(\d+)$/);
   if (branchMatch) {
     return {
-      container: branchMatch[2] as "then" | "else",
+      container: branchMatch[2] as BranchLabelEnum,
       conditionIndex: Number(branchMatch[1]),
       index: Number(branchMatch[3]),
     };

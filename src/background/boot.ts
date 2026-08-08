@@ -40,6 +40,7 @@ import { preloadDismissedOrigins } from "./dismissed-origins";
 import { preloadSeenOrigins } from "./seen-origins";
 import { registerFirstAttachToastBridge } from "./first-attach-toast";
 import { logCaughtError, logBgWarnError, logSampledDebug, BgLogTag} from "./bg-logger";
+import { BootPersistenceMode } from "../types/enums";
 
 const BUILD_META_URL = "build-meta.json";
 
@@ -73,7 +74,7 @@ export async function boot(): Promise<void> {
         // Configure userScripts world early (non-blocking on failure)
         void configureUserScriptWorld();
 
-        setBootPersistenceMode(manager.getPersistenceMode() as "opfs" | "storage" | "memory");
+        setBootPersistenceMode(manager.getPersistenceMode() as BootPersistenceMode);
         console.log("[Marco] ✓ DB initialized (%s)", manager.getPersistenceMode());
 
         step = "sync-build-cache";

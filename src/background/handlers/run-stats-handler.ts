@@ -1,3 +1,5 @@
+import { Status1 } from "../../../standalone-scripts/macro-controller/src/types/enums";
+
 /**
  * Marco Extension — Run Statistics Handler (Spec 15 T-7)
  *
@@ -19,7 +21,7 @@ export interface CycleMetric {
     startTime: string;
     endTime: string;
     durationMs: number;
-    status: "success" | "error" | "skipped";
+    status: Status1;
     errorMessage?: string;
 }
 
@@ -65,7 +67,7 @@ export async function handleRecordCycleMetric(payload: { projectId: string; cycl
         cycleNumber: number;
         startTime: string;
         endTime: string;
-        status: "success" | "error" | "skipped";
+        status: Status1;
         errorMessage?: string;
     };
 

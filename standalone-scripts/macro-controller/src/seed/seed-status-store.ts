@@ -17,17 +17,11 @@
 import { StorageKey } from '../types/storage-keys';
 import { logError } from '../error-utils';
 import type { OrphanRepairReport } from './repair-plan-next-orphans';
-
-export type SeedStageStatus = 'ok' | 'failed' | 'skipped';
+import { SeedStageStatus, StageEnum1 } from "../types/enums";
 
 export interface SeedStageReport {
   readonly stage:
-    | 'schema-init'
-    | 'legacy-read-memory-dedupe'
-    | 'orphan-repair'
-    | 'seed-plan-next'
-    | 'auto-repair'
-    | 'read-memory-duplicate-validation';
+    StageEnum1;
   readonly status: SeedStageStatus;
   /** Short machine-friendly reason when `status !== 'ok'`. */
   readonly reason?: string;

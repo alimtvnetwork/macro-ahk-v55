@@ -1,3 +1,5 @@
+import { TargetEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
+
 /**
  * Marco — Platform Adapter Interface
  *
@@ -42,7 +44,7 @@ export interface PlatformTabs {
  */
 export interface PlatformAdapter {
     /** Identifies the runtime environment. */
-    readonly target: "extension" | "preview";
+    readonly target: TargetEnum;
 
     /** Sends a typed message to the background service worker. */
     sendMessage<T = void>(message: MessagePayload): Promise<T>;

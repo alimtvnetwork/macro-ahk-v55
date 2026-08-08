@@ -12,6 +12,7 @@ import type { SqlRow } from "./handler-types";
 import type { SqlValue } from "sql.js";
 import type { MessageRequest } from "../../shared/messages";
 import type { DbManager } from "../db-manager";
+import { DatabaseEnum } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 let dbManager: DbManager | null = null;
 
@@ -27,12 +28,12 @@ function getManager(): DbManager {
     return dbManager!;
 }
 
-function resolveDb(database: "logs" | "errors") {
+function resolveDb(database: DatabaseEnum) {
     const mgr = getManager();
     return database === "errors" ? mgr.getErrorsDb() : mgr.getLogsDb();
 }
 
-function resolveTable(database: "logs" | "errors"): string {
+function resolveTable(database: DatabaseEnum): string {
     return database === "errors" ? "Errors" : "Logs";
 }
 
@@ -84,7 +85,7 @@ export async function handleQueryLogs(
     message: MessageRequest,
 ): Promise<{ rows: SqlRow[]; total: number }> {
     const payload = message as MessageRequest & {
-        database: "logs" | "errors";
+        database: DatabaseEnum;
         offset: number;
         limit: number;
         source?: string;
@@ -142,7 +143,7 @@ export async function handleGetLogDetail(
     message: MessageRequest,
 ): Promise<{ row: SqlRow | null }> {
     const payload = message as MessageRequest & {
-        database: "logs" | "errors";
+        database: DatabaseEnum;
         rowId: number;
     };
 

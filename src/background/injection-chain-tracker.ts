@@ -1,3 +1,5 @@
+import { RoleEnum } from "../types/enums";
+
 /**
  * Marco Extension — Injection Chain Tracker
  *
@@ -16,7 +18,7 @@ export interface ChainEntry {
     /** Human-readable script name (e.g., "marco-sdk.js") */
     scriptName: string;
     /** Role in the chain */
-    role: "global-dep" | "explicit-dep" | "target";
+    role: RoleEnum;
     /** 0-based position in resolved injection order */
     order: number;
     /** Whether the script was found in the store */

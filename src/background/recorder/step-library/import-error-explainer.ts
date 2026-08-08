@@ -20,8 +20,9 @@
  */
 
 import type { ImportFailure, ImportReason } from "./import-bundle";
+import { ImportErrorSeverityEnum } from "../../../types/enums";
 
-export type ImportErrorSeverity = "Bundle" | "Conflict" | "Internal";
+export type ImportErrorSeverity = ImportErrorSeverityEnum;
 
 export interface ImportErrorExplanation {
     readonly Title: string;

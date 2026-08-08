@@ -13,12 +13,12 @@
  */
 
 import { throwDiagnostic } from '../errors/diagnostic-error';
-
+import { Status9 } from "../types/enums";
 
 export interface TaskQueueItem {
     readonly id: string;
     readonly text: string;
-    status: "pending" | "active" | "done" | "failed";
+    status: Status9;
     readonly createdAt: number;
 }
 

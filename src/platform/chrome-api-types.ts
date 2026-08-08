@@ -1,3 +1,6 @@
+import { WorldEnum } from "../types/enums";
+import { OriginEnum, WorldEnum1, RunAtEnum1 } from "../../standalone-scripts/macro-controller/src/types/enums";
+
 /**
  * Marco — Chrome API Ambient Types
  *
@@ -38,7 +41,7 @@ declare global {
             function query(queryInfo: Record<string, any>): Promise<Array<{ id?: number; url?: string }>>;
         }
         namespace scripting {
-            type ExecutionWorld = "ISOLATED" | "MAIN";
+            type ExecutionWorld = WorldEnum;
             interface InjectionTarget { tabId: number; frameIds?: number[]; allFrames?: boolean }
             interface ScriptInjection {
                 target: InjectionTarget;
@@ -52,7 +55,7 @@ declare global {
                 target: InjectionTarget;
                 css?: string;
                 files?: string[];
-                origin?: "AUTHOR" | "USER";
+                origin?: OriginEnum;
             }
             interface InjectionResult { frameId: number; result: any }
             function executeScript(injection: ScriptInjection): Promise<InjectionResult[]>;
@@ -65,14 +68,14 @@ declare global {
                 matches?: string[];
                 excludeMatches?: string[];
                 js?: Array<{ code?: string; file?: string }>;
-                world?: "USER_SCRIPT" | "MAIN";
+                world?: WorldEnum1;
                 worldId?: string;
-                runAt?: "document_start" | "document_end" | "document_idle";
+                runAt?: RunAtEnum1;
             }
             interface Injection {
                 target: { tabId: number; frameIds?: number[]; allFrames?: boolean };
                 js?: Array<{ code?: string; file?: string }>;
-                world?: "USER_SCRIPT" | "MAIN";
+                world?: WorldEnum1;
                 worldId?: string;
                 injectImmediately?: boolean;
             }

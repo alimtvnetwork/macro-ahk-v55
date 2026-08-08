@@ -1,3 +1,6 @@
+import { SideEnum1 } from "../../../../src/types/enums";
+import { DirectionEnum } from "../types/enums";
+
 /**
  * MacroLoop Controller — Flyout placement resolver (Step A4)
  *
@@ -31,8 +34,8 @@ export interface ViewportLike {
   readonly innerHeight: number;
 }
 
-export type HorizontalPlacement = 'right' | 'left';
-export type VerticalPlacement = 'down' | 'up';
+export type HorizontalPlacement = SideEnum1;
+export type VerticalPlacement = DirectionEnum;
 
 export interface PlacementResult {
   readonly top: number;

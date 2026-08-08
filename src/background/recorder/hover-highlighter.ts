@@ -1,26 +1,4 @@
-/**
- * Marco Extension — Hover Highlighter
- *
- * Phase 17 — Macro Recorder.
- *
- * Renders two nested overlays — a primary outline of the element under the
- * cursor and a dashed outline of its smart group container — into a single
- * shadow-root host with `pointer-events: none`. No DOM mutation of the
- * inspected element. Active in three modes:
- *
- *   - "recording" — auto-on while a recorder session runs.
- *   - "replay"   — auto-on while the replay runner ticks (listens for
- *                  `replay:step:start` / `replay:step:end` CustomEvents).
- *   - "inspector" — on-demand toggle from the recorder toolbar.
- *
- * Alt-key cycling: while Alt is held, mouse-wheel up/down moves the primary
- * outline up/down the ancestor chain; releasing Alt resets the offset on the
- * next mousemove.
- *
- * @see spec/31-macro-recorder/17-hover-highlighter-and-data-controllers.md
- */
-
-export type HighlighterMode = "off" | "recording" | "replay" | "inspector";
+import { HighlighterMode } from "../../types/enums";
 
 export interface HoverHighlighterHandle {
     readonly Host: HTMLElement;

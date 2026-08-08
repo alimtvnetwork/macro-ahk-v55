@@ -12,6 +12,7 @@
 import type { Database as SqlJsDatabase } from "sql.js";
 import type { DbManager } from "../db-manager";
 import { bindOpt, requireField } from "./handler-guards";
+import { Type4, ResourceType } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -65,10 +66,10 @@ export interface VersionInfoResponse {
 export interface InstructionStep {
     StepId: string;
     Order: number;
-    Type: "Download" | "Execute" | "Update" | "Validate";
+    Type: Type4;
     Condition: string | null;
     Payload: {
-        ResourceType?: "Script" | "Binary" | "ChromeExtension";
+        ResourceType?: ResourceType;
         Source?: {
             Url: string;
             ExpectedStatusCode: number;

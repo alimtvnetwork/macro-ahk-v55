@@ -24,20 +24,21 @@ import type { ImportAuditActionRecord, ImportAuditFormat } from './prompt-import
 import { log } from '../logger';
 import { makeUniqueSlug, slugKey } from './prompt-slug-utils';
 import { throwDiagnostic } from '../errors/diagnostic-error';
+import { StageEnum2, ImportAuditRowActionEnum, ConflictEnum, VariantEnum4 } from "../types/enums";
 
-type Stage = 'idle' | 'parsing' | 'preview' | 'committing' | 'done' | 'error';
+type Stage = StageEnum2;
 
 // Step 15: per-row action, selectable in the preview table.
 //   add           = brand-new slug, always inserted
 //   overwrite     = conflict, replace the existing cache entry
 //   skip          = do nothing (identical rows default here)
 //   rename        = import under a unique slug, keep existing untouched
-export type RowAction = 'add' | 'overwrite' | 'skip' | 'rename';
+export type RowAction = ImportAuditRowActionEnum;
 
 export interface PreviewRow {
   slug: string;
   name: string;
-  conflict: 'new' | 'update' | 'identical' | 'duplicate';
+  conflict: ConflictEnum;
   action: RowAction;
   incoming: PromptEntry;
 }
@@ -75,7 +76,7 @@ function applyStyle(element: HTMLElement, css: string): void {
   element.style.cssText = css;
 }
 
-function makeBtn(label: string, variant: 'primary' | 'ghost'): HTMLButtonElement {
+function makeBtn(label: string, variant: VariantEnum4): HTMLButtonElement {
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.textContent = label;

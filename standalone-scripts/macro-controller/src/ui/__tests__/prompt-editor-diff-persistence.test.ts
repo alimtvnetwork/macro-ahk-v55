@@ -11,6 +11,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { openPromptCreationModal } from '../prompt-injection';
 import { PLAN_NEXT_SEED_ROWS } from '../../seed/plan-next-prompts';
 import { clearDiffPrefs, DIFF_PREF_PREFIX } from './helpers/clear-diff-prefs';
+import { RoleEnum4 } from "../../types/enums";
 
 const PLAN_KEY = `${DIFF_PREF_PREFIX}plan`;
 const NEXT_KEY = `${DIFF_PREF_PREFIX}next`;
@@ -21,7 +22,7 @@ beforeEach(() => {
 });
 
 
-function openEditModal(role: 'plan' | 'next'): {
+function openEditModal(role: RoleEnum4): {
   overlay: HTMLElement;
   diffBtn: HTMLButtonElement;
   diffHost: HTMLElement;

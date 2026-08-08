@@ -5,8 +5,9 @@
 import { describe, it, expect } from 'vitest';
 import { needsBalanceEnrichment } from '../needs-balance-enrichment';
 import type { WorkspaceCredit } from '../../types/credit-types';
+import { Enum_75c5b314 } from "../../types/enums";
 
-function ws(partial: Partial<Pick<WorkspaceCredit, 'id' | 'plan' | 'tier'>>): Pick<WorkspaceCredit, 'id' | 'plan' | 'tier'> {
+function ws(partial: Partial<Pick<WorkspaceCredit, Enum_75c5b314>>): Pick<WorkspaceCredit, Enum_75c5b314> {
   return { id: 'ws-1', plan: 'pro_1', tier: 'PRO', ...partial };
 }
 

@@ -5,8 +5,9 @@ import { readCreditBalanceUpdateCacheSync } from './credit-balance-cache';
 import { hasInlineCredits, isUnifiedBillingWorkspace } from './credit-fetch-controller';
 import { mapPlanFromWire, shouldFetchCreditBalanceForPlan } from './plan-mapper';
 import { resolveDisplayAvailable, resolveDisplayTotal } from './credit-balance-display';
+import { CreditSummarySourceEnum } from "../types/enums";
 
-export type CreditSummarySource = 'Inline' | 'Cache' | 'Timeout' | 'Missing' | 'Pending';
+export type CreditSummarySource = CreditSummarySourceEnum;
 
 export interface CreditSummary {
     readonly available: number;

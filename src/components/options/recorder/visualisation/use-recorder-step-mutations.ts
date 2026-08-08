@@ -11,9 +11,11 @@ import { useRecorderProjectData } from "@/hooks/use-recorder-project-data";
 import { sendMessage } from "@/lib/message-client";
 
 import { logError } from "../../options-logger";
+import { StepLinkSlotEnum } from "../../../../../standalone-scripts/macro-controller/src/types/enums";
+import { Enum_4b5a7f2f } from "../../../../types/enums";
 
 type ProjectDataApi = ReturnType<typeof useRecorderProjectData>;
-type LinkSlot = "OnSuccessProjectId" | "OnFailureProjectId";
+type LinkSlot = StepLinkSlotEnum;
 
 export interface RecorderStepMutations {
     readonly handleRename: (stepId: number, newName: string) => Promise<void>;
@@ -25,7 +27,7 @@ export interface RecorderStepMutations {
 
 export function useRecorderStepMutations(
     projectSlug: string,
-    api: Pick<ProjectDataApi, "reload" | "updateStepMeta" | "setStepTags" | "setStepLink">,
+    api: Pick<ProjectDataApi, Enum_4b5a7f2f>,
 ): RecorderStepMutations {
     return {
         handleRename: useRenameHandler(projectSlug, api.reload),

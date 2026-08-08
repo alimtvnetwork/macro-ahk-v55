@@ -7,6 +7,7 @@
 
 import { MessageType, type MessageRequest } from "../shared/messages";
 import { handleLogEntry, handleLogError } from "./handlers/logging-handler";
+import { LevelEnum, LevelEnum1, LevelEnum2 } from "../types/enums";
 
 export interface InjectionDiagnosticContext {
     configId?: string;
@@ -33,7 +34,7 @@ export async function persistInjectionWarn(
 }
 
 async function persistLogEntry(
-    level: "INFO" | "WARN",
+    level: LevelEnum,
     action: string,
     detail: string,
     context: InjectionDiagnosticContext,
@@ -89,13 +90,13 @@ export async function persistInjectionError(
 export async function mirrorDiagnosticToTab(
     tabId: number,
     message: string,
-    level: "log" | "warn" | "error" = "warn",
+    level: LevelEnum1 = "warn",
 ): Promise<void> {
     try {
         await chrome.scripting.executeScript({
             target: { tabId },
             world: "MAIN",
-            func: (detail: string, entryLevel: "log" | "warn" | "error") => {
+            func: (detail: string, entryLevel: LevelEnum1) => {
                 if (entryLevel === "error") {
                     console.error(detail);
                     return;
@@ -122,7 +123,7 @@ export async function mirrorDiagnosticToTab(
 // eslint-disable-next-line max-lines-per-function
 export async function mirrorPipelineLogsToTab(
     tabId: number,
-    lines: Array<{ "msg": string; level: "log" | "warn" | "error" | "__group__" | "__groupEnd__" }>,
+    lines: Array<{ "msg": string; level: LevelEnum2 }>,
     groupTitle?: string,
 ): Promise<void> {
     if (lines.length === 0) return;

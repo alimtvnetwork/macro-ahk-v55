@@ -20,6 +20,7 @@ import { ServiceResult } from '../../utils/result-wrapper';
  */
 
 import { DataSourceKindId } from "../recorder-db-schema";
+import { MethodEnum } from "../../types/enums";
 
 export interface ParsedDataSource {
     readonly DataSourceKindId: number;
@@ -198,7 +199,7 @@ function normalizeRow(row: Record<string, unknown>): Record<string, string> {
 
 export interface EndpointFetchInit {
     readonly Url: string;
-    readonly Method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+    readonly Method?: MethodEnum;
     readonly Headers?: Record<string, string>;
     readonly Body?: string;
     readonly TimeoutMs?: number;

@@ -24,8 +24,7 @@ import { ensureInlineStripsFrame } from './inline-strips-frame';
 import { extractEditorPlainText, replaceEditorText } from './editor-text';
 import { captureChatSubmit } from '../capture/chat-submit-capture';
 import { buildNextSelectorControl } from './next-selector-control';
-
-
+import { RepeatPhaseEnum, DisplayValueEnum } from "../types/enums";
 
 export const PRESETS = [1, 2, 3, 4, 5, 8, 10, 12, 15, 20, 25, 30, 50, 60, 70, 75, 80, 100, 200] as const;
 /**
@@ -45,7 +44,7 @@ export const WAIT_MODE_SUBMIT_READY = 'submit-ready' as const;
 export const WAIT_MODE_FIXED_DELAY = 'fixed-delay' as const;
 export type RepeatWaitMode = typeof WAIT_MODE_SUBMIT_READY | typeof WAIT_MODE_FIXED_DELAY;
 
-type RepeatPhase = 'idle' | 'submitting' | 'waiting-completion' | 'waiting-delay';
+type RepeatPhase = RepeatPhaseEnum;
 
 interface RepeatState {
   count: number;
@@ -476,7 +475,7 @@ function wireTogglePopover(
   wrap: HTMLElement,
   trigger: HTMLElement,
   pop: HTMLElement,
-  displayValue: 'flex' | 'inline-flex' = 'flex',
+  displayValue: DisplayValueEnum = 'flex',
 ): { open: () => void; close: () => void } {
   function open(): void {
     positionTogglePopoverFixed(trigger, pop);

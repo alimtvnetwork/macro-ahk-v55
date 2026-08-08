@@ -20,11 +20,10 @@
  */
 
 import type { PersistedSelector } from "./step-persistence";
+import { PromotionErrorCodeEnum } from "../../types/enums";
 
 export type PromotionErrorCode =
-    | "TargetNotFound"     // SelectorId not present in the input list.
-    | "AlreadyPrimary"     // SelectorId is already the primary.
-    | "EmptyInput";        // The selector list is empty.
+    PromotionErrorCodeEnum;        // The selector list is empty.
 
 export interface PromotionError {
     readonly Code: PromotionErrorCode;

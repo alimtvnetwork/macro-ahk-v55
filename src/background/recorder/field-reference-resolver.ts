@@ -18,6 +18,7 @@
 
 import type { JsonValue } from "../handlers/handler-types";
 import { isSensitiveDiagnosticName, maskDiagnosticValue } from "./sensitive-diagnostics";
+import { VariableValueType, VariableFailureReasonEnum } from "../../types/enums";
 
 const TOKEN_PATTERN = /\\?\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/g;
 
@@ -30,26 +31,8 @@ export type FieldRow = Readonly<Record<string, string>>;
  * report the *actual* type that arrived rather than crashing the resolver.
  */
 export type LooseFieldRow = Readonly<Record<string, JsonValue | undefined>>;
-
-/**
- * Per-variable diagnostic record attached to failure logs. One entry per
- * `{{Token}}` referenced by the template — including ones that resolved
- * successfully, so AI debuggers can see the entire input surface.
- *
- * Conformance: mem://standards/verbose-logging-and-failure-diagnostics
- *   "Every failure MUST log full VariableContext[] with name + source +
- *    resolvedValue + valueType + reason; never omit silently."
- */
-export type VariableValueType =
-    | "string" | "number" | "boolean" | "null" | "undefined" | "object" | "array";
-
 export type VariableFailureReason =
-    | "Resolved"           // Not a failure — kept so the union covers OK rows.
-    | "MissingColumn"      // The token references a column that is not in the row at all.
-    | "NullValue"          // Column exists but value is null.
-    | "UndefinedValue"     // Column exists but value is undefined.
-    | "EmptyString"        // Column exists, value is "" — usually fatal for required inputs.
-    | "TypeMismatch";      // Value present but not the type the step expected.
+    VariableFailureReasonEnum;      // Value present but not the type the step expected.
 
 export interface VariableContext {
     readonly Name: string;                 // e.g. "Email"

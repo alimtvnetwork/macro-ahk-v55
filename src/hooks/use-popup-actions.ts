@@ -14,6 +14,7 @@ import {
   previewSqliteZip,
   type BundlePreview,
 } from "@/lib/sqlite-bundle";
+import { Enum_7249a314, Enum_7b1045ad } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 export interface InjectionResultSummary {
   scriptId: string;
@@ -30,7 +31,7 @@ export interface InjectionResultSummary {
  */
 type InjectionResultEntry = Pick<
   InjectionResult,
-  "scriptId" | "scriptName" | "isSuccess" | "errorMessage" | "skipReason" | "durationMs"
+  Enum_7249a314
 >;
 
 function triggerDownload(url: string, filename: string) {
@@ -56,7 +57,7 @@ export function usePopupActions() {
   const [importPreviewOpen, setImportPreviewOpen] = useState(false);
   const fileRef = useRef<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const importModeRef = useRef<"merge" | "replace">("replace");
+  const importModeRef = useRef<Enum_7b1045ad>("replace");
 
   /** Run all enabled scripts into the active tab. */
   // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity
@@ -256,7 +257,7 @@ function formatSkipReason(reason?: string): string {
     }
   }, []);
 
-  const handleDbImport = useCallback((mode: "merge" | "replace") => {
+  const handleDbImport = useCallback((mode: Enum_7b1045ad) => {
     importModeRef.current = mode;
 
     if (!fileInputRef.current) {

@@ -14,12 +14,13 @@
 
 import type { PromptEntry } from '../types/ui-types';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
+import { PromptsBundleFormatEnum } from "../types/enums";
 
 /** Envelope schema version. Bump only for breaking changes. */
 export const PROMPTS_BUNDLE_SCHEMA_VERSION = 1 as const;
 
 /** Serialization format the entries travelled through. */
-export type PromptsBundleFormat = 'json' | 'zip' | 'sqlite';
+export type PromptsBundleFormat = PromptsBundleFormatEnum;
 
 /**
  * Revision history rows carried inside a bundle when the exporter is

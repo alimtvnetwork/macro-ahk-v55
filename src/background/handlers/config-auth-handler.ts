@@ -53,6 +53,7 @@ const REFRESH_COOKIE_NAME_CANDIDATES = [
 ] as const;
 
 import { LOVABLE_TAB_PATTERNS } from "../../shared/lovable-tab-patterns";
+import { SourceEnum } from "../../types/enums";
 
 // Extends the shared platform list with localhost for dev-mode auth probing.
 const PLATFORM_TAB_PATTERNS: readonly string[] = [
@@ -172,7 +173,7 @@ function getBundledDefaults(): Record<string, unknown> {
 /** Retrieves the merged config using the 3-tier cascade. */
 export async function handleGetConfig(): Promise<{
     config: Record<string, unknown>;
-    source: "local" | "remote" | "hardcoded";
+    source: SourceEnum;
 }> {
     const defaults = getBundledDefaults();
     const cascadeResult = await resolveConfigCascade(defaults);

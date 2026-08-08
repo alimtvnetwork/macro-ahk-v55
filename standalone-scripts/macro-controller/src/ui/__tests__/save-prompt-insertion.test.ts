@@ -27,6 +27,7 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { insertBeforeFirstButton } from "../save-prompt";
+import { IdEnum } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Test helpers                                                       */
@@ -41,7 +42,7 @@ function makeContainer(): HTMLDivElement {
 }
 
 /** Creates a Marco-style wrapper with the given id, mimicking the real ones. */
-function makeMarcoWrapper(id: "marco-save-prompt-btn" | "marco-chatbox-prompts-btn"): HTMLElement {
+function makeMarcoWrapper(id: IdEnum): HTMLElement {
     const wrapper = document.createElement("div");
     wrapper.id = id;
     wrapper.setAttribute("type", "button");

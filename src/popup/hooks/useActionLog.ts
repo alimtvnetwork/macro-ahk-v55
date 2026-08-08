@@ -6,12 +6,13 @@
  */
 
 import { useState, useCallback } from "react";
+import { VariantEnum3 } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-export type ActionStatus = "success" | "error" | "info";
+export type ActionStatus = VariantEnum3;
 
 export interface ActionLogEntry {
     action: string;

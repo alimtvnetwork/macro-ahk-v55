@@ -1,5 +1,6 @@
 import { ModalRefs, CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_BG_MUTED_1, CSS_BORDER_DEFAULT, CSS_BORDER_RADIUS_6, ATTR_ARIA_VALUENOW, ATTR_ARIA_VALUETEXT, CSS_CURSOR_POINTER } from './prompt-library-types';
 import type { ImportProgress } from './prompt-io';
+import { SourceEnum10 } from "../types/enums";
 
 export function buildImportProgressElement(): {
   wrap: HTMLDivElement;
@@ -129,7 +130,7 @@ export function renderPartialImportErrors(
   const list = document.createElement('ul');
   list.dataset.testid = 'library-import-partial-errors-list';
   list.style.cssText = ['margin:0', 'padding:0 0 0 18px', 'max-height:180px', 'overflow-y:auto', 'font-family:ui-monospace,SFMono-Regular,Menlo,monospace', 'font-size:11.5px'].join(';');
-  const appendRow = (source: 'parse' | 'entry', message: string): void => {
+  const appendRow = (source: SourceEnum10, message: string): void => {
     const li = document.createElement('li');
     li.style.cssText = 'margin:2px 0;white-space:pre-wrap;word-break:break-word;';
     const tag = document.createElement('span');

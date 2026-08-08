@@ -20,6 +20,7 @@ import {
     AlertTriangle,
     Loader2,
 } from "lucide-react";
+import { Status7 } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -30,7 +31,7 @@ interface ValidationEntry {
     xpath: string;
     selector?: string;
     found: number;
-    status: "pass" | "fail" | "fallback";
+    status: Status7;
     error?: string;
     fallbackUsed?: boolean;
 }

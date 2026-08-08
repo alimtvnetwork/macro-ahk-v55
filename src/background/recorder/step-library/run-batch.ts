@@ -31,17 +31,11 @@ import {
     type LeafStepExecutor,
     type RunGroupResult,
 } from "./run-group-runner";
+import { BatchGroupStatus, BatchFailurePolicyEnum } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
 /* ------------------------------------------------------------------ */
-
-export type BatchGroupStatus =
-    | "Pending"
-    | "Running"
-    | "Succeeded"
-    | "Failed"
-    | "Skipped"; // batch aborted before this group ran
 
 export interface BatchGroupReport {
     readonly StepGroupId: number;
@@ -53,7 +47,7 @@ export interface BatchGroupReport {
     readonly Result: RunGroupResult | null;
 }
 
-export type BatchFailurePolicy = "StopOnFailure" | "ContinueOnFailure";
+export type BatchFailurePolicy = BatchFailurePolicyEnum;
 
 export interface RunBatchOptions {
     readonly db: StepLibraryDb;

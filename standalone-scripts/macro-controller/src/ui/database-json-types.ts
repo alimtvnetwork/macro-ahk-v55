@@ -1,3 +1,6 @@
+import { Type } from "../../../../src/types/enums";
+import { ActionEnum3 } from "../types/enums";
+
 /**
  * MacroLoop Controller — JSON Schema Types & Sample
  *
@@ -9,7 +12,7 @@
 
 export interface JsonColumnDef {
   name: string;
-  type: 'TEXT' | 'INTEGER' | 'REAL' | 'BLOB' | 'BOOLEAN';
+  type: Type;
   nullable?: boolean;
   unique?: boolean;
   default?: string;
@@ -32,7 +35,7 @@ export interface JsonTableDef {
 
 export interface JsonMigration {
   table: string;
-  action: 'addColumn' | 'dropColumn' | 'renameColumn';
+  action: ActionEnum3;
   column?: JsonColumnDef;
   oldName?: string;
   newName?: string;

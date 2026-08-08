@@ -7,6 +7,8 @@
  */
 
 import type { BundlePreview, DiffItem } from "@/lib/sqlite-bundle";
+import { Enum_7b1045ad } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { LabelEnum } from "../types/enums";
 
 export interface CategoryCounts {
   readonly matched: number;
@@ -24,7 +26,7 @@ export interface CategoryCounts {
 export function countCategory(
   items: DiffItem[],
   existing: number,
-  mode: "merge" | "replace",
+  mode: Enum_7b1045ad,
 ): CategoryCounts {
   const matched = items.filter((i) => i.status === "overwrite").length;
   const unmatched = items.filter((i) => i.status === "new").length;
@@ -45,7 +47,7 @@ export function formatCategoryLine(label: string, c: CategoryCounts): string {
  * output and will fail the round-trip toast tests.
  */
 export const SUMMARY_CATEGORY_ORDER: ReadonlyArray<{
-  readonly label: "Projects" | "Scripts" | "Configs";
+  readonly label: LabelEnum;
   readonly pick: (preview: BundlePreview) => { items: DiffItem[]; existing: number };
 }> = [
   { label: "Projects", pick: (p) => ({ items: p.projectItems, existing: p.existingProjectCount }) },
@@ -53,7 +55,7 @@ export const SUMMARY_CATEGORY_ORDER: ReadonlyArray<{
   { label: "Configs", pick: (p) => ({ items: p.configItems, existing: p.existingConfigCount }) },
 ];
 
-export function buildImportSummary(preview: BundlePreview, mode: "merge" | "replace"): string {
+export function buildImportSummary(preview: BundlePreview, mode: Enum_7b1045ad): string {
   const lines: string[] = [];
   let totalMatched = 0;
   let totalUnmatched = 0;

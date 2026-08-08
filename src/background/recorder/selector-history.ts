@@ -31,6 +31,7 @@
  */
 
 import type { PersistedReplayStepResult } from "./replay-run-persistence";
+import { SelectorHealthEnum } from "../../types/enums";
 
 export interface SelectorOutcomePoint {
     readonly RunId: number;
@@ -40,7 +41,7 @@ export interface SelectorOutcomePoint {
     readonly DurationMs: number;
 }
 
-export type SelectorHealth = "healthy" | "regressed" | "always-failing" | "unknown";
+export type SelectorHealth = SelectorHealthEnum;
 
 export interface SelectorHistoryBucket {
     /** `ResolvedXPath` value, or `null` for the legacy/unknown bucket. */

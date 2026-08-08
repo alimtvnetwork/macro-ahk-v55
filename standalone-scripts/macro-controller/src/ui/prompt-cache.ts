@@ -11,6 +11,8 @@ import { logError } from '../error-utils';
 import { showToast } from '../toast';
 import { DB_PROMPTS_CACHE_VERSION as DB_VERSION } from '../constants';
 import { PromptCacheKey } from '../types';
+import { RoleEnum5, Enum_190b59f6 } from "../types/enums";
+
 // ============================================
 // Types
 // ============================================
@@ -32,7 +34,7 @@ export interface CachedPromptEntry {
    * this entry lives in the Prompt DB table and round-trips through it on
    * import/export. Absent for legacy JSON-cache-only entries.
    */
-  role?: 'plan' | 'next' | 'generic';
+  role?: RoleEnum5;
   /**
    * Plan-15 tasks 13-14: configurable replace token key + N chip values.
    * Present only for role-scoped rows (plan/next/generic) so import/export
@@ -279,7 +281,7 @@ export function getCachedHash(): Promise<string | null> {
 // ============================================
 
 /** Save rendered dropdown HTML + state to IndexedDB. */
-export function writeUISnapshot(snapshot: Omit<UISnapshot, 'id' | 'savedAt'>): Promise<void> {
+export function writeUISnapshot(snapshot: Omit<UISnapshot, Enum_190b59f6>): Promise<void> {
   return writeRecord(PromptCacheKey.UiStore, {
     id: PromptCacheKey.UiCache,
     html: snapshot.html,

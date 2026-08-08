@@ -31,13 +31,9 @@ import { BgLogTag, logBgError } from "../bg-logger";
  * the controller hasn't been injected into the tab yet.
  */
 export type ProbeFailureReason =
-    | "NoTabId"
-    | "NoReceiver"
-    | "EmptyResponse"
-    | "ProbeFailed"
-    | "Exception";
+    ProbeFailureReasonEnum;
 
-export type DetectedWorkspaceSource = "api" | "cache" | "dom" | "none";
+export type DetectedWorkspaceSource = SourceEnum4;
 
 export interface MatchedRuleInfo {
     /** The rule's pattern (e.g. "https://*.lovable.app/*"). */
@@ -45,7 +41,7 @@ export interface MatchedRuleInfo {
     /** The rule's match strategy. */
     matchType: UrlRule["matchType"];
     /** How this rule was identified: replayed from the live injection record, or freshly evaluated against the URL. */
-    origin: "injection-record" | "evaluated";
+    origin: OriginEnum1;
 }
 
 export interface OpenLovableTabInfo {
@@ -62,7 +58,7 @@ export interface OpenLovableTabInfo {
     /** Resolved project name, or null when no binding could be matched. */
     projectName: string | null;
     /** Path used to bind: "injection", "probe", or "none". */
-    bindingSource: "injection" | "probe" | "none";
+    bindingSource: BindingSourceEnum;
     /** Workspace name detected by the controller running in the tab (best-effort). */
     detectedWorkspaceName: string | null;
     /** Workspace ID cached by the controller running in the tab (best-effort). */
@@ -86,6 +82,8 @@ export interface OpenLovableTabsResponse {
 
 /** URL match patterns for chrome.tabs.query — single source of truth. */
 import { LOVABLE_TAB_PATTERNS } from "../../shared/lovable-tab-patterns";
+import { ProbeFailureReasonEnum, OriginEnum1, BindingSourceEnum } from "../../types/enums";
+import { SourceEnum4 } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 interface ProbePayload {
     workspaceName?: string;

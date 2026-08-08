@@ -20,12 +20,13 @@ import { ServiceResult } from '../utils/result-wrapper';
 import { PLAN_NEXT_SEED_ROWS } from './plan-next-prompts';
 import { getPromptBySlug, upsertPrompt } from '../db/prompt-db';
 import { logDiagnosticFromCode } from '../error-utils';
+import { OutcomeEnum3 } from "../types/enums";
 
 export interface OrphanRepairEntry {
   readonly slug: string;
   readonly fromRole: string;
   readonly toRole: string;
-  readonly outcome: 'adopted' | 'skipped-lookup-failed' | 'skipped-missing' | 'skipped-role-ok' | 'failed-upsert';
+  readonly outcome: OutcomeEnum3;
   readonly reason?: string;
 }
 

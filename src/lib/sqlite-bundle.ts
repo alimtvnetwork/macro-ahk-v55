@@ -34,6 +34,7 @@ import {
   formatValidationError,
   CURRENT_FORMAT_VERSION,
 } from "@/lib/sqlite-bundle-contract";
+import { Status2 } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -1050,7 +1051,7 @@ export async function previewSqliteZip(
 
 export interface DiffItem {
   name: string;
-  status: "new" | "overwrite";
+  status: Status2;
 }
 
 export interface BundlePreview {

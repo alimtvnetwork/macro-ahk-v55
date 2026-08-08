@@ -9,6 +9,7 @@ import { ServiceResult } from '../../../utils/result-wrapper';
  */
 
 import { StepKindId } from "@/background/recorder/step-library/schema";
+import { UrlMatchEnum, Mode2, SelectorKindEnum } from "../../../types/enums";
 
 export interface SubmitInput {
     StepKindId: StepKindId;
@@ -21,9 +22,9 @@ export type BuildResult =
     | { readonly Ok: true;  readonly Input: SubmitInput }
     | { readonly Ok: false; readonly ErrorMessage: string; readonly ErrorDescription?: string };
 
-export type UrlMatchDialect = "Exact" | "Prefix" | "Glob" | "Regex";
-export type UrlTabClickMode = "OpenNew" | "FocusExisting" | "OpenOrFocus";
-export type SelectorKindOption = "Auto" | "XPath" | "Css";
+export type UrlMatchDialect = UrlMatchEnum;
+export type UrlTabClickMode = Mode2;
+export type SelectorKindOption = SelectorKindEnum;
 
 export interface UrlTabClickFormState {
     UrlPattern: string;

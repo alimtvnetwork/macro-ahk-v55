@@ -20,6 +20,8 @@ import type { WorkspaceCredit } from '../types';
 import { resolveCreditSummary } from '../credit-balance-update/credit-summary-resolver';
 import { formatPlanDisplayLabel } from '../credit-balance-update/plan-mapper';
 import { makeDraggable } from './drag-window';
+import { CreditToneEnum, SortKeyEnum, SortDirEnum } from "../types/enums";
+import { SideEnum1 } from "../../../../src/types/enums";
 
 const DIALOG_ID = 'marco-credit-totals-modal';
 const ATTR_ARIA_LABEL = 'aria-label';
@@ -75,7 +77,7 @@ export function downloadCsv(filename: string, csvText: string): void {
 }
 
 /** Tone palette for credit numbers — colourful, dark-theme safe (Step 7). */
-export type CreditTone = 'ok' | 'warn' | 'used' | 'total' | 'muted' | 'accent';
+export type CreditTone = CreditToneEnum;
 const TONE_COLOR: Record<CreditTone, string> = {
   ok: '#86efac',      // green — remaining / healthy
   warn: '#fbbf24',    // amber — alerts
@@ -134,8 +136,8 @@ function ensureRowStyles(): void {
 }
 
 /** Sort key + direction for the breakdown table (Step 9). */
-export type SortKey = 'name' | 'plan' | 'projects' | 'used' | 'rem' | 'total';
-export type SortDir = 'asc' | 'desc' | 'none';
+export type SortKey = SortKeyEnum;
+export type SortDir = SortDirEnum;
 export interface SortState { key: SortKey; dir: SortDir; }
 
 const NUMERIC_KEYS: ReadonlySet<SortKey> = new Set(['projects', 'used', 'rem', 'total']);
@@ -180,7 +182,7 @@ export function nextSortDir(key: SortKey, current: SortState): SortState {
   return { key, dir: 'none' };
 }
 
-const COLUMNS: ReadonlyArray<{ key: SortKey; label: string; align: 'left' | 'right' }> = [
+const COLUMNS: ReadonlyArray<{ key: SortKey; label: string; align: SideEnum1 }> = [
   { key: 'name', label: 'Workspace', align: 'left' },
   { key: 'plan', label: 'Plan', align: 'left' },
   { key: 'projects', label: 'Prj', align: 'right' },

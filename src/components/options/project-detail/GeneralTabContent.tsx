@@ -35,6 +35,7 @@ import { generateLlmGuide } from "@/lib/generate-llm-guide";
 import { generateDts } from "@/lib/generate-dts";
 import { exportKnowledgeBase } from "@/lib/developer-guide-bundle";
 import { toast } from "sonner";
+import { LogLevelEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -366,7 +367,7 @@ export function GeneralTabContent({ project, allProjects, onSave }: GeneralTabCo
             <select
               value={settings?.logLevel ?? "info"}
               onChange={(e) => {
-                const logLevel = e.target.value as "debug" | "info" | "warn" | "error";
+                const logLevel = e.target.value as LogLevelEnum;
                 void onSave({ id: project.id, settings: { ...(settings ?? {}), logLevel } as StoredProject["settings"] });
                 toast.success(`Log level set to ${logLevel}`);
               }}

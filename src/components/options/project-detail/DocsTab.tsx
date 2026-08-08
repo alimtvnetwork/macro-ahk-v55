@@ -11,6 +11,7 @@ import { BookOpen, Database, RefreshCw, FileCode, Braces } from "lucide-react";
 import { toast } from "sonner";
 import { sendMessage } from "@/lib/message-client";
 import { DevGuideSection } from "../DevGuideSection";
+import { Enum_4fd41a90 } from "../../../types/enums";
 
 interface DocsTabProps {
   namespace: string;
@@ -22,7 +23,7 @@ interface DocsTabProps {
 export function DocsTab({ namespace, slug, targetUrls }: DocsTabProps) {
   const [generating, setGenerating] = useState(false);
   const [docsOutput, setDocsOutput] = useState<{ markdown?: string; prisma?: string } | null>(null);
-  const [docsFormat, setDocsFormat] = useState<"markdown" | "prisma">("markdown");
+  const [docsFormat, setDocsFormat] = useState<Enum_4fd41a90>("markdown");
 
   const handleGenerateDocs = useCallback(async () => {
     setGenerating(true);

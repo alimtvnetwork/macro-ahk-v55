@@ -1,3 +1,5 @@
+import { Status5 } from "./types/enums";
+
 /**
  * Startup Timing Waterfall — records elapsed time per bootstrap phase.
  * Used by Auth Diagnostics panel to visualize startup performance.
@@ -8,7 +10,7 @@ export interface TimingEntry {
   label: string;
   startMs: number;
   endMs: number;
-  status: 'ok' | 'warn' | 'error' | 'pending';
+  status: Status5;
   detail?: string | undefined;
 }
 

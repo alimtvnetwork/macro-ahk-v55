@@ -1,3 +1,6 @@
+import { WorldEnum } from "../types/enums";
+import { RunAtEnum1, MatchType1, RoleEnum2, LogLevelEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
+
 /**
  * Marco Extension — Seed Manifest Types
  *
@@ -51,7 +54,7 @@ export interface SeedProjectEntry {
     /** Whether this project seeds on first install */
     SeedOnInstall: boolean;
     /** Chrome execution world */
-    World: "MAIN" | "ISOLATED";
+    World: WorldEnum;
     /** Global load order (lower = first) */
     LoadOrder: number;
     /** Whether this is a global utility */
@@ -106,7 +109,7 @@ export interface SeedScriptEntry {
      * When to run. Values are Chrome's `chrome.scripting` enum literals
      * (third-party value-set — kept verbatim).
      */
-    RunAt?: "document_start" | "document_idle" | "document_end";
+    RunAt?: RunAtEnum1;
     /** Description */
     Description?: string;
     /** Whether to auto-inject on page load */
@@ -159,13 +162,13 @@ export interface SeedPromptEntry {
 
 export interface SeedUrlPattern {
     Pattern: string;
-    MatchType: "glob" | "regex" | "exact";
+    MatchType: MatchType1;
 }
 
 export interface SeedCookieBinding {
     CookieName: string;
     Url: string;
-    Role: "session" | "refresh" | "other";
+    Role: RoleEnum2;
     Description: string;
 }
 
@@ -181,7 +184,7 @@ export interface SeedCookieBinding {
  */
 export interface SeedProjectSettings {
     IsolateScripts?: boolean;
-    LogLevel?: "debug" | "info" | "warn" | "error";
+    LogLevel?: LogLevelEnum;
     RetryOnNavigate?: boolean;
     ChatBoxXPath?: string;
     OnlyRunAsDependency?: boolean;

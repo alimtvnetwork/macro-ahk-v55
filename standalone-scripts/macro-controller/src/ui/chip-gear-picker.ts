@@ -13,6 +13,7 @@ import { showToast } from '../toast';
 import { DiagnosticError } from '../errors/diagnostic-error';
 import { showDiagnosticToast } from '../errors/show-diagnostic-toast';
 import { isSqlBridgeContractError, resetSqlBridgeCache } from '../db/sql-bridge';
+import { LoadStageEnum } from "../types/enums";
 
 export interface PickPromptOptions {
   role: PromptRole;
@@ -24,7 +25,7 @@ export interface PickPromptOptions {
   confirmLabel?: string;
 }
 
-type LoadStage = 'initial-list' | 'auto-seed' | 'post-seed-list';
+type LoadStage = LoadStageEnum;
 
 function reasonOf(err: unknown, fallback: string): string {
   if (err === null || err === undefined) return fallback;

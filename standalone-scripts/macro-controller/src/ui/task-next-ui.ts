@@ -18,6 +18,8 @@ import { REPLACE_KEY_DEFAULT } from '../db/prompt-defaults';
 import { substituteToken } from '../utils/token-substitute';
 import { listPromptsByRole } from '../db/prompt-db';
 import { runWithBridgeRetry } from '../db/sql-bridge';
+import { TaskNextPromptSourceEnum, Enum_3c41a5e1, CycleStatus } from "../types/enums";
+
 /** Settings shape for Task Next */
 export interface TaskNextSettings {
   [key: string]: TaskNextSettingValue;
@@ -187,7 +189,7 @@ export function findAddToTasksButton(): HTMLElement | null {
   return findButtonByXPath() || findButtonBySelectors();
 }
 
-type TaskNextPromptSource = 'queue' | 'legacy';
+type TaskNextPromptSource = TaskNextPromptSourceEnum;
 
 interface TaskNextPromptSelection {
   readonly text: string;
@@ -216,7 +218,7 @@ export async function dequeueTaskNextPrompt(): Promise<TaskNextPromptResult> {
   }
 }
 
-export function substituteTaskNextPromptText(prompt: Pick<PromptEntry, 'text' | 'replaceKey'>, n: number): string {
+export function substituteTaskNextPromptText(prompt: Pick<PromptEntry, Enum_3c41a5e1>, n: number): string {
   return substituteToken(prompt.text, prompt.replaceKey || REPLACE_KEY_DEFAULT, n);
 }
 
@@ -389,8 +391,6 @@ export function dispatchTaskNextSubmit(): boolean {
  * split-button label keeps its v3.79.x behaviour (paste, do NOT submit).
  */
 const TASK_NEXT_QUEUE_LABEL = 'Task Next queue';
-
-type CycleStatus = 'ok' | 'paste-failed' | 'submit-failed' | 'idle-cancelled' | 'idle-timeout' | 'cancelled' | 'queue-empty';
 
 async function resolveCyclePrompt(_deps: TaskNextDeps, legacyText: string): Promise<{ text: string; source: TaskNextPromptSource; remaining: number }> {
   const dequeued = await dequeueTaskNextPrompt();

@@ -25,6 +25,7 @@ import {
     type CreditBalanceFetchSource,
 } from './store';
 import { recordFetch, shouldFetch } from './throttle';
+import { OutcomeEnum2 } from "../types/enums";
 
 /** Options for `fetchAndPersist`. */
 export interface FetchAndPersistOptions {
@@ -37,7 +38,7 @@ export interface FetchAndPersistOptions {
 /** Outcome of one fetch attempt. */
 export interface FetchAndPersistResult {
     readonly workspaceId: string;
-    readonly outcome: 'fetched' | 'throttled' | 'failed';
+    readonly outcome: OutcomeEnum2;
     /** Fresh API response when outcome='fetched', else null. */
     readonly response: CreditBalanceResponse | null;
     /** Row used by the UI: fresh row when fetched, last cached row otherwise. */

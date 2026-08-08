@@ -11,8 +11,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { sendMessage } from "@/lib/message-client";
 import { logError } from "./hook-logger";
-
-export type LinkState = "synced" | "pinned" | "detached";
+import { LinkState } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 export interface LinkInfo {
   state: LinkState;

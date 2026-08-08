@@ -12,10 +12,11 @@ import {
     QUEUE_PLAY_BUTTON_XPATH,
     QUEUE_RESUME_ARIA_LABEL,
 } from './selectors';
+import { ReasonEnum8 } from "../types/enums";
 
 export interface AutoResumeResult {
     readonly acted: boolean;
-    readonly reason: 'loop-stopped' | 'document-hidden' | 'queue-missing' | 'queue-empty' | 'already-running' | 'no-resume-button' | 'ok' | 'threw';
+    readonly reason: ReasonEnum8;
     readonly count?: number;
 }
 

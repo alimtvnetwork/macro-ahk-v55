@@ -18,7 +18,7 @@ interface Row {
   Id: number;
   ProjectId: string;
   ProjectName: string | null;
-  Source: 'paste' | 'repeat' | 'next-chip' | 'plan-chip' | 'manual';
+  Source: ChatSubmitSourceEnum;
   FileId: string;
   CharCount: number;
   CreatedAt: number;
@@ -78,6 +78,7 @@ vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 import { enforceChatSubmitWindow, DEFAULT_CHAT_SUBMIT_CAP } from '../chat-submit-window';
 import { renameProjectChatSubmits } from '../../db/project-chat-submit-db';
 import { openProjectHistoryPanel } from '../../ui/project-history-panel';
+import { ChatSubmitSourceEnum } from "../../types/enums";
 
 const PROJECT_ID = 'proj-integration-1';
 

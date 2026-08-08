@@ -14,6 +14,8 @@ import { bumpMinor } from "./library-version-manager";
 import { collectTypedRows, type JsonValue } from "./handler-types";
 import { bindOpt, missingFieldError, requireField, type HandlerErrorResponse } from "./handler-guards";
 import { logBgWarnError, logSampledDebug, BgLogTag } from "../utils/logger";
+import { AssetType, ActionEnum } from "../../types/enums";
+import { LinkState } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Message Interfaces                                                 */
@@ -103,9 +105,6 @@ const SQL_LAST_INSERT_ROWID = "SELECT last_insert_rowid()";
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
-
-export type AssetType = "prompt" | "script" | "chain" | "preset";
-export type LinkState = "synced" | "pinned" | "detached";
 
 export interface SharedAsset {
     Id: number;
@@ -370,7 +369,7 @@ export async function handleSyncLibraryAsset(payload: AssetIdMsg): Promise<{ syn
  * Per spec §6.2: compares content hash, returns action needed.
  */
 export async function handlePromoteAsset(payload: PromoteMsg): Promise<{
-    action: "created" | "identical" | "conflict";
+    action: ActionEnum;
     assetId?: number;
     existingVersion?: string;
 }> {

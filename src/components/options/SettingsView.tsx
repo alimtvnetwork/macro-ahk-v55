@@ -37,6 +37,8 @@ import { sendMessage } from "@/lib/message-client";
 import { toast } from "sonner";
 import { DEFAULT_CHATBOX_XPATH } from "@/shared/defaults";
 import { logError } from "./options-logger";
+import { RunAtEnum1 } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { ThemeEnum } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -46,12 +48,12 @@ interface SettingsData {
   autoRunOnPageLoad: boolean;
   showNotifications: boolean;
   showInjectionToast: boolean;
-  defaultRunAt: "document_start" | "document_idle" | "document_end";
+  defaultRunAt: RunAtEnum1;
   debugMode: boolean;
   verboseLogging: boolean;
   maxCycleCount: number;
   idleTimeout: number;
-  theme: "system" | "light" | "dark";
+  theme: ThemeEnum;
   chatBoxXPath: string;
   injectionBudgetMs: number;
   optionsMountBudgetMs: number;

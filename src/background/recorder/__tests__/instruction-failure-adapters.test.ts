@@ -42,6 +42,7 @@ import {
     type Condition,
     type PredicateEvaluation,
 } from "../condition-evaluator";
+import { SelectorKindEnum, ReasonEnum2, KindEnum2 } from "../../../types/enums";
 
 /** Stable clock so timestamps are deterministic across runs. */
 const FIXED_NOW = (): Date => new Date("2026-04-26T10:00:00.000Z");
@@ -359,10 +360,10 @@ const SELECTOR_PREDICATE_SOURCE_FILE = "src/background/recorder/condition-evalua
 interface SelectorPredicateMappingCase {
     readonly Label: string;
     readonly Selector: string;
-    readonly SelectorKind?: "Auto" | "XPath" | "Css";
-    readonly Reason: "InvalidSelector" | "ZeroMatches" | "ConditionTimeout";
+    readonly SelectorKind?: SelectorKindEnum;
+    readonly Reason: ReasonEnum2;
     readonly ExpectedReason: string;        // FailureReport.Reason
-    readonly ExpectedDetailKind: "XPath" | "Css";
+    readonly ExpectedDetailKind: KindEnum2;
 }
 
 const SELECTOR_PREDICATE_MATRIX: ReadonlyArray<SelectorPredicateMappingCase> = [
@@ -545,7 +546,7 @@ interface OptionalCase {
     readonly Label: string;
     readonly ObservedUrl?: string;
     readonly Selector?: string;
-    readonly SelectorKind?: "Auto" | "XPath" | "Css";
+    readonly SelectorKind?: SelectorKindEnum;
 }
 
 const OPTIONAL_CASES: ReadonlyArray<OptionalCase> = [

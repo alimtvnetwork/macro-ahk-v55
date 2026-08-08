@@ -18,12 +18,7 @@
  */
 
 import type { SelectorHistoryBucket, SelectorOutcomePoint } from "./selector-history";
-
-export type DriftTimelineState =
-    | "no-history"      // Bucket has no runs at all.
-    | "always-failing"  // Never succeeded; FirstDrift is the first-ever failure.
-    | "healthy"         // No drift detected — last run still ok.
-    | "drifted";        // Has a LastSuccess AND a FirstDrift after it.
+import { DriftTimelineState } from "../../types/enums";
 
 export interface DriftTimelinePoint {
     readonly RunId: number;

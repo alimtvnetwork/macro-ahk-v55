@@ -14,6 +14,7 @@
 
 import { describe, it, expect } from "vitest";
 import type { SeedProjectEntry } from "../../shared/seed-manifest-types";
+import { MatchType1 } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 // Re-export the internal helpers by re-implementing them with the same
 // signature here — the production code lives in `manifest-seeder.ts` as
@@ -30,7 +31,7 @@ function extractUrlMatchRules(project: SeedProjectEntry) {
     }));
 }
 
-function makeProject(targets: Array<{ Pattern: string; MatchType: "glob" | "exact" | "regex" }>): SeedProjectEntry {
+function makeProject(targets: Array<{ Pattern: string; MatchType: MatchType1 }>): SeedProjectEntry {
     return {
         Name: "test", DisplayName: "Test", Version: "1.0.0", Description: "",
         SeedId: "test-seed", SeedOnInstall: true, World: "MAIN",
@@ -72,7 +73,7 @@ describe("manifest-seeder URL extraction", () => {
     });
 
     it("urlMatches and urlMatchRules have matching length + order", () => {
-        const targets: Array<{ Pattern: string; MatchType: "glob" | "exact" | "regex" }> = [
+        const targets: Array<{ Pattern: string; MatchType: MatchType1 }> = [
             { Pattern: "a", MatchType: "exact" },
             { Pattern: "b", MatchType: "glob" },
         ];

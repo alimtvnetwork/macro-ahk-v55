@@ -14,9 +14,9 @@ import { throwDiagnostic } from './errors/diagnostic-error';
 import { clearMembersCache, invalidateMembersCache } from './ws-members-fetch';
 import { showToast } from './toast';
 import { WorkspaceCredit } from './types/credit-types';
+import { MemberRoleEnum } from "./types/enums";
 
-
-export type MemberRole = 'member' | 'owner';
+export type MemberRole = MemberRoleEnum;
 
 interface MembershipsApi {
   invite: (wsId: string, email: string, role: MemberRole, options?: { baseUrl?: string }) => Promise<{ ok: boolean; status: number; data: unknown }>;

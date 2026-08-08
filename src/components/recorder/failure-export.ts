@@ -21,6 +21,7 @@
  */
 
 import type { FailureReport } from "@/background/recorder/failure-logger";
+import { ExportFormatEnum } from "../../types/enums";
 
 export interface FailureBundle {
     readonly Generator: "marco-extension";
@@ -55,7 +56,7 @@ export function buildFailureBundle(
  * into a ticket). "Minified" omits whitespace (best when uploading to
  * a service that parses bytes-on-the-wire or when filesize matters).
  */
-export type ExportFormat = "pretty" | "minified";
+export type ExportFormat = ExportFormatEnum;
 
 export const DEFAULT_EXPORT_FORMAT: ExportFormat = "pretty";
 

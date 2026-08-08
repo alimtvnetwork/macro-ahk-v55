@@ -18,17 +18,10 @@ import {
     loadDiagnosticsCache,
     saveDiagnosticsCache,
 } from "./token-seeder-diagnostics-cache";
+import { AccessDeniedCodeEnum } from "../../types/enums";
 
 type AccessDeniedCode =
-    | "RESPECTIVE_HOST_PERMISSION"
-    | "MISSING_HOST_PERMISSION"
-    | "PAGE_CONTENTS_BLOCKED"
-    | "EXTENSIONS_GALLERY_BLOCKED"
-    | "RESTRICTED_SCHEME"
-    | "NO_HOST_PATTERN"
-    | "PERMISSION_NOT_GRANTED"
-    | "GENERIC_CANNOT_SCRIPT"
-    | "UNKNOWN";
+    AccessDeniedCodeEnum;
 
 interface InaccessibleSeedTarget {
     tabId: number;

@@ -59,7 +59,7 @@ const PLAN_DEFAULT_CURRENT_MARKERS = [
     'If I could find you',
 ] as const;
 
-async function rawSql(method: 'QUERY' | 'SCHEMA', sql: string): Promise<RawSqlResp> {
+async function rawSql(method: MethodEnum1, sql: string): Promise<RawSqlResp> {
     void DB_NAME;
     return runSqlBridge(method, sql);
 }
@@ -394,6 +394,7 @@ async function writeSeedAuditRow(params: {
 
 
 import { ServiceResult } from '../utils/result-wrapper';
+import { MethodEnum1 } from "../types/enums";
 
 // eslint-disable-next-line max-lines-per-function
 export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> {

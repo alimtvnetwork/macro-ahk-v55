@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { sendMessage } from "@/lib/message-client";
 import { useVisibilityPausedInterval } from "@/hooks/use-visibility-paused-interval";
+import { RequestType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 export interface NetworkEntry {
   method: string;
@@ -8,7 +9,7 @@ export interface NetworkEntry {
   status: number;
   statusText: string;
   durationMs: number;
-  requestType: "xhr" | "fetch";
+  requestType: RequestType;
   timestamp: string;
   initiator: string;
   requestHeaders?: Record<string, string>;

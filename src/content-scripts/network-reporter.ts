@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- XHR monkey-patching requires unsafe property injection on native prototypes */
+import { RequestType } from "../../standalone-scripts/macro-controller/src/types/enums";
+
 /**
  * Marco Extension — Content Script: Network Reporter
  *
@@ -33,7 +35,7 @@ interface CapturedEntry {
     status: number;
     statusText: string;
     durationMs: number;
-    requestType: "xhr" | "fetch";
+    requestType: RequestType;
     timestamp: string;
     initiator: string;
 }

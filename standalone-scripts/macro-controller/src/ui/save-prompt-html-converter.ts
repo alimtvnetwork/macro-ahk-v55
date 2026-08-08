@@ -1,3 +1,5 @@
+import { ListType } from "../types/enums";
+
 /**
  * MacroLoop Controller — HTML to Markdown Converter
  *
@@ -82,7 +84,7 @@ function convertPreBlock(element: HTMLElement, fallbackText: string): string {
   return '```' + language + '\n' + content + '\n```\n\n';
 }
 
-function convertList(element: HTMLElement, listType: 'ul' | 'ol'): string {
+function convertList(element: HTMLElement, listType: ListType): string {
   const items = element.querySelectorAll(':scope > li');
   let markdown = '';
 

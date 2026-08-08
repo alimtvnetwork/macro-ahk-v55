@@ -62,6 +62,7 @@ import {
     type JsInlineResult,
 } from "./js-step-sandbox";
 import { isSensitiveDiagnosticName, maskDiagnosticValue } from "./sensitive-diagnostics";
+import { SourceEnum6 } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -107,7 +108,7 @@ function classifyValue(v: string): { Type: VariableValueType; Display: string } 
 function buildVarEntry(
     key: string,
     raw: unknown,
-    source: "Vars" | "Row",
+    source: SourceEnum6,
     column: string | null,
 ): VariableContext {
     const sensitive = isSensitiveDiagnosticName(key);

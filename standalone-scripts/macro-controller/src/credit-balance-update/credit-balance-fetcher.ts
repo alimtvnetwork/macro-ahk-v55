@@ -5,6 +5,7 @@ import { Plan } from './plan';
 import { parseCreditBalance, type CreditBalanceWire } from './credit-balance-parser';
 import { logCreditFetchFailure, logCreditParseFailure, sanitizeBearerPrefix } from './credit-balance-logger';
 import type { CreditBalance, CreditFailureLogPayload, CreditFetchResult } from './credit-balance-types';
+import { Enum_76ebb585 } from "../types/enums";
 
 const CREDIT_BALANCE_PATH_SUFFIX = '/credit-balance';
 const DEFAULT_FETCH_TIMEOUT_MS = 3000;
@@ -98,7 +99,7 @@ function buildResult(
     return { outcome, balance, fetchedAt: Date.now(), sourceUrl, errorDetail };
 }
 
-function classifyHttpReason(status: number): 'AuthError' | 'Http5xx' | 'Http4xx' {
+function classifyHttpReason(status: number): Enum_76ebb585 {
     if (status === 401 || status === 403) return 'AuthError';
     if (status >= 500) return 'Http5xx';
     return 'Http4xx';

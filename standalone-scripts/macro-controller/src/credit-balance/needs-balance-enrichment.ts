@@ -20,6 +20,7 @@
  */
 
 import type { WorkspaceCredit } from '../types/credit-types';
+import { Enum_75c5b314, ReasonEnum5 } from "../types/enums";
 
 /** Plan literals eligible for /credit-balance enrichment. */
 const ENRICHABLE_PLANS: ReadonlySet<string> = new Set(['pro_0', 'pro_1']);
@@ -28,7 +29,7 @@ const ENRICHABLE_PLANS: ReadonlySet<string> = new Set(['pro_0', 'pro_1']);
 const FREE_TIER_LITERALS: ReadonlySet<string> = new Set(['free', 'free_tier', 'starter']);
 
 export interface NeedsBalanceEnrichmentInput {
-  readonly workspace: Pick<WorkspaceCredit, 'id' | 'plan' | 'tier'>;
+  readonly workspace: Pick<WorkspaceCredit, Enum_75c5b314>;
   /** True when a fresh (non-stale) cache row already exists for this workspace. */
   readonly hasFreshCache: boolean;
 }
@@ -37,11 +38,7 @@ export interface NeedsBalanceEnrichmentResult {
   readonly needs: boolean;
   /** Stable machine code so callers/log lines can reason about the decision. */
   readonly reason:
-    | 'ok'
-    | 'no-id'
-    | 'free-tier'
-    | 'non-enrichable-plan'
-    | 'cache-fresh';
+    ReasonEnum5;
 }
 
 function normalize(value: string | null | undefined): string {

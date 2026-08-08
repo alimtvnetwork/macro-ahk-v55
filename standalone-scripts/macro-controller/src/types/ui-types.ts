@@ -1,3 +1,5 @@
+import { LevelEnum4 } from "./enums";
+
 /**
  * Macro Controller — UI, Prompt & Misc Type Definitions
  *
@@ -24,7 +26,7 @@ export interface ActivityLogEntry {
 export interface ToastEntry {
   id: string;
   message: string;
-  type: 'success' | 'error' | 'info' | 'warn';
+  type: LevelEnum4;
   element: HTMLElement;
   dismissTimer: ReturnType<typeof setTimeout> | null;
 }

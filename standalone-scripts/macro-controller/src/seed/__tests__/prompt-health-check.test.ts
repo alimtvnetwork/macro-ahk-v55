@@ -35,13 +35,14 @@ vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
 
 import { runPromptHealthCheck } from '../prompt-health-check';
 import { PLAN_NEXT_SEED_ROWS } from '../plan-next-prompts';
+import { RoleEnum4 } from "../../types/enums";
 
 interface DbShape {
     Id: number; Slug: string; Name: string; Body: string; Role: string;
     IsDefault: number; ReplaceKey: string; ReplaceValues: string;
     CreatedAt: number; UpdatedAt: number;
 }
-function healthyRow(role: 'plan' | 'next', overrides: Partial<DbShape> = {}): DbShape {
+function healthyRow(role: RoleEnum4, overrides: Partial<DbShape> = {}): DbShape {
     const seed = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault);
     if (!seed) throw new Error('seed row missing for role=' + role);
     return {

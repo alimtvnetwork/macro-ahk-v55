@@ -17,6 +17,7 @@ import { loadSession, persistSession } from "./recorder/recorder-session-storage
 import { recorderReducer, IDLE_SESSION } from "./recorder/recorder-store";
 import { isNewTabOrBlankUrl } from "../shared/url-utils";
 import { evaluateUrlMatches } from "./project-matcher";
+import { SourceEnum1, PhaseEnum } from "../types/enums";
 
 const RUN_SCRIPTS_COMMAND = "run-scripts";
 const FORCE_RUN_SCRIPTS_COMMAND = "force-run-scripts";
@@ -146,7 +147,7 @@ async function getActiveTab(): Promise<chrome.tabs.Tab | null> {
 interface ResolvedShortcutScripts {
     scripts: ScriptEntry[];
     /** Where the scripts came from for diagnostics. */
-    source: "active-project" | "none";
+    source: SourceEnum1;
     /** Human-readable project label, e.g. `"My Project" (id=abc)` or `none`. */
     projectLabel: string;
 }
@@ -256,7 +257,7 @@ async function toggleRecordingFromShortcut(): Promise<void> {
 
 /** Returns the recorder action that the primary toolbar button maps to. */
 function chooseToggleAction(
-    phase: "Idle" | "Recording" | "Paused",
+    phase: PhaseEnum,
     projectSlug: string,
 ): import("./recorder/recorder-store").RecorderAction {
     if (phase === "Idle") {

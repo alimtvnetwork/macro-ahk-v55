@@ -34,6 +34,7 @@ import type {
     DanglingRunGroupRef,
     StepGroupExportPreview,
 } from "@/background/recorder/step-library/export-bundle";
+import { ToneEnum1 } from "../../types/enums";
 
 export interface ExportPreviewDialogProps {
     readonly open: boolean;
@@ -52,7 +53,7 @@ function StatTile(props: {
     readonly icon: React.ReactNode;
     readonly label: string;
     readonly value: number;
-    readonly tone?: "default" | "warn";
+    readonly tone?: ToneEnum1;
 }) {
     const toneClass =
         props.tone === "warn"

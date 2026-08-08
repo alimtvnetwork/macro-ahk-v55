@@ -31,6 +31,7 @@ import type JSZipType from "jszip";
 
 import { applySchema, StepKindId } from "./schema";
 import { StepLibraryDb, type StepGroupRow, type StepRow } from "./db";
+import { ExportReasonEnum } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -54,13 +55,7 @@ export interface StepGroupExportInput {
 }
 
 export type ExportReason =
-    | "Ok"
-    | "ProjectNotFound"
-    | "GroupNotFound"
-    | "GroupOutsideProject"
-    | "EmptySelection"
-    | "RunGroupTargetMissing"
-    | "InternalError";
+    ExportReasonEnum;
 
 export interface ExportFailure {
     readonly Reason: Exclude<ExportReason, "Ok">;

@@ -1,3 +1,5 @@
+import { Type4, ResourceType, Status10 } from "../../../types/enums";
+
 export interface UpdaterEndpoint {
   id: number;
   url: string;
@@ -11,9 +13,9 @@ export interface UpdaterStep {
   id: number;
   stepId: string;
   sortOrder: number;
-  type: "Download" | "Execute" | "Update" | "Validate";
+  type: Type4;
   condition?: string;
-  resourceType?: "Script" | "Binary" | "ChromeExtension";
+  resourceType?: ResourceType;
   sourceUrl?: string;
   expectedStatus?: number;
   isRedirectable?: boolean;
@@ -52,7 +54,7 @@ export interface UpdaterEntry {
   categories: string[];
   endpoints: UpdaterEndpoint[];
   steps: UpdaterStep[];
-  status?: "up-to-date" | "update-available" | "error" | "unchecked";
+  status?: Status10;
 }
 
 export const INTERVAL_OPTIONS = [

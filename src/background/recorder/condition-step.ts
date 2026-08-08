@@ -1,3 +1,5 @@
+import { OutcomeEnum, ReasonEnum1 } from "../../types/enums";
+
 /**
  * Marco Extension — Condition Step Routing (Spec 18 §4.2 + §5)
  *
@@ -11,7 +13,7 @@ export type RouteAction =
     | { readonly Kind: "GoToLabel"; readonly Label: string }
     | { readonly Kind: "GoToStepId"; readonly StepId: number }
     | { readonly Kind: "RunGroup"; readonly StepGroupId: number }
-    | { readonly Kind: "EndRun"; readonly Outcome: "Pass" | "Fail" };
+    | { readonly Kind: "EndRun"; readonly Outcome: OutcomeEnum };
 
 export const MAX_ROUTE_JUMPS = 256;
 
@@ -23,8 +25,8 @@ export interface RouteableStep {
 export type RouteResolution =
     | { readonly Kind: "Cursor"; readonly NextIndex: number; readonly JumpsUsed: number }
     | { readonly Kind: "RunGroup"; readonly StepGroupId: number; readonly NextIndex: number; readonly JumpsUsed: number }
-    | { readonly Kind: "End"; readonly Outcome: "Pass" | "Fail"; readonly JumpsUsed: number }
-    | { readonly Kind: "Error"; readonly Reason: "InvalidRouteTarget" | "RouteLoopDetected"; readonly Detail: string };
+    | { readonly Kind: "End"; readonly Outcome: OutcomeEnum; readonly JumpsUsed: number }
+    | { readonly Kind: "Error"; readonly Reason: ReasonEnum1; readonly Detail: string };
 
 export interface RouteContext {
     readonly Steps: ReadonlyArray<RouteableStep>;

@@ -39,6 +39,7 @@ vi.mock('../../db/prompt-db', () => ({
 }));
 
 import { openPromptLibraryModal } from '../prompt-library-modal';
+import { StepEnum } from "../../types/enums";
 
 const flush = async (): Promise<void> => {
     await new Promise((r) => setTimeout(r, 0));
@@ -82,7 +83,7 @@ describe('prompt-library-modal - aria-live announcement of import errors', () =>
 
         // Observe the exact sequence of mutations. If content is inserted
         // BEFORE the region is unhidden, screen readers miss the alert.
-        type Step = 'unhidden' | 'child-added';
+        type Step = StepEnum;
         const order: Step[] = [];
         const observer = new MutationObserver((records) => {
             for (const r of records) {

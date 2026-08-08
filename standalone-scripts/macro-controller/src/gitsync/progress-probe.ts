@@ -30,12 +30,11 @@ import { logError } from '../error-utils';
 import { throwDiagnostic } from '../errors/diagnostic-error';
 import { log } from '../logger';
 import { CREDIT_API_BASE } from '../shared-state';
+import { GitsyncJobStatus, ReasonEnum7 } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
-
-export type GitsyncJobStatus = 'pending' | 'running' | 'completed' | 'failed';
 
 export interface GitsyncProgressResult {
     readonly repo_url?: string | null;
@@ -54,7 +53,7 @@ export interface GitsyncProgressBody {
 
 export type GitsyncConnectionState =
     | { connected: true; repoUrl: string; repoName: string | null; owner: string | null }
-    | { connected: false; reason: 'no_job' | 'no_repo_url' | 'deadline' | 'error'; httpStatus?: number };
+    | { connected: false; reason: ReasonEnum7; httpStatus?: number };
 
 interface SdkApiResponse {
     readonly ok: boolean;

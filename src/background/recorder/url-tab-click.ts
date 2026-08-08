@@ -1,3 +1,5 @@
+import { UrlMatchEnum, Mode2, SelectorKindEnum, UrlTabClickReasonEnum1, KindEnum2, ReasonEnum4 } from "../../types/enums";
+
 /**
  * Marco Extension — UrlTabClick Step (Spec 19 §1)
  *
@@ -21,9 +23,9 @@
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-export type UrlMatchDialect = "Exact" | "Prefix" | "Glob" | "Regex";
-export type UrlTabClickMode = "OpenNew" | "FocusExisting" | "OpenOrFocus";
-export type SelectorKindOption = "Auto" | "XPath" | "Css";
+export type UrlMatchDialect = UrlMatchEnum;
+export type UrlTabClickMode = Mode2;
+export type SelectorKindOption = SelectorKindEnum;
 
 export interface UrlTabClickParams {
     readonly UrlPattern: string;
@@ -37,13 +39,7 @@ export interface UrlTabClickParams {
 }
 
 export type UrlTabClickReason =
-    | "Ok"
-    | "TabNotFound"
-    | "InvalidUrlPattern"
-    | "SelectorNotFound"
-    | "UrlPatternMismatch"
-    | "UrlTabClickTimeout"
-    | "BadParams";
+    UrlTabClickReasonEnum1;
 
 export interface UrlTabClickResult {
     readonly Reason: UrlTabClickReason;
@@ -67,7 +63,7 @@ export interface TabsAdapter {
     focusTab(id: number): Promise<void>;
     createTab(url: string): Promise<TabRef>;
     /** Dispatch the captured click; returns the URL of the resulting tab. */
-    dispatchClick?(selector: string, kind: "Css" | "XPath"): Promise<TabRef>;
+    dispatchClick?(selector: string, kind: KindEnum2): Promise<TabRef>;
     /** Wait for an updated tab whose URL matches `predicate` within deadline. */
     waitForMatchingTab(
         predicate: (url: string) => boolean,
@@ -203,7 +199,7 @@ export function compileUrlPattern(
 /* ------------------------------------------------------------------ */
 
 export interface ValidationError {
-    readonly Reason: "InvalidUrlPattern" | "BadParams";
+    readonly Reason: ReasonEnum4;
     readonly Detail: string;
 }
 
@@ -296,7 +292,7 @@ function hasCrossOriginAnchorHref(context: CaptureClickContext): boolean {
 /*  Replay                                                              */
 /* ------------------------------------------------------------------ */
 
-function selectorKind(params: UrlTabClickParams): "Css" | "XPath" {
+function selectorKind(params: UrlTabClickParams): KindEnum2 {
     const kind = params.SelectorKind ?? "Auto";
     if (kind === "XPath") return "XPath";
     if (kind === "Css") return "Css";

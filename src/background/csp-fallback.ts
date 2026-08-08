@@ -9,6 +9,7 @@
 import { transitionHealth } from "./health-handler";
 import { handleGetSettings } from "./handlers/settings-handler";
 import { logBgWarnError, logCaughtError, logSampledDebug, BgLogTag} from "./bg-logger";
+import { DomTargetEnum } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -21,7 +22,7 @@ export interface CspInjectionResult {
     isFallback: boolean;
     errorMessage?: string;
     /** Which DOM element the script tag was appended to. */
-    domTarget?: "body" | "documentElement" | "unknown";
+    domTarget?: DomTargetEnum;
 }
 
 /* ------------------------------------------------------------------ */

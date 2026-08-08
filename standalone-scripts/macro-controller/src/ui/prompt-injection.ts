@@ -22,6 +22,7 @@ import { downloadAiGuideline } from './prompt-ai-guideline';
 import { ensurePromptModalTheme } from './prompt-modal-theme';
 import { getSeedBodyForSlug } from '../seed/plan-next-prompts';
 import { renderDiffPane } from './prompt-diff';
+import { RuleEnum } from "../types/enums";
 
 const CSS_BTN_HOVER_BG = '#2d3348';
 const CSS_BTN_REST_BG = '#252a36';
@@ -123,7 +124,7 @@ interface PromptSaveFailure {
    * fix next) instead of a generic "Save failed" message.
    */
   failure?: {
-    rule: 'rule-zero' | 'token-drift' | 'upstream';
+    rule: RuleEnum;
     code?: string;
     expectedN?: number | null;
     actualN?: number | null;

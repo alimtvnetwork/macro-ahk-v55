@@ -8,8 +8,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Plus, Check, X } from "lucide-react";
 import type { JsonValue } from "./json-tree-types";
-
-type NewPropertyType = "string" | "number" | "boolean" | "object" | "array";
+import { NewPropertyType } from "../../../types/enums";
 
 const DEFAULT_VALUES: Record<NewPropertyType, JsonValue> = {
   string: "",

@@ -1,62 +1,4 @@
-/**
- * Marco Extension — Form Snapshot Capture
- *
- * Pure helpers that walk a captured DOM element, locate its enclosing form
- * (or form-like container), and produce a {@link FormSnapshot} of every
- * input/textarea/select inside it. Used by the recorder when a step is a
- * `Submit`, a submit-button `Click`, or any `Type`/`Select` step that wants
- * to stamp its own field value at the moment of capture.
- *
- * Two-tier output, matching mem://standards/verbose-logging-and-failure-diagnostics:
- *
- *   - `Fields` — name/type/required/sensitive metadata. ALWAYS populated.
- *     Cheap to store, safe to log even on non-verbose runs. Lets a debugger
- *     know which fields existed and whether any required ones were empty.
- *
- *   - `Values` — actual user-entered values (already sensitivity-masked).
- *     ONLY populated when the caller passes `Verbose: true`. Off by default
- *     so the SQLite/OPFS payload stays small and we never silently persist
- *     untruncated form data.
- *
- * Sensitive-field rules (mask by default):
- *   - `<input type="password">`
- *   - `autocomplete` containing `cc-number`, `cc-csc`, `one-time-code`,
- *     `current-password`, `new-password`
- *   - field name/id matching /password|secret|token|otp|pin|cvv|ssn|credit/i
- *
- * Masking replaces the value with `"*".repeat(value.length)` so length is
- * preserved (useful for "did the user even type something?" debugging) but
- * the secret never lands in storage.
- *
- * Pure: no DOM mutation, no chrome.*, no async. Tolerates `null` /
- * detached / form-less targets by returning `null`.
- */
-
-export type FormFieldType =
-    | "text"
-    | "email"
-    | "password"
-    | "number"
-    | "tel"
-    | "url"
-    | "search"
-    | "date"
-    | "datetime-local"
-    | "month"
-    | "week"
-    | "time"
-    | "color"
-    | "range"
-    | "file"
-    | "hidden"
-    | "checkbox"
-    | "radio"
-    | "select"
-    | "select-multiple"
-    | "textarea"
-    | "submit"
-    | "button"
-    | "other";
+import { FormFieldType, TagEnum } from "../../types/enums";
 
 export interface FormFieldMeta {
     /** First non-empty of: name, id, aria-label, placeholder, fallback `field#N`. */
@@ -84,7 +26,7 @@ export interface FormFieldValue {
 export interface FormSnapshot {
     /** Identifying info about the form element. */
     readonly Form: {
-        readonly Tag: "form" | "container";
+        readonly Tag: TagEnum;
         readonly Id: string | null;
         readonly Name: string | null;
         readonly Action: string | null;

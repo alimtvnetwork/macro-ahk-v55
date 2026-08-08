@@ -8,8 +8,7 @@
 
 import { AlertCircle, CheckCircle2, Circle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-export type CauseStatus = "ok" | "warn" | "error";
+import { CauseStatus } from "../../../types/enums";
 
 export interface RecorderEmptyStateProps {
     readonly projectSlug: string;

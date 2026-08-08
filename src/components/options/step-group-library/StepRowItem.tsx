@@ -31,6 +31,7 @@ import { stepKindLabel } from "@/hooks/use-step-library";
 
 import { logError } from "../options-logger";
 import { STEP_DRAG_MIME } from "./constants";
+import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 export interface StepRowItemProps {
     readonly step: StepRow;
@@ -39,7 +40,7 @@ export interface StepRowItemProps {
     readonly stepGroupId: number;
     readonly waitLabel: string | null;
     readonly waitTitle: string | null;
-    readonly onMove: (stepId: number, direction: "up" | "down") => void;
+    readonly onMove: (stepId: number, direction: DirectionEnum) => void;
     readonly onDropReorder: (stepGroupId: number, sourceStepId: number, targetStepId: number) => void;
     readonly onToggleDisabled: (step: StepRow, nextDisabled: boolean) => void;
     readonly onEdit: (step: StepRow) => void;

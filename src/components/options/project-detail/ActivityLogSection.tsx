@@ -9,10 +9,11 @@ import { Button } from "@/components/ui/button";
 import { ListOrdered, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { logError } from "../options-logger";
+import { LogLevelEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 interface ActivityLogEntry {
   timestamp: string;
-  level: "info" | "warn" | "error" | "debug";
+  level: LogLevelEnum;
   message: string;
 }
 

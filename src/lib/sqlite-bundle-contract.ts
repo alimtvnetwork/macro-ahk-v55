@@ -1,4 +1,6 @@
 import { ServiceResult } from '../utils/result-wrapper';
+import { BundleMode, CodeEnum } from "../types/enums";
+
 /**
  * Marco Extension — Bundle SQLite PascalCase Contract
  *
@@ -154,9 +156,6 @@ export const REQUIRED_TABLES = ["Projects", "Scripts", "Configs", "Meta"] as con
 /** Tables that MUST exist in a prompts-only bundle. */
 export const REQUIRED_PROMPTS_ONLY_TABLES = ["Prompts", "Meta"] as const;
 
-/** Bundle modes the validator can be asked to enforce. */
-export type BundleMode = "full" | "prompts-only";
-
 /** Result of a strict schema validation pass. */
 export interface BundleValidationResult {
     ok: boolean;
@@ -167,16 +166,7 @@ export interface BundleValidationResult {
 export interface BundleValidationError {
     /** Stable machine-readable code (lets callers branch on category). */
     code:
-        | "MISSING_TABLE"
-        | "UNKNOWN_TABLE"
-        | "MISSING_COLUMN"
-        | "UNKNOWN_COLUMN"
-        | "NON_PASCAL_TABLE"
-        | "NON_PASCAL_COLUMN"
-        | "LEGACY_SNAKE_CASE"
-        | "MISSING_FORMAT_VERSION"
-        | "UNSUPPORTED_FORMAT_VERSION"
-        | "READ_ERROR";
+        CodeEnum;
     /** Human-readable, actionable error message (always present). */
     message: string;
     /** Affected table name, when applicable. */

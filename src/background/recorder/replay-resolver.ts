@@ -22,9 +22,10 @@
 
 import { SelectorKindId } from "../recorder-db-schema";
 import type { PersistedSelector } from "./step-persistence";
+import { KindEnum4 } from "../../types/enums";
 
 export interface ResolvedSelector {
-    readonly Kind: "XPath" | "Css" | "Aria";
+    readonly Kind: KindEnum4;
     readonly Expression: string;
     readonly AnchorChain: ReadonlyArray<number>;
 }

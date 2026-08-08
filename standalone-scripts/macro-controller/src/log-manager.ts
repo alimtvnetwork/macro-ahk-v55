@@ -17,9 +17,7 @@
 /* ------------------------------------------------------------------ */
 
 export type LogLevel =
-  | 'debug' | 'info' | 'warn' | 'error'
-  | 'success' | 'delegate' | 'check' | 'skip' | 'sub'
-  | 'INFO' | 'ERROR' | 'WARN' | 'DEBUG' | 'SUB';
+  LogLevelEnum1;
 
 export interface LogManagerConfig {
   [key: string]: boolean | Record<string, boolean>;
@@ -36,6 +34,8 @@ export interface LogManagerConfig {
 }
 
 import { StorageKey } from './types';
+import { LogLevelEnum1 } from "./types/enums";
+
 const STORAGE_KEY = StorageKey.LogManagerConfig;
 
 const DEFAULT_CONFIG: LogManagerConfig = {

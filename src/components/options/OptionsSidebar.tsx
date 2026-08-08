@@ -36,17 +36,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useErrorCount } from "@/hooks/use-error-count";
+import { SidebarSectionEnum, Type5 } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
 export type SidebarSection =
-  | "projects" | "scripts" | "prompts" | "automation" | "updaters" | "storage" | "api" | "library" | "step-groups" | "settings" | "about"
-  | "logging" | "timing" | "data" | "network" | "activity" | "audit";
+  SidebarSectionEnum;
 
 export interface SidebarSelection {
-  type: "section" | "project" | "script";
+  type: Type5;
   section?: SidebarSection;
   projectId?: string;
   scriptId?: string;

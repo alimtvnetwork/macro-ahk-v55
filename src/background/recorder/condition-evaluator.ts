@@ -1,3 +1,5 @@
+import { SelectorKindEnum, OpEnum, ReasonEnum, KindEnum2, Mode1 } from "../../types/enums";
+
 /**
  * Marco Extension — Condition Evaluator (Spec 18)
  *
@@ -17,7 +19,7 @@
 /*  Public types                                                       */
 /* ------------------------------------------------------------------ */
 
-export type SelectorKind = "Auto" | "XPath" | "Css";
+export type SelectorKind = SelectorKindEnum;
 
 export type Matcher =
     | { readonly Kind: "Exists" }
@@ -27,7 +29,7 @@ export type Matcher =
     | { readonly Kind: "TextRegex";    readonly Pattern: string; readonly Flags?: string }
     | { readonly Kind: "AttrEquals";   readonly Name: string; readonly Value: string }
     | { readonly Kind: "AttrContains"; readonly Name: string; readonly Value: string }
-    | { readonly Kind: "Count";        readonly Op: "eq" | "gte" | "lte"; readonly N: number };
+    | { readonly Kind: "Count";        readonly Op: OpEnum; readonly N: number };
 
 export interface Predicate {
     readonly Selector: string;
@@ -48,13 +50,13 @@ export const MAX_PREDICATE_COUNT = 32;
 export type ConditionWaitOutcome =
     | { readonly Ok: true;  readonly DurationMs: number; readonly Polls: number }
     | { readonly Ok: false; readonly DurationMs: number; readonly Polls: number;
-        readonly Reason: "ConditionTimeout" | "InvalidSelector";
+        readonly Reason: ReasonEnum;
         readonly Detail: string;
         readonly LastEvaluation: PredicateEvaluation[] };
 
 export interface PredicateEvaluation {
     readonly Selector: string;
-    readonly Kind: "XPath" | "Css";
+    readonly Kind: KindEnum2;
     readonly Matcher: string;
     readonly Result: boolean;
     readonly Detail?: string;
@@ -188,7 +190,7 @@ function evaluatePredicate(predicate: Predicate, options: EvaluateOptions): bool
 function recordTrace(
     options: EvaluateOptions,
     predicate: Predicate,
-    kind: "XPath" | "Css",
+    kind: KindEnum2,
     result: boolean,
     detail?: string,
 ): void {
@@ -215,7 +217,7 @@ function matchTextContains(element: Element, matcher: Matcher & { Kind: "TextCon
     return matchText(element.textContent ?? "", matcher.Value, matcher.CaseSensitive, (a, b) => a.includes(b));
 }
 
-function matchAttr(element: Element, name: string, expected: string, mode: "eq" | "contains"): boolean {
+function matchAttr(element: Element, name: string, expected: string, mode: Mode1): boolean {
     const value = element.getAttribute(name);
     if (value === null) return false;
     return mode === "eq" ? value === expected : value.includes(expected);
@@ -245,7 +247,7 @@ function isVisible(element: Element): boolean {
     return true;
 }
 
-function compareCount(count: number, op: "eq" | "gte" | "lte", n: number): boolean {
+function compareCount(count: number, op: OpEnum, n: number): boolean {
     if (op === "eq") return count === n;
     if (op === "gte") return count >= n;
     return count <= n;
@@ -255,14 +257,14 @@ function compareCount(count: number, op: "eq" | "gte" | "lte", n: number): boole
 /*  Selector locators                                                  */
 /* ------------------------------------------------------------------ */
 
-export function resolveSelectorKind(kind: SelectorKind, expression: string): "XPath" | "Css" {
+export function resolveSelectorKind(kind: SelectorKind, expression: string): KindEnum2 {
     if (kind === "XPath") return "XPath";
     if (kind === "Css") return "Css";
     const trimmed = expression.trimStart();
     return trimmed.startsWith("/") || trimmed.startsWith("(") ? "XPath" : "Css";
 }
 
-function locateFirst(expression: string, kind: "XPath" | "Css", doc: Document): Element | null {
+function locateFirst(expression: string, kind: KindEnum2, doc: Document): Element | null {
     if (kind === "XPath") {
         const r = doc.evaluate(expression, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
         const node = r.singleNodeValue;
@@ -271,7 +273,7 @@ function locateFirst(expression: string, kind: "XPath" | "Css", doc: Document): 
     return doc.querySelector(expression);
 }
 
-function locateAll(expression: string, kind: "XPath" | "Css", doc: Document): Element[] {
+function locateAll(expression: string, kind: KindEnum2, doc: Document): Element[] {
     if (kind === "XPath") {
         const r = doc.evaluate(expression, doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
         const out: Element[] = [];

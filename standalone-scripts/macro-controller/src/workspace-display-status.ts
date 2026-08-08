@@ -23,16 +23,11 @@ import type { WorkspaceCredit } from './types';
 import type { WorkspaceLifecycleConfig } from './workspace-lifecycle-config';
 import { daysToRefillForWs } from './workspace-refill-priority';
 import { daysBetween, getEffectiveStatus, type WorkspaceStatus } from './workspace-status';
+import { WorkspaceDisplayKindEnum, WorkspaceDisplayToneEnum } from "./types/enums";
 
 /** Display-side badge categories. Decoupled from internal lifecycle enum. */
 export type WorkspaceDisplayKind =
-  | 'canceled'
-  | 'expired'
-  | 'expired-hard'
-  | 'expire-soon'
-  | 'past-due-expiring'
-  | 'refill-soon'
-  | 'normal';
+  WorkspaceDisplayKindEnum;
 
 /**
  * Issue 119: grace period in days after a workspace enters `past-due-expiring`
@@ -43,12 +38,7 @@ export const PAST_DUE_GRACE_DAYS = 10;
 
 /** Abstract tone names. Renderer maps these to CSS. */
 export type WorkspaceDisplayTone =
-  | 'muted'      // canceled / past-due 0–2d — gray bg, light text, no red
-  | 'danger'     // expired / expire-soon / past-due ≥10d — red
-  | 'warning'    // past-due 3–9d — amber
-  | 'orange'     // reserved fallback
-  | 'info'       // refill-soon — sky
-  | 'none';      // normal — no badge
+  WorkspaceDisplayToneEnum;      // normal — no badge
 
 export interface WorkspaceDisplayStatus {
   kind: WorkspaceDisplayKind;

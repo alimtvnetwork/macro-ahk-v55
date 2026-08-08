@@ -28,11 +28,12 @@
 import { logError } from '../error-utils';
 import { log } from '../logger';
 import type { CreditBalanceResponse } from '../types';
+import { CreditBalanceFetchSourceEnum } from "../types/enums";
 
 const KEY_PREFIX = 'MacroCreditBalanceCache:';
 
 /** Source of a persisted credit-balance row. */
-export type CreditBalanceFetchSource = 'auto' | 'batch' | 'manual';
+export type CreditBalanceFetchSource = CreditBalanceFetchSourceEnum;
 
 /** Stable row shape stored under each `MacroCreditBalanceCache:{wsId}` key. */
 export interface CreditBalanceCacheRow {

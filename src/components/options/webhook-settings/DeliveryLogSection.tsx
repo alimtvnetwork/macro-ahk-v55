@@ -35,8 +35,7 @@ import {
     formatTime,
     presentVariant,
 } from "./delivery-log-utils";
-
-export type StatusFilter = "all" | "success" | "skipped" | "failure";
+import { StatusFilter } from "../../../types/enums";
 
 export interface LogCounts {
     readonly all: number;

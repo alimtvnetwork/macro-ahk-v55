@@ -26,6 +26,7 @@
 // call site having to add a second `vi.mock('../ui/extension-relay', ...)`.
 import { sendToExtension } from './extension-bridge';
 import { DB_NAME } from './db-name';
+import { MethodEnum1, BucketEnum } from "../types/enums";
 
 export interface SqlBridgeResp {
     isOk: boolean;
@@ -34,8 +35,8 @@ export interface SqlBridgeResp {
     lastInsertId?: number;
 }
 
-export type LegacyMethod = 'QUERY' | 'SCHEMA';
-export type Bucket = 'SELECT' | 'ALTER' | 'WRITE';
+export type LegacyMethod = MethodEnum1;
+export type Bucket = BucketEnum;
 
 // Candidate method names, in probe order. The background handler accepts both
 // the legacy names and the bridge fallbacks. The fallbacks remain for older

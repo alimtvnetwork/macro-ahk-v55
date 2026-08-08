@@ -12,8 +12,9 @@ import { Database, KeyRound, HardDrive, Settings2 } from "lucide-react";
 import { DataBrowserPanel } from "./DataBrowserPanel";
 import { ProjectDatabasePanel } from "./project-database/ProjectDatabasePanel";
 import { ConfigDbTab } from "./project-database/ConfigDbTab";
+import { StorageSubTabEnum } from "../../types/enums";
 
-type StorageSubTab = "kv" | "database" | "config" | "indexeddb";
+type StorageSubTab = StorageSubTabEnum;
 
 interface ProjectStoragePanelProps {
   projectId: string;

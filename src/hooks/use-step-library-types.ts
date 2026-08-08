@@ -10,6 +10,7 @@ import type { SqlJsStatic } from "sql.js";
 import type { StepLibraryDb, ProjectRow, StepGroupRow, StepRow } from "@/background/recorder/step-library/db";
 import type { GroupInputBag, GroupInputsMap } from "@/background/recorder/step-library/group-inputs";
 import type { StepKindId } from "@/background/recorder/step-library/schema";
+import { DirectionEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 export type StepLibraryLoadError =
     | { Kind: "SqlJsLoad"; Message: string; Hint: string; Recoverable: true }
@@ -34,7 +35,7 @@ export interface UseStepLibraryApi extends UseStepLibraryState {
     readonly createGroup: (input: { Name: string; ParentStepGroupId: number | null; Description?: string | null }) => number;
     readonly renameGroup: (stepGroupId: number, newName: string) => void;
     readonly deleteGroup: (stepGroupId: number) => void;
-    readonly moveGroupWithinParent: (stepGroupId: number, direction: "up" | "down") => void;
+    readonly moveGroupWithinParent: (stepGroupId: number, direction: DirectionEnum) => void;
     readonly reorderSiblings: (parentStepGroupId: number | null, orderedIds: readonly number[]) => void;
     readonly setGroupArchived: (stepGroupId: number, archived: boolean) => void;
     readonly setStepDisabled: (stepId: number, disabled: boolean) => void;
@@ -53,7 +54,7 @@ export interface UseStepLibraryApi extends UseStepLibraryState {
         TargetStepGroupId?: number | null;
     }) => void;
     readonly deleteStep: (stepId: number) => void;
-    readonly moveStepWithinGroup: (stepId: number, direction: "up" | "down") => void;
+    readonly moveStepWithinGroup: (stepId: number, direction: DirectionEnum) => void;
     readonly reorderSteps: (stepGroupId: number, orderedStepIds: readonly number[]) => void;
     readonly setGroupInput: (stepGroupId: number, bag: GroupInputBag) => void;
     readonly clearGroupInput: (stepGroupId: number) => void;

@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { GripVertical, Trash2, Check, Loader2, Clock, AlertCircle, SkipForward, Copy } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { LevelEnum3 } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Status badge                                                       */
@@ -107,7 +108,7 @@ function StepEditor({ step, onChange }: { step: ChainStep; onChange: (s: ChainSt
       return (
         <div className="flex gap-2">
           <Input value={step.message} onChange={(e) => onChange({ ...step, message: e.target.value })} placeholder="Message" className="h-7 text-xs flex-1" />
-          <Select value={step.level ?? "info"} onValueChange={(v) => onChange({ ...step, level: v as "info" | "success" | "warning" | "error" })}>
+          <Select value={step.level ?? "info"} onValueChange={(v) => onChange({ ...step, level: v as LevelEnum3 })}>
             <SelectTrigger className="h-7 text-xs w-24"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="info">Info</SelectItem>

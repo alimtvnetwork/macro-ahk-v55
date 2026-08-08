@@ -1,3 +1,5 @@
+import { SourceEnum7 } from "../../types/enums";
+
 /**
  * Marco Extension — Recorder Selection Bus
  *
@@ -25,7 +27,7 @@ export interface RecorderSelection {
     /** Optional StepId when a single step row is active. */
     readonly StepId: number | null;
     /** Origin of the change — used to suppress feedback loops. */
-    readonly Source: "options" | "controller" | "external";
+    readonly Source: SourceEnum7;
 }
 
 const EVENT_NAME = "marco:recorder-selection-changed";

@@ -19,12 +19,11 @@
  */
 
 import type { SelectorAttempt } from "@/background/recorder/failure-logger";
-
-export type TraceStepStatus = "matched" | "missed" | "errored" | "pending";
+import { TraceStepStatus, RoleEnum3, OutcomeEnum1 } from "../../types/enums";
 
 export interface TraceStep {
     readonly Order: number;                  // 1-based position in the walk.
-    readonly Role: "Primary" | "Fallback";
+    readonly Role: RoleEnum3;
     readonly Strategy: string;
     readonly Expression: string;
     readonly ResolvedExpression: string;
@@ -41,7 +40,7 @@ export interface ReplayTraceSummary {
     readonly Evaluated: number;
     readonly Skipped: number;
     readonly StoppedAt: number | null;        // 1-based Order of the matched step.
-    readonly Outcome: "matched" | "exhausted" | "empty";
+    readonly Outcome: OutcomeEnum1;
 }
 
 export interface ReplayTrace {
@@ -64,7 +63,7 @@ function classify(attempt: SelectorAttempt, stopped: boolean): TraceStepStatus {
     return "missed";
 }
 
-function noteFor(attempt: SelectorAttempt, status: TraceStepStatus, role: "Primary" | "Fallback"): string {
+function noteFor(attempt: SelectorAttempt, status: TraceStepStatus, role: RoleEnum3): string {
     switch (status) {
         case "matched":
             return `${role} resolved → ${attempt.MatchCount} match${attempt.MatchCount === 1 ? "" : "es"}; replay stopped here.`;
@@ -115,7 +114,7 @@ function buildTraceStep(attempt: SelectorAttempt, previous: ReadonlyArray<TraceS
     return createTraceStep(attempt, status, role, previous.length + 1);
 }
 
-function createTraceStep(attempt: SelectorAttempt, status: TraceStepStatus, role: "Primary" | "Fallback", order: number): TraceStep {
+function createTraceStep(attempt: SelectorAttempt, status: TraceStepStatus, role: RoleEnum3, order: number): TraceStep {
     return {
         Order: order, Role: role, Strategy: attempt.Strategy, Expression: attempt.Expression,
         ResolvedExpression: attempt.ResolvedExpression.length > 0 ? attempt.ResolvedExpression : attempt.Expression,

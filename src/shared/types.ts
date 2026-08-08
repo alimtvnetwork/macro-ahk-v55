@@ -1,24 +1,17 @@
-/**
- * Marco Extension — Shared TypeScript Interfaces
- *
- * Core data model types from specs 09, 12, 13.
- * See spec/05-chrome-extension/12-project-model-and-url-rules.md
- */
-
-/** Health state machine from spec 09. */
-export type HealthState = "HEALTHY" | "DEGRADED" | "ERROR" | "FATAL";
+import { HealthState, WorldEnum } from "../types/enums";
+import { MatchType, InjectionMethodEnum, RunAtEnum1 } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /** URL matching modes for project rules. */
-export type MatchMode = "exact" | "prefix" | "regex" | "glob";
+export type MatchMode = MatchType;
 
 /** Script execution world. */
-export type ExecutionWorld = "ISOLATED" | "MAIN";
+export type ExecutionWorld = WorldEnum;
 
 /** Config injection methods (Method 3 deprecated). */
-export type InjectionMethod = "global" | "message";
+export type InjectionMethod = InjectionMethodEnum;
 
 /** Script run-at timing. */
-export type RunAt = "document_start" | "document_end" | "document_idle";
+export type RunAt = RunAtEnum1;
 
 /** Injection conditions for a URL rule. */
 export interface InjectionConditions {

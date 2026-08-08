@@ -40,6 +40,7 @@ import {
     requireField,
     requireSlug,
 } from "./handler-guards";
+import { RawSqlKindEnum } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -54,7 +55,7 @@ interface ProjectApiMessage {
 }
 
 type ProjectDb = ReturnType<typeof getProjectDb>;
-type RawSqlKind = "read" | "write" | "schema" | "transaction";
+type RawSqlKind = RawSqlKindEnum;
 
 interface RawSqlStatement {
     sql: string;

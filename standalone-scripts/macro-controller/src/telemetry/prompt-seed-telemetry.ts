@@ -27,38 +27,15 @@ import { log } from '../logger';
 import { logError } from '../error-utils';
 import { StorageKey } from '../types/storage-keys';
 import type { PromptRole } from '../types/prompt-role';
+import { PromptSeedEventNameEnum, SeedStageStatus } from "../types/enums";
+import { LevelEnum3 } from "../../../../src/types/enums";
 
 export const PROMPT_SEED_TRACE_MAX = 50;
 
 export type PromptSeedEventName =
-  | 'seed.start'
-  | 'seed.insert-or-ignore'
-  | 'seed.legacy-upgrade'
-  | 'seed.legacy-upgrade-skip'
-  | 'seed.promote-default'
-  | 'seed.promote-default-kept'
-  | 'seed.complete'
-  | 'seed.failed'
-  | 'seed.audit-skip'
-  | 'seed.audit-write'
-  | 'editor.prefill.db-hit'
-  | 'editor.prefill.reseed'
-  | 'editor.prefill.direct-insert'
-  | 'editor.prefill.direct-insert-failed'
-  | 'editor.prefill.static-fallback'
-  | 'editor.prefill.missing'
-  | 'editor.prefill.drift'
-  | 'reseed.start'
-  | 'reseed.force'
-  | 'reseed.complete'
-  | 'health.default.isSuccess'
-  | 'health.default.missing'
-  | 'health.default.schema-drift'
-  | 'health.auto-repair.start'
-  | 'health.auto-repair.recovered'
-  | 'health.auto-repair.failed';
+  PromptSeedEventNameEnum;
 
-export type PromptSeedOutcome = 'ok' | 'skipped' | 'failed';
+export type PromptSeedOutcome = SeedStageStatus;
 
 export interface PromptSeedEvent {
   /** ISO timestamp, always in UTC (see mem://localization/timezone). */
@@ -82,7 +59,7 @@ interface EmitInput {
   detail?: string;
 }
 
-function levelFor(outcome: PromptSeedOutcome): 'success' | 'warning' | 'error' | 'info' {
+function levelFor(outcome: PromptSeedOutcome): LevelEnum3 {
   if (outcome === 'failed') return 'error';
   if (outcome === 'skipped') return 'warning';
   return 'success';

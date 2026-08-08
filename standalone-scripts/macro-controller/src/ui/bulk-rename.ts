@@ -50,6 +50,7 @@ import {
   buildTokenRow,
   buildPresetRow,
 } from './bulk-rename-fields';
+import { KeyEnum1 } from "../types/enums";
 
 /**
  * Render the floating bulk rename dialog for selected workspaces.
@@ -510,7 +511,7 @@ function _snapshotStartNumInputsInto(startNums: StartNums): void {
 
 function _wireStartNumInput(
   id: string,
-  key: 'dollar' | 'hash' | 'star',
+  key: KeyEnum1,
   startNums: StartNums,
   updatePreview: () => void,
 ): void {

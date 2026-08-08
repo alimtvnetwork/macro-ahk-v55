@@ -17,6 +17,7 @@
 
 import { logDiagnosticFromCode } from '../error-utils';
 import { runSql as runSqlBridge } from './sql-bridge';
+import { ChatSubmitSourceEnum } from "../types/enums";
 
 // Scope tag retained for future logError() call sites during migration to
 // DiagnosticError codes. Referenced via void to keep bundlers from tree-
@@ -25,11 +26,7 @@ const SCOPE = 'ProjectChatSubmitDb';
 void SCOPE;
 
 export type ChatSubmitSource =
-  | 'paste'
-  | 'repeat'
-  | 'next-chip'
-  | 'plan-chip'
-  | 'manual';
+  ChatSubmitSourceEnum;
 
 export interface ChatSubmitRow {
   Id: number;

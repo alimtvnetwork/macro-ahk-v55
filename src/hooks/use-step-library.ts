@@ -41,6 +41,7 @@ import {
     useAssembleApi,
 } from "./step-library/step-library-hooks";
 import type { StepLibraryLoadError, UseStepLibraryApi, UseStepLibraryState } from "./use-step-library-types";
+import { StageEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 export type { StepLibraryLoadError, UseStepLibraryApi, UseStepLibraryState };
 
@@ -78,7 +79,7 @@ const DEFAULT_PROJECT_EXTERNAL_ID = "00000000-0000-0000-0000-000000000001";
 // StepLibraryLoadError type is defined in `use-step-library-types.ts` and re-exported above.
 
 
-function classifyLoadError(err: unknown, stage: "sqljs" | "storage-read" | "storage-write" | "other"): StepLibraryLoadError {
+function classifyLoadError(err: unknown, stage: StageEnum): StepLibraryLoadError {
     const message = err instanceof Error ? err.message : String(err ?? "Unknown error");
     if (stage === "sqljs") {
         return {

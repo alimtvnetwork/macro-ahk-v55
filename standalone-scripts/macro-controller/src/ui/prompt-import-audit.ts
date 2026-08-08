@@ -43,10 +43,10 @@
 
 import { log } from '../logger';
 import { throwDiagnostic } from '../errors/diagnostic-error';
+import { ImportAuditRowActionEnum, ImportAuditStatus, PromptsBundleFormatEnum } from "../types/enums";
 
-export type ImportAuditRowAction = 'add' | 'overwrite' | 'skip' | 'rename';
-export type ImportAuditStatus = 'in_progress' | 'committed' | 'rolled_back';
-export type ImportAuditFormat = 'json' | 'zip' | 'sqlite';
+export type ImportAuditRowAction = ImportAuditRowActionEnum;
+export type ImportAuditFormat = PromptsBundleFormatEnum;
 
 export interface ImportAuditActionRecord {
   slug: string;

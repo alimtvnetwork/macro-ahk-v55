@@ -10,6 +10,7 @@
  */
 
 import type { MessageRequest } from "../../shared/messages";
+import { Status7 } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -20,7 +21,7 @@ export interface XPathValidationEntry {
     xpath: string;
     selector?: string;
     found: number;
-    status: "pass" | "fail" | "fallback";
+    status: Status7;
     error?: string;
     fallbackUsed?: boolean;
 }

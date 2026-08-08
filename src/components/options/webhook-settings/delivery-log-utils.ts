@@ -18,6 +18,8 @@ import {
     type WebhookDeliverySkipped,
     type WebhookDeliverySuccess,
 } from "@/background/recorder/step-library/result-webhook";
+import { VariantEnum } from "../../../types/enums";
+import { MimeKindEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 /**
  * A delivery-log entry is a "corrupt placeholder" when the loader could not
@@ -62,7 +64,7 @@ function describeFailure(entry: WebhookDeliveryFailure): string {
     return `Status: Failed${httpPart}\nError: ${entry.Error}`;
 }
 
-type VariantBadgeVariant = "default" | "secondary" | "outline" | "destructive";
+type VariantBadgeVariant = VariantEnum;
 
 export interface VariantPresentation {
     readonly badgeLabel: string;
@@ -243,7 +245,7 @@ function downloadFile(filename: string, mimeType: string, content: string): void
     window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
-export function exportFilteredLog(entries: ReadonlyArray<WebhookDeliveryResult>, format: "json" | "csv"): void {
+export function exportFilteredLog(entries: ReadonlyArray<WebhookDeliveryResult>, format: MimeKindEnum): void {
     if (entries.length === 0) {
         toast.error("No entries match the current filters");
         return;

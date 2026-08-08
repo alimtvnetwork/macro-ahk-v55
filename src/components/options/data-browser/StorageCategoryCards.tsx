@@ -7,8 +7,9 @@
 
 import { Database, HardDrive, Cookie, Archive } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { StorageCategoryEnum } from "../../../types/enums";
 
-export type StorageCategory = "database" | "session" | "cookies" | "local";
+export type StorageCategory = StorageCategoryEnum;
 
 interface CategoryStats {
   label: string;

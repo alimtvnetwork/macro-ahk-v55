@@ -52,6 +52,7 @@ import {
     STEP_GROUP_NAME_MAX_LEN,
     validateStepGroupName,
 } from "./step-group-name-validator";
+import { Mode3, KindEnum5 } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -85,7 +86,7 @@ export interface BatchRenameDialogProps {
 /*  Transforms                                                         */
 /* ------------------------------------------------------------------ */
 
-type Mode = "replace" | "prefix" | "suffix" | "sequence";
+type Mode = Mode3;
 
 interface TransformInput {
     readonly Mode: Mode;
@@ -300,7 +301,7 @@ function ReplaceTab({ find, setFind, replace, setReplace }: {
 function AffixTab({ id, label, placeholder, value, setValue, kind }: {
     id: string; label: string; placeholder: string;
     value: string; setValue: (v: string) => void;
-    kind: "prefix" | "suffix";
+    kind: KindEnum5;
 }) {
     return (
         <TabsContent value={kind} className="space-y-2 pt-3">

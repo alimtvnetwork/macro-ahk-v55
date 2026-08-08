@@ -11,6 +11,7 @@ import { InjectionCopyButton } from "@/components/popup/InjectionCopyButton";
 import { sendMessage } from "@/lib/message-client";
 import React, { useState, useEffect } from "react";
 import { useErrorCount } from "@/hooks/use-error-count";
+import { Enum_7b1045ad } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 interface Props {
   loggingMode: string;
@@ -21,7 +22,7 @@ interface Props {
   onViewLogs: () => void;
   onExport: () => void;
   onDbExport: () => void;
-  onDbImport: (mode: "merge" | "replace") => void;
+  onDbImport: (mode: Enum_7b1045ad) => void;
   onRefresh: () => void;
 }
 
@@ -167,7 +168,7 @@ export function PopupFooter({
   onRefresh,
 }: Props) {
   const { count: errorCount } = useErrorCount(15_000);
-  const [importMode, setImportMode] = useState<"merge" | "replace">("replace");
+  const [importMode, setImportMode] = useState<Enum_7b1045ad>("replace");
   const [cacheClearing, setCacheClearing] = useState(false);
   const [cacheCleared, setCacheCleared] = useState<number | null>(null);
   const [cacheStats, setCacheStats] = useState<{ entryCount: number; categories: Record<string, number> } | null>(null);
@@ -295,7 +296,7 @@ export function PopupFooter({
         <ToggleGroup
           type="single"
           value={importMode}
-          onValueChange={(mode) => { if (mode) setImportMode(mode as "merge" | "replace"); }}
+          onValueChange={(mode) => { if (mode) setImportMode(mode as Enum_7b1045ad); }}
           className="bg-muted/50 rounded-md p-0.5 shrink-0 mx-0.5"
         >
           <ToggleGroupItem value="merge" className="text-[9px] h-5 px-2 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-sm">

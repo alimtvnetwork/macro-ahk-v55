@@ -37,6 +37,7 @@ import { state, loopCreditState } from './shared-state';
 import { stopLoop } from './loop-engine';
 import { showToast } from './toast';
 import { resolveToken } from './auth';
+import { SourceEnum5 } from "./types/enums";
 
 declare global {
   interface Window {
@@ -127,7 +128,7 @@ function onPageHide(): void {
  * Compares the current projectId against the last-seen one. On change
  * (including to/from null), stop the loop and notify once.
  */
-function evaluateRouteChange(source: 'history' | 'popstate'): void {
+function evaluateRouteChange(source: SourceEnum5): void {
   // U-4: href just changed; drop the memoized project ID so the next read recomputes.
   invalidateProjectIdCache();
   const currentProjectId = extractProjectIdFromUrl();

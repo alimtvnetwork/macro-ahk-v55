@@ -26,6 +26,7 @@ import { pickPromptFromRole } from './chip-gear-picker';
 import { setDefaultPromptForRole, deletePromptById } from '../db/prompt-db';
 import { exportPromptsToJson } from './prompt-io';
 import { dispatchPromptsChanged } from './prompts-changed-event';
+import { RejectionType } from "../types/enums";
 
 /**
  * Plan 26 step 9: coded diagnostic toast helper for chip-gear actions. Keeps
@@ -227,7 +228,7 @@ export function buildChipGearActionSection(input: BuildChipGearButtonInput): HTM
 }
 
 function wrapAction(name: string, role: PromptRole, action: () => Promise<void> | void): void {
-  const handleFailure = (rejectionType: 'threw' | 'rejected', err: unknown): void => {
+  const handleFailure = (rejectionType: RejectionType, err: unknown): void => {
     reportGearFailure(
       'UI_ACTION_E001',
       { actionName: name, role, rejectionType, reason: toErrorMessage(err) },

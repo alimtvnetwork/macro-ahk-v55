@@ -14,8 +14,9 @@ import type {
     FieldBindingRow,
     DataSourceRow,
 } from "@/hooks/use-recorder-project-data";
+import { MimeKindEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
-export type ExportFormat = "json" | "csv";
+export type ExportFormat = MimeKindEnum;
 
 interface ExportOptions {
     readonly projectSlug: string;

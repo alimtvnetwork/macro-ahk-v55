@@ -1,14 +1,4 @@
-/**
- * Marco Extension, Keyword Events, Target Picker Status
- *
- * Pure helper extracted from `TargetPickerRow` (Plan 25 step 12): classifies
- * a CSS-selector draft into one of four states so the row can render the
- * matching input border colour + inline hint. Keeping the classifier out of
- * the component drops `TargetPickerRow`'s cognitive complexity under the
- * 15-branch ceiling (was 18).
- */
-
-export type SelectorStatus = "empty" | "invalid" | "no-match" | "match";
+import { SelectorStatus } from "../../../types/enums";
 
 export function classifySelector(kind: string, selectorText: string): SelectorStatus {
     if (kind !== "Selector") { return "empty"; }

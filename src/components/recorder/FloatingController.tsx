@@ -49,13 +49,11 @@ import { useDraggable } from "@/hooks/use-draggable";
 import { openExtensionOptions } from "@/lib/open-extension-options";
 import { loadPanelToggles, savePanelToggles } from "@/lib/controller-panel-toggles";
 import { StepKindId } from "@/background/recorder/step-library/schema";
+import { ControllerMode } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types & constants                                                  */
 /* ------------------------------------------------------------------ */
-
-export type ControllerMode = "mini" | "compact" | "expanded";
-
 const MODE_STORAGE_KEY = "marco-floating-controller-mode";
 const STOP_CONFIRM_TIMEOUT_MS = 2500;
 

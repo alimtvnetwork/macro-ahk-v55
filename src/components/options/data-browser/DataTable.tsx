@@ -22,6 +22,8 @@ import { cn } from "@/lib/utils";
 import { formatDataTimestamp } from "./data-browser-helpers";
 import { LevelBadge, CategoryBadge } from "./DataBadges";
 import type { DataBrowserFilters } from "@/hooks/use-extension-data";
+import { DatabaseEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { ActiveViewEnum } from "../../../types/enums";
 
 interface BrowserRow {
   id: number;
@@ -36,8 +38,8 @@ interface BrowserRow {
 }
 
 interface DataTableProps {
-  activeDb: "logs" | "errors";
-  onDbChange: (db: "logs" | "errors" | "datastore") => void;
+  activeDb: DatabaseEnum;
+  onDbChange: (db: ActiveViewEnum) => void;
   rows: BrowserRow[];
   isLoading: boolean;
   page: number;
@@ -112,7 +114,7 @@ export function DataTable({
           <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
             Data Browser
           </CardTitle>
-          <Select value={activeDb} onValueChange={(v) => onDbChange(v as "logs" | "errors" | "datastore")}>
+          <Select value={activeDb} onValueChange={(v) => onDbChange(v as ActiveViewEnum)}>
             <SelectTrigger className="w-32 h-8 text-xs">
               <SelectValue />
             </SelectTrigger>
@@ -228,7 +230,7 @@ export function DataTable({
 
 interface DataRowProps {
   row: BrowserRow;
-  activeDb: "logs" | "errors";
+  activeDb: DatabaseEnum;
 }
 
 /** Single data row displaying a log or error entry. */

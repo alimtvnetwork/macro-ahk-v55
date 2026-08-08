@@ -48,6 +48,7 @@ import { renderFilterMenu } from './prompt-filter-menu';
 import { buildDropdownHeader } from './prompt-dropdown-header';
 
 import { sortEntriesByOrder, attachDragHandlers, getSlugPositionSource } from './prompt-drag-order';
+import { SlugPositionSourceEnum } from "../types/enums";
 
 /**
  * Visual metadata for each prompt-position source. Rendered as a small
@@ -55,7 +56,7 @@ import { sortEntriesByOrder, attachDragHandlers, getSlugPositionSource } from '.
  * came from the canonical default, a migrated saved order, or their own
  * drag-and-drop persistence.
  */
-const POSITION_SOURCE_META: Record<'default' | 'migrated' | 'drag', { glyph: string; bg: string; tooltip: string }> = {
+const POSITION_SOURCE_META: Record<SlugPositionSourceEnum, { glyph: string; bg: string; tooltip: string }> = {
   default: { glyph: 'D',  bg: 'rgba(107,114,128,0.75)', tooltip: 'Position from DEFAULT_PROMPT_ORDER (no saved order applies).' },
   migrated: { glyph: 'M', bg: 'rgba(59,130,246,0.85)',  tooltip: 'Position from a saved order carried across migrations (not manually dragged).' },
   drag: { glyph: '⇅',      bg: 'rgba(16,185,129,0.85)',  tooltip: 'Position set by your drag-and-drop and persisted to localStorage.' },

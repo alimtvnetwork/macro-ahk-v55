@@ -11,18 +11,19 @@
 /* ------------------------------------------------------------------ */
 
 import { logCaughtError, logBgWarnError, BgLogTag} from "./bg-logger";
+import { MergeStrategyEnum, SourceEnum } from "../types/enums";
 
 export interface RemoteConfigSettings {
     isEnabled: boolean;
     endpointUrl: string;
     refreshIntervalMinutes: number;
-    mergeStrategy: "deep" | "replace";
+    mergeStrategy: MergeStrategyEnum;
     authHeader: string;
 }
 
 export interface ConfigCascadeResult {
     config: Record<string, unknown>;
-    source: "remote" | "local" | "hardcoded";
+    source: SourceEnum;
     lastFetchedAt: string | null;
     lastFetchError: string | null;
 }
@@ -196,7 +197,7 @@ function mergeConfigs(
     defaults: Record<string, unknown>,
     local: Record<string, unknown>,
     remote: Record<string, unknown>,
-    strategy: "deep" | "replace",
+    strategy: MergeStrategyEnum,
 ): Record<string, unknown> {
     const isReplace = strategy === "replace";
 

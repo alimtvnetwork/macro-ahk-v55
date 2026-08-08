@@ -31,6 +31,7 @@ import type { StoredProject } from "@/hooks/use-projects-scripts";
 import { exportAllAsSqliteZip, exportProjectAsSqliteZip, exportProjectsAsSqliteZip, importFromSqliteZip, mergeFromSqliteZip, previewSqliteZip, type BundlePreview, type DiffItem } from "@/lib/sqlite-bundle";
 import { buildImportSummary, countCategory, SUMMARY_CATEGORY_ORDER } from "@/lib/import-summary";
 import { toast } from "sonner";
+import { Enum_7b1045ad } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -74,7 +75,7 @@ export const ProjectsListView = forwardRef<HTMLDivElement, Props>(function Proje
   const [preview, setPreview] = useState<BundlePreview | null>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [importMode, setImportMode] = useState<"merge" | "replace">("replace");
+  const [importMode, setImportMode] = useState<Enum_7b1045ad>("replace");
   const [selectExportOpen, setSelectExportOpen] = useState(false);
 
   const handleImportClick = () => fileRef.current?.click();
@@ -284,7 +285,7 @@ export const ProjectsListView = forwardRef<HTMLDivElement, Props>(function Proje
         <ToggleGroup
           type="single"
           value={importMode}
-          onValueChange={(mode) => { if (mode) setImportMode(mode as "merge" | "replace"); }}
+          onValueChange={(mode) => { if (mode) setImportMode(mode as Enum_7b1045ad); }}
           className="bg-muted/50 border border-border rounded-md p-0.5"
         >
           <ToggleGroupItem value="merge" className="text-xs h-7 px-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-sm">

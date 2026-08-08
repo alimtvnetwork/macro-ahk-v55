@@ -23,6 +23,7 @@ import type {
     RenameDialogState,
     StepEditorDialogState,
 } from "./dialog-state";
+import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 type StepLibrary = ReturnType<typeof useStepLibrary>;
 type BatchActions = ReturnType<typeof useStepGroupBatchActions>;
@@ -173,7 +174,7 @@ export function doDelete(deps: MutationDeps): void {
     }
 }
 
-export function doMove(deps: MutationDeps, id: number, direction: "up" | "down"): void {
+export function doMove(deps: MutationDeps, id: number, direction: DirectionEnum): void {
     try { deps.lib.moveGroupWithinParent(id, direction); }
     catch (caught) { toast.error(caught instanceof Error ? caught.message : "Move failed"); }
 }
@@ -230,7 +231,7 @@ export function doStepEditorSubmit(deps: MutationDeps, input: StepEditorSubmitIn
     }
 }
 
-export function doStepMove(deps: MutationDeps, stepId: number, direction: "up" | "down"): void {
+export function doStepMove(deps: MutationDeps, stepId: number, direction: DirectionEnum): void {
     try { deps.lib.moveStepWithinGroup(stepId, direction); }
     catch (caught) { toast.error(caught instanceof Error ? caught.message : "Move failed"); }
 }

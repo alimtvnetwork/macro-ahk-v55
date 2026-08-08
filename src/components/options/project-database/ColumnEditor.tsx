@@ -13,12 +13,13 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { ValidationRuleEditor, type ValidationRule } from "./ValidationRuleEditor";
+import { Type } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-export type SqliteType = "TEXT" | "INTEGER" | "REAL" | "BLOB" | "BOOLEAN";
+export type SqliteType = Type;
 
 export interface ColumnDefinition {
   name: string;

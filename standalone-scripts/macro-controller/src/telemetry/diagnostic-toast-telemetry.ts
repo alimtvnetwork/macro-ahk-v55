@@ -24,6 +24,7 @@ import { StorageKey } from '../types/storage-keys';
 import type { ErrorCode, ErrorSeverity } from '../errors/error-codes';
 import type { ToastLevel } from '../errors/show-diagnostic-toast';
 import type { RequestDetail, ToastOpts } from '../toast';
+import { LevelEnum3 } from "../../../../src/types/enums";
 
 export const DIAGNOSTIC_TOAST_TRACE_MAX = 50;
 
@@ -135,7 +136,7 @@ function formatLine(evt: DiagnosticToastEvent): string {
 }
 
 
-function levelToLogLevel(level: ToastLevel): 'success' | 'warning' | 'error' | 'info' {
+function levelToLogLevel(level: ToastLevel): LevelEnum3 {
   if (level === 'error') return 'error';
   if (level === 'warn') return 'warning';
   return 'info';

@@ -17,6 +17,7 @@ import { VERSION } from '../shared-state';
 import { buildPromptsBundle, validatePromptsBundle, type BundleRevisionRow, type PromptsBundleV1 } from './prompt-bundle-types';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
 import { listPromptRevisions, insertImportedRevisions } from '../db/prompt-revision-db';
+import { PhaseEnum3 } from "../types/enums";
 
 /**
  * Options for `exportPromptsToJson`.
@@ -435,7 +436,7 @@ export function parsePromptsText(jsonText: string): ParsedPromptsResult {
  *   the import.
  */
 export interface ImportProgress {
-  phase: 'entries' | 'revisions' | 'done';
+  phase: PhaseEnum3;
   entriesCommitted: number;
   totalEntries: number;
   insertedRevisions: number;

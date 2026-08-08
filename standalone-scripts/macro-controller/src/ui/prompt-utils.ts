@@ -17,10 +17,7 @@ import { TOAST_MAX_STACK } from '../constants';
 import { getProjectKvStore } from '../project-kv-store';
 import { extractProjectIdFromUrl } from '../workspace-detection';
 import { saveCommunication } from '../db/macro-db';
-
-
-
-
+import { PasteOutcomeEnum, CaptureSourceEnum } from "../types/enums";
 
 async function capturePasteSubmit(text: string, source: ChatSubmitSource): Promise<void> {
   try { await captureChatSubmit({ source, text }); }
@@ -501,7 +498,7 @@ function pasteIntoContentEditable(target: HTMLElement, text: string): boolean {
   return false;
 }
 
-export type PasteOutcome = 'injected' | 'clipboard' | 'failed' | 'cancelled';
+export type PasteOutcome = PasteOutcomeEnum;
 
 /**
  * Scan text for {{?Variable Name}} and prompt user for values.
@@ -605,7 +602,7 @@ function showVariableInputModal(vars: string[]): Promise<Record<string, string> 
   });
 }
 
-export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, getByXPath: (xpath: string) => Element | null, captureSource: 'paste' | 'next-chip' | 'plan-chip' = 'paste'): Promise<PasteOutcome> {
+export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, getByXPath: (xpath: string) => Element | null, captureSource: CaptureSourceEnum = 'paste'): Promise<PasteOutcome> {
   // 1. Handle date/time (legacy)
   const now = new Date();
   let text = rawText

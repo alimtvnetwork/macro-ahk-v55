@@ -16,6 +16,7 @@ import { KeywordEventAddStepControls } from "./KeywordEventAddStepControls";
 import { LiveDispatchPreview } from "./LiveDispatchPreview";
 import { TargetPickerRow } from "./TargetPickerRow";
 import { PauseAfterRow } from "./PauseAfterRow";
+import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 export interface KeywordEventCardProps {
     readonly event: KeywordEvent;
@@ -27,7 +28,7 @@ export interface KeywordEventCardProps {
     readonly onUpdate: (patch: Partial<Omit<KeywordEvent, "Id">>) => void;
     readonly onAddStep: (step: Omit<KeywordEventStep, "Id">) => void;
     readonly onRemoveStep: (stepId: string) => void;
-    readonly onMoveStep: (stepId: string, dir: "up" | "down") => void;
+    readonly onMoveStep: (stepId: string, dir: DirectionEnum) => void;
     readonly onRemoveSteps: (eventId: string, stepIds: readonly string[]) => void;
     readonly onSetStepsEnabled: (eventId: string, stepIds: readonly string[], enabled: boolean) => void;
     readonly onRelabelSteps: (eventId: string, stepIds: readonly string[], labels: readonly string[]) => void;

@@ -33,6 +33,7 @@ import { sqlLit } from '../db/prompt-role-db';
 import { PLAN_NEXT_SEED_ROWS } from './plan-next-prompts';
 import { seedPlanNextPrompts } from './seed-plan-next';
 import { emitPromptSeedEvent } from '../telemetry/prompt-seed-telemetry';
+import { Mode4, MethodEnum1 } from "../types/enums";
 
 export interface ReseedOptions {
   /** When true, overwrite existing default rows (destructive). */
@@ -41,7 +42,7 @@ export interface ReseedOptions {
 
 export interface ReseedResult {
   ok: boolean;
-  mode: 'idempotent' | 'force';
+  mode: Mode4;
   /** Number of default rows overwritten in force mode. */
   forcedUpdates?: number;
   error?: string;
@@ -53,7 +54,7 @@ const EV_RESEED_COMPLETE = 'reseed.complete' as const;
 
 
 
-async function rawSql(method: 'QUERY' | 'SCHEMA', sql: string): Promise<RawSqlResp> {
+async function rawSql(method: MethodEnum1, sql: string): Promise<RawSqlResp> {
   void DB_NAME;
   return runSqlBridge(method, sql);
 }
@@ -93,7 +94,7 @@ async function forceResetDefaultBodies(): Promise<{ forced: number; error?: stri
  */
 export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<ReseedResult> {
   const force = opts.force === true;
-  const mode: 'idempotent' | 'force' = force ? 'force' : 'idempotent';
+  const mode: Mode4 = force ? 'force' : 'idempotent';
   emitPromptSeedEvent({ event: 'reseed.start', outcome: 'ok', detail: mode });
   try {
     // Always run the normal seeder first so missing rows are inserted and

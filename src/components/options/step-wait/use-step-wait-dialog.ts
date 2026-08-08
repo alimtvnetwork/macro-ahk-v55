@@ -21,8 +21,9 @@ import {
     type WaitCondition,
     type WaitConfig,
 } from "@/background/recorder/step-library/step-wait";
+import { SelectorKindEnum } from "../../../types/enums";
 
-export type KindMode = "Auto" | "Css" | "XPath";
+export type KindMode = SelectorKindEnum;
 
 export interface TestResult {
     readonly Kind: SelectorKind;

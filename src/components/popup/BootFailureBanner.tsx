@@ -5,6 +5,7 @@ import { AlertTriangle, ChevronDown, ChevronRight, Copy, Check, Download, MouseP
 import { readClickTrail, type ClickTrailEntry } from "@/lib/click-trail";
 import { useBenignWarningStats } from "@/hooks/use-benign-warning-stats";
 import type { BenignWarningTally } from "@/lib/benign-warnings";
+import { Enum_1ab45d34, CauseKindEnum } from "../../types/enums";
 
 /** Structured per-failure context — see BootErrorContext in shared/messages.ts. */
 export interface BootErrorContext {
@@ -78,7 +79,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
   // steps, and SQL body (keeping only the correlation header, op summary,
   // WASM probe, and benign tally totals). "full" includes everything.
   // Persisted across mounts so users keep their preferred default.
-  const [reportMode, setReportMode] = useState<"short" | "full">(() => {
+  const [reportMode, setReportMode] = useState<Enum_1ab45d34>(() => {
     try {
       const saved = localStorage.getItem("marco_support_report_mode");
       return saved === "short" ? "short" : "full";
@@ -87,7 +88,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       return "full";
     }
   });
-  const setReportModePersisted = (mode: "short" | "full"): void => {
+  const setReportModePersisted = (mode: Enum_1ab45d34): void => {
     setReportMode(mode);
     try {
       localStorage.setItem("marco_support_report_mode", mode);
@@ -423,7 +424,7 @@ function CollapsibleSection({ icon, label, isOpen, onToggle, children }: Collaps
 /*  Cause Classification                                          */
 /* ────────────────────────────────────────────────────────────── */
 
-type CauseKind = "wasm-missing" | "wasm" | "opfs" | "storage" | "migration" | "schema" | "unknown";
+type CauseKind = CauseKindEnum;
 
 interface Cause {
   kind: CauseKind;
@@ -542,7 +543,7 @@ interface ReportInput {
   /** Tally of warnings filtered out of the Errors drawer. */
   benignTally: BenignWarningTally;
   /** "short" — correlation header + summary only; "full" — everything. */
-  mode: "short" | "full";
+  mode: Enum_1ab45d34;
 }
 
 /** Produces a plain-text bundle suitable for clipboard/issue reports. */

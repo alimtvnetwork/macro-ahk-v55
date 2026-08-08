@@ -31,6 +31,7 @@ import type { WasmProbeSnapshot } from "@/hooks/use-extension-data";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, XCircle, AlertTriangle, RefreshCw, ShieldAlert, FileWarning, Copy, Check, Wrench, ExternalLink, RotateCw, Terminal, FileCode } from "lucide-react";
 import { logError } from "./options-logger";
+import { InitOutcomeEnum, FixScenarioEnum } from "../../types/enums";
 
 /* ----------------------------------------------------------------------- */
 /*  Runtime CSP probe                                                       */
@@ -98,7 +99,7 @@ function readDeclaredCsp(): string | null {
 /*  Boot-side WASM init evaluation                                          */
 /* ----------------------------------------------------------------------- */
 
-type InitOutcome = "success" | "failed" | "in_progress" | "unknown";
+type InitOutcome = InitOutcomeEnum;
 
 interface InitEvaluation {
     outcome: InitOutcome;
@@ -408,12 +409,7 @@ export function WasmStatusBanner() {
 /* ----------------------------------------------------------------------- */
 
 type FixScenario =
-    | "all_clear"
-    | "manifest_missing_directive"
-    | "stale_build_reload_needed"
-    | "csp_blocked_unknown_cause"
-    | "boot_failed_non_csp"
-    | "build_tooling_pnpm_dlx_less";
+    FixScenarioEnum;
 
 interface FixStep {
     title: string;

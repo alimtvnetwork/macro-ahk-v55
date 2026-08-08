@@ -7,6 +7,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { sendMessage } from "@/lib/message-client";
 import { isBenignWarning } from "@/lib/benign-warnings";
+import { KindEnum, SeverityFilterEnum, SourceFilterEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 export interface TimelineEntry {
   id: string;
@@ -17,11 +18,11 @@ export interface TimelineEntry {
   message: string;
   detail?: string;
   stack?: string;
-  kind: "log" | "error";
+  kind: KindEnum;
 }
 
-export type SeverityFilter = "all" | "info" | "warn" | "error";
-export type SourceFilter = "all" | "background" | "content" | "user-script" | "macro";
+export type SeverityFilter = SeverityFilterEnum;
+export type SourceFilter = SourceFilterEnum;
 
 interface RawLog {
   id: number;

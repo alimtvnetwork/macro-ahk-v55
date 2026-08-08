@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { getPlatform } from "../../platform";
 import { ProjectEditor } from "./ProjectEditor";
 import { Toast } from "../shared/Toast";
+import { RoleEnum1, VariantEnum3, Enum_7b1045ad } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -22,7 +23,7 @@ interface StoredProject {
     targetUrls: { pattern: string; matchType: string }[];
     scripts: { path: string; order: number; configBinding?: string; code?: string }[];
     configs?: { id: string; name: string }[];
-    cookies?: Array<{ cookieName: string; url: string; role: "session" | "refresh" | "custom"; description?: string }>;
+    cookies?: Array<{ cookieName: string; url: string; role: RoleEnum1; description?: string }>;
     settings?: Record<string, unknown>;
     createdAt: string;
     updatedAt: string;
@@ -38,8 +39,8 @@ export function ProjectsSection() {
     const [projects, setProjects] = useState<StoredProject[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [editingProject, setEditingProject] = useState<StoredProject | null | "new">(null);
-    const [toast, setToast] = useState<{ message: string; variant: "success" | "error" | "info" } | null>(null);
-    const [importMode, setImportMode] = useState<"merge" | "replace">("replace");
+    const [toast, setToast] = useState<{ message: string; variant: VariantEnum3 } | null>(null);
+    const [importMode, setImportMode] = useState<Enum_7b1045ad>("replace");
     const sqliteInputRef = useRef<HTMLInputElement>(null);
 
     const loadProjects = useCallback(async () => {

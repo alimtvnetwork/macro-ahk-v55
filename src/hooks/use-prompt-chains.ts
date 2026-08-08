@@ -6,6 +6,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { sendMessage } from "@/lib/message-client";
 import type { PromptEntry } from "./use-prompts";
+import { ChainStepStatus } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -25,8 +26,6 @@ export interface PromptChain {
     createdAt: string;
     updatedAt: string;
 }
-
-export type ChainStepStatus = "pending" | "running" | "done" | "error" | "skipped";
 
 export interface ChainExecutionState {
     chainId: string;

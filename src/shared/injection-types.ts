@@ -1,3 +1,5 @@
+import { InjectionLaunchSourceEnum, RunAtEnum1, SkipReasonEnum1, InlineSyntaxFlagSourceEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
+
 /**
  * Marco Extension — Script Injection Types
  *
@@ -11,7 +13,7 @@ export interface ScriptAssets {
 }
 
 /** How an injection was started. Manual launches may open visible page UI. */
-export type InjectionLaunchSource = "manual" | "passive";
+export type InjectionLaunchSource = InjectionLaunchSourceEnum;
 
 /** A script to inject into a tab. */
 export interface InjectableScript {
@@ -19,7 +21,7 @@ export interface InjectableScript {
     name?: string;
     code: string;
     order: number;
-    runAt?: "document_start" | "document_idle" | "document_end";
+    runAt?: RunAtEnum1;
     configBinding?: string;
     themeBinding?: string;
     isIife?: boolean;
@@ -28,7 +30,7 @@ export interface InjectableScript {
 }
 
 /** Reason a script was skipped during resolution. */
-export type SkipReason = "disabled" | "missing" | "resolver_mismatch" | "empty_code";
+export type SkipReason = SkipReasonEnum1;
 
 /** Result of a single script injection. */
 export interface InjectionResult {
@@ -96,7 +98,7 @@ export interface NormalizedInjectScriptsResponse {
      * `false`. Useful for diagnostics and for telemetry that wants to
      * know how often older backgrounds are still in play.
      */
-    inlineSyntaxFlagSource: "wire" | "legacy-default";
+    inlineSyntaxFlagSource: InlineSyntaxFlagSourceEnum;
 }
 
 /**

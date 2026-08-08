@@ -10,6 +10,7 @@
 import type { Database as SqlJsDatabase } from "sql.js";
 import type { SqlValue } from "./handlers/handler-types";
 import { ensureMetaTables } from "./schema-meta-engine";
+import { SortOrder, Type } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -20,7 +21,7 @@ export interface WhereClause {
 }
 
 export interface OrderByClause {
-    [column: string]: "asc" | "desc";
+    [column: string]: SortOrder;
 }
 
 export interface CreateArgs {
@@ -229,7 +230,7 @@ export function queryCount(
 
 export interface ColumnDef {
     Name: string;
-    Type: "TEXT" | "INTEGER" | "REAL" | "BLOB" | "BOOLEAN";
+    Type: Type;
     Nullable?: boolean;
     Default?: string;
 }

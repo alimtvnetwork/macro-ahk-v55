@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, AlertTriangle, Plus, RefreshCw, FolderOpen, FileCode, Settings } from "lucide-react";
 import type { BundlePreview, DiffItem } from "@/lib/sqlite-bundle";
+import { Enum_7b1045ad } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 interface ImportPreviewDialogProps {
   open: boolean;
@@ -18,7 +19,7 @@ interface ImportPreviewDialogProps {
   preview: BundlePreview | null;
   loading: boolean;
   importing: boolean;
-  mode: "merge" | "replace";
+  mode: Enum_7b1045ad;
   onConfirm: () => void;
   onCancel: () => void;
 }

@@ -1,3 +1,5 @@
+import { ErrorSeverityEnum, ErrorAreaEnum } from "../types/enums";
+
 /**
  * Central error-code registry for the macro-controller extension.
  *
@@ -15,34 +17,10 @@
  *  - .lovable/spec/commands/04-professional-diagnostic-error-messages.md
  */
 
-export type ErrorSeverity = 'fatal' | 'error' | 'warn' | 'info';
+export type ErrorSeverity = ErrorSeverityEnum;
 
 export type ErrorArea =
-  | 'PROMPT'
-  | 'PROMPT_IO'
-  | 'SEED'
-  | 'HEALTH'
-  | 'REPAIR'
-  | 'HISTORY'
-  | 'DB'
-  | 'HTTP'
-  | 'SDK'
-  | 'WS_MEMBERS'
-  | 'WS_MOVE'
-  | 'WS_CONTEXT'
-  | 'REMIX'
-  | 'RENAME'
-  | 'GITSYNC'
-  | 'CREDIT'
-  | 'PROZERO'
-  | 'SETTINGS'
-  | 'SPLITTER'
-  | 'TELEMETRY'
-  | 'UI'
-  | 'ASYNC'
-  | 'LOOP'
-  | 'QUEUE'
-  | 'TYPE';
+  ErrorAreaEnum;
 
 
 export interface ErrorCodeEntry {

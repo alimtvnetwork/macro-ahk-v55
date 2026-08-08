@@ -1,3 +1,5 @@
+import { SkipReasonEnum2 } from "../../../standalone-scripts/macro-controller/src/types/enums";
+
 /**
  * Marco Extension — React Popup: Injection Results
  *
@@ -14,7 +16,7 @@ export interface InjectionResultEntry {
     isSuccess: boolean;
     errorMessage?: string;
     durationMs?: number;
-    skipReason?: "disabled" | "missing" | "resolver_mismatch";
+    skipReason?: SkipReasonEnum2;
     scriptName?: string;
 }
 

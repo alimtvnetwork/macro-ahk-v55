@@ -16,6 +16,7 @@
  */
 
 import type { KeywordEvent } from "@/hooks/use-keyword-events";
+import { SequencePreviewIssueEnum } from "../types/enums";
 
 export interface SequenceRenameInput {
     readonly Base: string;
@@ -51,10 +52,7 @@ export function renderSequenceName(input: SequenceRenameInput, index: number): s
 /* ------------------------------------------------------------------ */
 
 export type SequencePreviewIssue =
-    | "empty"           // resolved name is empty / whitespace
-    | "too-long"        // > 200 chars; matches Keyword column soft limit
-    | "duplicate"       // collides with another row inside this rename batch
-    | "collision";      // collides with an existing event NOT in the selection
+    SequencePreviewIssueEnum;      // collides with an existing event NOT in the selection
 
 export interface SequencePreviewRow {
     readonly Id: string;

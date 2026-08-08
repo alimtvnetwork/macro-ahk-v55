@@ -40,6 +40,7 @@ import type {
 } from "@/background/recorder/failure-logger";
 import type { VariableContext } from "@/background/recorder/field-reference-resolver";
 import { FormSnapshotTable } from "./FormSnapshotTable";
+import { ReasonGroupEnum } from "../../types/enums";
 
 interface FailureDetailsPanelProps {
     readonly report: FailureReport;
@@ -51,7 +52,7 @@ interface FailureDetailsPanelProps {
 /*  Reason classification                                              */
 /* ------------------------------------------------------------------ */
 
-type ReasonGroup = "variable" | "selector" | "syntax" | "timeout" | "other";
+type ReasonGroup = ReasonGroupEnum;
 
 const REASON_GROUP: Readonly<Record<FailureReasonCode, ReasonGroup>> = {
     VariableMissing:        "variable",

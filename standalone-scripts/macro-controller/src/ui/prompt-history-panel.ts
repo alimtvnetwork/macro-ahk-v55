@@ -26,6 +26,8 @@ import { showToast } from '../toast';
 import { showUndoToast } from './prompt-utils';
 import { writePendingRestoreUndo, clearPendingRestoreUndo } from './pending-restore-undo';
 import { PLAN_NEXT_SEED_ROWS } from '../seed/plan-next-prompts';
+import { VariantEnum3, HistorySortKeyEnum, HistoryImportedFilterEnum } from "../types/enums";
+import { SortOrder } from "../../../../src/types/enums";
 
 export interface OpenPromptHistoryInput {
     role: PromptRole;
@@ -41,7 +43,7 @@ export interface HistoryPanelDeps {
     getDefault?: typeof getDefaultPromptForRole;
     upsert?: typeof upsertPrompt;
     deletePrompt?: typeof deletePromptById;
-    toast?: (message: string, kind?: 'info' | 'success' | 'error') => void;
+    toast?: (message: string, kind?: VariantEnum3) => void;
     /**
      * Injectable undo-toast (v4.185.0). Defaults to `showUndoToast` from
      * `prompt-utils`. Split out from `toast` so unit tests can verify the
@@ -135,7 +137,7 @@ function reportHistoryFailure(
     code: string,
     context: DiagnosticContext,
     userSentence: string,
-    opts: { cause?: unknown; toast?: (m: string, k?: 'info' | 'success' | 'error') => void } = {},
+    opts: { cause?: unknown; toast?: (m: string, k?: VariantEnum3) => void } = {},
 ): void {
     logHistoryDiagnostic(code, context, opts.cause);
     (opts.toast ?? showToast)(userSentence + '  [code=' + code + ']', 'error');
@@ -451,15 +453,15 @@ function buildSubtitleText(total: number, visible: number): string {
 }
 
 /** Sortable columns exposed in the history toolbar (v4.192.0). */
-export type HistorySortKey = 'date' | 'reason';
-export type HistorySortDir = 'asc' | 'desc';
+export type HistorySortKey = HistorySortKeyEnum;
+export type HistorySortDir = SortOrder;
 /**
  * Imported-provenance filter cycle:
  * - `all`: show both native and imported rows.
  * - `only`: show only rows written by `insertImportedRevisions` (PromptId=0).
  * - `exclude`: hide those rows entirely.
  */
-export type HistoryImportedFilter = 'all' | 'only' | 'exclude';
+export type HistoryImportedFilter = HistoryImportedFilterEnum;
 
 interface HistoryViewState {
     sortKey: HistorySortKey;

@@ -15,6 +15,7 @@
 import type { Database as SqlJsDatabase } from "sql.js";
 import { initProjectDb } from "../project-db-manager";
 import { readStepRow, type PersistedStep } from "./step-persistence";
+import { StepLinkSlotEnum } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -28,7 +29,7 @@ export interface StepMetaPatch {
     readonly TimeoutMs?: number | null;
 }
 
-export type StepLinkSlot = "OnSuccessProjectId" | "OnFailureProjectId";
+export type StepLinkSlot = StepLinkSlotEnum;
 
 /* ------------------------------------------------------------------ */
 /*  Validation constants & helpers (Phase 14 spec constraints)         */

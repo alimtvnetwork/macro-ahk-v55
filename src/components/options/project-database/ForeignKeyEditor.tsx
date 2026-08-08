@@ -11,12 +11,13 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2, Link } from "lucide-react";
+import { OnDeleteEnum } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-export type OnDeleteAction = "CASCADE" | "SET NULL" | "RESTRICT" | "NO ACTION";
+export type OnDeleteAction = OnDeleteEnum;
 
 export interface ForeignKeyDefinition {
   sourceColumn: string;

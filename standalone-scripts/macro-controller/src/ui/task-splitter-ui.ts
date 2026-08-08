@@ -32,7 +32,7 @@ import { getSettingsOverrides } from '../settings-store';
 import { REPLACE_KEY_DEFAULT } from '../db/prompt-defaults';
 import { PLAN_DEFAULT_BODY } from '../seed/plan-next-prompts';
 import { substituteToken } from '../utils/token-substitute';
-
+import { Enum_e15ad38, PlanPromptSourceEnum } from "../types/enums";
 
 const DELAY_PRESETS_SEC = [2, 5, 10, 15, 30, 60] as const;
 const STEP_MIN = 2;
@@ -619,8 +619,8 @@ export async function triggerSplitFromInline(stepCount: number): Promise<void> {
   }
 }
 
-type PlanPromptEntry = Pick<PromptEntry, 'slug' | 'name' | 'text' | 'replaceKey' | 'parentSlug' | 'variantValue'>;
-export type PlanPromptSource = 'db-default' | 'window-config' | 'preamble-prompts' | 'default-prompts' | 'parent-slug-variant' | 'slug-variant' | 'not-found';
+type PlanPromptEntry = Pick<PromptEntry, Enum_e15ad38>;
+export type PlanPromptSource = PlanPromptSourceEnum;
 let lastPlanPromptSource: PlanPromptSource = 'not-found';
 export function getLastPlanPromptSource(): PlanPromptSource { return lastPlanPromptSource; }
 

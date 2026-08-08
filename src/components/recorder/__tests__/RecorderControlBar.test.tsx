@@ -9,8 +9,9 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { render, screen, cleanup, act } from "@testing-library/react";
 import { RecorderControlBar } from "../RecorderControlBar";
 import { RECORDER_SESSION_STORAGE_KEY } from "@/background/recorder/recorder-session-types";
+import { PhaseEnum } from "../../../types/enums";
 
-function seed(phase: "Idle" | "Recording" | "Paused"): void {
+function seed(phase: PhaseEnum): void {
     if (phase === "Idle") {
         window.localStorage.removeItem(RECORDER_SESSION_STORAGE_KEY);
         return;

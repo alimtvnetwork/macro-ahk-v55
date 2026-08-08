@@ -46,11 +46,12 @@ import {
     captureFormSnapshot,
     type FormSnapshot,
 } from "./form-snapshot";
+import { FailurePhaseEnum, FailureReasonCodeEnum, Enum_3f9b995 } from "../../types/enums";
 
 export type { VariableContext } from "./field-reference-resolver";
 export type { FormSnapshot } from "./form-snapshot";
 
-export type FailurePhase = "Record" | "Replay";
+export type FailurePhase = FailurePhaseEnum;
 
 /**
  * Top-level short-code classifying the failure for AI grouping.
@@ -59,24 +60,7 @@ export type FailurePhase = "Record" | "Replay";
 export type FailureReasonCode =
     // ---- Variable / data-row failures (highest priority — explain WHY the
     //      step had bad inputs before any selector was even tried). --------
-    | "VariableMissing"        // {{Token}} references a column not in the row.
-    | "VariableNull"           // Column exists but value is null.
-    | "VariableUndefined"      // Column exists but value is undefined.
-    | "VariableEmpty"          // Column exists but value is "".
-    | "VariableTypeMismatch"   // Column present but wrong type for this step.
-    // ---- Selector failures ------------------------------------------------
-    | "ZeroMatches"            // No selector (primary or fallback) matched anything.
-    | "PrimaryMissedFallbackOk" // Primary missed but a fallback matched — drift.
-    | "XPathSyntaxError"       // At least one XPath threw during evaluation.
-    | "CssSyntaxError"         // At least one CSS selector threw.
-    | "UnresolvedAnchor"       // XPathRelative anchor chain broken / cyclic.
-    | "EmptyExpression"        // A stored expression was "".
-    | "NoSelectors"            // Step had zero selectors persisted.
-    // ---- Other ------------------------------------------------------------
-    | "Timeout"                // Wait/Retry exceeded budget (set by callers).
-    | "ConditionTimeout"       // Gate condition not met within TimeoutMs (per spec 19 §2).
-    | "JsThrew"                // JsInline step threw inside the sandbox.
-    | "Unknown";               // Caller did not classify — last resort.
+    FailureReasonCodeEnum;               // Caller did not classify — last resort.
 
 export interface SelectorAttempt {
     readonly SelectorId: number | null;
@@ -241,7 +225,7 @@ interface FailureReportContext {
 function buildContextCore(
     input: BuildFailureReportInput,
     now: () => Date,
-): Pick<FailureReportContext, "Message" | "Stack" | "Attempts" | "Reason" | "ReasonDetail" | "Verbose"> {
+): Pick<FailureReportContext, Enum_3f9b995> {
     const message = extractMessage(input.Error);
     const attempts = resolveAttempts(input);
     const variables: ReadonlyArray<VariableContext> = input.Variables ?? [];

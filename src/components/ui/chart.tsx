@@ -3,6 +3,7 @@ import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 
 import { cn } from "@/lib/utils";
+import { IndicatorEnum, Enum_7cb0a3c2 } from "../../types/enums";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const;
@@ -96,7 +97,7 @@ const ChartTooltipContent = React.forwardRef<
     React.ComponentProps<"div"> & {
       hideLabel?: boolean;
       hideIndicator?: boolean;
-      indicator?: "line" | "dot" | "dashed";
+      indicator?: IndicatorEnum;
       nameKey?: string;
       labelKey?: string;
     }
@@ -231,7 +232,7 @@ const ChartLegend = RechartsPrimitive.Legend;
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> &
-    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+    Pick<RechartsPrimitive.LegendProps, Enum_7cb0a3c2> & {
       hideIcon?: boolean;
       nameKey?: string;
     }

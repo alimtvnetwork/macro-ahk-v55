@@ -15,6 +15,7 @@ import {
   FileCode,
 } from "lucide-react";
 import type { StoredProject } from "@/hooks/use-projects-scripts";
+import { StageEnum3 } from "../../../types/enums";
 
 export interface InjectionOrderPreviewProps {
   project: StoredProject;
@@ -28,7 +29,7 @@ interface OrderEntry {
   step: number;
   label: string;
   scriptName: string;
-  stage: "global" | "dependency" | "project";
+  stage: StageEnum3;
   projectName: string;
   isEnabled: boolean;
   order: number;

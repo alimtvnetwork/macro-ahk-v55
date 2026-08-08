@@ -24,6 +24,7 @@ import {
 import type { KeywordEventTarget } from "@/hooks/use-keyword-events";
 import { cn } from "@/lib/utils";
 import { classifySelector, type SelectorStatus } from "./target-picker-status";
+import { KindEnum9 } from "../../../types/enums";
 
 const CSS_INPUT_INVALID = "border-destructive focus-visible:ring-destructive";
 
@@ -116,7 +117,7 @@ function SelectorInputRow(props: {
     );
 }
 
-function NonSelectorHint(props: { kind: "ActiveElement" | "Body" }): JSX.Element {
+function NonSelectorHint(props: { kind: KindEnum9 }): JSX.Element {
     return (
         <p className="text-[10px] text-muted-foreground">
             {props.kind === "ActiveElement"
@@ -151,7 +152,7 @@ export function TargetPickerRow(props: TargetPickerRowProps): JSX.Element {
             <KindSelector eventId={eventId} kind={value.Kind} onKindChange={handleKindChange} />
             {isSelector
                 ? <SelectorInputRow eventId={eventId} selectorText={selectorText} status={status} onChange={onChange} />
-                : <NonSelectorHint kind={value.Kind as "ActiveElement" | "Body"} />}
+                : <NonSelectorHint kind={value.Kind as KindEnum9} />}
         </div>
     );
 }

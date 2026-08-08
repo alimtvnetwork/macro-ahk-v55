@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Shield, Play, Copy, Check, Loader2 } from "lucide-react";
 import { sendMessage } from "@/lib/message-client";
+import { Status, VariantEnum } from "../../types/enums";
 
 interface AuthStrategyResult {
     name: string;
@@ -22,14 +23,14 @@ interface AuthStrategyResult {
 }
 
 interface AuthHealthData {
-    status: "authenticated" | "degraded" | "unauthenticated";
+    status: Status;
     resolvedVia: string | null;
     totalMs: number;
     strategies: AuthStrategyResult[];
     checkedAt: string;
 }
 
-const STATUS_CONFIG: Record<string, { icon: string; variant: "default" | "secondary" | "destructive" | "outline"; label: string }> = {
+const STATUS_CONFIG: Record<string, { icon: string; variant: VariantEnum; label: string }> = {
     authenticated: { icon: "🟢", variant: "default", label: "Authenticated" },
     degraded: { icon: "🟡", variant: "secondary", label: "Degraded" },
     unauthenticated: { icon: "🔴", variant: "destructive", label: "Unauthenticated" },

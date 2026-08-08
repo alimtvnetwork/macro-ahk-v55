@@ -39,6 +39,7 @@ vi.mock('../ui/extension-relay', () => ({
 }));
 
 import { createOpenTabsSection } from '../ui/section-open-tabs';
+import { BindingSourceEnum, OriginEnum1 } from "../../../../src/types/enums";
 
 describe('open-tabs-section', () => {
   beforeEach(() => {
@@ -59,12 +60,12 @@ describe('open-tabs-section', () => {
     windowFocused: boolean;
     projectId: string | null;
     projectName: string | null;
-    bindingSource: 'injection' | 'probe' | 'none';
+    bindingSource: BindingSourceEnum;
     detectedWorkspaceName: string | null;
     detectedWorkspaceId: string | null;
     detectedWorkspaceSource: 'api' | 'cache' | 'dom' | 'none' | null;
     probeError: string | null;
-    matchedRule: { pattern: string; matchType: string; origin: 'injection-record' | 'evaluated' } | null;
+    matchedRule: { pattern: string; matchType: string; origin: OriginEnum1 } | null;
   }> {
     return [
       {

@@ -16,13 +16,15 @@ import { escapeHtml, buildPagination, buildDataTableElement } from './database-d
 
 import { MACRO_CONTROLLER_NS, DB_PAGE_SIZE } from '../constants';
 import { DomId } from '../types';
+import { Enum_7dc824d7 } from "../types/enums";
+
 const PAGE_SIZE = DB_PAGE_SIZE;
 
 /** Filter state for a single table. */
 export interface FilterState {
   column: string;
   value: string;
-  mode: 'like' | 'exact';
+  mode: Enum_7dc824d7;
   caseSensitive: boolean;
   columns: string[];
 }

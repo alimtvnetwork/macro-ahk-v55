@@ -1,3 +1,5 @@
+import { StrategyEnum } from "../types/enums";
+
 /**
  * Issue 128 — Read the Lovable Queue section's count badge.
  *
@@ -14,7 +16,7 @@ export const QUEUE_COUNT_XPATH =
 
 interface CountSpanResult {
     element: HTMLElement | null;
-    strategy: 'primary-xpath' | 'fallback-header-walk' | 'fallback-aria-walk' | 'none';
+    strategy: StrategyEnum;
 }
 
 function tryPrimaryXPath(): HTMLElement | null {

@@ -1,3 +1,5 @@
+import { ReasonEnum6 } from "../types/enums";
+
 /**
  * MacroLoop Controller — Credit Balance Throttle Gate
  *
@@ -38,7 +40,7 @@ let lastAnyFetchAt = 0;
 export interface ShouldFetchDecision {
     readonly allowed: boolean;
     readonly waitMs: number;
-    readonly reason: 'ok' | 'forced' | 'per-ws-cooldown' | 'inter-ws-cooldown';
+    readonly reason: ReasonEnum6;
 }
 
 /**

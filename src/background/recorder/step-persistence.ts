@@ -30,6 +30,7 @@ import {
     StepStatusId,
     type StepKindId,
 } from "../recorder-db-schema";
+import { Enum_50213bfa } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -321,7 +322,7 @@ function readSelector(db: SqlJsDatabase, selectorId: number): PersistedSelector 
     return rowToSelector(row);
 }
 
-function rowToStepIdentity(row: ReadonlyArray<unknown>): Pick<PersistedStep, "StepId" | "StepKindId" | "StepStatusId" | "OrderIndex" | "VariableName" | "Label" | "Description" | "InlineJs" | "ParamsJson"> {
+function rowToStepIdentity(row: ReadonlyArray<unknown>): Pick<PersistedStep, Enum_50213bfa> {
     return {
         StepId: row[0] as number, StepKindId: row[1] as number, StepStatusId: row[2] as number,
         OrderIndex: row[3] as number, VariableName: row[4] as string, Label: row[5] as string,

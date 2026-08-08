@@ -1,3 +1,5 @@
+import { JsonLogLevelEnum } from "../types/enums";
+
 /**
  * MacroLoop Controller — JSON tab log line leaf.
  *
@@ -7,7 +9,7 @@
  * Pure DOM helper, zero imports.
  */
 
-export type JsonLogLevel = 'ok' | 'err' | 'info' | 'warn';
+export type JsonLogLevel = JsonLogLevelEnum;
 
 /** Append a styled log line to the log container. */
 export function appendLog(logEl: HTMLElement, level: JsonLogLevel, text: string): void {

@@ -22,6 +22,7 @@ import { wrapWithIsolation } from "./injection-wrapper";
 import { getLogsDb, markLoggingDirty } from "./logging-handler";
 import { getFilesByProject } from "./file-storage-handler";
 import { logCaughtError, BgLogTag} from "../bg-logger";
+import { RequireStatus } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -35,8 +36,6 @@ interface DynamicRequireMessage extends MessageRequest {
     /** Tab ID where the script should be injected */
     tabId: number;
 }
-
-type RequireStatus = "loaded" | "denied" | "error" | "not_found";
 
 /* ------------------------------------------------------------------ */
 /*  Handler                                                            */

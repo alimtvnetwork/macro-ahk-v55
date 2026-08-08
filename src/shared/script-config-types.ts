@@ -1,3 +1,5 @@
+import { RunAtEnum1, MatchType1 } from "../../standalone-scripts/macro-controller/src/types/enums";
+
 /**
  * Marco Extension — Script & Config Types
  *
@@ -16,7 +18,7 @@ export interface StoredScript {
     isAbsolute?: boolean;
     order: number;
     isEnabled: boolean;
-    runAt?: "document_start" | "document_idle" | "document_end";
+    runAt?: RunAtEnum1;
     configBinding?: string;
     themeBinding?: string;
     cookieBinding?: string;
@@ -68,7 +70,7 @@ export interface StoredScript {
  */
 export interface UrlRule {
     pattern: string;
-    matchType: "glob" | "exact" | "regex";
+    matchType: MatchType1;
 }
 
 /** A stored JSON config record. */

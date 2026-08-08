@@ -16,6 +16,7 @@ import {
 import type { KeywordEvent, KeywordEventStep } from "@/hooks/use-keyword-events";
 import { validateEventSteps } from "@/lib/keyword-event-validation";
 import { KeywordEventStepContextMenu } from "../KeywordEventStepContextMenu";
+import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 const CSS_TEXT_DESTRUCTIVE = "text-destructive";
 
@@ -23,7 +24,7 @@ export interface KeywordEventStepListProps {
     readonly event: KeywordEvent;
     readonly currentStepIndex: number | null;
     readonly onRemoveStep: (stepId: string) => void;
-    readonly onMoveStep: (stepId: string, dir: "up" | "down") => void;
+    readonly onMoveStep: (stepId: string, dir: DirectionEnum) => void;
     readonly onRemoveSteps: (eventId: string, stepIds: readonly string[]) => void;
     readonly onSetStepsEnabled: (eventId: string, stepIds: readonly string[], enabled: boolean) => void;
     readonly onRelabelSteps: (eventId: string, stepIds: readonly string[], labels: readonly string[]) => void;
@@ -120,7 +121,7 @@ interface StepRowProps {
     readonly onRemoveSteps: (eventId: string, stepIds: readonly string[]) => void;
     readonly onRelabelSteps: (eventId: string, stepIds: readonly string[], labels: readonly string[]) => void;
     readonly onRemoveStep: (stepId: string) => void;
-    readonly onMoveStep: (stepId: string, dir: "up" | "down") => void;
+    readonly onMoveStep: (stepId: string, dir: DirectionEnum) => void;
 }
 
 // eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf; Plan 25 Step 14

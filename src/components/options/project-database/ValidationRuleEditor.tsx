@@ -19,12 +19,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Check, X, FlaskConical } from "lucide-react";
+import { Type1 } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-export type ValidationStrategy = "string" | "date" | "regex" | "enum" | "number";
+export type ValidationStrategy = Type1;
 
 export interface StringValidation {
   startsWith?: string;

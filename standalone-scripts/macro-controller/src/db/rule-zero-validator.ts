@@ -1,3 +1,5 @@
+import { RuleZeroCodeEnum } from "../types/enums";
+
 /**
  * Rule-0 validator — "Step count is law".
  *
@@ -49,11 +51,7 @@ export interface RuleZeroCheck {
 }
 
 export type RuleZeroCode =
-    | 'template'
-    | 'match'
-    | 'no-declaration'
-    | 'no-steps'
-    | 'mismatch';
+    RuleZeroCodeEnum;
 
 const RE_FENCE = /^\s*```/;
 const RE_STEPS_HEADING = /^#{1,6}\s+steps\s*$/i;

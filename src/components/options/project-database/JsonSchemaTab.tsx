@@ -26,6 +26,7 @@ import { sendMessage } from "@/lib/message-client";
 import { ErrorModal } from "./ErrorModal";
 import { createErrorModel, type ErrorModel } from "@/types/error-model";
 import { logError } from "../options-logger";
+import { FormatEnum1 } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Example template                                                    */
@@ -413,7 +414,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
   };
 
   /* ---- Generate Docs ---- */
-  const handleGenerateDocs = async (format: "markdown" | "prisma" | "both") => {
+  const handleGenerateDocs = async (format: FormatEnum1) => {
     setGeneratingDocs(true);
     try {
       const result = await sendMessage<{ isOk: boolean; markdown?: string; prisma?: string; errorMessage?: string }>({

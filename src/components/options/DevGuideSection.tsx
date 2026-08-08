@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { ChevronDown, ChevronRight, BookOpen, Copy, ClipboardCopy, AlertTriangle, ExternalLink, Stethoscope } from "lucide-react";
 import { toast } from "sonner";
+import { SectionEnum } from "../../types/enums";
 
 /** Sub-namespaces expected on every Projects.<CodeName> object — kept in sync with project-namespace-builder.ts */
 const EXPECTED_SUB_NAMESPACES = [
@@ -44,7 +45,7 @@ interface Props {
   /** The full SDK namespace for this project, e.g. RiseupAsiaMacroExt.Projects.MacroController */
   namespace: string;
   /** Which section this guide is for */
-  section: "urls" | "variables" | "xpath" | "cookies" | "scripts" | "kv" | "files" | "all";
+  section: SectionEnum;
   /** Optional URL rules — when provided, renders an "Open matched tab" helper button */
   targetUrls?: DevGuideTargetUrl[];
 }

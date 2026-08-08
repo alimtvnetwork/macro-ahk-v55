@@ -11,19 +11,10 @@
  */
 
 import { log } from '../logger';
+import { ImportErrorCodeEnum, PhaseEnum2, ToastLevelEnum } from "../types/enums";
 
 export type ImportErrorCode =
-  | 'PARSE_INVALID_JSON'
-  | 'PARSE_ZIP_CORRUPT'
-  | 'PARSE_SQLITE_INVALID'
-  | 'PARSE_UNKNOWN_FORMAT'
-  | 'PARSE_SCHEMA_MISMATCH'
-  | 'PARSE_EMPTY_BUNDLE'
-  | 'COMMIT_QUOTA_EXCEEDED'
-  | 'COMMIT_IDB_UNAVAILABLE'
-  | 'COMMIT_TRANSACTION_ABORTED'
-  | 'COMMIT_DOUBLE_FAULT'
-  | 'COMMIT_UNKNOWN';
+  ImportErrorCodeEnum;
 
 export interface ClassifiedImportError {
   code: ImportErrorCode;
@@ -89,7 +80,7 @@ function classifyParseError(err: unknown, message: string): ClassifiedImportErro
  * Delegates to phase-specific helpers so each stays under the
  * cognitive-complexity threshold.
  */
-export function classifyImportError(err: unknown, phase: 'parse' | 'commit'): ClassifiedImportError {
+export function classifyImportError(err: unknown, phase: PhaseEnum2): ClassifiedImportError {
   const message = err instanceof Error ? err.message : String(err);
   const name = err instanceof Error ? err.name : '';
   return phase === 'commit'
@@ -130,7 +121,7 @@ export class ImportCommitError extends Error {
 export function logStructured(input: {
   namespace: string;
   code: string;
-  level: 'info' | 'warn' | 'error';
+  level: ToastLevelEnum;
   fields?: Record<string, string | number | boolean | null | undefined>;
 }): void {
   const parts: string[] = ['code=' + input.code];

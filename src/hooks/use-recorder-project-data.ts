@@ -16,6 +16,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { sendMessage } from "@/lib/message-client";
+import { StepLinkSlotEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  PascalCase row shapes (mirror server records)                      */
@@ -49,7 +50,7 @@ export interface StepMetaPatch {
     readonly TimeoutMs?: number | null;
 }
 
-export type StepLinkSlot = "OnSuccessProjectId" | "OnFailureProjectId";
+export type StepLinkSlot = StepLinkSlotEnum;
 
 export interface SelectorRow {
     readonly SelectorId: number;

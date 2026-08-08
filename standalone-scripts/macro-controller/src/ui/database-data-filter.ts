@@ -13,6 +13,7 @@ import type { FilterState } from './database-modal-data';
 // loadTableData/getActiveFilters are lazy-loaded at handler time to eliminate
 // the modal-data ↔ filter runtime cycle (madge circulars #11 and #12).
 import { escapeHtml } from './database-html-escape';
+import { Enum_7dc824d7 } from "../types/enums";
 
 // ── Filter Bar ──
 
@@ -156,7 +157,7 @@ function buildSearchButton(
   button.onclick = async () => {
     const selectedColumn = columnSelect.value;
     const filterValue = valueInput.value.trim();
-    const selectedMode = modeSelect.value as 'like' | 'exact';
+    const selectedMode = modeSelect.value as Enum_7dc824d7;
     const caseSensitiveCheckbox = caseSensitiveLabel.querySelector('input') as HTMLInputElement;
     const isCaseSensitive = caseSensitiveCheckbox.checked;
     const hasValidFilter = selectedColumn !== '' && filterValue !== '';

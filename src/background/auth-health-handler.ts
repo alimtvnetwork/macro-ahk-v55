@@ -33,7 +33,7 @@ export interface AuthStrategyResult {
 
 export interface AuthHealthResponse {
     /** Overall auth status */
-    status: "authenticated" | "degraded" | "unauthenticated";
+    status: Status;
     /** Which strategy ultimately provided the token (null if none) */
     resolvedVia: string | null;
     /** Total time for the full waterfall */
@@ -53,6 +53,8 @@ const AUTH_API_BASE = "https://api.lovable.dev";
 import { LOVABLE_TAB_PATTERNS as PLATFORM_TAB_PATTERNS } from "../shared/lovable-tab-patterns";
 
 import { getChromeRef } from "./chrome-ref";
+import { Status } from "../types/enums";
+
 // Chrome extension APIs — typed via shared ChromeRef
 const _chrome = getChromeRef();
 

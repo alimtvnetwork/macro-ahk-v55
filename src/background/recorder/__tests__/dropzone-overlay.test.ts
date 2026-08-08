@@ -11,11 +11,12 @@ import {
     type DropZoneHandle,
     type DroppedDataSource,
 } from "../dropzone-overlay";
+import { Type9 } from "../../../types/enums";
 
 let handle: DropZoneHandle | null = null;
 afterEach(() => { handle?.Destroy(); handle = null; });
 
-function fireDrag(type: "dragenter" | "dragover" | "dragleave" | "drop", files?: File[]): DragEvent {
+function fireDrag(type: Type9, files?: File[]): DragEvent {
     const dt = {
         types: files === undefined ? [] : ["Files"],
         files: files ?? [],

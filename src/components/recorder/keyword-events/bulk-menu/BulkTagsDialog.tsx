@@ -19,9 +19,10 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { parseTagInput } from "@/lib/keyword-event-bulk-actions";
 import type { KeywordEvent } from "@/hooks/use-keyword-events";
+import { Mode5 } from "../../../../types/enums";
 
 export interface BulkTagsDialogProps {
-    readonly mode: "add" | "remove";
+    readonly mode: Mode5;
     readonly open: boolean;
     readonly onOpenChange: (open: boolean) => void;
     readonly selectedEvents: ReadonlyArray<KeywordEvent>;

@@ -16,8 +16,9 @@ import { logSub } from './logger';
 import { nsWrite, nsCallTyped, nsReadTyped } from './api-namespace';
 import { UIManager } from './core/UIManager';
 import { Label } from './types';
+import { IdempotentResultEnum } from "./types/enums";
 
-type IdempotentResult = 'proceed' | 'abort';
+type IdempotentResult = IdempotentResultEnum;
 
 const CONSOLE_PREFIX = '%c[MacroLoop v';
 const STYLE_GREEN = 'color: #10b981; font-weight: bold;';

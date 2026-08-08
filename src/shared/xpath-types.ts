@@ -1,3 +1,5 @@
+import { FullStrategyEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
+
 /**
  * Marco Extension — XPath Recorder Types
  *
@@ -10,5 +12,5 @@ export interface RecordedXPath {
     tagName: string;
     text: string;
     timestamp: string;
-    strategy: "id" | "testid" | "role-text" | "positional";
+    strategy: FullStrategyEnum;
 }

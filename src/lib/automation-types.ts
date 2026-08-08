@@ -1,3 +1,6 @@
+import { LevelEnum3, Type2, TriggerType, ChainRunnerStatus, BranchLabelEnum } from "../types/enums";
+import { ChainStepStatus } from "../../standalone-scripts/macro-controller/src/types/enums";
+
 /**
  * Automation Chain Types — Spec 21
  *
@@ -52,11 +55,11 @@ export interface StepSetKv {
 export interface StepNotify {
   type: "notify";
   message: string;
-  level?: "info" | "success" | "warning" | "error";
+  level?: LevelEnum3;
 }
 
 export interface ConditionCheck {
-  type: "element_exists" | "element_absent" | "kv_equals" | "kv_exists";
+  type: Type2;
   selector?: string;
   key?: string;
   value?: string;
@@ -83,8 +86,6 @@ export type ChainStep =
 /* ------------------------------------------------------------------ */
 /*  Trigger Types                                                      */
 /* ------------------------------------------------------------------ */
-
-export type TriggerType = "manual" | "on_page_load" | "on_element" | "interval" | "cron";
 
 export interface TriggerConfig {
   /** URL pattern for on_page_load */
@@ -120,14 +121,12 @@ export interface AutomationChain {
 /*  Execution State                                                    */
 /* ------------------------------------------------------------------ */
 
-export type StepStatus = "pending" | "running" | "done" | "error" | "skipped";
-
-export type ChainRunnerStatus = "idle" | "running" | "paused" | "completed" | "error" | "cancelled";
+export type StepStatus = ChainStepStatus;
 
 export interface FlattenedStep {
   step: ChainStep;
   depth: number;
-  branchLabel?: "then" | "else";
+  branchLabel?: BranchLabelEnum;
 }
 
 export interface ChainExecutionState {

@@ -10,12 +10,15 @@
 import { el } from './database-schema-helpers';
 
 import { DomId } from '../types';
+import { Type7, OnDeleteEnum1 } from "../types/enums";
+import { Type } from "../../../../src/types/enums";
+
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
 export interface ColumnValidation {
-  type: 'string' | 'date' | 'regex';
+  type: Type7;
   startsWith?: string;
   endsWith?: string;
   contains?: string;
@@ -30,13 +33,13 @@ export interface ColumnValidation {
 export interface ForeignKeyDef {
   table: string;
   column: string;
-  onDelete: 'CASCADE' | 'SET NULL' | 'RESTRICT';
-  onUpdate: 'CASCADE' | 'SET NULL' | 'RESTRICT';
+  onDelete: OnDeleteEnum1;
+  onUpdate: OnDeleteEnum1;
 }
 
 export interface ColumnEntry {
   name: string;
-  type: 'TEXT' | 'INTEGER' | 'REAL' | 'BLOB' | 'BOOLEAN';
+  type: Type;
   nullable: boolean;
   defaultVal: string;
   validation: ColumnValidation | null;

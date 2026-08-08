@@ -1,3 +1,5 @@
+import { ChainShortcutActionEnum } from "../types/enums";
+
 /**
  * Marco Extension — Keyword Event Chain shortcut matcher
  *
@@ -15,7 +17,7 @@
  * requires the chain to be idle; Stop requires it to be running.
  */
 
-export type ChainShortcutAction = "run" | "stop";
+export type ChainShortcutAction = ChainShortcutActionEnum;
 
 export interface ChainShortcutEvent {
     readonly key: string;

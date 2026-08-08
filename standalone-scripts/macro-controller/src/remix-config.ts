@@ -21,8 +21,9 @@ import {
   DEFAULT_REMIX_OPEN_IN_CURRENT_TAB,
   DEFAULT_REMIX_NEXT_V_CASING,
 } from './constants';
+import { DEFAULTREMIXNEXTVCASINGEnum } from "./types/enums";
 
-export type RemixVCasing = 'preserve' | 'upper' | 'lower';
+export type RemixVCasing = DEFAULTREMIXNEXTVCASINGEnum;
 
 export interface RemixConfig {
   defaultIncludeHistory: boolean;

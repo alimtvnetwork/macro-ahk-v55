@@ -11,6 +11,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { logError } from "./hook-logger";
+import { DirectionEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 const STORAGE_KEY = "marco-keyword-events-v1";
 
@@ -93,7 +94,7 @@ export interface UseKeywordEventsApi {
     readonly updateEvent: (id: string, patch: Partial<Omit<KeywordEvent, "Id">>) => void;
     readonly addStep: (eventId: string, step: Omit<KeywordEventStep, "Id">) => void;
     readonly removeStep: (eventId: string, stepId: string) => void;
-    readonly moveStep: (eventId: string, stepId: string, direction: "up" | "down") => void;
+    readonly moveStep: (eventId: string, stepId: string, direction: DirectionEnum) => void;
     /**
      * Bulk delete a set of steps inside a single event. No-op when the id list
      * is empty or none of the ids resolve. Kept event-scoped so the right-click
@@ -191,7 +192,7 @@ export function useKeywordEvents(): UseKeywordEventsApi {
         ));
     }, []);
 
-    const moveStep = useCallback((eventId: string, stepId: string, direction: "up" | "down") => {
+    const moveStep = useCallback((eventId: string, stepId: string, direction: DirectionEnum) => {
         setEvents(prev => prev.map(e => {
             if (e.Id !== eventId) return e;
             const idx = e.Steps.findIndex(s => s.Id === stepId);

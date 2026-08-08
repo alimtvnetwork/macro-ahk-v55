@@ -14,6 +14,7 @@ import { ServiceResult } from '../utils/result-wrapper';
 
 import { logError } from '../error-utils';
 import { decodeReplaceValues, REPLACE_VALUES_DEFAULT } from '../db/prompt-defaults';
+import { RoleEnum5 } from "../types/enums";
 
 /** Parse a JSON-encoded/persisted values list into positive integers. */
 export function parseNumericValues(raw: readonly string[]): number[] {
@@ -35,7 +36,7 @@ export function parseNumericValues(raw: readonly string[]): number[] {
  * are number-only surfaces (v4.74.0).
  */
 export async function resolveConfiguredChipValues(
-    role: 'plan' | 'next' | 'generic',
+    role: RoleEnum5,
     fallback: readonly number[],
 ): Promise<number[]> {
     try {

@@ -27,6 +27,7 @@ import {
     normalizeReplaceValues,
     validateReplaceKey,
 } from './prompt-defaults';
+import { MethodEnum1 } from "../types/enums";
 
 export interface PromptRow {
     Id: number;
@@ -66,7 +67,7 @@ export interface UpsertInput {
 
 type RawSqlOk = SqlBridgeResp;
 
-async function runSql(method: 'QUERY' | 'SCHEMA', sql: string): Promise<RawSqlOk> {
+async function runSql(method: MethodEnum1, sql: string): Promise<RawSqlOk> {
     // Delegates to the adaptive bridge (see db/sql-bridge.ts). The legacy
     // 'QUERY' | 'SCHEMA' signature is preserved for call-site compatibility;
     // the bridge maps it onto whichever method name the backend accepts.

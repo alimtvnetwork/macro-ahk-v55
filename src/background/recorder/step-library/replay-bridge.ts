@@ -53,6 +53,7 @@ import type { LeafStepExecutor, LeafStepContext } from "./run-group-runner";
 import { StepKindId } from "./schema";
 import { executeUrlTabClick } from "../url-tab-click";
 import { ChromeTabsAdapter } from "../chrome-tabs-adapter";
+import { KindEnum8 } from "../../../types/enums";
 
 const SOURCE_FILE = "src/background/recorder/step-library/replay-bridge.ts";
 
@@ -262,7 +263,7 @@ function buildSelectorStep(step: StepRow, payload: StepPayload, kind: "Click"): 
     };
 }
 
-function buildValueStep(step: StepRow, payload: StepPayload, kind: "Type" | "Select"): ReplayStepInput {
+function buildValueStep(step: StepRow, payload: StepPayload, kind: KindEnum8): ReplayStepInput {
     return {
         StepId: step.StepId, Index: step.OrderIndex, Kind: kind,
         Selectors: [requireSelector(step, payload)],

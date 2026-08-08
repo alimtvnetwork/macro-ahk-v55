@@ -4,8 +4,9 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 import { logError } from "./hook-logger";
+import { EditorThemeNameEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
 
-export type EditorThemeName = "dracula" | "monokai" | "nord" | "light";
+export type EditorThemeName = EditorThemeNameEnum;
 
 const STORAGE_KEY = "marco_editor_theme";
 const DEFAULT_THEME: EditorThemeName = "dracula";

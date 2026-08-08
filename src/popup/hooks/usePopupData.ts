@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { getPlatform } from "../../platform";
+import { ConnectionEnum } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -29,7 +30,7 @@ export interface WasmProbeResult {
 }
 
 export interface StatusData {
-    connection: "online" | "offline" | "degraded";
+    connection: ConnectionEnum;
     token: { status: string; expiresIn: string | null };
     config: { status: string; source: string };
     loggingMode: string;

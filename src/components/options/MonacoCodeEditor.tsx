@@ -23,11 +23,12 @@ import {
   Eye,
   PencilLine,
 } from "lucide-react";
+import { LanguageEnum, Enum_d264e93 } from "../../types/enums";
 
 interface Props {
   value: string;
   onChange: (value: string) => void;
-  language: "javascript" | "json" | "markdown";
+  language: LanguageEnum;
   height?: string;
   readOnly?: boolean;
 }
@@ -498,7 +499,7 @@ export function MonacoCodeEditor({ value, onChange, language, height = "240px", 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [editorError, setEditorError] = useState<string | null>(null);
-  const [mdMode, setMdMode] = useState<"edit" | "preview">("edit");
+  const [mdMode, setMdMode] = useState<Enum_d264e93>("edit");
 
   const useFallback = useMemo(() => isExtensionRuntime() || editorError !== null, [editorError]);
   const isMarkdown = language === "markdown";

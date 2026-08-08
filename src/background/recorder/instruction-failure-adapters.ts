@@ -33,27 +33,24 @@ import type {
     PredicateEvaluation,
 } from "./condition-evaluator";
 import { resolveSelectorKind } from "./condition-evaluator";
+import { UrlTabClickReasonEnum, UrlMatchEnum, Mode2, SelectorKindEnum, ConditionFailureSourceEnum, ReasonEnum2, KindEnum2 } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  UrlTabClick failure shape                                          */
 /* ------------------------------------------------------------------ */
 
 export type UrlTabClickReason =
-    | "UrlTabClickTimeout"
-    | "TabNotFound"
-    | "InvalidUrlPattern"
-    | "SelectorNotFound"
-    | "UrlPatternMismatch";
+    UrlTabClickReasonEnum;
 
 export interface UrlTabClickFailure {
     readonly Reason: UrlTabClickReason;
     readonly Detail: string;
     readonly UrlPattern: string;
-    readonly UrlMatch: "Exact" | "Prefix" | "Glob" | "Regex";
-    readonly Mode: "OpenNew" | "FocusExisting" | "OpenOrFocus";
+    readonly UrlMatch: UrlMatchEnum;
+    readonly Mode: Mode2;
     readonly ObservedUrl?: string;
     readonly Selector?: string;
-    readonly SelectorKind?: "Auto" | "XPath" | "Css";
+    readonly SelectorKind?: SelectorKindEnum;
     readonly TimeoutMs: number;
     readonly DurationMs: number;
 }
@@ -114,7 +111,7 @@ function serializeUrlTabClickDetail(f: UrlTabClickFailure): string {
 /*  evaluation failures — both surface as ConditionWaitOutcome)         */
 /* ------------------------------------------------------------------ */
 
-export type ConditionFailureSource = "Gate" | "ConditionStep" | "Wait";
+export type ConditionFailureSource = ConditionFailureSourceEnum;
 
 export interface BuildConditionFailureReportInput {
     readonly Outcome: Extract<ConditionWaitOutcome, { Ok: false }>;
@@ -191,8 +188,8 @@ function sourceFileForSource(s: ConditionFailureSource): string {
 
 export interface BuildSelectorPredicateReportInput {
     readonly Selector: string;
-    readonly SelectorKind?: "Auto" | "XPath" | "Css";
-    readonly Reason: "InvalidSelector" | "ZeroMatches" | "ConditionTimeout";
+    readonly SelectorKind?: SelectorKindEnum;
+    readonly Reason: ReasonEnum2;
     readonly Detail: string;
     readonly StepId: number;
     readonly Index: number;
@@ -208,13 +205,13 @@ export interface BuildSelectorPredicateReportInput {
  * Wraps the leaf in a one-node condition tree so the canonical detail
  * string still includes a serialized `ConditionSerialized` block.
  */
-function classifyPredicateReason(rawReason: string, kind: "XPath" | "Css"): string {
+function classifyPredicateReason(rawReason: string, kind: KindEnum2): string {
     if (rawReason === "ConditionTimeout") return "Timeout";
     if (rawReason === "InvalidSelector") return kind === "XPath" ? "XPathSyntaxError" : "CssSyntaxError";
     return "ZeroMatches";
 }
 
-function formatPredicateDetail(input: BuildSelectorPredicateReportInput, kind: "XPath" | "Css", trace: PredicateEvaluation): string {
+function formatPredicateDetail(input: BuildSelectorPredicateReportInput, kind: KindEnum2, trace: PredicateEvaluation): string {
     return [
         `Reason=${input.Reason}`,
         `Selector=${input.Selector}`,

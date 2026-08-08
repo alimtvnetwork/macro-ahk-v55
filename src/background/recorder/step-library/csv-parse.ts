@@ -1,3 +1,5 @@
+import { CsvFailureBranchEnum, DelimiterEnum } from "../../../types/enums";
+
 /**
  * Marco Extension — Minimal CSV Parser
  *
@@ -39,17 +41,11 @@ export interface CsvParseContext {
 
 /** Branch identifier for the parser stage that produced a failure. */
 export type CsvFailureBranch =
-    | "empty-input"
-    | "size-limit"
-    | "unterminated-quote"
-    | "no-rows"
-    | "duplicate-headers"
-    | "empty-header"
-    | "row-limit";
+    CsvFailureBranchEnum;
 
 export interface CsvParseSuccess {
     readonly Ok: true;
-    readonly Delimiter: "," | ";";
+    readonly Delimiter: DelimiterEnum;
     readonly Headers: ReadonlyArray<string>;
     /** One row per data line, aligned with `Headers`. Missing trailing cells are coerced to "". */
     readonly Rows: ReadonlyArray<ReadonlyArray<string>>;
@@ -176,7 +172,7 @@ function stepUnquoted(source: string, i: number, ch: string, delimiter: string, 
     return i;
 }
 
-function tokenize(source: string, delimiter: "," | ";", sourceLabel: string | null): {
+function tokenize(source: string, delimiter: DelimiterEnum, sourceLabel: string | null): {
     records: string[][];
     warnings: string[];
     error: CsvParseFailure | null;
@@ -251,7 +247,7 @@ function alignRowsToHeaders(dataRows: string[][], width: number, warnings: strin
     return aligned;
 }
 
-function detectDelimiter(source: string): "," | ";" {
+function detectDelimiter(source: string): DelimiterEnum {
     // Inspect the first line, ignoring quoted regions.
     let inQuotes = false;
     let commas = 0;
