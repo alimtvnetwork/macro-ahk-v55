@@ -21,7 +21,7 @@ This is the **master reference**. Every rule here is enforced across all languag
 - [Code Mutation Avoidance](../18-code-mutation-avoidance.md)
 - [Null Pointer Safety](../19-null-pointer-safety.md)
 - [Nesting Resolution Patterns](../20-nesting-resolution-patterns.md)
-- [Newline Styling Examples](../21-newline-styling-examples.md)
+- [Newline Styling Examples](../../../02-coding-guidelines-v2/01-cross-language/21-newline-styling-examples.md)
 - [Defer Rules (Go)](../../03-golang/05-defer-rules.md)
 
 ---

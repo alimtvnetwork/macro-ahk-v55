@@ -144,7 +144,7 @@ See also §3.1 for the `isDefined`/`isDefinedAndValid` guard pattern.
 
 ## 19. Newline Styling
 
-> Full reference: [21-newline-styling-examples.md](../21-newline-styling-examples.md)
+> Full reference: [21-newline-styling-examples.md](../../../02-coding-guidelines-v2/01-cross-language/21-newline-styling-examples.md)
 
 Supplements Code Style rules R4, R5, R10, R12, R13 with detailed before/after examples.
 
