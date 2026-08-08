@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Phase B Step 52 — network-count assertion.
  *
@@ -55,10 +56,10 @@ beforeEach(async () => {
     const cache = await import('../credit-balance-update/credit-balance-cache');
     cache.clearCreditBalanceUpdateMemoryCache();
     try { await cache.invalidateCreditBalanceUpdateCache('ws_net_1'); } catch (_e) {
-        logError("AutoCatch", "Unhandled exception", _e);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
     }
     try { await cache.invalidateCreditBalanceUpdateCache('ws_net_2'); } catch (_e) {
-        logError("AutoCatch", "Unhandled exception", _e);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
     }
 });
 

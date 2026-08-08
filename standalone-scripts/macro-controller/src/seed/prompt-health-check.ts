@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Prompt Health Check — v4.170.5
@@ -117,7 +118,7 @@ export async function runPromptHealthCheck(opts: RunHealthCheckOptions = {}): Pr
       }
       inspectRow(role, seedSlug, res.value, issues);
     } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
       const message = err instanceof Error ? err.message : String(err);
       issues.push({ role, slug: seedSlug, code: 'query-failed', detail: 'threw: ' + message });
     }
@@ -138,7 +139,7 @@ function publishReport(report: PromptHealthReport, silent: boolean): void {
   try {
     window.__marcoPromptHealthReport = report;
   } catch (_err) {
-    logError("AutoCatch", "Unhandled exception", _err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _err);
   }
 
   if (report.ok) {

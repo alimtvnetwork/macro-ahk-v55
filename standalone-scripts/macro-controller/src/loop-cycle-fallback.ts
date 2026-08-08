@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "./constants/timing";
 import { ServiceResult } from './utils/result-wrapper';
 /**
@@ -333,7 +334,7 @@ async function doCycleFetchWithToken(isRetryAttempt: boolean): Promise<void> {
     log('Cycle fallback API: response received', 'check');
     await processWorkspaceData(data);
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     handleCycleFetchError(err as Error, freshToken);
   } finally {
     releaseCycleLock();

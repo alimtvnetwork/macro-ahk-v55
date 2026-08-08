@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Script Re-Inject Section (Issue 77, Task 8.5)
@@ -57,7 +58,7 @@ function saveStateBeforeReinject(): void {
       });
       localStorage.setItem(REINJECT_KEYS.creditData, creditSnapshot);
     } catch (_e) {
-      logError("AutoCatch", "Unhandled exception", _e);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
       logSub('Re-inject: credit snapshot save failed — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
     }
     localStorage.setItem(REINJECT_KEYS.timestamp, String(Date.now()));
@@ -83,7 +84,7 @@ export function restoreReinjectState(): { restored: boolean; loopWasRunning: boo
     // Clear all keys regardless
     Object.values(REINJECT_KEYS).forEach(function(k) {
       try { localStorage.removeItem(k); } catch (_e) {
-        logError("AutoCatch", "Unhandled exception", _e);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
         logSub('Re-inject: failed to clear key ' + k + ' — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
       }
     });
@@ -124,7 +125,7 @@ export function checkAndRestoreReinjectState(): { restored: boolean; loopWasRunn
     // Clear all keys
     Object.values(REINJECT_KEYS).forEach(function(k) {
       try { localStorage.removeItem(k); } catch (_e) {
-        logError("AutoCatch", "Unhandled exception", _e);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
         logSub('Re-inject: failed to clear key ' + k + ' — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
       }
     });
@@ -230,7 +231,7 @@ function performVersionCheck(ctx: VersionCheckCtx): void {
   try {
     resultPromise = sendToExtension('GET_SCRIPT_INFO', { scriptName: 'macroController' }) as Promise<ExtensionResponse> | undefined;
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     resultPromise = undefined;
   }
   if (!resultPromise || typeof resultPromise.then !== 'function') {

@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Logger-shape acceptance/rejection matrix for `logDiagnosticFromCode`.
  *
@@ -138,7 +139,7 @@ describe('logDiagnosticFromCode — rejected logger shapes fall back cleanly', (
         try {
           logDiagnosticFromCode('PROMPT_EDIT_E001', CTX);
         } catch (e) {
-          logError("AutoCatch", "Unhandled exception", e);
+          logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
           threw = e;
         }
 

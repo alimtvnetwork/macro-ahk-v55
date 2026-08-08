@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Credit-sort hamburger rows (v3.30.0) — 4 radio-style options.
  *
@@ -53,7 +54,7 @@ describe('Credit-sort hamburger rows (v3.30.0)', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
     try { localStorage.removeItem('ml_credit_sort_mode'); } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     }
     setLoopWsCreditSortMode('none');
   });

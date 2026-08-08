@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Prompts Import modal (plan 12 steps 13-14).
  *
@@ -571,7 +572,7 @@ async function performImportCommit(
     await deps.onCommitted();
     setTimeout(close, 1200);
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     await handleCommitError(err, state);
     transition('error');
   }
@@ -691,7 +692,7 @@ async function startParse(
     state.rows = await diffAgainstCache(bundle.entries);
     transition('preview');
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     const errors = await import('./prompt-import-errors');
     const classified = errors.classifyImportError(err, 'parse');
     state.errorMessage = 'Failed to parse file';

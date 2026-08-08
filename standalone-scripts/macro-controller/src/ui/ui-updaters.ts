@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — UI Update Functions
@@ -223,7 +224,7 @@ export function destroyPanel(): void {
   try {
     if (typeof domCache.invalidate === 'function') domCache.invalidate();
   } catch (_e) {
-    logError("AutoCatch", "Unhandled exception", _e);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
   }
 
   // v3.60.0: drop stale UI factories so the next IIFE installs fresh closures
@@ -233,7 +234,7 @@ export function destroyPanel(): void {
     nsWrite('_internal.createUIWrapper', undefined as unknown as () => void);
     nsWrite('_internal.createUIManager', undefined as unknown as () => object);
   } catch (_e) {
-    logError("AutoCatch", "Unhandled exception", _e);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
   }
 
   // Tear down the singleton so the next injection bootstraps a fresh one

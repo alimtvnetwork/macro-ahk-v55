@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller — Async Utilities (SDK Delegation Layer)
  *
@@ -68,7 +69,7 @@ function getSdkUtils(): SdkUtils | null {
       return w.marco.utils;
     }
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   } // allow-swallow: SDK probe — absence is the expected case in unit/isolated contexts; caller handles null.
 
   return null;

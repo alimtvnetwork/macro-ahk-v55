@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { DomainConstants } from "../constants/domain";
 /**
  * MacroLoop Controller — Credit Totals Modal (Issue 116, Task 2)
@@ -628,7 +629,7 @@ export function showCreditTotalsModal(): void {
   // Focus the panel so ESC works immediately.
   // allow-swallow: panel may not be focusable in headless test contexts; ESC still works via document-level listener
   try { panel.focus(); } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   }
 }
 

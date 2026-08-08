@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Streaming prompts ZIP writer (plan 12 step 22).
  *
@@ -224,7 +225,7 @@ export function buildPromptsZipStream(
         controller.enqueue(buildEocd(centralStart, centralSize, central.length));
         controller.close();
       } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
         controller.error(err);
       }
     },

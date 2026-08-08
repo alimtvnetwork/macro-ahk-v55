@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Workspace Dialog Detection — Tier 2 XPath-based workspace detection via project dialog.
  *
@@ -317,7 +318,7 @@ function findWorkspaceNameViaCss(_fn: string, perWs: WorkspaceCredit[]): { match
         }
       }
     } catch (e: unknown) {
-      logError("AutoCatch", "Unhandled exception", e);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
       logSub('CSS fallback [' + (si + 1) + '/' + selectors.length + ']: "' + sel + '" → ERROR: ' + toErrorMessage(e), 2);
     }
   }
@@ -349,7 +350,7 @@ export function closeProjectDialogSafe(btn: Element): void {
       reactClick(btn, CONFIG.PROJECT_BUTTON_XPATH);
     }
   } catch (e: unknown) {
-    logError("AutoCatch", "Unhandled exception", e);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
     logSub('Error closing dialog: ' + toErrorMessage(e), 1);
   }
 }

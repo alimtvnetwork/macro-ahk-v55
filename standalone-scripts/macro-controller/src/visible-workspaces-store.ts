@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Visible-workspaces store — tiny pub/sub for the dashboard SummaryBar
  * (Issue 125 Task 9, filter-reactive recomputation).
@@ -24,7 +25,7 @@ export function publishVisibleWorkspaces(rows: ReadonlyArray<WorkspaceCredit>): 
         try {
             cb(rows);
         } catch (_e: unknown) {
-            logError("AutoCatch", "Unhandled exception", _e);
+            logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
         }
     }
 }
@@ -34,7 +35,7 @@ export function subscribeVisibleWorkspaces(cb: Listener): () => void {
     // Push the current snapshot immediately so late subscribers stay in sync.
     if (lastRows.length > 0) {
         try { cb(lastRows); } catch (_e: unknown) {
-            logError("AutoCatch", "Unhandled exception", _e);
+            logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
         }
     }
 

@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Tests for prompt-token-guard.ts (plan-14, step 6).
  */
@@ -40,7 +41,7 @@ describe('assertParamTokensUnchanged', () => {
             assertParamTokensUnchanged('hi {{count}}', 'hi {{n}}');
             throw new Error('should have thrown');
         } catch (e) {
-            logError("AutoCatch", "Unhandled exception", e);
+            logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
             expect(e).toBeInstanceOf(ParamTokenMismatch);
             const err = e as ParamTokenMismatch;
             expect(err.added).toEqual(['n']);

@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Settings Dialog
@@ -415,7 +416,7 @@ function _saveGeneralSettings(genResult: GeneralPanelResult, deps: SettingsDeps)
       localStorage.removeItem('marco_custom_display_name');
     }
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   } // allow-swallow: localStorage throws in private browsing or when disabled; custom display name is non-critical.
 
   const newChatXPath = genResult.inputs.pasteTargetXPath.value;

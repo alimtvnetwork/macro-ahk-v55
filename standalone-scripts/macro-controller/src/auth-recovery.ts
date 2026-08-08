@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller — Auth Recovery & Refresh Waterfall
  * Phase 5B: Extracted from auth.ts
@@ -179,7 +180,7 @@ function resolveTokenTtlMs(): number {
       return overrides.tokenTtlMs;
     }
   } catch (_e) {
-    logError("AutoCatch", "Unhandled exception", _e);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
     logDebug('getTokenTtlMs', 'Config override read failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 
@@ -191,7 +192,7 @@ function resolveTokenTtlMs(): number {
       return config.authBridge.tokenTtlMs;
     }
   } catch (_e) {
-    logError("AutoCatch", "Unhandled exception", _e);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
     logDebug('getTokenTtlMs', '__MARCO_CONFIG__ read failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 

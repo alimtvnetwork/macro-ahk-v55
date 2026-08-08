@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { ServiceResult } from '../utils/result-wrapper';
 /**
  * MacroLoop Controller — SQLite DB Management (prompts.macro)
@@ -182,7 +183,7 @@ export async function migratePromptReplaceColumns(): Promise<void> {
     }
     await ensurePromptRoleDefaultIndex();
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', { column: 'batch', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -294,7 +295,7 @@ export async function initMacroDb(): Promise<void> {
       stages.push({ stage: STAGE_SCHEMA_INIT, status: 'failed', reason });
     }
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     const reason = err instanceof Error ? err.message : String(err);
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'send-schema-init', reason }, err);
     stages.push({ stage: STAGE_SCHEMA_INIT, status: 'failed', reason });
@@ -321,7 +322,7 @@ export async function saveProjectMetadata(projectId: string, name: string, url: 
   try {
     await runSqlBridge('SCHEMA', sql);
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'saveProjectMetadata', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -344,7 +345,7 @@ export async function saveCommunication(projectId: string, prompt: string, respo
     await runSqlBridge('SCHEMA', sql);
     log('Communication saved to Macro DB', 'info');
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'saveCommunication', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -370,7 +371,7 @@ export async function syncTaskQueueToDb(projectId: string, tasks: DbTask[]): Pro
   try {
     await runSqlBridge('SCHEMA', sql);
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'syncTaskQueueToDb', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -405,7 +406,7 @@ export async function purgeOldCommunications(days: number = 30): Promise<void> {
     await runSqlBridge('SCHEMA', sql);
     log(`[MacroDb] Purged communications older than ${days} days`, 'info');
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'purgeOldCommunications', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -453,7 +454,7 @@ export async function exportDatabaseDump(): Promise<void> {
       logDiagnosticFromCode('DB_MACRO_EXPORT_E001', { reason: resp?.errorMessage || 'no dump data' });
     }
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     logDiagnosticFromCode('DB_MACRO_EXPORT_E001', { reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }

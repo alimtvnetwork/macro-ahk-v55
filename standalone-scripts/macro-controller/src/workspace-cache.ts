@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { logError, logWarn, logDebug } from './error-utils';
 /**
  * Workspace Cache — localStorage persistence for instant UI on reload.
@@ -27,7 +28,7 @@ function resolveProjectId(): string {
     const altMatch = href.match(/id-preview--([a-f0-9-]{36})/i);
     if (altMatch) return altMatch[1];
   } catch (_e) {
-    logError("AutoCatch", "Unhandled exception", _e);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
     logDebug('resolveProjectId', 'URL parse failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 
@@ -106,7 +107,7 @@ export function invalidateCacheOnProjectSwitch(): void {
       localStorage.setItem(StorageKeyType.WsLastProject, currentPid);
     }
   } catch (_e) {
-    logError("AutoCatch", "Unhandled exception", _e);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
     logWarn('invalidateCacheOnProjectSwitch', 'localStorage write failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 }
@@ -132,7 +133,7 @@ export function migrateLegacyCache(): void {
       }
     }
   } catch (_e) {
-    logError("AutoCatch", "Unhandled exception", _e);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
     logWarn('migrateLegacyCache', 'localStorage read/write failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 }

@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller — Shared State & Configuration
  * Step 2b: Extracted from macro-looping.ts IIFE scope
@@ -101,7 +102,7 @@ try {
     root.Projects.MacroController.meta.version = VERSION;
   }
 } catch (_e) {
-  logError("AutoCatch", "Unhandled exception", _e);
+  logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
   logDebug('shared-state', 'SDK namespace not yet registered — version set at injection time');
 }
 

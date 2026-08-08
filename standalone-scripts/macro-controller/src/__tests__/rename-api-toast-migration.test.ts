@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * PlanTierType 22 · gap #7 follow-up: remaining `rename-api` toast sites migrated to
  * `showDiagnosticToast`.
@@ -141,7 +142,7 @@ describe('rename-api remaining toast migrations', () => {
         try {
             await renameWorkspace('ws-500', 'renamed');
         } catch (e) {
-            logError("AutoCatch", "Unhandled exception", e);
+            logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
             thrown = e;
         }
         expect(thrown).toBeInstanceOf(DiagnosticError);

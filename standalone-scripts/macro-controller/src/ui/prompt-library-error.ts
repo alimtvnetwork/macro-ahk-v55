@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { logError } from '../error-utils';
 import {
   ModalRefs,
@@ -96,6 +97,6 @@ export function focusErrorBanner(refs: ModalRefs): void {
   const banner = refs.errorBanner;
   if (!banner || banner.hidden) return;
   try { banner.focus(); } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   }
 }

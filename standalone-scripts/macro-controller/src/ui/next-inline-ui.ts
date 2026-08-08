@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Inline strips above the Lovable chat textarea — order top→bottom:
@@ -745,7 +746,7 @@ function restoreActionOverflowPositions(original: Map<HTMLElement, OriginalActio
   for (const [actionElement, position] of original) {
     const next = position.next && position.next.parentNode === position.parent ? position.next : null;
     try { position.parent.insertBefore(actionElement, next); } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     }
   }
   original.clear();

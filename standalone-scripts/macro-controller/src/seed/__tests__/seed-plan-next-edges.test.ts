@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Negative + idempotency edge coverage for `seed-plan-next.ts`
@@ -65,7 +66,7 @@ beforeEach(() => {
     sendImpl = null;
     (logDiagnosticFromCode as unknown as Mock).mockClear();
     try { localStorage.removeItem('marco_last_seed_telemetry'); } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     }
 });
 

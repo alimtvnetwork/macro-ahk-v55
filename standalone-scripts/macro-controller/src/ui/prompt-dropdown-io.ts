@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "../constants/timing";
 /**
  * Prompt Dropdown IO helpers (PlanTierType-17 steps 23 & 24)
@@ -231,7 +232,7 @@ function makeIoOptionRow(pop: HTMLElement, label: string, run: () => Promise<voi
         });
       }
     } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
       showPasteToast('❌ ' + label + ' failed: ' + String(err), true);
     }
   };
@@ -345,7 +346,7 @@ async function runPromptImport(text: string, rerender: Rerender): Promise<void> 
     await loadPromptsFromJson();
     rerender();
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     showPasteToast('❌ Import failed: ' + String(err), true);
   }
 }
@@ -365,7 +366,7 @@ export async function dispatchImportFile(file: File, rerender: Rerender): Promis
     const text = new TextDecoder('utf-8').decode(bytes);
     await runPromptImport(text, rerender);
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     showPasteToast('❌ Import failed: ' + String(err), true);
   }
 }

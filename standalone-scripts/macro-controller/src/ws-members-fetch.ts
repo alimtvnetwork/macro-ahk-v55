@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { ServiceResult } from './utils/result-wrapper';
 /**
  * Workspace Members Fetcher — v3.4.3
@@ -116,7 +117,7 @@ export async function fetchMembersForMany(
       bulkCache.set(id, res);
       results.push(res);
     } catch (e: unknown) {
-      logError("AutoCatch", "Unhandled exception", e);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
       results.push({ wsId: id, wsName, members: [], error: e instanceof Error ? e.message : String(e) });
     }
   }

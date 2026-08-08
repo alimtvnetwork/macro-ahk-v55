@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * seed-plan-next.ts - idempotent seeder for the PlanTierType/Next prompt library
  * (plan-14, step 9). Emits structured boot telemetry (v4.72.0):
@@ -166,7 +167,7 @@ function persistTelemetry(tel: RoleTelemetry[]): void {
         const payload = { at: new Date().toISOString(), roles: tel };
         localStorage.setItem(StorageKeyType.LastSeedTelemetry, JSON.stringify(payload));
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
         const reason = err instanceof Error ? err.message : String(err);
         logDiagnosticFromCode('SEED_TELEMETRY_E001', { reason }, err);
     }
@@ -400,7 +401,7 @@ async function writeSeedAuditRow(params: {
         const mod = await import('../shared-state');
         version = typeof mod.VERSION === 'string' ? mod.VERSION : '';
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     }
     const sql = 'INSERT INTO PromptSeedAudit '
         + '(SeededAt, AppVersion, InsertedTotal, SkippedTotal, PromotedTotal, UpgradedTotal, Reason, TelemetryJson) VALUES ('
@@ -431,7 +432,7 @@ async function writeSeedAuditRow(params: {
 
 import { ServiceResult } from '../utils/result-wrapper';
 import { MethodEnum1 } from "../types/enums";
- 
+
 export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> {
     const startedAt = Date.now();
     try {

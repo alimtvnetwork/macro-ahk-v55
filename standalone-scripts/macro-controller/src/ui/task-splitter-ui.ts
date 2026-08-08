@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "../constants/timing";
 import { ServiceResult } from '../utils/result-wrapper';
 /**
@@ -344,7 +345,7 @@ async function parseAndEnqueueLatestReply(expectedN: number): Promise<void> {
     log('TaskSplitter: enqueued ' + added.length + '/' + expectedN + ' tasks for project ' + projectId, 'info');
     showPasteToast('✅ Task Splitter: queued ' + added.length + ' tasks', false);
   } catch (caught: CaughtError) {
-    logError("AutoCatch", "Unhandled exception", caught);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, caught);
     reportSplitterParseFailure(caught, expectedN);
   }
 }

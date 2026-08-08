@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { TimingEntryStatusType } from "./types/enums";
 
 /**
@@ -114,7 +115,7 @@ export function logTimingSummary(): void {
     const ver = ext?.version || '?';
     lines.push('│  Version: v' + ver + '                                                    │'.substring(0, 55) + '│');
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   }
 
   lines.push('└─────────────────────────────────────────────────────────────────┘');

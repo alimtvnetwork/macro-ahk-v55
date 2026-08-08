@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller — Database Schema Tab
  *
@@ -445,7 +446,7 @@ function buildTableEntry(
         columns.map(column => column.Name + ' (' + column.Type + ')').join(', '));
       info.appendChild(colInfo);
     } catch (_e) {
-      logError("AutoCatch", "Unhandled exception", _e);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
       logDebug('database-schema-tab', 'Column JSON parse failed: ' + (_e instanceof Error ? _e.message : String(_e)));
     }
   }

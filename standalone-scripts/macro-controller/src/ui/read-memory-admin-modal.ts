@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Read Memory Admin Modal
  *
@@ -57,7 +58,7 @@ async function invalidateJsonCopy(): Promise<void> {
     const { clearPromptCache } = await import('./prompt-cache');
     await clearPromptCache();
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'read-memory-admin-cache',
       reason: err instanceof Error ? err.message : String(err),

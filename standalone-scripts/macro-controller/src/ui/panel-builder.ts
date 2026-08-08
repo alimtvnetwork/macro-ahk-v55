@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Panel Builder — orchestrator for MacroLoop Controller panel (Phase 5F barrel)
  *
@@ -128,7 +129,7 @@ function wireSummaryBarSubscription(summaryBar: SummaryBarHandle): void {
   subscribeVisibleWorkspaces(function (rows) {
     let config: ReturnType<typeof getWorkspaceLifecycleConfig> | null = null;
     try { config = getWorkspaceLifecycleConfig(); } catch (_e: unknown) {
-      logError("AutoCatch", "Unhandled exception", _e);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
       config = null;
     }
     const resolver: DisplayKindResolver = function (ws) {
@@ -171,7 +172,7 @@ function assemblePanelChildren(ui: HTMLElement, c: PanelChildren): void {
   ui.appendChild(c.taskSplitterSection);
   ui.appendChild(c.toolsSection);
 }
- 
+
 export function createUI(deps: PanelBuilderDeps): void {
   let container = getByXPath(CONFIG.CONTROLS_XPATH);
   const isMissingContainer = !container;

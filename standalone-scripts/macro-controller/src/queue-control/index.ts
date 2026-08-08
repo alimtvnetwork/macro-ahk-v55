@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * queue-control — pauseQueue() / resumeQueue() click the Lovable
  * "Pause queue" / "Resume queue" buttons. These are the ONLY clicks the
@@ -35,7 +36,7 @@ function findButton(xpath: string, ariaLabel: string): HTMLElement | null {
             return node;
         }
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     }
     const all = document.querySelectorAll<HTMLElement>('button[aria-label="' + ariaLabel + '"]');
 

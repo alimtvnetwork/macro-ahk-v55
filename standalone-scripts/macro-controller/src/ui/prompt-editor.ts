@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Shared Prompt Editor entry point (PlanTierType-23, step 4).
@@ -90,7 +91,7 @@ async function collectRoleList(role: PromptRole, snapshot: RoleSnapshot): Promis
     }
     snapshot.roleListError = listed.ok ? '(empty)' : (listed.error ?? 'unknown');
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     snapshot.roleListThrew = err instanceof Error ? err.message : String(err);
   }
 }
@@ -123,7 +124,7 @@ async function collectSlugOwner(
     const bySlug = await getPromptBySlug(slug);
     recordSlugOwner(bySlug as Parameters<typeof recordSlugOwner>[0], role, snapshot);
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     snapshot.slugLookupThrew = err instanceof Error ? err.message : String(err);
   }
 }
@@ -193,7 +194,7 @@ export async function openPromptEditor(input: OpenPromptEditorInput): Promise<vo
     if (templatePreview) modalOptions.templatePreview = templatePreview;
     openPromptCreationModal(rc.ctx, rc.taskNextDeps, editPrompt, prefill, modalOptions);
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     const reason = err instanceof Error ? err.message : String(err);
     reportEditorFailure(
       'PROMPT_EDIT_E003',
@@ -244,7 +245,7 @@ async function resolveRequiredTokensForRole(role: PromptRole): Promise<string[]>
       for (const t of extractParamTokens(result.value.Body)) tokens.add(t);
     }
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     const snap = await buildRoleDiagnosticSnapshot(role);
     const context: DiagnosticContext = {
       ...snap,
@@ -415,7 +416,7 @@ export async function openDefaultPromptEditor(role: PromptRole): Promise<void> {
       '❌ No default prompt found for ' + role,
     );
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     await handleOpenDefaultError(role, seedRow, err);
   }
 }

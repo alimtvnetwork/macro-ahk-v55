@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { log } from '../logger';
 import { showToast } from '../toast';
 import { exportPromptsToJson, parsePromptsText, performPromptImport } from './prompt-io';
@@ -127,7 +128,7 @@ export async function handleImportFile(
     showToast(IMPORT_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
     refs.lastImportFailed = true;
     try { fileInput.value = ''; } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     }
     focusErrorBanner(refs);
 
@@ -163,7 +164,7 @@ export async function handleImportFile(
     renderPartialImportErrors(refs, results.errors, parsed.errors);
     if (origin === 'drop') focusAfter = 'import';
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     logLibraryImportFailure('thrown', 'threw during read/parse for name=' + file.name, err);
     const reason = extractImportErrorReason(err);
     refs.status.textContent = IMPORT_FAILED_PREFIX + reason;

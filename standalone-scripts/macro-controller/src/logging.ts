@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { toErrorMessage, logError, logDebug } from './error-utils';
 /**
  * MacroLoop Controller — Logging Module
@@ -313,7 +314,7 @@ export function clearAllLogs(): void {
     const key = getLogStorageKey();
     localStorage.removeItem(key);
   } catch (_e) {
-    logError("AutoCatch", "Unhandled exception", _e);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
     logDebug('clearAllLogs', 'localStorage.removeItem failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 }

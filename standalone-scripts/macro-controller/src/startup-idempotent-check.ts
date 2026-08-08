@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller, Idempotent Injection Check
  * Extracted from macro-looping.ts (V2 Phase 02).
@@ -68,7 +69,7 @@ export function runIdempotentCheck(): IdempotentResult {
 function handleVersionMismatch(marker: HTMLElement, existingVersion: string): IdempotentResult {
   console.warn(LabelType.LogMacroloopV + VERSION + '] VERSION MISMATCH: existing=' + existingVersion + ' new=' + VERSION + ', forcing re-injection');
   try { nsCallTyped('api.loop.stop'); } catch (e) {
-    logError("AutoCatch", "Unhandled exception", e);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
     logSub('Version mismatch teardown: loop stop failed, ' + (e instanceof Error ? e.message : String(e)), 1);
   }
   marker.remove();
@@ -132,7 +133,7 @@ function attemptUiRecovery(marker: HTMLElement): IdempotentResult {
   // Recovery failed, force full re-bootstrap
   console.warn(LabelType.LogMacroloopV + VERSION + '] UI recovery failed, forcing full re-bootstrap');
   try { nsCallTyped('api.loop.stop'); } catch (_e) {
-    logError("AutoCatch", "Unhandled exception", _e);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
     logSub('UI recovery fallback: loop stop failed, ' + (_e instanceof Error ? _e.message : String(_e)), 1);
   }
   marker.remove();
@@ -184,7 +185,7 @@ function healManager(
   if (typeof register !== 'function') return;
   let has = false;
   try { has = !!getter(); } catch (_e) {
-    logError("AutoCatch", "Unhandled exception", _e);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
     logSub('Self-heal getter threw for ' + label + ': ' + (_e instanceof Error ? _e.message : String(_e)), 1);
   }
   const isMissingHas = !has;

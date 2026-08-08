@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Panel Sections — Tools master section and panel assembly extracted from panel-builder.ts (Phase 5F)
  *
@@ -178,7 +179,7 @@ function _buildWsDropdown(deps: PanelBuilderDeps): { wsDropSection: HTMLElement 
     triggerLoopMoveFromSelection: deps.triggerLoopMoveFromSelection,
   });
 }
- 
+
 function _buildToolsCollapsible(
   _deps: PanelBuilderDeps, btnStyle: string, taskNextDeps: TaskNextDeps,
   toolsSections: ReturnType<typeof buildToolsSections>,
@@ -211,7 +212,7 @@ function _buildToolsCollapsible(
       toolsMasterBody.style.display = '';
       toolsCol.toggle.textContent = '[-]';
       try { localStorage.setItem('ml_collapse_tools_master', 'expanded'); } catch (_e) {
-        logError("AutoCatch", "Unhandled exception", _e);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
         logSub('Failed to persist tools collapse state: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
       }
     }

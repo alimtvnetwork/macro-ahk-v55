@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { ServiceResult } from '../utils/result-wrapper';
 import { logError } from '../error-utils';
 import { log } from '../logger';
@@ -51,17 +52,17 @@ export async function handleDelete(
       refs.status.textContent = 'Delete blocked: ' + reason;
       logError(LOG_SCOPE, 'delete blocked', res);
       try { showToast(msgText, 'error'); } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
       }
       try { window.alert(msgText); } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
       }
 
       return;
     }
     refs.status.textContent = 'Deleted.';
     try { showToast('Deleted prompt "' + row.Slug + '"', 'success'); } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     }
     await renderAllRoles(refs);
     void (async (): Promise<void> => {

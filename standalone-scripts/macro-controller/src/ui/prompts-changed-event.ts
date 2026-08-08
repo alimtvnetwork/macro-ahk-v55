@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Cross-module notification that the Prompt table changed on disk.
  *
@@ -25,10 +26,10 @@ export function dispatchPromptsChanged(detail: PromptsChangedDetail = {}): void 
   try {
     document.dispatchEvent(new CustomEvent(PROMPTS_CHANGED_EVENT, { detail }));
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     // Older jsdom environments without CustomEvent fall back to a plain Event.
     try { document.dispatchEvent(new Event(PROMPTS_CHANGED_EVENT)); } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     }
   }
 }

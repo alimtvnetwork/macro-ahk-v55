@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Selected-workspaces store — pub/sub for multi-workspace bulk operations.
  * (Issue 130 Task 2).
@@ -16,7 +17,7 @@ function notify(): void {
     try {
       cb(new Set(selectedIds));
     } catch (_e: unknown) {
-      logError("AutoCatch", "Unhandled exception", _e);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
     }
   }
 }

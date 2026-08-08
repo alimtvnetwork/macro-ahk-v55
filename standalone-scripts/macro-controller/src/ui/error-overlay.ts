@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller — Floating Error Overlay
  *
@@ -549,7 +550,7 @@ function renderErrorList(): void {
     list.appendChild(buildErrorItem(error));
   }
 }
- 
+
 function buildErrorItem(error: OverlayError): HTMLElement {
   const item = document.createElement('div');
   item.className = 'eo-item';
@@ -788,7 +789,7 @@ function bridgeErrorToExtension(message: string, stack?: string, source?: string
       scriptCode: source || 'overlay',
     });
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   }
 }
 

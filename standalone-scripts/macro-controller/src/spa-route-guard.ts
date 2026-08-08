@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller — SPA Route Guard (U-5, v2.245.0)
  *
@@ -153,7 +154,7 @@ function evaluateRouteChange(source: RouteChangeSourceType): void {
     try {
       showToast('Project route changed — loop stopped', 'info', { noStop: true });
     } catch (_e: unknown) {
-      logError("AutoCatch", "Unhandled exception", _e);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
     }
 
     // Re-resolve the workspace name from the REST API for the new project.

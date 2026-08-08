@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Bulk Rename Dialog
@@ -154,7 +155,7 @@ async function _autoSave(inputs: RenameInputsResult): Promise<void> {
     const preset = _readUiToPreset(inputs);
     await store.savePreset(_activePresetName, preset);
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   }
 }
 

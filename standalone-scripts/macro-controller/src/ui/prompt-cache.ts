@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller — IndexedDB Prompt Cache (Dual-Record)
  *
@@ -153,7 +154,7 @@ function writeRecord(storeName: string, record: Record<string, unknown>): Promis
         tx.oncomplete = function() { db.close(); resolve(); };
         tx.onerror = function() { db.close(); resolve(); };
       } catch (e) {
-        logError("AutoCatch", "Unhandled exception", e);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
         logWriteError(storeName, e);
         resolve();
       }

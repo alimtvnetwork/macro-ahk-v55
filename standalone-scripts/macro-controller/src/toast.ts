@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "./constants/timing";
 /**
  * MacroLoop Controller — Toast Notification System
@@ -86,7 +87,7 @@ function getNotify(): MarcoNotify | null {
       return notify!;
     }
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   }
 
   return null;
@@ -187,7 +188,7 @@ class ToastManager {
       try {
         listener();
       } catch (_e) {
-        logError("AutoCatch", "Unhandled exception", _e);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
         logDebug('ToastManager', 'Error change listener threw: ' + (_e instanceof Error ? _e.message : String(_e)));
       }
     }

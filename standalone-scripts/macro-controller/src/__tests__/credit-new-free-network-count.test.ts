@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * PlanTierType 01 — Step 8a + 8d regression.
  *
@@ -83,7 +84,7 @@ beforeEach(async () => {
     cache.clearCreditBalanceUpdateMemoryCache();
     for (const id of ['ws_newfree_1', 'ws_pro_inline_1']) {
         try { await cache.invalidateCreditBalanceUpdateCache(id); } catch (_e) {
-            logError("AutoCatch", "Unhandled exception", _e);
+            logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
         }
     }
 });

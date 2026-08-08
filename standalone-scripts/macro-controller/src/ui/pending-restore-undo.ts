@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { DbResult } from '../db/db-result';
 import { ServiceResult } from '../utils/result-wrapper';
 /**
@@ -117,7 +118,7 @@ export function clearPendingRestoreUndo(): void {
     try {
         store.removeItem(STORAGE_KEY);
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     }
 }
 

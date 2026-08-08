@@ -1,5 +1,6 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { ServiceResult } from '../utils/result-wrapper';
- 
+
 /**
  * MacroLoop Controller — Task Next Automation UI
  * Step 03e: Extracted from createUI() closure
@@ -185,7 +186,7 @@ function findButtonBySelectors(): HTMLElement | null {
 
       return btn as HTMLElement;
     } catch (e) {
-      logError("AutoCatch", "Unhandled exception", e);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
       logSub('Task Next: querySelector failed for "' + selector + '": ' + (e instanceof Error ? e.message : String(e)), 1);
     }
   }

@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "./constants/timing";
 import { toErrorMessage , logError } from './error-utils';
 /**
@@ -197,7 +198,7 @@ function findViaAriaLabel(desc: ElementDescriptor): Element | null {
         return result;
       }
     } catch (_e) {
-      logError("AutoCatch", "Unhandled exception", _e);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
       logSub('ARIA label query skipped for "' + label + '": ' + toErrorMessage(_e), 1);
     }
   }

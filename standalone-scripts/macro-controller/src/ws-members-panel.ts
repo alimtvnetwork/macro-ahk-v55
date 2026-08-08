@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "./constants/timing";
 /**
  * Workspace Members Panel — v2.216.0
@@ -61,7 +62,7 @@ function copyToClipboard(value: string, label: string): void {
     document.body.removeChild(ta);
     if (ok) onOk(); else onFail('execCommand returned false');
   } catch (err: unknown) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     onFail(err instanceof Error ? err.message : String(err));
   }
 }
@@ -124,7 +125,7 @@ function exportMembersCsv(wsName: string, members: WorkspaceMember[]): void {
     setTimeout(function () { URL.revokeObjectURL(url); }, Timings.TIMEOUT_SHORT);
     showToast('📄 Exported ' + members.length + ' members → ' + filename, 'success');
   } catch (err: unknown) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     const msg = err instanceof Error ? err.message : String(err);
     showToast('❌ CSV export failed: ' + msg, 'error');
   }
@@ -657,7 +658,7 @@ function submitInvite(el: HTMLElement, wsId: string, wsName: string, form: HTMLF
         await inviteMember(wsId, email, role);
         results.success++;
       } catch (e: unknown) {
-        logError("AutoCatch", "Unhandled exception", e);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
         results.fail++;
       }
     }

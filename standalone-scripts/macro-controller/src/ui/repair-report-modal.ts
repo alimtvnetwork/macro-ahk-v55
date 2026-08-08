@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * repair-report-modal.ts — v4.246.0
  *
@@ -109,7 +110,7 @@ export function stashRepairReport(report: RepairReportSummary): void {
   try {
     if (typeof window !== 'undefined') window.__marcoLastRepairReport = report;
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   }
   const text = formatRepairReportText(report);
   if (report.reseedAttempted && !report.reseedOk) {
@@ -190,7 +191,7 @@ export function showRepairReportModal(report: RepairReportSummary): HTMLElement 
       void navigator.clipboard.writeText(formatRepairReportText(report));
       copyBtn.textContent = '✓ Copied';
     } catch (caught) {
-      logError("AutoCatch", "Unhandled exception", caught);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, caught);
       const reason = toErrorMessage(caught);
       logDiagnosticFromCode('REPAIR_COPY_E001', { reason }, caught);
       copyBtn.textContent = 'Copy failed';

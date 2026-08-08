@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Migration: remove duplicate/legacy Read Memory seed entries from SQLite.
  *
@@ -67,7 +68,7 @@ async function invalidateJsonCopy(): Promise<void> {
     const { clearPromptCache } = await import('../ui/prompt-cache');
     await clearPromptCache();
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'legacy-read-memory-cache',
       reason: err instanceof Error ? err.message : String(err),
@@ -91,7 +92,7 @@ export async function migrateRemoveLegacyReadMemoryDuplicates(): Promise<void> {
       'success',
     );
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'legacy-read-memory',
       reason: err instanceof Error ? err.message : String(err),

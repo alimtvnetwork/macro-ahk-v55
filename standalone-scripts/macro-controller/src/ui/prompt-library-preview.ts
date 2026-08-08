@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { showToast } from '../toast';
 import { parsePromptsText, previewPromptImport, type PromptImportPreview } from './prompt-io';
 import { buildFriendlyImportError } from './prompt-import-error-message';
@@ -121,7 +122,7 @@ export async function computeAndRenderPreview(
     renderImportErrorBanner(refs, invalid.headline, invalid.hint);
     showToast(PREVIEW_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
     try { previewFileInput.value = ''; } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     }
 
     return;
@@ -147,19 +148,19 @@ export async function computeAndRenderPreview(
     renderPreviewPanel(refs, panel, preview, file, parsed.errors.length, () => {
       hidePreviewPanel(panel);
       try { previewFileInput.value = ''; } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
       }
       void handleImportFile(refs, file, fileInput, importBtn, 'click');
     }, () => {
       hidePreviewPanel(panel);
       try { previewFileInput.value = ''; } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
       }
       refs.status.textContent = 'Preview cancelled.';
     });
     refs.status.textContent = 'Preview ready for ' + file.name + '.';
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     logLibraryImportFailure('preview', 'threw during read/parse for name=' + file.name, err);
     const reason = extractImportErrorReason(err);
     refs.status.textContent = PREVIEW_FAILED_PREFIX + reason;

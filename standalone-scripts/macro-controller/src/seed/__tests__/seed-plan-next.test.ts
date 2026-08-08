@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Tests for the idempotent PlanTierType/Next seeder + boot telemetry (v4.72.0).
@@ -41,7 +42,7 @@ import { seedPlanNextPrompts } from '../seed-plan-next';
 beforeEach(() => {
     captured.length = 0; responsesQueue = []; logCalls.length = 0;
     try { localStorage.removeItem('marco_last_seed_telemetry'); } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     }
 });
 

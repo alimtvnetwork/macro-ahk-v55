@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Panel integration test — Issue 125 Task 6-8.
  *
@@ -18,7 +19,7 @@ import type { DashboardSummary } from '../summary-bar/types';
 
 function clearLocalStorage(): void {
     try { localStorage.clear(); } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     }
 }
 

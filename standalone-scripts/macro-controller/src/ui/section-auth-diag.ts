@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller — Auth Diagnostics Section
  *
@@ -129,7 +130,7 @@ export function createAuthDiagRow(deps: AuthDiagDeps): AuthDiagResult {
     diagBody.style.display = isHidden ? 'flex' : 'none';
     col.toggle.textContent = isHidden ? '[-]' : '[+]';
     try { localStorage.setItem('ml_collapse_auth_diag', isHidden ? 'expanded' : 'collapsed'); } catch (_e: unknown) {
-      logError("AutoCatch", "Unhandled exception", _e);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
       logSub('Failed to persist auth diag collapse state: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
     }
   };

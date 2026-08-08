@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * MacroLoop Controller — Workspace Filter Hamburger Menu
  *
@@ -176,7 +177,7 @@ function persistCompactMode(active: boolean): void {
   try {
     localStorage.setItem('ml_compact_mode', active ? 'true' : 'false');
   } catch (ex: unknown) {
-    logError("AutoCatch", "Unhandled exception", ex);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, ex);
     logSub('Failed to persist compact mode: ' + (ex instanceof Error ? ex.message : String(ex)), 1);
   }
 }

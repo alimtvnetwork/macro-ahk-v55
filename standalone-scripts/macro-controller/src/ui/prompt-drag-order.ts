@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Prompt drag-and-drop reordering.
  *
@@ -45,7 +46,7 @@ function runPromptOrderMigrations(): void {
     for (const key of LEGACY_STORAGE_KEYS) localStorage.removeItem(key);
     localStorage.setItem(MIGRATION_REV_KEY, String(CURRENT_MIGRATION_REV));
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   }
 }
 
@@ -60,7 +61,7 @@ function readLegacyOrder(): string[] {
         return parsed.filter((v): v is string => typeof v === 'string');
       }
     } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     }
   }
 
@@ -153,7 +154,7 @@ export function savePromptOrder(order: string[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   }
 }
 
@@ -191,7 +192,7 @@ function saveDragTouched(set: Set<string>): void {
     if (typeof localStorage === 'undefined') return;
     localStorage.setItem(DRAG_TOUCHED_KEY, JSON.stringify([...set]));
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   }
 }
 
@@ -199,7 +200,7 @@ function clearDragTouched(): void {
   try {
     if (typeof localStorage !== 'undefined') localStorage.removeItem(DRAG_TOUCHED_KEY);
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   }
 }
 
@@ -228,7 +229,7 @@ export function getSlugPositionSource(slug: string): SlugPositionInfo {
       migrationRev = Number(localStorage.getItem(MIGRATION_REV_KEY) ?? '0') || 0;
     }
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   }
   const effective = saved.length > 0 ? saved : DEFAULT_PROMPT_ORDER.slice();
   const index = effective.indexOf(slug);
@@ -268,7 +269,7 @@ export function getPromptOrderSource(): PromptOrderSource {
       migrationRev = Number(localStorage.getItem(MIGRATION_REV_KEY) ?? '0') || 0;
     }
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
   }
   const usingSaved = saved.length > 0;
 

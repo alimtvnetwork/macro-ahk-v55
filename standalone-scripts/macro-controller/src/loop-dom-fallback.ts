@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Loop DOM Fallback — DOM-based fallback strategies, direct moves, deprecated delegation
  *
@@ -28,7 +29,7 @@ export function dispatchDelegateSignal(direction: string): void {
   try {
     navigator.clipboard.writeText(signal).catch(function(err) { logSub('Clipboard write failed: ' + (err instanceof Error ? err.message : String(err)), 1); });
   } catch (e) {
-    logError("AutoCatch", "Unhandled exception", e);
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
     logSub('Clipboard API unavailable: ' + (e instanceof Error ? e.message : String(e)), 1);
   }
 }

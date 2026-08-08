@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { toErrorMessage, logError } from '../error-utils';
 /**
  * MacroLoop Controller — Prompt Utility Functions
@@ -137,7 +138,7 @@ export function parseWithRecovery(content: string): unknown {
       try {
         return JSON.parse(repaired);
       } catch (_repairErr) {
-        logError("AutoCatch", "Unhandled exception", _repairErr);
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _repairErr);
         logSub('JSON repair also failed: ' + (_repairErr instanceof Error ? _repairErr.message : String(_repairErr)), 1);
       }
     }

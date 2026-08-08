@@ -1,3 +1,4 @@
+const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "../constants/timing";
 import { ServiceResult } from '../utils/result-wrapper';
 /**
@@ -790,7 +791,7 @@ function _buildPromptModalFooter(
   };
   const writeDiffPref = function (open: boolean): void {
     try { window.localStorage.setItem(diffPersistKey, open ? '1' : '0'); } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
+      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     }
   };
   let isDiffOpen = false;
