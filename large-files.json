@@ -1,0 +1,1662 @@
+[
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\errors\\error-codes.ts",
+    "lines": 1370
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-dropdown.ts",
+    "lines": 1295
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-history-panel.ts",
+    "lines": 1276
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\next-inline-ui.ts",
+    "lines": 1188
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\projects-modal.ts",
+    "lines": 1125
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-injection.ts",
+    "lines": 1103
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\repeat-loop-ui.ts",
+    "lines": 1036
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\settings-tab-panels.ts",
+    "lines": 929
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\startup.ts",
+    "lines": 897
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\config-auth-handler.ts",
+    "lines": 871
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\run-group-runner.ts",
+    "lines": 869
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\export-bundle.ts",
+    "lines": 858
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-members-panel.ts",
+    "lines": 853
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\error-overlay.ts",
+    "lines": 803
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\library-handler.ts",
+    "lines": 790
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\import-bundle.ts",
+    "lines": 772
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\task-splitter-ui.ts",
+    "lines": 755
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\manifest-seeder.ts",
+    "lines": 734
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-utils.ts",
+    "lines": 726
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\injection-handler.ts",
+    "lines": 722
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-import-modal.ts",
+    "lines": 711
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-hover-card.ts",
+    "lines": 710
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\bulk-rename.ts",
+    "lines": 708
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\credit-totals-modal.ts",
+    "lines": 704
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\prompt-handler.ts",
+    "lines": 701
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-io.ts",
+    "lines": 686
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\csp-fallback.ts",
+    "lines": 655
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\failure-logger.ts",
+    "lines": 623
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\api-explorer-handler.ts",
+    "lines": 617
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\macro-ui.ts",
+    "lines": 601
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\result-webhook.ts",
+    "lines": 589
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\panel-controls.ts",
+    "lines": 584
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\live-dom-replay.ts",
+    "lines": 581
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\schema-meta-engine.ts",
+    "lines": 580
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\message-registry.ts",
+    "lines": 572
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\session-log-writer.ts",
+    "lines": 570
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\db-schemas.ts",
+    "lines": 566
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-move.ts",
+    "lines": 559
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\token-seeder.ts",
+    "lines": 554
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\task-next-ui.ts",
+    "lines": 551
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-context-menu.ts",
+    "lines": 547
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\panel-layout.ts",
+    "lines": 538
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-editor.ts",
+    "lines": 538
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\db-manager.ts",
+    "lines": 530
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\script-resolver.ts",
+    "lines": 530
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\schema-migration.ts",
+    "lines": 510
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\workspace-observer.ts",
+    "lines": 499
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\auto-injector.ts",
+    "lines": 497
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-fetch.ts",
+    "lines": 486
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\field-binding-overlay.ts",
+    "lines": 479
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\db.ts",
+    "lines": 474
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\database-schema-tab.ts",
+    "lines": 472
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\types\\config-types.ts",
+    "lines": 471
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\rename-bulk.ts",
+    "lines": 467
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\auth-resolve.ts",
+    "lines": 466
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\context-menu-handler.ts",
+    "lines": 465
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\toast.ts",
+    "lines": 463
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\seed\\seed-plan-next.ts",
+    "lines": 455
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\url-tab-click.ts",
+    "lines": 446
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-loader.ts",
+    "lines": 445
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\db\\macro-db.ts",
+    "lines": 441
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\project-api-handler.ts",
+    "lines": 441
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-list-renderer.ts",
+    "lines": 437
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\default-project-seeder.ts",
+    "lines": 437
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\recorder-toolbar.ts",
+    "lines": 437
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-parser.ts",
+    "lines": 431
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\logging.ts",
+    "lines": 428
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\auth-bridge.ts",
+    "lines": 426
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\step-wait.ts",
+    "lines": 426
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\settings-ui.ts",
+    "lines": 425
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\injection-pipeline.ts",
+    "lines": 420
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\auth-recovery.ts",
+    "lines": 416
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\boot.ts",
+    "lines": 414
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\logging-handler.ts",
+    "lines": 413
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\updater-handler.ts",
+    "lines": 409
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\condition-evaluator.ts",
+    "lines": 409
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\ws-filter-menu.ts",
+    "lines": 406
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-drag-order.ts",
+    "lines": 401
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\project-handler.ts",
+    "lines": 399
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\chip-gear-menu.ts",
+    "lines": 396
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\hover-highlighter.ts",
+    "lines": 390
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\input-source.ts",
+    "lines": 386
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\hot-reload-section.ts",
+    "lines": 380
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\tools-sections-builder.ts",
+    "lines": 374
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\ui-status-renderer.ts",
+    "lines": 373
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\database-schema-editors.ts",
+    "lines": 372
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\workspace-detection.ts",
+    "lines": 372
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\loop-controls.ts",
+    "lines": 371
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\url-trigger.ts",
+    "lines": 365
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\loop-cycle-fallback.ts",
+    "lines": 362
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\core\\MacroController.ts",
+    "lines": 361
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\seed-diagnostics-panel.ts",
+    "lines": 361
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\injection-toast.ts",
+    "lines": 360
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\storage-browser-handler.ts",
+    "lines": 358
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\injection-cache.ts",
+    "lines": 356
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-persistence.ts",
+    "lines": 355
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-adjacent.ts",
+    "lines": 349
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-dropdown-io.ts",
+    "lines": 347
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\js-step-diagnostics.ts",
+    "lines": 347
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\database-modal-data.ts",
+    "lines": 346
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\auth-diag-rows.ts",
+    "lines": 343
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\shared-state.ts",
+    "lines": 340
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\database-modal-styles.ts",
+    "lines": 340
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\save-prompt.ts",
+    "lines": 334
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-dialog-detection.ts",
+    "lines": 334
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\replay-bridge.ts",
+    "lines": 334
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\spa-reinject.ts",
+    "lines": 334
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\project-db-manager.ts",
+    "lines": 333
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-balance.ts",
+    "lines": 332
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\data-bridge-handler.ts",
+    "lines": 332
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\settings-modal.ts",
+    "lines": 330
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-shell.ts",
+    "lines": 330
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\rename-api.ts",
+    "lines": 329
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\api-namespace.ts",
+    "lines": 328
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\builtin-script-guard.ts",
+    "lines": 323
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\form-snapshot.ts",
+    "lines": 321
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\step-group-library\\mutation-handlers.ts",
+    "lines": 318
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\recorder\\failure-report-validator.ts",
+    "lines": 317
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\error-utils.ts",
+    "lines": 316
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\remote-config-fetcher.ts",
+    "lines": 314
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\menu-builder.ts",
+    "lines": 313
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-cache.ts",
+    "lines": 309
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder-db-schema.ts",
+    "lines": 309
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\dom-helpers.ts",
+    "lines": 308
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\panel-sections.ts",
+    "lines": 308
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\ws-dropdown-builder.ts",
+    "lines": 307
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\project-query-builder.ts",
+    "lines": 306
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\schema.ts",
+    "lines": 306
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-bundle-types.ts",
+    "lines": 304
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\boot-diagnostics.ts",
+    "lines": 303
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\project-namespace-builder.ts",
+    "lines": 301
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\open-tabs-handler.ts",
+    "lines": 300
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\xpath-utils.ts",
+    "lines": 299
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\db\\prompt-revision-db.ts",
+    "lines": 297
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\data-source-parsers.ts",
+    "lines": 297
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\field-reference-resolver.ts",
+    "lines": 296
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\settings-store.ts",
+    "lines": 295
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\panel-builder.ts",
+    "lines": 295
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\config-seeder.ts",
+    "lines": 295
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\csv-parse.ts",
+    "lines": 294
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-balance-update\\credit-fetch-controller.ts",
+    "lines": 292
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\auth-health-handler.ts",
+    "lines": 291
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\workspace-display-status.ts",
+    "lines": 290
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\logging-export-handler.ts",
+    "lines": 290
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\task-queue.ts",
+    "lines": 289
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\workspace-status.ts",
+    "lines": 287
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\bg-logger.ts",
+    "lines": 286
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\db\\prompt-db.ts",
+    "lines": 285
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\section-open-tabs.ts",
+    "lines": 285
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\cookie-watcher.ts",
+    "lines": 284
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\shortcut-command-handler.ts",
+    "lines": 284
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\script-config-handler.ts",
+    "lines": 279
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-chain-persistence.ts",
+    "lines": 279
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-checkbox-handler.ts",
+    "lines": 278
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\selector-attempt-evaluator.ts",
+    "lines": 273
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\monaco-js-intellisense.ts",
+    "lines": 273
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\storage-surfaces-handler.ts",
+    "lines": 270
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\about-modal.ts",
+    "lines": 268
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\http-request-step.ts",
+    "lines": 267
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\wasm-integrity.ts",
+    "lines": 264
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\read-memory-admin-modal.ts",
+    "lines": 263
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\replay-run-persistence.ts",
+    "lines": 262
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\save-prompt-prompt-list.ts",
+    "lines": 259
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\webhook-settings\\delivery-log-utils.ts",
+    "lines": 259
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-members-bulk-panel.ts",
+    "lines": 258
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\async-utils.ts",
+    "lines": 257
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\json-tree\\json-tree-helpers.ts",
+    "lines": 256
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\automation-chain-handler.ts",
+    "lines": 254
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-io-dialog.ts",
+    "lines": 253
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\sw-shims.ts",
+    "lines": 251
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\database-json-migrate.ts",
+    "lines": 250
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\gitsync\\progress-probe.ts",
+    "lines": 249
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\plan-task-ui.ts",
+    "lines": 248
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\instruction-failure-adapters.ts",
+    "lines": 248
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\injection-namespace-bootstrap.ts",
+    "lines": 246
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\state-manager.ts",
+    "lines": 246
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\remix-modal.ts",
+    "lines": 245
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\gitsync\\ensure-repo.ts",
+    "lines": 244
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\panel-header.ts",
+    "lines": 243
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\inline-strips-frame.ts",
+    "lines": 242
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\repair-report-modal.ts",
+    "lines": 242
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\prompt-chain-handler.ts",
+    "lines": 241
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\ui-updaters.ts",
+    "lines": 240
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\first-attach-toast.ts",
+    "lines": 240
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\recorder-step-handler.ts",
+    "lines": 239
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\bulk-rename-fields.ts",
+    "lines": 236
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\dropzone-overlay.ts",
+    "lines": 235
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\project-database\\useSchemaBuilder.ts",
+    "lines": 235
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\errors\\diagnostic-error.ts",
+    "lines": 234
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-order-indicator.ts",
+    "lines": 233
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\health-handler.ts",
+    "lines": 232
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\project-history-panel.ts",
+    "lines": 231
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\script-info-handler.ts",
+    "lines": 231
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\hotkey-executor.ts",
+    "lines": 230
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\log-csv-export.ts",
+    "lines": 228
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\injection-request-resolver.ts",
+    "lines": 228
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\selector-comparison.ts",
+    "lines": 228
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-io-zip-stream.ts",
+    "lines": 226
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\auto-attach.ts",
+    "lines": 224
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\telemetry\\diagnostic-toast-telemetry.ts",
+    "lines": 223
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\chat-history-modal.ts",
+    "lines": 223
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\db\\sql-bridge.ts",
+    "lines": 222
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\project-kv-store.ts",
+    "lines": 222
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\dynamic-require-handler.ts",
+    "lines": 221
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\csv-input\\use-csv-input-controller.ts",
+    "lines": 221
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-members-mutations.ts",
+    "lines": 219
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\user-script-log-handler.ts",
+    "lines": 218
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\database-data-filter.ts",
+    "lines": 216
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\step-group-library\\use-view-model.ts",
+    "lines": 216
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-balance\\store.ts",
+    "lines": 213
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-io-zip.ts",
+    "lines": 213
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\config-validator.ts",
+    "lines": 212
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\recorder\\failure-export.ts",
+    "lines": 212
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\capture-to-step-bridge.ts",
+    "lines": 211
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\errors\\format.ts",
+    "lines": 209
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\injection-wrapper.ts",
+    "lines": 209
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\csv-mapping.ts",
+    "lines": 209
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\chip-gear-picker.ts",
+    "lines": 207
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\drift-element-diff.ts",
+    "lines": 207
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\step-group-library\\use-export-import.ts",
+    "lines": 207
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\task-manager.ts",
+    "lines": 206
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\database-modal.ts",
+    "lines": 206
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\loop-check.ts",
+    "lines": 205
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-name-matching.ts",
+    "lines": 205
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-import-audit.ts",
+    "lines": 202
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\remix-dropdown.ts",
+    "lines": 201
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\payment-notice-removal.ts",
+    "lines": 201
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\settings-handler.ts",
+    "lines": 201
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\run-batch.ts",
+    "lines": 200
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\error-handler.ts",
+    "lines": 199
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\sqlite-bind-safety.ts",
+    "lines": 199
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\section-auth-diag.ts",
+    "lines": 198
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-balance-update\\credit-balance-cache.ts",
+    "lines": 197
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\pending-restore-undo.ts",
+    "lines": 197
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-balance-update\\credit-balance-fetcher.ts",
+    "lines": 195
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\db\\rule-zero-validator.ts",
+    "lines": 194
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\save-prompt-dropdown.ts",
+    "lines": 194
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\step-group-library\\use-library-panel-state.ts",
+    "lines": 194
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\injection-syntax-preflight.ts",
+    "lines": 193
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\group-inputs.ts",
+    "lines": 193
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\file-storage-handler.ts",
+    "lines": 192
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\selector-history.ts",
+    "lines": 192
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\step-editor\\payload-builders.ts",
+    "lines": 192
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\drift-timeline.ts",
+    "lines": 190
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\spa-route-guard.ts",
+    "lines": 187
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\status-explainer.ts",
+    "lines": 187
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-totals.ts",
+    "lines": 186
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\log-manager.ts",
+    "lines": 186
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\macro-looping.ts",
+    "lines": 186
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\startup-idempotent-check.ts",
+    "lines": 186
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\dependency-resolver.ts",
+    "lines": 186
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\sdk-selftest-handler.ts",
+    "lines": 186
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\use-token-seeder-diagnostics.ts",
+    "lines": 186
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\rename-preset-store.ts",
+    "lines": 185
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\changelog-modal.ts",
+    "lines": 185
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\recorder\\failure-reports-panel\\use-failure-reports-panel.ts",
+    "lines": 185
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\constants.ts",
+    "lines": 182
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-api.ts",
+    "lines": 182
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\injection-dependency-builder.ts",
+    "lines": 182
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\summary-bar\\hover-card.ts",
+    "lines": 181
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\skeleton.ts",
+    "lines": 179
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\api-namespace-types.ts",
+    "lines": 178
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\recorder-capture-handler.ts",
+    "lines": 178
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\injection-diagnostics.ts",
+    "lines": 178
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\message-router.ts",
+    "lines": 178
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\migration-v4-sql.ts",
+    "lines": 178
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\auth-diag-waterfall.ts",
+    "lines": 177
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\summary-bar\\compute-summary.ts",
+    "lines": 177
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-llm-guide-download.ts",
+    "lines": 176
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-import-pipeline.ts",
+    "lines": 175
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\template-renderer.ts",
+    "lines": 175
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\dismissed-origins.ts",
+    "lines": 175
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\service-worker-main.ts",
+    "lines": 175
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\project-name-dropdown.ts",
+    "lines": 174
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\save-prompt-task-next.ts",
+    "lines": 174
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\xpath-handler.ts",
+    "lines": 174
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\import-error-explainer.ts",
+    "lines": 174
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\status-handler.ts",
+    "lines": 174
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\seed\\prompt-health-check.ts",
+    "lines": 173
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\keyboard-handlers.ts",
+    "lines": 173
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\sdk-bridge-handler.ts",
+    "lines": 170
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\dom-cache.ts",
+    "lines": 168
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\remix-bulk.ts",
+    "lines": 168
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\telemetry\\prompt-seed-telemetry.ts",
+    "lines": 168
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-balance\\batch-refresh.ts",
+    "lines": 167
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\task-splitter-parse.ts",
+    "lines": 167
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\marco-sdk-template.ts",
+    "lines": 167
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-progress.ts",
+    "lines": 166
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\storage-migration.ts",
+    "lines": 166
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\condition-evaluator.ts",
+    "lines": 165
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\remix\\new-project-cache.ts",
+    "lines": 163
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\next-selector-control.ts",
+    "lines": 163
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\shared-state-runtime.ts",
+    "lines": 161
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\types\\ui-types.ts",
+    "lines": 161
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\network-handler.ts",
+    "lines": 161
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\storage-handler.ts",
+    "lines": 160
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-io-zip-reader.ts",
+    "lines": 159
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\summary-bar\\component.ts",
+    "lines": 159
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\xpath-validation-handler.ts",
+    "lines": 159
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\project-matcher.ts",
+    "lines": 159
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\recorder-store.ts",
+    "lines": 159
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\seed\\reseed-command.ts",
+    "lines": 158
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\field-binding-persistence.ts",
+    "lines": 158
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\types\\credit-types.ts",
+    "lines": 157
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-dropdown-header.ts",
+    "lines": 157
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-import-commit.ts",
+    "lines": 156
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\auto-attach-runner.ts",
+    "lines": 155
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\step-wait\\use-step-wait-dialog.ts",
+    "lines": 155
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-preview.ts",
+    "lines": 154
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\url-matcher.ts",
+    "lines": 154
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\database-data-table.ts",
+    "lines": 153
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\database-json-tab.ts",
+    "lines": 153
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\remix-history.ts",
+    "lines": 152
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\webhook-settings\\use-webhook-settings-state.ts",
+    "lines": 152
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\recorder\\recorder-self-test.ts",
+    "lines": 150
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\gitsync-cache.ts",
+    "lines": 149
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\projects-cache.ts",
+    "lines": 149
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\interval-registry.ts",
+    "lines": 148
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\check-button.ts",
+    "lines": 148
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\menu-helpers.ts",
+    "lines": 148
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-import-errors.ts",
+    "lines": 148
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\loop-cycle.ts",
+    "lines": 147
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-actions.ts",
+    "lines": 146
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\redock-observer.ts",
+    "lines": 146
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\database-schema-styles.ts",
+    "lines": 145
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\db-persistence.ts",
+    "lines": 144
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\selector-tester.ts",
+    "lines": 144
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\remix-fetch.ts",
+    "lines": 143
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-diff.ts",
+    "lines": 143
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\utils\\mini-zip.ts",
+    "lines": 143
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\startup-persistence.ts",
+    "lines": 140
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-io-db-bridge.ts",
+    "lines": 140
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\recorder\\recorder-export.ts",
+    "lines": 140
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\auto-attach.ts",
+    "lines": 139
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-io-sqlite-reader.ts",
+    "lines": 139
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\handler-guards.ts",
+    "lines": 139
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\storage\\chat-submit-opfs-store.ts",
+    "lines": 138
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\db\\project-chat-submit-db.ts",
+    "lines": 136
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\startup-toast.ts",
+    "lines": 136
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\auth-jwt-utils.ts",
+    "lines": 136
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\inline-strip-group-collapse.ts",
+    "lines": 133
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\url-matches-backfill.ts",
+    "lines": 133
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\recorder\\selector-replay-trace.ts",
+    "lines": 133
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\js-snippet-persistence.ts",
+    "lines": 132
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\recorder\\visualisation\\use-recorder-step-mutations.ts",
+    "lines": 132
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\queue-control\\queue-count.ts",
+    "lines": 131
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-io-sqlite.ts",
+    "lines": 131
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\gitsync\\disconnect-repo.ts",
+    "lines": 130
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-members-fetch.ts",
+    "lines": 130
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\grouped-kv-handler.ts",
+    "lines": 130
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\injection-result-builder.ts",
+    "lines": 130
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\run-stats-handler.ts",
+    "lines": 130
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\hot-reload.ts",
+    "lines": 130
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\project-lock\\store.ts",
+    "lines": 129
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\updater\\updater-types.ts",
+    "lines": 129
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\capture\\chat-submit-history.ts",
+    "lines": 128
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-balance-update\\credit-balance-parser.ts",
+    "lines": 128
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\telemetry\\prompt-edit-e005-store.ts",
+    "lines": 127
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\project-injection-status.ts",
+    "lines": 127
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-filter-menu.ts",
+    "lines": 126
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-row.ts",
+    "lines": 126
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\project-database\\useConfigDb.ts",
+    "lines": 126
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\db\\validate-read-memory-duplicates.ts",
+    "lines": 125
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\countdown.ts",
+    "lines": 125
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\workspace-cache.ts",
+    "lines": 125
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\js-step-sandbox.ts",
+    "lines": 125
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\gitsync-api.ts",
+    "lines": 124
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\seed\\prompt-health-auto-repair.ts",
+    "lines": 124
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\js-executor.ts",
+    "lines": 124
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-balance-update\\credit-summary-resolver.ts",
+    "lines": 123
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\loop-dom-fallback.ts",
+    "lines": 123
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\seed\\plan-next-prompts.ts",
+    "lines": 123
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\editor-text.ts",
+    "lines": 123
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-balance\\fetcher.ts",
+    "lines": 122
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\startup-global-handlers.ts",
+    "lines": 122
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-editor.ts",
+    "lines": 122
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\step-group-list\\list-panel-mutation-helpers.ts",
+    "lines": 122
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\remix\\invalidate-sentinel.ts",
+    "lines": 121
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\kv-handler.ts",
+    "lines": 121
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\startup-timing.ts",
+    "lines": 119
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\execution-next-preview.ts",
+    "lines": 118
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\group-inputs\\use-group-inputs-controller.ts",
+    "lines": 118
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\schema-meta-handler.ts",
+    "lines": 117
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\input-source\\use-input-source-draft.ts",
+    "lines": 117
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-dropdown-render.ts",
+    "lines": 116
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-status-badges.ts",
+    "lines": 116
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\xpath-of-element.ts",
+    "lines": 116
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-members-chip-input.ts",
+    "lines": 115
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-balance\\throttle.ts",
+    "lines": 112
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\remix-name-resolver.ts",
+    "lines": 112
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-view-state.ts",
+    "lines": 112
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\data-source-persistence.ts",
+    "lines": 112
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\export-error-explainer.ts",
+    "lines": 112
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\queue-control\\task-queue.ts",
+    "lines": 111
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\project-export-handler.ts",
+    "lines": 111
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-ai-guideline.ts",
+    "lines": 110
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\storage-auto-pruner.ts",
+    "lines": 110
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\promote-selector.ts",
+    "lines": 109
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\log-activity-ui.ts",
+    "lines": 108
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\workspace-lifecycle-config.ts",
+    "lines": 108
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\db\\prompt-token-guard.ts",
+    "lines": 107
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\migration-v3-sql.ts",
+    "lines": 107
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\replay-resolver.ts",
+    "lines": 107
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\loop-move-gate.ts",
+    "lines": 106
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\queue-control\\auto-resume.ts",
+    "lines": 106
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\recorder\\wait-for-element.ts",
+    "lines": 106
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\injection-timing-history.ts",
+    "lines": 105
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\startup-token-gate.ts",
+    "lines": 104
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\namespace-cache.ts",
+    "lines": 104
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\cookie-helpers.ts",
+    "lines": 103
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\background\\handlers\\recorder-field-binding-handler.ts",
+    "lines": 103
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\src\\components\\options\\recorder\\recorder-step-detail\\use-recorder-step-detail.ts",
+    "lines": 103
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\capture\\chat-submit-capture.ts",
+    "lines": 102
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\remix\\navigate-to-remixed.ts",
+    "lines": 102
+  },
+  {
+    "file": "d:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-modal.ts",
+    "lines": 102
+  }
+]

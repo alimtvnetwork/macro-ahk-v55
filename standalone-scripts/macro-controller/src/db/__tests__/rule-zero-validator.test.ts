@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Tests for rule-zero-validator.ts — the "step count is law" gate.
  *
@@ -64,31 +65,31 @@ describe('countTopLevelSteps', () => {
 describe('validateRuleZero', () => {
     it('R1: template body with Steps:{{n}} passes as template', () => {
         const r = validateRuleZero('Steps: {{n}}\n\n## Steps\n1. do\n');
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         expect(r.code).toBe('template');
     });
     it('R2: prose "EXACTLY {{n}} steps" passes as template', () => {
         const r = validateRuleZero('Write EXACTLY {{n}} steps.\n1. do\n');
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         expect(r.code).toBe('template');
     });
     it('R3: declared 5 with exactly 5 steps -> match', () => {
         const body = 'Steps: 5\n\n## Steps\n1. a\n2. b\n3. c\n4. d\n5. e\n';
         const r = validateRuleZero(body);
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         expect(r.code).toBe('match');
         expect(r.expectedN).toBe(5);
         expect(r.actualN).toBe(5);
     });
     it('R4: no declaration -> pass with no-declaration', () => {
         const r = validateRuleZero('Just some notes with 1. thing and 2. more');
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         expect(r.code).toBe('no-declaration');
     });
     it('R5: declared 5 but body has 3 -> mismatch (blocked)', () => {
         const body = 'Steps: 5\n\n## Steps\n1. a\n2. b\n3. c\n';
         const r = validateRuleZero(body);
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.code).toBe('mismatch');
         expect(r.expectedN).toBe(5);
         expect(r.actualN).toBe(3);
@@ -97,14 +98,14 @@ describe('validateRuleZero', () => {
     it('R6: declared 5 but no numbered steps -> no-steps (blocked)', () => {
         const body = 'Steps: 5\n\n## Steps\n\nprose only, no list\n';
         const r = validateRuleZero(body);
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.code).toBe('no-steps');
     });
     it('R7: "# 20 steps Plan" header but only 18 items -> mismatch', () => {
         const items = Array.from({ length: 18 }, (_, i) => (i + 1) + '. item').join('\n');
         const body = '# 20 steps Plan\n\n## Steps\n' + items + '\n';
         const r = validateRuleZero(body);
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.expectedN).toBe(20);
         expect(r.actualN).toBe(18);
     });

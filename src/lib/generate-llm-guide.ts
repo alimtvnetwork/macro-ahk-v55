@@ -492,9 +492,9 @@ ${ns}.log.info(\\\`Run #\\\${runCount}\\\`);
 const session = await ${ns}.cookies.get("sessionToken");
 const config = await ${ns}.vars.getAll();
 
-const response = await fetch(config.apiUrl + "/data", {
+const response = ServiceResult.wrapFetch(await fetch(config.apiUrl + "/data", {
   headers: { Authorization: \\\`Bearer \\\${session}\\\` }
-});
+}));
 const data = await response.json();
 ${ns}.log.info("Fetched data", { count: data.length });
 \`\`\`
@@ -504,8 +504,8 @@ ${ns}.log.info("Fetched data", { count: data.length });
 \`\`\`js
 try {
   const result = await marco.utils.withRetry(async () => {
-    const res = await fetch("/api/submit", { method: "POST", body: payload });
-    if (!res.ok) throw new Error("HTTP " + res.status);
+    const res = ServiceResult.wrapFetch(await fetch("/api/submit", { method: "POST", body: payload }));
+    if (res.isFail) throw new Error("HTTP " + res.status);
     return res.json();
   }, { maxAttempts: 3, delayMs: 2000, backoffMultiplier: 1.5 });
 

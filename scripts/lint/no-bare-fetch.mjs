@@ -127,6 +127,8 @@ function isGlobalFetch(line) {
     if (/^fetch\s*\(/.test(trimmed) && /:\s*(void|Promise|number|string|boolean)/.test(trimmed)) return false;
     // Match global fetch( or await fetch(  — but not inside strings
     if (!/\bfetch\s*\(/.test(trimmed)) return false;
+    // Allow ServiceResult.wrapFetch and other wrappers on the same line
+    if (trimmed.includes("httpFailFast") || trimmed.includes("httpFetchOrThrow") || trimmed.includes("ServiceResult.wrapFetch")) return false;
     return true;
 }
 

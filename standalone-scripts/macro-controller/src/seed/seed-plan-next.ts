@@ -393,10 +393,16 @@ async function writeSeedAuditRow(params: {
 }
 
 
-export async function seedPlanNextPrompts(): Promise<SeedResult> {
-    const startedAt = Date.now();
-    emitPromptSeedEvent({ event: 'seed.start', outcome: 'ok' });
+import { ServiceResult } from '../utils/result-wrapper';
+
+// eslint-disable-next-line max-lines-per-function
+export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> {
+    if (!getPromptsConfig) {
+        return ServiceResult.wrap({ ok: false, error: 'startup dependency missing (getPromptsConfig)' });
+    }
     try {
+        const startedAt = Date.now();
+        emitPromptSeedEvent({ event: 'seed.start', outcome: 'ok' });
         const tel = initTelemetry();
         const existing = await selectExistingSlugs();
         tallyInsertCounts(existing, tel);
@@ -411,7 +417,7 @@ export async function seedPlanNextPrompts(): Promise<SeedResult> {
                 event: 'seed.failed', outcome: 'failed', detail: message,
                 metrics: { elapsedMs: Date.now() - startedAt },
             });
-            return { ok: false, error: message };
+            return ServiceResult.wrap({ ok: false, error: message });
         }
         const insertedTotal = Array.from(tel.values()).reduce((s, t) => s + t.inserted, 0);
         const skippedTotal = Array.from(tel.values()).reduce((s, t) => s + t.skipped, 0);
@@ -439,7 +445,7 @@ export async function seedPlanNextPrompts(): Promise<SeedResult> {
                 promoted: telemetry.reduce((s, t) => s + t.promotedDefault, 0),
             },
         });
-        return { ok: true, telemetry };
+        return ServiceResult.wrap({ ok: true, telemetry });
     } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         logDiagnosticFromCode('SEED_INSERT_E001', {
@@ -449,6 +455,6 @@ export async function seedPlanNextPrompts(): Promise<SeedResult> {
             event: 'seed.failed', outcome: 'failed', detail: message,
             metrics: { elapsedMs: Date.now() - startedAt },
         });
-        return { ok: false, error: message };
+        return ServiceResult.wrap({ ok: false, error: message });
     }
 }

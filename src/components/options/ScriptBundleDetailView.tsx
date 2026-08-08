@@ -383,8 +383,8 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
                 if (!updateUrl.trim()) return;
                 setIsCheckingUpdate(true);
                 try {
-                  const res = await fetch(updateUrl.trim());
-                  if (!res.ok) {
+                  const res = ServiceResult.wrapFetch(await fetch(updateUrl.trim()));
+                  if (res.isFail) {
                     // HEFF: single attempt; report status and stop.
                     throw new Error(
                       `HEFF: HTTP ${res.status} on GET ${updateUrl.trim()} — update fetch halted. Awaiting user instruction.`,

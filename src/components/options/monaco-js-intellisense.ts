@@ -170,7 +170,7 @@ function buildSnippets(monaco: MonacoModule) {
     { label: "gid", detail: "document.getElementById", insertText: "document.getElementById('${1:id}')$0" },
     { label: "ael", detail: "addEventListener", insertText: "${1:element}.addEventListener('${2:event}', (${3:e}) => {\n\t$0\n});" },
     { label: "ce", detail: "document.createElement", insertText: "document.createElement('${1:tag}')$0" },
-    { label: "fetch", detail: "fetch request", insertText: "const ${1:response} = await fetch('${2:url}', {\n\tmethod: '${3|GET,POST,PUT,DELETE|}',\n\theaders: { 'Content-Type': 'application/json' },\n\t${4:body: JSON.stringify($5)}\n});\nconst ${6:data} = await $1.json();$0" },
+    { label: "fetch", detail: "fetch request", insertText: "const ${1:response} = ServiceResult.wrapFetch(await fetch('${2:url}', {\n\tmethod: '${3|GET,POST,PUT,DELETE|}',\n\theaders: { 'Content-Type': 'application/json' },\n\t${4:body: JSON.stringify($5)}\n}));\nconst ${6:data} = await $1.json();$0" },
     { label: "timeout", detail: "setTimeout", insertText: "setTimeout(() => {\n\t$0\n}, ${1:1000});" },
     { label: "interval", detail: "setInterval", insertText: "const ${1:timer} = setInterval(() => {\n\t$0\n}, ${2:1000});" },
     { label: "promise", detail: "new Promise", insertText: "new Promise((resolve, reject) => {\n\t$0\n})" },

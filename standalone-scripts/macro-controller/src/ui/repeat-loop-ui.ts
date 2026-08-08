@@ -310,7 +310,10 @@ async function runRepeatLoopAsync(): Promise<void> {
     if (repeatLoopState.completed >= repeatLoopState.count) break;
     await waitBetweenIterations();
   }
+  finishRepeatLoop();
+}
 
+function finishRepeatLoop(): void {
   const wasCancelled = repeatLoopState.cancelled;
   const done = repeatLoopState.completed;
   const total = repeatLoopState.count;
@@ -852,13 +855,8 @@ function buildTopRow(opts: { useLocalCollapse: boolean }): BuiltTopRow {
   input.style.flex = '0 0 auto';
   row.appendChild(input);
 
-  const presetsWrap = document.createElement('span');
-  presetsWrap.style.cssText = 'position:relative;display:flex;align-items:center;gap:4px;flex-wrap:nowrap;flex:1 1 auto;min-width:0;';
-  presetsWrap.appendChild(buildCountPresets());
-  const chipOverflowSentinel = document.createElement('span');
-  chipOverflowSentinel.style.cssText = 'display:none;flex-shrink:0;';
-  presetsWrap.appendChild(chipOverflowSentinel);
-  row.appendChild(presetsWrap);
+  const { wrap, sentinel } = buildPresetsWrap();
+  row.appendChild(wrap);
 
   const progress = document.createElement('span');
   progress.style.cssText = 'font-size:10px;color:' + cPrimaryLight + ';flex:0 0 auto;min-width:42px;text-align:right;';
@@ -869,12 +867,29 @@ function buildTopRow(opts: { useLocalCollapse: boolean }): BuiltTopRow {
   action.style.flex = '0 0 auto';
   action.dataset['trailingAction'] = '1';
   row.appendChild(action);
+  
   if (opts.useLocalCollapse) row.appendChild(buildCollapseButton());
 
+  installOverflowHooks(row, wrap, sentinel);
+
+  return { row, input, progress, action };
+}
+
+function buildPresetsWrap(): { wrap: HTMLElement, sentinel: HTMLElement } {
+  const wrap = document.createElement('span');
+  wrap.style.cssText = 'position:relative;display:flex;align-items:center;gap:4px;flex-wrap:nowrap;flex:1 1 auto;min-width:0;';
+  wrap.appendChild(buildCountPresets());
+  const sentinel = document.createElement('span');
+  sentinel.style.cssText = 'display:none;flex-shrink:0;';
+  wrap.appendChild(sentinel);
+  return { wrap, sentinel };
+}
+
+function installOverflowHooks(row: HTMLElement, presetsWrap: HTMLElement, sentinel: HTMLElement): void {
   void (async () => {
     try {
       const mod = await import('./next-inline-ui');
-      mod.installChipOverflow(presetsWrap, chipOverflowSentinel, buildRepeatChipForOverflow, 'rgba(124,58,237,0.6)');
+      mod.installChipOverflow(presetsWrap, sentinel, buildRepeatChipForOverflow, 'rgba(124,58,237,0.6)');
       mod.installActionOverflow(row, 'rgba(124,58,237,0.6)');
     } catch (e) {
       log('Repeat: overflow install failed — ' + (e instanceof Error ? e.message : String(e)), 'warn');

@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Next Selector Control (v4.170.5)
  *
@@ -46,7 +47,7 @@ async function populate(refs: RenderRefs): Promise<void> {
   let rows: PromptRow[] = [];
   try {
     const listed = await listPromptsByRole('next');
-    if (!listed.ok) {
+    if (listed.isFail) {
       logError('NextSelector', 'listPromptsByRole failed', new Error(listed.error ?? 'list failed'));
       refs.hint.textContent = '(unavailable)';
       return;
@@ -81,7 +82,7 @@ async function onSelectionChanged(refs: RenderRefs): Promise<void> {
   if (!Number.isFinite(id) || id <= 0) return;
   try {
     const result = await setDefaultPromptForRole(id, 'next');
-    if (!result.ok) {
+    if (result.isFail) {
       logError('NextSelector', 'setDefaultPromptForRole failed', new Error(result.error ?? 'set default failed'));
       showPasteToast('❌ Could not switch Next prompt', true);
       return;

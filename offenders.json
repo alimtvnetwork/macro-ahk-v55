@@ -1,0 +1,1064 @@
+[
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\errors\\error-codes.ts",
+    "lines": 1370,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-dropdown.ts",
+    "lines": 1295,
+    "badCatches": 0,
+    "negations": 8
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-history-panel.ts",
+    "lines": 1276,
+    "badCatches": 0,
+    "negations": 16
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\next-inline-ui.ts",
+    "lines": 1188,
+    "badCatches": 0,
+    "negations": 9
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\projects-modal.ts",
+    "lines": 1125,
+    "badCatches": 0,
+    "negations": 11
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-injection.ts",
+    "lines": 1103,
+    "badCatches": 0,
+    "negations": 9
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\repeat-loop-ui.ts",
+    "lines": 1036,
+    "badCatches": 0,
+    "negations": 11
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\settings-tab-panels.ts",
+    "lines": 929,
+    "badCatches": 0,
+    "negations": 3
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\startup.ts",
+    "lines": 897,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\handlers\\config-auth-handler.ts",
+    "lines": 871,
+    "badCatches": 4,
+    "negations": 10
+  },
+  {
+    "file": "src\\background\\recorder\\step-library\\run-group-runner.ts",
+    "lines": 869,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\recorder\\step-library\\export-bundle.ts",
+    "lines": 858,
+    "badCatches": 0,
+    "negations": 2
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ws-members-panel.ts",
+    "lines": 853,
+    "badCatches": 0,
+    "negations": 9
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\error-overlay.ts",
+    "lines": 803,
+    "badCatches": 0,
+    "negations": 2
+  },
+  {
+    "file": "src\\background\\handlers\\library-handler.ts",
+    "lines": 790,
+    "badCatches": 2,
+    "negations": 5
+  },
+  {
+    "file": "src\\background\\recorder\\step-library\\import-bundle.ts",
+    "lines": 772,
+    "badCatches": 0,
+    "negations": 2
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\task-splitter-ui.ts",
+    "lines": 755,
+    "badCatches": 0,
+    "negations": 10
+  },
+  {
+    "file": "src\\background\\manifest-seeder.ts",
+    "lines": 734,
+    "badCatches": 0,
+    "negations": 6
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-utils.ts",
+    "lines": 726,
+    "badCatches": 0,
+    "negations": 5
+  },
+  {
+    "file": "src\\background\\handlers\\injection-handler.ts",
+    "lines": 722,
+    "badCatches": 2,
+    "negations": 4
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-import-modal.ts",
+    "lines": 711,
+    "badCatches": 0,
+    "negations": 2
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ws-hover-card.ts",
+    "lines": 710,
+    "badCatches": 0,
+    "negations": 11
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\bulk-rename.ts",
+    "lines": 708,
+    "badCatches": 0,
+    "negations": 3
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\credit-totals-modal.ts",
+    "lines": 704,
+    "badCatches": 0,
+    "negations": 7
+  },
+  {
+    "file": "src\\background\\handlers\\prompt-handler.ts",
+    "lines": 701,
+    "badCatches": 4,
+    "negations": 4
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-io.ts",
+    "lines": 686,
+    "badCatches": 0,
+    "negations": 3
+  },
+  {
+    "file": "src\\background\\csp-fallback.ts",
+    "lines": 655,
+    "badCatches": 0,
+    "negations": 3
+  },
+  {
+    "file": "src\\background\\recorder\\failure-logger.ts",
+    "lines": 623,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "src\\background\\api-explorer-handler.ts",
+    "lines": 617,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\macro-ui.ts",
+    "lines": 601,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "src\\background\\recorder\\step-library\\result-webhook.ts",
+    "lines": 589,
+    "badCatches": 0,
+    "negations": 8
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\panel-controls.ts",
+    "lines": 584,
+    "badCatches": 0,
+    "negations": 5
+  },
+  {
+    "file": "src\\background\\recorder\\live-dom-replay.ts",
+    "lines": 581,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\schema-meta-engine.ts",
+    "lines": 580,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "src\\background\\message-registry.ts",
+    "lines": 572,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\session-log-writer.ts",
+    "lines": 570,
+    "badCatches": 1,
+    "negations": 8
+  },
+  {
+    "file": "src\\background\\db-schemas.ts",
+    "lines": 566,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ws-move.ts",
+    "lines": 559,
+    "badCatches": 0,
+    "negations": 10
+  },
+  {
+    "file": "src\\background\\handlers\\token-seeder.ts",
+    "lines": 554,
+    "badCatches": 0,
+    "negations": 7
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\task-next-ui.ts",
+    "lines": 551,
+    "badCatches": 0,
+    "negations": 3
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ws-context-menu.ts",
+    "lines": 547,
+    "badCatches": 0,
+    "negations": 5
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\panel-layout.ts",
+    "lines": 538,
+    "badCatches": 0,
+    "negations": 9
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-editor.ts",
+    "lines": 538,
+    "badCatches": 0,
+    "negations": 10
+  },
+  {
+    "file": "src\\background\\db-manager.ts",
+    "lines": 530,
+    "badCatches": 2,
+    "negations": 2
+  },
+  {
+    "file": "src\\background\\script-resolver.ts",
+    "lines": 530,
+    "badCatches": 0,
+    "negations": 3
+  },
+  {
+    "file": "src\\background\\schema-migration.ts",
+    "lines": 510,
+    "badCatches": 1,
+    "negations": 1
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\workspace-observer.ts",
+    "lines": 499,
+    "badCatches": 0,
+    "negations": 7
+  },
+  {
+    "file": "src\\background\\auto-injector.ts",
+    "lines": 497,
+    "badCatches": 0,
+    "negations": 2
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\credit-fetch.ts",
+    "lines": 486,
+    "badCatches": 0,
+    "negations": 12
+  },
+  {
+    "file": "src\\background\\recorder\\field-binding-overlay.ts",
+    "lines": 479,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\recorder\\step-library\\db.ts",
+    "lines": 474,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\database-schema-tab.ts",
+    "lines": 472,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\types\\config-types.ts",
+    "lines": 471,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\rename-bulk.ts",
+    "lines": 467,
+    "badCatches": 0,
+    "negations": 3
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\auth-resolve.ts",
+    "lines": 466,
+    "badCatches": 0,
+    "negations": 6
+  },
+  {
+    "file": "src\\background\\context-menu-handler.ts",
+    "lines": 465,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\toast.ts",
+    "lines": 463,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\seed\\seed-plan-next.ts",
+    "lines": 455,
+    "badCatches": 0,
+    "negations": 8
+  },
+  {
+    "file": "src\\background\\recorder\\url-tab-click.ts",
+    "lines": 446,
+    "badCatches": 0,
+    "negations": 2
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-loader.ts",
+    "lines": 445,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\db\\macro-db.ts",
+    "lines": 441,
+    "badCatches": 0,
+    "negations": 5
+  },
+  {
+    "file": "src\\background\\handlers\\project-api-handler.ts",
+    "lines": 441,
+    "badCatches": 0,
+    "negations": 5
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ws-list-renderer.ts",
+    "lines": 437,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\default-project-seeder.ts",
+    "lines": 437,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\recorder\\recorder-toolbar.ts",
+    "lines": 437,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\credit-parser.ts",
+    "lines": 431,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\logging.ts",
+    "lines": 428,
+    "badCatches": 1,
+    "negations": 4
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\auth-bridge.ts",
+    "lines": 426,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "src\\background\\recorder\\step-library\\step-wait.ts",
+    "lines": 426,
+    "badCatches": 1,
+    "negations": 1
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\settings-ui.ts",
+    "lines": 425,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "src\\background\\handlers\\injection-pipeline.ts",
+    "lines": 420,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\auth-recovery.ts",
+    "lines": 416,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\boot.ts",
+    "lines": 414,
+    "badCatches": 0,
+    "negations": 2
+  },
+  {
+    "file": "src\\background\\handlers\\logging-handler.ts",
+    "lines": 413,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\handlers\\updater-handler.ts",
+    "lines": 409,
+    "badCatches": 0,
+    "negations": 5
+  },
+  {
+    "file": "src\\background\\recorder\\condition-evaluator.ts",
+    "lines": 409,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\ws-filter-menu.ts",
+    "lines": 406,
+    "badCatches": 0,
+    "negations": 2
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-drag-order.ts",
+    "lines": 401,
+    "badCatches": 0,
+    "negations": 6
+  },
+  {
+    "file": "src\\background\\handlers\\project-handler.ts",
+    "lines": 399,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\chip-gear-menu.ts",
+    "lines": 396,
+    "badCatches": 0,
+    "negations": 9
+  },
+  {
+    "file": "src\\background\\recorder\\hover-highlighter.ts",
+    "lines": 390,
+    "badCatches": 0,
+    "negations": 2
+  },
+  {
+    "file": "src\\background\\recorder\\step-library\\input-source.ts",
+    "lines": 386,
+    "badCatches": 0,
+    "negations": 3
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\hot-reload-section.ts",
+    "lines": 380,
+    "badCatches": 0,
+    "negations": 3
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\tools-sections-builder.ts",
+    "lines": 374,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\ui-status-renderer.ts",
+    "lines": 373,
+    "badCatches": 0,
+    "negations": 6
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\database-schema-editors.ts",
+    "lines": 372,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\workspace-detection.ts",
+    "lines": 372,
+    "badCatches": 0,
+    "negations": 6
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\loop-controls.ts",
+    "lines": 371,
+    "badCatches": 0,
+    "negations": 8
+  },
+  {
+    "file": "src\\background\\url-trigger.ts",
+    "lines": 365,
+    "badCatches": 0,
+    "negations": 2
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\loop-cycle-fallback.ts",
+    "lines": 362,
+    "badCatches": 0,
+    "negations": 5
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\core\\MacroController.ts",
+    "lines": 361,
+    "badCatches": 0,
+    "negations": 10
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\seed-diagnostics-panel.ts",
+    "lines": 361,
+    "badCatches": 0,
+    "negations": 2
+  },
+  {
+    "file": "src\\background\\handlers\\injection-toast.ts",
+    "lines": 360,
+    "badCatches": 2,
+    "negations": 3
+  },
+  {
+    "file": "src\\background\\handlers\\storage-browser-handler.ts",
+    "lines": 358,
+    "badCatches": 2,
+    "negations": 2
+  },
+  {
+    "file": "src\\background\\injection-cache.ts",
+    "lines": 356,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "src\\background\\recorder\\step-persistence.ts",
+    "lines": 355,
+    "badCatches": 0,
+    "negations": 2
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ws-adjacent.ts",
+    "lines": 349,
+    "badCatches": 0,
+    "negations": 8
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-dropdown-io.ts",
+    "lines": 347,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\recorder\\js-step-diagnostics.ts",
+    "lines": 347,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\database-modal-data.ts",
+    "lines": 346,
+    "badCatches": 0,
+    "negations": 2
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\auth-diag-rows.ts",
+    "lines": 343,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\shared-state.ts",
+    "lines": 340,
+    "badCatches": 1,
+    "negations": 1
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\database-modal-styles.ts",
+    "lines": 340,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\save-prompt.ts",
+    "lines": 334,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ws-dialog-detection.ts",
+    "lines": 334,
+    "badCatches": 0,
+    "negations": 8
+  },
+  {
+    "file": "src\\background\\recorder\\step-library\\replay-bridge.ts",
+    "lines": 334,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "src\\background\\spa-reinject.ts",
+    "lines": 334,
+    "badCatches": 0,
+    "negations": 3
+  },
+  {
+    "file": "src\\background\\project-db-manager.ts",
+    "lines": 333,
+    "badCatches": 1,
+    "negations": 4
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\credit-balance.ts",
+    "lines": 332,
+    "badCatches": 0,
+    "negations": 9
+  },
+  {
+    "file": "src\\background\\handlers\\data-bridge-handler.ts",
+    "lines": 332,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\settings-modal.ts",
+    "lines": 330,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-library-shell.ts",
+    "lines": 330,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\rename-api.ts",
+    "lines": 329,
+    "badCatches": 0,
+    "negations": 5
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\api-namespace.ts",
+    "lines": 328,
+    "badCatches": 0,
+    "negations": 5
+  },
+  {
+    "file": "src\\background\\builtin-script-guard.ts",
+    "lines": 323,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "src\\background\\recorder\\form-snapshot.ts",
+    "lines": 321,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "src\\components\\options\\step-group-library\\mutation-handlers.ts",
+    "lines": 318,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "src\\components\\recorder\\failure-report-validator.ts",
+    "lines": 317,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\error-utils.ts",
+    "lines": 316,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "src\\background\\remote-config-fetcher.ts",
+    "lines": 314,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\menu-builder.ts",
+    "lines": 313,
+    "badCatches": 0,
+    "negations": 2
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-cache.ts",
+    "lines": 309,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\recorder-db-schema.ts",
+    "lines": 309,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\dom-helpers.ts",
+    "lines": 308,
+    "badCatches": 0,
+    "negations": 10
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\panel-sections.ts",
+    "lines": 308,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\ws-dropdown-builder.ts",
+    "lines": 307,
+    "badCatches": 0,
+    "negations": 3
+  },
+  {
+    "file": "src\\background\\project-query-builder.ts",
+    "lines": 306,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\recorder\\step-library\\schema.ts",
+    "lines": 306,
+    "badCatches": 0,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-bundle-types.ts",
+    "lines": 304,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "src\\background\\boot-diagnostics.ts",
+    "lines": 303,
+    "badCatches": 0,
+    "negations": 1
+  },
+  {
+    "file": "src\\background\\project-namespace-builder.ts",
+    "lines": 301,
+    "badCatches": 0,
+    "negations": 3
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\xpath-utils.ts",
+    "lines": 299,
+    "badCatches": 0,
+    "negations": 7
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\db\\prompt-revision-db.ts",
+    "lines": 297,
+    "badCatches": 0,
+    "negations": 8
+  },
+  {
+    "file": "src\\background\\auth-health-handler.ts",
+    "lines": 291,
+    "badCatches": 1,
+    "negations": 2
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\task-queue.ts",
+    "lines": 289,
+    "badCatches": 0,
+    "negations": 5
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\workspace-status.ts",
+    "lines": 287,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\db\\prompt-db.ts",
+    "lines": 285,
+    "badCatches": 0,
+    "negations": 11
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\section-open-tabs.ts",
+    "lines": 285,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "src\\background\\cookie-watcher.ts",
+    "lines": 284,
+    "badCatches": 2,
+    "negations": 2
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ws-checkbox-handler.ts",
+    "lines": 278,
+    "badCatches": 0,
+    "negations": 9
+  },
+  {
+    "file": "src\\components\\options\\monaco-js-intellisense.ts",
+    "lines": 273,
+    "badCatches": 3,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\gitsync\\progress-probe.ts",
+    "lines": 249,
+    "badCatches": 0,
+    "negations": 6
+  },
+  {
+    "file": "src\\background\\handlers\\injection-namespace-bootstrap.ts",
+    "lines": 246,
+    "badCatches": 1,
+    "negations": 6
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\remix-modal.ts",
+    "lines": 245,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\gitsync\\ensure-repo.ts",
+    "lines": 244,
+    "badCatches": 0,
+    "negations": 5
+  },
+  {
+    "file": "src\\background\\handlers\\script-info-handler.ts",
+    "lines": 231,
+    "badCatches": 0,
+    "negations": 6
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ws-members-mutations.ts",
+    "lines": 219,
+    "badCatches": 0,
+    "negations": 10
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\credit-balance\\store.ts",
+    "lines": 213,
+    "badCatches": 0,
+    "negations": 8
+  },
+  {
+    "file": "src\\background\\handlers\\injection-wrapper.ts",
+    "lines": 209,
+    "badCatches": 4,
+    "negations": 1
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ws-name-matching.ts",
+    "lines": 205,
+    "badCatches": 0,
+    "negations": 6
+  },
+  {
+    "file": "src\\background\\handlers\\error-handler.ts",
+    "lines": 199,
+    "badCatches": 1,
+    "negations": 0
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\pending-restore-undo.ts",
+    "lines": 197,
+    "badCatches": 0,
+    "negations": 5
+  },
+  {
+    "file": "src\\background\\handlers\\injection-syntax-preflight.ts",
+    "lines": 193,
+    "badCatches": 1,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\recorder\\step-library\\group-inputs.ts",
+    "lines": 193,
+    "badCatches": 1,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\handlers\\file-storage-handler.ts",
+    "lines": 192,
+    "badCatches": 0,
+    "negations": 6
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\log-manager.ts",
+    "lines": 186,
+    "badCatches": 2,
+    "negations": 2
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\startup-idempotent-check.ts",
+    "lines": 186,
+    "badCatches": 1,
+    "negations": 4
+  },
+  {
+    "file": "src\\background\\dependency-resolver.ts",
+    "lines": 186,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "src\\background\\handlers\\injection-dependency-builder.ts",
+    "lines": 182,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "src\\background\\marco-sdk-template.ts",
+    "lines": 167,
+    "badCatches": 5,
+    "negations": 5
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-library-progress.ts",
+    "lines": 166,
+    "badCatches": 0,
+    "negations": 5
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\remix\\new-project-cache.ts",
+    "lines": 163,
+    "badCatches": 0,
+    "negations": 6
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\seed\\reseed-command.ts",
+    "lines": 158,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\gitsync-cache.ts",
+    "lines": 149,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\projects-cache.ts",
+    "lines": 149,
+    "badCatches": 0,
+    "negations": 7
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\loop-cycle.ts",
+    "lines": 147,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\prompt-library-actions.ts",
+    "lines": 146,
+    "badCatches": 0,
+    "negations": 6
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\startup-persistence.ts",
+    "lines": 140,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\storage\\chat-submit-opfs-store.ts",
+    "lines": 138,
+    "badCatches": 0,
+    "negations": 7
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\gitsync\\disconnect-repo.ts",
+    "lines": 130,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "src\\background\\handlers\\grouped-kv-handler.ts",
+    "lines": 130,
+    "badCatches": 0,
+    "negations": 9
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\js-executor.ts",
+    "lines": 124,
+    "badCatches": 0,
+    "negations": 4
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\ui\\editor-text.ts",
+    "lines": 123,
+    "badCatches": 0,
+    "negations": 5
+  },
+  {
+    "file": "src\\background\\handlers\\kv-handler.ts",
+    "lines": 121,
+    "badCatches": 0,
+    "negations": 8
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\queue-control\\auto-resume.ts",
+    "lines": 106,
+    "badCatches": 1,
+    "negations": 0
+  },
+  {
+    "file": "src\\background\\cookie-helpers.ts",
+    "lines": 103,
+    "badCatches": 2,
+    "negations": 2
+  },
+  {
+    "file": "standalone-scripts\\macro-controller\\src\\capture\\chat-submit-capture.ts",
+    "lines": 102,
+    "badCatches": 0,
+    "negations": 4
+  }
+]

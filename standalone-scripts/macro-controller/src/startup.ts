@@ -1,3 +1,4 @@
+import { ServiceResult } from './utils/result-wrapper';
 /**
  * MacroLoop Controller, Startup & Initialization
  * Step 2h: Extracted from macro-looping.ts
@@ -76,7 +77,6 @@ export { setupGlobalErrorHandlers as _setupGlobalErrorHandlers, setupDiagnosticD
  * 6. Start workspace observer
  * 7. Setup auth resync
  */
-// eslint-disable-next-line max-lines-per-function -- boot sequence is intentionally linear; splitting harms readability
 export function bootstrap(deps: {
   fetchLoopCreditsWithDetect: (isRetry?: boolean) => void;
   setLoopInterval: (ms: number) => void;
@@ -95,41 +95,52 @@ export function bootstrap(deps: {
     return;
   }
 
-  // Preload user settings overrides (chrome.storage.local) before any UI render
-  // so the first paint of the workspace list reflects edited grace/refill values.
-  // Fire-and-forget, non-blocking; resolver falls back to JSON until loaded.
+  preloadSettingsOverrides();
+  void hydrateCreditBalanceFromCache();
+  initializeMacroDbAndCapture();
+
+  setupPersistenceObserver(function () {
+    const mc = MacroController.getInstance();
+    if (tryCreateUiNow(mc)) {
+      updateUI();
+    }
+  });
+  setupGlobalErrorHandlers();
+  setupDiagnosticDump();
+  // U-5: tear down loop on SPA navigation away from /projects/{id}
+  installSpaRouteGuard();
+
+  showToast('MacroLoop v' + VERSION + ', loading workspace…', 'info', { noStop: true });
+  _placeScriptMarker();
+  _registerGlobals(deps);
+  _logWorkspaceCacheStatus();
+  registerTokenBroadcastListener();
+  registerPageWorkspaceResponder();
+  scheduleUiCreationFallback();
+  timingStart(Label.PromptPrewarm, 'Prompt Pre-warm');
+  _preWarmPrompts(0);
+  loadWorkspacesOnStartup();
+}
+
+function preloadSettingsOverrides(): void {
   void loadSettingsOverrides().then(function (overrides) {
-    // Hydrate the credit-balance-update controller timeout (Step 47) so the
-    // user-configured slider value takes effect on first paint. Subscribe so
-    // SAVE_SETTINGS updates hot-reload into the controller too.
     if (typeof overrides.creditFetchDelayMs === 'number') {
       setCreditFetchTimeoutMs(overrides.creditFetchDelayMs);
     }
     subscribeCreditFetchSettings();
-
-    // Re-render the UI when the user saves new overrides so the workspace
-    // status pills pick up the new thresholds without a page reload.
     onSettingsChange(function () {
       try { updateUI(); } catch (err: unknown) { logError('Startup', 'UI update failed on settings change', err); }
     });
   });
+}
 
-  // Spec 122a, hydrate the credit-balance throttle map + cached numbers
-  // from SQLite before any /credit-balance call so the 10s per-ws cooldown
-  // survives reloads and the panel can paint last-known values immediately.
-  void hydrateCreditBalanceFromCache();
-
-  // Init Macro DB and Capture
+function initializeMacroDbAndCapture(): void {
   void initMacroDb().then(async () => {
     installReseedCommandGlobal();
-    // First-run safety net: idempotent seed of Plan/Next default prompts.
-    // Prevents the chip editor from opening blank when the DB has no
-    // default row (fresh install, wiped DB, or partial prior seed).
-    // `INSERT OR IGNORE` preserves user edits across subsequent boots.
     try {
       const result = await seedPlanNextPrompts();
-      if (!result.ok) {
-        logError('Startup', 'first-run prompt seed failed: ' + (result.error ?? 'unknown'));
+      if (result.isFail) {
+        logError('Startup', 'first-run prompt seed failed: ' + (result.error || 'Unknown'));
       }
     } catch (err: unknown) {
       logError('Startup', 'first-run prompt seed threw', err);
@@ -144,40 +155,6 @@ export function bootstrap(deps: {
       return node instanceof Element ? node : null;
     });
   });
-
-  setupPersistenceObserver(function () {
-    const mc = MacroController.getInstance();
-    if (tryCreateUiNow(mc)) {
-      updateUI();
-    }
-  });
-  setupGlobalErrorHandlers();
-  setupDiagnosticDump();
-  // U-5: tear down loop on SPA navigation away from /projects/{id}
-  installSpaRouteGuard();
-
-  // Unified notifier: use SDK-backed toast system only (queued until SDK is ready)
-  showToast('MacroLoop v' + VERSION + ', loading workspace…', 'info', { noStop: true });
-
-  _placeScriptMarker();
-  _registerGlobals(deps);
-  _logWorkspaceCacheStatus();
-
-  // v7.41: Register proactive token broadcast listener
-  registerTokenBroadcastListener();
-
-  // Register page-side responder for background-initiated workspace probes
-  // (consumed by the "Open Lovable Tabs" panel in the macro controller).
-  registerPageWorkspaceResponder();
-
-  scheduleUiCreationFallback();
-
-
-  // ── Background data loading ──
-  timingStart(Label.PromptPrewarm, 'Prompt Pre-warm');
-  _preWarmPrompts(0);
-
-  loadWorkspacesOnStartup();
 }
 
 /**
@@ -187,7 +164,8 @@ export function bootstrap(deps: {
  */
 function scheduleUiCreationFallback(): void {
   const uiCreationTimeout = window.setTimeout(function () {
-    if (!document.getElementById(IDS.CONTAINER)) {
+    const isContainerMissing = !document.getElementById(IDS.CONTAINER);
+    if (isContainerMissing) {
       log('Startup: ⏱ 5s timeout, creating UI without workspace data (fallback)', 'warn');
       createUiAndObserver();
     }
@@ -230,10 +208,13 @@ function registerPassiveAttachShortcut(deps: Parameters<typeof bootstrap>[0]): v
   w.__MARCO_PASSIVE_SHORTCUT__ = true;
 
   const handler = function (e: KeyboardEvent): void {
-    if (!e.ctrlKey || !e.altKey || e.shiftKey) return;
-    if (e.key.toLowerCase() !== 'h') return;
+    const isMissingModifiers = !e.ctrlKey || !e.altKey || e.shiftKey;
+    if (isMissingModifiers) return;
+    const isNotH = e.key.toLowerCase() !== 'h';
+    if (isNotH) return;
     // Bail out if the full panel is already up, let the in-panel handler run.
-    if (document.getElementById(IDS.CONTAINER)) return;
+    const hasContainer = !!document.getElementById(IDS.CONTAINER);
+    if (hasContainer) return;
     e.preventDefault();
     document.removeEventListener('keydown', handler, true);
     w.__MARCO_PASSIVE_SHORTCUT__ = false;
@@ -371,7 +352,8 @@ function _checkPendingTasksOnStartup(): void {
       // const { TaskQueueManager } = await import('./task-manager');
       const queueState = await loadTaskQueue();
       const pending = queueState.tasks.filter(t => t.status === 'pending' || t.status === 'hold');
-      if (pending.length > 0 && !queueState.isPaused) {
+      const isRunning = !queueState.isPaused;
+      if (pending.length > 0 && isRunning) {
         _showStartupResumeDialog(pending.length);
       } else if (pending.length > 0 && queueState.isPaused) {
         showToast(`📋 ${pending.length} task${pending.length > 1 ? 's' : ''} in queue (paused). Open Task Queue to resume.`, 'info', { noStop: true });
@@ -440,12 +422,14 @@ function tryCreateUiNow(mc: MacroController): boolean {
     return true;
   }
 
-  if (!mc.hasUI) {
+  const isMissingUi = !mc.hasUI;
+  if (isMissingUi) {
     ensureUiManagerRegistered(mc);
   }
 
   const ui = mc.ui;
-  if (!ui) {
+  const isUiMissing = !ui;
+  if (isUiMissing) {
     return false;
   }
 
@@ -519,7 +503,8 @@ function cancelTimeoutAndCreateUi(): void {
     window.clearTimeout(timeoutId);
     (state as unknown as Record<string, unknown>).__uiTimeoutId = undefined;
   }
-  if (!document.getElementById(IDS.CONTAINER)) {
+  const isMissingContainer = !document.getElementById(IDS.CONTAINER);
+  if (isMissingContainer) {
     createUiAndObserver();
   }
 }
@@ -564,7 +549,8 @@ function handleTokenFailure(tokenResult: { waitedMs: number; reason: string }): 
 function logAuthDiag(): void {
   try {
     const authDiag = window.marco?.auth?.getLastAuthDiag?.();
-    if (!authDiag) return;
+    const isMissingAuthDiag = !authDiag;
+    if (isMissingAuthDiag) return;
 
     const bridgeTag = authDiag.bridgeOutcome === 'hit' ? '✅ bridge hit'
       : authDiag.bridgeOutcome === 'timeout' ? '⏱ bridge timeout'
@@ -679,7 +665,9 @@ function handleCreditError(err: unknown): void {
 function fetchTier1Prefetch(projectId: string, _token: string): Promise<MarkViewedResponse | null> {
   try {
     const workspaceApi = window.marco?.api?.workspace;
-    if (!workspaceApi || typeof workspaceApi.markViewed !== 'function') {
+    const isMissingWorkspaceApi = !workspaceApi;
+    const isMissingMarkViewed = isMissingWorkspaceApi || typeof workspaceApi.markViewed !== 'function';
+    if (isMissingMarkViewed) {
       log('Startup: Tier 1 prefetch skipped, marco-sdk workspace API unavailable', 'warn');
       timingEnd(Label.WsPrefetch, 'warn', 'SDK workspace API unavailable');
       return Promise.resolve(null);
@@ -695,7 +683,8 @@ function fetchTier1Prefetch(projectId: string, _token: string): Promise<MarkView
 }
 
 function handleTier1Response(resp: { ok: boolean; status?: number; data?: unknown }): MarkViewedResponse | null {
-  if (!resp.ok) {
+  const isFailed = resp.isFail;
+  if (isFailed) {
     log('Startup: Tier 1 prefetch HTTP ' + resp.status, 'warn');
     timingEnd(Label.WsPrefetch, 'warn', 'HTTP ' + resp.status);
     return null;
@@ -718,7 +707,8 @@ function resolveTier1Workspace(tier1Data: MarkViewedResponse): boolean {
   // Extract project name from mark-viewed response
   const apiProjectName = (tier1Data.project && (tier1Data.project.name || tier1Data.project.title))
     || (tier1Data.name as string) || (tier1Data.title as string) || '';
-  if (apiProjectName && !state.projectNameFromApi) {
+  const isMissingProjectName = !state.projectNameFromApi;
+  if (apiProjectName && isMissingProjectName) {
     state.projectNameFromApi = apiProjectName;
     log('Startup: 📁 Project name from Tier 1 prefetch: "' + apiProjectName + '"', 'success');
   }
@@ -730,7 +720,8 @@ function resolveTier1Workspace(tier1Data: MarkViewedResponse): boolean {
   const perWs = loopCreditState.perWorkspace || [];
   let matched = wsById[wsId];
 
-  if (!matched) {
+  const isMissingMatch = !matched;
+  if (isMissingMatch) {
     for (const ws of perWs) {
       const isMatch = ws.id === wsId;
 
@@ -763,6 +754,7 @@ function resolveTier1Workspace(tier1Data: MarkViewedResponse): boolean {
 // Retry policy: first retry forces cookie refresh, second retry is the final pass.
 
  
+// eslint-disable-next-line max-lines-per-function
 function scheduleWorkspaceRetry(attempt: number): void {
   const isExhausted = attempt > STARTUP_WS_MAX_RETRIES;
   if (isExhausted) {
@@ -800,11 +792,13 @@ function scheduleWorkspaceRetry(attempt: number): void {
       }
     }
 
-    if (!retryToken) {
+    const isMissingRetryToken1 = !retryToken;
+    if (isMissingRetryToken1) {
       retryToken = resolveToken();
     }
 
-    if (!retryToken) {
+    const isMissingRetryToken2 = !retryToken;
+    if (isMissingRetryToken2) {
       log(Label.StartupRetry + attempt + ', no token available after cookie fallback, moving to next retry', 'warn');
       scheduleWorkspaceRetry(attempt + 1);
       return;

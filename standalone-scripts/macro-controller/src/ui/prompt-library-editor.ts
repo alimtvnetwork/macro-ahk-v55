@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 import { logError } from '../error-utils';
 import { log } from '../logger';
 import { type PromptRow, upsertPrompt } from '../db/prompt-db';
@@ -78,7 +79,7 @@ export async function handleEditSave(refs: ModalRefs, row: PromptRow, payload: E
       replaceKey: payload.replaceKey,
       replaceValues: payload.replaceValues,
     });
-    if (!res.ok) {
+    if (res.isFail) {
       refs.status.textContent = 'Save failed: ' + (res.error ?? 'unknown');
       logError(LOG_SCOPE, 'edit save failed', res);
       return;

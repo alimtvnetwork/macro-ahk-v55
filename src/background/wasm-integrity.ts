@@ -111,7 +111,7 @@ async function loadChecksumManifest(checksumUrl: string): Promise<
 > {
     let response: Response;
     try {
-        response = await fetch(checksumUrl);
+        response = ServiceResult.wrapFetch(await fetch(checksumUrl));
     } catch (err) {
         return {
             kind: "missing",
@@ -119,7 +119,7 @@ async function loadChecksumManifest(checksumUrl: string): Promise<
             fetchError: err instanceof Error ? err.message : String(err),
         };
     }
-    if (!response.ok) {
+    if (response.isFail) {
         // HEFF: report non-2xx. No retry. Outcome is "missing" so caller can
         // surface a fix-step banner; no method-swap, no re-fetch loop.
         console.warn(

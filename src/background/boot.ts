@@ -287,8 +287,8 @@ function formatBootError(step: string, error: unknown): string {
 /** Reads the current buildId from build-meta.json, if available. */
 async function readCurrentBuildId(): Promise<string | null> {
     try {
-        const response = await fetch(chrome.runtime.getURL(BUILD_META_URL), { cache: "no-store" });
-        if (!response.ok) {
+        const response = ServiceResult.wrapFetch(await fetch(chrome.runtime.getURL(BUILD_META_URL), { cache: "no-store" }));
+        if (response.isFail) {
             return null;
         }
 
@@ -393,8 +393,8 @@ async function precacheStableScripts(): Promise<void> {
             }
 
             const url = chrome.runtime.getURL(path);
-            const response = await fetch(url);
-            if (!response.ok) {
+            const response = ServiceResult.wrapFetch(await fetch(url));
+            if (response.isFail) {
                 cacheResults.push(path + " (fetch failed: " + response.status + ") — halting remaining warms");
                 break;
             }

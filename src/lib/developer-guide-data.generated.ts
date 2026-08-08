@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Developer Guide Data — AUTO-GENERATED
  *
@@ -1612,7 +1613,7 @@ console.table(errors);
 \`\`\`javascript
 // Probe workspace API to verify connectivity
 const resp = await marco.api.workspace.probe();
-console.log("API health:", resp.ok ? "✅" : "❌", resp.status);
+console.log("API health:", resp.isSuccess ? "✅" : "❌", resp.status);
 \`\`\`
 `,
 
@@ -1949,7 +1950,7 @@ export default instruction;
     async function refreshCredits() {
         try {
             const resp = await marco.api.credits.fetchWorkspaces();
-            if (resp.ok) {
+            if (resp.isSuccess) {
                 const display = document.getElementById("credit-display");
                 if (display) {
                     display.textContent = JSON.stringify(resp.data);

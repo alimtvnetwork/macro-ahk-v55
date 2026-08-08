@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Marco Extension — Auto-Attach Runner
  *
@@ -91,7 +92,7 @@ export function runAutoAttach(
         const decision = evaluateAutoAttach(project, view, libraryIds);
         decisions.push({ scriptId: stored.id, decision });
 
-        if (decision.ok) {
+        if (decision.isSuccess) {
             attached.push(buildAttachedScriptEntry(view, startingOrder + attached.length));
             continue;
         }
@@ -139,7 +140,7 @@ export async function persistAutoAttachDecisions(
             decisions: decisions.map(({ scriptId, decision }) => ({
                 scriptId,
                 scriptName: libraryById.get(scriptId)?.name ?? scriptId,
-                ok: decision.ok,
+                ok: decision.isSuccess,
                 reason: decision.reason,
                 detail: decision.detail,
             })),

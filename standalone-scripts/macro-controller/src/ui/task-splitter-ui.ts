@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Task Splitter UI — paste one long instruction, break it into N steps,
  * then walk through them (manual Next ▶ or timed auto-run).
@@ -636,7 +637,7 @@ async function resolvePlanPromptFromDb(n: number): Promise<string | null> {
   try {
     const mod = await import('../db/prompt-db');
     const result = await mod.getDefaultPromptForRole('plan');
-    if (!result.ok || !result.value || result.value.Body.length === 0) return null;
+    if (result.isFail || !result.value || result.value.Body.length === 0) return null;
     const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
     logPlanSource(n, 'db-default', 'Prompt table plan default');
     return substitutePlanN(result.value.Body, key, n);

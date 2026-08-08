@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Plan-22 steps 11..23: prompt-crud pos/neg boundary + DB-error tests.
  *
@@ -56,28 +57,28 @@ describe('prompt-db negative: DB-layer errors propagate to caller', () => {
     it('listPromptsByRole returns ok=false when driver reports isOk=false', async () => {
         nextResponse = { isOk: false, error: 'sql: table Prompt missing' };
         const r = await listPromptsByRole('plan');
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/query failed|table Prompt missing/);
     });
 
     it('upsertPrompt INSERT surfaces DB error (never returns ok=true)', async () => {
         nextResponse = { isOk: false, error: 'UNIQUE constraint failed: Prompt.Slug' };
         const r = await upsertPrompt({ slug: 'dup', name: 'n', body: 'b', role: 'generic' });
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/write failed|UNIQUE constraint failed/);
     });
 
     it('upsertPrompt UPDATE surfaces DB error and does not swallow it', async () => {
         nextResponse = { isOk: false, error: 'disk I/O error' };
         const r = await upsertPrompt({ id: 4, slug: 's', name: 'n', body: 'b', role: 'generic' });
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/write failed|disk I\/O error/);
     });
 
     it('setDefaultPromptForRole propagates transactional flip failure', async () => {
         nextResponse = { isOk: false, error: 'transaction rolled back' };
         const r = await setDefaultPromptForRole(9, 'next');
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/enforceSingleDefaultPerRole failed|transaction rolled back/);
     });
 
@@ -88,7 +89,7 @@ describe('prompt-db negative: DB-layer errors propagate to caller', () => {
             { isOk: false, error: 'row is locked' },
         ];
         const r = await deletePromptById(2);
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/delete failed|row is locked/);
     });
 });
@@ -96,37 +97,37 @@ describe('prompt-db negative: DB-layer errors propagate to caller', () => {
 describe('prompt-db negative: input validation short-circuits before DB I/O', () => {
     it('deletePromptById rejects negative id without DB round-trip', async () => {
         const r = await deletePromptById(-1);
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(captured).toHaveLength(0);
     });
 
     it('deletePromptById rejects NaN id without DB round-trip', async () => {
         const r = await deletePromptById(Number.NaN);
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(captured).toHaveLength(0);
     });
 
     it('getDefaultPromptForRole rejects invalid role without DB round-trip', async () => {
         const r = await getDefaultPromptForRole('unknown' as never);
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(captured).toHaveLength(0);
     });
 
     it('setDefaultPromptForRole rejects invalid role without DB round-trip', async () => {
         const r = await setDefaultPromptForRole(1, 'x' as never);
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(captured).toHaveLength(0);
     });
 
     it('upsertPrompt empty-field error names the missing field (name)', async () => {
         const r = await upsertPrompt({ slug: 's', name: '', body: 'b', role: 'plan' });
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/name/);
     });
 
     it('upsertPrompt empty-field error names the missing field (body)', async () => {
         const r = await upsertPrompt({ slug: 's', name: 'n', body: '', role: 'plan' });
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/body/);
     });
 });
@@ -140,7 +141,7 @@ describe('prompt-db positive: full happy-path integration for a plan-role edit',
             body: 'The plan needs {{n}} steps',
             replaceKey: 'n', replaceValues: ['2', '3', '5'],
         });
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         // v4.187.0: since v4.173.0 upsertPrompt reads the pre-image row
         // BEFORE writing so a rollback is possible. Successful UPDATE with
         // an empty pre-image (rows:[]) therefore emits two DB calls:
@@ -163,13 +164,13 @@ describe('prompt-db positive: full happy-path integration for a plan-role edit',
             ] },
         ];
         const list = await listPromptsByRole('next');
-        expect(list.ok).toBe(true);
+        expect(list.isSuccess).toBe(true);
         expect(list.value).toHaveLength(2);
 
         // 2) flip default
         responsesQueue = [{ isOk: true }];
         const flip = await setDefaultPromptForRole(2, 'next');
-        expect(flip.ok).toBe(true);
+        expect(flip.isSuccess).toBe(true);
 
         // 3) delete non-default row (row count > 1 -> allowed)
         responsesQueue = [
@@ -178,6 +179,6 @@ describe('prompt-db positive: full happy-path integration for a plan-role edit',
             { isOk: true },
         ];
         const del = await deletePromptById(1);
-        expect(del.ok).toBe(true);
+        expect(del.isSuccess).toBe(true);
     });
 });

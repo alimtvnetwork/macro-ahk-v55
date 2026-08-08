@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Marco Extension — Session Log File Writer
  *
@@ -275,7 +276,7 @@ export async function buildSessionReport(sid?: string): Promise<string> {
     }
 
     const result = await tryReadSessionDir(targetSid);
-    if (result.ok) return result.report;
+    if (result.isSuccess) return result.report;
 
     // Fallback: requested session dir missing — try the most recent available session
     const available = await listSessionIds();
@@ -286,7 +287,7 @@ export async function buildSessionReport(sid?: string): Promise<string> {
     if (available.length > 0) {
         const fallbackSid = available[0]; // most recent
         const fallback = await tryReadSessionDir(fallbackSid);
-        if (fallback.ok) {
+        if (fallback.isSuccess) {
             const notice = [
                 `[session-log-writer] Requested session #${targetSid} not found at "opfs-root/${LOGS_DIR_NAME}/${SESSION_PREFIX}${targetSid}/".`,
                 `  Available sessions: [${availableList}]`,

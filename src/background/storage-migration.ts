@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Marco Extension — chrome.storage.local Schema Migration Runner
  *
@@ -151,7 +152,7 @@ export async function runStorageMigrations(): Promise<StorageMigrationResult> {
     let lastApplied = fromVersion;
     for (const migration of pending) {
         const outcome = await applyMigration(migration);
-        if (!outcome.ok) {
+        if (outcome.isFail) {
             return {
                 fromVersion,
                 toVersion: lastApplied,

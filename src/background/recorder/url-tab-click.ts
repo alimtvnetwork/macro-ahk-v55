@@ -404,30 +404,42 @@ async function awaitOpenedSettle(
 
 function precheck(base: ResultBase): { readonly test?: (url: string) => boolean; readonly error?: UrlTabClickResult } {
     const validation = validateUrlTabClickParams(base.params);
-    if (validation !== null) {
+    const hasValidationError = validation !== null;
+    if (hasValidationError) {
         const reason: UrlTabClickReason = validation.Reason === "BadParams" ? "BadParams" : "InvalidUrlPattern";
         return { error: buildResult(base, reason, { Detail: validation.Detail }) };
     }
     const compiled = compileUrlPattern(base.params.UrlPattern, base.params.UrlMatch);
-    if (!compiled.Ok) return { error: buildResult(base, "InvalidUrlPattern", { Detail: compiled.Detail }) };
+    const isCompileFailed = !compiled.Ok;
+    if (isCompileFailed) return { error: buildResult(base, "InvalidUrlPattern", { Detail: compiled.Detail }) };
     return { test: compiled.Test };
 }
 
-export async function executeUrlTabClick(
-    init: ExecuteUrlTabClickInit,
-): Promise<UrlTabClickResult> {
+export async function executeUrlTabClick(init: ExecuteUrlTabClickInit): Promise<UrlTabClickResult> {
     const now = init.NowMs ?? (() => Date.now());
     const base: ResultBase = { params: init.Params, now, startedAt: now() };
-    const timeoutMs = init.Params.TimeoutMs ?? DEFAULT_TIMEOUT_MS;
+    return executeWithBase(base, init);
+}
+
+async function executeWithBase(base: ResultBase, init: ExecuteUrlTabClickInit): Promise<UrlTabClickResult> {
     const pre = precheck(base);
-    if (pre.error !== undefined) return pre.error;
+    const hasPrecheckError = pre.error !== undefined;
+    if (hasPrecheckError) return pre.error!;
+    
     const test = pre.test as (url: string) => boolean;
     const mode = init.Params.Mode;
-    if (mode === "FocusExisting" || mode === "OpenOrFocus") {
+    const shouldTryFocus = mode === "FocusExisting" || mode === "OpenOrFocus";
+    
+    if (shouldTryFocus) {
         const focused = await tryFocusExisting(base, init.Tabs, test);
-        if (focused !== null) return focused;
+        const isFocused = focused !== null;
+        if (isFocused) return focused!;
     }
+    
     const outcome = await openNewTab(base, init.Tabs);
-    if (outcome.Kind === "error") return outcome.Result;
+    const isErrorOutcome = outcome.Kind === "error";
+    if (isErrorOutcome) return outcome.Result;
+    
+    const timeoutMs = init.Params.TimeoutMs ?? DEFAULT_TIMEOUT_MS;
     return awaitOpenedSettle(base, init.Tabs, test, outcome.Tab, timeoutMs);
 }

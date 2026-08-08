@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Plan-22 gap: `writeSeedAuditRow` no-observable-change SKIP path coverage.
  *
@@ -91,7 +92,7 @@ describe('seedPlanNextPrompts: audit-skip on no-observable-change boot', () => {
             { isOk: true, rows: [{ '1': 1 }] },
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
 
         const auditWrites = captured.filter(c => c.sql.startsWith('INSERT INTO PromptSeedAudit'));
         expect(auditWrites, 'no audit row on idempotent boot').toHaveLength(0);

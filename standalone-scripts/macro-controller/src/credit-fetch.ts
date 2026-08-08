@@ -1,3 +1,4 @@
+import { ServiceResult } from './utils/result-wrapper';
 /**
  * MacroLoop Controller — Credit Fetch
  *
@@ -310,7 +311,7 @@ export function fetchLoopCredits(
 
     apiFetchWorkspaces()
       .then(async function (resp: SdkApiResponse): Promise<Record<string, unknown> | undefined> {
-        if (!resp.ok) {
+        if (resp.isFail) {
           if (isAuthFailure(resp.status) && !isRetry) {
             const recovered = await handleAuthRecovery(token, resp.status, '');
             if (!recovered) { mc().updateUI(); return undefined; }
@@ -432,7 +433,7 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
 
   const resp = await apiFetchWorkspaces();
 
-  if (!resp.ok) {
+  if (resp.isFail) {
     if (isAuthFailure(resp.status) && !isRetry) {
       return handleAsyncAuthFailure(resp, token);
     }

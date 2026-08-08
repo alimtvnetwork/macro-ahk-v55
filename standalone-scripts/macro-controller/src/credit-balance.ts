@@ -1,3 +1,4 @@
+import { ServiceResult } from './utils/result-wrapper';
 /**
  * Credit Balance API — Free Credit Detection via /workspaces/{id}/credit-balance
  *
@@ -111,7 +112,7 @@ export async function resolveWorkspaceId(): Promise<string | null> {
   try {
     const resp = await window.marco!.api!.workspace.resolveByProject(projectId, { baseUrl: CREDIT_API_BASE });
 
-    if (!resp.ok) {
+    if (resp.isFail) {
       if (isAuthFailure(resp.status)) {
         markBearerTokenExpired('credit-balance-ws');
       }
@@ -214,7 +215,7 @@ export async function fetchCreditBalance(
   try {
     const resp = await window.marco!.api!.credits.fetchBalance(wsId, { baseUrl: CREDIT_API_BASE });
 
-    if (!resp.ok) {
+    if (resp.isFail) {
       if (isAuthFailure(resp.status) && !isRetry) {
         markBearerTokenExpired('credit-balance');
         log('CreditBalance: Auth ' + resp.status + ' — recovering...', 'warn');

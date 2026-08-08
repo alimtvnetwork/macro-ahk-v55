@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Prompt Injection — Prompt creation/edit modal, paste-into-editor logic
  *
@@ -571,7 +572,7 @@ export function saveRoleScopedPrompt(input: PromptSaveInput, role: PromptRole): 
   // Extended to `next` in v4.183.0 to close the asymmetric-validator gap.
   if (role === 'plan' || role === 'next') {
     const check = validateRuleZero(input.text);
-    if (!check.ok) {
+    if (check.isFail) {
       const slug = buildSlug(role, input.name, input.editPrompt);
       logDiagnosticFromCode(
         'PROMPT_VALIDATE_E001',
@@ -609,7 +610,7 @@ export function saveRoleScopedPrompt(input: PromptSaveInput, role: PromptRole): 
     replaceKey: input.editPrompt?.replaceKey,
     replaceValues: input.editPrompt?.replaceValues,
   }).then(function(result) {
-    if (result.ok) return { isOk: true };
+    if (result.isSuccess) return { isOk: true };
     return {
       isOk: false,
       errorMessage: result.error ?? 'Role-scoped prompt save failed',
@@ -827,7 +828,7 @@ function _buildPromptModalFooter(
   const refreshDriftState = function (): void {
     const missing = tokenStrip ? tokenStrip.recomputeMissing(contentArea.value) : [];
     const ruleZero = ruleZeroIndicator ? ruleZeroIndicator.recompute(contentArea.value) : null;
-    const ruleZeroBlocks = ruleZero !== null && !ruleZero.ok;
+    const ruleZeroBlocks = ruleZero !== null && ruleZero.isFail;
     const blocked = missing.length > 0 || ruleZeroBlocks;
     (saveBtn as HTMLButtonElement).disabled = blocked;
     saveBtn.style.opacity = blocked ? '0.5' : '1';
@@ -895,7 +896,7 @@ function _buildPromptModalFooter(
         };
         if (previousId !== undefined) undoPayload.id = previousId;
         return upsertPrompt(undoPayload).then(function(r) {
-          if (!r.ok) {
+          if (r.isFail) {
             showPasteToast('❌ Undo failed: ' + (r.error ?? 'upsert failed'), true);
             logDiagnosticFromCode(
               'PROMPT_UNDO_E001',

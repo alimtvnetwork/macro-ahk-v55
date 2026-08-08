@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * MacroLoop Controller — GitSync progress probe (v3.40.2)
  *
@@ -140,7 +141,7 @@ export async function probeProgress(
             + ' pid=' + projectId + ' → null', 'info');
         return null;
     }
-    if (!resp.ok) {
+    if (resp.isFail) {
         const preview = JSON.stringify(resp.data).substring(0, 200);
         logError('GitsyncProbe', 'probeProgress HTTP ' + resp.status
             + ' [ws=' + wsId + ' pid=' + projectId + ' job=' + jobId + ']'

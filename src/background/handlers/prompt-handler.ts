@@ -496,8 +496,8 @@ export async function loadBundledDefaultPrompts(): Promise<PromptEntry[] | null>
 
     try {
         const url = chrome.runtime.getURL("prompts/macro-prompts.json");
-        const response = await fetch(url);
-        if (!response.ok) {
+        const response = ServiceResult.wrapFetch(await fetch(url));
+        if (response.isFail) {
             // HEFF: bundled asset missing/mis-served. No retry; log and return null.
             logSampledDebug(
                 BgLogTag.PROMPTS,

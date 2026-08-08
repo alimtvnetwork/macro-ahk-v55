@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Marco Extension — Recorder Data Source Parsers
  *
@@ -261,7 +262,7 @@ async function readEndpointPayload(response: Response): Promise<unknown> {
 }
 
 async function assertResponseOk(response: Response): Promise<void> {
-    if (response.ok) {
+    if (response.isSuccess) {
         return;
     }
 

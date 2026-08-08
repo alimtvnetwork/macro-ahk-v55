@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * MacroLoop Controller — ensureGithubRepo helper (Issue 129 Step 5)
  *
@@ -128,7 +129,7 @@ async function postSync(
         return { ok: false, jobId: null, httpStatus: 0, reason: 'network_error' };
     }
 
-    if (!resp.ok) {
+    if (resp.isFail) {
         const preview = JSON.stringify(resp.data).substring(0, 200);
         logError('EnsureRepo', 'postSync HTTP ' + resp.status
             + ' [ws=' + wsId + ' conn=' + connId + ' pid=' + projectId + ']'
@@ -213,7 +214,7 @@ export async function ensureGithubRepo(
 
     // ── 2) POST /sync once (no retry).
     const posted = await postSync(wsId, connId, projectId);
-    if (!posted.ok || !posted.jobId) {
+    if (posted.isFail || !posted.jobId) {
         setGitsyncCache(wsId, projectId, 'error');
         return { status: 'failed', reason: posted.reason, httpStatus: posted.httpStatus };
     }

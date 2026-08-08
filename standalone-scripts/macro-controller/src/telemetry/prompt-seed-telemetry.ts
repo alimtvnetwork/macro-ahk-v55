@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * prompt-seed-telemetry.ts (v4.170.5)
  *
@@ -50,7 +51,7 @@ export type PromptSeedEventName =
   | 'reseed.start'
   | 'reseed.force'
   | 'reseed.complete'
-  | 'health.default.ok'
+  | 'health.default.isSuccess'
   | 'health.default.missing'
   | 'health.default.schema-drift'
   | 'health.auto-repair.start'

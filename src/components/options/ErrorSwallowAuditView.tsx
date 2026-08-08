@@ -158,12 +158,12 @@ export default function ErrorSwallowAuditView() {
     const load = useCallback(async () => {
         setState({ kind: "loading" });
         try {
-            const res = await fetch(DEFAULT_AUDIT_URL, { cache: "no-store" });
+            const res = ServiceResult.wrapFetch(await fetch(DEFAULT_AUDIT_URL, { cache: "no-store" }));
             if (res.status === 404) {
                 setState({ kind: "missing" });
                 return;
             }
-            if (!res.ok) {
+            if (res.isFail) {
                 // HEFF: single attempt; surface status, do NOT retry.
                 setState({
                     kind: "error",

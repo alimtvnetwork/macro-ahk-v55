@@ -498,6 +498,10 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
       return;
     }
 
+    renderHistoryItems(filtered, listContainer);
+  }
+
+  function renderHistoryItems(filtered: unknown[], container: HTMLElement) {
     filtered.forEach(row => {
       const item = document.createElement('div');
       item.style.cssText = 'padding:8px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background 0.2s;';
@@ -512,10 +516,8 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
         </div>
         <div style="font-size:11px;color:${cPanelText};word-break:break-word;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${r.Prompt}</div>
       `;
-      item.onclick = () => {
-        _showHistoryDetailModal(r);
-      };
-      listContainer.appendChild(item);
+      item.onclick = () => _showHistoryDetailModal(r);
+      container.appendChild(item);
     });
   }
 
@@ -561,31 +563,53 @@ function _mountSubmitHistoryPanel(panel: HTMLElement): void {
 
 /** Shows a full-screen modal with history details. */
 function _showHistoryDetailModal(row: Record<string, unknown>): void {
+  const overlay = buildModalOverlay();
+  const modal = buildHistoryModalContainer();
+  
+  modal.appendChild(buildHistoryModalHeader(overlay));
+  modal.appendChild(buildHistoryModalContent(row));
+  modal.appendChild(buildHistoryModalFooter(row));
+  
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+function buildModalOverlay(): HTMLElement {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
   overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  return overlay;
+}
 
+function buildHistoryModalContainer(): HTMLElement {
   const modal = document.createElement('div');
   const s = state as unknown as Record<string, string>;
   modal.style.cssText = 'background:' + (s.cPanelBg || '#1a1625') + ';border:1px solid ' + (s.cPanelBorder || '#2d2b3b') + ';border-radius:12px;width:90%;max-width:600px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,0.6);overflow:hidden;';
-  
+  return modal;
+}
+
+function buildHistoryModalHeader(overlay: HTMLElement): HTMLElement {
   const header = document.createElement('div');
   header.style.cssText = 'padding:16px 20px;border-bottom:1px solid ' + cPanelBorder + ';display:flex;justify-content:space-between;align-items:center;';
   header.innerHTML = `<span style="font-size:14px;font-weight:700;color:${cPrimaryLight};">Prompt Detail</span>`;
-  
   const closeBtn = document.createElement('span');
   closeBtn.textContent = '✕';
   closeBtn.style.cssText = 'cursor:pointer;color:#64748b;font-size:18px;';
   closeBtn.onclick = () => overlay.remove();
   header.appendChild(closeBtn);
+  return header;
+}
 
+function buildHistoryModalContent(row: Record<string, unknown>): HTMLElement {
   const content = document.createElement('div');
   content.style.cssText = 'flex:1;overflow-y:auto;padding:20px;font-family:monospace;font-size:12px;color:' + cPanelText + ';white-space:pre-wrap;line-height:1.5;background:' + cPanelBgAlt + ';';
   content.textContent = (row as { Prompt?: string }).Prompt || '';
+  return content;
+}
 
+function buildHistoryModalFooter(row: Record<string, unknown>): HTMLElement {
   const footer = document.createElement('div');
   footer.style.cssText = 'padding:12px 20px;border-top:1px solid ' + cPanelBorder + ';display:flex;justify-content:flex-end;gap:10px;';
-  
   const copyBtn = document.createElement('button');
   copyBtn.textContent = '📋 Copy Prompt';
   copyBtn.style.cssText = 'padding:8px 16px;background:' + cPrimary + ';color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;';
@@ -593,13 +617,8 @@ function _showHistoryDetailModal(row: Record<string, unknown>): void {
     navigator.clipboard.writeText((row as { Prompt?: string }).Prompt || '');
     showToast('✅ Prompt copied to clipboard', 'info');
   };
-
   footer.appendChild(copyBtn);
-  modal.appendChild(header);
-  modal.appendChild(content);
-  modal.appendChild(footer);
-  overlay.appendChild(modal);
-  document.body.appendChild(overlay);
+  return footer;
 }
 
 

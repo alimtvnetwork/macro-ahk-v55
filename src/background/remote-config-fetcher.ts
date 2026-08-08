@@ -112,15 +112,15 @@ async function fetchRemoteConfig(
             DEFAULT_TIMEOUT_MS,
         );
 
-        const response = await fetch(settings.endpointUrl, {
+        const response = ServiceResult.wrapFetch(await fetch(settings.endpointUrl, {
             method: "GET",
             headers,
             signal: controller.signal,
-        });
+        }));
 
         clearTimeout(timeoutId);
 
-        const isResponseOk = response.ok;
+        const isResponseOk = response.isSuccess;
 
         if (isResponseOk) {
             return handleSuccessfulFetch(response);

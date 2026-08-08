@@ -215,89 +215,74 @@ export async function handleGetToken(
     const resolvedCookieNames = await resolveSessionCookieNamesFromProjects(projectId);
     const primaryUrl = await resolvePrimaryUrl(tabUrlHint);
 
-    // ── Strategy 1 (preferred): Direct cookie read — no network, no 401 risk ──
-    const sessionLookup = await readCookieValueByNameCandidates(
-        resolvedCookieNames.sessionNames,
-        primaryUrl,
-    );
-    if (sessionLookup.value !== null && isLikelyJwt(sessionLookup.value)) {
-        console.log("[config-auth] GET_TOKEN: found JWT directly in session cookie");
-        cachedSessionId = sessionLookup.value;
-        cachedAt = Date.now();
-        return {
-            token: sessionLookup.value,
-            refreshed: true,
-            cookieName: sessionLookup.cookieName ?? COOKIE_SESSION_ID,
-        };
-    }
+    const strat1 = await tryStrategy1DirectCookie(resolvedCookieNames.sessionNames, primaryUrl);
+    if (strat1) return strat1;
 
-    // ── Strategy 2: Supabase localStorage JWT from platform tabs ──
-    const localStorageJwt = await readSupabaseJwtFromPlatformTabs(tabUrlHint);
-    if (localStorageJwt !== null) {
-        console.log("[config-auth] GET_TOKEN: found JWT in platform tab localStorage");
-        cachedSessionId = localStorageJwt;
-        cachedAt = Date.now();
-        return {
-            token: localStorageJwt,
-            refreshed: true,
-            cookieName: "localStorage[sb-*-auth-token]",
-        };
-    }
+    const strat2 = await tryStrategy2LocalStorage(tabUrlHint);
+    if (strat2) return strat2;
 
-    // ── Strategy 3: Signed URL token fallback (no network) ──
-    const signedUrlToken = await resolveSignedUrlTokenCandidate(tabUrlHint, primaryUrl);
+    const strat3 = await tryStrategy3SignedUrl(tabUrlHint, primaryUrl);
+    if (strat3) return strat3;
 
-    if (signedUrlToken !== null) {
-        console.log("[config-auth] GET_TOKEN: using signed URL token fallback");
-        cachedSessionId = signedUrlToken;
-        cachedAt = Date.now();
-        return {
-            token: signedUrlToken,
-            refreshed: true,
-            cookieName: "signedUrl[__lovable_token]",
-        };
-    }
-
-    // ── Strategy 4: Opaque session-cookie exchange ──
+    const sessionLookup = await readCookieValueByNameCandidates(resolvedCookieNames.sessionNames, primaryUrl);
     const refreshLookup = sessionLookup.value === null
         ? await readCookieValueByNameCandidates(resolvedCookieNames.refreshNames, primaryUrl)
         : { value: null, cookieName: null };
-    const exchangeToken = await fetchAuthTokenFromSessionExchange(
-        projectId,
-        sessionLookup.value !== null || refreshLookup.value !== null,
-    );
 
+    const strat4 = await tryStrategy4Exchange(projectId, sessionLookup, refreshLookup);
+    if (strat4) return strat4;
+
+    if (sessionLookup.value !== null) {
+        logBgWarnError(BgLogTag.CONFIG_AUTH, "GET_TOKEN: session cookie exists but no JWT could be derived");
+        return { token: null, refreshed: false, errorMessage: "Session cookie exists, but JWT cookie/localStorage lookup failed." };
+    }
+
+    const cookieDiscovery = await discoverAuthCookieNames(primaryUrl);
+    return { token: null, refreshed: false, errorMessage: buildMissingCookieMessage(cookieDiscovery, resolvedCookieNames.sessionNames, resolvedCookieNames.refreshNames) };
+}
+
+async function tryStrategy1DirectCookie(names: string[], url: string): Promise<{ token: string; refreshed: boolean; cookieName: string } | null> {
+    const lookup = await readCookieValueByNameCandidates(names, url);
+    if (lookup.value !== null && isLikelyJwt(lookup.value)) {
+        console.log("[config-auth] GET_TOKEN: found JWT directly in session cookie");
+        cachedSessionId = lookup.value;
+        cachedAt = Date.now();
+        return { token: lookup.value, refreshed: true, cookieName: lookup.cookieName ?? COOKIE_SESSION_ID };
+    }
+    return null;
+}
+
+async function tryStrategy2LocalStorage(hint?: string): Promise<{ token: string; refreshed: boolean; cookieName: string } | null> {
+    const jwt = await readSupabaseJwtFromPlatformTabs(hint);
+    if (jwt !== null) {
+        console.log("[config-auth] GET_TOKEN: found JWT in platform tab localStorage");
+        cachedSessionId = jwt;
+        cachedAt = Date.now();
+        return { token: jwt, refreshed: true, cookieName: "localStorage[sb-*-auth-token]" };
+    }
+    return null;
+}
+
+async function tryStrategy3SignedUrl(hint?: string, url?: string): Promise<{ token: string; refreshed: boolean; cookieName: string } | null> {
+    const token = await resolveSignedUrlTokenCandidate(hint, url);
+    if (token !== null) {
+        console.log("[config-auth] GET_TOKEN: using signed URL token fallback");
+        cachedSessionId = token;
+        cachedAt = Date.now();
+        return { token, refreshed: true, cookieName: "signedUrl[__lovable_token]" };
+    }
+    return null;
+}
+
+async function tryStrategy4Exchange(projectId: string, sessionLookup: any, refreshLookup: any): Promise<{ token: string; refreshed: boolean; cookieName: string } | null> {
+    const exchangeToken = await fetchAuthTokenFromSessionExchange(projectId, sessionLookup.value !== null || refreshLookup.value !== null);
     if (exchangeToken !== null) {
         console.log("[config-auth] GET_TOKEN: exchanged opaque session cookie for JWT");
         cachedSessionId = exchangeToken;
         cachedAt = Date.now();
-        return {
-            token: exchangeToken,
-            refreshed: true,
-            cookieName: "auth-token-exchange",
-        };
+        return { token: exchangeToken, refreshed: true, cookieName: "auth-token-exchange" };
     }
-
-    if (sessionLookup.value !== null) {
-        logBgWarnError(BgLogTag.CONFIG_AUTH, "GET_TOKEN: session cookie exists but no JWT could be derived");
-        return {
-            token: null,
-            refreshed: false,
-            errorMessage: "Session cookie exists, but JWT cookie/localStorage lookup failed.",
-        };
-    }
-
-    const cookieDiscovery = await discoverAuthCookieNames(primaryUrl);
-
-    return {
-        token: null,
-        refreshed: false,
-        errorMessage: buildMissingCookieMessage(
-            cookieDiscovery,
-            resolvedCookieNames.sessionNames,
-            resolvedCookieNames.refreshNames,
-        ),
-    };
+    return null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -535,7 +520,12 @@ async function getActivePlatformTabs(tabUrlHint?: string): Promise<chrome.tabs.T
         } catch (hintErr) {
             // Ignore hint query failures — pattern-based query below still runs.
             // Hint URL may be malformed or restricted (chrome://, file://).
-            console.debug(`[config-auth] tabs.query(hint="${tabUrlHint}") failed, falling back to pattern query:`, hintErr);
+            logSampledDebug(
+                BgLogTag.CONFIG_AUTH,
+                "tabs.query fallback",
+                `tabs.query(hint="${tabUrlHint}") failed, falling back to pattern query`,
+                hintErr instanceof Error ? hintErr : String(hintErr)
+            );
         }
     }
 
@@ -597,9 +587,14 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
                                 const p2 = JSON.parse(storedToken);
                                 const t2 = p2?.access_token ?? p2?.currentSession?.access_token ?? p2?.token;
                                 if (typeof t2 === "string" && t2.startsWith("eyJ") && t2.split(".").length === 3) return t2;
-                            } catch { if (storedToken.startsWith("eyJ") && storedToken.split(".").length === 3) return storedToken; }
+                            } catch (parseErr) {
+                                logSampledDebug(BgLogTag.CONFIG_AUTH, "token parse failed", "Failed to parse storedToken", parseErr instanceof Error ? parseErr : String(parseErr));
+                                if (storedToken.startsWith("eyJ") && storedToken.split(".").length === 3) return storedToken;
+                            }
                         }
-                    } catch (lsErr) { console.debug("[config-auth] localStorage scan unavailable:", lsErr); }
+                    } catch (lsErr) {
+                        logSampledDebug(BgLogTag.CONFIG_AUTH, "localStorage scan unavailable", "localStorage scan unavailable", lsErr instanceof Error ? lsErr : String(lsErr));
+                    }
                     return null;
                 },
             });
@@ -697,11 +692,11 @@ async function fetchAuthTokenFromSessionExchange(
     // and propagated as null (unified-auth-contract handles re-auth elsewhere).
     const url = `${AUTH_API_BASE}/projects/${projectId}/auth-token`;
     try {
-        const response = await fetch(url, {
+        const response = ServiceResult.wrapFetch(await fetch(url, {
             method: "GET",
             credentials: "include",
-        });
-        if (!response.ok) {
+        }));
+        if (response.isFail) {
             logBgWarnError(
                 BgLogTag.CONFIG_AUTH,
                 `HEFF: HTTP ${response.status} on GET ${url} — auth-token exchange failed; ` +
@@ -763,7 +758,12 @@ function extractProjectIdFromUrl(url: string): string | null {
     } catch (urlErr) {
         // Fall through to legacy string regex checks below. Debug only — this
         // catch fires for any non-URL input passed to extractProjectId.
-        console.debug("[config-auth] extractProjectId URL parse failed, using legacy regex fallback:", urlErr);
+        logSampledDebug(
+            BgLogTag.CONFIG_AUTH,
+            "extractProjectId",
+            "URL parse failed, using legacy regex fallback",
+            urlErr instanceof Error ? urlErr : String(urlErr)
+        );
     }
 
     // Legacy fallback regexes (defensive)
@@ -830,7 +830,12 @@ async function discoverAuthCookieNames(primaryUrl: string): Promise<CookieDiscov
         } catch (cookieErr) {
             // Ignore candidate URL errors and keep scanning. Debug because we
             // intentionally probe many candidate URLs and most will not match.
-            console.debug("[config-auth] cookie candidate URL scan errored, continuing:", cookieErr);
+            logSampledDebug(
+                BgLogTag.CONFIG_AUTH,
+                "cookie scanner",
+                "cookie candidate URL scan errored, continuing",
+                cookieErr instanceof Error ? cookieErr : String(cookieErr)
+            );
         }
     }
 

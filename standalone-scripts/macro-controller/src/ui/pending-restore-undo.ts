@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * pending-restore-undo.ts — Persist a restore's undo intent across page
  * reloads so the Undo affordance survives a quick refresh within the
@@ -125,12 +126,12 @@ async function reverseUpdate(p: UpdatePayload): Promise<{ ok: boolean; error?: s
         replaceKey: p.preReplaceKey,
         replaceValues: p.preReplaceValues,
     });
-    return revert.ok ? { ok: true } : { ok: false, error: revert.error ?? 'unknown' };
+    return revert.isSuccess ? { ok: true } : { ok: false, error: revert.error ?? 'unknown' };
 }
 
 async function reverseInsert(p: InsertPayload): Promise<{ ok: boolean; error?: string }> {
     const del = await deletePromptById(p.newId);
-    return del.ok ? { ok: true } : { ok: false, error: del.error ?? 'unknown' };
+    return del.isSuccess ? { ok: true } : { ok: false, error: del.error ?? 'unknown' };
 }
 
 /**
@@ -155,7 +156,7 @@ export function hydratePendingRestoreUndo(now: number = Date.now()): boolean {
         const result = record.payload.kind === 'update'
             ? await reverseUpdate(record.payload)
             : await reverseInsert(record.payload);
-        if (!result.ok) {
+        if (result.isFail) {
             logError(LOG_SCOPE, 'reverse failed after refresh', result.error);
             showToast('❌ Undo failed: ' + (result.error ?? 'unknown'), 'error');
             return;

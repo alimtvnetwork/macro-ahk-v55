@@ -1,5 +1,5 @@
 {
-  "GeneratedAt": "2026-08-08T06:06:02.447Z",
+  "GeneratedAt": "2026-08-08T07:44:47.879Z",
   "Items": [
     {
       "Id": "9ce78a370955",
@@ -11,10 +11,10 @@
       "Snippet": "catch {"
     },
     {
-      "Id": "607c2c9e8919",
+      "Id": "33857b1f11a8",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/seed/prompt-health-check.ts",
-      "Line": 139,
+      "Line": 140,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch (_err) {"
@@ -38,10 +38,10 @@
       "Snippet": "catch (_e: unknown) {"
     },
     {
-      "Id": "1ba70cf349fb",
+      "Id": "7917893dc518",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/ui/next-inline-ui.ts",
-      "Line": 711,
+      "Line": 712,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"
@@ -56,10 +56,10 @@
       "Snippet": "catch {"
     },
     {
-      "Id": "0061abc4a281",
+      "Id": "13565d316df0",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/ui/pending-restore-undo.ts",
-      "Line": 111,
+      "Line": 112,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"
@@ -146,28 +146,19 @@
       "Snippet": "catch(function() {"
     },
     {
-      "Id": "4c7443aff8cf",
+      "Id": "be406deee043",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/ui/prompt-injection.ts",
-      "Line": 639,
+      "Line": 640,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch(function() {"
     },
     {
-      "Id": "34e06c54f3ce",
+      "Id": "177762938d51",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/ui/prompt-injection.ts",
-      "Line": 764,
-      "Rule": "no-empty-catch",
-      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
-      "Snippet": "catch {"
-    },
-    {
-      "Id": "83a12c82ce3b",
-      "Severity": "P1",
-      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-actions.ts",
-      "Line": 47,
+      "Line": 765,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"
@@ -182,10 +173,19 @@
       "Snippet": "catch {"
     },
     {
-      "Id": "863b5510c231",
+      "Id": "a0a7897295f8",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/ui/prompt-library-actions.ts",
-      "Line": 52,
+      "Line": 49,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch {"
+    },
+    {
+      "Id": "a255e85c3e0b",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-actions.ts",
+      "Line": 53,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"
@@ -254,19 +254,19 @@
       "Snippet": "catch {"
     },
     {
-      "Id": "e6afb3d67486",
+      "Id": "c2572af4498b",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/ui/ui-updaters.ts",
-      "Line": 215,
+      "Line": 220,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch (_e) {"
     },
     {
-      "Id": "36175f8d3e94",
+      "Id": "90bfb602c826",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/ui/ui-updaters.ts",
-      "Line": 223,
+      "Line": 228,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch (_e) {"

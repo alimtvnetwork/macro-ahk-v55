@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Prompt Health Check — v4.170.5
  *
@@ -112,7 +113,7 @@ export async function runPromptHealthCheck(opts: RunHealthCheckOptions = {}): Pr
     const seedSlug = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault)?.slug ?? (role + '-default');
     try {
       const res = await getDefaultPromptForRole(role);
-      if (!res.ok) {
+      if (res.isFail) {
         issues.push({ role, slug: seedSlug, code: 'query-failed', detail: res.error ?? 'unknown query error' });
         continue;
       }
@@ -140,8 +141,8 @@ function publishReport(report: PromptHealthReport, silent: boolean): void {
     // window may be locked down in some sandboxes; safe to ignore.
   }
 
-  if (report.ok) {
-    emitPromptSeedEvent({ event: 'health.default.ok', role: 'generic', outcome: 'ok', detail: 'all defaults healthy' });
+  if (report.isSuccess) {
+    emitPromptSeedEvent({ event: 'health.default.isSuccess', role: 'generic', outcome: 'ok', detail: 'all defaults healthy' });
     return;
   }
 

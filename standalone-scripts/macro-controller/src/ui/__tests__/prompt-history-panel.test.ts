@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * openPromptHistoryPanel:
  * - Resolves the slug via getDefaultPromptForRole when not supplied.
@@ -188,7 +189,7 @@ describe('openPromptHistoryPanel', () => {
   it('parseRevisionImportPayload accepts a matching schema-v1 payload (v4.183.0)', () => {
     const payload = buildRevisionExportPayload('plan-default', 'plan', [makeRev()], 1_700_000_000_000);
     const parsed = parseRevisionImportPayload(JSON.stringify(payload), 'plan-default', 'plan');
-    expect(parsed.ok).toBe(true);
+    expect(parsed.isSuccess).toBe(true);
     expect(parsed.rows).toHaveLength(1);
     expect(parsed.rows?.[0].Body).toBe('old body {{n}}');
     expect(parsed.rows?.[0].CreatedAt).toBe(1_700_000_000_000);

@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * prompt-health-auto-repair.ts — v4.178.0
  *
@@ -40,7 +41,7 @@ export interface AutoRepairResult {
   reseedError?: string;
   /** Health report AFTER repair. Same as initialReport when no repair ran. */
   finalReport: PromptHealthReport;
-  /** True iff finalReport.ok === true. */
+  /** True iff finalReport.isSuccess === true. */
   isHealthy: boolean;
 }
 
@@ -53,7 +54,7 @@ export interface AutoRepairResult {
  * and the toast fires as it does today.
  */
 function shouldAttemptRepair(report: PromptHealthReport): boolean {
-  return report.ok === false && report.issues.length > 0;
+  return report.isSuccess === false && report.issues.length > 0;
 }
 
 function emitRepairStart(initial: PromptHealthReport): void {
@@ -99,7 +100,7 @@ export async function runPromptHealthCheckWithAutoRepair(): Promise<AutoRepairRe
       repairAttempted: false,
       reseedOk: true,
       finalReport: initialReport,
-      isHealthy: initialReport.ok,
+      isHealthy: initialReport.isSuccess,
     };
   }
   emitRepairStart(initialReport);
@@ -108,13 +109,13 @@ export async function runPromptHealthCheckWithAutoRepair(): Promise<AutoRepairRe
   // the user must see the red banner. When healthy, publishReport
   // short-circuits before the toast, so a healthy state stays quiet.
   const finalReport = await runPromptHealthCheck({ silent: false });
-  const isHealthy = finalReport.ok;
+  const isHealthy = finalReport.isSuccess;
   if (isHealthy) emitRepairRecovered();
   else emitRepairFailed(finalReport, reseed.error);
   const result: AutoRepairResult = {
     initialReport,
     repairAttempted: true,
-    reseedOk: reseed.ok,
+    reseedOk: reseed.isSuccess,
     finalReport,
     isHealthy,
   };

@@ -1,3 +1,4 @@
+import { ServiceResult } from './utils/result-wrapper';
 /**
  * Bulk Remix Next — v2.219.0
  *
@@ -42,7 +43,7 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
     throwDiagnostic('REMIX_BULK_E001', { missingApi: 'window.marco.api.projects.list', wsId });
   }
   const resp = await sdk.api.projects.list(wsId, { baseUrl: CREDIT_API_BASE });
-  if (!resp.ok) {
+  if (resp.isFail) {
     throwDiagnostic('REMIX_BULK_E003', { status: resp.status, wsId });
   }
   const data = resp.data as { projects?: Array<{ id?: string; name?: string }> };

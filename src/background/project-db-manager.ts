@@ -68,7 +68,7 @@ async function ensureSqlJs(): Promise<SqlJs> {
     const wasmUrl = chrome.runtime.getURL("wasm/sql-wasm.wasm");
     let wasmResponse: Response;
     try {
-        wasmResponse = await fetch(wasmUrl);
+        wasmResponse = ServiceResult.wrapFetch(await fetch(wasmUrl));
     } catch (err) {
         throw new Error(
             `Failed to fetch WASM binary at "${wasmUrl}". ` +
@@ -76,7 +76,7 @@ async function ensureSqlJs(): Promise<SqlJs> {
             `Original error: ${err instanceof Error ? err.message : String(err)}`,
         );
     }
-    if (!wasmResponse.ok) {
+    if (wasmResponse.isFail) {
         throw new Error(
             `WASM fetch returned HTTP ${wasmResponse.status} for "${wasmUrl}". ` +
             `Ensure "wasm/sql-wasm.wasm" is listed in manifest web_accessible_resources.`,

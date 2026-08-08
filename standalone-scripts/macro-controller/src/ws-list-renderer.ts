@@ -74,7 +74,8 @@ export function filterAndSortWorkspaces(
   const fs = readFilterState(filter, DataAttr.Active);
   const survivors: Array<{ ws: WorkspaceCredit; wsIndex: number }> = [];
   for (const [wsIndex, ws] of workspaces.entries()) {
-    if (!passesFilters(ws, fs)) continue;
+    const isFilteredOut = !passesFilters(ws, fs);
+    if (isFilteredOut) continue;
     survivors.push({ ws, wsIndex });
   }
 
@@ -112,7 +113,8 @@ export function filterAndSortWorkspaces(
 
 function updateWsCountLabel(count: number, total: number, filter: string): void {
   const countLabel = document.getElementById('loop-ws-count-label');
-  if (!countLabel) return;
+  const isMissingCountLabel = !countLabel;
+  if (isMissingCountLabel) return;
   const anyFilterActive = filter || getLoopWsFreeOnly() || getLoopWsExpiredWithCredits()
     || getLoopWsExpiring() || getLoopWsRefillSoon()
     || viewState().getCreditSortMode() !== 'none' || count !== total;
@@ -127,32 +129,17 @@ export function renderLoopWorkspaceList(
   filter: string,
 ): void {
   const listEl = document.getElementById('loop-ws-list');
-  if (!listEl) return;
+  const isMissingListEl = !listEl;
+  if (isMissingListEl) return;
 
-  let count = 0;
-  let currentIdx = -1;
   const maxTotalCredits = computeMaxTotalCredits(workspaces);
   const survivors = filterAndSortWorkspaces(workspaces, filter);
-
   publishVisibleWorkspaces(workspaces);
 
   const selEl = document.getElementById(DomId.LoopWsSelected);
   const selIdValue = selEl ? selEl.getAttribute(DataAttr.SelectedId) || false : false;
 
-  const frag = document.createDocumentFragment();
-  for (const { ws, wsIndex } of survivors) {
-    const isCurrent = isCurrentWorkspace(ws, currentName);
-    if (isCurrent) currentIdx = count;
-    frag.appendChild(buildWsRow(ws, wsIndex, isCurrent, count, maxTotalCredits, selIdValue, DataAttr.WsId, DataAttr.WsName, DataAttr.WsCurrent));
-    count++;
-  }
-
-  if (count === 0) {
-    const emptyEl = document.createElement('div');
-    emptyEl.style.cssText = 'padding:8px;color:' + cPrimaryLight + ';font-size:10px;text-align:center;';
-    emptyEl.textContent = '🔍 No matches';
-    frag.appendChild(emptyEl);
-  }
+  const { frag, count, currentIdx } = buildWorkspaceNodes(survivors, currentName, maxTotalCredits, selIdValue);
 
   listEl.innerHTML = '';
   listEl.appendChild(frag);
@@ -160,6 +147,34 @@ export function renderLoopWorkspaceList(
   updateWsCountLabel(count, workspaces.length, filter);
   attachWsListEventDelegation(listEl, currentIdx, filter);
   attachHoverCardForList(listEl);
+}
+
+function buildWorkspaceNodes(
+  survivors: Array<{ ws: WorkspaceCredit; wsIndex: number }>,
+  currentName: string,
+  maxTotalCredits: number,
+  selIdValue: string | boolean
+): { frag: DocumentFragment, count: number, currentIdx: number } {
+  let count = 0;
+  let currentIdx = -1;
+  const frag = document.createDocumentFragment();
+
+  for (const { ws, wsIndex } of survivors) {
+    const isCurrent = isCurrentWorkspace(ws, currentName);
+    if (isCurrent) currentIdx = count;
+    frag.appendChild(buildWsRow(ws, wsIndex, isCurrent, count, maxTotalCredits, selIdValue, DataAttr.WsId, DataAttr.WsName, DataAttr.WsCurrent));
+    count++;
+  }
+
+  const isEmpty = count === 0;
+  if (isEmpty) {
+    const emptyEl = document.createElement('div');
+    emptyEl.style.cssText = 'padding:8px;color:' + cPrimaryLight + ';font-size:10px;text-align:center;';
+    emptyEl.textContent = '🔍 No matches';
+    frag.appendChild(emptyEl);
+  }
+
+  return { frag, count, currentIdx };
 }
 
 function attachHoverCardForList(listEl: HTMLElement): void {
@@ -180,15 +195,23 @@ function attachWsListEventDelegation(
   filter: string,
 ): void {
   const elWithHandlers = listEl as HTMLElementWithHandlers;
+  removeExistingDelegation(listEl, elWithHandlers);
+  attachNewDelegation(listEl, elWithHandlers);
+  scrollToCurrentIfNeeded(listEl, currentIdx, filter);
+}
 
-  if (elWithHandlers._wsDelegateHandler) {
-    listEl.removeEventListener('click', elWithHandlers._wsDelegateHandler);
+function removeExistingDelegation(listEl: HTMLElement, elWithHandlers: HTMLElementWithHandlers): void {
+  const hasExistingHandler = !!elWithHandlers._wsDelegateHandler;
+  if (hasExistingHandler) {
+    listEl.removeEventListener('click', elWithHandlers._wsDelegateHandler!);
     listEl.removeEventListener('dblclick', elWithHandlers._wsDblHandler!);
     listEl.removeEventListener('contextmenu', elWithHandlers._wsCtxHandler!);
     listEl.removeEventListener('mouseover', elWithHandlers._wsHoverHandler!);
     listEl.removeEventListener('mouseout', elWithHandlers._wsOutHandler!);
   }
+}
 
+function attachNewDelegation(listEl: HTMLElement, elWithHandlers: HTMLElementWithHandlers): void {
   elWithHandlers._wsDelegateHandler = _createClickHandler();
   elWithHandlers._wsDblHandler = _createDblClickHandler();
   elWithHandlers._wsCtxHandler = _createCtxHandler();
@@ -200,11 +223,16 @@ function attachWsListEventDelegation(
   listEl.addEventListener('contextmenu', elWithHandlers._wsCtxHandler);
   listEl.addEventListener('mouseover', elWithHandlers._wsHoverHandler);
   listEl.addEventListener('mouseout', elWithHandlers._wsOutHandler);
+}
 
-  if (currentIdx >= 0 && !filter) {
+function scrollToCurrentIfNeeded(listEl: HTMLElement, currentIdx: number, filter: string): void {
+  const hasNoFilter = !filter;
+  const isEligible = currentIdx >= 0 && hasNoFilter;
+  if (isEligible) {
     setTimeout(function () {
       const currentItem = listEl.querySelector('.loop-ws-item[data-ws-current="true"]');
-      if (currentItem) {
+      const hasCurrentItem = !!currentItem;
+      if (hasCurrentItem) {
         currentItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       }
     }, 50);
@@ -214,7 +242,8 @@ function attachWsListEventDelegation(
 function _createClickHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    if (!item) return;
+    const isMissingItem = !item;
+    if (isMissingItem) return;
     if ((e.target as HTMLElement).classList && (e.target as HTMLElement).classList.contains('loop-ws-checkbox')) {
       e.preventDefault();
       e.stopPropagation();
@@ -233,7 +262,8 @@ function _createClickHandler(): (e: MouseEvent) => void {
 function _createDblClickHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    if (!item) return;
+    const isMissingItem = !item;
+    if (isMissingItem) return;
     e.preventDefault();
     e.stopPropagation();
     if (item.getAttribute(DataAttr.WsCurrent) === 'true') {
@@ -248,7 +278,8 @@ function _createDblClickHandler(): (e: MouseEvent) => void {
 function _createCtxHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    if (!item) return;
+    const isMissingItem = !item;
+    if (isMissingItem) return;
     e.preventDefault();
     e.stopPropagation();
     showWsContextMenu(
@@ -262,7 +293,10 @@ function _createCtxHandler(): (e: MouseEvent) => void {
 function _createHoverHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    if (!item || item.getAttribute(DataAttr.WsCurrent) === 'true') return;
+    const isMissingItem = !item;
+    if (isMissingItem) return;
+    const isCurrent = item.getAttribute(DataAttr.WsCurrent) === 'true';
+    if (isCurrent) return;
     const selEl = document.getElementById(DomId.LoopWsSelected);
     const selId = selEl ? selEl.getAttribute(DataAttr.SelectedId) : '';
     const itemId = item.getAttribute(DataAttr.WsId);
@@ -274,7 +308,10 @@ function _createHoverHandler(): (e: MouseEvent) => void {
 function _createOutHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    if (!item || item.getAttribute(DataAttr.WsCurrent) === 'true') return;
+    const isMissingItem = !item;
+    if (isMissingItem) return;
+    const isCurrent = item.getAttribute(DataAttr.WsCurrent) === 'true';
+    if (isCurrent) return;
     const selEl = document.getElementById(DomId.LoopWsSelected);
     const selId = selEl ? selEl.getAttribute(DataAttr.SelectedId) : '';
     const itemId = item.getAttribute(DataAttr.WsId);
@@ -288,7 +325,8 @@ class WsDropdownState {
   private hash = '';
 
   static getInstance(): WsDropdownState {
-    if (!WsDropdownState.instance) {
+    const isDropdownStateUninitialized = !WsDropdownState.instance;
+    if (isDropdownStateUninitialized) {
       WsDropdownState.instance = new WsDropdownState();
     }
     return WsDropdownState.instance;
@@ -307,7 +345,8 @@ function dropdownState(): WsDropdownState {
 
 export function populateLoopWorkspaceDropdown(): void {
   const listEl = document.getElementById('loop-ws-list');
-  if (!listEl) return;
+  const isMissingListEl = !listEl;
+  if (isMissingListEl) return;
   const workspaces = loopCreditState.perWorkspace || [];
   if (workspaces.length === 0) {
     if (dropdownState().getHash() === '_empty') { dropdownState().recordSkip(); return; }
@@ -365,7 +404,8 @@ class CreditResolvedRepaintScheduler {
   private readonly debounceMs = 120;
 
   static get(): CreditResolvedRepaintScheduler {
-    if (!CreditResolvedRepaintScheduler.instance) {
+    const isRepaintSchedulerUninitialized = !CreditResolvedRepaintScheduler.instance;
+    if (isRepaintSchedulerUninitialized) {
       CreditResolvedRepaintScheduler.instance = new CreditResolvedRepaintScheduler();
     }
     return CreditResolvedRepaintScheduler.instance;

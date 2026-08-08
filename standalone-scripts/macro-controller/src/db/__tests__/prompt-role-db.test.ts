@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Tests for Prompt table schema migration + enforceSingleDefaultPerRole
  * (plan-14, steps 3 + 4).
@@ -56,7 +57,7 @@ describe('Prompt table schema (step 3)', () => {
 describe('enforceSingleDefaultPerRole (step 4)', () => {
     it('emits a BEGIN/COMMIT block with a clear-others UPDATE and a set-one UPDATE', async () => {
         const result = await enforceSingleDefaultPerRole('plan', 7);
-        expect(result.ok).toBe(true);
+        expect(result.isSuccess).toBe(true);
         expect(captured).toHaveLength(1);
         const sql = captured[0].sql;
         expect(sql).toMatch(/^BEGIN TRANSACTION;/);
@@ -67,7 +68,7 @@ describe('enforceSingleDefaultPerRole (step 4)', () => {
 
     it('rejects unknown roles before touching the DB', async () => {
         const result = await enforceSingleDefaultPerRole('bogus' as never, 1);
-        expect(result.ok).toBe(false);
+        expect(result.isSuccess).toBe(false);
         expect(result.error).toMatch(/invalid role/);
         expect(captured).toHaveLength(0);
     });
@@ -75,7 +76,7 @@ describe('enforceSingleDefaultPerRole (step 4)', () => {
     it('rejects non-positive / non-integer keepId', async () => {
         for (const bad of [0, -1, 1.5, Number.NaN]) {
             const r = await enforceSingleDefaultPerRole('next', bad);
-            expect(r.ok).toBe(false);
+            expect(r.isSuccess).toBe(false);
             expect(r.error).toMatch(/positive integer/);
         }
         expect(captured).toHaveLength(0);
@@ -84,7 +85,7 @@ describe('enforceSingleDefaultPerRole (step 4)', () => {
     it('surfaces driver errors instead of swallowing them', async () => {
         nextResponse = { isOk: false, errorMessage: 'db locked' };
         const r = await enforceSingleDefaultPerRole('next', 3);
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/db locked/);
     });
 
@@ -92,7 +93,7 @@ describe('enforceSingleDefaultPerRole (step 4)', () => {
         for (const role of ['plan', 'next', 'generic'] as const) {
             captured.length = 0;
             const r = await enforceSingleDefaultPerRole(role, 42);
-            expect(r.ok).toBe(true);
+            expect(r.isSuccess).toBe(true);
             expect(captured[0].sql).toContain("Role = '" + role + "'");
         }
     });

@@ -530,10 +530,10 @@ async function performFetch(
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
-        const res = await fetch(finalUrl, { method: "POST", headers, body, signal: controller.signal });
+        const res = ServiceResult.wrapFetch(await fetch(finalUrl, { method: "POST", headers, body, signal: controller.signal }));
         clearTimeout(timer);
         const durationMs = Date.now() - startedAt;
-        return res.ok
+        return res.isSuccess
             ? buildSuccess(event, finalUrl, res.status, durationMs, emittedAt, payload)
             : buildHttpFailure(event, finalUrl, res.status, res.statusText, durationMs, emittedAt, payload);
     } catch (err) {

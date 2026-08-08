@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Marco Extension — HttpRequest Step (Spec 17 §3)
  *
@@ -178,7 +179,7 @@ async function processHttpResponse(
     response: Response, context: HttpRequestContext, params: HttpRequestParams,
 ): Promise<HttpStepResult> {
     const snippet = await safeReadSnippet(response);
-    if (response.ok === false) {
+    if (response.isSuccess === false) {
         return httpErrorResult(response.status, snippet, context);
     }
     const captureOutcome = tryCaptureJson(snippet, params.CaptureAs);

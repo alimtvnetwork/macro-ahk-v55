@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * prompt-role-contract.test.ts — v4.179.0
  *
@@ -61,10 +62,10 @@ describe('Prompt role contract matrix (v4.179.0)', () => {
 
     describe('C3. Rule-0 passes for every seed body (template or declared-count)', () => {
         for (const row of PLAN_NEXT_SEED_ROWS) {
-            it('slug=' + row.slug + ' — validateRuleZero.ok===true', () => {
+            it('slug=' + row.slug + ' — validateRuleZero.isSuccess===true', () => {
                 const result = validateRuleZero(row.body);
                 expect(
-                    result.ok,
+                    result.isSuccess,
                     'Rule-0 violation on seed slug=' + row.slug + ' code=' + result.code
                     + ' reason=' + result.reason,
                 ).toBe(true);
@@ -110,11 +111,11 @@ describe('Prompt role contract matrix (v4.179.0)', () => {
         const MISMATCH_BODY = '# 5 steps Plan, Maximal Enforcement\n\n1. one\n2. two\n3. three\n';
         it('validateRuleZero flags mismatch (shared by plan and next callers)', () => {
             const r = validateRuleZero(MISMATCH_BODY);
-            expect(r.ok).toBe(false);
+            expect(r.isSuccess).toBe(false);
         });
         it('validateRuleZero passes on template bodies for both roles', () => {
             const r = validateRuleZero('# {{n}} steps Plan\n\n1. only\n');
-            expect(r.ok).toBe(true);
+            expect(r.isSuccess).toBe(true);
         });
     });
 });

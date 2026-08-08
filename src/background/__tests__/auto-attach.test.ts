@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Unit tests for evaluateAutoAttach — one per skip reason C1..C8.
  * See mem://features/auto-attach-policy.md.
@@ -37,7 +38,7 @@ const LIB = new Set(["s1", "dep-1"]);
 describe("evaluateAutoAttach", () => {
     it("C1 skips when autoStart is off", () => {
         const r = evaluateAutoAttach(makeProject({ settings: { autoStart: false } }), makeScript(), LIB);
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.reason).toBe("AUTOATTACH_SKIPPED_AUTOSTART_OFF");
     });
 
@@ -83,7 +84,7 @@ describe("evaluateAutoAttach", () => {
 
     it("returns OK when every C1..C8 is satisfied", () => {
         const r = evaluateAutoAttach(makeProject(), makeScript(), LIB);
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         expect(r.reason).toBe("OK");
     });
 });

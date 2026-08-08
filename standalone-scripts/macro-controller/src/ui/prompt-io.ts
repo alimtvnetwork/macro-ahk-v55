@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Prompt IO, Core Logic & Types (Issue 131).
  *
@@ -122,7 +123,7 @@ async function collectRevisionsForEntries(entries: CachedPromptEntry[]): Promise
     if (!slug || seenSlugs.has(slug)) continue;
     seenSlugs.add(slug);
     const res = await listPromptRevisions(slug);
-    if (!res.ok || !res.value) {
+    if (res.isFail || !res.value) {
       log('[PromptIO] revision fetch failed for slug=' + slug + ': ' + (res.error ?? 'unknown'), 'warn');
       continue;
     }
@@ -510,7 +511,7 @@ async function commitRevisions(
   let groupsDone = 0;
   for (const [slug, rows] of groups) {
     const res = await insertImportedRevisions(slug, rows);
-    if (res.ok) inserted += rows.length;
+    if (res.isSuccess) inserted += rows.length;
     else results.errors.push(`revisions for slug=${slug}: ${res.error ?? 'unknown'}`);
     groupsDone++;
     emit({ phase: 'revisions', entriesCommitted, totalEntries, insertedRevisions: inserted, totalRevisions, groupsDone, totalGroups, slug });
@@ -607,7 +608,7 @@ async function collectExistingRoleSlugs(dbEntries: readonly CachedPromptEntry[])
   const existing = new Set<string>();
   for (const role of rolesTouched) {
     const res = await listPromptsByRole(role);
-    if (res.ok && res.value) {
+    if (res.isSuccess && res.value) {
       for (const r of res.value) if (r.Slug) existing.add(role + ':' + r.Slug);
     }
   }

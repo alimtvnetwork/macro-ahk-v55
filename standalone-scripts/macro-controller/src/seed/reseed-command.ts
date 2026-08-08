@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * reseed-command.ts — on-demand recovery for the Plan/Next prompt library.
  *
@@ -98,7 +99,7 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
     // Always run the normal seeder first so missing rows are inserted and
     // legacy bodies get their non-destructive checksum upgrade.
     const seedResult = await seedPlanNextPrompts();
-    if (!seedResult.ok) {
+    if (seedResult.isFail) {
       emitPromptSeedEvent({
         event: EV_RESEED_COMPLETE, outcome: 'failed',
         detail: 'seedPlanNextPrompts: ' + (seedResult.error ?? '?'),

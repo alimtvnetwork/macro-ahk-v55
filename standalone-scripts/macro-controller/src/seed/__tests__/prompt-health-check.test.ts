@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Tests for the runtime prompt health check (prompt-health-check.ts).
  *
@@ -69,7 +70,7 @@ describe('runPromptHealthCheck', () => {
     it('H1: healthy defaults -> ok=true, no toast', async () => {
         responsesQueue = [ok(healthyRow('plan')), ok(healthyRow('next'))];
         const report = await runPromptHealthCheck();
-        expect(report.ok).toBe(true);
+        expect(report.isSuccess).toBe(true);
         expect(report.issues).toEqual([]);
         expect(toastCalls).toEqual([]);
     });
@@ -77,7 +78,7 @@ describe('runPromptHealthCheck', () => {
     it('H2: missing default row surfaces row-missing + error toast', async () => {
         responsesQueue = [empty(), ok(healthyRow('next'))];
         const report = await runPromptHealthCheck();
-        expect(report.ok).toBe(false);
+        expect(report.isSuccess).toBe(false);
         const codes = report.issues.map(i => i.code);
         expect(codes).toContain('row-missing');
         expect(toastCalls.length).toBe(1);
@@ -90,7 +91,7 @@ describe('runPromptHealthCheck', () => {
             ok(healthyRow('next')),
         ];
         const report = await runPromptHealthCheck();
-        expect(report.ok).toBe(false);
+        expect(report.isSuccess).toBe(false);
         const codes = report.issues.map(i => i.code);
         expect(codes).toContain('missing-required-token');
     });
@@ -101,14 +102,14 @@ describe('runPromptHealthCheck', () => {
             ok(healthyRow('next')),
         ];
         const report = await runPromptHealthCheck();
-        expect(report.ok).toBe(false);
+        expect(report.isSuccess).toBe(false);
         expect(report.issues.map(i => i.code)).toContain('not-flagged-default');
     });
 
     it('H5: DB query error surfaces query-failed and does not throw', async () => {
         responsesQueue = [{ isOk: false, errorMessage: 'boom' }, ok(healthyRow('next'))];
         const report = await runPromptHealthCheck();
-        expect(report.ok).toBe(false);
+        expect(report.isSuccess).toBe(false);
         const planIssue = report.issues.find(i => i.role === 'plan');
         expect(planIssue?.code).toBe('query-failed');
         expect(planIssue?.detail).toContain('boom');

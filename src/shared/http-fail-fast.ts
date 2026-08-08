@@ -8,7 +8,7 @@
  *   - spec/03-error-manage/01-error-resolution/05-http-error-fail-fast.md
  *
  * Usage:
- *   const res = await fetch(url, init);
+ *   const res = ServiceResult.wrapFetch(await fetch(url, init));
  *   await httpFailFast(res, { method: "GET", url });   // throws on non-2xx
  *   const body = await res.json();
  *
@@ -163,6 +163,6 @@ export const httpFailFast = async (response: Response, context: HttpCallContext)
  */
 export const httpFetchOrThrow = async (url: string, init?: RequestInit): Promise<Response> => {
     const method = (init?.method ?? "GET").toUpperCase();
-    const response = await fetch(url, init);
+    const response = ServiceResult.wrapFetch(await fetch(url, init));
     return httpFailFast(response, { method, url });
 };

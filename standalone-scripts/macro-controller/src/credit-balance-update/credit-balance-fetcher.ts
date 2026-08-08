@@ -82,8 +82,8 @@ export async function fetchWithTimeout(
     }, timeoutMs);
 
     try {
-        // no-bare-fetch-allow: caller performs the required immediate response.ok classification and logs Reason/ReasonDetail.
-        return await fetch(url, { ...init, signal: controller.signal });
+        // no-bare-fetch-allow: caller performs the required immediate response.isSuccess classification and logs Reason/ReasonDetail.
+        return ServiceResult.wrapFetch(await fetch(url, { ...init, signal: controller.signal }));
     } finally {
         clearTimeout(timer);
     }
@@ -183,7 +183,7 @@ export async function fetchWorkspaceCreditBalance(
             },
         }, timeoutMs);
 
-        if (!response.ok) {
+        if (response.isFail) {
             return await handleNonOkResponse(response, options, url, token, startMs);
         }
         return await parseOkResponse(response, options, url, token, startMs);

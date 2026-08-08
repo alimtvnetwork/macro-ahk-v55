@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * prompt-db.ts - CRUD for the `Prompt` table (plan-14, step 5).
  *
@@ -245,7 +246,7 @@ export async function upsertPrompt(input: UpsertInput): Promise<DbResult<number>
         // recordPromptRevision; we never fail the upsert on history failure.
         const { recordPromptRevision } = await import('./prompt-revision-db');
         const revResult = await recordPromptRevision({ previous: preImage, reason: 'upsert' });
-        if (!revResult.ok) {
+        if (revResult.isFail) {
             logDiagnosticFromCode('DB_PROMPT_REVISION_SNAPSHOT_E001', { slug: preImage.Slug, reason: revResult.error ?? 'unknown error' });
         }
     }

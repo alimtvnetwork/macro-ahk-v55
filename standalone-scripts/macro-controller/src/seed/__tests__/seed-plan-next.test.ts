@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Tests for the idempotent Plan/Next seeder + boot telemetry (v4.72.0).
  * Call sequence: [pre-select existing slugs] -> [INSERT OR IGNORE]
@@ -57,7 +58,7 @@ describe('seedPlanNextPrompts', () => {
             { isOk: true },                            // audit-log INSERT
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         expect(captured).toHaveLength(9);
         expect(captured[0].sql).toMatch(/^SELECT Slug FROM Prompt WHERE Slug IN/);
         expect(captured[1].sql).toMatch(/^INSERT OR IGNORE INTO Prompt/);
@@ -85,7 +86,7 @@ describe('seedPlanNextPrompts', () => {
             { isOk: true, rows: [{ '1': 1 }] },       // hasDefault next
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         expect(captured).toHaveLength(6);
         expect(captured.some(c => c.sql.startsWith('UPDATE Prompt SET IsDefault = 1'))).toBe(false);
         expect(captured.some(c => c.sql.startsWith('INSERT INTO PromptSeedAudit'))).toBe(false);
@@ -105,7 +106,7 @@ describe('seedPlanNextPrompts', () => {
             { isOk: true },                            // audit-log INSERT
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         expect(captured).toHaveLength(8);
         expect(captured[6].sql).toContain("Slug = 'next-default'");
         expect(captured[7].sql).toMatch(/^INSERT INTO PromptSeedAudit/);
@@ -119,7 +120,7 @@ describe('seedPlanNextPrompts', () => {
             { isOk: false, errorMessage: 'disk full' },
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/disk full/);
     });
 

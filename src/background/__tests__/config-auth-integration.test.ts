@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 /**
@@ -126,7 +127,7 @@ async function setupTest(options: {
         for (const [pattern, response] of fetchResponses) {
             if (url.includes(pattern)) {
                 return {
-                    ok: response.ok,
+                    ok: response.isSuccess,
                     status: response.status,
                     json: async () => response.json,
                     text: async () => JSON.stringify(response.json),

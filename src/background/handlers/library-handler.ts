@@ -13,6 +13,7 @@ import { computeContentHash } from "./library-content-hasher";
 import { bumpMinor } from "./library-version-manager";
 import { collectTypedRows, type JsonValue } from "./handler-types";
 import { bindOpt, missingFieldError, requireField, type HandlerErrorResponse } from "./handler-guards";
+import { logBgWarnError, logSampledDebug, BgLogTag } from "../utils/logger";
 
 /* ------------------------------------------------------------------ */
 /*  Message Interfaces                                                 */
@@ -64,10 +65,10 @@ function broadcastLibraryChanged(): void {
     try {
         if (typeof chrome === "undefined" || !chrome.runtime?.sendMessage) return;
         chrome.runtime.sendMessage({ type: "LIBRARY_CHANGED" }).catch((sendErr) => {
-            console.debug("[library] LIBRARY_CHANGED broadcast had no receiver:", sendErr);
+            logSampledDebug(BgLogTag.LIBRARY, "LIBRARY_CHANGED failed", "LIBRARY_CHANGED broadcast had no receiver", sendErr instanceof Error ? sendErr : String(sendErr));
         });
     } catch (broadcastErr) {
-        console.warn("[library] broadcastLibraryChanged failed:", broadcastErr);
+        logBgWarnError(BgLogTag.LIBRARY, "broadcastLibraryChanged failed", broadcastErr instanceof Error ? broadcastErr : undefined);
     }
 }
 
@@ -90,10 +91,10 @@ function broadcastLibrarySynced(payload: Omit<LibrarySyncBroadcast, "type">): vo
         if (typeof chrome === "undefined" || !chrome.runtime?.sendMessage) return;
         const message: LibrarySyncBroadcast = { type: "LIBRARY_SYNC_BROADCAST", ...payload };
         chrome.runtime.sendMessage(message).catch((sendErr) => {
-            console.debug("[library] LIBRARY_SYNC_BROADCAST had no receiver:", sendErr);
+            logSampledDebug(BgLogTag.LIBRARY, "LIBRARY_SYNC failed", "LIBRARY_SYNC_BROADCAST had no receiver", sendErr instanceof Error ? sendErr : String(sendErr));
         });
     } catch (broadcastErr) {
-        console.warn("[library] broadcastLibrarySynced failed:", broadcastErr);
+        logBgWarnError(BgLogTag.LIBRARY, "broadcastLibrarySynced failed", broadcastErr instanceof Error ? broadcastErr : undefined);
     }
 }
 

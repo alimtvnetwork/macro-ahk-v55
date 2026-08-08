@@ -265,12 +265,12 @@ async function fetchVersionInfo(
     isRedirectable: boolean,
     maxRedirectDepth: number,
 ): Promise<VersionInfoResponse> {
-    const response = await fetch(url, {
+    const response = ServiceResult.wrapFetch(await fetch(url, {
         redirect: isRedirectable ? "follow" : "error",
         signal: AbortSignal.timeout(10_000),
-    });
+    }));
 
-    if (!response.ok) {
+    if (response.isFail) {
         // HEFF: single attempt, no retry.
         throw new Error(
             `HEFF: HTTP ${response.status} on GET ${url} — VersionInfo fetch failed (${response.statusText}). ` +
@@ -294,12 +294,12 @@ export async function fetchInstructions(
     url: string,
     isRedirectable: boolean,
 ): Promise<InstructionResponse> {
-    const response = await fetch(url, {
+    const response = ServiceResult.wrapFetch(await fetch(url, {
         redirect: isRedirectable ? "follow" : "error",
         signal: AbortSignal.timeout(15_000),
-    });
+    }));
 
-    if (!response.ok) {
+    if (response.isFail) {
         // HEFF: single attempt, no retry.
         throw new Error(
             `HEFF: HTTP ${response.status} on GET ${url} — Instruction fetch failed. ` +

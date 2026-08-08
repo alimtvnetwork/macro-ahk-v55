@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Plan Task UI — Inline accordion mirror of Task Next, but injects a
  * "plan this task in N steps" prompt instead of running a multi-task loop.
@@ -48,7 +49,7 @@ async function resolvePlanBody(n: number): Promise<string> {
   try {
     const mod = await import('../db/prompt-db');
     const result = await mod.getDefaultPromptForRole('plan');
-    if (result.ok && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
+    if (result.isSuccess && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
       const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
       return substituteToken(result.value.Body, key, n);
     }

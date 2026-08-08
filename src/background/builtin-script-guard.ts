@@ -233,8 +233,8 @@ async function seedMissingBuiltinsDirectly(
         const instrAbsUrl = chrome.runtime.getURL(instrRelPath);
         console.log("[builtin-guard:fallback] Fetching instruction.json for %s → %s", scriptName, instrAbsUrl);
         try {
-            const instrResp = await fetch(instrAbsUrl);
-            if (instrResp.ok) {
+            const instrResp = ServiceResult.wrapFetch(await fetch(instrAbsUrl));
+            if (instrResp.isSuccess) {
                 // Phase 2c: instruction.json is the canonical PascalCase
                 // artifact. Reads use PascalCase keys with no fallback —
                 // a stale camelCase artifact will surface as defaults
@@ -265,8 +265,8 @@ async function seedMissingBuiltinsDirectly(
         const scriptAbsUrl = chrome.runtime.getURL(meta.filePath);
         console.log("[builtin-guard:fallback] Fetching script file for %s → %s", scriptName, scriptAbsUrl);
         try {
-            const scriptResp = await fetch(scriptAbsUrl);
-            if (scriptResp.ok) {
+            const scriptResp = ServiceResult.wrapFetch(await fetch(scriptAbsUrl));
+            if (scriptResp.isSuccess) {
                 const code = await scriptResp.text();
                 if (code && code.length > 10) {
                     codeStub = code;

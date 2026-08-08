@@ -95,8 +95,8 @@ async function fetchInstruction(folder: string): Promise<InstructionManifest> {
     const url = chrome.runtime.getURL(
         `projects/scripts/${folder}/instruction.json`,
     );
-    const res = await fetch(url);
-    if (!res.ok) {
+    const res = ServiceResult.wrapFetch(await fetch(url));
+    if (res.isFail) {
         throw new Error(`Failed to fetch instruction.json: ${res.status}`);
     }
     return res.json() as Promise<InstructionManifest>;
@@ -141,7 +141,7 @@ export async function handleGetScriptInfo(
             const scriptUrl = chrome.runtime.getURL(
                 `projects/scripts/${folder}/${outputFile}`,
             );
-            const headRes = await fetch(scriptUrl, { method: "HEAD" });
+            const headRes = ServiceResult.wrapFetch(await fetch(scriptUrl, { method: "HEAD" }));
             const cl = headRes.headers.get("content-length");
             if (cl) sizeBytes = parseInt(cl, 10);
         } catch { // allow-swallow: HEAD probe for script size is optional metadata; null sentinel is acceptable
@@ -190,8 +190,8 @@ export async function handleHotReloadScript(
         const scriptUrl = chrome.runtime.getURL(
             `projects/scripts/${folder}/${outputFile}`,
         );
-        const scriptRes = await fetch(scriptUrl);
-        if (!scriptRes.ok) {
+        const scriptRes = ServiceResult.wrapFetch(await fetch(scriptUrl));
+        if (scriptRes.isFail) {
             return {
                 isOk: false,
                 errorMessage: `Script fetch failed: ${scriptRes.status}`,

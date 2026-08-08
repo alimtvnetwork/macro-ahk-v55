@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 import { useState } from "react";
 import { logError } from "@/hooks/popup-logger";
 import { AlertTriangle, ChevronDown, ChevronRight, Copy, Check, Download, MousePointerClick, Code2, ListChecks, Database, Terminal, FileWarning, ShieldOff } from "lucide-react";
@@ -291,7 +292,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
         <CollapsibleSection
           icon={<FileWarning className="h-3 w-3" />}
           // eslint-disable-next-line sonarjs/no-nested-template-literals -- inline label formatting; helper would obscure the one-line summary
-          label={`WASM probe — ${probe.ok ? "ok" : "failed"} (${probe.status !== null ? `HTTP ${probe.status}` : "no response"})`}
+          label={`WASM probe — ${probe.isSuccess ? "ok" : "failed"} (${probe.status !== null ? `HTTP ${probe.status}` : "no response"})`}
           isOpen={showProbe}
           onToggle={() => setShowProbe((v) => !v)}
         >
@@ -299,7 +300,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
             <div className="flex flex-wrap gap-x-3 gap-y-1">
               <span><span className="text-destructive/60">status:</span> {probe.status !== null ? probe.status : "—"}</span>
               <span><span className="text-destructive/60">content-length:</span> {probe.contentLength ?? "—"}</span>
-              <span><span className="text-destructive/60">ok:</span> {probe.ok ? "true" : "false"}</span>
+              <span><span className="text-destructive/60">ok:</span> {probe.isSuccess ? "true" : "false"}</span>
               <span><span className="text-destructive/60">at:</span> {formatTime(probe.at)}</span>
             </div>
             <div className="break-all">
@@ -600,7 +601,7 @@ function buildReport(input: ReportInput): string {
     lines.push(`  URL:            ${p.url}`);
     lines.push(`  Status:         ${p.status !== null ? p.status : "(no response)"}`);
     lines.push(`  Content-Length: ${p.contentLength ?? "(absent)"}`);
-    lines.push(`  OK:             ${p.ok ? "true" : "false"}`);
+    lines.push(`  OK:             ${p.isSuccess ? "true" : "false"}`);
     lines.push(`  Probed at:      ${p.at}`);
     if (p.headError !== null) {
       lines.push(`  HEAD error:     ${p.headError}`);

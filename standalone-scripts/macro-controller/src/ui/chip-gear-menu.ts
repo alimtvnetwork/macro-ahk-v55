@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Inline chip gear menu (Plan-23, step 3).
  *
@@ -285,7 +286,7 @@ async function runReseedAndOpen(role: PromptRole, force: boolean): Promise<void>
   }
   showToast(force ? '⚠️ Forcing default reset…' : '🔄 Re-seeding defaults…', 'info');
   const result = await reseedPromptsOnDemand({ force });
-  if (!result.ok) {
+  if (result.isFail) {
     const reason = result.error ?? 'unknown';
     reportGearFailure(
       'SEED_RESEED_E001',
@@ -346,7 +347,7 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
   if (!picked) return;
   if (picked.IsDefault === 1) { showToast('Already active', 'info'); return; }
   const res = await setDefaultPromptForRole(picked.Id, role);
-  if (!res.ok) {
+  if (res.isFail) {
     const reason = res.error ?? 'unknown';
     reportGearFailure(
       'DB_WRITE_E003',
@@ -378,7 +379,7 @@ async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> 
   });
   if (!ok) return;
   const res = await deletePromptById(picked.Id);
-  if (!res.ok) {
+  if (res.isFail) {
     const reason = res.error ?? 'unknown';
     reportGearFailure(
       'DB_WRITE_E004',

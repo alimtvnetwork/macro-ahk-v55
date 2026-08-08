@@ -1,3 +1,4 @@
+import { ServiceResult } from './utils/result-wrapper';
 /**
  * Workspace Move — API-based project move and session verification.
  *
@@ -102,7 +103,7 @@ async function probeSessionWithToken(context: string, token: string): Promise<vo
   try {
     const resp = await window.marco!.api!.workspace.probe({ baseUrl: CREDIT_API_BASE });
 
-    if (!resp.ok) {
+    if (resp.isFail) {
       logError('unknown', Label.LogSessionCheck + context + '] ❌ Session probe failed: HTTP ' + resp.status + ' (auth: ' + authLabel + ')');
       showToast(context + ' failed — session also broken (HTTP ' + resp.status + '). Re-auth needed.', 'error');
 
@@ -330,7 +331,7 @@ async function handleMoveResponse(
     await handleMoveAuthFailure(projectId, targetWorkspaceId, targetWorkspaceName, token, resp.status);
     return;
   }
-  if (resp.ok) {
+  if (resp.isSuccess) {
     log('Move response: ' + resp.status + label, 'success');
     handleMoveSuccess(targetWorkspaceName, label);
     return;
@@ -466,7 +467,7 @@ async function executeSwitchContext(
       return;
     }
 
-    if (resp.ok) {
+    if (resp.isSuccess) {
       log('Switch context response: ' + resp.status + label, 'success');
     } else {
       const bodyPreview = JSON.stringify(resp.data).substring(0, 500);

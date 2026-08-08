@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Marco Extension — SQLite Bundle Export / Import
  *
@@ -971,7 +972,7 @@ export async function previewSqliteZip(
   // Strict PascalCase v4 contract gate. Block the preview dialog from
   // ever showing rows extracted from a malformed/legacy bundle.
   const validation = validateBundleSchema(db, "full");
-  if (!validation.ok) {
+  if (validation.isFail) {
     db.close();
     throw new Error(formatValidationError(validation));
   }
@@ -1112,7 +1113,7 @@ async function extractBundle(file: File, options?: ImportOptions) {
   // so a malformed bundle never reaches the SAVE_* messaging layer (where
   // partial writes could corrupt the live extension state).
   const validation = validateBundleSchema(db, "full");
-  if (!validation.ok) {
+  if (validation.isFail) {
     db.close();
     throw new Error(formatValidationError(validation));
   }
@@ -1276,7 +1277,7 @@ async function extractPromptsBundle(
   const dbData = await dbFile.async("uint8array");
   const db = await openDb(dbData);
   const validation = validateBundleSchema(db, "prompts-only");
-  if (!validation.ok) {
+  if (validation.isFail) {
     db.close();
     throw new Error(formatValidationError(validation));
   }

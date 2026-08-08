@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Inline strips above the Lovable chat textarea — order top→bottom:
  *   1) 📋 Plan  → click number → APPEND Plan-${N} prompt to chat (no submit)
@@ -159,9 +160,9 @@ async function resolveNextTextDbFirst(deps: TaskNextDeps, n: number): Promise<st
     const bridge = await import('../db/sql-bridge');
     const result = await bridge.runWithBridgeRetry(
       function() { return mod.getDefaultPromptForRole('next'); },
-      function(r) { return r.ok ? undefined : (r.error ?? 'getDefaultPromptForRole !ok'); },
+      function(r) { return r.isSuccess ? undefined : (r.error ?? 'getDefaultPromptForRole !ok'); },
     );
-    if (result.ok && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
+    if (result.isSuccess && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
       const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
       log('NextInline.resolve: using DB next-default (' + result.value.Body.length + ' chars, key=' + key + ') for N=' + n, 'info');
       return substituteToken(result.value.Body, key, n);

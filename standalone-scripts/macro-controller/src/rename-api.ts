@@ -1,3 +1,4 @@
+import { ServiceResult } from './utils/result-wrapper';
 /**
  * MacroLoop Controller — Single Workspace Rename API
  *
@@ -278,7 +279,7 @@ async function executeRename(
 
   // Other errors — handleRenameError already surfaced the structured toast;
   // throw the SAME DiagnosticError instance so the message never drifts.
-  if (!resp.ok) {
+  if (resp.isFail) {
     throw handleRenameError(resp, wsId, attempt);
   }
 

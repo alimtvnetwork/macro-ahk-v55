@@ -1,3 +1,4 @@
+import { ServiceResult } from '../utils/result-wrapper';
 /**
  * pro-zero-credit-balance-client — typed GET /workspaces/{WorkspaceId}/credit-balance.
  *
@@ -34,7 +35,7 @@ function buildNetworkError(reason: string): CreditBalanceFetchResult {
 }
 
 function handleResponse(resp: SdkBalanceResponse): CreditBalanceFetchResult {
-    if (!resp.ok) return buildHttpError(resp.status);
+    if (resp.isFail) return buildHttpError(resp.status);
     const parsed = parseCreditBalanceResponse(resp.data);
     if (!parsed.isOk) return buildParseError(parsed.reason);
     logReceived(parsed.data.total_granted, parsed.data.total_remaining, parsed.data.total_billing_period_used);

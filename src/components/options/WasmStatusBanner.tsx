@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Marco Extension — WASM / sql.js Initialization Status Banner
  *
@@ -118,7 +119,7 @@ function evaluateBootInit(
 
     if (isFailure && mentionsWasm) {
         const headDetail = wasmProbe !== null && wasmProbe !== undefined
-            ? `HEAD probe → ${wasmProbe.url}\n  status=${wasmProbe.status ?? "n/a"} length=${wasmProbe.contentLength ?? "n/a"} ok=${wasmProbe.ok}`
+            ? `HEAD probe → ${wasmProbe.url}\n  status=${wasmProbe.status ?? "n/a"} length=${wasmProbe.contentLength ?? "n/a"} ok=${wasmProbe.isSuccess}`
             : null;
         const errorDetail = bootError ?? "(no error message captured)";
         const detail = headDetail !== null ? `${errorDetail}\n\n${headDetail}` : errorDetail;
@@ -190,7 +191,7 @@ function buildReport(args: {
         lines.push(`URL:            ${wasmProbe.url}`);
         lines.push(`HTTP status:    ${wasmProbe.status ?? "n/a"}`);
         lines.push(`Content-Length: ${wasmProbe.contentLength ?? "n/a"}`);
-        lines.push(`OK:             ${wasmProbe.ok}`);
+        lines.push(`OK:             ${wasmProbe.isSuccess}`);
         lines.push(`HEAD error:     ${wasmProbe.headError ?? "(none)"}`);
         lines.push(`Captured at:    ${wasmProbe.at}`);
     } else {

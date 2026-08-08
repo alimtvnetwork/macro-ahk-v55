@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../../utils/result-wrapper';
 /**
  * Pure payload builders for StepEditorDialog. Each function takes the
  * per-kind form state (plus the shared label) and returns a discriminated
@@ -89,7 +90,7 @@ export function buildHotkeyPayload(
         return { Ok: false, ErrorMessage: "Add at least one key combination for the Hotkey step." };
     }
     const parsedWait = parseNonNegativeMs(waitMsRaw, "Wait (ms)");
-    if (!parsedWait.ok) { return { Ok: false, ErrorMessage: parsedWait.message }; }
+    if (parsedWait.isFail) { return { Ok: false, ErrorMessage: parsedWait.message }; }
     const payload = parsedWait.value === undefined
         ? { Keys: [...chords] }
         : { Keys: [...chords], WaitMs: parsedWait.value };
@@ -142,7 +143,7 @@ export function buildUrlTabClickPayload(label: string, form: UrlTabClickFormStat
     const validation = validateUrlTabClickForm(form);
     if (validation !== null) { return validation; }
     const parsedTimeout = parseNonNegativeMs(form.TimeoutMs, "Timeout (ms)");
-    if (!parsedTimeout.ok) { return { Ok: false, ErrorMessage: parsedTimeout.message }; }
+    if (parsedTimeout.isFail) { return { Ok: false, ErrorMessage: parsedTimeout.message }; }
     const payload = buildUrlTabClickPayloadObject(form, parsedTimeout.value);
     return {
         Ok: true,

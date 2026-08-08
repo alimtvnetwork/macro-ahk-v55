@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../../utils/result-wrapper';
 /**
  * Marco Extension — Run-Time Input Source
  *
@@ -310,7 +311,7 @@ function handleResponse(
     durationMs: number,
     continueOnFail: boolean,
 ): FetchInputResult {
-    if (!res.ok) {
+    if (res.isFail) {
         return buildErrorResult({ url: config.Url, status: res.status, error: `HTTP ${res.status} ${res.statusText}`, durationMs, continueOnFail });
     }
     const parsed = parseResponseBag(text);

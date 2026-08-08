@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Negative + idempotency edge coverage for `seed-plan-next.ts`
  * (Plan-22 steps 41-48).
@@ -72,7 +73,7 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
             { isOk: true, rows: [{ '1': 1 }] },                // next default present
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         // With no pre-select data, every seed row is counted as "inserted"
         // (defensive, not misleading: the OR IGNORE below is still safe).
         const plan = r.telemetry?.find(t => t.role === 'plan');
@@ -93,7 +94,7 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
             { isOk: true },                                    // next promote ok
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         const plan = r.telemetry?.find(t => t.role === 'plan');
         const next = r.telemetry?.find(t => t.role === 'next');
         expect(plan?.promotedDefault).toBe(0);
@@ -114,7 +115,7 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
         });
         try {
             const r = await seedPlanNextPrompts();
-            expect(r.ok).toBe(true);
+            expect(r.isSuccess).toBe(true);
             expect(logDiagnosticFromCode).toHaveBeenCalledWith(
                 'SEED_TELEMETRY_E001',
                 expect.objectContaining({ reason: expect.stringContaining('quota') }),
@@ -145,7 +146,7 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
             { isOk: true, rows: [{ '1': 1 }] }, { isOk: true, rows: [{ '1': 1 }] },
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         for (const bucket of r.telemetry ?? []) {
             expect(bucket.replaceKey).toBe(REPLACE_KEY_DEFAULT);
             expect(bucket.replaceValueCount).toBe(REPLACE_VALUES_DEFAULT.length);
@@ -155,7 +156,7 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
     it('E6: an outer rawSql throw surfaces via ok:false + coded diagnostic, never swallowed', async () => {
         sendImpl = async () => { throw new Error('driver offline'); };
         const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/driver offline/);
         expect(logDiagnosticFromCode).toHaveBeenCalledWith(
             'SEED_INSERT_E001',

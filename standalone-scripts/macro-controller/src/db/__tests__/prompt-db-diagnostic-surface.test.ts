@@ -1,3 +1,4 @@
+import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Plan 22 gap #2: `upsertPrompt` / `deletePromptById` diagnostic-code surface.
  *
@@ -61,7 +62,7 @@ describe('prompt-db diagnostic surface (Plan 22 gap #2)', () => {
             // @ts-expect-error - invalid role by contract
             slug: 's', name: 'n', role: 'garbage', body: 'x',
         });
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(pickCode()).toBe('DB_PROMPT_E001');
         expect(pickWhere()).toBe('upsertPrompt');
     });
@@ -71,7 +72,7 @@ describe('prompt-db diagnostic surface (Plan 22 gap #2)', () => {
             slug: 'plan-default', name: 'Plan', role: 'plan',
             previousBody: 'do {{n}} steps', body: 'no tokens',
         });
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(pickCode()).toBe('DB_PROMPT_E001');
         expect(pickWhere()).toBe('upsertPrompt');
         expect(captured).toHaveLength(0);
@@ -80,7 +81,7 @@ describe('prompt-db diagnostic surface (Plan 22 gap #2)', () => {
     it('D3: upsertPrompt SQL failure surfaces DB errorMessage in reason', async () => {
         nextResp = { isOk: false, errorMessage: 'disk I/O failure' };
         const r = await upsertPrompt({ slug: 's', name: 'n', role: 'generic', body: 'x' });
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(pickCode()).toBe('DB_PROMPT_E001');
         const context = logDiagnosticMock.mock.calls[0][1] as { where?: string; reason?: string };
         expect(context.where).toBe('upsertPrompt');
@@ -89,7 +90,7 @@ describe('prompt-db diagnostic surface (Plan 22 gap #2)', () => {
 
     it('D4: deletePromptById non-integer id emits DB_PROMPT_E001 with where=deletePromptById', async () => {
         const r = await deletePromptById(0);
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(pickCode()).toBe('DB_PROMPT_E001');
         expect(pickWhere()).toBe('deletePromptById');
         expect(captured).toHaveLength(0);
@@ -98,7 +99,7 @@ describe('prompt-db diagnostic surface (Plan 22 gap #2)', () => {
     it('D5: successful upsert emits NO diagnostic (positive baseline: no false-positive logs)', async () => {
         nextResp = { isOk: true, rows: [], lastInsertId: 42 };
         const r = await upsertPrompt({ slug: 's', name: 'n', role: 'generic', body: 'x' });
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         expect(logDiagnosticMock).not.toHaveBeenCalled();
     });
 });
