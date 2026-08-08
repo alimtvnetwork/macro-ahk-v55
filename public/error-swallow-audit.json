@@ -1,5 +1,5 @@
 {
-  "GeneratedAt": "2026-08-08T13:10:37.840Z",
+  "GeneratedAt": "2026-08-08T14:12:28.155Z",
   "Items": [
     {
       "Id": "ee51b7fa58e4",
@@ -20,10 +20,10 @@
       "Snippet": "catch(function() {"
     },
     {
-      "Id": "1d10c68d7760",
+      "Id": "938ebd404e65",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/ui/prompt-injection.ts",
-      "Line": 666,
+      "Line": 667,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch(function() {"

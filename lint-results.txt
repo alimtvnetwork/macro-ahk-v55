@@ -1,0 +1,541 @@
+
+> vite_react_shadcn_ts@0.0.0 lint
+> eslint .
+
+
+D:\work\macro-ahk\.lovable\scratch\enum-migrator.ts
+   23:5    error  Expected blank line before this statement            padding-line-between-statements
+   28:5    error  Expected blank line before this statement            padding-line-between-statements
+   30:9    error  Expected blank line before this statement            padding-line-between-statements
+   34:23   error  Identifier 'str' is restricted                       id-denylist
+   35:12   error  Identifier 'str' is restricted                       id-denylist
+   60:9    error  Expected blank line before this statement            padding-line-between-statements
+   68:105  error  Expected blank line before this statement            padding-line-between-statements
+  106:9    error  Expected blank line before this statement            padding-line-between-statements
+  122:60   error  Unnecessary escape character: \/                     no-useless-escape
+  148:17   error  'objProps' is never reassigned. Use 'const' instead  prefer-const
+  152:17   error  Expected blank line before this statement            padding-line-between-statements
+
+D:\work\macro-ahk\.lovable\scratch\enum-renamer.ts
+  20:23  error  Identifier 'str' is restricted  id-denylist
+  21:12  error  Identifier 'str' is restricted  id-denylist
+
+D:\work\macro-ahk\.lovable\scratch\find-unions.ts
+  14:5  error  'unionOccurrences' is never reassigned. Use 'const' instead  prefer-const
+  24:5  error  Expected blank line before this statement                    padding-line-between-statements
+  44:5  error  'groups' is never reassigned. Use 'const' instead            prefer-const
+
+D:\work\macro-ahk\.lovable\scratch\refactor-ast.ts
+  12:5  error  Expected blank line before this statement                 padding-line-between-statements
+  16:5  error  'modifiedFiles' is never reassigned. Use 'const' instead  prefer-const
+
+D:\work\macro-ahk\original_modal.ts
+   102:9   error    Expected blank line before this statement                                                padding-line-between-statements
+   115:1   error    More than 1 blank line not allowed                                                       no-multiple-empty-lines
+   164:1   error    More than 1 blank line not allowed                                                       no-multiple-empty-lines
+   176:5   error    Expected blank line before this statement                                                padding-line-between-statements
+   209:5   error    Expected blank line before this statement                                                padding-line-between-statements
+   330:1   error    More than 1 blank line not allowed                                                       no-multiple-empty-lines
+   492:1   error    More than 1 blank line not allowed                                                       no-multiple-empty-lines
+   565:1   warning  Async function 'computeAndRenderPreview' has too many lines (53). Maximum allowed is 25  max-lines-per-function
+   580:9   error    Expected blank line before this statement                                                padding-line-between-statements
+   591:13  error    Expected blank line before this statement                                                padding-line-between-statements
+   625:1   warning  Function 'buildPreviewList' has too many lines (28). Maximum allowed is 25               max-lines-per-function
+   651:5   error    Expected blank line before this statement                                                padding-line-between-statements
+   661:5   error    Expected blank line before this statement                                                padding-line-between-statements
+   671:5   error    Expected blank line before this statement                                                padding-line-between-statements
+   695:1   error    More than 1 blank line not allowed                                                       no-multiple-empty-lines
+   749:1   error    More than 1 blank line not allowed                                                       no-multiple-empty-lines
+   764:1   warning  Function 'renderImportErrorBanner' has too many lines (33). Maximum allowed is 25        max-lines-per-function
+   815:1   warning  Function 'buildPartialErrorsDetails' has too many lines (37). Maximum allowed is 25      max-lines-per-function
+   851:5   error    Expected blank line before this statement                                                padding-line-between-statements
+   854:1   warning  Function 'renderPartialImportErrors' has too many lines (34). Maximum allowed is 25      max-lines-per-function
+   866:9   error    Expected blank line before this statement                                                padding-line-between-statements
+   900:1   error    More than 1 blank line not allowed                                                       no-multiple-empty-lines
+   910:5   error    Expected blank line before this statement                                                padding-line-between-statements
+   926:9   error    Expected blank line before this statement                                                padding-line-between-statements
+   941:5   error    Expected blank line before this statement                                                padding-line-between-statements
+   980:9   error    Expected blank line before this statement                                                padding-line-between-statements
+  1005:13  error    Expected blank line before this statement                                                padding-line-between-statements
+  1114:1   warning  Function 'buildImportProgressElement' has too many lines (40). Maximum allowed is 25     max-lines-per-function
+  1154:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1176:1   warning  Function 'updateImportProgress' has too many lines (35). Maximum allowed is 25           max-lines-per-function
+  1189:9   error    Expected blank line before this statement                                                padding-line-between-statements
+  1205:9   error    Expected blank line before this statement                                                padding-line-between-statements
+  1215:1   error    More than 1 blank line not allowed                                                       no-multiple-empty-lines
+  1241:1   error    More than 1 blank line not allowed                                                       no-multiple-empty-lines
+  1246:9   error    Expected blank line before this statement                                                padding-line-between-statements
+  1249:82  error    Expected blank line before this statement                                                padding-line-between-statements
+  1252:9   error    Expected blank line before this statement                                                padding-line-between-statements
+  1258:9   error    Expected blank line before this statement                                                padding-line-between-statements
+  1271:60  error    Expected blank line before this statement                                                padding-line-between-statements
+  1272:77  error    Expected blank line before this statement                                                padding-line-between-statements
+  1282:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1306:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1331:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1337:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1355:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1362:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1382:1   warning  Async function 'buildRoleSection' has too many lines (29). Maximum allowed is 25         max-lines-per-function
+  1398:9   error    Expected blank line before this statement                                                padding-line-between-statements
+  1406:9   error    Expected blank line before this statement                                                padding-line-between-statements
+  1410:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1420:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1432:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1450:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1453:1   warning  Function 'buildRowRight' has too many lines (46). Maximum allowed is 25                  max-lines-per-function
+  1508:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1518:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1527:1   warning  Async function 'handleResetToDefault' has too many lines (37). Maximum allowed is 25     max-lines-per-function
+  1532:9   error    Expected blank line before this statement                                                padding-line-between-statements
+  1536:9   error    Expected blank line before this statement                                                padding-line-between-statements
+  1552:13  error    Expected blank line before this statement                                                padding-line-between-statements
+  1591:1   warning  Function 'buildTokenRow' has too many lines (26). Maximum allowed is 25                  max-lines-per-function
+  1615:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1639:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1642:1   warning  Function 'buildEditorEl' has too many lines (31). Maximum allowed is 25                  max-lines-per-function
+  1666:5   error    Expected blank line before this statement                                                padding-line-between-statements
+  1674:1   error    More than 1 blank line not allowed                                                       no-multiple-empty-lines
+  1675:1   warning  Function 'openInlineEditor' has too many lines (28). Maximum allowed is 25               max-lines-per-function
+  1684:13  error    Expected blank line before this statement                                                padding-line-between-statements
+  1690:13  error    Expected blank line before this statement                                                padding-line-between-statements
+  1728:13  error    Expected blank line before this statement                                                padding-line-between-statements
+  1746:13  error    Expected blank line before this statement                                                padding-line-between-statements
+  1769:13  error    Expected blank line before this statement                                                padding-line-between-statements
+  1779:1   warning  Async function 'handleDelete' has too many lines (35). Maximum allowed is 25             max-lines-per-function
+  1792:13  error    Expected blank line before this statement                                                padding-line-between-statements
+  1806:14  error    Block must not be padded by blank lines                                                  padded-blocks
+  1816:1   error    More than 1 blank line not allowed                                                       no-multiple-empty-lines
+  1829:5   error    Expected blank line before this statement                                                padding-line-between-statements
+
+D:\work\macro-ahk\spec\26-chrome-extension-generic\12-templates\chrome-adapter.template.ts
+   31:13  error  Expected blank line before this statement  padding-line-between-statements
+   35:13  error  Expected blank line before this statement  padding-line-between-statements
+   70:9   error  Expected blank line before this statement  padding-line-between-statements
+  103:17  error  Expected blank line before this statement  padding-line-between-statements
+  106:13  error  Expected blank line before this statement  padding-line-between-statements
+  109:9   error  Expected blank line before this statement  padding-line-between-statements
+  124:5   error  Expected blank line before this statement  padding-line-between-statements
+  140:9   error  Expected blank line before this statement  padding-line-between-statements
+  155:9   error  Expected blank line before this statement  padding-line-between-statements
+  160:9   error  Expected blank line before this statement  padding-line-between-statements
+  176:9   error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\spec\26-chrome-extension-generic\12-templates\error-model.template.ts
+   83:9  error  Expected blank line before this statement  padding-line-between-statements
+  115:9  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\spec\26-chrome-extension-generic\12-templates\message-client.template.ts
+   91:9   error  Expected blank line before this statement  padding-line-between-statements
+  107:17  error  Expected blank line before this statement  padding-line-between-statements
+  155:9   error  Expected blank line before this statement  padding-line-between-statements
+  174:9   error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\spec\26-chrome-extension-generic\12-templates\namespace-logger.template.ts
+  76:5  error  Expected blank line before this statement  padding-line-between-statements
+  94:5  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\src\background\auth-health-handler.ts
+   81:31  warning  Define a constant instead of duplicating this literal 4 times        sonarjs/no-duplicate-string
+  107:64  warning  Async arrow function has too many lines (41). Maximum allowed is 40  max-lines-per-function
+
+D:\work\macro-ahk\src\background\boot.ts
+  253:31  warning  Define a constant instead of duplicating this literal 4 times  sonarjs/no-duplicate-string
+
+D:\work\macro-ahk\src\background\db-manager.ts
+  98:1  warning  Async function 'runWasmHeadAttempt' has too many lines (41). Maximum allowed is 40  max-lines-per-function
+
+D:\work\macro-ahk\src\background\handlers\config-auth-handler.ts
+  287:71  error    Unexpected any. Specify a different type                      @typescript-eslint/no-explicit-any
+  287:91  error    Unexpected any. Specify a different type                      @typescript-eslint/no-explicit-any
+  579:23  warning  Method 'func' has too many lines (45). Maximum allowed is 40  max-lines-per-function
+
+D:\work\macro-ahk\src\background\handlers\injection-namespace-bootstrap.ts
+  33:8  warning  Async function 'bootstrapNamespaceRoot' has too many lines (43). Maximum allowed is 40  max-lines-per-function
+
+D:\work\macro-ahk\src\background\handlers\library-handler.ts
+  75:31  warning  Define a constant instead of duplicating this literal 4 times  sonarjs/no-duplicate-string
+
+D:\work\macro-ahk\src\background\handlers\project-api-handler.ts
+  350:10  warning  Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed  sonarjs/cognitive-complexity
+
+D:\work\macro-ahk\src\background\handlers\recorder-capture-handler.ts
+  128:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\work\macro-ahk\src\background\handlers\script-info-handler.ts
+  121:8  warning  Async function 'handleGetScriptInfo' has too many lines (42). Maximum allowed is 40  max-lines-per-function
+
+D:\work\macro-ahk\src\background\handlers\sdk-bridge-handler.ts
+  70:23  warning  Update this function so that its implementation is not identical to the one on line 38  sonarjs/no-identical-functions
+
+D:\work\macro-ahk\src\background\hot-reload.ts
+  81:1  warning  Async function 'pollBuildMeta' has too many lines (42). Maximum allowed is 40  max-lines-per-function
+
+D:\work\macro-ahk\src\background\injection-diagnostics.ts
+  55:31  warning  Define a constant instead of duplicating this literal 4 times  sonarjs/no-duplicate-string
+
+D:\work\macro-ahk\src\background\migration-v3-sql.ts
+  47:8  warning  Function 'migrateSessionsToIntegerPk' has too many lines (42). Maximum allowed is 40  max-lines-per-function
+
+D:\work\macro-ahk\src\background\project-db-manager.ts
+  185:35  warning  Define a constant instead of duplicating this literal 4 times  sonarjs/no-duplicate-string
+
+D:\work\macro-ahk\src\background\recorder\chrome-tabs-adapter.ts
+   5:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   7:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  17:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\work\macro-ahk\src\background\recorder\new-tab-tracker.ts
+  19:21  error  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  19:54  error  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  28:21  error  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  28:56  error  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  28:73  error  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  28:83  error  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  42:72  error  Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  50:13  error  Use Logger.error / logError / logBgError instead of console.error (see scripts/audit-logger-compliance.mjs allowlist)  no-restricted-syntax
+
+D:\work\macro-ahk\src\background\recorder\step-library\replay-bridge.ts
+  110:1   warning  Async function 'executeUrlTabClickLeaf' has too many lines (49). Maximum allowed is 40  max-lines-per-function
+  122:17  error    Unexpected any. Specify a different type                                                @typescript-eslint/no-explicit-any
+
+D:\work\macro-ahk\src\background\session-log-writer.ts
+  347:39  warning  Define a constant instead of duplicating this literal 8 times  sonarjs/no-duplicate-string
+
+D:\work\macro-ahk\src\components\options\ImportSummaryDialog.tsx
+  48:16  warning  Function 'ImportSummaryDialog' has too many lines (100). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\ProjectDetailView.tsx
+  178:1  warning  Function 'PrimaryTabPanels' has too many lines (52). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\RunResultsSummaryPanel.tsx
+  50:16  warning  Function 'RunResultsSummaryPanel' has too many lines (89). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\StepEditorDialog.tsx
+  131:16  warning  Function 'StepEditorDialog' has too many lines (152). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\StepGroupLibraryPanel.tsx
+  52:16  warning  Function 'StepGroupLibraryPanel' has too many lines (88). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\StepLibraryErrorState.tsx
+  64:16  warning  Function 'StepLibraryErrorState' has too many lines (73). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\StorageBrowserView.tsx
+  108:31  warning  Define a constant instead of duplicating this literal 5 times  sonarjs/no-duplicate-string
+
+D:\work\macro-ahk\src\components\options\UpdaterPanel.tsx
+  32:8  warning  Function 'UpdaterPanel' has too many lines (396). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\csv-input\use-csv-input-controller.ts
+  80:1  warning  Function 'useCsvParseState' has too many lines (26). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\group-inputs\use-group-inputs-controller.ts
+  33:8  warning  Function 'useGroupInputsController' has too many lines (78). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\project-database\useConfigDb.ts
+  74:26  warning  Async arrow function has too many lines (27). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\project-database\useSchemaBuilder.ts
+  173:35  warning  Async arrow function has too many lines (26). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\recorder\RecorderEmptyState.tsx
+  26:8  warning  Function 'RecorderEmptyState' has too many lines (71). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\recorder\RecorderStepGraph.tsx
+  40:8  warning  Function 'RecorderStepGraph' has too many lines (69). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\recorder\RecorderVisualisationHeader.tsx
+  32:8  warning  Function 'RecorderVisualisationHeader' has too many lines (55). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\recorder\RecorderVisualisationPanel.tsx
+  33:16  warning  Function 'RecorderVisualisationPanel' has too many lines (60). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\recorder\recorder-self-test.ts
+  45:8  warning  Async function 'runRecorderSelfTest' has too many lines (41). Maximum allowed is 25  max-lines-per-function
+  94:1  warning  Async function 'insertDummyStep' has too many lines (29). Maximum allowed is 25      max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\recorder\recorder-step-detail\use-recorder-step-detail.ts
+  24:8  warning  Function 'useRecorderStepDetail' has too many lines (68). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\run-group\use-run-group-controller.ts
+  28:8   warning  Function 'useRunGroupController' has too many lines (53). Maximum allowed is 25  max-lines-per-function
+  44:35  warning  Async arrow function has too many lines (26). Maximum allowed is 25              max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\run-results-summary-aggregate.ts
+  20:8  warning  Function 'aggregate' has too many lines (30). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-library\LibraryTwoPaneBody.tsx
+  37:8  warning  Function 'LibraryTwoPaneBody' has too many lines (78). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-library\use-export-import.ts
+  100:8   warning  Function 'useStepGroupExportImport' has too many lines (99). Maximum allowed is 25  max-lines-per-function
+  113:27  warning  Async arrow function has too many lines (28). Maximum allowed is 25                 max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-library\use-library-panel-state.ts
+   45:8  warning  Function 'useLibraryPanelState' has too many lines (94). Maximum allowed is 25  max-lines-per-function
+  163:8  warning  Function 'useLibraryStatePrune' has too many lines (31). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-library\use-library-selection.ts
+  26:8  warning  Function 'useLibrarySelection' has too many lines (38). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-library\use-view-model.ts
+  59:8  warning  Function 'useStepGroupLibraryViewModel' has too many lines (144). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-list\ListPanelDetailsCard.tsx
+   60:8  warning  Function 'ListPanelDetailsCard' has too many lines (91). Maximum allowed is 50  max-lines-per-function
+  162:1  warning  Function 'StepRowItem' has too many lines (51). Maximum allowed is 50           max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-list\ListPanelDialogs.tsx
+  81:8  warning  Function 'ListPanelDialogs' has too many lines (122). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-list\ListPanelGroupRow.tsx
+  30:8  warning  Function 'ListPanelGroupRow' has too many lines (63). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-list\ListPanelGroupsList.tsx
+  42:8  warning  Function 'ListPanelGroupsList' has too many lines (117). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-list\ListPanelHeader.tsx
+  41:8  warning  Function 'ListPanelHeader' has too many lines (111). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-list\ListPanelIODialogs.tsx
+  42:8  warning  Function 'ListPanelIODialogs' has too many lines (56). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-list\list-panel-mutation-helpers.ts
+  32:8  warning  Function 'useValidationErrors' has too many lines (27). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-list\use-list-panel-selection.ts
+  12:8  warning  Function 'useListPanelSelection' has too many lines (46). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-list\use-list-panel-state.ts
+  24:8  warning  Function 'useListPanelState' has too many lines (64). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-group-list\use-list-panel-view.ts
+  30:8  warning  Function 'useListPanelView' has too many lines (39). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\step-wait\use-step-wait-dialog.ts
+  93:8  warning  Function 'useStepWaitDialog' has too many lines (62). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\token-seeder-diagnostics-cache.ts
+  47:8  warning  Function 'loadDiagnosticsCache' has too many lines (26). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\updater\updater-types.ts
+  88:8  warning  Function 'mapBackendEntry' has too many lines (41). Maximum allowed is 25  max-lines-per-function
+
+D:\work\macro-ahk\src\components\options\webhook-settings\DeliveryLogSection.tsx
+   70:8  warning  Function 'DeliveryLogSection' has too many lines (127). Maximum allowed is 50  max-lines-per-function
+  310:1  warning  Function 'LogEntryRow' has too many lines (51). Maximum allowed is 50          max-lines-per-function
+
+D:\work\macro-ahk\src\components\popup\InjectionCopyButton.tsx
+  199:13  warning  Arrow function has too many lines (65). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\recorder\DriftElementDiffView.tsx
+  120:1  warning  Function 'DriftTimelineStrip' has too many lines (83). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\recorder\FailureDetailsPanel.tsx
+  96:8  warning  Function 'FailureDetailsPanel' has too many lines (55). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\recorder\FailureReportsPanel.tsx
+  26:8  warning  Function 'FailureReportsPanel' has too many lines (56). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\recorder\FormSnapshotTable.tsx
+  37:8  warning  Function 'FormSnapshotTable' has too many lines (72). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\recorder\HotkeyChordCapture.tsx
+  55:8  warning  Function 'HotkeyChordCapture' has too many lines (116). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\recorder\LiveRecordedActionsTree.tsx
+  78:8  warning  Function 'LiveRecordedActionsTree' has too many lines (109). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\recorder\RecorderControlBar.tsx
+  29:8  warning  Function 'RecorderControlBar' has too many lines (72). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\recorder\RecorderLiveTreePanel.tsx
+   78:8  warning  Function 'RecorderLiveTreePanel' has too many lines (133). Maximum allowed is 50  max-lines-per-function
+  266:1  warning  Function 'GroupNode' has too many lines (69). Maximum allowed is 50               max-lines-per-function
+
+D:\work\macro-ahk\src\components\recorder\SelectorComparisonPanel.tsx
+  142:1  warning  Function 'AttemptRow' has too many lines (60). Maximum allowed is 50                max-lines-per-function
+  209:8  warning  Function 'SelectorComparisonPanel' has too many lines (107). Maximum allowed is 50  max-lines-per-function
+
+D:\work\macro-ahk\src\components\recorder\SelectorReplayTracePanel.tsx
+   77:8  warning  Function 'SelectorReplayTracePanel' has too many lines (57). Maximum allowed is 50  max-lines-per-function
+  194:1  warning  Function 'TraceStepRow' has too many lines (62). Maximum allowed is 50              max-lines-per-function
+
+D:\work\macro-ahk\src\components\recorder\SelectorTesterPanel.tsx
+  48:8   warning  Function 'SelectorTesterPanel' has too many lines (95). Maximum allowed is 50        max-lines-per-function
+  48:17  warning  Refactor this function to reduce its Cognitive Complexity from 21 to the 15 allowed  sonarjs/cognitive-complexity
+
+D:\work\macro-ahk\src\hooks\use-draggable.ts
+  132:1  warning  Function 'usePointerDragHandlers' has too many lines (41). Maximum allowed is 40  max-lines-per-function
+
+D:\work\macro-ahk\src\lib\click-trail.ts
+  63:31  warning  Define a constant instead of duplicating this literal 4 times  sonarjs/no-duplicate-string
+
+D:\work\macro-ahk\src\options\sections\ProjectsSection.tsx
+  55:31  warning  Define a constant instead of duplicating this literal 5 times  sonarjs/no-duplicate-string
+
+D:\work\macro-ahk\standalone-scripts\macro-controller\src\ui\panel-sections.ts
+  183:1  warning  Function '_buildToolsCollapsible' has too many lines (61). Maximum allowed is 60  max-lines-per-function
+
+D:\work\macro-ahk\standalone-scripts\macro-controller\src\ui\projects-modal.ts
+  988:1  warning  Function 'exportCsv' has too many lines (61). Maximum allowed is 60  max-lines-per-function
+
+D:\work\macro-ahk\standalone-scripts\macro-controller\src\ui\prompt-library-import-pipeline.ts
+  110:8  warning  Async function 'handleImportFile' has too many lines (68). Maximum allowed is 60  max-lines-per-function
+
+D:\work\macro-ahk\standalone-scripts\macro-controller\src\ui\prompt-library-preview.ts
+  108:8  warning  Async function 'computeAndRenderPreview' has too many lines (61). Maximum allowed is 60  max-lines-per-function
+
+D:\work\macro-ahk\standalone-scripts\macro-controller\src\ui\prompt-library-shell.ts
+  234:8  warning  Function 'buildShell' has too many lines (91). Maximum allowed is 60  max-lines-per-function
+
+D:\work\macro-ahk\standalone-scripts\macro-controller\src\ui\ui-status-renderer.ts
+  47:8  warning  Function 'updateStatus' has too many lines (86). Maximum allowed is 60  max-lines-per-function
+
+D:\work\macro-ahk\tests\e2e\e2e-02-project-crud.spec.ts
+   86:9  error  Expected blank line before this statement  padding-line-between-statements
+  110:5  error  Expected blank line before this statement  padding-line-between-statements
+  196:9  error  Expected blank line before this statement  padding-line-between-statements
+  201:5  error  Expected blank line before this statement  padding-line-between-statements
+  215:3  error  Expected blank line before this statement  padding-line-between-statements
+  274:3  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\e2e-21-xpath-capture.spec.ts
+  151:5  error  Expected blank line before this statement  padding-line-between-statements
+  165:5  error  Expected blank line before this statement  padding-line-between-statements
+  176:5  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\e2e-24-cross-project-sync.spec.ts
+   90:7  error  Expected blank line before this statement  padding-line-between-statements
+  115:7  error  Expected blank line before this statement  padding-line-between-statements
+  143:3  error  Expected blank line before this statement  padding-line-between-statements
+  186:5  error  Expected blank line before this statement  padding-line-between-statements
+  194:5  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\e2e-credit-balance-ktlo.spec.ts
+  41:17  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\e2e-credit-balance-no-fetch-when-inline.spec.ts
+  19:5  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\e2e-credit-balance-timeout.spec.ts
+  47:25  error  Expected blank line before this statement  padding-line-between-statements
+  50:25  error  Expected blank line before this statement  padding-line-between-statements
+  60:17  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\e2e-macro-controller-harness.spec.ts
+  44:17  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\extension-dir.ts
+  33:3  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\fixtures.ts
+   74:3  error  Expected blank line before this statement  padding-line-between-statements
+   95:3  error  Expected blank line before this statement  padding-line-between-statements
+  103:3  error  Expected blank line before this statement  padding-line-between-statements
+  111:3  error  Expected blank line before this statement  padding-line-between-statements
+  142:3  error  Expected blank line before this statement  padding-line-between-statements
+  170:3  error  Expected blank line before this statement  padding-line-between-statements
+  183:1  error  More than 1 blank line not allowed         no-multiple-empty-lines
+
+D:\work\macro-ahk\tests\e2e\fixtures\credit-balance\workspaces.ts
+  135:5  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\global-setup.ts
+  44:5  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\prompt-chip-edit-regression.spec.ts
+  36:5  error  Expected blank line before this statement  padding-line-between-statements
+  86:5  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\prompt-export-import-roundtrip.spec.ts
+   49:5   error  Expected blank line before this statement  padding-line-between-statements
+  113:5   error  Expected blank line before this statement  padding-line-between-statements
+  183:13  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\prompt-history-import-roundtrip.spec.ts
+   45:5   error  Expected blank line before this statement  padding-line-between-statements
+  101:5   error  Expected blank line before this statement  padding-line-between-statements
+  130:17  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\prompt-history-restore-undo.spec.ts
+   45:5   error  Expected blank line before this statement  padding-line-between-statements
+   91:5   error  Expected blank line before this statement  padding-line-between-statements
+  145:17  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\prompt-history-sort-filter.spec.ts
+  38:5  error  Expected blank line before this statement  padding-line-between-statements
+  83:5  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\prompt-rename-regression.spec.ts
+   48:5   error  Expected blank line before this statement  padding-line-between-statements
+  100:5   error  Expected blank line before this statement  padding-line-between-statements
+  114:13  error  Expected blank line before this statement  padding-line-between-statements
+  143:13  error  Expected blank line before this statement  padding-line-between-statements
+  169:13  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\prompt-undo-toast-regression.spec.ts
+   42:5   error  Expected blank line before this statement  padding-line-between-statements
+   92:5   error  Expected blank line before this statement  padding-line-between-statements
+  146:13  error  Expected blank line before this statement  padding-line-between-statements
+  154:13  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\repeat-more-popover.spec.ts
+   33:5  error  Expected blank line before this statement  padding-line-between-statements
+   83:5  error  Expected blank line before this statement  padding-line-between-statements
+   93:5  error  Expected blank line before this statement  padding-line-between-statements
+  100:9  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\reporters\extension-artifacts-reporter.ts
+   93:3  error  Expected blank line before this statement  padding-line-between-statements
+  101:5  error  Expected blank line before this statement  padding-line-between-statements
+  117:3  error  Expected blank line before this statement  padding-line-between-statements
+  136:7  error  Expected blank line before this statement  padding-line-between-statements
+  141:7  error  Expected blank line before this statement  padding-line-between-statements
+  161:3  error  Expected blank line before this statement  padding-line-between-statements
+  176:3  error  Expected blank line before this statement  padding-line-between-statements
+  365:5  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\reporters\slow-step-reporter.ts
+  59:7  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\script-injection.spec.ts
+   85:3   error  Expected blank line before this statement  padding-line-between-statements
+  113:3   error  Expected blank line before this statement  padding-line-between-statements
+  117:7   error  Expected blank line before this statement  padding-line-between-statements
+  141:3   error  Expected blank line before this statement  padding-line-between-statements
+  166:3   error  Expected blank line before this statement  padding-line-between-statements
+  199:41  error  Block must not be padded by blank lines    padded-blocks
+  363:7   error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\seed-plan-next-regression.spec.ts
+   61:5   error  Expected blank line before this statement  padding-line-between-statements
+  111:5   error  Expected blank line before this statement  padding-line-between-statements
+  133:13  error  Expected blank line before this statement  padding-line-between-statements
+  180:1   error  More than 1 blank line not allowed         no-multiple-empty-lines
+  183:13  error  Expected blank line before this statement  padding-line-between-statements
+  218:13  error  Expected blank line before this statement  padding-line-between-statements
+  244:13  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\utils\credit-balance-stub.ts
+   86:13  error  Expected blank line before this statement  padding-line-between-statements
+  102:13  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\utils\esbuild-loader.ts
+  41:5  error  Expected blank line before this statement  padding-line-between-statements
+  65:5  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\tests\e2e\utils\onboarding.ts
+  279:5  error  Expected blank line before this statement  padding-line-between-statements
+  287:3  error  Expected blank line before this statement  padding-line-between-statements
+
+D:\work\macro-ahk\vite.config.extension.ts
+  219:17  error  Expected blank line before this statement  padding-line-between-statements
+  349:17  error  Expected blank line before this statement  padding-line-between-statements
+
+Γ£û 305 problems (205 errors, 100 warnings)
+  182 errors and 0 warnings potentially fixable with the `--fix` option.
+
