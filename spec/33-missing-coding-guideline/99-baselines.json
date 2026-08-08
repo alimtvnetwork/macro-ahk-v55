@@ -30,10 +30,10 @@
     "asUnknownAsDoubleCasts": 71,
     "any_in_prod": 0,
     "strictFlagFallout": {
-      "noUncheckedIndexedAccess": 271,
+      "noUncheckedIndexedAccess": 479,
       "exactOptionalPropertyTypes": 0,
       "noImplicitOverride": 0,
-      "noPropertyAccessFromIndexSignature": 411
+      "noPropertyAccessFromIndexSignature": 683
     }
   },
   "targets": {

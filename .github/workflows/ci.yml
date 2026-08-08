@@ -2241,7 +2241,7 @@ jobs:
   # ════════════════════════════════════════════════════════════
   build-extension:
     name: Build · Chrome Extension
-    needs: [spec-links, markdown-filename-policy, no-nested-template-literals, eslint-run-summary-types, contract-checkers-wired, cicd-index-sync, p0-rules-audit, madge-cycles-floor, strict-flag-fallout, pascalcase-instruction-migration, report-standalone-registry, readme-conventions, typecheck-app, typecheck-standalone, typecheck-clean, lint-standalone, build-sdk, build-xpath, build-payment-banner-hider, build-macro-controller, build-prompts, casing-instruction-json, import-export-e2e]
+    needs: [spec-links, markdown-filename-policy, no-nested-template-literals, eslint-run-summary-types, contract-checkers-wired, cicd-index-sync, p0-rules-audit, madge-cycles-floor, strict-flag-fallout, pascalcase-instruction-migration, report-standalone-registry, readme-conventions, typecheck-app, typecheck-standalone, typecheck-clean, lint-standalone, build-sdk, build-xpath, build-payment-banner-hider, build-macro-controller, build-prompts, casing-instruction-json, import-export-e2e, build-prompt-manager]
     runs-on: ubuntu-latest
     # `actions: read` is required for `gh api .../actions/runs/.../artifacts`
     # used by the "Resolve payment-banner-hider artifact URL + id" step.
@@ -2348,6 +2348,12 @@ jobs:
         with:
           name: lovable-dashboard-dist
           path: standalone-scripts/lovable-dashboard/dist/
+
+      - name: Download Prompt Manager dist
+        uses: actions/download-artifact@v4
+        with:
+          name: prompt-manager-dist
+          path: standalone-scripts/prompt-manager/dist/
 
 
 
@@ -2991,5 +2997,25 @@ jobs:
         with:
           name: lovable-dashboard-dist
           path: standalone-scripts/lovable-dashboard/dist/
+          retention-days: 1
+
+  build-prompt-manager:
+    name: Build · prompt-manager
+    needs: build-sdk
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: pnpm/action-setup@v4
+        with: { version: 9, run_install: false }
+      - name: Install dependencies
+        run: pnpm install --prefer-offline --no-frozen-lockfile
+      - name: Build prompt-manager
+        run: pnpm run build:prompt-manager
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prompt-manager-dist
+          path: standalone-scripts/prompt-manager/dist/
           retention-days: 1
 

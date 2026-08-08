@@ -66,6 +66,7 @@ export const PROJECTS = [
     "lovable-owner-switch",
     "lovable-user-add",
     "lovable-dashboard",
+    "prompt-manager",
 ];
 
 const args = process.argv.slice(2);
