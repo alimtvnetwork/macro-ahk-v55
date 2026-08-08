@@ -1,7 +1,7 @@
 /**
  * PromptRole - discriminator column for the Prompt table (plan-14, step 2).
  *
- * `plan`    - fires from the Plan chip in the Marco Inline strip.
+ * `plan`    - fires from the PlanTierType chip in the Marco Inline strip.
  * `next`    - fires from the Next chip in the Marco Inline strip.
  * `generic` - default for all pre-existing prompts (no role assigned).
  *

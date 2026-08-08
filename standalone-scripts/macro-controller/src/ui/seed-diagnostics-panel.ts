@@ -1,7 +1,7 @@
 /**
  * seed-diagnostics-panel.ts (v4.405.0)
  *
- * Read-only modal that shows the last Plan/Next prompt seeding boot pass:
+ * Read-only modal that shows the last PlanTierType/Next prompt seeding boot pass:
  * every stage that ran, its status, any error reason, and any diagnostic
  * toasts related to seeding/prompt-load that fired since boot. Sourced
  * from `SeedStatusSnapshot` + `readDiagnosticToastTrace()`; never queries
@@ -9,7 +9,7 @@
  */
 
 import { readSeedStatusSnapshot } from '../seed/seed-status-store';
-import type { SeedStageReport, SeedStageStatus } from '../seed/seed-status-store';
+import type { SeedStageReport, SeedStageStatusType } from '../seed/seed-status-store';
 import { readDiagnosticToastTrace } from '../telemetry/diagnostic-toast-telemetry';
 import type { DiagnosticToastEvent } from '../telemetry/diagnostic-toast-telemetry';
 import {
@@ -31,7 +31,7 @@ const RELEVANT_CODES = new Set<string>([
 
 const NOT_ACCEPTED = '(not yet accepted)';
 
-const STATUS_COLOR: Record<SeedStageStatus, string> = {
+const STATUS_COLOR: Record<SeedStageStatusType, string> = {
   ok: '#22c55e',
   failed: '#ef4444',
   skipped: '#9ca3af',
@@ -237,7 +237,7 @@ function buildHeader(): HTMLDivElement {
   const header = document.createElement('div');
   header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;';
   const title = document.createElement('div');
-  title.textContent = 'Plan/Next seeding diagnostics';
+  title.textContent = 'PlanTierType/Next seeding diagnostics';
   title.style.cssText = 'font-size:14px;font-weight:600;';
   const closeBtn = document.createElement('button');
   closeBtn.textContent = 'Close';

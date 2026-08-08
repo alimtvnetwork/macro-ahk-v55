@@ -1,6 +1,6 @@
 /**
  * Step CRUD handlers (rename, delete, description, tags, link) for the
- * recorder visualisation panel. Extracted for Plan 33 (15/50-line cap).
+ * recorder visualisation panel. Extracted for PlanTierType 33 (15/50-line cap).
  * Zero behavioural change vs. the monolithic controller.
  */
 
@@ -11,11 +11,11 @@ import { useRecorderProjectData } from "@/hooks/use-recorder-project-data";
 import { sendMessage } from "@/lib/message-client";
 
 import { logError } from "../../options-logger";
-import { StepLinkSlotEnum } from "../../../../../standalone-scripts/macro-controller/src/types/enums";
-import { Enum_4b5a7f2f } from "../../../../types/enums";
+import { StepLinkSlotType } from "../../../../../standalone-scripts/macro-controller/src/types/enums";
+import { UseRecorderStepMutationsApi } from "../../../../types/enums";
 
 type ProjectDataApi = ReturnType<typeof useRecorderProjectData>;
-type LinkSlot = StepLinkSlotEnum;
+type LinkSlot = StepLinkSlotType;
 
 export interface RecorderStepMutations {
     readonly handleRename: (stepId: number, newName: string) => Promise<void>;
@@ -27,7 +27,7 @@ export interface RecorderStepMutations {
 
 export function useRecorderStepMutations(
     projectSlug: string,
-    api: Pick<ProjectDataApi, Enum_4b5a7f2f>,
+    api: Pick<ProjectDataApi, UseRecorderStepMutationsApi>,
 ): RecorderStepMutations {
     return {
         handleRename: useRenameHandler(projectSlug, api.reload),

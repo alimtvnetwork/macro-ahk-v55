@@ -12,9 +12,9 @@
  * No DOM access. No side effects. Stays in lockstep with `getEffectiveStatus`.
  */
 import type { WorkspaceCredit } from './types';
-import { isCanceledStatus, isPastDueStatus, isExpiredTier, WsTierValue } from './types/subscription-status';
+import { isCanceledStatus, isPastDueStatus, isExpiredTier, WsTierValueType } from './types/subscription-status';
 import type { WorkspaceLifecycleConfig } from './workspace-lifecycle-config';
-import type { WorkspaceStatus, WorkspaceStatusKind } from './workspace-status';
+import type { WorkspaceStatus, WorkspaceStatusKindType } from './workspace-status';
 import { daysBetween, daysUntil, getEffectiveStatus } from './workspace-status';
 
 export interface StatusTraceStep {
@@ -114,7 +114,7 @@ export function explainEffectiveStatus(
   // 3 & 4. tier === EXPIRED (non-past_due)
   const isTierExpired = isExpiredTier(tier);
   const tierExpired = isTierExpired && !isPastDue;
-  const notExpiredTierReason = 'tier is "' + (tier || 'empty') + '" (not ' + WsTierValue.EXPIRED + ')';
+  const notExpiredTierReason = 'tier is "' + (tier || 'empty') + '" (not ' + WsTierValueType.EXPIRED + ')';
   add(
     'tier=EXPIRED + grace exceeded',
     'tier is EXPIRED (non past_due) AND days since change ≥ grace (' + grace + 'd) → fully-expired',
@@ -163,7 +163,7 @@ export function explainEffectiveStatus(
   add(
     'normal',
     'no other rule matched → normal (no pill)',
-    finalStatus.kind === ('normal' as WorkspaceStatusKind),
+    finalStatus.kind === ('normal' as WorkspaceStatusKindType),
     'a higher-priority rule fired',
   );
 

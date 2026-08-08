@@ -1,10 +1,10 @@
-import { ProjectLockReasonEnum } from "../types/enums";
+import { ProjectLockReasonType } from "../types/enums";
 
 /**
  * project-lock — shared types (Issue 124 §2.4).
  */
 
-export type ProjectLockReason = ProjectLockReasonEnum;
+export type ProjectLockReason = ProjectLockReasonType;
 
 export interface ProjectLockEvent {
     readonly WorkspaceId: string;

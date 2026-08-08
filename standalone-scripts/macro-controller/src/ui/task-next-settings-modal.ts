@@ -1,11 +1,11 @@
 /**
  * MacroLoop Controller - Task Next Settings Modal
- * Plan-17 step 12: Extracted from task-next-ui.ts to keep the file below the
+ * PlanTierType-17 step 12: Extracted from task-next-ui.ts to keep the file below the
  * 500 LOC cap. Behavior is unchanged; imports and DOM structure preserved.
  */
 
 import { cPanelBg, cPanelFg, cPrimary, cPrimaryLight } from '../shared-state';
-import { Label } from '../types';
+import { LabelType } from '../types';
 import { showPasteToast } from './prompt-utils';
 import { taskNextState, saveTaskNextSettings, type TaskNextDeps } from './task-next-ui';
 
@@ -76,7 +76,7 @@ export function openTaskNextSettingsModal(deps: TaskNextDeps) {
     taskNextState.settings.retryCount = parseInt(inputs.retryCount.value) || 3;
     taskNextState.settings.retryDelayMs = parseInt(inputs.retryDelayMs.value) || 1000;
     taskNextState.settings.buttonXPath = inputs.buttonXPath.value || taskNextState.settings.buttonXPath;
-    taskNextState.settings.promptSlug = inputs.promptSlug.value || Label.NextTasks;
+    taskNextState.settings.promptSlug = inputs.promptSlug.value || LabelType.NextTasks;
     taskNextState.settings.requireStartForMultiRun = true;
     saveTaskNextSettings(deps);
     overlay.remove();

@@ -1,6 +1,7 @@
+import { DbResult } from '../db/db-result';
 import { ServiceResult } from '../utils/result-wrapper';
 /**
- * prompt-history-panel.ts - Restore-from-revision UI for Plan/Next prompts.
+ * prompt-history-panel.ts - Restore-from-revision UI for PlanTierType/Next prompts.
  *
  * Root problem this solves: v4.173.0 shipped the `PromptRevision` table and
  * `recordPromptRevision` snapshot on every `upsertPrompt`, but nothing in the
@@ -26,7 +27,7 @@ import { showToast } from '../toast';
 import { showUndoToast } from './prompt-utils';
 import { writePendingRestoreUndo, clearPendingRestoreUndo } from './pending-restore-undo';
 import { PLAN_NEXT_SEED_ROWS } from '../seed/plan-next-prompts';
-import { VariantEnum3, HistorySortKeyEnum, HistoryImportedFilterEnum } from "../types/enums";
+import { ToastVariantType, HistorySortKeyType, HistoryImportedFilterType } from "../types/enums";
 import { SortOrder } from "../../../../src/types/enums";
 
 export interface OpenPromptHistoryInput {
@@ -43,7 +44,7 @@ export interface HistoryPanelDeps {
     getDefault?: typeof getDefaultPromptForRole;
     upsert?: typeof upsertPrompt;
     deletePrompt?: typeof deletePromptById;
-    toast?: (message: string, kind?: VariantEnum3) => void;
+    toast?: (message: string, kind?: ToastVariantType) => void;
     /**
      * Injectable undo-toast (v4.185.0). Defaults to `showUndoToast` from
      * `prompt-utils`. Split out from `toast` so unit tests can verify the
@@ -54,7 +55,7 @@ export interface HistoryPanelDeps {
 }
 
 /**
- * Plan 26 step 10 (was v4.185.0 / v4.197.0 dedupe): route History-panel
+ * PlanTierType 26 step 10 (was v4.185.0 / v4.197.0 dedupe): route History-panel
  * failures through the coded-diagnostic registry with a per-code dedupe +
  * hourly rate cap. `logHistoryDiagnostic` calls `logDiagnosticFromCode`
  * exactly once per emission window; `reportHistoryFailure` layers a toast
@@ -137,7 +138,7 @@ function reportHistoryFailure(
     code: string,
     context: DiagnosticContext,
     userSentence: string,
-    opts: { cause?: unknown; toast?: (m: string, k?: VariantEnum3) => void } = {},
+    opts: { cause?: unknown; toast?: (m: string, k?: ToastVariantType) => void } = {},
 ): void {
     logHistoryDiagnostic(code, context, opts.cause);
     (opts.toast ?? showToast)(userSentence + '  [code=' + code + ']', 'error');
@@ -249,7 +250,7 @@ export async function openPromptHistoryPanel(
     const getDef = deps.getDefault ?? getDefaultPromptForRole;
     const toast = deps.toast ?? showToast;
 
-    const roleLabel = input.role === 'plan' ? 'Plan' : input.role === 'next' ? 'Next' : String(input.role);
+    const roleLabel = input.role === 'plan' ? 'PlanTierType' : input.role === 'next' ? 'Next' : String(input.role);
     const slug = await resolveSlug(input, getDef, listRole);
     if (slug === null) {
         toast(
@@ -261,7 +262,7 @@ export async function openPromptHistoryPanel(
     }
 
     const revResult = await listRev(slug);
-    if (revResult.isFail || !revResult.value) {
+    if (!revResult.ok || !revResult.value) {
         const reason = revResult.error ?? 'unknown';
         reportHistoryFailure(
             'HISTORY_LIST_E001',
@@ -284,10 +285,10 @@ async function resolveSlug(
 ): Promise<string | null> {
     if (typeof input.slug === 'string' && input.slug.length > 0) return input.slug;
     const def = await getDef(input.role);
-    if (def.isSuccess && def.value) return def.value.Slug;
+    if (def.ok && def.value) return def.value.Slug;
     // Fallback 1: any existing row for this role (default flag may have been lost).
     const listed = await listRole(input.role);
-    if (listed.isSuccess && Array.isArray(listed.value) && listed.value.length > 0) {
+    if (listed.ok && Array.isArray(listed.value) && listed.value.length > 0) {
         const first = listed.value[0];
         if (first && typeof first.Slug === 'string' && first.Slug.length > 0) return first.Slug;
     }
@@ -301,7 +302,7 @@ async function resolveSlug(
             role: input.role,
             fallbackChain: 'getDefault->listByRole->seed',
         },
-        def.isSuccess ? undefined : def.error,
+        def.ok ? undefined : def.error,
     );
     return null;
 }
@@ -453,7 +454,7 @@ function buildSubtitleText(total: number, visible: number): string {
 }
 
 /** Sortable columns exposed in the history toolbar (v4.192.0). */
-export type HistorySortKey = HistorySortKeyEnum;
+export type HistorySortKey = HistorySortKeyType;
 export type HistorySortDir = SortOrder;
 /**
  * Imported-provenance filter cycle:
@@ -461,7 +462,7 @@ export type HistorySortDir = SortOrder;
  * - `only`: show only rows written by `insertImportedRevisions` (PromptId=0).
  * - `exclude`: hide those rows entirely.
  */
-export type HistoryImportedFilter = HistoryImportedFilterEnum;
+export type HistoryImportedFilter = HistoryImportedFilterType;
 
 interface HistoryViewState {
     sortKey: HistorySortKey;
@@ -829,7 +830,7 @@ async function handleRestoreUpdate(
             replaceKey: preImage.replaceKey,
             replaceValues: preImage.replaceValues,
         });
-        if (revert.isFail) {
+        if (!revert.ok) {
             const reason = revert.error ?? 'unknown';
             reportHistoryFailure(
                 'HISTORY_UNDO_E001',
@@ -865,7 +866,7 @@ function handleRestoreInsert(
     undoToast(successMsg, async () => {
         clearPendingRestoreUndo();
         const del = await deleteFn(newId);
-        if (del.isFail) {
+        if (!del.ok) {
             const reason = del.error ?? 'unknown';
             reportHistoryFailure(
                 'HISTORY_UNDO_E001',
@@ -901,7 +902,7 @@ async function handleRestore(
     if (!proceed) return;
 
     const listResult = await listByRole(role);
-    if (listResult.isFail || !listResult.value) {
+    if (!listResult.ok || !listResult.value) {
         const reason = listResult.error ?? 'unknown';
         reportHistoryFailure(
             'HISTORY_RESTORE_E001',
@@ -924,7 +925,7 @@ async function handleRestore(
         replaceKey: rev.ReplaceKey,
         replaceValues,
     });
-    if (upsertResult.isFail) {
+    if (!upsertResult.ok) {
         const reason = upsertResult.error ?? 'unknown';
         reportHistoryFailure(
             'HISTORY_RESTORE_E001',
@@ -1065,26 +1066,26 @@ function validateImportEnvelope(
     expectedRole: PromptRole,
 ): { ok: true; envelope: Record<string, unknown>; revisions: unknown[] } | { ok: false; error: string } {
     if (!parsed || typeof parsed !== 'object') {
-        return { ok: false, error: 'Payload is not an object' };
+        return new DbResult(false, undefined, 'Payload is not an object');
     }
     const p = parsed as Record<string, unknown>;
     if (p['schemaVersion'] !== 1) {
-        return { ok: false, error: 'Unsupported schemaVersion (expected 1, got ' + String(p['schemaVersion']) + ')' };
+        return new DbResult(false, undefined, 'Unsupported schemaVersion (expected 1, got ' + String(p['schemaVersion']) + ')');
     }
     const pSlug = p['slug'];
     if (typeof pSlug !== 'string' || pSlug.trim() === '') {
-        return { ok: false, error: 'Missing or invalid slug' };
+        return new DbResult(false, undefined, 'Missing or invalid slug');
     }
     if (pSlug !== expectedSlug) {
-        return { ok: false, error: 'Slug mismatch: file is for "' + pSlug + '", panel is open on "' + expectedSlug + '"' };
+        return new DbResult(false, undefined, 'Slug mismatch: file is for "' + pSlug + '", panel is open on "' + expectedSlug + '"');
     }
     const pRole = p['role'];
     if (pRole !== expectedRole) {
-        return { ok: false, error: 'Role mismatch: file is "' + String(pRole) + '", panel is "' + expectedRole + '"' };
+        return new DbResult(false, undefined, 'Role mismatch: file is "' + String(pRole) + '", panel is "' + expectedRole + '"');
     }
     const pRevisions = p['revisions'];
     if (!Array.isArray(pRevisions)) {
-        return { ok: false, error: 'revisions is not an array' };
+        return new DbResult(false, undefined, 'revisions is not an array');
     }
     return { ok: true, envelope: p, revisions: pRevisions };
 }
@@ -1096,17 +1097,17 @@ function coerceImportRow(
     expectedRole: PromptRole,
 ): { ok: true; row: ImportedRevisionInput } | { ok: false; error: string } {
     if (!rawItem || typeof rawItem !== 'object') {
-        return { ok: false, error: 'revisions[' + String(index) + '] is not an object' };
+        return new DbResult(false, undefined, 'revisions[' + String(index) + '] is not an object');
     }
     const raw = rawItem as Record<string, unknown>;
     const rawBody = raw['Body'];
     const rawName = raw['Name'];
     const rawSlug = raw['Slug'];
     if (typeof rawBody !== 'string' || typeof rawName !== 'string' || typeof rawSlug !== 'string') {
-        return { ok: false, error: 'revisions[' + String(index) + '] missing required fields' };
+        return new DbResult(false, undefined, 'revisions[' + String(index) + '] missing required fields');
     }
     if (rawSlug !== expectedSlug) {
-        return { ok: false, error: 'revisions[' + String(index) + '] slug mismatch' };
+        return new DbResult(false, undefined, 'revisions[' + String(index) + '] slug mismatch');
     }
     const rawRole = raw['Role'];
     const rawReplaceKey = raw['ReplaceKey'];
@@ -1137,14 +1138,14 @@ export function parseRevisionImportPayload(
     try {
         parsed = JSON.parse(jsonText);
     } catch (err) {
-        return { ok: false, error: 'Invalid JSON: ' + (err instanceof Error ? err.message : String(err)) };
+        return new DbResult(false, undefined, 'Invalid JSON: ' + (err instanceof Error ? err.message : String(err)));
     }
     const envelope = validateImportEnvelope(parsed, expectedSlug, expectedRole);
-    if (envelope.isFail) return { ok: false, error: envelope.error };
+    if (!envelope.ok) return new DbResult(false, undefined, envelope.error);
     const rows: ImportedRevisionInput[] = [];
     for (let i = 0; i < envelope.revisions.length; i += 1) {
         const coerced = coerceImportRow(envelope.revisions[i], i, expectedSlug, expectedRole);
-        if (coerced.isFail) return { ok: false, error: coerced.error };
+        if (!coerced.ok) return new DbResult(false, undefined, coerced.error);
         rows.push(coerced.row);
     }
     return { ok: true, rows, sourceSlug: expectedSlug, sourceRole: expectedRole };
@@ -1194,15 +1195,15 @@ async function writeImportedRevisions(
     toast: NonNullable<HistoryPanelDeps['toast']>,
 ): Promise<void> {
     const snapshotResult = await getMaxRevisionId();
-    const sinceId = snapshotResult.isSuccess && typeof snapshotResult.value === 'number' ? snapshotResult.value : 0;
-    if (snapshotResult.isFail) {
+    const sinceId = snapshotResult.ok && typeof snapshotResult.value === 'number' ? snapshotResult.value : 0;
+    if (!snapshotResult.ok) {
         logHistoryDiagnostic(
             'HISTORY_INTERNAL_E001',
             { stage: 'max-rev-id', reason: 'getMaxRevisionId failed before import: ' + (snapshotResult.error ?? '?') },
         );
     }
     const write = await insertImportedRevisions(slug, rows);
-    if (write.isFail) {
+    if (!write.ok) {
         const reason = write.error ?? '?';
         reportHistoryFailure(
             'HISTORY_IMPORT_E002',
@@ -1215,10 +1216,10 @@ async function writeImportedRevisions(
     const count = write.value ?? 0;
     const successMsg = '✓ Imported ' + String(count) + ' revision(s). Reopen History to see them.';
     const undoToast = deps.undoToast ?? showUndoToast;
-    if (snapshotResult.isSuccess && count > 0) {
+    if (snapshotResult.ok && count > 0) {
         undoToast(successMsg, async () => {
             const del = await deleteImportedRevisionsAfter(slug, sinceId);
-            if (del.isFail) {
+            if (!del.ok) {
                 const reason = del.error ?? 'unknown';
                 reportHistoryFailure(
                     'HISTORY_UNDO_E001',
@@ -1251,7 +1252,7 @@ async function handleImportFile(
     try {
         const text = await file.text();
         const parsed = parseRevisionImportPayload(text, slug, role);
-        if (parsed.isFail || !parsed.rows) {
+        if (!parsed.ok || !parsed.rows) {
             const reason = parsed.error ?? 'unknown';
             captureLastImportFailure('parse', 'parse rejected: ' + reason);
             reportHistoryFailure(

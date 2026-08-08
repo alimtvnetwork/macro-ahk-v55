@@ -1,6 +1,6 @@
 /**
  * controller-state.ts — Pure value + type module for the MacroController
- * singleton. Extracted from `core/MacroController.ts` per Plan-17 step 4
+ * singleton. Extracted from `core/MacroController.ts` per PlanTierType-17 step 4
  * (SS-03) so that manager implementations and API-namespace consumers can
  * import sub-manager contracts without pulling in the whole
  * MacroController class file (which transitively imports shared-state,

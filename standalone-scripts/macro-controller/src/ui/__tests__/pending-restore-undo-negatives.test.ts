@@ -1,5 +1,6 @@
+import { DbResult } from '../../db/db-result';
 /**
- * Plan 22 gap #6: Undo path negative branches for `pending-restore-undo.ts`.
+ * PlanTierType 22 gap #6: Undo path negative branches for `pending-restore-undo.ts`.
  *
  * Complements `pending-restore-undo.test.ts` (happy-path coverage) by pinning
  * the failure and shape-guard branches that a silent regression could break:
@@ -24,6 +25,9 @@ vi.mock('../../error-utils', () => ({
     toErrorMessage: (e: unknown) => String(e),
 }));
 vi.mock('../../db/prompt-db', () => ({
+    DbResult,
+    DbResult,
+    DbResult,
     upsertPrompt: vi.fn(),
     deletePromptById: vi.fn(),
 }));
@@ -45,7 +49,7 @@ function makeUpdateRecord(overrides?: Partial<PendingRestoreUndo>): PendingResto
     return {
         payload: {
             kind: 'update', restoredId: 7, restoredBody: 'NEW', restoredReplaceKey: 'n',
-            slug: 'plan', name: 'Plan', role: 'plan',
+            slug: 'plan', name: 'PlanTierType', role: 'plan',
             preBody: 'OLD', preReplaceKey: 'n', preReplaceValues: ['1', '2'],
         },
         message: 'Restored', undoLabel: 'Undo restore',
@@ -65,9 +69,9 @@ beforeEach(() => {
 });
 afterEach(() => { vi.useRealTimers(); });
 
-describe('pending-restore-undo: negative branches (Plan 22 gap #6)', () => {
+describe('pending-restore-undo: negative branches (PlanTierType 22 gap #6)', () => {
     it('U1: reverseUpdate failure surfaces error toast and clears record before reverse call', async () => {
-        asMock(upsertPrompt).mockResolvedValue({ ok: false, error: 'DRIFT' });
+        asMock(upsertPrompt).mockResolvedValue(new DbResult(false, undefined, 'DRIFT'));
         writePendingRestoreUndo(makeUpdateRecord());
         hydratePendingRestoreUndo();
         // Record must be cleared *synchronously* on click, before the async reverse resolves,
@@ -83,7 +87,7 @@ describe('pending-restore-undo: negative branches (Plan 22 gap #6)', () => {
     });
 
     it('U2: reverseInsert failure surfaces error toast', async () => {
-        asMock(deletePromptById).mockResolvedValue({ ok: false, error: 'ROW_LOCKED' });
+        asMock(deletePromptById).mockResolvedValue(new DbResult(false, undefined, 'ROW_LOCKED'));
         const now = Date.now();
         writePendingRestoreUndo({
             payload: { kind: 'insert', newId: 42 },

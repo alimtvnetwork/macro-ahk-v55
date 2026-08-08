@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * Prompt table column migration.
  *
@@ -32,7 +33,7 @@ vi.mock('../../error-utils', async () => {
 });
 vi.mock('../../logging', () => ({ log: vi.fn() }));
 vi.mock('../../seed/seed-plan-next', () => ({
-    seedPlanNextPrompts: vi.fn(async () => ({ ok: true })),
+    seedPlanNextPrompts: vi.fn(async () => (new DbResult(true, undefined))),
 }));
 
 import { initMacroDb, migratePromptReplaceColumns } from '../macro-db';

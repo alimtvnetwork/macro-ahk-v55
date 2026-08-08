@@ -6,7 +6,7 @@
  * the active step is a Wait), plus a step counter so the user can correlate
  * with the step list below.
  *
- * Extracted from `KeywordEventsPanel.tsx` (Plan 25 step 11). The old inline
+ * Extracted from `KeywordEventsPanel.tsx` (PlanTierType 25 step 11). The old inline
  * function was 74 lines; splitting the two `preview.Kind` branches into
  * `KeyPreviewBody` + `WaitPreviewBody` keeps every function under the
  * `max-lines-per-function` ceiling.

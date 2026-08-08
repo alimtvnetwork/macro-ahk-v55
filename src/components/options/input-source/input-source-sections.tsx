@@ -9,7 +9,7 @@ import { Plus, Send, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
     Select,
@@ -53,9 +53,9 @@ function EndpointSection({ api }: SectionProps) {
     return (
         <section className="space-y-3 rounded-md border p-3">
             <div className="flex items-center justify-between">
-                <Label htmlFor="src-enabled" className="text-sm font-medium">
+                <LabelType htmlFor="src-enabled" className="text-sm font-medium">
                     Fetch input data at run start
-                </Label>
+                </LabelType>
                 <Switch
                     id="src-enabled"
                     checked={draft.Enabled}
@@ -63,7 +63,7 @@ function EndpointSection({ api }: SectionProps) {
                 />
             </div>
             <div className="space-y-1.5">
-                <Label htmlFor="src-url" className="text-xs text-muted-foreground">Endpoint URL</Label>
+                <LabelType htmlFor="src-url" className="text-xs text-muted-foreground">Endpoint URL</LabelType>
                 <Input
                     id="src-url"
                     type="url"
@@ -88,7 +88,7 @@ interface FieldProps {
 function MethodField({ draft, setDraft }: FieldProps) {
     return (
         <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Method</Label>
+            <LabelType className="text-xs text-muted-foreground">Method</LabelType>
             <Select
                 value={draft.Method}
                 onValueChange={(v) => setDraft((p) => ({ ...p, Method: v as InputSourceMethod }))}
@@ -106,7 +106,7 @@ function MethodField({ draft, setDraft }: FieldProps) {
 function TimeoutField({ draft, setDraft }: FieldProps) {
     return (
         <div className="space-y-1.5">
-            <Label htmlFor="src-timeout" className="text-xs text-muted-foreground">Timeout (ms)</Label>
+            <LabelType htmlFor="src-timeout" className="text-xs text-muted-foreground">Timeout (ms)</LabelType>
             <Input
                 id="src-timeout"
                 type="number"
@@ -128,7 +128,7 @@ function HeadersSection({ api }: SectionProps) {
     return (
         <section className="space-y-2 rounded-md border p-3">
             <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">Custom headers</Label>
+                <LabelType className="text-sm font-medium">Custom headers</LabelType>
                 <Button size="sm" variant="outline" onClick={addHeader}>
                     <Plus className="mr-1 h-3.5 w-3.5" />
                     Add header
@@ -181,7 +181,7 @@ function BodySection({ api }: SectionProps) {
     const { draft, setDraft } = api;
     return (
         <section className="space-y-2 rounded-md border p-3">
-            <Label htmlFor="src-body" className="text-sm font-medium">Request body (JSON)</Label>
+            <LabelType htmlFor="src-body" className="text-sm font-medium">Request body (JSON)</LabelType>
             <Textarea
                 id="src-body"
                 rows={4}
@@ -201,7 +201,7 @@ function FailurePolicySection({ api }: SectionProps) {
     const { draft, setDraft } = api;
     return (
         <section className="space-y-2 rounded-md border p-3">
-            <Label className="text-sm font-medium">If the endpoint fails</Label>
+            <LabelType className="text-sm font-medium">If the endpoint fails</LabelType>
             <Select
                 value={draft.OnFailure}
                 onValueChange={(v) => setDraft((p) => ({
@@ -226,7 +226,7 @@ function TestFetchSection({ api }: SectionProps) {
     return (
         <section className="space-y-2 rounded-md border p-3">
             <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">Test fetch</Label>
+                <LabelType className="text-sm font-medium">Test fetch</LabelType>
                 <Button size="sm" variant="outline" onClick={handleTest} disabled={busy}>
                     <Send className="mr-1 h-3.5 w-3.5" />
                     {busy ? "Fetching…" : "Send test fetch"}

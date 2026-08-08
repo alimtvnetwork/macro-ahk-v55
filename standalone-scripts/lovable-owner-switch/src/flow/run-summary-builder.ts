@@ -21,7 +21,7 @@ import type {
     RunSummary, RunSummaryAction, RunSummaryCounts, RunSummaryRow,
 } from "../../../lovable-common/src/report/run-summary-types";
 import { RowOutcomeCode } from "./row-types";
-import { LogSeverity } from "./log-sink";
+import { LogSeverityType } from "./log-sink";
 import type { PromotedOwnerRecord, RowExecutionResult } from "./row-types";
 import type { LogEntry } from "./log-sink";
 
@@ -85,7 +85,7 @@ const countRows = (rows: ReadonlyArray<RunSummaryRow>): RunSummaryCounts => ({
 
 const noticesFrom = (entries: ReadonlyArray<LogEntry>): ReadonlyArray<string> => {
     return entries
-        .filter((e) => e.Severity === LogSeverity.Warn || e.Severity === LogSeverity.Error)
+        .filter((e) => e.Severity === LogSeverityType.Warn || e.Severity === LogSeverityType.Error)
         .map((e) => `[${e.Severity}] [Row=${e.RowIndex ?? "-"}] [${e.Phase}] ${e.Message}`);
 };
 

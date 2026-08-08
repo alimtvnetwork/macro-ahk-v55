@@ -40,7 +40,7 @@ import {
     type MutationDeps,
     type StepEditorSubmitInput,
 } from "./mutation-handlers";
-import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { DirectionType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 type StepLibrary = ReturnType<typeof useStepLibrary>;
 
@@ -79,11 +79,11 @@ function bindHandlers(deps: MutationDeps) {
         handleCreate: () => doCreate(deps),
         handleRename: () => doRename(deps),
         handleDelete: () => doDelete(deps),
-        handleMove: (id: number, direction: DirectionEnum) => doMove(deps, id, direction),
+        handleMove: (id: number, direction: DirectionType) => doMove(deps, id, direction),
         handleArchiveToggle: (group: StepGroupRow) => doArchiveToggle(deps, group),
         handleStepEditorSubmit: (input: StepEditorSubmitInput) =>
             doStepEditorSubmit(deps, input),
-        handleStepMove: (stepId: number, direction: DirectionEnum) =>
+        handleStepMove: (stepId: number, direction: DirectionType) =>
             doStepMove(deps, stepId, direction),
         handleStepDeleteConfirm: () => doStepDeleteConfirm(deps),
         handleDropReorder: (parentId: number | null, sourceId: number, targetId: number) =>

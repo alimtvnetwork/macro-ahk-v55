@@ -26,7 +26,7 @@ import {
     __writeCreditBalanceUpdateMemoryCacheForTests,
     clearCreditBalanceUpdateMemoryCache,
 } from '../credit-balance-update/credit-balance-cache';
-import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
+import { CreditFetchOutcomeType } from '../credit-balance-update/credit-fetch-outcome';
 import { parseCreditBalance } from '../credit-balance-update/credit-balance-parser';
 
 function ws(partial: Partial<WorkspaceCredit>): WorkspaceCredit {
@@ -53,7 +53,7 @@ beforeEach(() => { clearCreditBalanceUpdateMemoryCache(); });
 describe('CreditSummary — wire fields available_balance / cloud_remaining / ai_remaining', () => {
     it('buildCachedSummary surfaces the three fields from the cached balance', () => {
         __writeCreditBalanceUpdateMemoryCacheForTests('ws_cached', {
-            outcome: CreditFetchOutcome.ApiHit,
+            outcome: CreditFetchOutcomeType.ApiHit,
             fetchedAt: Date.now(),
             sourceUrl: 'test',
             errorDetail: null,
@@ -77,7 +77,7 @@ describe('CreditSummary — wire fields available_balance / cloud_remaining / ai
 
     it('buildCachedSummary rounds and floors at 0', () => {
         __writeCreditBalanceUpdateMemoryCacheForTests('ws_round', {
-            outcome: CreditFetchOutcome.ApiHit,
+            outcome: CreditFetchOutcomeType.ApiHit,
             fetchedAt: Date.now(),
             sourceUrl: 'test',
             errorDetail: null,
@@ -108,7 +108,7 @@ describe('CreditSummary — wire fields available_balance / cloud_remaining / ai
 
     it('zeroSummary (Timeout) reports 0 for all three fields', () => {
         __writeCreditBalanceUpdateMemoryCacheForTests('ws_timeout', {
-            outcome: CreditFetchOutcome.Timeout,
+            outcome: CreditFetchOutcomeType.Timeout,
             fetchedAt: Date.now(),
             sourceUrl: 'test',
             errorDetail: 'timeout',
@@ -141,7 +141,7 @@ describe('CreditSummary — wire fields available_balance / cloud_remaining / ai
             grant_type_balances: [],
         });
         __writeCreditBalanceUpdateMemoryCacheForTests('ws_roundtrip', {
-            outcome: CreditFetchOutcome.ApiHit,
+            outcome: CreditFetchOutcomeType.ApiHit,
             fetchedAt: Date.now(),
             sourceUrl: 'test',
             errorDetail: null,

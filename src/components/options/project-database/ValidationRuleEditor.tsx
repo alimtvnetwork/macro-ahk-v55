@@ -16,16 +16,16 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Check, X, FlaskConical } from "lucide-react";
-import { Type1 } from "../../../types/enums";
+import { ColumnValidationType } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-export type ValidationStrategy = Type1;
+export type ValidationStrategy = ColumnValidationType;
 
 export interface StringValidation {
   startsWith?: string;
@@ -233,7 +233,7 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
       {strategy === "string" && (
         <div className="grid grid-cols-2 gap-1.5">
           <div className="space-y-0.5">
-            <Label className="text-[9px] text-muted-foreground">Starts with</Label>
+            <LabelType className="text-[9px] text-muted-foreground">Starts with</LabelType>
             <Input
               value={rule.string?.startsWith ?? ""}
               onChange={(e) => updateString({ startsWith: e.target.value || undefined })}
@@ -242,7 +242,7 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
             />
           </div>
           <div className="space-y-0.5">
-            <Label className="text-[9px] text-muted-foreground">Ends with</Label>
+            <LabelType className="text-[9px] text-muted-foreground">Ends with</LabelType>
             <Input
               value={rule.string?.endsWith ?? ""}
               onChange={(e) => updateString({ endsWith: e.target.value || undefined })}
@@ -251,7 +251,7 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
             />
           </div>
           <div className="space-y-0.5">
-            <Label className="text-[9px] text-muted-foreground">Contains</Label>
+            <LabelType className="text-[9px] text-muted-foreground">Contains</LabelType>
             <Input
               value={rule.string?.contains ?? ""}
               onChange={(e) => updateString({ contains: e.target.value || undefined })}
@@ -261,7 +261,7 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
           </div>
           <div className="flex gap-1.5">
             <div className="space-y-0.5 flex-1">
-              <Label className="text-[9px] text-muted-foreground">Min len</Label>
+              <LabelType className="text-[9px] text-muted-foreground">Min len</LabelType>
               <Input
                 type="number"
                 value={rule.string?.minLength ?? ""}
@@ -271,7 +271,7 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
               />
             </div>
             <div className="space-y-0.5 flex-1">
-              <Label className="text-[9px] text-muted-foreground">Max len</Label>
+              <LabelType className="text-[9px] text-muted-foreground">Max len</LabelType>
               <Input
                 type="number"
                 value={rule.string?.maxLength ?? ""}
@@ -287,7 +287,7 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
       {/* Date validation fields */}
       {strategy === "date" && (
         <div className="space-y-0.5">
-          <Label className="text-[9px] text-muted-foreground">Date format</Label>
+          <LabelType className="text-[9px] text-muted-foreground">Date format</LabelType>
           <Select
             value={rule.date?.format ?? "YYYY-MM-DD"}
             onValueChange={(v) => updateDate({ format: v })}
@@ -308,7 +308,7 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
       {strategy === "regex" && (
         <div className="space-y-1.5">
           <div className="space-y-0.5">
-            <Label className="text-[9px] text-muted-foreground">Pattern</Label>
+            <LabelType className="text-[9px] text-muted-foreground">Pattern</LabelType>
             <Input
               value={rule.regex?.pattern ?? ""}
               onChange={(e) => updateRegex({ pattern: e.target.value })}
@@ -318,7 +318,7 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
             />
           </div>
           <div className="space-y-0.5">
-            <Label className="text-[9px] text-muted-foreground">Flags</Label>
+            <LabelType className="text-[9px] text-muted-foreground">Flags</LabelType>
             <Input
               value={rule.regex?.flags ?? ""}
               onChange={(e) => updateRegex({ flags: e.target.value })}
@@ -333,9 +333,9 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
       {/* Enum validation fields */}
       {strategy === "enum" && (
         <div className="space-y-1.5">
-          <Label className="text-[9px] text-muted-foreground">
+          <LabelType className="text-[9px] text-muted-foreground">
             Allowed values (one per line)
-          </Label>
+          </LabelType>
           <textarea
             value={(rule.enum?.values ?? []).join("\n")}
             onChange={(e) => updateEnum(e.target.value.split("\n").filter(Boolean))}
@@ -366,7 +366,7 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
         <div className="space-y-1.5">
           <div className="grid grid-cols-2 gap-1.5">
             <div className="space-y-0.5">
-              <Label className="text-[9px] text-muted-foreground">Min</Label>
+              <LabelType className="text-[9px] text-muted-foreground">Min</LabelType>
               <Input
                 type="number"
                 value={rule.number?.min ?? ""}
@@ -377,7 +377,7 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
               />
             </div>
             <div className="space-y-0.5">
-              <Label className="text-[9px] text-muted-foreground">Max</Label>
+              <LabelType className="text-[9px] text-muted-foreground">Max</LabelType>
               <Input
                 type="number"
                 value={rule.number?.max ?? ""}
@@ -397,9 +397,9 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
               disabled={readOnly}
               className="h-3 w-3 rounded border-border"
             />
-            <Label htmlFor="integer-only" className="text-[9px] text-muted-foreground cursor-pointer">
+            <LabelType htmlFor="integer-only" className="text-[9px] text-muted-foreground cursor-pointer">
               Integer only (no decimals)
-            </Label>
+            </LabelType>
           </div>
         </div>
       )}
@@ -407,7 +407,7 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
       {/* Live tester */}
       {showTester && (
         <div className="space-y-1 pt-1 border-t border-border">
-          <Label className="text-[9px] text-muted-foreground">Test value</Label>
+          <LabelType className="text-[9px] text-muted-foreground">Test value</LabelType>
           <div className="flex gap-1.5 items-center">
             <Input
               value={testValue}

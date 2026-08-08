@@ -36,10 +36,10 @@ function ws(id: string): WorkspaceCredit {
 }
 
 beforeEach(async () => {
-    const { CreditFetchOutcome } = await import('../credit-balance-update/credit-fetch-outcome');
+    const { CreditFetchOutcomeType } = await import('../credit-balance-update/credit-fetch-outcome');
     fetchSpy.mockReset();
     fetchSpy.mockImplementation(async () => ({
-        outcome: CreditFetchOutcome.ApiHit,
+        outcome: CreditFetchOutcomeType.ApiHit,
         balance: {
             totalRemaining: 50, totalGranted: 100,
             dailyRemaining: 5, dailyLimit: 10,

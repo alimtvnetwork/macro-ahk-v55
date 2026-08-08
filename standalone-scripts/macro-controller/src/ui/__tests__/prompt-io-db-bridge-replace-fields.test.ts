@@ -1,5 +1,6 @@
+import { DbResult } from '../../db/db-result';
 /**
- * Plan-15 Task 16: IO round-trip coverage for ReplaceKey / ReplaceValues.
+ * PlanTierType-15 Task 16: IO round-trip coverage for ReplaceKey / ReplaceValues.
  *
  * Locks the plan-15 task-13 wiring:
  *  - `collectDbEntriesForExport` populates `replaceKey` + `replaceValues`
@@ -16,6 +17,9 @@ vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 const listMock = vi.hoisted(() => vi.fn());
 const upsertMock = vi.hoisted(() => vi.fn());
 vi.mock('../../db/prompt-db', () => ({
+    DbResult,
+    DbResult,
+    DbResult,
     listPromptsByRole: listMock,
     upsertPrompt: upsertMock,
 }));
@@ -29,17 +33,17 @@ import type { CachedPromptEntry } from '../prompt-cache';
 beforeEach(() => {
     listMock.mockReset();
     upsertMock.mockReset();
-    upsertMock.mockImplementation(async () => ({ ok: true, value: 1 }));
+    upsertMock.mockImplementation(async () => (new DbResult(true, 1)));
 });
 
 describe('collectDbEntriesForExport: ReplaceKey/ReplaceValues round-trip', () => {
     it('carries replaceKey and cloned replaceValues from PromptRow into CachedPromptEntry', async () => {
         listMock.mockImplementation(async (role: string) => {
-            if (role !== 'plan') return { ok: true, value: [] };
+            if (role !== 'plan') return new DbResult(true, []);
             return {
                 ok: true,
                 value: [{
-                    Id: 1, Slug: 'plan-default', Name: 'Plan default',
+                    Id: 1, Slug: 'plan-default', Name: 'PlanTierType default',
                     Body: 'P {{count}}', Role: 'plan', IsDefault: 1,
                     ReplaceKey: 'count',
                     ReplaceValues: ['3', '7', '11'],
@@ -59,7 +63,7 @@ describe('collectDbEntriesForExport: ReplaceKey/ReplaceValues round-trip', () =>
 
     it('leaves replaceValues undefined when the row column is missing/non-array', async () => {
         listMock.mockImplementation(async (role: string) => {
-            if (role !== 'next') return { ok: true, value: [] };
+            if (role !== 'next') return new DbResult(true, []);
             return {
                 ok: true,
                 value: [{
@@ -81,11 +85,11 @@ describe('collectDbEntriesForExport: ReplaceKey/ReplaceValues round-trip', () =>
 describe('commitDbEntries: forwards replaceKey/replaceValues/previousReplaceKey', () => {
     it('passes previousReplaceKey from the existing row so a rename passes the drift guard', async () => {
         listMock.mockImplementation(async (role: string) => {
-            if (role !== 'plan') return { ok: true, value: [] };
+            if (role !== 'plan') return new DbResult(true, []);
             return {
                 ok: true,
                 value: [{
-                    Id: 1, Slug: 'plan-default', Name: 'Plan default',
+                    Id: 1, Slug: 'plan-default', Name: 'PlanTierType default',
                     Body: 'P {{n}}', Role: 'plan', IsDefault: 0,
                     ReplaceKey: 'n',
                     ReplaceValues: ['1', '2', '3', '5', '8'],
@@ -94,7 +98,7 @@ describe('commitDbEntries: forwards replaceKey/replaceValues/previousReplaceKey'
             };
         });
         const entries: CachedPromptEntry[] = [{
-            name: 'Plan default', text: 'P {{count}}', slug: 'plan-default', role: 'plan',
+            name: 'PlanTierType default', text: 'P {{count}}', slug: 'plan-default', role: 'plan',
             replaceKey: 'count', replaceValues: ['3', '7', '11'],
         }];
         const result = await commitDbEntries(entries);
@@ -116,7 +120,7 @@ describe('commitDbEntries: forwards replaceKey/replaceValues/previousReplaceKey'
     });
 
     it('omits previousReplaceKey when inserting a brand-new slug', async () => {
-        listMock.mockImplementation(async () => ({ ok: true, value: [] }));
+        listMock.mockImplementation(async () => (new DbResult(true, [])));
         const entries: CachedPromptEntry[] = [{
             name: 'Custom', text: 'C {{n}}', slug: 'plan-custom', role: 'plan',
             replaceKey: 'n', replaceValues: ['2', '4', '6'],

@@ -1,6 +1,6 @@
-import type { CreditFetchOutcome } from './credit-fetch-outcome';
+import type { CreditFetchOutcomeType } from './credit-fetch-outcome';
 import type { GrantType } from './grant-type';
-import type { Plan } from './plan';
+import type { PlanTierType } from './plan';
 
 export interface Membership {
     readonly workspaceId: string;
@@ -16,7 +16,7 @@ export interface WorkspaceInfo {
     readonly id: string;
     readonly name: string;
     readonly ownerId: string;
-    readonly plan: Plan;
+    readonly plan: PlanTierType;
     readonly defaultProjectVisibility: string;
     readonly billingPeriodCreditsUsed: number;
     readonly billingPeriodCreditsLimit: number;
@@ -67,7 +67,7 @@ export interface CreditBalance {
 }
 
 export interface CreditFetchResult {
-    readonly outcome: CreditFetchOutcome;
+    readonly outcome: CreditFetchOutcomeType;
     readonly balance: CreditBalance | null;
     readonly fetchedAt: number;
     readonly sourceUrl: string;
@@ -79,7 +79,7 @@ export interface CreditFailureLogPayload {
     readonly ReasonDetail: string;
     readonly SourceUrl: string;
     readonly WorkspaceId: string;
-    readonly Plan: Plan;
+    readonly PlanTierType: PlanTierType;
     readonly BearerPrefix: string | null;
     readonly Status: number | null;
     readonly BodyPreview: string | null;

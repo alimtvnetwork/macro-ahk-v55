@@ -9,7 +9,7 @@
  */
 
 import {
-  LoopDirection,
+  LoopDirectionType,
   type ControllerState,
   type LoopCreditState,
   type ActivityLogEntry,
@@ -36,11 +36,11 @@ export function setActivityLogVisible(v: boolean): void { activityLogState.visib
 /** @deprecated Use getActivityLogVisible(). Kept for backward compat. */
 export { activityLogState };
 export const activityLogLines: ActivityLogEntry[] = [];
-import { ApiPath, DomId } from './types';
+import { ApiPathType, DomIdType } from './types';
 import { MAX_ACTIVITY_LINES, CREDIT_CACHE_TTL_S } from './constants';
 export { CREDIT_CACHE_TTL_S };
 export const maxActivityLines = MAX_ACTIVITY_LINES;
-export const CREDIT_API_BASE = ApiPath.CreditApiBase;
+export const CREDIT_API_BASE = ApiPathType.CreditApiBase;
 
 export const loopCreditState: LoopCreditState = {
   lastCheckedAt: null,
@@ -108,7 +108,7 @@ export function setLastSessionBridgeSource(v: string): void { sessionBridgeState
 // ============================================
 // Toast constants (legacy — now delegated to SDK marco.notify)
 // ============================================
-export const toastContainerId = DomId.ToastContainer;
+export const toastContainerId = DomIdType.ToastContainer;
 
 // ============================================
 // Controller State (Step 2i: moved from macro-looping.ts IIFE)
@@ -127,7 +127,7 @@ import { RETRY_MAX_RETRIES as _retryMaxRetries, RETRY_BACKOFF_MS as _retryBackof
 
 export const state: ControllerState = {
   running: false,
-  direction: LoopDirection.Down,
+  direction: LoopDirectionType.Down,
   cycleCount: 0,
   countdown: 0,
   isIdle: false,

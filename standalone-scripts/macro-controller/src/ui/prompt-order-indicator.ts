@@ -13,9 +13,9 @@ import {
   getEffectivePromptOrder,
   getPromptOrderSource,
 } from './prompt-drag-order';
-import { ViolationKindEnum } from "../types/enums";
+import { ViolationKindType } from "../types/enums";
 
-export type ViolationKind = ViolationKindEnum;
+export type ViolationKind = ViolationKindType;
 
 export interface OrderRow {
   slug: string;

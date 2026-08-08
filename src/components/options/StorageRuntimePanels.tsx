@@ -22,9 +22,9 @@ import {
   Plus,
   Eraser,
 } from "lucide-react";
-import { Enum_162dadd6 } from "../../types/enums";
+import { SemanticSemantic162dadd } from "../../types/enums";
 
-type RuntimeStorageSurface = Enum_162dadd6;
+type RuntimeStorageSurface = SemanticSemantic162dadd;
 
 interface SessionEntry {
   key: string;

@@ -1,6 +1,6 @@
 import { ServiceResult } from '../../utils/result-wrapper';
 /**
- * Plan-15 Task 17: `upsertPrompt` rename acceptance via `previousReplaceKey`.
+ * PlanTierType-15 Task 17: `upsertPrompt` rename acceptance via `previousReplaceKey`.
  *
  * Locks the contract that the DB layer forwards `{ oldKey, newKey }` into
  * `assertParamTokensUnchanged`, so:
@@ -34,7 +34,7 @@ beforeEach(() => {
 describe('upsertPrompt: token rename acceptance', () => {
     it('accepts `{{n}}` -> `{{count}}` when previousReplaceKey=n and replaceKey=count', async () => {
         const res = await upsertPrompt({
-            id: 1, slug: 'plan-default', name: 'Plan default',
+            id: 1, slug: 'plan-default', name: 'PlanTierType default',
             body: 'Give me the next {{count}} steps',
             role: 'plan',
             previousBody: 'Give me the next {{n}} steps',
@@ -42,7 +42,7 @@ describe('upsertPrompt: token rename acceptance', () => {
             replaceKey: 'count',
             replaceValues: ['3', '5', '8'],
         });
-        expect(res.isSuccess).toBe(true);
+        expect(res.ok).toBe(true);
         expect(res.error).toBeUndefined();
         // The write actually ran (SCHEMA call issued).
         const schemaCalls = sendMock.mock.calls.filter(([, p]) => (p as { method: string }).method === 'SCHEMA');
@@ -54,12 +54,12 @@ describe('upsertPrompt: token rename acceptance', () => {
 
     it('rejects a plan edit that drops `{{n}}` entirely (no rename supplied)', async () => {
         const res = await upsertPrompt({
-            id: 1, slug: 'plan-default', name: 'Plan default',
+            id: 1, slug: 'plan-default', name: 'PlanTierType default',
             body: 'Give me the next steps',
             role: 'plan',
             previousBody: 'Give me the next {{n}} steps',
         });
-        expect(res.isSuccess).toBe(false);
+        expect(res.ok).toBe(false);
         expect(res.error).toContain('ParamTokenMismatch');
         expect(res.error).toContain('removed');
         // No SCHEMA call should have fired.
@@ -69,14 +69,14 @@ describe('upsertPrompt: token rename acceptance', () => {
 
     it('rejects a rename that changes token count (e.g. two {{n}} -> one {{count}})', async () => {
         const res = await upsertPrompt({
-            id: 1, slug: 'plan-default', name: 'Plan default',
+            id: 1, slug: 'plan-default', name: 'PlanTierType default',
             body: 'Next {{count}} tasks',
             role: 'plan',
             previousBody: 'Next {{n}} tasks in {{n}} minutes',
             previousReplaceKey: 'n',
             replaceKey: 'count',
         });
-        expect(res.isSuccess).toBe(false);
+        expect(res.ok).toBe(false);
         expect(res.error).toContain('ParamTokenMismatch');
     });
 
@@ -87,15 +87,15 @@ describe('upsertPrompt: token rename acceptance', () => {
             role: 'generic',
             previousBody: 'previously had {{n}} tokens',
         });
-        expect(res.isSuccess).toBe(true);
+        expect(res.ok).toBe(true);
     });
 
     it('skips the token guard when previousBody is missing (fresh insert path)', async () => {
         const res = await upsertPrompt({
-            slug: 'plan-new', name: 'Plan new',
+            slug: 'plan-new', name: 'PlanTierType new',
             body: 'Body with {{n}}',
             role: 'plan',
         });
-        expect(res.isSuccess).toBe(true);
+        expect(res.ok).toBe(true);
     });
 });

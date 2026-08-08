@@ -1,5 +1,6 @@
+import { DbResult } from '../../db/db-result';
 /**
- * Plan 26 · Step 8 · prompt-editor DiagnosticError migration.
+ * PlanTierType 26 · Step 8 · prompt-editor DiagnosticError migration.
  *
  * Verifies that every migrated error path in `ui/prompt-editor.ts` now emits a
  * coded DiagnosticError with a fully-populated context object, and that the
@@ -22,13 +23,16 @@ const mocks = vi.hoisted(() => ({
   upsertPrompt: vi.fn(),
   setDefaultPromptForRole: vi.fn(),
   emitPromptSeedEvent: vi.fn(),
-  seedPlanNextPrompts: vi.fn(async () => ({ ok: true })),
+  seedPlanNextPrompts: vi.fn(async () => (new DbResult(true, undefined))),
 }));
 
 vi.mock('../../toast', () => ({ showToast: mocks.showToast }));
 vi.mock('../prompt-loader', () => buildPromptLoaderMock({ getRevalidateContext: mocks.getRevalidateContext }));
 vi.mock('../prompt-injection', () => ({ openPromptCreationModal: mocks.openPromptCreationModal }));
 vi.mock('../../db/prompt-db', () => ({
+    DbResult,
+    DbResult,
+    DbResult,
   listPromptsByRole: mocks.listPromptsByRole,
   getDefaultPromptForRole: mocks.getDefaultPromptForRole,
   upsertPrompt: mocks.upsertPrompt,
@@ -41,7 +45,7 @@ vi.mock('../../seed/seed-plan-next', () => ({
 }));
 vi.mock('../../seed/plan-next-prompts', () => ({
   PLAN_NEXT_SEED_ROWS: [
-    { role: 'plan', slug: 'plan-default', name: 'Plan', body: 'Do {{n}} steps', isDefault: true },
+    { role: 'plan', slug: 'plan-default', name: 'PlanTierType', body: 'Do {{n}} steps', isDefault: true },
     { role: 'next', slug: 'next-default', name: 'Next', body: 'Next {{n}} steps', isDefault: true },
   ],
 }));
@@ -55,14 +59,14 @@ const getDefaultPromptForRoleMock = mocks.getDefaultPromptForRole;
 // Now import the SUT.
 import { openPromptEditor, openDefaultPromptEditor } from '../prompt-editor';
 
-describe('prompt-editor DiagnosticError migration (Plan 26 · step 8)', () => {
+describe('prompt-editor DiagnosticError migration (PlanTierType 26 · step 8)', () => {
   let errSpy: ReturnType<typeof vi.spyOn>;
   let logSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     for (const m of Object.values(mocks)) m.mockReset();
     // Restore default seed behavior consumed by openDefaultPromptEditor preflight.
-    mocks.seedPlanNextPrompts.mockResolvedValue({ ok: true });
+    mocks.seedPlanNextPrompts.mockResolvedValue(new DbResult(true, undefined));
     errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
   });
@@ -94,7 +98,7 @@ describe('prompt-editor DiagnosticError migration (Plan 26 · step 8)', () => {
   it('PROMPT_EDIT_E006: emits code + role when no seed row and no DB default exist', async () => {
     getRevalidateContextMock.mockReturnValue({ context: {}, taskNextDeps: {} });
     // openDefaultPromptEditor for 'generic' has no seed row registered.
-    getDefaultPromptForRoleMock.mockResolvedValue({ ok: true, value: null });
+    getDefaultPromptForRoleMock.mockResolvedValue(new DbResult(true, null));
 
     await openDefaultPromptEditor('generic' as never);
 

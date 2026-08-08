@@ -92,16 +92,16 @@ async function openPanel(page: Page): Promise<void> {
         // Deterministic mixed fixture: 2 upsert (native), 1 restore
         // (native), 1 import (imported sentinel PromptId=0).
         const rows: RevRow[] = [
-            { Id: 11, PromptId: 7, Slug: slug, Name: 'Plan default', Body: 'earliest',
+            { Id: 11, PromptId: 7, Slug: slug, Name: 'PlanTierType default', Body: 'earliest',
               Role: role, ReplaceKey: 'n', ReplaceValues: '["1"]',
               CreatedAt: 1_700_000_100_000, Reason: 'upsert' },
-            { Id: 12, PromptId: 7, Slug: slug, Name: 'Plan default', Body: 'middle-a',
+            { Id: 12, PromptId: 7, Slug: slug, Name: 'PlanTierType default', Body: 'middle-a',
               Role: role, ReplaceKey: 'n', ReplaceValues: '["1"]',
               CreatedAt: 1_700_000_200_000, Reason: 'restore' },
-            { Id: 13, PromptId: 7, Slug: slug, Name: 'Plan default', Body: 'middle-b',
+            { Id: 13, PromptId: 7, Slug: slug, Name: 'PlanTierType default', Body: 'middle-b',
               Role: role, ReplaceKey: 'n', ReplaceValues: '["1"]',
               CreatedAt: 1_700_000_300_000, Reason: 'upsert' },
-            { Id: 14, PromptId: 0, Slug: slug, Name: 'Plan default', Body: 'imported-latest',
+            { Id: 14, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'imported-latest',
               Role: role, ReplaceKey: 'n', ReplaceValues: '["1"]',
               CreatedAt: 1_700_000_400_000, Reason: 'import' },
         ];

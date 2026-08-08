@@ -53,7 +53,7 @@ export async function loadCreditMap(): Promise<CreditMap> {
         triggerRefresh();
         return readMap();
     } catch (caught) {
-        logError("CreditSource.load", caught);
+        logError("CreditSourceType.load", caught);
         return new Map();
     }
 }

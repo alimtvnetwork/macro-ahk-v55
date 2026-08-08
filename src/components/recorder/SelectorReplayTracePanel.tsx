@@ -35,7 +35,7 @@ import {
     type TraceStepStatus,
 } from "./selector-replay-trace";
 import { FormSnapshotBadge } from "./FormSnapshotTable";
-import { OutcomeEnum1 } from "../../types/enums";
+import { ReplayTraceSummaryOutcome } from "../../types/enums";
 
 interface SelectorReplayTracePanelProps {
     readonly report: FailureReport;
@@ -151,7 +151,7 @@ function SummaryBar({
     readonly evaluated: number;
     readonly skipped: number;
     readonly stoppedAt: number | null;
-    readonly outcome: OutcomeEnum1;
+    readonly outcome: ReplayTraceSummaryOutcome;
     readonly snapshot: FailureReport["FormSnapshot"];
 }) {
     const tone =

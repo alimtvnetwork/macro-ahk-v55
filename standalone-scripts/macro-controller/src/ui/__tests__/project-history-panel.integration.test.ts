@@ -1,7 +1,7 @@
 /**
  * Integration test — `openProjectHistoryPanel` end-to-end.
  *
- * Plan 13, Step 10 (verification harness). Unlike the unit test in
+ * PlanTierType 13, Step 10 (verification harness). Unlike the unit test in
  * `project-history-panel.test.ts` (which injects `deps`), this test
  * uses the panel's DEFAULT dependencies so the real
  * `chat-submit-history` service runs. The storage substrate

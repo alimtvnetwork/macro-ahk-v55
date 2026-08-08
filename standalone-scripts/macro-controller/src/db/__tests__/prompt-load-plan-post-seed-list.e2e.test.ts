@@ -4,7 +4,7 @@ import { ServiceResult } from '../../utils/result-wrapper';
  *
  * End-to-end coverage for the reported PROMPT_LOAD_E001 regression: after
  * the rawSql v2 contract change (backend rejects `method: 'QUERY'` and
- * restricts `method: 'SCHEMA'` to `ALTER TABLE`), loading Plan prompts at
+ * restricts `method: 'SCHEMA'` to `ALTER TABLE`), loading PlanTierType prompts at
  * `stage=post-seed-list` with `seedAttempted=true` for role=plan must still
  * succeed via the adaptive sql-bridge fallback.
  *
@@ -38,7 +38,7 @@ beforeEach(() => {
 
 function fakePlanRow(): Record<string, unknown> {
     return {
-        Id: 1, Slug: 'plan-default', Name: 'Plan', Body: 'Plan {{n}} steps',
+        Id: 1, Slug: 'plan-default', Name: 'PlanTierType', Body: 'PlanTierType {{n}} steps',
         Role: 'plan', IsDefault: 1, ReplaceKey: 'n', ReplaceValues: JSON.stringify(['1']),
         CreatedAt: 1, UpdatedAt: 1,
     };
@@ -57,7 +57,7 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
         });
 
         const res = await listPromptsByRole('plan');
-        expect(res.isSuccess).toBe(true);
+        expect(res.ok).toBe(true);
         expect(res.value?.[0]?.Role).toBe('plan');
 
         // Bridge should have recorded the QUERY rejection and cached SELECT.
@@ -70,7 +70,7 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
     it('surfaces PROMPT_LOAD_E001-shaped reason when every SELECT candidate is rejected', async () => {
         sendMock.mockResolvedValue({ isOk: false, errorMessage: 'Unsupported method: QUERY' });
         const res = await listPromptsByRole('plan');
-        expect(res.isSuccess).toBe(false);
+        expect(res.ok).toBe(false);
         expect(isSqlBridgeContractError(res.error) || /no accepted method/.test(res.error ?? ''))
             .toBe(true);
     });
@@ -80,7 +80,7 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
         sendMock.mockImplementationOnce(() =>
             Promise.resolve({ isOk: true, rows: [fakePlanRow()] }));
         const first = await listPromptsByRole('plan');
-        expect(first.isSuccess).toBe(true);
+        expect(first.ok).toBe(true);
 
         // Backend then rolls forward and rejects the cached method with a
         // contract-shape error. The bridge should invalidate the cache and
@@ -96,7 +96,7 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
         });
 
         const second = await listPromptsByRole('plan');
-        expect(second.isSuccess).toBe(true);
+        expect(second.ok).toBe(true);
     });
 
     it('manual resetSqlBridgeCache clears winning state for one bucket', () => {

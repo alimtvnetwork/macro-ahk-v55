@@ -5,7 +5,7 @@
  * and the batch rename/delete outcome handlers for `StepGroupListPanel`.
  *
  * Extracted so the parent panel's render function stays under the
- * ESLint `max-lines-per-function` threshold (Plan 24, SS-04b Phase 5).
+ * ESLint `max-lines-per-function` threshold (PlanTierType 24, SS-04b Phase 5).
  * All behaviour is preserved verbatim.
  */
 

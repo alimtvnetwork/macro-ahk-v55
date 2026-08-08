@@ -14,7 +14,7 @@
  *   - hard cap of `MAX_ROWS` data rows to prevent runaway sessions
  */
 
-import { OwnerSwitchCsvColumn } from "./csv-column";
+import { OwnerSwitchCsvColumnType } from "./csv-column";
 import { splitCsv } from "./csv-splitter";
 import { resolveHeader } from "./csv-header";
 import { readOptional, readRequired } from "./csv-cell";
@@ -28,20 +28,20 @@ const stripBom = (text: string): string => (text.startsWith(BOM) ? text.slice(BO
 
 const buildRow = (
     raw: ReadonlyArray<string>,
-    indices: ReadonlyMap<OwnerSwitchCsvColumn, number>,
+    indices: ReadonlyMap<OwnerSwitchCsvColumnType, number>,
     rowIndex: number,
 ): OwnerSwitchCsvRow => ({
     RowIndex: rowIndex,
-    LoginEmail: readRequired(raw, indices, OwnerSwitchCsvColumn.LoginEmail),
-    Password: readOptional(raw, indices, OwnerSwitchCsvColumn.Password),
-    OwnerEmail1: readRequired(raw, indices, OwnerSwitchCsvColumn.OwnerEmail1),
-    OwnerEmail2: readOptional(raw, indices, OwnerSwitchCsvColumn.OwnerEmail2),
-    Notes: readOptional(raw, indices, OwnerSwitchCsvColumn.Notes),
+    LoginEmail: readRequired(raw, indices, OwnerSwitchCsvColumnType.LoginEmail),
+    Password: readOptional(raw, indices, OwnerSwitchCsvColumnType.Password),
+    OwnerEmail1: readRequired(raw, indices, OwnerSwitchCsvColumnType.OwnerEmail1),
+    OwnerEmail2: readOptional(raw, indices, OwnerSwitchCsvColumnType.OwnerEmail2),
+    Notes: readOptional(raw, indices, OwnerSwitchCsvColumnType.Notes),
 });
 
 const tryBuildRow = (
     raw: ReadonlyArray<string>,
-    indices: ReadonlyMap<OwnerSwitchCsvColumn, number>,
+    indices: ReadonlyMap<OwnerSwitchCsvColumnType, number>,
     rowIndex: number,
     errors: CsvParseError[],
 ): OwnerSwitchCsvRow | null => {

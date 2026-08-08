@@ -5,7 +5,7 @@ import { ServiceResult } from '../utils/result-wrapper';
  * Handles parsing, validation, and the upsert-merge strategy for the
  * prompts import/export flow. As of plan 12 step 5, JSON exports emit
  * the shared `PromptsBundleV1` envelope from `prompt-bundle-types.ts`
- * so JSON, ZIP, and SQLite exporters stay in sync. Plan 12 step 6 wires
+ * so JSON, ZIP, and SQLite exporters stay in sync. PlanTierType 12 step 6 wires
  * `parsePromptsText()` to accept both the new envelope and legacy bare
  * arrays produced by pre-v4.35 builds.
  */
@@ -17,7 +17,7 @@ import { VERSION } from '../shared-state';
 import { buildPromptsBundle, validatePromptsBundle, type BundleRevisionRow, type PromptsBundleV1 } from './prompt-bundle-types';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
 import { listPromptRevisions, insertImportedRevisions } from '../db/prompt-revision-db';
-import { PhaseEnum3 } from "../types/enums";
+import { ImportProgressPhaseType } from "../types/enums";
 
 /**
  * Options for `exportPromptsToJson`.
@@ -124,7 +124,7 @@ async function collectRevisionsForEntries(entries: CachedPromptEntry[]): Promise
     if (!slug || seenSlugs.has(slug)) continue;
     seenSlugs.add(slug);
     const res = await listPromptRevisions(slug);
-    if (res.isFail || !res.value) {
+    if (!res.ok || !res.value) {
       log('[PromptIO] revision fetch failed for slug=' + slug + ': ' + (res.error ?? 'unknown'), 'warn');
       continue;
     }
@@ -262,7 +262,7 @@ export function validatePromptEntryDetailed(
 
 
 /**
- * Plan-14 step 13: merge JSON-cache entries with DB rows so exports carry
+ * PlanTierType-14 step 13: merge JSON-cache entries with DB rows so exports carry
  * user-edited plan/next/generic prompts. DB rows win on slug collisions.
  * Kept as a small helper so ZIP / SQLite exporters can share it.
  */
@@ -320,7 +320,7 @@ export function mergePrompts(
 /**
  * Parses a JSON string and validates its contents.
  *
- * Plan 12 step 6: accepts three shapes and returns a normalized
+ * PlanTierType 12 step 6: accepts three shapes and returns a normalized
  * `CachedPromptEntry[]` for the merger:
  *   1. `PromptsBundleV1` envelope (preferred, produced by v4.35+).
  *   2. Bare `PromptEntry[]` array (legacy pre-v4.35 export).
@@ -436,7 +436,7 @@ export function parsePromptsText(jsonText: string): ParsedPromptsResult {
  *   the import.
  */
 export interface ImportProgress {
-  phase: PhaseEnum3;
+  phase: ImportProgressPhaseType;
   entriesCommitted: number;
   totalEntries: number;
   insertedRevisions: number;
@@ -512,7 +512,7 @@ async function commitRevisions(
   let groupsDone = 0;
   for (const [slug, rows] of groups) {
     const res = await insertImportedRevisions(slug, rows);
-    if (res.isSuccess) inserted += rows.length;
+    if (res.ok) inserted += rows.length;
     else results.errors.push(`revisions for slug=${slug}: ${res.error ?? 'unknown'}`);
     groupsDone++;
     emit({ phase: 'revisions', entriesCommitted, totalEntries, insertedRevisions: inserted, totalRevisions, groupsDone, totalGroups, slug });
@@ -609,7 +609,7 @@ async function collectExistingRoleSlugs(dbEntries: readonly CachedPromptEntry[])
   const existing = new Set<string>();
   for (const role of rolesTouched) {
     const res = await listPromptsByRole(role);
-    if (res.isSuccess && res.value) {
+    if (res.ok && res.value) {
       for (const r of res.value) if (r.Slug) existing.add(role + ':' + r.Slug);
     }
   }

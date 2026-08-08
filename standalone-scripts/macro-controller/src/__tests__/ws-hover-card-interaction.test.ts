@@ -18,7 +18,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { attachWorkspaceHoverCard, hideWorkspaceHoverCard } from '../ws-hover-card';
 import type { WorkspaceCredit } from '../types';
-import { Type6 } from "../types/enums";
+import { MouseEventType } from "../types/enums";
 
 declare global {
   interface Window { __MARCO_CONFIG__?: Record<string, unknown>; }
@@ -81,7 +81,7 @@ function setupList(itemRect: { left: number; top: number; width: number; height:
 
 /** Fire a delegated MouseEvent with explicit target + relatedTarget. */
 function fireMouse(
-  type: Type6,
+  type: MouseEventType,
   list: HTMLElement,
   target: HTMLElement,
   relatedTarget: HTMLElement | null,

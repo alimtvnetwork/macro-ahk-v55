@@ -5,7 +5,7 @@
  * component function stays under the ESLint `max-lines-per-function`
  * threshold. Behaviour is preserved verbatim.
  *
- * v4.213.0 (Plan-24 SS-04b Phase 9b): factored selection and view
+ * v4.213.0 (PlanTierType-24 SS-04b Phase 9b): factored selection and view
  * derivations into `use-list-panel-selection.ts` and
  * `use-list-panel-view.ts` so this hook body sits under 50 lines.
  */

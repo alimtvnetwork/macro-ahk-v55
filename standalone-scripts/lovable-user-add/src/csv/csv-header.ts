@@ -6,19 +6,19 @@
  * match (PascalCase) — the UI surfaces the exact required names.
  */
 
-import { UserAddCsvColumn, REQUIRED_COLUMNS, ALL_COLUMNS } from "./csv-column";
+import { UserAddCsvColumnType, REQUIRED_COLUMNS, ALL_COLUMNS } from "./csv-column";
 import type { CsvParseError, CsvParseWarning } from "./csv-types";
 
 export interface HeaderResolution {
-    Indices: ReadonlyMap<UserAddCsvColumn, number>;
+    Indices: ReadonlyMap<UserAddCsvColumnType, number>;
     Errors: ReadonlyArray<CsvParseError>;
     Warnings: ReadonlyArray<CsvParseWarning>;
 }
 
 const HEADER_ROW_INDEX = 0;
 
-const buildIndexMap = (header: ReadonlyArray<string>): Map<UserAddCsvColumn, number> => {
-    const out = new Map<UserAddCsvColumn, number>();
+const buildIndexMap = (header: ReadonlyArray<string>): Map<UserAddCsvColumnType, number> => {
+    const out = new Map<UserAddCsvColumnType, number>();
 
     for (const column of ALL_COLUMNS) {
         const idx = header.findIndex((h) => h.trim() === column);
@@ -32,7 +32,7 @@ const buildIndexMap = (header: ReadonlyArray<string>): Map<UserAddCsvColumn, num
 };
 
 const collectMissingErrors = (
-    indices: ReadonlyMap<UserAddCsvColumn, number>,
+    indices: ReadonlyMap<UserAddCsvColumnType, number>,
 ): CsvParseError[] => {
     const errors: CsvParseError[] = [];
 

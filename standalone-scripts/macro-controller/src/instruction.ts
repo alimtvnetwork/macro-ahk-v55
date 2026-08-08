@@ -10,16 +10,16 @@
  */
 
 import type { ProjectInstruction } from "../../types/instruction/project-instruction";
-import { InjectionWorld } from "../../types/instruction/enums/injection-world";
-import { InjectionRunAt } from "../../types/instruction/enums/injection-run-at";
-import { MatchType } from "../../types/instruction/enums/match-type";
-import { AssetInjectTarget } from "../../types/instruction/enums/asset-inject-target";
+import { InjectionWorldType } from "../../types/instruction/enums/injection-world";
+import { InjectionRunAtType } from "../../types/instruction/enums/injection-run-at";
+import { MatchRuleType } from "../../types/instruction/enums/match-type";
+import { AssetInjectTargetType } from "../../types/instruction/enums/asset-inject-target";
 import { VERSION } from "../../shared-version";
-import { LogLevelEnum } from "./types/enums";
+import { LogLevelType } from "./types/enums";
 
 type MacroControllerSettings = {
     IsolateScripts: boolean;
-    LogLevel: LogLevelEnum;
+    LogLevel: LogLevelType;
     RetryOnNavigate: boolean;
 };
 
@@ -29,7 +29,7 @@ const instruction: ProjectInstruction<MacroControllerSettings> = {
     DisplayName: "Macro Controller",
     Version: VERSION,
     Description: "Macro Controller for workspace and credit management",
-    World: InjectionWorld.Main,
+    World: InjectionWorldType.Main,
     Dependencies: ["marco-sdk", "xpath"],
     LoadOrder: 2,
     Seed: {
@@ -37,12 +37,12 @@ const instruction: ProjectInstruction<MacroControllerSettings> = {
         SeedOnInstall: true,
         IsRemovable: false,
         AutoInject: true,
-        RunAt: InjectionRunAt.DocumentIdle,
+        RunAt: InjectionRunAtType.DocumentIdle,
         CookieBinding: "lovable-session-id.id",
         TargetUrls: [
-            { Pattern: "https://lovable.dev/projects/*", MatchType: MatchType.Glob },
-            { Pattern: "https://*.lovable.app/*", MatchType: MatchType.Glob },
-            { Pattern: "https://*.lovableproject.com/*", MatchType: MatchType.Glob },
+            { Pattern: "https://lovable.dev/projects/*", MatchRuleType: MatchRuleType.Glob },
+            { Pattern: "https://*.lovable.app/*", MatchRuleType: MatchRuleType.Glob },
+            { Pattern: "https://*.lovableproject.com/*", MatchRuleType: MatchRuleType.Glob },
         ],
         Cookies: [
             { CookieName: "lovable-session-id.id", Url: "https://lovable.dev", Role: "session", Description: "Session ID — primary bearer token" },
@@ -60,7 +60,7 @@ const instruction: ProjectInstruction<MacroControllerSettings> = {
     },
     Assets: {
         Css: [
-            { File: "macro-looping.css", Inject: AssetInjectTarget.Head },
+            { File: "macro-looping.css", Inject: AssetInjectTargetType.Head },
         ],
         Configs: [
             { File: "macro-looping-config.json", Key: "config", InjectAs: "__MARCO_CONFIG__" },

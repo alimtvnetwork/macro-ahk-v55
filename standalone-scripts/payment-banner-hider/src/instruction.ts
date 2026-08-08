@@ -8,10 +8,10 @@
  */
 
 import type { ProjectInstruction } from "../../types/instruction/project-instruction";
-import { InjectionWorld } from "../../types/instruction/enums/injection-world";
-import { InjectionRunAt } from "../../types/instruction/enums/injection-run-at";
-import { MatchType } from "../../types/instruction/enums/match-type";
-import { AssetInjectTarget } from "../../types/instruction/enums/asset-inject-target";
+import { InjectionWorldType } from "../../types/instruction/enums/injection-world";
+import { InjectionRunAtType } from "../../types/instruction/enums/injection-run-at";
+import { MatchRuleType } from "../../types/instruction/enums/match-type";
+import { AssetInjectTargetType } from "../../types/instruction/enums/asset-inject-target";
 import type { EmptySettings } from "../../types/instruction/seed/empty-settings";
 import { VERSION } from "../../shared-version";
 
@@ -21,7 +21,7 @@ const instruction: ProjectInstruction<EmptySettings> = {
     DisplayName: "Payment Banner Hider",
     Version: VERSION,
     Description: "Auto-hides the Lovable 'Payment issue detected.' sticky banner with a smooth CSS3 fade.",
-    World: InjectionWorld.Main,
+    World: InjectionWorldType.Main,
     IsGlobal: true,
     Dependencies: [],
     LoadOrder: 2,
@@ -30,16 +30,16 @@ const instruction: ProjectInstruction<EmptySettings> = {
         SeedOnInstall: true,
         IsRemovable: true,
         AutoInject: true,
-        RunAt: InjectionRunAt.DocumentIdle,
+        RunAt: InjectionRunAtType.DocumentIdle,
         TargetUrls: [
-            { Pattern: "https://lovable.dev/*", MatchType: MatchType.Glob },
+            { Pattern: "https://lovable.dev/*", MatchRuleType: MatchRuleType.Glob },
         ],
         Cookies: [],
         Settings: {},
     },
     Assets: {
         Css: [
-            { File: "payment-banner-hider.css", Inject: AssetInjectTarget.Head },
+            { File: "payment-banner-hider.css", Inject: AssetInjectTargetType.Head },
         ],
         Configs: [],
         Scripts: [

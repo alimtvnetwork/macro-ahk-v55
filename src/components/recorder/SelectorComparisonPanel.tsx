@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { CheckCircle2, XCircle, AlertTriangle, Crosshair, FileDown, History, Star } from "lucide-react";
 import { toast } from "sonner";
 import type { SelectorComparison, SelectorAttemptComparison } from "@/background/recorder/selector-comparison";
@@ -259,13 +259,13 @@ export function SelectorComparisonPanel({ comparison, stepId, url, history, onPr
                             disabled={!hasHistory}
                             aria-label="Show prior replay outcomes per selector"
                         />
-                        <Label
+                        <LabelType
                             htmlFor="show-history"
                             className={`text-[11px] flex items-center gap-1 ${hasHistory ? "" : "text-muted-foreground"}`}
                         >
                             <History className="h-3 w-3" aria-hidden />
                             History
-                        </Label>
+                        </LabelType>
                     </div>
                     <Button
                         variant="outline"

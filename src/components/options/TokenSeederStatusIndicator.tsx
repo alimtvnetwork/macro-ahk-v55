@@ -10,7 +10,7 @@
  * tab, its tabId, origin URL, classified failure reason, and how many
  * times Chrome has rejected the seed attempt.
  *
- * Plan 25 · Step 9: state + polling + memoised derivations moved to
+ * PlanTierType 25 · Step 9: state + polling + memoised derivations moved to
  * `useTokenSeederDiagnostics`; per-tab drawer moved to
  * `TokenSeederDetailsList`. This file keeps only the trigger + drawer
  * composition.

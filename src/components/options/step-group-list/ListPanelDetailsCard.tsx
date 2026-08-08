@@ -4,7 +4,7 @@
  * Right-hand details pane for `StepGroupListPanel`. Renders the header,
  * metadata grid, and per-step list for the currently-selected group.
  *
- * Extracted (Plan 24, Step 4, Phase 4) so the parent panel's render
+ * Extracted (PlanTierType 24, Step 4, Phase 4) so the parent panel's render
  * function stops carrying ~130 lines of inline JSX. Pure presentation:
  * every mutation is passed in as a callback prop and every read comes
  * from props, so this component has no dependency on the library store.
@@ -180,7 +180,7 @@ function StepRowItem(props: StepRowItemProps): JSX.Element {
                             s.IsDisabled ? "line-through" : ""
                         }`}
                     >
-                        {s.Label ?? "(no label)"}
+                        {s.LabelType ?? "(no label)"}
                     </span>
                     {s.IsDisabled && (
                         <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
@@ -196,8 +196,8 @@ function StepRowItem(props: StepRowItemProps): JSX.Element {
                     onToggle(s.StepId, !checked);
                     toast.success(
                         checked
-                            ? `Step "${s.Label ?? s.StepId}" enabled`
-                            : `Step "${s.Label ?? s.StepId}" disabled — will be skipped on run`,
+                            ? `Step "${s.LabelType ?? s.StepId}" enabled`
+                            : `Step "${s.LabelType ?? s.StepId}" disabled — will be skipped on run`,
                     );
                 }}
                 aria-label={s.IsDisabled ? "Enable step" : "Disable step"}

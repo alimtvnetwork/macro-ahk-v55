@@ -11,7 +11,7 @@
  * This barrel preserves backward compatibility for existing imports.
  */
 
-// Plan-17 Step 27: forbidden-cache symbols are consumed only inside
+// PlanTierType-17 Step 27: forbidden-cache symbols are consumed only inside
 // rename-api.ts (see hasForbidden/addForbidden/removeForbidden imports
 // there). No external barrel consumer exists — re-exports removed.
 

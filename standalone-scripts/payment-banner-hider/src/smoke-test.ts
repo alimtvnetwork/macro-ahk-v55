@@ -18,10 +18,10 @@
 
 import { BannerLocator, type LocateResult } from "./banner-locator";
 import { PaymentBannerHider } from "./index";
-import { BannerLogFn } from "../../types/runtime/enums/banner";
+import { BannerLogFnType } from "../../types/runtime/enums/banner";
 import { logPaymentBannerHiderError } from "./logger";
 import {
-    BannerState,
+    BannerStateType,
     REMOVE_DELAY_MS,
     STATE_ATTR,
 } from "./types";
@@ -54,7 +54,7 @@ interface AssertionFailure {
 function assertState(
     element: HTMLElement,
     step: string,
-    expected: BannerState | null,
+    expected: BannerStateType | null,
 ): AssertionFailure | null {
     const actual = element.getAttribute(STATE_ATTR);
     const expectedStr = expected === null ? "(none)" : expected;
@@ -94,15 +94,15 @@ export async function runPaymentBannerHiderSmokeTest(): Promise<boolean> {
         const hider = new PaymentBannerHider(new StubBannerLocator(banner));
         hider.check();
 
-        const fading = assertState(banner, "after-check", BannerState.Fading);
+        const fading = assertState(banner, "after-check", BannerStateType.Fading);
         if (fading !== null) failures.push(fading);
 
         await wait(FADING_WAIT_MS);
-        const hiding = assertState(banner, "post-microtask", BannerState.Hiding);
+        const hiding = assertState(banner, "post-microtask", BannerStateType.Hiding);
         if (hiding !== null) failures.push(hiding);
 
         await wait(DONE_WAIT_MS);
-        const done = assertState(banner, "post-delay", BannerState.Done);
+        const done = assertState(banner, "post-delay", BannerStateType.Done);
         if (done !== null) failures.push(done);
 
         if (failures.length === 0) {
@@ -111,7 +111,7 @@ export async function runPaymentBannerHiderSmokeTest(): Promise<boolean> {
             return true;
         }
 
-        logPaymentBannerHiderError(BannerLogFn.SmokeTest, `${TAG} FAIL`, failures);
+        logPaymentBannerHiderError(BannerLogFnType.SmokeTest, `${TAG} FAIL`, failures);
 
         return false;
     } finally {

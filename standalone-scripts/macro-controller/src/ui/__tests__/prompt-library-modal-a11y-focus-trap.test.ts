@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * prompt-library-modal a11y — extended focus-trap + initial-focus coverage.
  *
@@ -22,8 +23,8 @@ vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 
 const rows: Record<string, unknown[]> = {
     plan: [
-        { Id: 1, Slug: 'plan-default', Name: 'Plan (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
-        { Id: 2, Slug: 'plan-concise', Name: 'Plan (concise)', Body: 'A {{n}} B', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 1, Slug: 'plan-default', Name: 'PlanTierType (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 2, Slug: 'plan-concise', Name: 'PlanTierType (concise)', Body: 'A {{n}} B', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
     ],
     next: [],
     generic: [],
@@ -31,9 +32,9 @@ const rows: Record<string, unknown[]> = {
 
 const mocks = vi.hoisted(() => ({
     listPromptsByRole: vi.fn(),
-    setDefaultPromptForRole: vi.fn(async () => ({ ok: true })),
-    deletePromptById: vi.fn(async () => ({ ok: true })),
-    upsertPrompt: vi.fn(async () => ({ ok: true, value: 99 })),
+    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+    upsertPrompt: vi.fn(async () => (new DbResult(true, 99))),
 }));
 vi.mock('../../db/prompt-db', () => mocks);
 
@@ -63,7 +64,7 @@ function getCloseBtn(): HTMLButtonElement {
 
 beforeEach(() => {
     document.body.innerHTML = '';
-    mocks.listPromptsByRole.mockImplementation(async (role: string) => ({ ok: true, value: rows[role] ?? [] }));
+    mocks.listPromptsByRole.mockImplementation(async (role: string) => (new DbResult(true, rows[role] ?? [])));
 });
 afterEach(() => {
     // Ensure any lingering modal is unmounted so its keydown listener detaches.

@@ -12,7 +12,7 @@ import type { WorkspaceMembership } from './workspace-membership';
 export interface WorkspaceInfoTyped {
     id: string;
     name: string;
-    /** Raw wire value — mapped to WorkspacePlan via workspace-plan-mapper. */
+    /** Raw wire value — mapped to WorkspacePlanType via workspace-plan-mapper. */
     plan: string;
     plan_type: string;
     credits_used: number;

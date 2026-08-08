@@ -102,19 +102,19 @@ function makeFixture(): Fixture {
     const rootStep1 = lib.appendStep({
         StepGroupId: root,
         StepKindId: StepKindId.Click,
-        Label: "Click submit",
+        LabelType: "Click submit",
         PayloadJson: JSON.stringify({ Selector: "#submit" }),
     });
     const rootRunGroupStep = lib.appendStep({
         StepGroupId: root,
         StepKindId: StepKindId.RunGroup,
-        Label: "Invoke child",
+        LabelType: "Invoke child",
         TargetStepGroupId: child,
     });
     const childStep1 = lib.appendStep({
         StepGroupId: child,
         StepKindId: StepKindId.Type,
-        Label: "Type email",
+        LabelType: "Type email",
         PayloadJson: JSON.stringify({ Selector: "#email", Value: "{{Email}}" }),
     });
     return {
@@ -227,9 +227,9 @@ describe("buildFilteredSnapshot", () => {
             expect(groups.find((g) => g.Name === "Sibling")).toBeUndefined();
 
             const rootSteps = lib.listSteps(fx.Root);
-            expect(rootSteps.map((s) => s.Label)).toEqual(["Click submit", "Invoke child"]);
+            expect(rootSteps.map((s) => s.LabelType)).toEqual(["Click submit", "Invoke child"]);
             const childSteps = lib.listSteps(fx.Child);
-            expect(childSteps.map((s) => s.Label)).toEqual(["Type email"]);
+            expect(childSteps.map((s) => s.LabelType)).toEqual(["Type email"]);
         } finally {
             reopened.close();
         }

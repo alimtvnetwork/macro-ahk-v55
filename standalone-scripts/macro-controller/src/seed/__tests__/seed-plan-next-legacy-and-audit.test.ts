@@ -1,6 +1,6 @@
 import { ServiceResult } from '../../utils/result-wrapper';
 /**
- * Plan-22 gaps: legacy-body upgrade paths and audit-write failure surface
+ * PlanTierType-22 gaps: legacy-body upgrade paths and audit-write failure surface
  * for `seed-plan-next.ts`.
  *
  * The existing `seed-plan-next.test.ts` and `seed-plan-next-edges.test.ts`
@@ -64,7 +64,7 @@ const STALE_NEXT_BODY = [
     'Give exactly {{n}} next steps and every remaining item after that.',
 ].join('\r\n');
 const STALE_PLAN_BODY = [
-    '# {{n}} steps Plan, Maximal Enforcement',
+    '# {{n}} steps PlanTierType, Maximal Enforcement',
     '',
     'Parse the number {{n}} in this prompt\'s header. That number is the EXACT count of steps in the plan you must write. Not {{n}}-1. Not {{n}}+1. If you cannot find it, STOP and ask.',
     '',
@@ -98,7 +98,7 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: true },                          // audit INSERT
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         const updates = captured.filter(c => /^UPDATE Prompt SET Body =/.test(c.sql));
         expect(updates).toHaveLength(1);
         expect(updates[0]!.sql).toContain("WHERE Slug = 'plan-default'");
@@ -120,7 +120,7 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: true, rows: [{ '1': 1 }] },
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         const updates = captured.filter(c => /^UPDATE Prompt SET Body =/.test(c.sql));
         expect(updates, 'user-authored body must be preserved').toHaveLength(0);
         // No observable change -> audit row must be skipped.
@@ -138,7 +138,7 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: true, rows: [{ '1': 1 }] },
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(logDiagnosticFromCode).toHaveBeenCalledWith(
             'SEED_LEGACY_UPGRADE_E001',
             expect.objectContaining({
@@ -165,7 +165,7 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: false, errorMessage: 'audit table missing' }, // audit INSERT fails
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(captured[8]!.sql).toMatch(/^INSERT INTO PromptSeedAudit/);
         expect(logDiagnosticFromCode).toHaveBeenCalledWith(
             'SEED_AUDIT_E001',
@@ -185,14 +185,14 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: true },
         ];
         const result = await seedPlanNextPrompts();
-        expect(result.isSuccess).toBe(true);
+        expect(result.ok).toBe(true);
         const updates = captured.filter(call => /^UPDATE Prompt SET Body =/.test(call.sql));
         expect(updates).toHaveLength(1);
         expect(updates[0]!.sql).toContain("WHERE Slug = 'next-default'");
         expect(updates[0]!.sql).toContain(NEXT_DEFAULT_BODY.slice(0, 40).replace(/'/g, "''"));
     });
 
-    it('upgrades managed stale plan-default drift used by Plan preset buttons', async () => {
+    it('upgrades managed stale plan-default drift used by PlanTierType preset buttons', async () => {
         responsesQueue = [
             { isOk: true, rows: ALL_SLUGS },
             { isOk: true },
@@ -204,7 +204,7 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: true },
         ];
         const result = await seedPlanNextPrompts();
-        expect(result.isSuccess).toBe(true);
+        expect(result.ok).toBe(true);
         const updates = captured.filter(call => /^UPDATE Prompt SET Body =/.test(call.sql));
         expect(updates).toHaveLength(1);
         expect(updates[0]!.sql).toContain("WHERE Slug = 'plan-default'");
@@ -215,13 +215,13 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
         responsesQueue = [
             { isOk: true, rows: ALL_SLUGS },
             { isOk: true },
-            { isOk: true, rows: [{ Body: '# Plan private\n\nUse {{n}} in my private workflow.' }] },
+            { isOk: true, rows: [{ Body: '# PlanTierType private\n\nUse {{n}} in my private workflow.' }] },
             { isOk: true, rows: [{ Body: '# custom next prompt' }] },
             { isOk: true, rows: [{ '1': 1 }] },
             { isOk: true, rows: [{ '1': 1 }] },
         ];
         const result = await seedPlanNextPrompts();
-        expect(result.isSuccess).toBe(true);
+        expect(result.ok).toBe(true);
         const updates = captured.filter(call => /^UPDATE Prompt SET Body =/.test(call.sql));
         expect(updates).toHaveLength(0);
     });
@@ -236,7 +236,7 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: true, rows: [{ '1': 1 }] },
         ];
         const result = await seedPlanNextPrompts();
-        expect(result.isSuccess).toBe(true);
+        expect(result.ok).toBe(true);
         const updates = captured.filter(call => /^UPDATE Prompt SET Body =/.test(call.sql));
         expect(updates).toHaveLength(0);
     });

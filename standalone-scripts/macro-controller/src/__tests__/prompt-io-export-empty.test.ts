@@ -1,5 +1,6 @@
+import { DbResult } from '../db/db-result';
 /**
- * Plan-22 gap #8: `exportPromptsToJson` empty-DB negative path.
+ * PlanTierType-22 gap #8: `exportPromptsToJson` empty-DB negative path.
  *
  * When the DB and cache are both empty, the exporter MUST warn the user
  * via toast and MUST NOT emit a blob download. Regression guard: prior
@@ -19,8 +20,8 @@ vi.mock('../toast', () => ({ showToast: vi.fn() }));
 vi.mock('../logging', () => ({ log: vi.fn() }));
 vi.mock('../shared-state', () => ({ VERSION: 'v0.test.0' }));
 vi.mock('../db/prompt-revision-db', () => ({
-    listPromptRevisions: vi.fn(async () => ({ ok: true, value: [] })),
-    insertImportedRevisions: vi.fn(async () => ({ ok: true })),
+    listPromptRevisions: vi.fn(async () => (new DbResult(true, []))),
+    insertImportedRevisions: vi.fn(async () => (new DbResult(true, undefined))),
 }));
 
 import { exportPromptsToJson, collectAllExportEntries } from '../ui/prompt-io';

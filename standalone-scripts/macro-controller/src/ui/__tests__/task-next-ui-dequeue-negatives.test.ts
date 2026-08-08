@@ -1,5 +1,5 @@
 /**
- * Plan 22 gap #12 (task-next-ui side): negative-path coverage for
+ * PlanTierType 22 gap #12 (task-next-ui side): negative-path coverage for
  * `dequeueTaskNextPrompt` in `ui/task-next-ui.ts:199-213`.
  *
  * Root cause of the design under test: the queue read is the ONLY place where

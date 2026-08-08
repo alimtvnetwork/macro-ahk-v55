@@ -126,8 +126,8 @@ describe("SharedAsset CRUD", () => {
     });
 
     // Create synced + pinned links
-    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 1, LinkState: "synced" } });
-    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 2, LinkState: "pinned" } });
+    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 1, LinkStateType: "synced" } });
+    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 2, LinkStateType: "pinned" } });
 
     const { detachedCount } = await handleDeleteSharedAsset({ assetId });
     expect(detachedCount).toBe(1); // Only the synced one counts
@@ -160,7 +160,7 @@ describe("AssetLink CRUD", () => {
 
     const { links } = await handleGetAssetLinks({ projectId: 10 });
     expect(links).toHaveLength(1);
-    expect(links[0].LinkState).toBe("synced");
+    expect(links[0].LinkStateType).toBe("synced");
   });
 
   it("updates link state", async () => {
@@ -169,11 +169,11 @@ describe("AssetLink CRUD", () => {
     });
 
     await handleSaveAssetLink({
-      link: { Id: linkId, SharedAssetId: assetId, ProjectId: 10, LinkState: "pinned", PinnedVersion: "1.0.0" },
+      link: { Id: linkId, SharedAssetId: assetId, ProjectId: 10, LinkStateType: "pinned", PinnedVersion: "1.0.0" },
     });
 
     const { links } = await handleGetAssetLinks({ projectId: 10 });
-    expect(links[0].LinkState).toBe("pinned");
+    expect(links[0].LinkStateType).toBe("pinned");
     expect(links[0].PinnedVersion).toBe("1.0.0");
   });
 
@@ -206,9 +206,9 @@ describe("Sync Engine", () => {
       asset: { Type: "prompt", Name: "P", Slug: "p", ContentJson: '{"v":1}' },
     });
 
-    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 1, LinkState: "synced" } });
-    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 2, LinkState: "synced" } });
-    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 3, LinkState: "pinned", PinnedVersion: "1.0.0" } });
+    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 1, LinkStateType: "synced" } });
+    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 2, LinkStateType: "synced" } });
+    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 3, LinkStateType: "pinned", PinnedVersion: "1.0.0" } });
 
     const result = await handleSyncLibraryAsset({ assetId });
     expect(result.syncedCount).toBe(2);
@@ -230,8 +230,8 @@ describe("Sync Engine", () => {
     const { assetId } = await handleSaveSharedAsset({
       asset: { Type: "prompt", Name: "B", Slug: "b", ContentJson: '{"v":1}' },
     });
-    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 1, LinkState: "synced" } });
-    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 2, LinkState: "pinned", PinnedVersion: "1.0.0" } });
+    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 1, LinkStateType: "synced" } });
+    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 2, LinkStateType: "pinned", PinnedVersion: "1.0.0" } });
 
     sendMessageSpy.mockClear();
     await handleSyncLibraryAsset({ assetId });
@@ -273,8 +273,8 @@ describe("Cross-Project Sync, Phase 3 flow", () => {
     const assetId = promoted.assetId!;
 
     // 2. Link two projects in 'synced' state.
-    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 10, LinkState: "synced" } });
-    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 11, LinkState: "synced" } });
+    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 10, LinkStateType: "synced" } });
+    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 11, LinkStateType: "synced" } });
 
     // 3. Update the shared asset content (simulate edit in Library).
     await handleSaveSharedAsset({
@@ -302,7 +302,7 @@ describe("Cross-Project Sync, Phase 3 flow", () => {
     const { links } = await handleGetAssetLinks({ assetId });
     expect(links).toHaveLength(2);
     for (const link of links) {
-      expect(link.LinkState).toBe("synced");
+      expect(link.LinkStateType).toBe("synced");
       expect(link.LocalOverrideJson).toBeNull();
       expect(link.SyncedAt).toBeTruthy();
     }

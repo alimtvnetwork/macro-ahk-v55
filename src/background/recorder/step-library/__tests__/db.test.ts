@@ -212,14 +212,14 @@ describe("Step, RunGroup invariants", () => {
         const stepId = lib.appendStep({
             StepGroupId: caller,
             StepKindId: StepKindId.RunGroup,
-            Label: "Call target",
+            LabelType: "Call target",
             TargetStepGroupId: target,
         });
         const [row] = lib.listSteps(caller);
         expect(row.StepId).toBe(stepId);
         expect(row.StepKindId).toBe(StepKindId.RunGroup);
         expect(row.TargetStepGroupId).toBe(target);
-        expect(row.Label).toBe("Call target");
+        expect(row.LabelType).toBe("Call target");
     });
 });
 
@@ -258,20 +258,20 @@ describe("Step / StepGroup CRUD", () => {
         expect(() => lib.reorderSteps(g1, [a, b])).toThrow(/does not belong/);
     });
 
-    it("updateStep edits Label, PayloadJson, and Kind in place (preserves OrderIndex)", () => {
+    it("updateStep edits LabelType, PayloadJson, and Kind in place (preserves OrderIndex)", () => {
         const { lib, projectId } = freshDb();
         const g = lib.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "g" });
-        const a = lib.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, Label: "old" });
+        const a = lib.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "old" });
         lib.appendStep({ StepGroupId: g, StepKindId: StepKindId.Type });
         const beforeOrder = lib.listSteps(g).find((s) => s.StepId === a)?.OrderIndex;
         lib.updateStep({
             StepId: a,
             StepKindId: StepKindId.Type,
-            Label: "new",
+            LabelType: "new",
             PayloadJson: '{"Selector":"#x","Value":"y"}',
         });
         const row = lib.listSteps(g).find((s) => s.StepId === a)!;
-        expect(row.Label).toBe("new");
+        expect(row.LabelType).toBe("new");
         expect(row.StepKindId).toBe(StepKindId.Type);
         expect(row.PayloadJson).toBe('{"Selector":"#x","Value":"y"}');
         expect(row.OrderIndex).toBe(beforeOrder);
@@ -313,8 +313,8 @@ describe("Step / StepGroup CRUD", () => {
         const { lib, projectId } = freshDb();
         const root = lib.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "root" });
         const child = lib.createGroup({ ProjectId: projectId, ParentStepGroupId: root, Name: "child" });
-        lib.appendStep({ StepGroupId: root, StepKindId: StepKindId.Click, Label: "click" });
-        lib.appendStep({ StepGroupId: child, StepKindId: StepKindId.Type, Label: "type" });
+        lib.appendStep({ StepGroupId: root, StepKindId: StepKindId.Click, LabelType: "click" });
+        lib.appendStep({ StepGroupId: child, StepKindId: StepKindId.Type, LabelType: "type" });
 
         const bytes = lib.exportDbBytes();
         const reopened = new StepLibraryDb(new SQL.Database(bytes));
@@ -324,9 +324,9 @@ describe("Step / StepGroup CRUD", () => {
         expect(groups.map((g) => g.Name)).toEqual(["root", "child"]);
         const rootGroup = groups.find((g) => g.Name === "root")!;
         const childGroup = groups.find((g) => g.Name === "child")!;
-        expect(reopened.listSteps(rootGroup.StepGroupId).map((s) => s.Label))
+        expect(reopened.listSteps(rootGroup.StepGroupId).map((s) => s.LabelType))
             .toEqual(["click"]);
-        expect(reopened.listSteps(childGroup.StepGroupId).map((s) => s.Label))
+        expect(reopened.listSteps(childGroup.StepGroupId).map((s) => s.LabelType))
             .toEqual(["type"]);
     });
 });

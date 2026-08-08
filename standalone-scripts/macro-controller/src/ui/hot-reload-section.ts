@@ -29,18 +29,18 @@ import { destroyPanel } from './ui-updaters';
 import { createCollapsibleSection } from './sections';
 import { logError } from '../error-utils';
 import { REINJECT_COOLDOWN_MS } from '../constants';
-import { CssFragment, StorageKey } from '../types';
+import { CssFragmentType, StorageKeyType } from '../types';
 /* ------------------------------------------------------------------ */
 /*  State preservation keys (spec §State Preservation Keys)           */
 /* ------------------------------------------------------------------ */
 
 const REINJECT_KEYS = {
-  wsName:        StorageKey.ReinjectPrefix + 'wsName',
-  wsId:          StorageKey.ReinjectPrefix + 'wsId',
-  loopRunning:   StorageKey.ReinjectPrefix + 'loopRunning',
-  loopDirection: StorageKey.ReinjectPrefix + 'loopDirection',
-  creditData:    StorageKey.ReinjectPrefix + 'creditData',
-  timestamp:     StorageKey.ReinjectPrefix + 'timestamp',
+  wsName:        StorageKeyType.ReinjectPrefix + 'wsName',
+  wsId:          StorageKeyType.ReinjectPrefix + 'wsId',
+  loopRunning:   StorageKeyType.ReinjectPrefix + 'loopRunning',
+  loopDirection: StorageKeyType.ReinjectPrefix + 'loopDirection',
+  creditData:    StorageKeyType.ReinjectPrefix + 'creditData',
+  timestamp:     StorageKeyType.ReinjectPrefix + 'timestamp',
 };
 
 function saveStateBeforeReinject(): void {
@@ -292,18 +292,18 @@ export function buildHotReloadSection(onVersionMismatch?: (available: string) =>
 
 function _buildVersionRows(): { runningRow: HTMLElement; availVal: HTMLElement } {
   const runningRow = document.createElement('div');
-  runningRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;font-size:' + tFontTiny + CssFragment.Padding2px0;
+  runningRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;font-size:' + tFontTiny + CssFragmentType.Padding2px0;
   const runningLabel = document.createElement('span');
   runningLabel.style.color = cPanelFgDim;
   runningLabel.textContent = 'Running';
   const runningVal = document.createElement('code');
-  runningVal.style.cssText = CssFragment.FontSize + tFontMicro + ';background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:3px;';
+  runningVal.style.cssText = CssFragmentType.FontSize + tFontMicro + ';background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:3px;';
   runningVal.textContent = 'v' + VERSION;
   runningRow.appendChild(runningLabel);
   runningRow.appendChild(runningVal);
 
   const availVal = document.createElement('code');
-  availVal.style.cssText = CssFragment.FontSize + tFontMicro + ';background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:3px;';
+  availVal.style.cssText = CssFragmentType.FontSize + tFontMicro + ';background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:3px;';
   availVal.textContent = '—';
 
   return { runningRow, availVal };
@@ -311,7 +311,7 @@ function _buildVersionRows(): { runningRow: HTMLElement; availVal: HTMLElement }
 
 function _buildAvailRow(availVal: HTMLElement): HTMLElement {
   const availRow = document.createElement('div');
-  availRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;font-size:' + tFontTiny + CssFragment.Padding2px0;
+  availRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;font-size:' + tFontTiny + CssFragmentType.Padding2px0;
   const availLabel = document.createElement('span');
   availLabel.style.color = cPanelFgDim;
   availLabel.textContent = 'Bundled';
@@ -322,7 +322,7 @@ function _buildAvailRow(availVal: HTMLElement): HTMLElement {
 
 function _buildStatusRow(): HTMLElement {
   const statusRow = document.createElement('div');
-  statusRow.style.cssText = CssFragment.FontSize + tFontMicro + ';color:' + cPanelFgDim + CssFragment.Padding2px0;
+  statusRow.style.cssText = CssFragmentType.FontSize + tFontMicro + ';color:' + cPanelFgDim + CssFragmentType.Padding2px0;
   statusRow.textContent = 'Not checked';
   return statusRow;
 }

@@ -1,6 +1,6 @@
 import { ServiceResult } from '../../utils/result-wrapper';
 /**
- * Tests for the idempotent Plan/Next seeder + boot telemetry (v4.72.0).
+ * Tests for the idempotent PlanTierType/Next seeder + boot telemetry (v4.72.0).
  * Call sequence: [pre-select existing slugs] -> [INSERT OR IGNORE]
  *   -> [hasDefault plan] -> [maybe promote plan]
  *   -> [hasDefault next] -> [maybe promote next].
@@ -58,15 +58,15 @@ describe('seedPlanNextPrompts', () => {
             { isOk: true },                            // audit-log INSERT
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(captured).toHaveLength(9);
         expect(captured[0].sql).toMatch(/^SELECT Slug FROM Prompt WHERE Slug IN/);
         expect(captured[1].sql).toMatch(/^INSERT OR IGNORE INTO Prompt/);
         expect(captured[5].sql).toBe("UPDATE Prompt SET IsDefault = 1 WHERE Slug = 'plan-default' AND Role = 'plan'");
         expect(captured[7].sql).toBe("UPDATE Prompt SET IsDefault = 1 WHERE Slug = 'next-default' AND Role = 'next'");
         expect(captured[8].sql).toMatch(/^INSERT INTO PromptSeedAudit/);
-        const plan = r.telemetry?.find(t => t.role === 'plan');
-        const next = r.telemetry?.find(t => t.role === 'next');
+        const plan = r.data?.telemetry?.find(t => t.role === 'plan');
+        const next = r.data?.telemetry?.find(t => t.role === 'next');
         expect(plan).toMatchObject({ inserted: 4, skipped: 0, promotedDefault: 1, alreadyDefault: 0 });
         expect(next).toMatchObject({ inserted: 4, skipped: 0, promotedDefault: 1, alreadyDefault: 0 });
         expect(logCalls.some(c => c.message.includes('[SeedPlanNext]'))).toBe(true);
@@ -86,11 +86,11 @@ describe('seedPlanNextPrompts', () => {
             { isOk: true, rows: [{ '1': 1 }] },       // hasDefault next
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(captured).toHaveLength(6);
         expect(captured.some(c => c.sql.startsWith('UPDATE Prompt SET IsDefault = 1'))).toBe(false);
         expect(captured.some(c => c.sql.startsWith('INSERT INTO PromptSeedAudit'))).toBe(false);
-        const plan = r.telemetry?.find(t => t.role === 'plan');
+        const plan = r.data?.telemetry?.find(t => t.role === 'plan');
         expect(plan).toMatchObject({ inserted: 0, skipped: 4, promotedDefault: 0, alreadyDefault: 1 });
     });
 
@@ -106,11 +106,11 @@ describe('seedPlanNextPrompts', () => {
             { isOk: true },                            // audit-log INSERT
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(captured).toHaveLength(8);
         expect(captured[6].sql).toContain("Slug = 'next-default'");
         expect(captured[7].sql).toMatch(/^INSERT INTO PromptSeedAudit/);
-        const next = r.telemetry?.find(t => t.role === 'next');
+        const next = r.data?.telemetry?.find(t => t.role === 'next');
         expect(next?.promotedDefault).toBe(1);
     });
 
@@ -120,7 +120,7 @@ describe('seedPlanNextPrompts', () => {
             { isOk: false, errorMessage: 'disk full' },
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/disk full/);
     });
 

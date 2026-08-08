@@ -12,7 +12,7 @@
 import type { Database as SqlJsDatabase } from "sql.js";
 import type { DbManager } from "../db-manager";
 import { bindOpt, requireField } from "./handler-guards";
-import { Type4, ResourceType } from "../../types/enums";
+import { InstructionStepType, ResourceType } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -66,7 +66,7 @@ export interface VersionInfoResponse {
 export interface InstructionStep {
     StepId: string;
     Order: number;
-    Type: Type4;
+    Type: InstructionStepType;
     Condition: string | null;
     Payload: {
         ResourceType?: ResourceType;

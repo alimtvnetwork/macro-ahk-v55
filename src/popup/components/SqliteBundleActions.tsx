@@ -11,7 +11,7 @@ import {
     importFromSqliteZip,
     mergeFromSqliteZip,
 } from "../../lib/sqlite-bundle";
-import { Enum_7b1045ad } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { PopupActionsModeType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -37,7 +37,7 @@ export function SqliteBundleActions({
     debugOk,
     debugError,
 }: SqliteBundleActionsProps) {
-    const [importMode, setImportMode] = useState<Enum_7b1045ad>("replace");
+    const [importMode, setImportMode] = useState<PopupActionsModeType>("replace");
     const [exportLabel, setExportLabel] = useState("🗄️ Export DB");
     const [importLabel, setImportLabel] = useState("📥 Import");
     const fileRef = useRef<HTMLInputElement>(null);

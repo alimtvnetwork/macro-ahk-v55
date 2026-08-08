@@ -15,7 +15,7 @@ import {
     type RecorderToolbarHandle,
 } from "../recorder-toolbar";
 import type { RecordingPhase } from "../recorder-session-types";
-import { ActionEnum4 } from "../../../types/enums";
+import { BtnAction } from "../../../types/enums";
 
 let handle: RecorderToolbarHandle | null = null;
 
@@ -35,7 +35,7 @@ function mount(onPhase?: (p: RecordingPhase) => void): RecorderToolbarHandle {
     return handle;
 }
 
-function btn(h: RecorderToolbarHandle, action: ActionEnum4): HTMLButtonElement {
+function btn(h: RecorderToolbarHandle, action: BtnAction): HTMLButtonElement {
     const element = h.Root.querySelector<HTMLButtonElement>(`button[data-action="${action}"]`);
     if (element === null) { throw new Error(`button[data-action="${action}"] not found`); }
     return element;

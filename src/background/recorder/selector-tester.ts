@@ -15,21 +15,21 @@
  */
 
 import type { DomContext } from "./failure-logger";
-import { SelectorKindEnum, KindEnum2 } from "../../types/enums";
+import { SelectorKindEnum, PredicateEvaluationKind } from "../../types/enums";
 
 export type SelectorTestKind = SelectorKindEnum;
 
 export interface SelectorTestResult {
     readonly Expression: string;
     /** Detected or supplied kind actually used for the lookup. */
-    readonly Kind: KindEnum2;
+    readonly Kind: PredicateEvaluationKind;
     readonly MatchCount: number;
     readonly FirstMatch: DomContext | null;
     readonly Error: string | null;
 }
 
 /** Detect the selector kind from the expression's leading character. */
-export function detectSelectorKind(expression: string): KindEnum2 {
+export function detectSelectorKind(expression: string): PredicateEvaluationKind {
     const trimmed = expression.trimStart();
     if (trimmed.startsWith("/") || trimmed.startsWith("(") || trimmed.startsWith("./")) {
         return "XPath";
@@ -50,7 +50,7 @@ export function testSelector(
     catch (err) { return selectorErrorResult(trimmed, useKind, err); }
 }
 
-function resolveKind(kind: SelectorTestKind, trimmed: string): KindEnum2 {
+function resolveKind(kind: SelectorTestKind, trimmed: string): PredicateEvaluationKind {
     return kind === "Auto" ? detectSelectorKind(trimmed) : kind;
 }
 
@@ -65,7 +65,7 @@ function emptyExpressionResult(expression: string, kind: SelectorTestKind): Sele
 }
 
 function runSelectorLookup(
-    trimmed: string, doc: Document, useKind: KindEnum2,
+    trimmed: string, doc: Document, useKind: PredicateEvaluationKind,
 ): SelectorTestResult {
     if (useKind === "XPath") { return runXPathLookup(trimmed, doc); }
     return runCssLookup(trimmed, doc);
@@ -98,7 +98,7 @@ function runCssLookup(trimmed: string, doc: Document): SelectorTestResult {
 }
 
 function selectorErrorResult(
-    trimmed: string, useKind: KindEnum2, err: unknown,
+    trimmed: string, useKind: PredicateEvaluationKind, err: unknown,
 ): SelectorTestResult {
     return {
         Expression: trimmed,

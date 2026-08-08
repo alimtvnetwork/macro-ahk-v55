@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * v4.197.0: verifies the "Last import error" area in the History panel
  * shows the most recent suppressed error message + timestamp, and can
@@ -9,10 +10,13 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 vi.mock('../../db/prompt-revision-db', () => ({
   listPromptRevisions: vi.fn(),
   insertImportedRevisions: vi.fn(),
-  getMaxRevisionId: vi.fn(async () => ({ ok: true, value: 100 })),
-  deleteImportedRevisionsAfter: vi.fn(async () => ({ ok: true, value: 0 })),
+  getMaxRevisionId: vi.fn(async () => (new DbResult(true, 100))),
+  deleteImportedRevisionsAfter: vi.fn(async () => (new DbResult(true, 0))),
 }));
 vi.mock('../../db/prompt-db', () => ({
+    DbResult,
+    DbResult,
+    DbResult,
   listPromptsByRole: vi.fn(),
   getDefaultPromptForRole: vi.fn(),
   upsertPrompt: vi.fn(),
@@ -40,7 +44,7 @@ beforeEach(() => {
 });
 
 async function openEmptyPanel(): Promise<void> {
-  const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [] });
+  const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, []));
   await openPromptHistoryPanel({ role: 'plan', slug: 'plan-default' }, { listRevisions, toast: vi.fn() });
 }
 

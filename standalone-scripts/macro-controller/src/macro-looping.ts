@@ -41,7 +41,7 @@ import { shouldInject } from './startup-domain-guard';
 import { runIdempotentCheck } from './startup-idempotent-check';
 import { installPaymentNoticeRemoval } from './ui/payment-notice-removal';
 
-import { Label } from './types';
+import { LabelType } from './types';
 
 (function macroLoopController() {
   'use strict';
@@ -49,12 +49,12 @@ import { Label } from './types';
   console.log('%c[MacroLoop v' + VERSION + '] IIFE entry — hostname: ' + window.location.hostname + ', href: ' + window.location.href.substring(0, 80), 'color: #a78bfa; font-weight: bold;');
 
   // ── Domain guard ──
-  timingStart(Label.DomainGuard, 'Domain Guard');
+  timingStart(LabelType.DomainGuard, 'Domain Guard');
   if (!shouldInject()) {
-    timingEnd(Label.DomainGuard, 'error', 'Injection blocked');
+    timingEnd(LabelType.DomainGuard, 'error', 'Injection blocked');
     return;
   }
-  timingEnd(Label.DomainGuard, 'ok');
+  timingEnd(LabelType.DomainGuard, 'ok');
 
   // ── Idempotent check (handles re-injection, version mismatch, SPA recovery) ──
   timingStart('idempotent', 'Idempotent Check');

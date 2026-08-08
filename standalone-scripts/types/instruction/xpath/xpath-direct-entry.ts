@@ -1,4 +1,4 @@
-import { XPathKind } from "../enums/xpath-kind";
+import { XPathKindType } from "../enums/xpath-kind";
 import type { Identifier } from "../primitives/identifier";
 
 /**
@@ -6,13 +6,13 @@ import type { Identifier } from "../primitives/identifier";
  *
  * Example:
  *   {
- *     kind: XPathKind.Direct,
+ *     kind: XPathKindType.Direct,
  *     name: "payment-banner-root",
  *     value: "//div[@data-role='payment-banner']",
  *   }
  */
 export type XPathDirectEntry = {
-    readonly kind: XPathKind.Direct;
+    readonly kind: XPathKindType.Direct;
     readonly name: Identifier;
     readonly value: string;
     readonly description?: string;

@@ -1,5 +1,5 @@
 /**
- * Plan 22 · credit-balance toast migration.
+ * PlanTierType 22 · credit-balance toast migration.
  *
  * Verifies that every failure surface in credit-balance.ts routes through
  * showDiagnosticToast with a registered CREDIT_BALANCE_E00N code, and that

@@ -9,7 +9,7 @@
 
 import { activityLogLines, getActivityLogVisible, maxActivityLines, setActivityLogVisible, cLogDefault, cLogError, cLogInfo, cLogSuccess, cLogDebug, cLogWarn, cLogDelegate, cLogCheck, cLogTimestamp, tFont, tFontSm } from './shared-state';
 import type { ActivityLogEntry } from './types';
-import { CssFragment } from './types';
+import { CssFragmentType } from './types';
 
 // CQ11: Encapsulate rendered count in singleton
 class LogRenderState {
@@ -54,10 +54,10 @@ function _buildLogEntryHtml(entry: ActivityLogEntry): string {
   const indentPx = (entry.indent || 0) * 12;
   let html = '<div style="font-size:' + tFontSm + ';font-family:' + tFont + ';padding:2px 0;color:' + color + ';margin-left:' + indentPx + 'px;">';
   if (entry.indent && entry.indent > 0) {
-    html += CssFragment.SpanStyleColor + cLogTimestamp + ';">' + entry.time + '</span> ';
+    html += CssFragmentType.SpanStyleColor + cLogTimestamp + ';">' + entry.time + '</span> ';
   } else {
-    html += CssFragment.SpanStyleColor + cLogTimestamp + ';">[' + entry.time + ']</span> ';
-    html += CssFragment.SpanStyleColor + cLogDefault + ';">[' + entry.level + ']</span> ';
+    html += CssFragmentType.SpanStyleColor + cLogTimestamp + ';">[' + entry.time + ']</span> ';
+    html += CssFragmentType.SpanStyleColor + cLogDefault + ';">[' + entry.level + ']</span> ';
   }
   html += entry.message;
   html += '</div>';

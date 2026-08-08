@@ -10,9 +10,9 @@ import {
 } from "../condition-step";
 
 const STEPS: ReadonlyArray<RouteableStep> = [
-    { StepId: 10, Label: "start" },
-    { StepId: 11, Label: "middle" },
-    { StepId: 12, Label: "end" },
+    { StepId: 10, LabelType: "start" },
+    { StepId: 11, LabelType: "middle" },
+    { StepId: 12, LabelType: "end" },
 ];
 
 describe("resolveRoute", () => {
@@ -34,7 +34,7 @@ describe("resolveRoute", () => {
 
     it("GoToLabel jumps to the matching index", () => {
         const r = resolveRoute(
-            { Kind: "GoToLabel", Label: "end" },
+            { Kind: "GoToLabel", LabelType: "end" },
             { Steps: STEPS, CurrentIndex: 0, JumpsUsed: 0 },
         );
         expect(r).toEqual({ Kind: "Cursor", NextIndex: 2, JumpsUsed: 1 });
@@ -42,7 +42,7 @@ describe("resolveRoute", () => {
 
     it("GoToLabel with unknown label returns InvalidRouteTarget", () => {
         const r = resolveRoute(
-            { Kind: "GoToLabel", Label: "missing" },
+            { Kind: "GoToLabel", LabelType: "missing" },
             { Steps: STEPS, CurrentIndex: 0, JumpsUsed: 0 },
         );
         expect(r.Kind).toBe("Error");

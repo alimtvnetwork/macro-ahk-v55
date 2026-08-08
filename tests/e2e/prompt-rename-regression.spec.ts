@@ -112,7 +112,7 @@ test.describe('prompt rename regression (plan-15)', () => {
         const result = await page.evaluate(async () => {
             const api = (window as unknown as { __promptDb: { upsertPrompt: (i: unknown) => Promise<UpsertResult> } }).__promptDb;
             return api.upsertPrompt({
-                id: 1, slug: 'plan-default', name: 'Plan default',
+                id: 1, slug: 'plan-default', name: 'PlanTierType default',
                 body: 'Give me the next {{count}} steps',
                 role: 'plan',
                 previousBody: 'Give me the next {{n}} steps',
@@ -141,7 +141,7 @@ test.describe('prompt rename regression (plan-15)', () => {
         const result = await page.evaluate(async () => {
             const api = (window as unknown as { __promptDb: { upsertPrompt: (i: unknown) => Promise<UpsertResult> } }).__promptDb;
             return api.upsertPrompt({
-                id: 1, slug: 'plan-default', name: 'Plan default',
+                id: 1, slug: 'plan-default', name: 'PlanTierType default',
                 body: 'Give me the next steps',
                 role: 'plan',
                 previousBody: 'Give me the next {{n}} steps',
@@ -167,7 +167,7 @@ test.describe('prompt rename regression (plan-15)', () => {
         const result = await page.evaluate(async () => {
             const api = (window as unknown as { __promptDb: { upsertPrompt: (i: unknown) => Promise<UpsertResult> } }).__promptDb;
             return api.upsertPrompt({
-                slug: 'plan-custom', name: 'Plan custom',
+                slug: 'plan-custom', name: 'PlanTierType custom',
                 body: 'Do the next {{n}} tasks',
                 role: 'plan',
                 replaceKey: 'n',

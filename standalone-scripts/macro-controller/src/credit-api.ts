@@ -1,5 +1,5 @@
 import { cCbAvail, cCbBilling, cCbBonus, cCbDaily, cCbEmpty, cCbRollover, cLogInfo, cPrimaryLight, creditBarWidthPx, tFont, tFontSm, trSlow } from './shared-state';
-import { CssFragment } from './types';
+import { CssFragmentType } from './types';
 import { throwDiagnostic } from './errors/diagnostic-error';
 
 /**
@@ -14,7 +14,7 @@ import { throwDiagnostic } from './errors/diagnostic-error';
 // ============================================
 
 /**
- * Plan literal used by the legacy-calc guard.
+ * PlanTierType literal used by the legacy-calc guard.
  * Spec: spec/22-app-issues/114-pro-zero-credit-balance-calculation.md §5 Step 2
  */
 const PRO_ZERO_PLAN_LITERAL = 'pro_0';
@@ -150,29 +150,29 @@ export function renderCreditBar(opts: CreditBarOpts): string {
   let h = '<div style="display:flex;align-items:center;gap:8px;' + mt + wW + '">';
   h += '<div role="progressbar" aria-label="Workspace credits" aria-valuemin="0" aria-valuemax="' + tc + '" aria-valuenow="' + av + '" title="' + bTitle + '" style="flex:none;height:' + bH + ';width:' + bW + ';min-width:' + bW + ';max-width:' + bW + ';background:' + cCbEmpty + ';border-radius:' + bR + ';overflow:hidden;display:flex;border:' + bBorder + ';' + bShadow + '">';
   h += '<div style="width:' + fillPct.toFixed(2) + '%;height:100%;display:flex;transition:width ' + trSlow + ' ease;">';
-  h += '<div title="🎁 Bonus: ' + fr + CssFragment.StyleWidth + segments.free + CssFragment.BarSegmentTail + cCbBonus[0] + ',' + cCbBonus[1] + CssFragment.TransitionTail + trSlow + CssFragment.EaseClose;
-  h += '<div title="💰 Monthly: ' + ba + '/' + bl + CssFragment.StyleWidth + segments.billing + CssFragment.BarSegmentTail + cCbBilling[0] + ',' + cCbBilling[1] + CssFragment.TransitionTail + trSlow + CssFragment.EaseClose;
-  h += '<div title="🔄 Rollover: ' + ro + '/' + rl + CssFragment.StyleWidth + segments.rollover + CssFragment.BarSegmentTail + cCbRollover[0] + ',' + cCbRollover[1] + CssFragment.TransitionTail + trSlow + CssFragment.EaseClose;
-  h += '<div title="📅 Free: ' + df + '/' + dl + CssFragment.StyleWidth + segments.daily + CssFragment.BarSegmentTail + cCbDaily[0] + ',' + cCbDaily[1] + CssFragment.TransitionTail + trSlow + CssFragment.EaseClose;
+  h += '<div title="🎁 Bonus: ' + fr + CssFragmentType.StyleWidth + segments.free + CssFragmentType.BarSegmentTail + cCbBonus[0] + ',' + cCbBonus[1] + CssFragmentType.TransitionTail + trSlow + CssFragmentType.EaseClose;
+  h += '<div title="💰 Monthly: ' + ba + '/' + bl + CssFragmentType.StyleWidth + segments.billing + CssFragmentType.BarSegmentTail + cCbBilling[0] + ',' + cCbBilling[1] + CssFragmentType.TransitionTail + trSlow + CssFragmentType.EaseClose;
+  h += '<div title="🔄 Rollover: ' + ro + '/' + rl + CssFragmentType.StyleWidth + segments.rollover + CssFragmentType.BarSegmentTail + cCbRollover[0] + ',' + cCbRollover[1] + CssFragmentType.TransitionTail + trSlow + CssFragmentType.EaseClose;
+  h += '<div title="📅 Free: ' + df + '/' + dl + CssFragmentType.StyleWidth + segments.daily + CssFragmentType.BarSegmentTail + cCbDaily[0] + ',' + cCbDaily[1] + CssFragmentType.TransitionTail + trSlow + CssFragmentType.EaseClose;
   h += '</div>';
   h += '</div>';
   const icoStyle = 'display:inline-block;min-width:42px;text-align:right;';
   const icoStyleWide = 'display:inline-block;min-width:60px;text-align:right;font-weight:700;';
   if (compact) {
     h += '<span style="font-size:' + tFontSm + ';font-family:' + tFont + ';white-space:nowrap;">';
-    h += CssFragment.SpanStyleColor + cPrimaryLight + ';' + icoStyle + '" title="🎁 Bonus — Promotional one-time credits (remaining/granted)">🎁' + fmtPair(fr, fg) + '</span> ';
-    h += CssFragment.SpanStyleColor + cCbBilling[1] + ';' + icoStyle + '" title="💰 Monthly — Subscription billing credits (remaining/limit)">💰' + fmtPair(ba, bl) + '</span> ';
-    h += CssFragment.SpanStyleColor + cLogInfo + ';' + icoStyle + '" title="🔄 Rollover — Unused credits carried over (remaining/limit)">🔄' + fmtPair(ro, rl) + '</span> ';
-    h += CssFragment.SpanStyleColor + cCbDaily[1] + ';' + icoStyle + '" title="📅 Free — Daily free credits (remaining/limit)">📅' + fmtPair(df, dl) + '</span> ';
-    h += CssFragment.SpanStyleColor + cCbAvail + ';' + icoStyleWide + '" title="Available / Total credits">⚡' + av + '/' + tc + '</span>';
+    h += CssFragmentType.SpanStyleColor + cPrimaryLight + ';' + icoStyle + '" title="🎁 Bonus — Promotional one-time credits (remaining/granted)">🎁' + fmtPair(fr, fg) + '</span> ';
+    h += CssFragmentType.SpanStyleColor + cCbBilling[1] + ';' + icoStyle + '" title="💰 Monthly — Subscription billing credits (remaining/limit)">💰' + fmtPair(ba, bl) + '</span> ';
+    h += CssFragmentType.SpanStyleColor + cLogInfo + ';' + icoStyle + '" title="🔄 Rollover — Unused credits carried over (remaining/limit)">🔄' + fmtPair(ro, rl) + '</span> ';
+    h += CssFragmentType.SpanStyleColor + cCbDaily[1] + ';' + icoStyle + '" title="📅 Free — Daily free credits (remaining/limit)">📅' + fmtPair(df, dl) + '</span> ';
+    h += CssFragmentType.SpanStyleColor + cCbAvail + ';' + icoStyleWide + '" title="Available / Total credits">⚡' + av + '/' + tc + '</span>';
     h += '</span>';
   } else {
     h += '<span style="font-size:' + tFontSm + ';white-space:nowrap;font-family:' + tFont + ';line-height:1;">';
-    h += CssFragment.SpanStyleColor + cPrimaryLight + ';' + icoStyle + '" title="🎁 Bonus — Promotional one-time credits (remaining/granted)">🎁' + fmtPair(fr, fg) + '</span> ';
-    h += CssFragment.SpanStyleColor + cCbBilling[1] + ';' + icoStyle + '" title="💰 Monthly — Subscription billing credits (remaining/limit)">💰' + fmtPair(ba, bl) + '</span> ';
-    h += CssFragment.SpanStyleColor + cLogInfo + ';' + icoStyle + '" title="🔄 Rollover — Unused credits carried over (remaining/limit)">🔄' + fmtPair(ro, rl) + '</span> ';
-    h += CssFragment.SpanStyleColor + cCbDaily[1] + ';' + icoStyle + '" title="📅 Free — Daily free credits (remaining/limit)">📅' + fmtPair(df, dl) + '</span> ';
-    h += CssFragment.SpanStyleColor + cCbAvail + ';' + icoStyleWide + '" title="⚡ Available / Total credits">⚡' + av + '/' + tc + '</span>';
+    h += CssFragmentType.SpanStyleColor + cPrimaryLight + ';' + icoStyle + '" title="🎁 Bonus — Promotional one-time credits (remaining/granted)">🎁' + fmtPair(fr, fg) + '</span> ';
+    h += CssFragmentType.SpanStyleColor + cCbBilling[1] + ';' + icoStyle + '" title="💰 Monthly — Subscription billing credits (remaining/limit)">💰' + fmtPair(ba, bl) + '</span> ';
+    h += CssFragmentType.SpanStyleColor + cLogInfo + ';' + icoStyle + '" title="🔄 Rollover — Unused credits carried over (remaining/limit)">🔄' + fmtPair(ro, rl) + '</span> ';
+    h += CssFragmentType.SpanStyleColor + cCbDaily[1] + ';' + icoStyle + '" title="📅 Free — Daily free credits (remaining/limit)">📅' + fmtPair(df, dl) + '</span> ';
+    h += CssFragmentType.SpanStyleColor + cCbAvail + ';' + icoStyleWide + '" title="⚡ Available / Total credits">⚡' + av + '/' + tc + '</span>';
     h += '</span>';
   }
   h += '</div>';

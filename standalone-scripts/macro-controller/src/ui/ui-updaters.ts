@@ -203,7 +203,7 @@ export function destroyPanel(): void {
   // v3.60.0: also remove satellite elements with their own idempotency guards
   const recordIndicator = document.getElementById(IDS.RECORD_INDICATOR);
   if (recordIndicator) recordIndicator.remove();
-  // v4.16+: inline strips (Plan / Next / Repeat) are NOT torn down here.
+  // v4.16+: inline strips (PlanTierType / Next / Repeat) are NOT torn down here.
   // They live in the shared `#marco-inline-strips-frame` above the chat box
   // and persist until the user explicitly clicks the frame × button. Closing
   // the TS Macro panel must not kill them. See plan

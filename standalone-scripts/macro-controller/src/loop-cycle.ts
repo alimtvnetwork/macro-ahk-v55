@@ -1,7 +1,7 @@
 /**
  * Loop Cycle - Core API-based loop iteration logic.
  *
- * Plan-17 step 13: fallback fetch flow moved to `./loop-cycle-fallback` to
+ * PlanTierType-17 step 13: fallback fetch flow moved to `./loop-cycle-fallback` to
  * keep this file under the 500 LOC cap. This module now owns only the
  * cycle entry point (`runCycle`), preconditions, and delegate-timeout guard.
  *

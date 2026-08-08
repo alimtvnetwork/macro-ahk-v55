@@ -10,7 +10,7 @@ import {
   type SortState,
 } from '../ui/credit-totals-modal';
 import type { WorkspaceCredit } from '../types';
-import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
+import { CreditFetchOutcomeType } from '../credit-balance-update/credit-fetch-outcome';
 import { __writeCreditBalanceUpdateMemoryCacheForTests, clearCreditBalanceUpdateMemoryCache } from '../credit-balance-update/credit-balance-cache';
 
 function ws(partial: Partial<WorkspaceCredit>): WorkspaceCredit {
@@ -78,7 +78,7 @@ describe('sortWorkspaces', () => {
   it('sorts by resolver-backed totals when raw workspace totals are 0/0', () => {
     clearCreditBalanceUpdateMemoryCache();
     __writeCreditBalanceUpdateMemoryCacheForTests('cached-high', {
-      outcome: CreditFetchOutcome.ApiHit,
+      outcome: CreditFetchOutcomeType.ApiHit,
       fetchedAt: Date.now(),
       sourceUrl: 'test',
       errorDetail: null,

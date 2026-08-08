@@ -111,7 +111,7 @@ describe('CSV export — header / row alignment', () => {
     const lines = exportAndRead([makeWs({})]);
     const header = lines[0];
     expect(header).toContain('Status Kind');
-    expect(header).toContain('Status Label');
+    expect(header).toContain('Status LabelType');
     expect(header).toContain('Subscription Status Changed At');
     expect(header).toContain('Days Since Status Change');
     expect(header).toContain('Days To Refill');

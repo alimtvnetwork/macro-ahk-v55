@@ -7,7 +7,7 @@ import { extractProjectIdFromUrl } from './workspace-detection';
 import { log } from './logger';
 import { syncTaskQueueToDb, saveProjectMetadata } from './db/macro-db';
 import { state } from './shared-state';
-import { Status6, DirectionEnum } from "./types/enums";
+import { MacroTaskStatusType, DirectionType } from "./types/enums";
 
 export interface MacroTask {
   id: string;
@@ -15,7 +15,7 @@ export interface MacroTask {
   projectName: string;
   prompt: string;
   timestamp: number;
-  status: Status6;
+  status: MacroTaskStatusType;
   error?: string;
   retryCount?: number;
   holdUntil?: number;
@@ -249,7 +249,7 @@ export function getQueueDelayUntil(): number { return _queueDelayUntil; }
 /**
  * Reorder a task in the queue.
  */
-export async function reorderTask(taskId: string, direction: DirectionEnum): Promise<void> {
+export async function reorderTask(taskId: string, direction: DirectionType): Promise<void> {
   const queueState = await loadTaskQueue();
   const index = queueState.tasks.findIndex(t => t.id === taskId);
   if (index === -1) return;

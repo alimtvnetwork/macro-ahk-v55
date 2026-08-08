@@ -1,5 +1,5 @@
 /** Outcomes for one credit-balance resolution attempt. */
-export const enum CreditFetchOutcome {
+export const enum CreditFetchOutcomeType {
     InlineHit = 'InlineHit',
     ApiHit = 'ApiHit',
     ApiCacheHit = 'ApiCacheHit',

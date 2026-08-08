@@ -1,5 +1,5 @@
 /**
- * seed-plan-next.ts - idempotent seeder for the Plan/Next prompt library
+ * seed-plan-next.ts - idempotent seeder for the PlanTierType/Next prompt library
  * (plan-14, step 9). Emits structured boot telemetry (v4.72.0):
  *   { role, inserted, skipped, promotedDefault, alreadyDefault }
  *
@@ -26,7 +26,7 @@ import {
     REPLACE_VALUES_DEFAULT_JSON,
 } from '../db/prompt-defaults';
 import type { PromptRole } from '../types/prompt-role';
-import { StorageKey } from '../types/storage-keys';
+import { StorageKeyType } from '../types/storage-keys';
 import { emitPromptSeedEvent } from '../telemetry/prompt-seed-telemetry';
 
 type RawSqlResp = SqlBridgeResp;
@@ -41,9 +41,9 @@ interface RoleTelemetry {
     skipped: number;
     promotedDefault: number;
     alreadyDefault: number;
-    /** Plan-15 task 14: seeded replace-token key (e.g. `n`). */
+    /** PlanTierType-15 task 14: seeded replace-token key (e.g. `n`). */
     replaceKey: string;
-    /** Plan-15 task 14: count of chip values seeded for the role. */
+    /** PlanTierType-15 task 14: count of chip values seeded for the role. */
     replaceValueCount: number;
 }
 interface SeedResult { ok: boolean; error?: string; telemetry?: RoleTelemetry[] }
@@ -154,7 +154,7 @@ async function promoteDefaultsAndTally(tel: Map<PromptRole, RoleTelemetry>): Pro
 function persistTelemetry(tel: RoleTelemetry[]): void {
     try {
         const payload = { at: new Date().toISOString(), roles: tel };
-        localStorage.setItem(StorageKey.LastSeedTelemetry, JSON.stringify(payload));
+        localStorage.setItem(StorageKeyType.LastSeedTelemetry, JSON.stringify(payload));
     } catch (err) {
         const reason = err instanceof Error ? err.message : String(err);
         logDiagnosticFromCode('SEED_TELEMETRY_E001', { reason }, err);
@@ -398,11 +398,8 @@ import { MethodEnum1 } from "../types/enums";
 
 // eslint-disable-next-line max-lines-per-function
 export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> {
-    if (!getPromptsConfig) {
-        return ServiceResult.wrap({ ok: false, error: 'startup dependency missing (getPromptsConfig)' });
-    }
+    const startedAt = Date.now();
     try {
-        const startedAt = Date.now();
         emitPromptSeedEvent({ event: 'seed.start', outcome: 'ok' });
         const tel = initTelemetry();
         const existing = await selectExistingSlugs();

@@ -3,11 +3,11 @@
  */
 
 import { useEffect, useState } from "react";
-import { VariantEnum3 } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { ToastVariantType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 interface ToastProps {
     message: string;
-    variant: VariantEnum3;
+    variant: ToastVariantType;
     onDismiss: () => void;
 }
 

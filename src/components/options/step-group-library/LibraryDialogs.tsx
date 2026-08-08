@@ -7,7 +7,7 @@
  * bags directly (`lib`, `state`, `viewModel`, `mutations`, `exportImport`,
  * `importApi`).
  *
- * Plan 25 · Step 8 (SS-06 Phase 4): the previous flat 41-prop surface
+ * PlanTierType 25 · Step 8 (SS-06 Phase 4): the previous flat 41-prop surface
  * was collapsed into six named bags. Each sub-group destructures only
  * the bags it needs, so future prop churn stays local.
  */
@@ -17,7 +17,7 @@ import { FilePlus2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -70,7 +70,7 @@ import type {
 
 export interface StepEditorSubmitInput {
     readonly StepKindId: StepKindId;
-    readonly Label: string | null;
+    readonly LabelType: string | null;
     readonly PayloadJson: string | null;
     readonly TargetStepGroupId: number | null;
 }
@@ -101,7 +101,7 @@ function CreateGroupDialog(props: {
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-2">
-                    <Label htmlFor="new-group-name">Name</Label>
+                    <LabelType htmlFor="new-group-name">Name</LabelType>
                     <Input
                         id="new-group-name"
                         value={state.name}
@@ -144,7 +144,7 @@ function RenameGroupDialog(props: {
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-2">
-                    <Label htmlFor="rename-group-name">New name</Label>
+                    <LabelType htmlFor="rename-group-name">New name</LabelType>
                     <Input
                         id="rename-group-name"
                         value={state.name}
@@ -202,7 +202,7 @@ function DeleteGroupDialog(props: {
 
 function renderDeleteStepBody(state: DeleteStepDialogState): string {
     if (state.step === null) return "No step selected.";
-    const label = state.step.Label ?? `Step #${state.step.StepId}`;
+    const label = state.step.LabelType ?? `Step #${state.step.StepId}`;
     return `"${label}" will be removed from this group. This cannot be undone.`;
 }
 

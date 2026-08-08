@@ -1,4 +1,4 @@
-import { RunAtEnum1, MatchType1 } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { ScriptRunAtType, UrlRuleMatchType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /**
  * Marco Extension — Script & Config Types
@@ -18,7 +18,7 @@ export interface StoredScript {
     isAbsolute?: boolean;
     order: number;
     isEnabled: boolean;
-    runAt?: RunAtEnum1;
+    runAt?: ScriptRunAtType;
     configBinding?: string;
     themeBinding?: string;
     cookieBinding?: string;
@@ -37,7 +37,7 @@ export interface StoredScript {
      * the seed project's `TargetUrls[].Pattern`. Consumed by auto-attach (C2)
      * in src/background/auto-attach.ts. Absence → no auto-attach (safe default).
      *
-     * NOTE: legacy `string[]` shape — does NOT carry `MatchType`. Glob is
+     * NOTE: legacy `string[]` shape — does NOT carry `MatchRuleType`. Glob is
      * implied. Use `urlMatchRules` (below) when the distinction between
      * `exact`, `glob`, and `regex` matters (e.g. lovable-dashboard's exact
      * `https://lovable.dev/dashboard` match). Kept for back-compat with
@@ -45,7 +45,7 @@ export interface StoredScript {
      */
     urlMatches?: string[];
     /**
-     * Rich URL-rule list with `MatchType` preserved. Populated by
+     * Rich URL-rule list with `MatchRuleType` preserved. Populated by
      * manifest-seeder alongside `urlMatches`. Consumers that need to honor
      * exact / regex semantics MUST prefer this field when present and fall
      * back to globbing `urlMatches` only when it is absent.
@@ -60,7 +60,7 @@ export interface StoredScript {
 }
 
 /**
- * URL match rule with the original `MatchType` preserved.
+ * URL match rule with the original `MatchRuleType` preserved.
  *
  * `glob`  — wildcard pattern (Chrome match-pattern style, e.g. `https://*.example.com/*`)
  * `exact` — strict string equality on the full href
@@ -70,7 +70,7 @@ export interface StoredScript {
  */
 export interface UrlRule {
     pattern: string;
-    matchType: MatchType1;
+    matchType: UrlRuleMatchType;
 }
 
 /** A stored JSON config record. */

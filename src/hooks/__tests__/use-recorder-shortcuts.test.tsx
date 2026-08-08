@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, render } from "@testing-library/react";
 import { useRecorderShortcuts } from "../use-recorder-shortcuts";
 import type { RecordingSession } from "@/background/recorder/recorder-session-types";
-import { PhaseEnum1 } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { BuildSessionPhaseType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 interface ProbeProps {
     readonly session: RecordingSession | null;
@@ -23,7 +23,7 @@ function Probe(props: ProbeProps): JSX.Element {
     return <div data-testid="probe" />;
 }
 
-function buildSession(phase: PhaseEnum1): RecordingSession {
+function buildSession(phase: BuildSessionPhaseType): RecordingSession {
     return {
         SessionId: "s1",
         ProjectSlug: "p",

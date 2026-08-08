@@ -1,7 +1,7 @@
 /**
  * plan-next-prompts.ts - seed rows for the Prompt table.
  *
- * The default Plan and Next chip bodies come from the generated prompt bundle,
+ * The default PlanTierType and Next chip bodies come from the generated prompt bundle,
  * which is built from standalone-scripts/prompts/13-next-tasks/prompt.md and
  * standalone-scripts/prompts/14-plan-steps/prompt.md. Do not hand-copy those
  * prompt bodies into this file again.
@@ -53,7 +53,7 @@ export const PLAN_DEFAULT_LEGACY_BODIES: string[] = [
         '3. `XX` is the next free 2-digit sequence across `pending/` + `completed/` combined.',
     ].join('\n'),
     [
-        '# {{n}} steps Plan, Maximal Enforcement',
+        '# {{n}} steps PlanTierType, Maximal Enforcement',
         '',
         'Parse the number {{n}} in this prompt\'s header. That number is the EXACT count of steps in the plan you must write.',
         '',
@@ -98,10 +98,10 @@ export interface SeedPromptRow {
 }
 
 export const PLAN_NEXT_SEED_ROWS: SeedPromptRow[] = [
-    { slug: 'plan-default', name: 'Plan (default)', body: PLAN_DEFAULT_BODY, role: 'plan', isDefault: true },
-    { slug: 'plan-concise', name: 'Plan (concise)', body: '# Plan in {{n}} steps (concise)\n\nWrite exactly {{n}} numbered steps. No preamble, no rationale block per step, one line each. TODO(user): replace with final concise variant.', role: 'plan', isDefault: false },
-    { slug: 'plan-with-evidence', name: 'Plan (evidence-first)', body: '# Plan in {{n}} steps (evidence-first)\n\nFor each of the {{n}} steps include a verifiable evidence artifact path. TODO(user): replace with final evidence-first variant.', role: 'plan', isDefault: false },
-    { slug: 'plan-risk-annotated', name: 'Plan (risk-annotated)', body: '# Plan in {{n}} steps (risk-annotated)\n\nAnnotate each of the {{n}} steps with a risk score 1-5 and a rollback note per step. TODO(user): replace with final risk-annotated variant.', role: 'plan', isDefault: false },
+    { slug: 'plan-default', name: 'PlanTierType (default)', body: PLAN_DEFAULT_BODY, role: 'plan', isDefault: true },
+    { slug: 'plan-concise', name: 'PlanTierType (concise)', body: '# PlanTierType in {{n}} steps (concise)\n\nWrite exactly {{n}} numbered steps. No preamble, no rationale block per step, one line each. TODO(user): replace with final concise variant.', role: 'plan', isDefault: false },
+    { slug: 'plan-with-evidence', name: 'PlanTierType (evidence-first)', body: '# PlanTierType in {{n}} steps (evidence-first)\n\nFor each of the {{n}} steps include a verifiable evidence artifact path. TODO(user): replace with final evidence-first variant.', role: 'plan', isDefault: false },
+    { slug: 'plan-risk-annotated', name: 'PlanTierType (risk-annotated)', body: '# PlanTierType in {{n}} steps (risk-annotated)\n\nAnnotate each of the {{n}} steps with a risk score 1-5 and a rollback note per step. TODO(user): replace with final risk-annotated variant.', role: 'plan', isDefault: false },
     { slug: 'next-default', name: 'Next (default)', body: NEXT_DEFAULT_BODY, role: 'next', isDefault: true },
     { slug: 'next-concise', name: 'Next (concise)', body: 'Give me the next {{n}} steps from the current pending plan. One line each, no rationale. TODO(user): replace with final concise variant.', role: 'next', isDefault: false },
     { slug: 'next-with-time', name: 'Next (time-estimate)', body: 'Give me the next {{n}} steps from the current pending plan, each with a realistic time estimate and what it unblocks. TODO(user): replace with final time-estimate variant.', role: 'next', isDefault: false },

@@ -5,7 +5,7 @@
  * vocabulary, but typed as an enum so consumers can switch exhaustively
  * without resorting to magic strings.
  */
-export const enum InjectionRunAt {
+export const enum InjectionRunAtType {
     DocumentStart = "document_start",
     DocumentEnd = "document_end",
     DocumentIdle = "document_idle",

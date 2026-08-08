@@ -1,4 +1,4 @@
-import { Type8 } from "../types/enums";
+import { ShowMsgLevelType } from "../types/enums";
 
 /**
  * MacroLoop Controller — Database Schema Helpers
@@ -40,7 +40,7 @@ export function escHtml(text: string): string {
 }
 
 /** Show a success or error message in the given area. */
-export function showMsg(area: HTMLElement, type: Type8, text: string): void {
+export function showMsg(area: HTMLElement, type: ShowMsgLevelType, text: string): void {
   area.textContent = '';
   const isSuccess = type === 'ok';
   const cssClass = isSuccess ? 'marco-schema-msg-ok' : 'marco-schema-msg-err';

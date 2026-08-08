@@ -15,10 +15,10 @@ import { VERSION, IDS } from './shared-state';
 import { logSub } from './logger';
 import { nsWrite, nsCallTyped, nsReadTyped } from './api-namespace';
 import { UIManager } from './core/UIManager';
-import { Label } from './types';
-import { IdempotentResultEnum } from "./types/enums";
+import { LabelType } from './types';
+import { IdempotentResultType } from "./types/enums";
 
-type IdempotentResult = IdempotentResultEnum;
+type IdempotentResult = IdempotentResultType;
 
 const CONSOLE_PREFIX = '%c[MacroLoop v';
 const STYLE_GREEN = 'color: #10b981; font-weight: bold;';
@@ -65,7 +65,7 @@ export function runIdempotentCheck(): IdempotentResult {
 }
 
 function handleVersionMismatch(marker: HTMLElement, existingVersion: string): IdempotentResult {
-  console.warn(Label.LogMacroloopV + VERSION + '] VERSION MISMATCH: existing=' + existingVersion + ' new=' + VERSION + ', forcing re-injection');
+  console.warn(LabelType.LogMacroloopV + VERSION + '] VERSION MISMATCH: existing=' + existingVersion + ' new=' + VERSION + ', forcing re-injection');
   try { nsCallTyped('api.loop.stop'); } catch (e) { logSub('Version mismatch teardown: loop stop failed, ' + (e instanceof Error ? e.message : String(e)), 1); }
   marker.remove();
   const staleContainer = document.getElementById(IDS.CONTAINER);
@@ -92,7 +92,7 @@ function handleGlobalsIntact(marker: HTMLElement): IdempotentResult {
   }
 
   // Same version + globals intact, but UI container missing (SPA DOM wipe/race)
-  console.warn(Label.LogMacroloopV + VERSION + '] Marker+globals present but UI missing, attempting controller UI recovery');
+  console.warn(LabelType.LogMacroloopV + VERSION + '] Marker+globals present but UI missing, attempting controller UI recovery');
   return attemptUiRecovery(marker);
 }
 
@@ -108,10 +108,10 @@ function attemptUiRecovery(marker: HTMLElement): IdempotentResult {
         existingController.ui.update();
       }
     } else {
-      console.warn(Label.LogMacroloopV + VERSION + '] UI recovery skipped, UIManager not available on existing controller');
+      console.warn(LabelType.LogMacroloopV + VERSION + '] UI recovery skipped, UIManager not available on existing controller');
     }
   } catch (e) {
-    console.warn(Label.LogMacroloopV + VERSION + '] UI recovery via existing controller failed: ' + String(e));
+    console.warn(LabelType.LogMacroloopV + VERSION + '] UI recovery via existing controller failed: ' + String(e));
   }
 
   if (document.getElementById(IDS.CONTAINER)) {
@@ -120,7 +120,7 @@ function attemptUiRecovery(marker: HTMLElement): IdempotentResult {
   }
 
   // Recovery failed, force full re-bootstrap
-  console.warn(Label.LogMacroloopV + VERSION + '] UI recovery failed, forcing full re-bootstrap');
+  console.warn(LabelType.LogMacroloopV + VERSION + '] UI recovery failed, forcing full re-bootstrap');
   try { nsCallTyped('api.loop.stop'); } catch (_e) { logSub('UI recovery fallback: loop stop failed, ' + (_e instanceof Error ? _e.message : String(_e)), 1); }
   marker.remove();
   return 'proceed';
@@ -134,12 +134,12 @@ function healAllManagers(existingController: RecoverableController | null): void
   if (!existingController.ui) {
     const savedUIFactory = nsReadTyped('_internal.createUIManager') as (() => unknown) | undefined;
     if (savedUIFactory && typeof existingController.registerUI === 'function') {
-      console.warn(Label.LogMacroloopV + VERSION + '] Self-healing: auto-registering UIManager from persisted factory');
+      console.warn(LabelType.LogMacroloopV + VERSION + '] Self-healing: auto-registering UIManager from persisted factory');
       existingController.registerUI(savedUIFactory());
     } else {
       const savedCreateFn = nsReadTyped('_internal.createUIWrapper') as (() => void) | undefined;
       if (savedCreateFn && typeof existingController.registerUI === 'function') {
-        console.warn(Label.LogMacroloopV + VERSION + '] Self-healing: auto-registering UIManager from persisted createFn (legacy)');
+        console.warn(LabelType.LogMacroloopV + VERSION + '] Self-healing: auto-registering UIManager from persisted createFn (legacy)');
         const healedUI = new UIManager();
         healedUI.setCreateFn(savedCreateFn);
         existingController.registerUI(healedUI);
@@ -171,14 +171,14 @@ function healManager(
   if (!has) {
     const factory = nsReadTyped(nsKey as keyof import('./api-namespace').NsPathMap) as (() => unknown) | undefined;
     if (factory) {
-      console.warn(Label.LogMacroloopV + VERSION + '] Self-healing: auto-registering ' + label + ' from persisted factory');
+      console.warn(LabelType.LogMacroloopV + VERSION + '] Self-healing: auto-registering ' + label + ' from persisted factory');
       register(factory());
     }
   }
 }
 
 function handleStaleMarker(marker: HTMLElement): IdempotentResult {
-  console.warn(Label.LogMacroloopV + VERSION + '] Stale marker found (globals missing), removing marker and re-initializing');
+  console.warn(LabelType.LogMacroloopV + VERSION + '] Stale marker found (globals missing), removing marker and re-initializing');
   marker.remove();
   const staleContainer = document.getElementById(IDS.CONTAINER);
   if (staleContainer) staleContainer.remove();

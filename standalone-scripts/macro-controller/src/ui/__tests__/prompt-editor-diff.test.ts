@@ -77,7 +77,7 @@ function openEditorWith(baseline: string): {
   const editPrompt = { id: 'db-row-1', slug: seedRow.slug, name: seedRow.name, text: baseline };
   openPromptCreationModal({} as never, {} as never, editPrompt as never, undefined, {
     requiredTokens: ['n'],
-    roleLabel: 'Plan',
+    roleLabel: 'PlanTierType',
     role: 'plan',
   });
   const overlay = document.getElementById('marco-prompt-modal')!;
@@ -87,7 +87,7 @@ function openEditorWith(baseline: string): {
   return { overlay, toggle, host, textarea };
 }
 
-describe('Diff toggle wired into the Plan editor', () => {
+describe('Diff toggle wired into the PlanTierType editor', () => {
   it('is hidden by default and revealed on click', () => {
     const { toggle, host } = openEditorWith('line-1\nline-2\n{{n}} steps');
     expect(host.style.display).toBe('none');

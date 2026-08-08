@@ -1,5 +1,5 @@
 /**
- * Plan 22 · gap #7 follow-up: remaining `rename-api` toast sites migrated to
+ * PlanTierType 22 · gap #7 follow-up: remaining `rename-api` toast sites migrated to
  * `showDiagnosticToast`.
  *
  * Locks the fixed contract for the three surviving raw-showToast callsites:

@@ -1,7 +1,7 @@
 import { getBearerToken, markBearerTokenExpired } from '../auth';
 import { CREDIT_API_BASE } from '../shared-state';
-import { CreditFetchOutcome } from './credit-fetch-outcome';
-import { Plan } from './plan';
+import { CreditFetchOutcomeType } from './credit-fetch-outcome';
+import { PlanTierType } from './plan';
 import { parseCreditBalance, type CreditBalanceWire } from './credit-balance-parser';
 import { logCreditFetchFailure, logCreditParseFailure, sanitizeBearerPrefix } from './credit-balance-logger';
 import type { CreditBalance, CreditFailureLogPayload, CreditFetchResult } from './credit-balance-types';
@@ -12,7 +12,7 @@ const DEFAULT_FETCH_TIMEOUT_MS = 3000;
 
 export interface FetchCreditBalanceOptions {
     readonly workspaceId: string;
-    readonly plan: Plan;
+    readonly plan: PlanTierType;
     readonly timeoutMs?: number;
     readonly forceTokenRefresh?: boolean;
 }
@@ -54,7 +54,7 @@ function buildFailurePayload(
         ReasonDetail: detail,
         SourceUrl: sourceUrl,
         WorkspaceId: options.workspaceId,
-        Plan: options.plan,
+        PlanTierType: options.plan,
         BearerPrefix: sanitizeBearerPrefix(token),
         Status: status,
         BodyPreview: bodyPreview,
@@ -91,7 +91,7 @@ export async function fetchWithTimeout(
 }
 
 function buildResult(
-    outcome: CreditFetchOutcome,
+    outcome: CreditFetchOutcomeType,
     balance: CreditBalance | null,
     sourceUrl: string,
     errorDetail: string | null,
@@ -99,10 +99,10 @@ function buildResult(
     return { outcome, balance, fetchedAt: Date.now(), sourceUrl, errorDetail };
 }
 
-function classifyHttpReason(status: number): Enum_76ebb585 {
-    if (status === 401 || status === 403) return 'AuthError';
-    if (status >= 500) return 'Http5xx';
-    return 'Http4xx';
+function classifyHttpReason(status: number): CreditFetchOutcomeType {
+    if (status === 401 || status === 403) return CreditFetchOutcomeType.AuthError;
+    if (status >= 500) return CreditFetchOutcomeType.HttpError;
+    return CreditFetchOutcomeType.HttpError;
 }
 
 async function handleNonOkResponse(
@@ -113,13 +113,14 @@ async function handleNonOkResponse(
     startMs: number,
 ): Promise<CreditFetchResult> {
     const bodyPreview = await readBodyPreview(response);
-    const reason = classifyHttpReason(response.status);
-    const detail = 'HTTP ' + response.status + ' from /workspaces/{id}/credit-balance';
-    if (reason === 'AuthError') {
+    const status = response.status;
+    const detail = 'HTTP ' + status + ' from /workspaces/{id}/credit-balance';
+    const reasonStr = status === 401 || status === 403 ? 'AuthError' : status >= 500 ? 'Http5xx' : 'HttpError';
+    if (reasonStr === 'AuthError') {
         markBearerTokenExpired('credit-balance-update');
     }
-    logCreditFetchFailure(buildFailurePayload(reason, detail, options, url, token, response.status, bodyPreview, startMs));
-    const outcome = reason === 'AuthError' ? CreditFetchOutcome.AuthError : CreditFetchOutcome.HttpError;
+    logCreditFetchFailure(buildFailurePayload(reasonStr, detail, options, url, token, status, bodyPreview, startMs));
+    const outcome = reasonStr === 'AuthError' ? CreditFetchOutcomeType.AuthError : CreditFetchOutcomeType.HttpError;
     return buildResult(outcome, null, url, detail);
 }
 
@@ -132,11 +133,11 @@ async function parseOkResponse(
 ): Promise<CreditFetchResult> {
     const raw = await response.json() as CreditBalanceWire;
     try {
-        return buildResult(CreditFetchOutcome.ApiHit, parseCreditBalance(raw), url, null);
+        return buildResult(CreditFetchOutcomeType.ApiHit, parseCreditBalance(raw), url, null);
     } catch (caught: CaughtError) {
         const detail = 'ParseError: ' + toCaughtMessage(caught);
         logCreditParseFailure(buildFailurePayload('ParseError', detail, options, url, token, response.status, null, startMs), caught);
-        return buildResult(CreditFetchOutcome.ParseError, null, url, detail);
+        return buildResult(CreditFetchOutcomeType.ParseError, null, url, detail);
     }
 }
 
@@ -151,11 +152,11 @@ function handleCaughtError(
     if (isAbortError(caught)) {
         const detail = 'Exceeded ' + timeoutMs + ' ms budget for workspace ' + options.workspaceId;
         logCreditFetchFailure(buildFailurePayload('Timeout', detail, options, url, token, null, null, startMs), caught);
-        return buildResult(CreditFetchOutcome.Timeout, null, url, detail);
+        return buildResult(CreditFetchOutcomeType.Timeout, null, url, detail);
     }
     const detail = 'Network error: ' + toCaughtMessage(caught);
     logCreditFetchFailure(buildFailurePayload('NetworkError', detail, options, url, token, null, null, startMs), caught);
-    return buildResult(CreditFetchOutcome.HttpError, null, url, detail);
+    return buildResult(CreditFetchOutcomeType.HttpError, null, url, detail);
 }
 
 export async function fetchWorkspaceCreditBalance(
@@ -169,7 +170,7 @@ export async function fetchWorkspaceCreditBalance(
     if (!token) {
         const detail = 'No bearer token returned by unified getBearerToken() contract';
         logCreditFetchFailure(buildFailurePayload('MissingToken', detail, options, url, null, null, null, startMs));
-        return buildResult(CreditFetchOutcome.MissingToken, null, url, detail);
+        return buildResult(CreditFetchOutcomeType.MissingToken, null, url, detail);
     }
 
     try {

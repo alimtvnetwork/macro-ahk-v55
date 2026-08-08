@@ -1,7 +1,7 @@
 /**
  * Marco Extension — Delivery-log helpers for WebhookSettingsDialog.
  *
- * Extracted from `WebhookSettingsDialog.tsx` (v4.213.0) as part of Plan-24
+ * Extracted from `WebhookSettingsDialog.tsx` (v4.213.0) as part of PlanTierType-24
  * SS-05: the dialog's render function had grown to 627 lines; moving these
  * pure formatters/exporters here cuts ~230 lines from the component file
  * and clears the `max-lines-per-function` warning on the dialog.
@@ -19,7 +19,7 @@ import {
     type WebhookDeliverySuccess,
 } from "@/background/recorder/step-library/result-webhook";
 import { VariantEnum } from "../../../types/enums";
-import { MimeKindEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { MimeKindType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 /**
  * A delivery-log entry is a "corrupt placeholder" when the loader could not
@@ -245,7 +245,7 @@ function downloadFile(filename: string, mimeType: string, content: string): void
     window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
-export function exportFilteredLog(entries: ReadonlyArray<WebhookDeliveryResult>, format: MimeKindEnum): void {
+export function exportFilteredLog(entries: ReadonlyArray<WebhookDeliveryResult>, format: MimeKindType): void {
     if (entries.length === 0) {
         toast.error("No entries match the current filters");
         return;

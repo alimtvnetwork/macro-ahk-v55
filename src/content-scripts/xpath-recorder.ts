@@ -27,7 +27,7 @@ import { enqueueCapture, flushNow } from "./xpath-capture-coalescer";
 import { mountRecorderToolbar, type RecorderToolbarHandle, type RecorderToolbarOptions } from "../background/recorder/recorder-toolbar";
 import { mountDropZoneOverlay, type DropZoneHandle } from "../background/recorder/dropzone-overlay";
 import type { RecordingPhase, RecordingSession } from "../background/recorder/recorder-session-types";
-import { FullStrategyEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { FullStrategyType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  State                                                              */
@@ -41,7 +41,7 @@ let dropzoneHandle: DropZoneHandle | null = null;
 /*  XPath Generation — Priority Strategy                               */
 /* ------------------------------------------------------------------ */
 
-type FullStrategy = FullStrategyEnum;
+type FullStrategy = FullStrategyType;
 
 interface FullCapture {
     xpath: string;

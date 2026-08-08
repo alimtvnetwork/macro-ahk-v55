@@ -3,7 +3,7 @@ import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 
 import { cn } from "@/lib/utils";
-import { IndicatorEnum, Enum_7cb0a3c2 } from "../../types/enums";
+import { IndicatorEnum, SemanticSemantic7cb0a3c } from "../../types/enums";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const;
@@ -232,7 +232,7 @@ const ChartLegend = RechartsPrimitive.Legend;
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> &
-    Pick<RechartsPrimitive.LegendProps, Enum_7cb0a3c2> & {
+    Pick<RechartsPrimitive.LegendProps, SemanticSemantic7cb0a3c> & {
       hideIcon?: boolean;
       nameKey?: string;
     }

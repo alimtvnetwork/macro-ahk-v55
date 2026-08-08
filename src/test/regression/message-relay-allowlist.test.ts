@@ -9,7 +9,7 @@
  *   bridge. The relay in `src/content-scripts/message-relay.ts` filters
  *   `event.data.type` against a static `ALLOWED_TYPES` allow-list before
  *   forwarding to the service worker. Dropping `PROJECT_API` from that
- *   set makes every Plan/Next/Generic DB call fail synchronously with
+ *   set makes every PlanTierType/Next/Generic DB call fail synchronously with
  *   `"Blocked disallowed message type: PROJECT_API"`, which surfaces as
  *   the red "Load error" rows in the Prompt Library modal.
  *

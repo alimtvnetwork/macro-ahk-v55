@@ -21,7 +21,7 @@ import { CONFIG, WS_HISTORY_MAX_ENTRIES, loopCreditState, state } from './shared
 import { logError } from './error-utils';
 
 import { WORKSPACE_OBSERVER_MAX_RETRIES } from './constants';
-import { Label } from './types';
+import { LabelType } from './types';
 
 function mc() { return MacroController.getInstance(); }
 
@@ -61,7 +61,7 @@ function tryApplyWorkspaceName(name: string, source: string): boolean {
     return false;
   }
   if (state.workspaceFromApi) {
-    logSub(source + ' returned "' + name + Label.IgnoringApiSet + state.workspaceName, 1);
+    logSub(source + ' returned "' + name + LabelType.IgnoringApiSet + state.workspaceName, 1);
     return true; // accepted but not changed
   }
   if (name !== state.workspaceName) {
@@ -354,7 +354,7 @@ function applyInitialObserverName(name: string): void {
   if (!isKnownWorkspaceName(name)) {
     logSub('Observer init: "' + name + '" not a known workspace — skipping (API will detect)', 1);
   } else if (state.workspaceFromApi) {
-    logSub('Observer init: "' + name + Label.IgnoringApiSet + state.workspaceName, 1);
+    logSub('Observer init: "' + name + LabelType.IgnoringApiSet + state.workspaceName, 1);
   } else {
     const oldName = state.workspaceName;
     state.workspaceName = name;
@@ -394,7 +394,7 @@ function handleObserverMutation(navEl: Node | Element): void {
     return;
   }
   if (state.workspaceFromApi) {
-    logSub('Observer mutation: "' + newName + Label.IgnoringApiSet + state.workspaceName, 1);
+    logSub('Observer mutation: "' + newName + LabelType.IgnoringApiSet + state.workspaceName, 1);
     return;
   }
   if (newName && newName !== state.workspaceName) {

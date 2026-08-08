@@ -1,5 +1,5 @@
 import type { WorkspaceCredit, HTMLElementWithHandlers } from './types';
-import { DataAttr, DomId } from './types';
+import { DataAttrType, DomIdType } from './types';
 import { loopCreditState, state, getLoopWsCheckedIds, cPrimaryLight } from './shared-state';
 import { log } from './logger';
 import { logError } from './error-utils';
@@ -48,7 +48,7 @@ export {
   setLoopWsCreditSortMode,
   EXPIRED_WITH_CREDITS_MIN,
 } from './ws-view-state';
-export type { CreditSortMode } from './ws-view-state';
+export type { CreditSortModeType } from './ws-view-state';
 
 export { buildLoopTooltipText } from './ws-tooltip-builder';
 export { buildStatusPillHtml, buildTierBadgeHtml } from './ws-status-badges';
@@ -71,7 +71,7 @@ export function filterAndSortWorkspaces(
   workspaces: WorkspaceCredit[],
   filter: string,
 ): Array<{ ws: WorkspaceCredit; wsIndex: number }> {
-  const fs = readFilterState(filter, DataAttr.Active);
+  const fs = readFilterState(filter, DataAttrType.Active);
   const survivors: Array<{ ws: WorkspaceCredit; wsIndex: number }> = [];
   for (const [wsIndex, ws] of workspaces.entries()) {
     const isFilteredOut = !passesFilters(ws, fs);
@@ -136,8 +136,8 @@ export function renderLoopWorkspaceList(
   const survivors = filterAndSortWorkspaces(workspaces, filter);
   publishVisibleWorkspaces(workspaces);
 
-  const selEl = document.getElementById(DomId.LoopWsSelected);
-  const selIdValue = selEl ? selEl.getAttribute(DataAttr.SelectedId) || false : false;
+  const selEl = document.getElementById(DomIdType.LoopWsSelected);
+  const selIdValue = selEl ? selEl.getAttribute(DataAttrType.SelectedId) || false : false;
 
   const { frag, count, currentIdx } = buildWorkspaceNodes(survivors, currentName, maxTotalCredits, selIdValue);
 
@@ -162,7 +162,7 @@ function buildWorkspaceNodes(
   for (const { ws, wsIndex } of survivors) {
     const isCurrent = isCurrentWorkspace(ws, currentName);
     if (isCurrent) currentIdx = count;
-    frag.appendChild(buildWsRow(ws, wsIndex, isCurrent, count, maxTotalCredits, selIdValue, DataAttr.WsId, DataAttr.WsName, DataAttr.WsCurrent));
+    frag.appendChild(buildWsRow(ws, wsIndex, isCurrent, count, maxTotalCredits, selIdValue, DataAttrType.WsId, DataAttrType.WsName, DataAttrType.WsCurrent));
     count++;
   }
 
@@ -248,14 +248,14 @@ function _createClickHandler(): (e: MouseEvent) => void {
       e.preventDefault();
       e.stopPropagation();
       handleWsCheckboxClick(
-        item.getAttribute(DataAttr.WsId) || '',
+        item.getAttribute(DataAttrType.WsId) || '',
         parseInt(item.getAttribute('data-ws-idx') || '0', 10),
         e.shiftKey,
       );
       return;
     }
     setLoopWsNavIndex(parseInt(item.getAttribute('data-ws-idx') || '0', 10));
-    log('Selected workspace: ' + item.getAttribute(DataAttr.WsName), 'success');
+    log('Selected workspace: ' + item.getAttribute(DataAttrType.WsName), 'success');
   };
 }
 
@@ -266,12 +266,12 @@ function _createDblClickHandler(): (e: MouseEvent) => void {
     if (isMissingItem) return;
     e.preventDefault();
     e.stopPropagation();
-    if (item.getAttribute(DataAttr.WsCurrent) === 'true') {
-      log('Double-click on current workspace "' + item.getAttribute(DataAttr.WsName) + '" — no move needed', 'warn');
+    if (item.getAttribute(DataAttrType.WsCurrent) === 'true') {
+      log('Double-click on current workspace "' + item.getAttribute(DataAttrType.WsName) + '" — no move needed', 'warn');
       return;
     }
-    log('Double-click move -> ' + item.getAttribute(DataAttr.WsName) + ' (id=' + item.getAttribute(DataAttr.WsId) + ')', 'delegate');
-    moveToWorkspace(item.getAttribute(DataAttr.WsId) || '', item.getAttribute(DataAttr.WsName) || '');
+    log('Double-click move -> ' + item.getAttribute(DataAttrType.WsName) + ' (id=' + item.getAttribute(DataAttrType.WsId) + ')', 'delegate');
+    moveToWorkspace(item.getAttribute(DataAttrType.WsId) || '', item.getAttribute(DataAttrType.WsName) || '');
   };
 }
 
@@ -283,8 +283,8 @@ function _createCtxHandler(): (e: MouseEvent) => void {
     e.preventDefault();
     e.stopPropagation();
     showWsContextMenu(
-      item.getAttribute(DataAttr.WsId) || '',
-      item.getAttribute(DataAttr.WsName) || '',
+      item.getAttribute(DataAttrType.WsId) || '',
+      item.getAttribute(DataAttrType.WsName) || '',
       e.clientX, e.clientY,
     );
   };
@@ -295,11 +295,11 @@ function _createHoverHandler(): (e: MouseEvent) => void {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
     const isMissingItem = !item;
     if (isMissingItem) return;
-    const isCurrent = item.getAttribute(DataAttr.WsCurrent) === 'true';
+    const isCurrent = item.getAttribute(DataAttrType.WsCurrent) === 'true';
     if (isCurrent) return;
-    const selEl = document.getElementById(DomId.LoopWsSelected);
-    const selId = selEl ? selEl.getAttribute(DataAttr.SelectedId) : '';
-    const itemId = item.getAttribute(DataAttr.WsId);
+    const selEl = document.getElementById(DomIdType.LoopWsSelected);
+    const selId = selEl ? selEl.getAttribute(DataAttrType.SelectedId) : '';
+    const itemId = item.getAttribute(DataAttrType.WsId);
     if (selId && selId === itemId) return;
     item.style.background = 'rgba(59,130,246,0.15)';
   };
@@ -310,11 +310,11 @@ function _createOutHandler(): (e: MouseEvent) => void {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
     const isMissingItem = !item;
     if (isMissingItem) return;
-    const isCurrent = item.getAttribute(DataAttr.WsCurrent) === 'true';
+    const isCurrent = item.getAttribute(DataAttrType.WsCurrent) === 'true';
     if (isCurrent) return;
-    const selEl = document.getElementById(DomId.LoopWsSelected);
-    const selId = selEl ? selEl.getAttribute(DataAttr.SelectedId) : '';
-    const itemId = item.getAttribute(DataAttr.WsId);
+    const selEl = document.getElementById(DomIdType.LoopWsSelected);
+    const selId = selEl ? selEl.getAttribute(DataAttrType.SelectedId) : '';
+    const itemId = item.getAttribute(DataAttrType.WsId);
     if (selId && selId === itemId) return;
     item.style.background = 'transparent';
   };
@@ -371,8 +371,8 @@ export function populateLoopWorkspaceDropdown(): void {
     loopCreditState.lastCheckedAt || 0,
     viewState().getFreeOnly() ? 1 : 0,
     viewState().getCompactMode() ? 1 : 0,
-    rolloverEl ? rolloverEl.getAttribute(DataAttr.Active) : '',
-    billingEl ? billingEl.getAttribute(DataAttr.Active) : '',
+    rolloverEl ? rolloverEl.getAttribute(DataAttrType.Active) : '',
+    billingEl ? billingEl.getAttribute(DataAttrType.Active) : '',
     minCreditsEl ? (minCreditsEl as HTMLInputElement).value : '',
     viewState().getExpiredWithCredits() ? 1 : 0,
     viewState().getExpiring() ? 1 : 0,

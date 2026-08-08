@@ -3,8 +3,8 @@ import { buildAiGuidelineMarkdown } from '../prompt-ai-guideline';
 
 describe('buildAiGuidelineMarkdown', () => {
     it('includes every required token verbatim in backticked form', () => {
-        const md = buildAiGuidelineMarkdown({ roleLabel: 'Plan', requiredTokens: ['n', 'plan.count'] });
-        expect(md).toContain('# Marco Prompt Editing Guideline (Plan)');
+        const md = buildAiGuidelineMarkdown({ roleLabel: 'PlanTierType', requiredTokens: ['n', 'plan.count'] });
+        expect(md).toContain('# Marco Prompt Editing Guideline (PlanTierType)');
         expect(md).toContain('`{{n}}`');
         expect(md).toContain('`{{plan.count}}`');
         expect(md).toContain('Preserve every required token verbatim');

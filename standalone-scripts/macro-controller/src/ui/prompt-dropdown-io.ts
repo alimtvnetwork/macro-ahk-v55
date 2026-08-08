@@ -1,5 +1,5 @@
 /**
- * Prompt Dropdown IO helpers (Plan-17 steps 23 & 24)
+ * Prompt Dropdown IO helpers (PlanTierType-17 steps 23 & 24)
  *
  * Extracted from `ui/prompt-dropdown.ts` to keep that file under the
  * standalone-scripts 500-line guideline. Hosts the Export / Import pill

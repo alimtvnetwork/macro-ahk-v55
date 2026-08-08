@@ -23,7 +23,7 @@ import { getAuthRecoveryExhausted, setAuthRecoveryExhausted } from './rename-aut
 import type { RenameStrategy } from './types';
 import { delay } from './async-utils';
 import { logError } from './error-utils';
-import { ApiPath } from './types';
+import { ApiPathType } from './types';
 import { throwDiagnostic, DiagnosticError } from './errors/diagnostic-error';
 
 // ============================================
@@ -111,7 +111,7 @@ function rejectNoBearerToken(wsId: string): Error {
   // human template, and footerCode stay in the error registry (never duplicated).
   showDiagnosticToast(err, {
     noStop: true,
-    requestDetail: { method: 'PUT', url: ApiPath.UserWorkspacesSlash + wsId },
+    requestDetail: { method: 'PUT', url: ApiPathType.UserWorkspacesSlash + wsId },
   });
   return err;
 }
@@ -136,7 +136,7 @@ function handleCreditLimitFallback(
   showDiagnosticToast(err, {
     requestDetail: {
       method: 'PUT',
-      url: ApiPath.UserWorkspacesSlash + wsId,
+      url: ApiPathType.UserWorkspacesSlash + wsId,
       status: resp.status,
       responseBody: bodyPreview,
     },
@@ -160,7 +160,7 @@ async function handleRenameAuthRecovery(
   // plan 22 gap #7 migration: structured warn toast for the 401-recovery path.
   const err = new DiagnosticError('RENAME_AUTH_RECOVERY_E001', { wsId });
   showDiagnosticToast(err, {
-    requestDetail: { method: 'PUT', url: ApiPath.UserWorkspacesSlash + wsId, status: 401 },
+    requestDetail: { method: 'PUT', url: ApiPathType.UserWorkspacesSlash + wsId, status: 401 },
   });
 
   try {
@@ -196,14 +196,14 @@ function handleRenameError(
   // structured toast, and return it so the caller throws the same instance.
   // Prevents drift between the toast copy and the thrown error's message.
   const err = new DiagnosticError('RENAME_REQUEST_E001', {
-    url: ApiPath.UserWorkspacesSlash + wsId,
+    url: ApiPathType.UserWorkspacesSlash + wsId,
     status: resp.status,
     wsId,
   });
   showDiagnosticToast(err, {
     requestDetail: {
       method: 'PUT',
-      url: ApiPath.UserWorkspacesSlash + wsId,
+      url: ApiPathType.UserWorkspacesSlash + wsId,
       status: resp.status,
       responseBody: bodyPreview,
     },
@@ -279,7 +279,7 @@ async function executeRename(
 
   // Other errors — handleRenameError already surfaced the structured toast;
   // throw the SAME DiagnosticError instance so the message never drifts.
-  if (resp.isFail) {
+  if (!resp.ok) {
     throw handleRenameError(resp, wsId, attempt);
   }
 

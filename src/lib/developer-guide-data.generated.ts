@@ -865,7 +865,7 @@ window.RiseupAsiaMacroExt ??= { Projects: {} };
 
 After Stage 2 completes, the pipeline checks whether any scripts have CSS assets:
 
-### Path A: CSS Detected → Sequential Injection Mode
+### Path A: CSS Detected → Sequential Injection OperationModeType
 
 CSS must load **before** its JS runs. Each script is injected individually:
 
@@ -876,7 +876,7 @@ CSS must load **before** its JS runs. Each script is injected individually:
 
 > If a script has no CSS, its JS is injected in the same order but the CSS step is skipped.
 
-### Path B: No CSS → Batch Mode
+### Path B: No CSS → Batch OperationModeType
 
 All scripts are batched into a single payload:
 

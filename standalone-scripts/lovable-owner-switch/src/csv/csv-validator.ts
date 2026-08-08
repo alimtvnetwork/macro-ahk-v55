@@ -14,7 +14,7 @@
  * are present.
  */
 
-import { OwnerSwitchCsvColumn } from "./csv-column";
+import { OwnerSwitchCsvColumnType } from "./csv-column";
 import { isValidEmail } from "./email-validator";
 import type { OwnerSwitchCsvRow, CsvParseError } from "./csv-types";
 
@@ -26,7 +26,7 @@ const MAX_PASSWORD_LENGTH = 200;
 const pushEmailError = (
     errors: CsvParseError[],
     rowIndex: number,
-    column: OwnerSwitchCsvColumn,
+    column: OwnerSwitchCsvColumnType,
     value: string,
 ): void => {
     errors.push({
@@ -39,7 +39,7 @@ const pushEmailError = (
 const validateOptionalEmail = (
     errors: CsvParseError[],
     rowIndex: number,
-    column: OwnerSwitchCsvColumn,
+    column: OwnerSwitchCsvColumnType,
     value: string | null,
 ): void => {
     if (value !== null && !isValidEmail(value)) {
@@ -50,7 +50,7 @@ const validateOptionalEmail = (
 const validateLength = (
     errors: CsvParseError[],
     rowIndex: number,
-    column: OwnerSwitchCsvColumn,
+    column: OwnerSwitchCsvColumnType,
     value: string | null,
     max: number,
 ): void => {
@@ -71,7 +71,7 @@ const validateOwnerPairDistinct = (
     if (row.OwnerEmail1.trim().toLowerCase() === row.OwnerEmail2.trim().toLowerCase()) {
         errors.push({
             RowIndex: row.RowIndex,
-            Column: OwnerSwitchCsvColumn.OwnerEmail2,
+            Column: OwnerSwitchCsvColumnType.OwnerEmail2,
             Message: `OwnerEmail2 duplicates OwnerEmail1 (${row.OwnerEmail1})`,
         });
     }
@@ -81,17 +81,17 @@ export const validateRow = (row: OwnerSwitchCsvRow): ReadonlyArray<CsvParseError
     const errors: CsvParseError[] = [];
 
     if (!isValidEmail(row.LoginEmail)) {
-        pushEmailError(errors, row.RowIndex, OwnerSwitchCsvColumn.LoginEmail, row.LoginEmail);
+        pushEmailError(errors, row.RowIndex, OwnerSwitchCsvColumnType.LoginEmail, row.LoginEmail);
     }
 
     if (!isValidEmail(row.OwnerEmail1)) {
-        pushEmailError(errors, row.RowIndex, OwnerSwitchCsvColumn.OwnerEmail1, row.OwnerEmail1);
+        pushEmailError(errors, row.RowIndex, OwnerSwitchCsvColumnType.OwnerEmail1, row.OwnerEmail1);
     }
 
-    validateOptionalEmail(errors, row.RowIndex, OwnerSwitchCsvColumn.OwnerEmail2, row.OwnerEmail2);
+    validateOptionalEmail(errors, row.RowIndex, OwnerSwitchCsvColumnType.OwnerEmail2, row.OwnerEmail2);
 
-    validateLength(errors, row.RowIndex, OwnerSwitchCsvColumn.Password, row.Password, MAX_PASSWORD_LENGTH);
-    validateLength(errors, row.RowIndex, OwnerSwitchCsvColumn.Notes, row.Notes, MAX_NOTES_LENGTH);
+    validateLength(errors, row.RowIndex, OwnerSwitchCsvColumnType.Password, row.Password, MAX_PASSWORD_LENGTH);
+    validateLength(errors, row.RowIndex, OwnerSwitchCsvColumnType.Notes, row.Notes, MAX_NOTES_LENGTH);
 
     validateOwnerPairDistinct(errors, row);
 
@@ -119,7 +119,7 @@ export const validateFile = (
 
         errors.push({
             RowIndex: row.RowIndex,
-            Column: OwnerSwitchCsvColumn.LoginEmail,
+            Column: OwnerSwitchCsvColumnType.LoginEmail,
             Message: `Duplicate LoginEmail (${row.LoginEmail}) — first seen on row ${firstSeen}`,
         });
     }

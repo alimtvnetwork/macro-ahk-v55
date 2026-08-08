@@ -350,7 +350,7 @@ function StepRowNode(props: {
                 {stepKindLabel(step.StepKindId)}
             </Badge>
             <span className="truncate">
-                {step.Label ?? `Step #${step.StepId}`}
+                {step.LabelType ?? `Step #${step.StepId}`}
             </span>
         </button>
     );

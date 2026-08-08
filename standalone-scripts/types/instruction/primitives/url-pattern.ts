@@ -1,5 +1,5 @@
 /**
- * URL pattern string. Interpretation depends on the sibling `MatchType`
+ * URL pattern string. Interpretation depends on the sibling `MatchRuleType`
  * value on the owning `TargetUrl`.
  *
  * Kept as a structural alias (not a branded type) for the Phase 1

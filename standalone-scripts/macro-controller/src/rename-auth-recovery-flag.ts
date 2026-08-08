@@ -1,7 +1,7 @@
 /**
  * Leaf module: `authRecoveryExhausted` flag shared by rename-api and rename-bulk.
  *
- * Extracted from `rename-bulk.ts` (Plan-17 step 8) to break the runtime cycle
+ * Extracted from `rename-bulk.ts` (PlanTierType-17 step 8) to break the runtime cycle
  *   rename-api.ts <-> rename-bulk.ts
  * observed by `scripts/check-madge-cycles.mjs`. `rename-api` needs to read /
  * clear the flag when a 401 recovery attempt runs, and `rename-bulk` needs to

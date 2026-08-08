@@ -1,6 +1,6 @@
 /**
  * Search input row for filtering keyword events. Extracted from
- * `KeywordEventsPanel.tsx` in Plan 25 Step 15.
+ * `KeywordEventsPanel.tsx` in PlanTierType 25 Step 15.
  */
 
 import { Search, X } from "lucide-react";

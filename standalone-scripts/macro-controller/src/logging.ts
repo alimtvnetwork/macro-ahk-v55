@@ -18,10 +18,10 @@ import { domCache } from './dom-cache';
 import type { PersistedLogEntry } from './types';
 import { shouldLog, shouldConsole, shouldPersist, shouldActivityUi } from './log-manager';
 import { addActivityLog } from './log-activity-ui';
-import { StorageKey } from './types/storage-keys';
+import { StorageKeyType } from './types/storage-keys';
 
 // NOTE: convenience barrel re-exports of `./log-csv-export` and
-// `./log-activity-ui` were removed in Plan-17 step 9 to break the
+// `./log-activity-ui` were removed in PlanTierType-17 step 9 to break the
 // `logging <-> log-csv-export` runtime cycle. Import those symbols
 // directly from their source module.
 
@@ -313,7 +313,7 @@ export function clearAllLogs(): void {
 
 function readSeedTelemetryBlock(): string[] {
   try {
-    const raw = localStorage.getItem(StorageKey.LastSeedTelemetry);
+    const raw = localStorage.getItem(StorageKeyType.LastSeedTelemetry);
     if (!raw) return ['Seed Telemetry: (not run this session)', '---'];
     return ['=== Seed Telemetry ===', raw, '---'];
   } catch (e) {

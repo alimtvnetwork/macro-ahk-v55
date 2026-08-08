@@ -13,7 +13,7 @@ import {
     sumExpiringSoon,
 } from '../pro-zero/pro-zero-credit-calculator';
 import { CreditGrantType } from '../pro-zero/credit-grant-type';
-import { MacroCreditSource } from '../pro-zero/macro-credit-source';
+import { MacroCreditSourceType } from '../pro-zero/macro-credit-source';
 import type { CreditBalanceResponseTyped } from '../pro-zero/credit-balance-response-typed';
 
 const NOW_MS = Date.parse('2026-05-25T00:00:00Z');
@@ -87,9 +87,9 @@ describe('calculateProZeroCreditSummary — reference payload (Group A)', () => 
         expect(calculateProZeroCreditSummary(on, NOW_MS).LedgerEnabled).toBe(true);
     });
 
-    it('A11: Source is always MacroCreditSource.CREDIT_BALANCE', () => {
+    it('A11: Source is always MacroCreditSourceType.CREDIT_BALANCE', () => {
         expect(calculateProZeroCreditSummary(referencePayload(), NOW_MS).Source).toBe(
-            MacroCreditSource.CREDIT_BALANCE,
+            MacroCreditSourceType.CREDIT_BALANCE,
         );
     });
 

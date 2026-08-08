@@ -43,7 +43,7 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
     throwDiagnostic('REMIX_BULK_E001', { missingApi: 'window.marco.api.projects.list', wsId });
   }
   const resp = await sdk.api.projects.list(wsId, { baseUrl: CREDIT_API_BASE });
-  if (resp.isFail) {
+  if (!resp.ok) {
     throwDiagnostic('REMIX_BULK_E003', { status: resp.status, wsId });
   }
   const data = resp.data as { projects?: Array<{ id?: string; name?: string }> };

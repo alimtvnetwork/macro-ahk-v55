@@ -11,15 +11,15 @@
 
 import { LogViewerSeverityCode } from "../../../lovable-common/src/ui/log-viewer-types";
 import type { LogViewerEntry } from "../../../lovable-common/src/ui/log-viewer-types";
-import { LogSeverity } from "./log-sink";
+import { LogSeverityType } from "./log-sink";
 import type { LogEntry } from "./log-sink";
 
-const mapSeverity = (severity: LogSeverity): LogViewerSeverityCode => {
-    if (severity === LogSeverity.Error) {
+const mapSeverity = (severity: LogSeverityType): LogViewerSeverityCode => {
+    if (severity === LogSeverityType.Error) {
         return LogViewerSeverityCode.Error;
     }
 
-    if (severity === LogSeverity.Warn) {
+    if (severity === LogSeverityType.Warn) {
         return LogViewerSeverityCode.Warn;
     }
 

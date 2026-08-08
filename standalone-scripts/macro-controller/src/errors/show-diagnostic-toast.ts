@@ -1,5 +1,5 @@
 /**
- * Plan 22 · gap #7 — toast rendering pipeline for structured failure payloads.
+ * PlanTierType 22 · gap #7 — toast rendering pipeline for structured failure payloads.
  *
  * Single sink that turns a `DiagnosticError` into a rendered toast: it logs
  * through `reportDiagnostic` (so the diagnostics sink always sees the failure)
@@ -14,9 +14,9 @@ import { emitDiagnosticToastEvent } from '../telemetry/diagnostic-toast-telemetr
 import type { DiagnosticError } from './diagnostic-error';
 import type { ErrorSeverity } from './error-codes';
 import type { DiagnosticToast } from './format';
-import { ToastLevelEnum } from "../types/enums";
+import { ToastLevelType } from "../types/enums";
 
-export type ToastLevel = ToastLevelEnum;
+export type ToastLevel = ToastLevelType;
 
 /**
  * Map the registry severity to the toast level surface. `fatal` and `error`

@@ -9,15 +9,15 @@ import { CSS_FIELD, CSS_INPUT, CSS_LABEL, CSS_SELECT, CSS_TABLE } from "./popup-
 
 export interface FieldSpec {
     Id: string;
-    Label: string;
+    LabelType: string;
     Type: "text" | "password" | "url" | "checkbox" | "file";
     Placeholder?: string;
 }
 
 export interface SelectSpec {
     Id: string;
-    Label: string;
-    Options: ReadonlyArray<{ Value: string; Label: string }>;
+    LabelType: string;
+    Options: ReadonlyArray<{ Value: string; LabelType: string }>;
     DefaultValue: string;
 }
 
@@ -46,7 +46,7 @@ const buildInput = (spec: FieldSpec): HTMLInputElement => {
 export const buildField = (spec: FieldSpec): HTMLDivElement => {
     const wrap = document.createElement("div");
     wrap.className = CSS_FIELD;
-    wrap.appendChild(buildLabel(spec.Id, spec.Label));
+    wrap.appendChild(buildLabel(spec.Id, spec.LabelType));
     wrap.appendChild(buildInput(spec));
 
     return wrap;
@@ -60,7 +60,7 @@ const buildSelect = (spec: SelectSpec): HTMLSelectElement => {
     for (const opt of spec.Options) {
         const o = document.createElement("option");
         o.value = opt.Value;
-        o.textContent = opt.Label;
+        o.textContent = opt.LabelType;
         select.appendChild(o);
     }
 
@@ -72,7 +72,7 @@ const buildSelect = (spec: SelectSpec): HTMLSelectElement => {
 export const buildSelectField = (spec: SelectSpec): HTMLDivElement => {
     const wrap = document.createElement("div");
     wrap.className = CSS_FIELD;
-    wrap.appendChild(buildLabel(spec.Id, spec.Label));
+    wrap.appendChild(buildLabel(spec.Id, spec.LabelType));
     wrap.appendChild(buildSelect(spec));
 
     return wrap;

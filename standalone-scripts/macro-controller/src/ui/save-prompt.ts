@@ -302,7 +302,7 @@ function renderToolbarPromptsDropdown(dropdown: HTMLElement, deps: SavePromptDep
   loadPromptsFromJson().then(function () {
     renderPromptsDropdown({ promptsDropdown: dropdown }, taskNextDeps);
   }).catch(function (caught: unknown) {
-    logError('savePrompt', 'Toolbar prompts dropdown failed to load unified Plan/Next renderer', caught);
+    logError('savePrompt', 'Toolbar prompts dropdown failed to load unified PlanTierType/Next renderer', caught);
     renderChatboxPromptsDropdown(dropdown, deps);
   });
 }

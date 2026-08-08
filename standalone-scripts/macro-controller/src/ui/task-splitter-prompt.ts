@@ -5,7 +5,7 @@
  * the LLM to split it into EXACTLY N self-contained subtasks, returning
  * strict JSON. No prose, no markdown fences, no commentary.
  *
- * Plan: .lovable/plans/pending/08-task-splitter-and-next-queue.md (step 2).
+ * PlanTierType: .lovable/plans/pending/08-task-splitter-and-next-queue.md (step 2).
  */
 
 import { throwDiagnostic } from '../errors/diagnostic-error';

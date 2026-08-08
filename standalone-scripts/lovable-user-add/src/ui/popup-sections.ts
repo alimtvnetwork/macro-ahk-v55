@@ -26,7 +26,7 @@ const sectionShell = (title: string): HTMLElement => {
 
 export const buildFileSection = (): HTMLElement => {
     const s = sectionShell("CSV Upload");
-    s.appendChild(buildField({ Id: ID_FILE_INPUT, Label: "Choose CSV file", Type: "file" }));
+    s.appendChild(buildField({ Id: ID_FILE_INPUT, LabelType: "Choose CSV file", Type: "file" }));
     const errors = document.createElement("div");
     errors.id = ID_ERRORS_PANEL;
     s.appendChild(errors);
@@ -35,14 +35,14 @@ export const buildFileSection = (): HTMLElement => {
 };
 
 const buildTaskFields = (s: HTMLElement): void => {
-    s.appendChild(buildField({ Id: ID_TASK_NAME, Label: "Task name", Type: "text", Placeholder: "User add 2026-04-24" }));
-    s.appendChild(buildField({ Id: ID_COMMON_PASSWORD, Label: "Common password", Type: "password" }));
-    s.appendChild(buildField({ Id: ID_LOGIN_URL, Label: "Login URL", Type: "url", Placeholder: DEFAULT_LOGIN_URL }));
+    s.appendChild(buildField({ Id: ID_TASK_NAME, LabelType: "Task name", Type: "text", Placeholder: "User add 2026-04-24" }));
+    s.appendChild(buildField({ Id: ID_COMMON_PASSWORD, LabelType: "Common password", Type: "password" }));
+    s.appendChild(buildField({ Id: ID_LOGIN_URL, LabelType: "Login URL", Type: "url", Placeholder: DEFAULT_LOGIN_URL }));
     s.appendChild(buildSelectField({
-        Id: ID_DEFAULT_ROLE, Label: "Default role (when CSV Role cell is empty)",
+        Id: ID_DEFAULT_ROLE, LabelType: "Default role (when CSV Role cell is empty)",
         Options: DEFAULT_ROLE_OPTIONS, DefaultValue: DEFAULT_ROLE_VALUE,
     }));
-    s.appendChild(buildField({ Id: ID_INCOGNITO_TOGGLE, Label: "Run in incognito", Type: "checkbox" }));
+    s.appendChild(buildField({ Id: ID_INCOGNITO_TOGGLE, LabelType: "Run in incognito", Type: "checkbox" }));
 };
 
 export const buildTaskSection = (): HTMLElement => {

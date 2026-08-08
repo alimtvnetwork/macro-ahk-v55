@@ -13,7 +13,7 @@
  */
 import { findAddToTasksButton } from './task-next-ui';
 import { isReturnButtonVisible } from '../xpath-utils';
-import { LovableIdleResultEnum } from "../types/enums";
+import { LovableIdleResultType } from "../types/enums";
 
 export interface LovableIdleOptions {
   isCancelled: () => boolean;
@@ -33,7 +33,7 @@ export interface LovableIdleOptions {
   warmupMs?: number;
 }
 
-export type LovableIdleResult = LovableIdleResultEnum;
+export type LovableIdleResult = LovableIdleResultType;
 
 function sleep(ms: number): Promise<void> {
   return new Promise(function (resolve) { setTimeout(resolve, ms); });

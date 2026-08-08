@@ -9,7 +9,7 @@
 export { parseOwnerSwitchCsv } from "./csv-parser";
 export { validateRow } from "./csv-validator";
 export { isValidEmail } from "./email-validator";
-export { OwnerSwitchCsvColumn, ALL_COLUMNS, REQUIRED_COLUMNS } from "./csv-column";
+export { OwnerSwitchCsvColumnType, ALL_COLUMNS, REQUIRED_COLUMNS } from "./csv-column";
 export type {
     OwnerSwitchCsvRow,
     OwnerSwitchCsvParseResult,

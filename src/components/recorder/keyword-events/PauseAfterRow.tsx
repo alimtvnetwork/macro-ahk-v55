@@ -2,7 +2,7 @@
  * Marco Extension, Keyword Events, Pause After Row
  *
  * Per-event pause override extracted from `KeywordEventsPanel.tsx` in
- * Plan 25 step 13 (was 94-line inline function). Splits the enabled body,
+ * PlanTierType 25 step 13 (was 94-line inline function). Splits the enabled body,
  * disabled body, and draft-parsing hook into leaves so the shell stays
  * under the `max-lines-per-function` ceiling.
  */
@@ -11,7 +11,7 @@ import { useEffect, useRef, useState, type JSX } from "react";
 import { Clock } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { DEFAULT_CHAIN_SETTINGS } from "@/lib/keyword-event-chain";
 import { cn } from "@/lib/utils";
@@ -98,12 +98,12 @@ function PauseAfterHeader(props: {
     return (
         <div className="flex items-center gap-2">
             <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-            <Label
+            <LabelType
                 htmlFor={`kev-pause-toggle-${eventId}`}
                 className="text-xs font-medium cursor-pointer"
             >
                 Override chain pause after this event
-            </Label>
+            </LabelType>
             <Switch
                 id={`kev-pause-toggle-${eventId}`}
                 checked={enabled}

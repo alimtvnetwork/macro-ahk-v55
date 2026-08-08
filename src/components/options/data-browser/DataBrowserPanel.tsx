@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
 import { ActiveViewEnum } from "../../../types/enums";
-import { DatabaseEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { DatabaseType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 type ActiveView = ActiveViewEnum;
 
@@ -119,7 +119,7 @@ export function DataBrowserPanel() {
             />
           ) : (
             <DataTable
-              activeDb={activeDb as DatabaseEnum}
+              activeDb={activeDb as DatabaseType}
               onDbChange={handleDbChange}
               rows={browser.rows}
               isLoading={browser.loading}

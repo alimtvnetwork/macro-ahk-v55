@@ -74,21 +74,21 @@ describe("expandRunGroups", () => {
         const helper = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Helper" });
         const inner  = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Inner" });
 
-        db.appendStep({ StepGroupId: inner, StepKindId: StepKindId.Click, Label: "InnerA" });
-        db.appendStep({ StepGroupId: inner, StepKindId: StepKindId.Type,  Label: "InnerB" });
+        db.appendStep({ StepGroupId: inner, StepKindId: StepKindId.Click, LabelType: "InnerA" });
+        db.appendStep({ StepGroupId: inner, StepKindId: StepKindId.Type,  LabelType: "InnerB" });
 
-        db.appendStep({ StepGroupId: helper, StepKindId: StepKindId.Click, Label: "Pre" });
-        db.appendStep({ StepGroupId: helper, StepKindId: StepKindId.RunGroup, TargetStepGroupId: inner, Label: "→Inner" });
-        db.appendStep({ StepGroupId: helper, StepKindId: StepKindId.Click, Label: "Post" });
+        db.appendStep({ StepGroupId: helper, StepKindId: StepKindId.Click, LabelType: "Pre" });
+        db.appendStep({ StepGroupId: helper, StepKindId: StepKindId.RunGroup, TargetStepGroupId: inner, LabelType: "→Inner" });
+        db.appendStep({ StepGroupId: helper, StepKindId: StepKindId.Click, LabelType: "Post" });
 
-        db.appendStep({ StepGroupId: root, StepKindId: StepKindId.Click, Label: "Start" });
-        db.appendStep({ StepGroupId: root, StepKindId: StepKindId.RunGroup, TargetStepGroupId: helper, Label: "→Helper" });
+        db.appendStep({ StepGroupId: root, StepKindId: StepKindId.Click, LabelType: "Start" });
+        db.appendStep({ StepGroupId: root, StepKindId: StepKindId.RunGroup, TargetStepGroupId: helper, LabelType: "→Helper" });
 
         const plan = asExpansionSuccess(expandRunGroups({ db, projectId, rootGroupId: root }));
 
         // No RunGroup steps survive expansion.
         expect(plan.Steps.every(s => s.Step.StepKindId !== StepKindId.RunGroup)).toBe(true);
-        expect(plan.Steps.map(s => s.Step.Label)).toEqual([
+        expect(plan.Steps.map(s => s.Step.LabelType)).toEqual([
             "Start", "Pre", "InnerA", "InnerB", "Post",
         ]);
         expect(plan.Steps.map(s => s.GroupPath.join(">"))).toEqual([
@@ -103,8 +103,8 @@ describe("expandRunGroups", () => {
         const db = freshDb();
         const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
         const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "G" });
-        const sOn = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, Label: "On" });
-        const sOff = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, Label: "Off" });
+        const sOn = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "On" });
+        const sOff = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "Off" });
         db.raw.exec(`UPDATE Step SET IsDisabled = 1 WHERE StepId = ${sOff};`);
 
         const dropped = asExpansionSuccess(expandRunGroups({ db, projectId, rootGroupId: g }));
@@ -121,14 +121,14 @@ describe("expandRunGroups", () => {
         const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
         const a = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "A" });
         const b = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "B" });
-        db.appendStep({ StepGroupId: a, StepKindId: StepKindId.Click, Label: "leadIn" });
-        db.appendStep({ StepGroupId: a, StepKindId: StepKindId.RunGroup, TargetStepGroupId: b, Label: "A→B" });
-        db.appendStep({ StepGroupId: b, StepKindId: StepKindId.RunGroup, TargetStepGroupId: a, Label: "B→A" });
+        db.appendStep({ StepGroupId: a, StepKindId: StepKindId.Click, LabelType: "leadIn" });
+        db.appendStep({ StepGroupId: a, StepKindId: StepKindId.RunGroup, TargetStepGroupId: b, LabelType: "A→B" });
+        db.appendStep({ StepGroupId: b, StepKindId: StepKindId.RunGroup, TargetStepGroupId: a, LabelType: "B→A" });
 
         const failure = asExpansionFailure(expandRunGroups({ db, projectId, rootGroupId: a }));
         expect(failure.Reason).toBe("RunGroupCycle");
         // The pre-cycle leaf was already added to the plan — surfaced via PartialSteps.
-        expect(failure.PartialSteps.map(s => s.Step.Label)).toEqual(["leadIn"]);
+        expect(failure.PartialSteps.map(s => s.Step.LabelType)).toEqual(["leadIn"]);
         expect(failure.CallStack).toEqual(["A", "B"]);
     });
 
@@ -146,7 +146,7 @@ describe("expandRunGroups", () => {
                 StepGroupId: ids[i],
                 StepKindId: StepKindId.RunGroup,
                 TargetStepGroupId: ids[i + 1],
-                Label: `→G${i + 1}`,
+                LabelType: `→G${i + 1}`,
             });
         }
         const failure = asExpansionFailure(expandRunGroups({ db, projectId, rootGroupId: ids[0] }));
@@ -195,7 +195,7 @@ describe("executeRunGroup", () => {
         const db = freshDb();
         const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
         const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "G" });
-        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, Label: "X" });
+        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "X" });
 
         const out = await executeRunGroup({
             db, projectId, rootGroupId: g, executeLeafStep: () => null,
@@ -208,7 +208,7 @@ describe("executeRunGroup", () => {
         const db = freshDb();
         const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
         const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Loop" });
-        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.RunGroup, TargetStepGroupId: g, Label: "self" });
+        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.RunGroup, TargetStepGroupId: g, LabelType: "self" });
 
         const out = asExecuteFailure(await executeRunGroup({
             db, projectId, rootGroupId: g, executeLeafStep: () => null,
@@ -232,7 +232,7 @@ describe("executeRunGroup", () => {
         for (let i = 0; i < ids.length - 1; i++) {
             db.appendStep({
                 StepGroupId: ids[i], StepKindId: StepKindId.RunGroup,
-                TargetStepGroupId: ids[i + 1], Label: `→D${i + 1}`,
+                TargetStepGroupId: ids[i + 1], LabelType: `→D${i + 1}`,
             });
         }
         const out = asExecuteFailure(await executeRunGroup({
@@ -247,7 +247,7 @@ describe("executeRunGroup", () => {
         const db = freshDb();
         const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
         const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "L" });
-        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, Label: "X" });
+        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "X" });
 
         const fakeReport: FailureReport = {
             Phase: "Replay", Message: "no match", Reason: "ZeroMatches",

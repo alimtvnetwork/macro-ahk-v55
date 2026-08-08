@@ -1,5 +1,5 @@
 /**
- * Plan-10 wide-surface for `WorkspaceCredit.rawApi`.
+ * PlanTierType-10 wide-surface for `WorkspaceCredit.rawApi`.
  *
  * `WorkspaceCredit.rawApi` is the verbatim `/user/workspaces` row and
  * currently typed as `unknown`, forcing every reader to cast or truthy-

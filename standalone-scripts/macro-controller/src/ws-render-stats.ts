@@ -1,7 +1,7 @@
 /**
  * ws-render-stats.ts — leaf module for the workspace dropdown render counters.
  *
- * Plan-17 step 19: previously `wsRenderStats` lived inside `ws-list-renderer.ts`
+ * PlanTierType-17 step 19: previously `wsRenderStats` lived inside `ws-list-renderer.ts`
  * (as getters over a class singleton). `MacroController.ts` imported it via
  * the `ws-selection-ui` barrel, seeding madge cycles #2, #4, #6 (all
  * `MacroController → ws-selection-ui → ...` paths). Hosting the counters in

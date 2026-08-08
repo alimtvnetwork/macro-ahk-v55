@@ -7,7 +7,7 @@ import { ServiceResult } from '../utils/result-wrapper';
  * When we later introduced role-scoped seeding, `seedPlanNextPrompts()`
  * used INSERT-OR-IGNORE which silently no-ops on UNIQUE(Slug) collisions
  * against those orphan rows. That kept the DB stuck under the wrong role
- * and produced default-editor failures whenever the Plan/Next chip gear
+ * and produced default-editor failures whenever the PlanTierType/Next chip gear
  * tried to open its default.
  *
  * This module runs BEFORE `seedPlanNextPrompts()` at boot: it scans every
@@ -20,13 +20,13 @@ import { ServiceResult } from '../utils/result-wrapper';
 import { PLAN_NEXT_SEED_ROWS } from './plan-next-prompts';
 import { getPromptBySlug, upsertPrompt } from '../db/prompt-db';
 import { logDiagnosticFromCode } from '../error-utils';
-import { OutcomeEnum3 } from "../types/enums";
+import { OrphanRepairOutcomeType } from "../types/enums";
 
 export interface OrphanRepairEntry {
   readonly slug: string;
   readonly fromRole: string;
   readonly toRole: string;
-  readonly outcome: OutcomeEnum3;
+  readonly outcome: OrphanRepairOutcomeType;
   readonly reason?: string;
 }
 
@@ -53,7 +53,7 @@ export async function repairPlanNextOrphans(): Promise<OrphanRepairReport> {
 
 async function repairSingleOrphan(seedRow: typeof PLAN_NEXT_SEED_ROWS[number]): Promise<OrphanRepairEntry> {
   const lookup = await getPromptBySlug(seedRow.slug);
-  if (lookup.isFail) {
+  if (!lookup.ok) {
     logDiagnosticFromCode('SEED_ORPHAN_REPAIR_E001', {
       slug: seedRow.slug, fromRole: 'unknown', toRole: seedRow.role,
       stage: 'lookup', reason: lookup.error ?? 'getPromptBySlug returned !ok',
@@ -69,7 +69,7 @@ async function repairSingleOrphan(seedRow: typeof PLAN_NEXT_SEED_ROWS[number]): 
     previousReplaceKey: existing.ReplaceKey, replaceKey: existing.ReplaceKey,
     replaceValues: existing.ReplaceValues,
   });
-  if (saved.isFail) {
+  if (!saved.ok) {
     logDiagnosticFromCode('SEED_ORPHAN_REPAIR_E001', {
       slug: seedRow.slug, fromRole: existing.Role, toRole: seedRow.role,
       stage: 'upsert', reason: saved.error ?? 'upsertPrompt returned !ok',

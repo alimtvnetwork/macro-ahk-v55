@@ -1,5 +1,6 @@
+import { DbResult } from '../../db/db-result';
 /**
- * Plan-15 Task 15: vitest coverage for the DB-driven chip-value resolver.
+ * PlanTierType-15 Task 15: vitest coverage for the DB-driven chip-value resolver.
  *
  * Locks the semantics of `resolveConfiguredChipValues`:
  *  - default-shaped DB row -> caller fallback preserved (plan/next legacy ramps).
@@ -13,6 +14,9 @@ vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 
 const getDefaultMock = vi.hoisted(() => vi.fn());
 vi.mock('../../db/prompt-db', () => ({
+    DbResult,
+    DbResult,
+    DbResult,
     getDefaultPromptForRole: getDefaultMock,
 }));
 
@@ -36,12 +40,12 @@ describe('resolveConfiguredChipValues', () => {
     const fallback = [5, 10, 20];
 
     it('returns fallback when DB row is missing', async () => {
-        getDefaultMock.mockResolvedValueOnce({ ok: true, value: undefined });
+        getDefaultMock.mockResolvedValueOnce(new DbResult(true, undefined));
         expect(await resolveConfiguredChipValues('plan', fallback)).toEqual(fallback);
     });
 
     it('returns fallback when getDefaultPromptForRole fails', async () => {
-        getDefaultMock.mockResolvedValueOnce({ ok: false, error: 'boom' });
+        getDefaultMock.mockResolvedValueOnce(new DbResult(false, undefined, 'boom'));
         expect(await resolveConfiguredChipValues('next', fallback)).toEqual(fallback);
     });
 
@@ -75,7 +79,7 @@ describe('resolveConfiguredChipValues', () => {
     });
 
     it('returns a fresh array (caller can mutate without corrupting fallback)', async () => {
-        getDefaultMock.mockResolvedValueOnce({ ok: true, value: undefined });
+        getDefaultMock.mockResolvedValueOnce(new DbResult(true, undefined));
         const out = await resolveConfiguredChipValues('plan', fallback);
         out.push(999);
         expect(fallback).toEqual([5, 10, 20]);

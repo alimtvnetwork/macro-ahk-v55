@@ -1,5 +1,5 @@
 /**
- * Plan-13 redaction path — cross-layer integration test.
+ * PlanTierType-13 redaction path — cross-layer integration test.
  *
  * Root cause covered: the unit test in `chat-submit-capture.test.ts` proves
  * `bodyForDisk()` writes the redaction placeholder when `isVerbose=false`,
@@ -94,7 +94,7 @@ beforeEach(() => {
   fileCounter = 0;
 });
 
-describe('Plan-13 redaction path (capture → OPFS → readEntry)', () => {
+describe('PlanTierType-13 redaction path (capture → OPFS → readEntry)', () => {
   it('verbose=false persists ONLY the redaction placeholder in the OPFS body', async () => {
     const result = await captureChatSubmit({ source: 'paste', text: SENSITIVE, isVerbose: false });
     expect(result.isCaptured).toBe(true);

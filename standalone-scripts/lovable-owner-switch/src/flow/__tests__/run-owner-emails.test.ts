@@ -13,7 +13,7 @@
 
 import { describe, expect, it, vi } from "vitest";
 import { runOwnerEmails } from "../run-owner-emails";
-import { LogPhase, LogSeverity } from "../log-sink";
+import { LogPhaseType, LogSeverityType } from "../log-sink";
 import type { LogEntry, LogSink } from "../log-sink";
 import type { RowExecutionContext } from "../row-types";
 import type { OwnerSwitchCsvRow } from "../../csv/csv-types";
@@ -69,7 +69,7 @@ describe("runOwnerEmails — failure marking, no rollback", () => {
         });
 
         const warnEntry = entries.find(
-            (e) => e.Phase === LogPhase.Promote && e.Severity === LogSeverity.Warn,
+            (e) => e.Phase === LogPhaseType.Promote && e.Severity === LogSeverityType.Warn,
         );
         expect(warnEntry).toBeDefined();
         expect(warnEntry?.Message).toMatch(/No rollback performed/);
@@ -91,7 +91,7 @@ describe("runOwnerEmails — failure marking, no rollback", () => {
         expect(result.Records[0].Promoted).toBe(false);
         expect(result.Failure?.Email).toBe("[email protected]");
 
-        const warnEntries = entries.filter((e) => e.Severity === LogSeverity.Warn);
+        const warnEntries = entries.filter((e) => e.Severity === LogSeverityType.Warn);
         expect(warnEntries).toHaveLength(0);
 
         spy.mockRestore();

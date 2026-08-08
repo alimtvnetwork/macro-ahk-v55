@@ -49,7 +49,7 @@ export enum StepKindId {
     /**
      * Spec 19 §1 — navigating click that opens or focuses a tab by
      * URL pattern. Payload mirrors `UrlTabClickParams` (PascalCase
-     * keys: UrlPattern, UrlMatch, Mode, Selector?, SelectorKind?,
+     * keys: UrlPattern, UrlMatch, OperationModeType, Selector?, SelectorKind?,
      * TimeoutMs?, DirectOpen?, Url?).
      */
     UrlTabClick = 9,
@@ -185,7 +185,7 @@ CREATE TABLE IF NOT EXISTS Step (
     StepGroupId       INTEGER NOT NULL,
     OrderIndex        INTEGER NOT NULL DEFAULT 0,
     StepKindId        TINYINT NOT NULL,
-    Label             VARCHAR(160) NULL,
+    LabelType             VARCHAR(160) NULL,
     PayloadJson       TEXT NULL,
     TargetStepGroupId INTEGER NULL,
     IsDisabled        TINYINT NOT NULL DEFAULT 0,

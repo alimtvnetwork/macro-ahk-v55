@@ -1,5 +1,6 @@
+import { DbResult } from '../../db/db-result';
 /**
- * Negative coverage for prompt-io-db-bridge (Plan-22 steps 32-40).
+ * Negative coverage for prompt-io-db-bridge (PlanTierType-22 steps 32-40).
  *
  * The happy paths (partition, merge, commit, drift error) live in
  * `prompt-io-db-bridge.test.ts`. This file locks the failure modes so
@@ -21,6 +22,9 @@ vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 const listMock = vi.hoisted(() => vi.fn());
 const upsertMock = vi.hoisted(() => vi.fn());
 vi.mock('../../db/prompt-db', () => ({
+    DbResult,
+    DbResult,
+    DbResult,
     listPromptsByRole: listMock,
     upsertPrompt: upsertMock,
 }));
@@ -54,7 +58,7 @@ describe('commitDbEntries — negative paths', () => {
         const entries: CachedPromptEntry[] = [
             { name: 'X', text: 'x', role: 'plan', slug: '   ' },
         ];
-        listMock.mockResolvedValue({ ok: true, value: [] });
+        listMock.mockResolvedValue(new DbResult(true, []));
         const result = await commitDbEntries(entries);
         expect(result.upserted).toBe(0);
         expect(result.errors[0]).toContain('missing slug for role=plan');
@@ -72,7 +76,7 @@ describe('commitDbEntries — negative paths', () => {
 describe('collectDbEntriesForExport — driver failure per role', () => {
     it('logs and continues when listPromptsByRole fails for one role', async () => {
         listMock.mockImplementation(async (role: string) => {
-            if (role === 'plan') return { ok: false, error: 'db locked' };
+            if (role === 'plan') return new DbResult(false, undefined, 'db locked');
             if (role === 'next') return {
                 ok: true,
                 value: [{
@@ -81,7 +85,7 @@ describe('collectDbEntriesForExport — driver failure per role', () => {
                     CreatedAt: 0, UpdatedAt: 0,
                 }],
             };
-            return { ok: true, value: [] };
+            return new DbResult(true, []);
         });
 
         const result = await collectDbEntriesForExport();

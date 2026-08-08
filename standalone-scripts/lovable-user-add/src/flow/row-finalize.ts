@@ -10,7 +10,7 @@
  * without rolling back the partial Step A POST.
  */
 
-import { UserAddLogPhase, UserAddLogSeverity, buildUserAddEntry } from "./log-sink";
+import { UserAddLogPhaseType, UserAddLogSeverityType, buildUserAddEntry } from "./log-sink";
 import type { UserAddLogSink } from "./log-sink";
 import type { UserAddRowContext, UserAddRowResult } from "./row-types";
 import type { UserAddRowStateStore, UserAddRowStateUpdate } from "./row-state-store";
@@ -28,12 +28,12 @@ const buildUpdate = (rowIndex: number, result: UserAddRowResult): UserAddRowStat
     WorkspaceId: result.WorkspaceId,
 });
 
-const severityFor = (result: UserAddRowResult): UserAddLogSeverity => {
+const severityFor = (result: UserAddRowResult): UserAddLogSeverityType => {
     if (result.HasError) {
-        return UserAddLogSeverity.Error;
+        return UserAddLogSeverityType.Error;
     }
 
-    return UserAddLogSeverity.Info;
+    return UserAddLogSeverityType.Info;
 };
 
 export const finalizeUserAddRow = (
@@ -41,7 +41,7 @@ export const finalizeUserAddRow = (
     store: UserAddRowStateStore, result: UserAddRowResult,
 ): UserAddRowResult => {
     sink.write(buildUserAddEntry(
-        ctx.Task.TaskId, ctx.Row.RowIndex, UserAddLogPhase.Row, severityFor(result),
+        ctx.Task.TaskId, ctx.Row.RowIndex, UserAddLogPhaseType.Row, severityFor(result),
         `Row ${ctx.Row.RowIndex} → ${result.Outcome} in ${result.DurationMs}ms (StepB=${result.StepBRan})`,
     ));
     store.update(buildUpdate(ctx.Row.RowIndex, result));

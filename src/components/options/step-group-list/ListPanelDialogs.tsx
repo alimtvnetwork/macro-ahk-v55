@@ -1,7 +1,7 @@
 /**
  * Create / Rename / Delete dialog trio for `StepGroupListPanel`.
  *
- * Extracted as the Plan 24 / Step 4 (Phase 1) slice for the list panel,
+ * Extracted as the PlanTierType 24 / Step 4 (Phase 1) slice for the list panel,
  * mirroring the tree panel's `LibraryDialogs` split. All state remains
  * owned by the panel; this component is a thin JSX shell that also
  * exports the `ValidatedNameField` used inside those dialogs so the
@@ -16,7 +16,7 @@ import { FilePlus2, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import {
     Dialog,
     DialogContent,
@@ -222,7 +222,7 @@ export function ValidatedNameField(props: {
     const invalid = props.error !== null && props.value !== "";
     return (
         <div className="space-y-2">
-            <Label htmlFor={props.id}>{props.label}</Label>
+            <LabelType htmlFor={props.id}>{props.label}</LabelType>
             <Input
                 id={props.id}
                 value={props.value}

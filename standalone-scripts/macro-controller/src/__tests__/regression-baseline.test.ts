@@ -1,7 +1,7 @@
 /**
- * regression-baseline.test.ts — Plan-17 step 1 (SS-01 characterisation tests).
+ * regression-baseline.test.ts — PlanTierType-17 step 1 (SS-01 characterisation tests).
  *
- * Purpose: freeze current runtime behavior of the surfaces the Plan-16
+ * Purpose: freeze current runtime behavior of the surfaces the PlanTierType-16
  * audit backlog (spec/33-missing-coding-guideline) will refactor in
  * subsequent steps. Every describe block below is marked `@behavior-lock`.
  *
@@ -10,11 +10,11 @@
  * justification in the release notes for that step.
  *
  * Locked surfaces (subset that can run without a live DOM/IndexedDB):
- *  1. Plan chip prompt body — `buildPlanTaskPrompt(n)`.
+ *  1. PlanTierType chip prompt body — `buildPlanTaskPrompt(n)`.
  *  2. Next chip token substitution — `substituteToken()` (also used by
- *     the Plan chip when a DB-backed ReplaceKey is present).
+ *     the PlanTierType chip when a DB-backed ReplaceKey is present).
  *  3. Prompt library IO partition — `partitionByRole()` + `mergeDbIntoExport()`
- *     (regression guard for Plan-15 ReplaceKey/ReplaceValues round-trip).
+ *     (regression guard for PlanTierType-15 ReplaceKey/ReplaceValues round-trip).
  *  4. Repeat-loop preset value set (pinned by user 2026-06-19).
  *
  * The remaining surfaces named in SS-01 (aggregateCreditTotals, moveToWorkspace,

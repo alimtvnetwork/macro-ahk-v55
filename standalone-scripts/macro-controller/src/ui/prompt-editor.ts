@@ -1,16 +1,16 @@
 import { ServiceResult } from '../utils/result-wrapper';
 /**
- * Shared Prompt Editor entry point (Plan-23, step 4).
+ * Shared Prompt Editor entry point (PlanTierType-23, step 4).
  *
  * Single reusable wrapper around `openPromptCreationModal` so every surface
- * that lets the user edit or add a prompt (Plan chip gear, Next chip gear,
+ * that lets the user edit or add a prompt (PlanTierType chip gear, Next chip gear,
  * Library modal row edit, Chatbox Save-Prompt button) opens the SAME editor.
  *
  * See: spec/33-missing-coding-guideline/prompt-editor-reuse.md
  *
  * Root cause the wrapper prevents:
  *   Before this file existed, editing was only reachable from the Library
- *   modal. The Plan and Next chips had no per-chip editor entry point, so
+ *   modal. The PlanTierType and Next chips had no per-chip editor entry point, so
  *   users had to hunt through the modal (issue 04). By centralizing the
  *   contract here, each chip becomes a 3-line wire-up instead of a fork.
  */
@@ -30,7 +30,7 @@ import { showToast } from '../toast';
 import { recordPromptEditE005 } from '../telemetry/prompt-edit-e005-store';
 
 /**
- * Plan 26 step 8: helper that emits a coded diagnostic toast for prompt-editor
+ * PlanTierType 26 step 8: helper that emits a coded diagnostic toast for prompt-editor
  * failures. Keeps the friendly user sentence, appends `[code=X]` so users can
  * copy it into bug reports, and routes the full context object to the SDK
  * logger via `logDiagnosticFromCode` so the diagnostics ZIP indexes it.
@@ -78,8 +78,8 @@ interface RoleSnapshot {
 async function collectRoleList(role: PromptRole, snapshot: RoleSnapshot): Promise<void> {
   try {
     const listed = await listPromptsByRole(role);
-    snapshot.roleListOk = String(listed.isSuccess);
-    if (listed.isSuccess && listed.value) {
+    snapshot.roleListOk = String(listed.ok);
+    if (listed.ok && listed.value) {
       snapshot.roleListCount = String(listed.value.length);
       snapshot.roleDefaultIds = listed.value
         .filter((r: PromptRow) => r.IsDefault === 1)
@@ -87,7 +87,7 @@ async function collectRoleList(role: PromptRole, snapshot: RoleSnapshot): Promis
         .join(',') || '(none)';
       return;
     }
-    snapshot.roleListError = listed.isSuccess ? '(empty)' : (listed.error ?? 'unknown');
+    snapshot.roleListError = listed.ok ? '(empty)' : (listed.error ?? 'unknown');
   } catch (err) {
     snapshot.roleListThrew = err instanceof Error ? err.message : String(err);
   }
@@ -98,8 +98,8 @@ function recordSlugOwner(
   role: PromptRole,
   snapshot: RoleSnapshot,
 ): void {
-  snapshot.slugLookupOk = String(bySlug.isSuccess);
-  if (bySlug.isSuccess && bySlug.value) {
+  snapshot.slugLookupOk = String(bySlug.ok);
+  if (bySlug.ok && bySlug.value) {
     snapshot.slugOwnerRole = bySlug.value.Role ?? '(null)';
     snapshot.slugOwnerId = String(bySlug.value.Id);
     snapshot.slugOwnerIsDefault = String(bySlug.value.IsDefault);
@@ -107,7 +107,7 @@ function recordSlugOwner(
     return;
   }
   snapshot.slugOwnerRole = '(no-row)';
-  if (bySlug.isFail) snapshot.slugLookupError = bySlug.error ?? 'unknown';
+  if (!bySlug.ok) snapshot.slugLookupError = bySlug.error ?? 'unknown';
 }
 
 async function collectSlugOwner(
@@ -171,7 +171,7 @@ export async function openPromptEditor(input: OpenPromptEditorInput): Promise<vo
       ? await loadEditablePrompt(input.role, input.promptId)
       : null;
     const requiredTokens = await resolveRequiredTokensForRole(input.role);
-    const roleLabel = input.role === 'plan' ? 'Plan' : input.role === 'next' ? 'Next' : 'Generic';
+    const roleLabel = input.role === 'plan' ? 'PlanTierType' : input.role === 'next' ? 'Next' : 'Generic';
     // Add-new mode (no promptId, no explicit prefill): seed the editor with
     // the canonical role default body so the user starts from a working
     // template that already contains the required {{n}} token, instead of a
@@ -200,7 +200,7 @@ function buildAddNewTemplatePrefill(role: PromptRole): OpenPromptEditorInput['pr
   if (role !== 'plan' && role !== 'next') return undefined;
   const seed = PLAN_NEXT_SEED_ROWS.find((r) => r.role === role && r.isDefault);
   if (!seed) return undefined;
-  const roleLabel = role === 'plan' ? 'Plan' : 'Next';
+  const roleLabel = role === 'plan' ? 'PlanTierType' : 'Next';
   return {
     name: 'New ' + roleLabel + ' prompt',
     text: seed.body,
@@ -217,7 +217,7 @@ function buildTemplatePreviewForRole(role: PromptRole): { body: string; slug?: s
 }
 
 /**
- * Plan-23 step 5 (rewired for remaining-item #3): derive the tokens the
+ * PlanTierType-23 step 5 (rewired for remaining-item #3): derive the tokens the
  * drift-guard MUST preserve for a role. Baseline is the single source of
  * truth `getRequiredTokensForRole(role)` in `seed-plan-next.ts`; we then
  * merge any additional `{{…}}` tokens found in the CURRENT DB default body
@@ -247,7 +247,7 @@ async function resolveRequiredTokensForRole(role: PromptRole): Promise<string[]>
 async function runPreflightSeed(role: PromptRole): Promise<void> {
   emitPromptSeedEvent({ event: 'editor.prefill.reseed', role, outcome: 'ok', detail: 'preflight' });
   const seed = await seedPlanNextPrompts();
-  if (seed.isFail) {
+  if (!seed.ok) {
     logDiagnosticFromCode('SEED_INSERT_E002', { role, reason: seed.error ?? 'seed failed' });
     emitPromptSeedEvent({ event: 'editor.prefill.reseed', role, outcome: 'failed', detail: seed.error ?? 'seed failed' });
   }
@@ -281,7 +281,7 @@ async function repairExistingSeedSlugBeforeInsert(
   seedRow: { slug: string; name: string; body: string },
 ): Promise<number | null> {
   const lookup = await getPromptBySlug(seedRow.slug);
-  if (lookup.isFail || !lookup.value) return null;
+  if (!lookup.ok || !lookup.value) return null;
   if (lookup.value.Role === role) {
     return promoteExistingPromptId(role, seedRow, lookup.value.Id, 'promoted-existing-slug');
   }
@@ -361,7 +361,7 @@ async function handleOpenDefaultError(
 
 /**
  * Open the editor pre-loaded with the default row for `role`. Convenience
- * entry used by the Plan / Next chip "Edit default" gear items so the caller
+ * entry used by the PlanTierType / Next chip "Edit default" gear items so the caller
  * does not have to look up the default id first.
  */
 export async function openDefaultPromptEditor(role: PromptRole): Promise<void> {
@@ -369,20 +369,20 @@ export async function openDefaultPromptEditor(role: PromptRole): Promise<void> {
   try {
     await runPreflightSeed(role);
     let result = await getDefaultPromptForRole(role);
-    if (result.isSuccess && !result.value && seedRow) {
+    if (result.ok && !result.value && seedRow) {
       const repairedId = await selfHealMissingDefault(role, seedRow);
       result = await getDefaultPromptForRole(role);
-      if (result.isSuccess && !result.value && repairedId !== null) {
+      if (result.ok && !result.value && repairedId !== null) {
         await openPromptEditor({ role, promptId: repairedId });
         return;
       }
     }
-    if (result.isSuccess && result.value) {
+    if (result.ok && result.value) {
       await openWithDriftCheck(role, result.value);
       return;
     }
     if (seedRow) {
-      const detail = result.isSuccess ? 'still missing' : (result.error ?? 'query failed');
+      const detail = result.ok ? 'still missing' : (result.error ?? 'query failed');
       await openStaticFallback(role, seedRow, detail);
       return;
     }
@@ -416,13 +416,13 @@ async function tryInsertAndPromoteSeed(
       body: seedRow.body,
       role,
     });
-    if (inserted.isFail || typeof inserted.value !== 'number' || inserted.value <= 0) {
-      const reason = inserted.isSuccess ? 'no id returned' : (inserted.error ?? 'upsert failed');
+    if (!inserted.ok || typeof inserted.value !== 'number' || inserted.value <= 0) {
+      const reason = inserted.ok ? 'no id returned' : (inserted.error ?? 'upsert failed');
       logDiagnosticFromCode('DB_WRITE_E002', { role, slug: seedRow.slug, reason });
       return null;
     }
     const promoted = await setDefaultPromptForRole(inserted.value, role);
-    if (promoted.isFail) {
+    if (!promoted.ok) {
       logDiagnosticFromCode('DB_WRITE_E003', {
         role, promptId: inserted.value, reason: promoted.error ?? 'setDefault failed',
       });
@@ -452,7 +452,7 @@ async function tryPromoteExistingSeedRow(
 
 async function findSeedRowInRole(role: PromptRole, slug: string): Promise<PromptRow | null> {
   const listed = await listPromptsByRole(role);
-  if (listed.isFail || !listed.value) {
+  if (!listed.ok || !listed.value) {
     logDiagnosticFromCode('DB_READ_E001', { role, reason: listed.error ?? 'list failed' });
     return null;
   }
@@ -466,15 +466,15 @@ async function promoteExistingPromptId(
   detail: string,
 ): Promise<number> {
   const promoted = await setDefaultPromptForRole(promptId, role);
-  if (promoted.isFail) {
+  if (!promoted.ok) {
     logDiagnosticFromCode('DB_WRITE_E003', {
       role, promptId, reason: promoted.error ?? 'setDefault failed',
     });
   }
   emitPromptSeedEvent({
     event: 'editor.prefill.direct-insert', role, slug: seedRow.slug,
-    outcome: promoted.isSuccess ? 'ok' : 'failed', metrics: { promptId },
-    detail: promoted.isSuccess ? detail : (promoted.error ?? 'setDefault failed'),
+    outcome: promoted.ok ? 'ok' : 'failed', metrics: { promptId },
+    detail: promoted.ok ? detail : (promoted.error ?? 'setDefault failed'),
   });
   return promptId;
 }
@@ -484,10 +484,10 @@ async function tryAdoptSeedSlugRow(
   seedRow: { slug: string; name: string; body: string },
 ): Promise<number | null> {
   const lookup = await getPromptBySlug(seedRow.slug);
-  if (lookup.isFail) {
+  if (!lookup.ok) {
     logDiagnosticFromCode('DB_READ_E001', { role, slug: seedRow.slug, reason: lookup.error ?? 'slug lookup failed' });
   }
-  if (lookup.isFail || !lookup.value) {
+  if (!lookup.ok || !lookup.value) {
     return null;
   }
   const adopted = await adoptSeedSlugRole(role, seedRow, lookup.value);
@@ -508,7 +508,7 @@ async function adoptSeedSlugRole(
     previousReplaceKey: row.ReplaceKey, replaceKey: row.ReplaceKey,
     replaceValues: row.ReplaceValues,
   });
-  if (saved.isSuccess && typeof saved.value === 'number') {
+  if (saved.ok && typeof saved.value === 'number') {
     return saved.value;
   }
   logDiagnosticFromCode('DB_WRITE_E002', { role, slug: seedRow.slug, reason: saved.error ?? 'adopt slug failed' });
@@ -517,7 +517,7 @@ async function adoptSeedSlugRole(
 
 async function loadEditablePrompt(role: PromptRole, id: number): Promise<EditablePrompt | null> {
   const listed = await listPromptsByRole(role);
-  if (listed.isFail || !listed.value) {
+  if (!listed.ok || !listed.value) {
     logDiagnosticFromCode('DB_READ_E001', { role, reason: listed.error ?? 'list failed' });
     return null;
   }

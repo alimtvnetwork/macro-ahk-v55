@@ -1,5 +1,5 @@
 /**
- * Plan-10, wire-driven entry point for the credit-balance batch refresh.
+ * PlanTierType-10, wire-driven entry point for the credit-balance batch refresh.
  *
  * Consumes raw `/user/workspaces` rows, narrows them via the plan-10
  * `WireWorkspace` guard, applies the `needsBalanceEnrichment` predicate

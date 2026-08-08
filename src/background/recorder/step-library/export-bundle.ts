@@ -346,7 +346,7 @@ function scanStepsForPreview(
             if (s.TargetStepGroupId !== null && includedSet.has(s.TargetStepGroupId)) continue;
             dangling.push({
                 StepId: s.StepId,
-                StepLabel: s.Label,
+                StepLabel: s.LabelType,
                 OwnerStepGroupId: id,
                 OwnerStepGroupName: groupNameById.get(id) ?? `#${id}`,
                 TargetStepGroupId: s.TargetStepGroupId,
@@ -577,7 +577,7 @@ function insertGroup(db: Database, g: StepGroupRow): void {
 function insertStep(db: Database, s: StepRow): void {
     const stmt = db.prepare(
         `INSERT INTO Step (
-            StepId, StepGroupId, OrderIndex, StepKindId, Label,
+            StepId, StepGroupId, OrderIndex, StepKindId, LabelType,
             PayloadJson, TargetStepGroupId, IsDisabled, CreatedAt, UpdatedAt
          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
     );
@@ -587,7 +587,7 @@ function insertStep(db: Database, s: StepRow): void {
             s.StepGroupId,
             s.OrderIndex,
             s.StepKindId,
-            s.Label,
+            s.LabelType,
             s.PayloadJson,
             s.TargetStepGroupId,
             s.IsDisabled ? 1 : 0,

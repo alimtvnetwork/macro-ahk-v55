@@ -1,7 +1,7 @@
 /**
  * MacroLoop Controller — HTML escape leaf.
  *
- * Plan-17 step 16: extracted from `database-data-table.ts` to break the
+ * PlanTierType-17 step 16: extracted from `database-data-table.ts` to break the
  * `database-modal-data → database-data-filter → database-data-table
  *  → database-modal-data` runtime cycle (madge circular #11).
  *

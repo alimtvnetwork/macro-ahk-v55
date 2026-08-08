@@ -3,7 +3,7 @@
  *
  * Spec: spec/22-app-issues/110-macro-controller-pro-zero-credit-balance.md §9.2
  *
- * Persists `{ WorkspaceId, WorkspaceJson, CreditBalanceJson, Plan, FetchedAt }`
+ * Persists `{ WorkspaceId, WorkspaceJson, CreditBalanceJson, PlanTierType, FetchedAt }`
  * via `marco.kv.set()` (background SQLite). Failures are logged, never thrown —
  * write is fire-and-forget per spec ("async-save").
  */
@@ -17,7 +17,7 @@ export interface WorkspacesRow {
     WorkspaceId: string;
     WorkspaceJson: string;
     CreditBalanceJson: string;
-    Plan: string;
+    PlanTierType: string;
     FetchedAt: string;
 }
 
@@ -34,7 +34,7 @@ function buildRow(workspace: WorkspaceInfoTyped, balance: CreditBalanceResponseT
         WorkspaceId: workspace.id,
         WorkspaceJson: JSON.stringify(workspace),
         CreditBalanceJson: JSON.stringify(balance),
-        Plan: workspace.plan,
+        PlanTierType: workspace.plan,
         FetchedAt: new Date().toISOString(),
     };
 }

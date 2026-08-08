@@ -9,7 +9,7 @@
 import { CheckCircle2, Eye, EyeOff, MousePointer2, SearchCheck, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
     Select,
@@ -73,7 +73,7 @@ export function SelectorField(props: SelectorFieldProps) {
     return (
         <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-                <Label htmlFor="wait-selector" className="text-sm font-medium">Selector</Label>
+                <LabelType htmlFor="wait-selector" className="text-sm font-medium">Selector</LabelType>
                 {selector.trim().length > 0 && (
                     <Badge variant={kindMode === "Auto" ? "secondary" : "outline"}>
                         {kindMode === "Auto" ? `Auto · ${detected}` : effectiveKind}
@@ -113,7 +113,7 @@ export function SelectorField(props: SelectorFieldProps) {
 export function KindModeField({ value, onChange }: { readonly value: KindMode; readonly onChange: (v: KindMode) => void }) {
     return (
         <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Selector type</Label>
+            <LabelType className="text-xs text-muted-foreground">Selector type</LabelType>
             <Select value={value} onValueChange={(v) => onChange(v as KindMode)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -129,7 +129,7 @@ export function KindModeField({ value, onChange }: { readonly value: KindMode; r
 export function ConditionField({ value, onChange }: { readonly value: WaitCondition; readonly onChange: (v: WaitCondition) => void }) {
     return (
         <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Condition</Label>
+            <LabelType className="text-xs text-muted-foreground">Condition</LabelType>
             <Select value={value} onValueChange={(v) => onChange(v as WaitCondition)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -153,9 +153,9 @@ export function ConditionField({ value, onChange }: { readonly value: WaitCondit
 export function TimeoutField({ value, onChange }: { readonly value: number; readonly onChange: (v: number) => void }) {
     return (
         <div className="space-y-1.5">
-            <Label htmlFor="wait-timeout" className="text-xs text-muted-foreground">
+            <LabelType htmlFor="wait-timeout" className="text-xs text-muted-foreground">
                 Timeout (ms, 250 to 60 000)
-            </Label>
+            </LabelType>
             <Input
                 id="wait-timeout"
                 type="number"

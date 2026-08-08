@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS Step (
     StepStatusId       INTEGER NOT NULL DEFAULT 1,
     OrderIndex         INTEGER NOT NULL,
     VariableName       TEXT    NOT NULL,
-    Label              TEXT    NOT NULL,
+    LabelType              TEXT    NOT NULL,
     Description        TEXT,
     InlineJs           TEXT,
     ParamsJson         TEXT,

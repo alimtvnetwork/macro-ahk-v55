@@ -1,5 +1,6 @@
+import { DbResult } from '../../db/db-result';
 /**
- * Plan-23 remaining-item #3 (regression coverage for v4.144.0 Step 2).
+ * PlanTierType-23 remaining-item #3 (regression coverage for v4.144.0 Step 2).
  *
  * Prompt Library per-row `↺ Reset` action:
  *   - Renders ONLY for seeded slugs whose current Body diverges from the seed.
@@ -19,9 +20,9 @@ vi.mock('../toast', () => ({ showToast: vi.fn() }));
 const rows: Record<string, unknown[]> = {
     plan: [
         // Seeded slug whose body diverges from the seed → Reset visible.
-        { Id: 1, Slug: 'plan-default', Name: 'Plan (default)', Body: 'user edit without token', Role: 'plan', IsDefault: 1, Category: 'plan', Tags: '', ReplaceKey: 'n', ReplaceValues: '', CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 1, Slug: 'plan-default', Name: 'PlanTierType (default)', Body: 'user edit without token', Role: 'plan', IsDefault: 1, Category: 'plan', Tags: '', ReplaceKey: 'n', ReplaceValues: '', CreatedAt: 0, UpdatedAt: 0 },
         // Seeded slug whose body ALREADY equals seed → Reset hidden.
-        { Id: 2, Slug: 'plan-concise', Name: 'Plan (concise)', Body: '# Plan in {{n}} steps (concise)\n\nWrite exactly {{n}} numbered steps. No preamble, no rationale block per step, one line each. TODO(user): replace with final concise variant.', Role: 'plan', IsDefault: 0, Category: 'plan', Tags: '', ReplaceKey: 'n', ReplaceValues: '', CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 2, Slug: 'plan-concise', Name: 'PlanTierType (concise)', Body: '# PlanTierType in {{n}} steps (concise)\n\nWrite exactly {{n}} numbered steps. No preamble, no rationale block per step, one line each. TODO(user): replace with final concise variant.', Role: 'plan', IsDefault: 0, Category: 'plan', Tags: '', ReplaceKey: 'n', ReplaceValues: '', CreatedAt: 0, UpdatedAt: 0 },
     ],
     next: [],
     generic: [
@@ -32,9 +33,9 @@ const rows: Record<string, unknown[]> = {
 
 const mocks = vi.hoisted(() => ({
     listPromptsByRole: vi.fn(),
-    setDefaultPromptForRole: vi.fn(async () => ({ ok: true })),
-    deletePromptById: vi.fn(async () => ({ ok: true })),
-    upsertPrompt: vi.fn(async () => ({ ok: true, value: 1 })),
+    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+    upsertPrompt: vi.fn(async () => (new DbResult(true, 1))),
 }));
 vi.mock('../../db/prompt-db', () => mocks);
 
@@ -56,9 +57,9 @@ function resetButtonForSlug(slug: string): HTMLButtonElement | null {
 describe('prompt-library-modal — per-row ↺ Reset', () => {
     beforeEach(() => {
         document.body.innerHTML = '';
-        mocks.listPromptsByRole.mockImplementation(async (role: string) => ({ ok: true, value: rows[role] ?? [] }));
+        mocks.listPromptsByRole.mockImplementation(async (role: string) => (new DbResult(true, rows[role] ?? [])));
         mocks.upsertPrompt.mockClear();
-        mocks.upsertPrompt.mockImplementation(async () => ({ ok: true, value: 1 }));
+        mocks.upsertPrompt.mockImplementation(async () => (new DbResult(true, 1)));
     });
     afterEach(() => { document.body.innerHTML = ''; vi.restoreAllMocks(); });
 
@@ -93,7 +94,7 @@ describe('prompt-library-modal — per-row ↺ Reset', () => {
         };
         expect(arg.slug).toBe('plan-default');
         expect(arg.body).toBe(PLAN_DEFAULT_BODY);
-        expect(arg.name).toBe('Plan (default)');
+        expect(arg.name).toBe('PlanTierType (default)');
         expect(arg.role).toBe('plan');
         expect(arg.replaceKey).toBe('n');
     });
@@ -109,7 +110,7 @@ describe('prompt-library-modal — per-row ↺ Reset', () => {
 
     it('upsertPrompt returning ok:false surfaces "Reset failed: <err>" in the status line', async () => {
         vi.spyOn(window, 'confirm').mockReturnValue(true);
-        mocks.upsertPrompt.mockImplementationOnce(async () => ({ ok: false, error: 'db-locked' }));
+        mocks.upsertPrompt.mockImplementationOnce(async () => (new DbResult(false, undefined, 'db-locked')));
         await openPromptLibraryModal();
         await flush();
         resetButtonForSlug('plan-default')!.click();

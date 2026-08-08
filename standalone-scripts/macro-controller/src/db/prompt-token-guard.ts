@@ -2,7 +2,7 @@
  * prompt-token-guard.ts - `{{token}}` parity check (plan-14, step 6).
  *
  * Root cause this prevents: silent drift of parameterized variables when
- * a user edits a Plan or Next prompt body. If the old body contained
+ * a user edits a PlanTierType or Next prompt body. If the old body contained
  * `{{count}}` and the edit accidentally renames or drops it, the
  * downstream renderer will inject a literal or crash at substitute
  * time. `assertParamTokensUnchanged` compares the multisets of

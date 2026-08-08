@@ -182,7 +182,7 @@ export function getBearerTokenFromSessionBridge(): string {
 // ============================================
 
 import { FALLBACK_SESSION_COOKIE_NAMES, COOKIE_DIAGNOSTIC_COOLDOWN_MS } from './constants';
-import { StorageKey } from './types';
+import { StorageKeyType } from './types';
 
 // CQ11: Encapsulate diagnostic timestamp in singleton
 class CookieDiagnosticState {
@@ -336,7 +336,7 @@ function logCookieDiagnostics(
 /** Read the timestamp when the token was last persisted. */
 export function getTokenSavedAt(): number {
   try {
-    const raw = localStorage.getItem(StorageKey.TokenSavedAt) || '0';
+    const raw = localStorage.getItem(StorageKeyType.TokenSavedAt) || '0';
 
     return parseInt(raw, 10) || 0;
   } catch (e: unknown) {
@@ -350,7 +350,7 @@ export function getTokenSavedAt(): number {
 export function saveTokenWithTimestamp(token: string): void {
   localStorage.setItem('marco_bearer_token', token);
   localStorage.setItem('lovable-session-id', token);
-  localStorage.setItem(StorageKey.TokenSavedAt, String(Date.now()));
+  localStorage.setItem(StorageKeyType.TokenSavedAt, String(Date.now()));
   log('[AuthBridge] Token persisted with timestamp', 'info');
 }
 

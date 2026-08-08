@@ -1,4 +1,4 @@
-import type { AssetInjectTarget } from "../enums/asset-inject-target";
+import type { AssetInjectTargetType } from "../enums/asset-inject-target";
 
 /**
  * A CSS file shipped with a standalone script and injected into the
@@ -8,5 +8,5 @@ import type { AssetInjectTarget } from "../enums/asset-inject-target";
  */
 export type CssAsset = {
     readonly File: string;
-    readonly Inject: AssetInjectTarget;
+    readonly Inject: AssetInjectTargetType;
 };

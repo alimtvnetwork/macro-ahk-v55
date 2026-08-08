@@ -100,10 +100,10 @@ export function findAnchorSelectorId(
 }
 
 /* ------------------------------------------------------------------ */
-/*  Label + variable-name normalisers                                  */
+/*  LabelType + variable-name normalisers                                  */
 /* ------------------------------------------------------------------ */
 
-/** Builds a human-readable Label from the capture, capped at 80 chars. */
+/** Builds a human-readable LabelType from the capture, capped at 80 chars. */
 export function buildLabel(payload: XPathCapturePayload): string {
     const trimmed = payload.Text.trim();
     const tag = payload.TagName.toLowerCase();
@@ -173,7 +173,7 @@ export function buildStepDraftFromCapture(
     return {
         StepKindId: stepKind,
         VariableName: payload.SuggestedVariableName,
-        Label: buildLabel(payload),
+        LabelType: buildLabel(payload),
         InlineJs: null,
         ParamsJson: paramsJson,
         IsBreakpoint: false,
@@ -203,7 +203,7 @@ export function deriveUrlTabClickParams(
     return {
         UrlPattern: deriveGlobPattern(observedUrl),
         UrlMatch: "Glob",
-        Mode: "OpenNew",
+        OperationModeType: "OpenNew",
         Selector: payload.XPathFull,
         SelectorKind: "XPath",
     };

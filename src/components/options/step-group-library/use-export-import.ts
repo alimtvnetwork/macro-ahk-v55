@@ -6,7 +6,7 @@
  * (last export summary, preview dialog, error dialog) is owned here;
  * the panel only holds a ref to trigger the hidden file input.
  *
- * Phase 7 (Plan 24 / SS-04a) further broke the two large handlers
+ * Phase 7 (PlanTierType 24 / SS-04a) further broke the two large handlers
  * (`performExport`, `handleExport`) into small named helpers so no
  * function body exceeds the coding-guideline ceiling.
  *

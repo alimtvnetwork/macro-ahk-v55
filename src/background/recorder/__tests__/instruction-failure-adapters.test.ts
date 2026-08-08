@@ -42,7 +42,7 @@ import {
     type Condition,
     type PredicateEvaluation,
 } from "../condition-evaluator";
-import { SelectorKindEnum, ReasonEnum2, KindEnum2 } from "../../../types/enums";
+import { SelectorKindEnum, BuildSelectorPredicateReportInputReason, PredicateEvaluationKind } from "../../../types/enums";
 
 /** Stable clock so timestamps are deterministic across runs. */
 const FIXED_NOW = (): Date => new Date("2026-04-26T10:00:00.000Z");
@@ -137,7 +137,7 @@ describe("UrlTabClick → FailureReport", () => {
                     Detail: `simulated ${reason}`,
                     UrlPattern: "https://app.example.com/orders/*",
                     UrlMatch: "Glob",
-                    Mode: "OpenOrFocus",
+                    OperationModeType: "OpenOrFocus",
                     ObservedUrl: "https://app.example.com/orders/42",
                     Selector: "a.open-orders",
                     SelectorKind: "Css",
@@ -177,7 +177,7 @@ describe("UrlTabClick → FailureReport", () => {
                 Detail: "no match",
                 UrlPattern: "https://x.test/",
                 UrlMatch: "Exact",
-                Mode: "FocusExisting",
+                OperationModeType: "FocusExisting",
                 TimeoutMs: 1000,
                 DurationMs: 1000,
             },
@@ -195,7 +195,7 @@ describe("UrlTabClick → FailureReport", () => {
                     Detail: reason,
                     UrlPattern: "https://x.test/*",
                     UrlMatch: "Glob",
-                    Mode: "OpenNew",
+                    OperationModeType: "OpenNew",
                     TimeoutMs: 1000,
                     DurationMs: 1000,
                 },
@@ -358,37 +358,37 @@ describe("Condition wait → FailureReport (Gate / WaitFor / ConditionStep)", ()
 const SELECTOR_PREDICATE_SOURCE_FILE = "src/background/recorder/condition-evaluator.ts";
 
 interface SelectorPredicateMappingCase {
-    readonly Label: string;
+    readonly LabelType: string;
     readonly Selector: string;
     readonly SelectorKind?: SelectorKindEnum;
-    readonly Reason: ReasonEnum2;
+    readonly Reason: BuildSelectorPredicateReportInputReason;
     readonly ExpectedReason: string;        // FailureReport.Reason
-    readonly ExpectedDetailKind: KindEnum2;
+    readonly ExpectedDetailKind: PredicateEvaluationKind;
 }
 
 const SELECTOR_PREDICATE_MATRIX: ReadonlyArray<SelectorPredicateMappingCase> = [
     // --- InvalidSelector → XPathSyntaxError vs CssSyntaxError ----------
     {
-        Label: "Auto + leading-slash + InvalidSelector → XPathSyntaxError",
+        LabelType: "Auto + leading-slash + InvalidSelector → XPathSyntaxError",
         Selector: "//div[unterminated", SelectorKind: "Auto",
         Reason: "InvalidSelector",
         ExpectedReason: "XPathSyntaxError", ExpectedDetailKind: "XPath",
     },
     {
-        Label: "Auto + non-slash + InvalidSelector → CssSyntaxError",
+        LabelType: "Auto + non-slash + InvalidSelector → CssSyntaxError",
         Selector: "div[unterminated", SelectorKind: "Auto",
         Reason: "InvalidSelector",
         ExpectedReason: "CssSyntaxError", ExpectedDetailKind: "Css",
     },
     {
-        Label: "Explicit XPath + InvalidSelector → XPathSyntaxError",
+        LabelType: "Explicit XPath + InvalidSelector → XPathSyntaxError",
         Selector: "div[unterminated",     // would auto-detect as Css; explicit overrides
         SelectorKind: "XPath",
         Reason: "InvalidSelector",
         ExpectedReason: "XPathSyntaxError", ExpectedDetailKind: "XPath",
     },
     {
-        Label: "Explicit Css + InvalidSelector → CssSyntaxError",
+        LabelType: "Explicit Css + InvalidSelector → CssSyntaxError",
         Selector: "//div",                 // would auto-detect as XPath; explicit overrides
         SelectorKind: "Css",
         Reason: "InvalidSelector",
@@ -396,24 +396,24 @@ const SELECTOR_PREDICATE_MATRIX: ReadonlyArray<SelectorPredicateMappingCase> = [
     },
     // --- ZeroMatches → keeps the canonical reason regardless of dialect --
     {
-        Label: "Auto + Css selector + ZeroMatches → ZeroMatches",
+        LabelType: "Auto + Css selector + ZeroMatches → ZeroMatches",
         Selector: "#never", Reason: "ZeroMatches",
         ExpectedReason: "ZeroMatches", ExpectedDetailKind: "Css",
     },
     {
-        Label: "Auto + XPath selector + ZeroMatches → ZeroMatches",
+        LabelType: "Auto + XPath selector + ZeroMatches → ZeroMatches",
         Selector: "//never", Reason: "ZeroMatches",
         ExpectedReason: "ZeroMatches", ExpectedDetailKind: "XPath",
     },
     // --- ConditionTimeout → schema Timeout regardless of dialect ---------
     {
-        Label: "Auto + XPath selector + ConditionTimeout → Timeout",
+        LabelType: "Auto + XPath selector + ConditionTimeout → Timeout",
         Selector: "/html/body/main", SelectorKind: "Auto",
         Reason: "ConditionTimeout",
         ExpectedReason: "Timeout", ExpectedDetailKind: "XPath",
     },
     {
-        Label: "Explicit Css + ConditionTimeout → Timeout",
+        LabelType: "Explicit Css + ConditionTimeout → Timeout",
         Selector: "main.app", SelectorKind: "Css",
         Reason: "ConditionTimeout",
         ExpectedReason: "Timeout", ExpectedDetailKind: "Css",
@@ -422,7 +422,7 @@ const SELECTOR_PREDICATE_MATRIX: ReadonlyArray<SelectorPredicateMappingCase> = [
 
 describe("Selector predicate → FailureReport", () => {
     it.each(SELECTOR_PREDICATE_MATRIX)(
-        "$Label, Phase/StepKind/SourceFile pinned, Reason mapping correct",
+        "$LabelType, Phase/StepKind/SourceFile pinned, Reason mapping correct",
         (c) => {
             const report = buildSelectorPredicateFailureReport({
                 Selector: c.Selector,
@@ -491,7 +491,7 @@ describe("Selector predicate → FailureReport", () => {
                     Detail: "tab never resolved",
                     UrlPattern: "https://x.test/*",
                     UrlMatch: "Glob",
-                    Mode: "OpenNew",
+                    OperationModeType: "OpenNew",
                     TimeoutMs: 1000,
                     DurationMs: 1001,
                 },
@@ -543,22 +543,22 @@ describe("Selector predicate → FailureReport", () => {
  * with a clear test name rather than a single combined assertion.
  */
 interface OptionalCase {
-    readonly Label: string;
+    readonly LabelType: string;
     readonly ObservedUrl?: string;
     readonly Selector?: string;
     readonly SelectorKind?: SelectorKindEnum;
 }
 
 const OPTIONAL_CASES: ReadonlyArray<OptionalCase> = [
-    { Label: "all optionals omitted" },
-    { Label: "ObservedUrl only", ObservedUrl: "https://x.test/now" },
-    { Label: "Selector only", Selector: "button.go" },
-    { Label: "SelectorKind only (no Selector)", SelectorKind: "XPath" },
-    { Label: "Selector + SelectorKind", Selector: "//button", SelectorKind: "XPath" },
-    { Label: "ObservedUrl + Selector", ObservedUrl: "https://x.test/now", Selector: "button.go" },
-    { Label: "ObservedUrl + SelectorKind", ObservedUrl: "https://x.test/now", SelectorKind: "Css" },
+    { LabelType: "all optionals omitted" },
+    { LabelType: "ObservedUrl only", ObservedUrl: "https://x.test/now" },
+    { LabelType: "Selector only", Selector: "button.go" },
+    { LabelType: "SelectorKind only (no Selector)", SelectorKind: "XPath" },
+    { LabelType: "Selector + SelectorKind", Selector: "//button", SelectorKind: "XPath" },
+    { LabelType: "ObservedUrl + Selector", ObservedUrl: "https://x.test/now", Selector: "button.go" },
+    { LabelType: "ObservedUrl + SelectorKind", ObservedUrl: "https://x.test/now", SelectorKind: "Css" },
     {
-        Label: "all three present",
+        LabelType: "all three present",
         ObservedUrl: "https://x.test/now",
         Selector: "button.go",
         SelectorKind: "Css",
@@ -567,7 +567,7 @@ const OPTIONAL_CASES: ReadonlyArray<OptionalCase> = [
 
 describe("UrlTabClick optional fields, schema conformance", () => {
     it.each(OPTIONAL_CASES)(
-        "$Label: produces a schema-valid report with a clean ReasonDetail",
+        "$LabelType: produces a schema-valid report with a clean ReasonDetail",
         (kase) => {
             const report = buildUrlTabClickFailureReport({
                 Failure: {
@@ -575,7 +575,7 @@ describe("UrlTabClick optional fields, schema conformance", () => {
                     Detail: "no matching tab",
                     UrlPattern: "https://x.test/*",
                     UrlMatch: "Glob",
-                    Mode: "OpenOrFocus",
+                    OperationModeType: "OpenOrFocus",
                     TimeoutMs: 1_000,
                     DurationMs: 1_000,
                     ObservedUrl: kase.ObservedUrl,
@@ -599,7 +599,7 @@ describe("UrlTabClick optional fields, schema conformance", () => {
 
             // 3. Required (always-present) segments.
             expect(report.ReasonDetail).toContain("Reason=TabNotFound");
-            expect(report.ReasonDetail).toContain("Mode=OpenOrFocus");
+            expect(report.ReasonDetail).toContain("OperationModeType=OpenOrFocus");
             expect(report.ReasonDetail).toContain("UrlMatch=Glob");
             expect(report.ReasonDetail).toContain("Pattern=https://x.test/*");
             expect(report.ReasonDetail).toContain("TimeoutMs=1000");
@@ -627,7 +627,7 @@ describe("UrlTabClick optional fields, schema conformance", () => {
                 Detail: "blank tab opened",
                 UrlPattern: "https://x.test/*",
                 UrlMatch: "Glob",
-                Mode: "OpenNew",
+                OperationModeType: "OpenNew",
                 TimeoutMs: 1_000,
                 DurationMs: 5,
                 ObservedUrl: "",
@@ -644,10 +644,10 @@ describe("UrlTabClick optional fields, schema conformance", () => {
             buildUrlTabClickFailureReport({
                 Failure: {
                     Reason: "TabNotFound",
-                    Detail: kase.Label,
+                    Detail: kase.LabelType,
                     UrlPattern: "https://x.test/*",
                     UrlMatch: "Glob",
-                    Mode: "OpenOrFocus",
+                    OperationModeType: "OpenOrFocus",
                     TimeoutMs: 1_000,
                     DurationMs: 1_000,
                     ObservedUrl: kase.ObservedUrl,
@@ -669,7 +669,7 @@ describe("UrlTabClick optional fields, schema conformance", () => {
                 Detail: "row context test",
                 UrlPattern: "https://x.test/*",
                 UrlMatch: "Glob",
-                Mode: "OpenOrFocus",
+                OperationModeType: "OpenOrFocus",
                 TimeoutMs: 1_000,
                 DurationMs: 1_000,
                 // No Selector / SelectorKind / ObservedUrl.
@@ -911,7 +911,7 @@ describe("Mixed-family bundle (UrlTabClick + ConditionTimeout + InvalidSelector)
                 Detail: "OpenNew tab never resolved",
                 UrlPattern: "https://orders.test/*",
                 UrlMatch: "Glob",
-                Mode: "OpenNew",
+                OperationModeType: "OpenNew",
                 TimeoutMs: 5_000,
                 DurationMs: 5_002,
                 ObservedUrl: "about:blank",
@@ -924,7 +924,7 @@ describe("Mixed-family bundle (UrlTabClick + ConditionTimeout + InvalidSelector)
                 Detail: "active tab URL does not match pattern",
                 UrlPattern: "https://orders.test/checkout",
                 UrlMatch: "Exact",
-                Mode: "OpenOrFocus",
+                OperationModeType: "OpenOrFocus",
                 TimeoutMs: 1_000,
                 DurationMs: 12,
                 ObservedUrl: "https://orders.test/cart",
@@ -937,7 +937,7 @@ describe("Mixed-family bundle (UrlTabClick + ConditionTimeout + InvalidSelector)
                 Detail: "click target absent in matched tab",
                 UrlPattern: "https://orders.test/*",
                 UrlMatch: "Glob",
-                Mode: "OpenOrFocus",
+                OperationModeType: "OpenOrFocus",
                 TimeoutMs: 2_000,
                 DurationMs: 2_001,
                 Selector: "button#confirm",

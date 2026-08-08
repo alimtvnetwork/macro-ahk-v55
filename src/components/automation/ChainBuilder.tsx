@@ -13,7 +13,7 @@ import { StepCard } from "./StepCard";
 import { TriggerConfigPanel } from "./TriggerConfig";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -279,11 +279,11 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
         {/* Name + Slug */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label className="text-xs font-medium">Name</Label>
+            <LabelType className="text-xs font-medium">Name</LabelType>
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Full Review Cycle" className="h-8 text-xs" />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-medium">Slug</Label>
+            <LabelType className="text-xs font-medium">Slug</LabelType>
             <Input
               value={slug}
               onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
@@ -299,7 +299,7 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
         {/* Steps */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label className="text-xs font-medium">Steps ({steps.length})</Label>
+            <LabelType className="text-xs font-medium">Steps ({steps.length})</LabelType>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size="sm" variant="outline" className="h-7 text-xs gap-1">

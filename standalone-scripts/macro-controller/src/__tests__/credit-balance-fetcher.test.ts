@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
-import { Plan } from '../credit-balance-update/plan';
+import { CreditFetchOutcomeType } from '../credit-balance-update/credit-fetch-outcome';
+import { PlanTierType } from '../credit-balance-update/plan';
 
 const { getBearerTokenSpy, markBearerTokenExpiredSpy, logErrorSpy, logWarnSpy } = vi.hoisted(() => ({
     getBearerTokenSpy: vi.fn(async () => 'tok_abc123def4567890'),
@@ -46,13 +46,13 @@ describe('credit-balance fetcher', () => {
         }), { status: 200 }));
         vi.stubGlobal('fetch', fetchSpy);
 
-        const result = await fetchWorkspaceCreditBalance({ workspaceId: 'ws_123', plan: Plan.Ktlo, timeoutMs: 3000 });
+        const result = await fetchWorkspaceCreditBalance({ workspaceId: 'ws_123', plan: PlanTierType.Ktlo, timeoutMs: 3000 });
 
         expect(getBearerTokenSpy).toHaveBeenCalledTimes(1);
         expect(fetchSpy).toHaveBeenCalledTimes(1);
         const init = fetchSpy.mock.calls[0][1] as RequestInit;
         expect((init.headers as Record<string, string>).Authorization).toBe('Bearer tok_abc123def4567890');
-        expect(result.outcome).toBe(CreditFetchOutcome.ApiHit);
+        expect(result.outcome).toBe(CreditFetchOutcomeType.ApiHit);
         expect(result.balance?.dailyRemaining).toBe(5);
     });
 
@@ -61,9 +61,9 @@ describe('credit-balance fetcher', () => {
         const fetchSpy = vi.fn(async () => new Response('{}', { status: 200 }));
         vi.stubGlobal('fetch', fetchSpy);
 
-        const result = await fetchWorkspaceCreditBalance({ workspaceId: 'ws_123', plan: Plan.Free, timeoutMs: 3000 });
+        const result = await fetchWorkspaceCreditBalance({ workspaceId: 'ws_123', plan: PlanTierType.Free, timeoutMs: 3000 });
 
-        expect(result.outcome).toBe(CreditFetchOutcome.MissingToken);
+        expect(result.outcome).toBe(CreditFetchOutcomeType.MissingToken);
         expect(fetchSpy).not.toHaveBeenCalled();
         expect(logErrorSpy).toHaveBeenCalledTimes(1);
         expect(String(logErrorSpy.mock.calls[0][1])).toContain('MissingToken');
@@ -72,9 +72,9 @@ describe('credit-balance fetcher', () => {
     it('marks bearer token expired on 401 and returns AuthError', async () => {
         vi.stubGlobal('fetch', vi.fn(async () => new Response('denied', { status: 401 })));
 
-        const result = await fetchWorkspaceCreditBalance({ workspaceId: 'ws_123', plan: Plan.Cancelled, timeoutMs: 3000 });
+        const result = await fetchWorkspaceCreditBalance({ workspaceId: 'ws_123', plan: PlanTierType.Cancelled, timeoutMs: 3000 });
 
-        expect(result.outcome).toBe(CreditFetchOutcome.AuthError);
+        expect(result.outcome).toBe(CreditFetchOutcomeType.AuthError);
         expect(markBearerTokenExpiredSpy).toHaveBeenCalledWith('credit-balance-update');
         expect(logErrorSpy).toHaveBeenCalledTimes(1);
         expect(String(logErrorSpy.mock.calls[0][1])).toContain('AuthError');
@@ -90,9 +90,9 @@ describe('credit-balance fetcher', () => {
         });
         vi.stubGlobal('fetch', neverResolvingFetch);
 
-        const result = await fetchWorkspaceCreditBalance({ workspaceId: 'ws_123', plan: Plan.Ktlo, timeoutMs: 1 });
+        const result = await fetchWorkspaceCreditBalance({ workspaceId: 'ws_123', plan: PlanTierType.Ktlo, timeoutMs: 1 });
 
-        expect(result.outcome).toBe(CreditFetchOutcome.Timeout);
+        expect(result.outcome).toBe(CreditFetchOutcomeType.Timeout);
         expect(logErrorSpy).toHaveBeenCalledTimes(1);
         expect(String(logErrorSpy.mock.calls[0][1])).toContain('Timeout');
     });

@@ -231,7 +231,7 @@ async function processTier1Response(
     return;
   }
 
-  if (resp.isFail) {
+  if (!resp.ok) {
     log(fn + ': Tier 1 FAILED — HTTP ' + resp.status + ' — falling to passive fallback', 'warn');
 
     if (isAuthFailure(resp.status)) {

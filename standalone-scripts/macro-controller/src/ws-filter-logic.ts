@@ -1,5 +1,5 @@
 import type { WorkspaceCredit } from './types';
-import { WsTierValue } from './types/subscription-status';
+import { WsTierValueType } from './types/subscription-status';
 import { isExpiredWs, expiredDays } from './credit-fetch';
 import { resolveCreditSummary } from './credit-balance-update/credit-summary-resolver';
 import {
@@ -8,7 +8,7 @@ import {
   isProExpiringWs,
 } from './ws-classifiers';
 import {
-  CreditSortMode,
+  CreditSortModeType,
   EXPIRED_WITH_CREDITS_MIN,
   viewState,
 } from './ws-view-state';
@@ -22,7 +22,7 @@ export interface WsFilterState {
   expiredWithCredits: boolean;
   expiring: boolean;
   refillSoon: boolean;
-  creditSortMode: CreditSortMode;
+  creditSortMode: CreditSortModeType;
 }
 
 export function readFilterState(filter: string, dataAttrActive: string): WsFilterState {
@@ -57,8 +57,8 @@ export function matchesTextFilter(ws: WorkspaceCredit, filter: string): boolean 
 }
 
 export function matchesExpiredWithCreditsFilter(ws: WorkspaceCredit): boolean {
-  const tier = (ws.tier || WsTierValue.FREE).toUpperCase().trim();
-  if (tier === WsTierValue.FREE) return false;
+  const tier = (ws.tier || WsTierValueType.FREE).toUpperCase().trim();
+  if (tier === WsTierValueType.FREE) return false;
   const sub = (ws.subscriptionStatus || '').toLowerCase().trim();
   if (sub === 'canceled' || sub === 'cancelled') return false;
   if (!isExpiredWs(ws)) return false;

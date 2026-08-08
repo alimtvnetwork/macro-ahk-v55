@@ -1,5 +1,5 @@
 /**
- * Prompt diff renderer — unified line-diff for the Plan/Next editor.
+ * Prompt diff renderer — unified line-diff for the PlanTierType/Next editor.
  *
  * Root problem: users could not see what would actually change before
  * hitting Save, so accidental edits shipped with no visual warning. This

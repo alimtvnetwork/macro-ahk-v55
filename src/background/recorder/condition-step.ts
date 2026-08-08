@@ -1,4 +1,4 @@
-import { OutcomeEnum, ReasonEnum1 } from "../../types/enums";
+import { OutcomeEnum, RouteResolutionReason } from "../../types/enums";
 
 /**
  * Marco Extension — Condition Step Routing (Spec 18 §4.2 + §5)
@@ -10,7 +10,7 @@ import { OutcomeEnum, ReasonEnum1 } from "../../types/enums";
 
 export type RouteAction =
     | { readonly Kind: "Continue" }
-    | { readonly Kind: "GoToLabel"; readonly Label: string }
+    | { readonly Kind: "GoToLabel"; readonly LabelType: string }
     | { readonly Kind: "GoToStepId"; readonly StepId: number }
     | { readonly Kind: "RunGroup"; readonly StepGroupId: number }
     | { readonly Kind: "EndRun"; readonly Outcome: OutcomeEnum };
@@ -19,14 +19,14 @@ export const MAX_ROUTE_JUMPS = 256;
 
 export interface RouteableStep {
     readonly StepId: number;
-    readonly Label: string;
+    readonly LabelType: string;
 }
 
 export type RouteResolution =
     | { readonly Kind: "Cursor"; readonly NextIndex: number; readonly JumpsUsed: number }
     | { readonly Kind: "RunGroup"; readonly StepGroupId: number; readonly NextIndex: number; readonly JumpsUsed: number }
     | { readonly Kind: "End"; readonly Outcome: OutcomeEnum; readonly JumpsUsed: number }
-    | { readonly Kind: "Error"; readonly Reason: ReasonEnum1; readonly Detail: string };
+    | { readonly Kind: "Error"; readonly Reason: RouteResolutionReason; readonly Detail: string };
 
 export interface RouteContext {
     readonly Steps: ReadonlyArray<RouteableStep>;
@@ -53,7 +53,7 @@ function resolveAllowedRoute(action: RouteAction, routeContext: RouteContext, ne
             return { Kind: "End", Outcome: action.Outcome, JumpsUsed: nextJumps };
 
         case "GoToLabel":
-            return resolveLabelRoute(action.Label, routeContext.Steps, nextJumps);
+            return resolveLabelRoute(action.LabelType, routeContext.Steps, nextJumps);
 
         case "GoToStepId":
             return resolveStepIdRoute(action.StepId, routeContext.Steps, nextJumps);
@@ -69,10 +69,10 @@ function resolveAllowedRoute(action: RouteAction, routeContext: RouteContext, ne
 }
 
 function resolveLabelRoute(label: string, steps: ReadonlyArray<RouteableStep>, nextJumps: number): RouteResolution {
-    const routeIndex = steps.findIndex((step) => step.Label === label);
+    const routeIndex = steps.findIndex((step) => step.LabelType === label);
     const isRouteTargetMissing = routeIndex < 0;
     if (isRouteTargetMissing) {
-        return createInvalidRouteTarget(`No step with Label='${label}' in current group`);
+        return createInvalidRouteTarget(`No step with LabelType='${label}' in current group`);
     }
 
     return { Kind: "Cursor", NextIndex: routeIndex, JumpsUsed: nextJumps };

@@ -2,7 +2,7 @@
  * User Add — per-task log writer.
  *
  * P19 requires Step A and Step B log lines to be **distinguishable**.
- * The `LogPhase` enum has dedicated `StepA` and `StepB` values (not
+ * The `LogPhaseType` enum has dedicated `StepA` and `StepB` values (not
  * the generic `Promote` used by Owner Switch) so the logs viewer can
  * filter/colourise without parsing message text.
  *
@@ -11,7 +11,7 @@
  * SQLite INSERT to the `UserAddLog` table (P12 schema).
  */
 
-export enum UserAddLogPhase {
+export enum UserAddLogPhaseType {
     StepA = "StepA",
     StepB = "StepB",
     Row = "Row",
@@ -19,7 +19,7 @@ export enum UserAddLogPhase {
     SignOut = "SignOut",
 }
 
-export enum UserAddLogSeverity {
+export enum UserAddLogSeverityType {
     Info = "Info",
     Warn = "Warn",
     Error = "Error",
@@ -28,8 +28,8 @@ export enum UserAddLogSeverity {
 export interface UserAddLogEntry {
     TaskId: string;
     RowIndex: number | null;
-    Phase: UserAddLogPhase;
-    Severity: UserAddLogSeverity;
+    Phase: UserAddLogPhaseType;
+    Severity: UserAddLogSeverityType;
     Message: string;
     TimestampUtc: string;
 }
@@ -40,7 +40,7 @@ export interface UserAddLogSink {
 
 export const buildUserAddEntry = (
     taskId: string, rowIndex: number | null,
-    phase: UserAddLogPhase, severity: UserAddLogSeverity, message: string,
+    phase: UserAddLogPhaseType, severity: UserAddLogSeverityType, message: string,
 ): UserAddLogEntry => ({
     TaskId: taskId, RowIndex: rowIndex, Phase: phase,
     Severity: severity, Message: message,

@@ -1,5 +1,5 @@
 /**
- * Plan 01 — Step 8a + 8d regression.
+ * PlanTierType 01 — Step 8a + 8d regression.
  *
  * Asserts the network-count contract that protects RCA #1 + #3 + #4 from
  * `.lovable/plans/completed/01-task-next-queue-sequential.md` (v3.82.0–v3.84.0):
@@ -61,10 +61,10 @@ function proWsWithInline(id: string): WorkspaceCredit {
 }
 
 beforeEach(async () => {
-    const { CreditFetchOutcome } = await import('../credit-balance-update/credit-fetch-outcome');
+    const { CreditFetchOutcomeType } = await import('../credit-balance-update/credit-fetch-outcome');
     fetchSpy.mockReset();
     fetchSpy.mockImplementation(async () => ({
-        outcome: CreditFetchOutcome.ApiHit,
+        outcome: CreditFetchOutcomeType.ApiHit,
         balance: {
             totalRemaining: 25, totalGranted: 50,
             dailyRemaining: 3, dailyLimit: 5,
@@ -87,7 +87,7 @@ beforeEach(async () => {
 describe('credit-balance — new-free + Pro-inline network contract (plan 01 step 8a/8d)', () => {
     it('new-free workspace with all-zero grant rows triggers exactly ONE /credit-balance call', async () => {
         const ctrl = await import('../credit-balance-update/credit-fetch-controller');
-        const { CreditFetchOutcome } = await import('../credit-balance-update/credit-fetch-outcome');
+        const { CreditFetchOutcomeType } = await import('../credit-balance-update/credit-fetch-outcome');
 
         const ws = newFreeWs('ws_newfree_1');
         expect(ctrl.hasInlineCredits(ws)).toBe(false);
@@ -95,13 +95,13 @@ describe('credit-balance — new-free + Pro-inline network contract (plan 01 ste
         const result = await ctrl.requestCredits(ws);
 
         expect(fetchSpy).toHaveBeenCalledTimes(1);
-        expect(result.outcome).toBe(CreditFetchOutcome.ApiHit);
+        expect(result.outcome).toBe(CreditFetchOutcomeType.ApiHit);
         expect(result.balance?.totalRemaining).toBe(25);
     });
 
     it('Pro_1 workspace with inline credits triggers ZERO /credit-balance calls', async () => {
         const ctrl = await import('../credit-balance-update/credit-fetch-controller');
-        const { CreditFetchOutcome } = await import('../credit-balance-update/credit-fetch-outcome');
+        const { CreditFetchOutcomeType } = await import('../credit-balance-update/credit-fetch-outcome');
 
         const ws = proWsWithInline('ws_pro_inline_1');
         const result = await ctrl.requestCredits(ws);
@@ -109,6 +109,6 @@ describe('credit-balance — new-free + Pro-inline network contract (plan 01 ste
         expect(fetchSpy).not.toHaveBeenCalled();
         // Pro_1 short-circuits at `shouldFetchCreditBalanceForPlan` BEFORE the
         // inline check, so the outcome is Skipped — not InlineHit.
-        expect(result.outcome).toBe(CreditFetchOutcome.Skipped);
+        expect(result.outcome).toBe(CreditFetchOutcomeType.Skipped);
     });
 });

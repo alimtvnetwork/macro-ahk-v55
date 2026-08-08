@@ -1,9 +1,9 @@
-import { ErrorSeverityEnum, ErrorAreaEnum } from "../types/enums";
+import { ErrorSeverityType, ErrorAreaType } from "../types/enums";
 
 /**
  * Central error-code registry for the macro-controller extension.
  *
- * Plan 26 / step 3. Every diagnostic error thrown from
+ * PlanTierType 26 / step 3. Every diagnostic error thrown from
  * `standalone-scripts/macro-controller/src` MUST reference a code defined here.
  *
  * Rules (enforced by scripts/check-error-codes-unique.mjs and Vitest):
@@ -17,10 +17,10 @@ import { ErrorSeverityEnum, ErrorAreaEnum } from "../types/enums";
  *  - .lovable/spec/commands/04-professional-diagnostic-error-messages.md
  */
 
-export type ErrorSeverity = ErrorSeverityEnum;
+export type ErrorSeverity = ErrorSeverityType;
 
 export type ErrorArea =
-  ErrorAreaEnum;
+  ErrorAreaType;
 
 
 export interface ErrorCodeEntry {
@@ -134,7 +134,7 @@ export const ERROR_CODES: Readonly<Record<string, ErrorCodeEntry>> = Object.free
     requiredContextKeys: ['table', 'op', 'pkey', 'sqliteCode'],
     nextFixHint: 'Reload the extension; if it persists, export diagnostics and report.',
   },
-  // ---- Plan 26 step 8: prompt-editor migration codes ----
+  // ---- PlanTierType 26 step 8: prompt-editor migration codes ----
   PROMPT_EDIT_E002: {
     code: 'PROMPT_EDIT_E002',
     area: 'PROMPT',
@@ -183,7 +183,7 @@ export const ERROR_CODES: Readonly<Record<string, ErrorCodeEntry>> = Object.free
     humanTemplate:
       'No default prompt row exists for role={role} and no seed row is registered.',
     requiredContextKeys: ['role'],
-    nextFixHint: 'Add a Plan/Next prompt via the "+ New" gear item; it will be promoted to default.',
+    nextFixHint: 'Add a PlanTierType/Next prompt via the "+ New" gear item; it will be promoted to default.',
   },
   PROMPT_EDIT_E007: {
     code: 'PROMPT_EDIT_E007',
@@ -255,7 +255,7 @@ export const ERROR_CODES: Readonly<Record<string, ErrorCodeEntry>> = Object.free
     requiredContextKeys: ['role', 'roleLabel', 'stage', 'seedAttempted', 'reason'],
     nextFixHint: 'Open More > Repair prompts, then retry; if it persists, export diagnostics.',
   },
-  // ---- Plan 26 step 9: chip-gear-menu migration codes ----
+  // ---- PlanTierType 26 step 9: chip-gear-menu migration codes ----
   UI_ACTION_E001: {
     code: 'UI_ACTION_E001',
     area: 'UI',
@@ -297,7 +297,7 @@ export const ERROR_CODES: Readonly<Record<string, ErrorCodeEntry>> = Object.free
     requiredContextKeys: ['promptId', 'name', 'reason'],
     nextFixHint: 'Reopen the row and retry, or use History to restore.',
   },
-  // ---- Plan 26 step 10: prompt-history-panel migration codes ----
+  // ---- PlanTierType 26 step 10: prompt-history-panel migration codes ----
   HISTORY_LIST_E001: {
     code: 'HISTORY_LIST_E001',
     area: 'HISTORY',
@@ -368,7 +368,7 @@ export const ERROR_CODES: Readonly<Record<string, ErrorCodeEntry>> = Object.free
     requiredContextKeys: ['stage', 'reason'],
     nextFixHint: 'Non-fatal; captured for telemetry.',
   },
-  // ---- Plan 26 step 11: prompt-injection validation migration codes ----
+  // ---- PlanTierType 26 step 11: prompt-injection validation migration codes ----
   PROMPT_VALIDATE_E002: {
     code: 'PROMPT_VALIDATE_E002',
     area: 'PROMPT',
@@ -399,7 +399,7 @@ export const ERROR_CODES: Readonly<Record<string, ErrorCodeEntry>> = Object.free
     requiredContextKeys: ['slug', 'reason'],
     nextFixHint: 'Open History and restore the previous revision manually.',
   },
-  // ---- Plan 26 step 12: seed + health migration codes ----
+  // ---- PlanTierType 26 step 12: seed + health migration codes ----
   SEED_PROMOTE_E001: {
     code: 'SEED_PROMOTE_E001',
     area: 'SEED',
@@ -460,7 +460,7 @@ export const ERROR_CODES: Readonly<Record<string, ErrorCodeEntry>> = Object.free
     requiredContextKeys: ['stage', 'reason'],
     nextFixHint: 'Open the ⚙ gear on the affected chip and run "🩹 Repair prompts".',
   },
-  // ---- Plan 26 step 13: DB layer migration codes ----
+  // ---- PlanTierType 26 step 13: DB layer migration codes ----
   DB_ROLE_ENFORCE_E001: {
     code: 'DB_ROLE_ENFORCE_E001',
     area: 'DB',
@@ -571,7 +571,7 @@ export const ERROR_CODES: Readonly<Record<string, ErrorCodeEntry>> = Object.free
     requiredContextKeys: ['op', 'kind', 'reason'],
     nextFixHint: 'Retry the submit capture; if it persists, export diagnostics.',
   },
-  // ---- Plan 26 step 14: repair-report modal codes ----
+  // ---- PlanTierType 26 step 14: repair-report modal codes ----
   REPAIR_RESEED_E001: {
     code: 'REPAIR_RESEED_E001',
     area: 'REPAIR',
@@ -602,13 +602,13 @@ export const ERROR_CODES: Readonly<Record<string, ErrorCodeEntry>> = Object.free
     requiredContextKeys: ['reason'],
     nextFixHint: 'Select the report text manually and copy with Ctrl/Cmd+C.',
   },
-  // ==== Plan 27 step 3: PROD-file code reservations ====
+  // ==== PlanTierType 27 step 3: PROD-file code reservations ====
   // Codes below cover every remaining legacy `throw new Error(...)` site in
   // `standalone-scripts/macro-controller/src/` (see manifest at
   // `.lovable/plans/subtasks/27-legacy-throw-migration/SS-01-migration-manifest.md`).
   // Codes emitted this turn: CREDIT_FETCH_E001..E003 (credit-fetch.ts).
   // All other codes are reserved (INTENTIONALLY_UNEMITTED) and graduate as
-  // steps 5..13 of Plan 27 land their migrations.
+  // steps 5..13 of PlanTierType 27 land their migrations.
 
   // --- credit-fetch.ts (emitted, step 4) ---
   CREDIT_FETCH_E001: {
@@ -642,7 +642,7 @@ export const ERROR_CODES: Readonly<Record<string, ErrorCodeEntry>> = Object.free
     nextFixHint: 'Sign in to Lovable again in this tab, then retry the action.',
   },
 
-  // --- credit-balance.ts (emitted, Plan 22 · toast migration) ---
+  // --- credit-balance.ts (emitted, PlanTierType 22 · toast migration) ---
   CREDIT_BALANCE_E001: {
     code: 'CREDIT_BALANCE_E001',
     area: 'CREDIT',

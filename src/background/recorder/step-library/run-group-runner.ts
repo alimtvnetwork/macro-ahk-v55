@@ -48,7 +48,7 @@
 import type { FailureReport } from "../failure-logger";
 import type { StepLibraryDb, StepGroupRow, StepRow } from "./db";
 import { StepKindId, MAX_RUN_GROUP_CALL_DEPTH } from "./schema";
-import { OutcomeEnum4, RunGroupFailureReasonEnum, Enum_4c6f84e9 } from "../../../types/enums";
+import { RunStepTraceEntryOutcome, RunGroupFailureReasonEnum, ExpansionFailureFrame } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -59,11 +59,11 @@ export interface RunStepTraceEntry {
     readonly StepId: number;
     readonly StepGroupId: number;
     readonly StepKindId: StepKindId;
-    readonly Label: string | null;
+    readonly LabelType: string | null;
     readonly OrderIndex: number;
     /** Names of every group from the root down to this step's group. */
     readonly GroupPath: ReadonlyArray<string>;
-    readonly Outcome: OutcomeEnum4;
+    readonly Outcome: RunStepTraceEntryOutcome;
     /** ISO-8601 timestamp captured at entry (UTC). */
     readonly StartedAt: string;
     readonly DurationMs: number;
@@ -214,7 +214,7 @@ function enterGroupTrace(frame: FrameContext, newStackNames: ReadonlyArray<strin
         StepId: -1,
         StepGroupId: frame.group.StepGroupId,
         StepKindId: StepKindId.RunGroup,
-        Label: `→ enter "${frame.group.Name}"`,
+        LabelType: `→ enter "${frame.group.Name}"`,
         OrderIndex: -1,
         GroupPath: newStackNames,
         Outcome: "EnteredGroup",
@@ -228,7 +228,7 @@ function exitGroupTrace(frame: FrameContext, newStackNames: ReadonlyArray<string
         StepId: -1,
         StepGroupId: frame.group.StepGroupId,
         StepKindId: StepKindId.RunGroup,
-        Label: `← exit "${frame.group.Name}"`,
+        LabelType: `← exit "${frame.group.Name}"`,
         OrderIndex: -1,
         GroupPath: newStackNames,
         Outcome: "ExitedGroup",
@@ -247,7 +247,7 @@ function buildSkippedTraceEntry(step: StepRow, groupPath: ReadonlyArray<string>,
         StepId: step.StepId,
         StepGroupId: step.StepGroupId,
         StepKindId: step.StepKindId,
-        Label: step.Label,
+        LabelType: step.LabelType,
         OrderIndex: step.OrderIndex,
         GroupPath: groupPath,
         Outcome: "Skipped",
@@ -431,7 +431,7 @@ function buildLeafOutcomeTraceEntry(
         StepId: step.StepId,
         StepGroupId: step.StepGroupId,
         StepKindId: step.StepKindId,
-        Label: step.Label,
+        LabelType: step.LabelType,
         OrderIndex: step.OrderIndex,
         GroupPath: groupPath,
         Outcome: report === null ? "Executed" : "Failed",
@@ -619,7 +619,7 @@ export interface ExpandOptions {
  * preview cannot show a plan that the runner would refuse to execute.
  */
 function expansionFailure(
-    frame: Pick<ExpansionFrame, Enum_4c6f84e9>,
+    frame: Pick<ExpansionFrame, ExpansionFailureFrame>,
     reason: Exclude<RunGroupFailureReason, "LeafStepFailed">,
     detail: string,
     stepId: number | null,

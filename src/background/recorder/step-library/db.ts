@@ -53,7 +53,7 @@ export interface StepRow {
     readonly StepGroupId: number;
     readonly OrderIndex: number;
     readonly StepKindId: StepKindId;
-    readonly Label: string | null;
+    readonly LabelType: string | null;
     readonly PayloadJson: string | null;
     readonly TargetStepGroupId: number | null;
     readonly IsDisabled: boolean;
@@ -255,7 +255,7 @@ export class StepLibraryDb {
 
     listSteps(stepGroupId: number): readonly StepRow[] {
         return this.selectAll<StepRow>(
-            `SELECT StepId, StepGroupId, OrderIndex, StepKindId, Label,
+            `SELECT StepId, StepGroupId, OrderIndex, StepKindId, LabelType,
                     PayloadJson, TargetStepGroupId, IsDisabled, CreatedAt, UpdatedAt
              FROM Step
              WHERE StepGroupId = ?
@@ -267,7 +267,7 @@ export class StepLibraryDb {
     appendStep(input: {
         StepGroupId: number;
         StepKindId: StepKindId;
-        Label?: string | null;
+        LabelType?: string | null;
         PayloadJson?: string | null;
         TargetStepGroupId?: number | null;
     }): number {
@@ -299,13 +299,13 @@ export class StepLibraryDb {
     private insertStepRow(input: {
         StepGroupId: number;
         StepKindId: StepKindId;
-        Label?: string | null;
+        LabelType?: string | null;
         PayloadJson?: string | null;
         TargetStepGroupId?: number | null;
     }, nextOrder: number): number {
         const stmt = this.db.prepare(
             `INSERT INTO Step
-                (StepGroupId, OrderIndex, StepKindId, Label, PayloadJson, TargetStepGroupId)
+                (StepGroupId, OrderIndex, StepKindId, LabelType, PayloadJson, TargetStepGroupId)
              VALUES (?, ?, ?, ?, ?, ?)
              RETURNING StepId;`,
         );
@@ -314,7 +314,7 @@ export class StepLibraryDb {
                 input.StepGroupId,
                 nextOrder,
                 input.StepKindId,
-                input.Label ?? null,
+                input.LabelType ?? null,
                 input.PayloadJson ?? null,
                 input.TargetStepGroupId ?? null,
             ]);
@@ -373,7 +373,7 @@ export class StepLibraryDb {
     updateStep(input: {
         StepId: number;
         StepKindId: StepKindId;
-        Label?: string | null;
+        LabelType?: string | null;
         PayloadJson?: string | null;
         TargetStepGroupId?: number | null;
     }): void {
@@ -390,12 +390,12 @@ export class StepLibraryDb {
         }
         this.exec(
             `UPDATE Step
-             SET StepKindId = ?, Label = ?, PayloadJson = ?, TargetStepGroupId = ?,
+             SET StepKindId = ?, LabelType = ?, PayloadJson = ?, TargetStepGroupId = ?,
                  UpdatedAt = datetime('now')
              WHERE StepId = ?;`,
             [
                 input.StepKindId,
-                input.Label ?? null,
+                input.LabelType ?? null,
                 input.PayloadJson ?? null,
                 input.TargetStepGroupId ?? null,
                 input.StepId,

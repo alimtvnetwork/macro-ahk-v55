@@ -23,12 +23,12 @@ import {
     listDataSources,
     type PersistedDataSource,
 } from "../recorder/data-source-persistence";
-import { MimeKindEnum } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { MimeKindType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 interface AddRequest {
     projectSlug: string;
     filePath: string;
-    mimeKind: MimeKindEnum;
+    mimeKind: MimeKindType;
     rawText: string;
 }
 
@@ -64,7 +64,7 @@ function validateAddRequest(req: AddRequest): void {
     }
 }
 
-function parseByKind(kind: MimeKindEnum, rawText: string): ParsedDataSource {
+function parseByKind(kind: MimeKindType, rawText: string): ParsedDataSource {
     if (kind === "csv") return parseCsv(rawText);
     if (kind === "json") return parseJsonRows(rawText);
     throw new Error(`Unsupported data source kind: ${kind as string}`);

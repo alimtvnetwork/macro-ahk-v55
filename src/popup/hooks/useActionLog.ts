@@ -6,13 +6,13 @@
  */
 
 import { useState, useCallback } from "react";
-import { VariantEnum3 } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { ToastVariantType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-export type ActionStatus = VariantEnum3;
+export type ActionStatus = ToastVariantType;
 
 export interface ActionLogEntry {
     action: string;

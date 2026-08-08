@@ -27,7 +27,7 @@ import { showToast } from './toast';
 import { logError } from './error-utils';
 import { log } from './logger';
 import { throwDiagnostic } from './errors/diagnostic-error';
-import { KeyEnum } from "./types/enums";
+import { GracePeriodKeyType } from "./types/enums";
 
 const MODAL_ID = 'marco-settings-modal';
 const BACKDROP_ID = 'marco-settings-modal-backdrop';
@@ -49,7 +49,7 @@ interface ModalHandlerStore {
   _marcoSettingsKey?: (e: KeyboardEvent) => void;
 }
 
-function readJsonConfigValue(key: KeyEnum): number | undefined {
+function readJsonConfigValue(key: GracePeriodKeyType): number | undefined {
   const config = (window.__MARCO_CONFIG__ || {}) as Record<string, unknown>;
   const credit = (config.creditStatus || {}) as Record<string, unknown>;
   const lifecycle = (credit.lifecycle || {}) as Record<string, unknown>;

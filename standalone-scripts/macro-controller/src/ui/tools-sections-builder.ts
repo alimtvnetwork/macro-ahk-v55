@@ -21,7 +21,7 @@ import { showToast, recentErrors, onRecentErrorsChange, formatRequestDetail } fr
 import { createCollapsibleSection } from './sections';
 
 import { CONFIG, IDS, VERSION, cInputBg, cInputBorder, cInputFg, cPanelBgAlt, cPanelFgDim, cPrimary, cPrimaryLight, cSectionHeader, trFast } from '../shared-state';
-import { CssFragment, DomId } from '../types';
+import { CssFragmentType, DomIdType } from '../types';
 export interface ToolsSectionsDeps {
   btnStyle: string;
   updateProjectButtonXPath: (nextXPath: string) => void;
@@ -65,7 +65,7 @@ function _buildXPathSection(deps: ToolsSectionsDeps): HTMLElement {
   const { updateProjectButtonXPath, updateProgressXPath, updateWorkspaceXPath } = deps;
   const xpathCol = createCollapsibleSection('XPath Configuration (editable)', 'ml_collapse_xpath');
   const xpathBody = xpathCol.body;
-  const inputStyle = CssFragment.Width100Padding3px5pxBorder1pxSol + cInputBorder + CssFragment.BorderRadius3pxBackground + cInputBg + ';color:' + cInputFg + ';font-family:monospace;font-size:9px;box-sizing:border-box;';
+  const inputStyle = CssFragmentType.Width100Padding3px5pxBorder1pxSol + cInputBorder + CssFragmentType.BorderRadius3pxBackground + cInputBg + ';color:' + cInputFg + ';font-family:monospace;font-size:9px;box-sizing:border-box;';
 
   const fields: Array<{ label: string; id: string; value: string; onChange: (nextXPath: string) => void; extraStyle?: string }> = [
     { label: 'Project Button XPath:', id: 'xpath-project-btn', value: CONFIG.PROJECT_BUTTON_XPATH, onChange: updateProjectButtonXPath, extraStyle: 'margin-bottom:4px;' },
@@ -75,7 +75,7 @@ function _buildXPathSection(deps: ToolsSectionsDeps): HTMLElement {
 
   for (const f of fields) {
     const lbl = document.createElement('div');
-    lbl.style.cssText = CssFragment.FontSize9pxColor + cSectionHeader + ';margin-bottom:1px;' + (f.extraStyle || '');
+    lbl.style.cssText = CssFragmentType.FontSize9pxColor + cSectionHeader + ';margin-bottom:1px;' + (f.extraStyle || '');
     lbl.textContent = f.label;
     const inp = document.createElement('input');
     inp.type = 'text';
@@ -102,7 +102,7 @@ function _buildJsExecutorSection(deps: ToolsSectionsDeps): { section: HTMLElemen
   const jsTextbox = document.createElement('textarea');
   jsTextbox.id = IDS.JS_EXECUTOR;
   jsTextbox.placeholder = 'JavaScript code...';
-  jsTextbox.style.cssText = 'flex:1;min-height:30px;padding:4px;border:1px solid ' + cInputBorder + CssFragment.BorderRadius3pxBackground + cInputBg + ';color:' + cInputFg + ';font-family:monospace;font-size:10px;resize:vertical;';
+  jsTextbox.style.cssText = 'flex:1;min-height:30px;padding:4px;border:1px solid ' + cInputBorder + CssFragmentType.BorderRadius3pxBackground + cInputBg + ';color:' + cInputFg + ';font-family:monospace;font-size:10px;resize:vertical;';
   jsTextbox.spellcheck = false;
   jsTextbox.onkeydown = function(e: KeyboardEvent) {
     const isCtrlEnter = e.ctrlKey && e.key === 'Enter';
@@ -123,7 +123,7 @@ function _buildJsExecutorSection(deps: ToolsSectionsDeps): { section: HTMLElemen
   jsBody.appendChild(jsRow);
 
   const jsHistLabel = document.createElement('div');
-  jsHistLabel.style.cssText = CssFragment.FontSize9pxColor + cPrimaryLight + ';margin-top:4px;';
+  jsHistLabel.style.cssText = CssFragmentType.FontSize9pxColor + cPrimaryLight + ';margin-top:4px;';
   jsHistLabel.textContent = 'JS History (click to recall, Up/Down arrows in textbox)';
   jsBody.appendChild(jsHistLabel);
 
@@ -195,9 +195,9 @@ function _buildJsLogsSection(): HTMLElement {
   logExportRow.style.cssText = 'display:flex;gap:4px;align-items:center;';
 
   const logLabel = document.createElement('span');
-  logLabel.style.cssText = CssFragment.FontSize9pxColor + cPrimaryLight + ';flex:1;';
+  logLabel.style.cssText = CssFragmentType.FontSize9pxColor + cPrimaryLight + ';flex:1;';
   logLabel.textContent = 'JS Logs (' + getAllLogs().length + ' entries)';
-  logLabel.id = DomId.LoopLogCount;
+  logLabel.id = DomIdType.LoopLogCount;
 
   const copyLogBtn = document.createElement('button');
   copyLogBtn.textContent = 'Copy';
@@ -205,7 +205,7 @@ function _buildJsLogsSection(): HTMLElement {
   copyLogBtn.onclick = function(e: Event) {
     e.preventDefault(); e.stopPropagation();
     copyLogsToClipboard();
-    const countEl = document.getElementById(DomId.LoopLogCount);
+    const countEl = document.getElementById(DomIdType.LoopLogCount);
     if (countEl) countEl.textContent = 'Copied! (' + getAllLogs().length + ' entries)';
     setTimeout(function() {
       if (countEl) countEl.textContent = 'JS Logs (' + getAllLogs().length + ' entries)';
@@ -225,7 +225,7 @@ function _buildJsLogsSection(): HTMLElement {
   clearLogBtn.onclick = function(e: Event) {
     e.preventDefault(); e.stopPropagation();
     clearAllLogs();
-    const countEl = document.getElementById(DomId.LoopLogCount);
+    const countEl = document.getElementById(DomIdType.LoopLogCount);
     if (countEl) countEl.textContent = 'JS Logs (0 entries)';
   };
 
@@ -252,7 +252,7 @@ function _buildRecentErrorsSection(): HTMLElement {
   copyAllErrBtn.textContent = '📋';
   copyAllErrBtn.title = 'Copy All Errors';
   copyAllErrBtn.style.cssText = _errBtnStyle;
-  copyAllErrBtn.onmouseenter = function() { copyAllErrBtn.style.filter = CssFragment.Brightness13; };
+  copyAllErrBtn.onmouseenter = function() { copyAllErrBtn.style.filter = CssFragmentType.Brightness13; };
   copyAllErrBtn.onmouseleave = function() { copyAllErrBtn.style.filter = ''; };
   copyAllErrBtn.onclick = function(e: Event) {
     e.preventDefault(); e.stopPropagation();
@@ -267,7 +267,7 @@ function _buildRecentErrorsSection(): HTMLElement {
   dlErrBtn.textContent = '⬇';
   dlErrBtn.title = 'Download Errors';
   dlErrBtn.style.cssText = _errBtnStyle;
-  dlErrBtn.onmouseenter = function() { dlErrBtn.style.filter = CssFragment.Brightness13; };
+  dlErrBtn.onmouseenter = function() { dlErrBtn.style.filter = CssFragmentType.Brightness13; };
   dlErrBtn.onmouseleave = function() { dlErrBtn.style.filter = ''; };
   dlErrBtn.onclick = function(e: Event) {
     e.preventDefault(); e.stopPropagation();
@@ -288,7 +288,7 @@ function _buildRecentErrorsSection(): HTMLElement {
   clearErrBtn.textContent = '🗑';
   clearErrBtn.title = 'Clear Errors';
   clearErrBtn.style.cssText = _errBtnStyle + 'color:#fca5a5;';
-  clearErrBtn.onmouseenter = function() { clearErrBtn.style.filter = CssFragment.Brightness13; };
+  clearErrBtn.onmouseenter = function() { clearErrBtn.style.filter = CssFragmentType.Brightness13; };
   clearErrBtn.onmouseleave = function() { clearErrBtn.style.filter = ''; };
   clearErrBtn.onclick = function(e: Event) {
     e.preventDefault(); e.stopPropagation();

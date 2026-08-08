@@ -8,7 +8,7 @@ import { ServiceResult } from '../utils/result-wrapper';
  */
 
 import { log, logSub } from '../logger';
-import { Label, type PromptEntry, type ResolvedPromptsConfig } from '../types';
+import { LabelType, type PromptEntry, type ResolvedPromptsConfig } from '../types';
 import { showPasteToast, pasteIntoEditor } from './prompt-utils';
 
 
@@ -18,7 +18,7 @@ import { REPLACE_KEY_DEFAULT } from '../db/prompt-defaults';
 import { substituteToken } from '../utils/token-substitute';
 import { listPromptsByRole } from '../db/prompt-db';
 import { runWithBridgeRetry } from '../db/sql-bridge';
-import { TaskNextPromptSourceEnum, Enum_3c41a5e1, CycleStatus } from "../types/enums";
+import { TaskNextPromptSourceType, PromptSubstituteFieldType, CycleStatusType } from "../types/enums";
 
 /** Settings shape for Task Next */
 export interface TaskNextSettings {
@@ -53,7 +53,7 @@ export const taskNextState: {
     retryCount: 3,
     retryDelayMs: 1000,
     buttonXPath: '/html/body/div[3]/div/div[2]/main/div/div/div[1]/div/div[2]/div/form/div[2]/div/button[2]',
-    promptSlug: Label.NextTasks,
+    promptSlug: LabelType.NextTasks,
     requireStartForMultiRun: true,
   },
   running: false,
@@ -125,7 +125,7 @@ function matchPromptByDerivedSlugOrKeywords<T extends { name?: string }>(entries
 export function findNextTasksPrompt(deps: TaskNextDeps) {
   const promptsCfg = deps.getPromptsConfig();
   const entries = promptsCfg.entries || [];
-  const targetSlug = taskNextState.settings.promptSlug || Label.NextTasks;
+  const targetSlug = taskNextState.settings.promptSlug || LabelType.NextTasks;
   const aliases = new Set<string>([targetSlug, 'next-tasks', 'next-steps']);
 
   const slugMap = entries.map(function(e) { return e.name + ' → slug=' + (e.slug || '⚠️ MISSING') + ', id=' + (e.id || '—'); });
@@ -189,7 +189,7 @@ export function findAddToTasksButton(): HTMLElement | null {
   return findButtonByXPath() || findButtonBySelectors();
 }
 
-type TaskNextPromptSource = TaskNextPromptSourceEnum;
+type TaskNextPromptSource = TaskNextPromptSourceType;
 
 interface TaskNextPromptSelection {
   readonly text: string;
@@ -218,7 +218,7 @@ export async function dequeueTaskNextPrompt(): Promise<TaskNextPromptResult> {
   }
 }
 
-export function substituteTaskNextPromptText(prompt: Pick<PromptEntry, Enum_3c41a5e1>, n: number): string {
+export function substituteTaskNextPromptText(prompt: Pick<PromptEntry, PromptSubstituteFieldType>, n: number): string {
   return substituteToken(prompt.text, prompt.replaceKey || REPLACE_KEY_DEFAULT, n);
 }
 
@@ -239,9 +239,9 @@ function selectLegacyTaskNextPrompt(deps: TaskNextDeps, n: number): TaskNextProm
 async function selectDbTaskNextPrompt(n: number): Promise<TaskNextPromptSelection | null> {
   const res = await runWithBridgeRetry(
     function() { return listPromptsByRole('next'); },
-    function(r) { return r.isSuccess ? undefined : (r.error ?? 'listPromptsByRole !ok'); },
+    function(r) { return r.ok ? undefined : (r.error ?? 'listPromptsByRole !ok'); },
   );
-  if (res.isFail || !res.value || res.value.length === 0) return null;
+  if (!res.ok || !res.value || res.value.length === 0) return null;
   const rows = res.value;
   const active = rows.find(function(r) { return r.IsDefault === 1; }) ?? rows[0];
   if (!active || !active.Body) return null;
@@ -405,7 +405,7 @@ async function runTaskNextCycle(
   k: number,
   n: number,
   waitForLovableIdle: typeof import('./lovable-idle').waitForLovableIdle,
-): Promise<CycleStatus> {
+): Promise<CycleStatusType> {
   if (taskNextState.cancelled) return 'cancelled';
   const cycleStart = Date.now();
   const chosen = await resolveCyclePrompt(deps, legacyPromptText);
@@ -426,7 +426,7 @@ async function runTaskNextCycle(
   return 'ok';
 }
 
-function reportCycleStatus(status: CycleStatus, k: number, n: number): void {
+function reportCycleStatus(status: CycleStatusType, k: number, n: number): void {
   const at = (k + 1) + '/' + n;
   if (status === 'cancelled') {
     showPasteToast('🛑 Task Next queue cancelled at ' + k + '/' + n, false);
@@ -544,7 +544,7 @@ export function __resetTaskNextCancelHandlerForTests(): void {
   _taskNextPagehideHandler = null;
 }
 
-// Settings modal lives in `./task-next-settings-modal.ts` (Plan-17 step 12).
+// Settings modal lives in `./task-next-settings-modal.ts` (PlanTierType-17 step 12).
 // Import it directly from there; the re-export was removed to avoid a
 // task-next-ui <-> task-next-settings-modal cycle.
 

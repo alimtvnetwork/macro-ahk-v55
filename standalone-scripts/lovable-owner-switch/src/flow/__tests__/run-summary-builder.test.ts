@@ -13,7 +13,7 @@
 import { describe, expect, it } from "vitest";
 import { buildOwnerSwitchRunSummary } from "../run-summary-builder";
 import { RowOutcomeCode } from "../row-types";
-import { LogPhase, LogSeverity } from "../log-sink";
+import { LogPhaseType, LogSeverityType } from "../log-sink";
 import {
     RunSummaryRowStatus, RunSummaryScriptCode,
     renderRunSummaryAsJson, renderRunSummaryAsText,
@@ -45,8 +45,8 @@ const loginFailedRow: RowExecutionResult = {
 };
 
 const warnEntry: LogEntry = {
-    TaskId: "t1", RowIndex: 2, Phase: LogPhase.Promote,
-    Severity: LogSeverity.Warn, Message: "No rollback performed", TimestampUtc: "2026-04-26T00:00:00Z",
+    TaskId: "t1", RowIndex: 2, Phase: LogPhaseType.Promote,
+    Severity: LogSeverityType.Warn, Message: "No rollback performed", TimestampUtc: "2026-04-26T00:00:00Z",
 };
 
 describe("buildOwnerSwitchRunSummary", () => {

@@ -1,12 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { sendMessage } from "@/lib/message-client";
-import { MatchStrategyEnum, RoleEnum1 } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { MatchStrategyType, CookieBindingRoleType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 interface CookieRule {
   id: string;
   name: string;
   domain: string;
-  matchStrategy: MatchStrategyEnum;
+  matchStrategy: MatchStrategyType;
   bindTo: string;
 }
 
@@ -14,7 +14,7 @@ interface CookieRule {
 interface CookieBinding {
   cookieName: string;
   url: string;
-  role: RoleEnum1;
+  role: CookieBindingRoleType;
   description?: string;
 }
 

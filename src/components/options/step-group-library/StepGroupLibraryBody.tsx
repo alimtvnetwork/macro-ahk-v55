@@ -3,7 +3,7 @@
  *
  * Thin composition seam that renders the header, two-pane body, and
  * dialog block. Each JSX island lives in its own file so no function
- * exceeds the ESLint `max-lines-per-function` ceiling. See Plan 24
+ * exceeds the ESLint `max-lines-per-function` ceiling. See PlanTierType 24
  * SS-06 Phase 3.
  */
 

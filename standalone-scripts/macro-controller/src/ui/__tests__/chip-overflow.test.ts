@@ -1,6 +1,6 @@
 /**
  * Regression tests for installChipOverflow (ResizeObserver-driven chip hiding
- * on the Plan/Next inline strips). jsdom does not lay out, so we stub
+ * on the PlanTierType/Next inline strips). jsdom does not lay out, so we stub
  * `clientWidth` / `scrollWidth` on the container so the recompute() sizing
  * math can be exercised deterministically. This pins:
  *

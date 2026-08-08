@@ -1,4 +1,4 @@
-// Plan 01 follow-up (post-Step-10): regression locks that the refill-priority
+// PlanTierType 01 follow-up (post-Step-10): regression locks that the refill-priority
 // sort recomputes the moment a CreditResolved cache write lands — i.e. the
 // onCreditResolved → invalidateWsDropdownHash → populateLoopWorkspaceDropdown
 // chain in ws-list-renderer.ts (lines 1143-1145) feeds fresh resolver data
@@ -11,7 +11,7 @@ import {
     clearCreditBalanceUpdateMemoryCache,
     __writeCreditBalanceUpdateMemoryCacheForTests,
 } from '../credit-balance-update/credit-balance-cache';
-import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
+import { CreditFetchOutcomeType } from '../credit-balance-update/credit-fetch-outcome';
 import type { CreditFetchResult } from '../credit-balance-update/credit-balance-types';
 import { sortByRefillPriority } from '../workspace-refill-priority';
 import type { WorkspaceCredit } from '../types';
@@ -35,7 +35,7 @@ function makeWs(id: string, available: number): WorkspaceCredit {
 
 function makeCachedResult(available: number): CreditFetchResult {
     return {
-        outcome: CreditFetchOutcome.ApiHit,
+        outcome: CreditFetchOutcomeType.ApiHit,
         balance: {
             totalRemaining: available,
             totalGranted: available,

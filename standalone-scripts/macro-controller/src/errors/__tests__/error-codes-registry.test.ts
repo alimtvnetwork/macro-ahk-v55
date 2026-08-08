@@ -1,5 +1,5 @@
 /**
- * Plan 26 / step 17 — Runtime Vitest suite for the ERROR_CODES registry.
+ * PlanTierType 26 / step 17 — Runtime Vitest suite for the ERROR_CODES registry.
  *
  * The static CI gate (`scripts/check-error-codes-unique.mjs`) parses the file
  * as text. This suite exercises the *runtime* object so a regression that

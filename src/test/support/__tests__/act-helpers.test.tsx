@@ -1,7 +1,7 @@
 /**
  * Marco Extension — smoke tests for `src/test/support/act-helpers.ts`.
  *
- * Plan 10 Step 2 verification: proves each helper actually silences the
+ * PlanTierType 10 Step 2 verification: proves each helper actually silences the
  * class of `act(...)` warning it targets. Each test installs a
  * `console.error` spy scoped to "not wrapped in act" and asserts the
  * spy is NEVER hit while running a component that would otherwise

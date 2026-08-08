@@ -28,19 +28,19 @@ import {
     BindError,
     wrapDatabaseWithBindSafety,
 } from "@/background/sqlite-bind-safety";
-import { Enum_56e0146f, Enum_83c400f } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { SqliteCommandType, SqlStmtOpType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Test doubles, minimal sql.js Database / Statement stand-ins       */
 /* ------------------------------------------------------------------ */
 
-interface StubDatabase extends Pick<SqlJsDatabase, Enum_56e0146f> {
+interface StubDatabase extends Pick<SqlJsDatabase, SqliteCommandType> {
     runCalls: Array<{ sql: string; params?: unknown }>;
     execCalls: Array<{ sql: string; params?: unknown }>;
     prepareCalls: string[];
 }
 
-interface StubStatement extends Pick<Statement, Enum_83c400f> {
+interface StubStatement extends Pick<Statement, SqlStmtOpType> {
     bindCalls: Array<unknown>;
     runCalls: Array<unknown>;
 }

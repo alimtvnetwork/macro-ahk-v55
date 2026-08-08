@@ -25,7 +25,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
-import { ActionEnum2, UrlSubTabEnum, AccentEnum } from "../../types/enums";
+import { UrlRuleAction, UrlSubTabEnum, AccentEnum } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -34,7 +34,7 @@ import { ActionEnum2, UrlSubTabEnum, AccentEnum } from "../../types/enums";
 interface UrlRule {
   pattern: string;
   matchType: string;
-  action?: ActionEnum2;
+  action?: UrlRuleAction;
   excludePattern?: string;
   label?: string;
 }
@@ -160,7 +160,7 @@ function updateUrlRule(targetUrls: UrlRule[], index: number, field: string, valu
 /*  Sub-Tab 1: URL Rules (open / ignore)                               */
 /* ------------------------------------------------------------------ */
 function UrlRulesSubTab({ targetUrls, onChange }: { targetUrls: UrlRule[]; onChange: (urls: UrlRule[]) => void }) {
-  const handleAdd = (action: ActionEnum2) => {
+  const handleAdd = (action: UrlRuleAction) => {
     onChange([...targetUrls, { pattern: "", matchType: "contains", action }]);
   };
 
@@ -297,7 +297,7 @@ function UrlRuleRow({ rule, accent, onUpdate, onRemove }: UrlRuleRowProps) {
       <Input
         value={rule.label || ""}
         onChange={(e) => onUpdate("label", e.target.value)}
-        placeholder="Label"
+        placeholder="LabelType"
         className="h-7 text-[10px] w-[80px] shrink-0 border-border/50"
       />
       <Button
@@ -377,7 +377,7 @@ function ProjectUrlsSubTab({ targetUrls, onChange }: { targetUrls: UrlRule[]; on
                   <Input
                     value={rule.label || ""}
                     onChange={(e) => handleUpdate(index, "label", e.target.value)}
-                    placeholder="Label (e.g. Production)"
+                    placeholder="LabelType (e.g. Production)"
                     className="h-6 text-[10px] font-semibold border-none shadow-none px-1 bg-transparent"
                   />
                   {rule.label && (
@@ -487,7 +487,7 @@ function UrlVariablesSubTab({ targetUrls, onChange }: { targetUrls: UrlRule[]; o
               <tr className="bg-muted/30 border-b border-border">
                 <th className="text-left px-2.5 py-1.5 font-semibold text-muted-foreground uppercase tracking-wider">Variable</th>
                 <th className="text-left px-2.5 py-1.5 font-semibold text-muted-foreground uppercase tracking-wider">Value</th>
-                <th className="text-left px-2.5 py-1.5 font-semibold text-muted-foreground uppercase tracking-wider">Label</th>
+                <th className="text-left px-2.5 py-1.5 font-semibold text-muted-foreground uppercase tracking-wider">LabelType</th>
                 <th className="w-8" />
               </tr>
             </thead>

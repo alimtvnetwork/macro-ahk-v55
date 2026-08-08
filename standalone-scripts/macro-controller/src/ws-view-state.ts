@@ -1,5 +1,5 @@
 import { logError } from './error-utils';
-import { CreditSortMode } from "./types/enums";
+import { CreditSortModeType } from "./types/enums";
 
 class WsListViewState {
   private static instance: WsListViewState | null = null;
@@ -9,7 +9,7 @@ class WsListViewState {
   private isRefillSoon = false;
   private isCompactMode: boolean;
   private isRefillPriority: boolean;
-  private creditSortMode: CreditSortMode;
+  private creditSortMode: CreditSortModeType;
 
   private constructor() {
     this.isCompactMode = this.loadBool('ml_compact_mode', true);
@@ -34,7 +34,7 @@ class WsListViewState {
     }
   }
 
-  private loadCreditSortMode(): CreditSortMode {
+  private loadCreditSortMode(): CreditSortModeType {
     try {
       const stored = localStorage.getItem('ml_credit_sort_mode');
       if (stored === 'high' || stored === 'low' || stored === 'pro-high' || stored === 'pro-low') {
@@ -71,8 +71,8 @@ class WsListViewState {
     }
   }
 
-  getCreditSortMode(): CreditSortMode { return this.creditSortMode; }
-  setCreditSortMode(mode: CreditSortMode): void {
+  getCreditSortMode(): CreditSortModeType { return this.creditSortMode; }
+  setCreditSortMode(mode: CreditSortModeType): void {
     this.creditSortMode = mode;
     try {
       localStorage.setItem('ml_credit_sort_mode', mode);
@@ -106,5 +106,5 @@ export function setLoopWsRefillSoon(enabled: boolean): void { viewState().setRef
 export function getLoopWsRefillPriority(): boolean { return viewState().getRefillPriority(); }
 export function setLoopWsRefillPriority(enabled: boolean): void { viewState().setRefillPriority(enabled); }
 
-export function getLoopWsCreditSortMode(): CreditSortMode { return viewState().getCreditSortMode(); }
-export function setLoopWsCreditSortMode(mode: CreditSortMode): void { viewState().setCreditSortMode(mode); }
+export function getLoopWsCreditSortMode(): CreditSortModeType { return viewState().getCreditSortMode(); }
+export function setLoopWsCreditSortMode(mode: CreditSortModeType): void { viewState().setCreditSortMode(mode); }

@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * G7: prompt-library-modal a11y — initial focus + Tab focus trap.
  *
@@ -14,7 +15,7 @@ vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 
 const rows: Record<string, unknown[]> = {
     plan: [
-        { Id: 1, Slug: 'plan-default', Name: 'Plan (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 1, Slug: 'plan-default', Name: 'PlanTierType (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
     ],
     next: [],
     generic: [],
@@ -22,9 +23,9 @@ const rows: Record<string, unknown[]> = {
 
 const mocks = vi.hoisted(() => ({
     listPromptsByRole: vi.fn(),
-    setDefaultPromptForRole: vi.fn(async () => ({ ok: true })),
-    deletePromptById: vi.fn(async () => ({ ok: true })),
-    upsertPrompt: vi.fn(async () => ({ ok: true, value: 99 })),
+    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+    upsertPrompt: vi.fn(async () => (new DbResult(true, 99))),
 }));
 vi.mock('../../db/prompt-db', () => mocks);
 
@@ -50,7 +51,7 @@ function focusableInModal(): HTMLElement[] {
 describe('prompt-library-modal — a11y focus trap', () => {
     beforeEach(() => {
         document.body.innerHTML = '';
-        mocks.listPromptsByRole.mockImplementation(async (role: string) => ({ ok: true, value: rows[role] ?? [] }));
+        mocks.listPromptsByRole.mockImplementation(async (role: string) => (new DbResult(true, rows[role] ?? [])));
     });
     afterEach(() => {
         document.body.innerHTML = '';

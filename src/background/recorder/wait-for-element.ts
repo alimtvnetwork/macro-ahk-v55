@@ -23,7 +23,7 @@ import {
     type Condition,
     type Predicate,
 } from "./condition-evaluator";
-import { SelectorKindEnum, WaitForPredicateEnum, KindEnum2, ReasonEnum3, ReasonEnum } from "../../types/enums";
+import { SelectorKindEnum, WaitForPredicateEnum, PredicateEvaluationKind, WaitForOutcomeReason, ReasonEnum } from "../../types/enums";
 
 export type WaitForKind = SelectorKindEnum;
 export type WaitForPredicate = WaitForPredicateEnum;
@@ -45,8 +45,8 @@ export interface WaitForSpec {
 }
 
 export type WaitForOutcome =
-    | { readonly Ok: true;  readonly DurationMs: number; readonly ResolvedKind: KindEnum2 }
-    | { readonly Ok: false; readonly DurationMs: number; readonly Reason: ReasonEnum3; readonly Detail: string };
+    | { readonly Ok: true;  readonly DurationMs: number; readonly ResolvedKind: PredicateEvaluationKind }
+    | { readonly Ok: false; readonly DurationMs: number; readonly Reason: WaitForOutcomeReason; readonly Detail: string };
 
 export interface WaitForOptions {
     readonly Doc: Document;

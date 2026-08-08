@@ -131,7 +131,7 @@ describe("findAnchorSelectorId", () => {
         insertStepRow(db, {
             StepKindId: StepKindId.Click,
             VariableName: "FormAnchor",
-            Label: "<form>",
+            LabelType: "<form>",
             InlineJs: null,
             IsBreakpoint: false,
             Selectors: [
@@ -218,7 +218,7 @@ describe("Spec 19.1, UrlTabClick capture branch", () => {
             }),
         );
         expect(params).not.toBeNull();
-        expect(params?.Mode).toBe("OpenNew");
+        expect(params?.OperationModeType).toBe("OpenNew");
         expect(params?.UrlMatch).toBe("Glob");
         expect(params?.UrlPattern).toBe("https://app.example.com/orders/*");
     });
@@ -257,7 +257,7 @@ describe("Spec 19.1, UrlTabClick capture branch", () => {
         expect(draft.StepKindId).toBe(StepKindId.UrlTabClick);
         expect(draft.ParamsJson).not.toBeNull();
         const parsed = JSON.parse(draft.ParamsJson ?? "{}");
-        expect(parsed.Mode).toBe("OpenNew");
+        expect(parsed.OperationModeType).toBe("OpenNew");
         expect(parsed.Selector).toBe("//a[@id='order-42']");
         expect(parsed.SelectorKind).toBe("XPath");
     });

@@ -1,5 +1,5 @@
 /**
- * Inline strips frame — single container that hosts Plan, Next, and Repeat
+ * Inline strips frame — single container that hosts PlanTierType, Next, and Repeat
  * strips as one visual unit above the Lovable chat textarea.
  *
  * Ownership: this module owns the outer frame DOM only. Each strip module
@@ -111,7 +111,7 @@ function buildHeader(): HTMLDivElement {
   header.style.cssText = HEADER_CSS;
 
   const label = document.createElement('span');
-  label.textContent = `Marco inline v${VERSION} (Plan / Next / Repeat)`;
+  label.textContent = `Marco inline v${VERSION} (PlanTierType / Next / Repeat)`;
   label.title = `Marco extension v${VERSION}`;
   header.appendChild(label);
 
@@ -123,7 +123,7 @@ function buildHeader(): HTMLDivElement {
   restore.type = 'button';
   restore.id = FRAME_RESTORE_ID;
   restore.style.cssText = RESTORE_BTN_CSS + ';display:none;';
-  restore.title = 'Restore Plan, Next, Repeat strips';
+  restore.title = 'Restore PlanTierType, Next, Repeat strips';
   restore.textContent = '↻ Restore inline strips';
   restore.onclick = function (): void {
     setInlineStripGroupRemoved(false);
@@ -136,7 +136,7 @@ function buildHeader(): HTMLDivElement {
   chevron.type = 'button';
   chevron.id = FRAME_CHEVRON_ID;
   chevron.style.cssText = BTN_CSS;
-  chevron.title = 'Minimize / maximize Plan, Next, Repeat';
+  chevron.title = 'Minimize / maximize PlanTierType, Next, Repeat';
   chevron.textContent = getInlineStripGroupCollapsed() ? '+' : '−';
   chevron.onclick = function (): void {
     toggleInlineStripGroupCollapsed();
@@ -149,7 +149,7 @@ function buildHeader(): HTMLDivElement {
   remove.type = 'button';
   remove.id = FRAME_REMOVE_ID;
   remove.style.cssText = BTN_CSS;
-  remove.title = 'Hide Plan / Next / Repeat strips (Restore button appears in header)';
+  remove.title = 'Hide PlanTierType / Next / Repeat strips (Restore button appears in header)';
   remove.textContent = '×';
   remove.onclick = function (): void {
     setInlineStripGroupRemoved(true);

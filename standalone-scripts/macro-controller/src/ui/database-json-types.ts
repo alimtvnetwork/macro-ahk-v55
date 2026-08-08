@@ -1,5 +1,5 @@
 import { Type } from "../../../../src/types/enums";
-import { ActionEnum3 } from "../types/enums";
+import { JsonMigrationActionType } from "../types/enums";
 
 /**
  * MacroLoop Controller — JSON Schema Types & Sample
@@ -35,7 +35,7 @@ export interface JsonTableDef {
 
 export interface JsonMigration {
   table: string;
-  action: ActionEnum3;
+  action: JsonMigrationActionType;
   column?: JsonColumnDef;
   oldName?: string;
   newName?: string;

@@ -5,7 +5,7 @@ import { AlertTriangle, ChevronDown, ChevronRight, Copy, Check, Download, MouseP
 import { readClickTrail, type ClickTrailEntry } from "@/lib/click-trail";
 import { useBenignWarningStats } from "@/hooks/use-benign-warning-stats";
 import type { BenignWarningTally } from "@/lib/benign-warnings";
-import { Enum_1ab45d34, CauseKindEnum } from "../../types/enums";
+import { BootFailureBannerMode, CauseKindEnum } from "../../types/enums";
 
 /** Structured per-failure context — see BootErrorContext in shared/messages.ts. */
 export interface BootErrorContext {
@@ -79,7 +79,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
   // steps, and SQL body (keeping only the correlation header, op summary,
   // WASM probe, and benign tally totals). "full" includes everything.
   // Persisted across mounts so users keep their preferred default.
-  const [reportMode, setReportMode] = useState<Enum_1ab45d34>(() => {
+  const [reportMode, setReportMode] = useState<BootFailureBannerMode>(() => {
     try {
       const saved = localStorage.getItem("marco_support_report_mode");
       return saved === "short" ? "short" : "full";
@@ -88,7 +88,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       return "full";
     }
   });
-  const setReportModePersisted = (mode: Enum_1ab45d34): void => {
+  const setReportModePersisted = (mode: BootFailureBannerMode): void => {
     setReportMode(mode);
     try {
       localStorage.setItem("marco_support_report_mode", mode);
@@ -543,7 +543,7 @@ interface ReportInput {
   /** Tally of warnings filtered out of the Errors drawer. */
   benignTally: BenignWarningTally;
   /** "short" — correlation header + summary only; "full" — everything. */
-  mode: Enum_1ab45d34;
+  mode: BootFailureBannerMode;
 }
 
 /** Produces a plain-text bundle suitable for clipboard/issue reports. */

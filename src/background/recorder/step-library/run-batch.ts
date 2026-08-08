@@ -31,7 +31,7 @@ import {
     type LeafStepExecutor,
     type RunGroupResult,
 } from "./run-group-runner";
-import { BatchGroupStatus, BatchFailurePolicyEnum } from "../../../types/enums";
+import { BatchGroupStatusType, BatchFailurePolicyType } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -39,7 +39,7 @@ import { BatchGroupStatus, BatchFailurePolicyEnum } from "../../../types/enums";
 
 export interface BatchGroupReport {
     readonly StepGroupId: number;
-    readonly Status: BatchGroupStatus;
+    readonly Status: BatchGroupStatusType;
     readonly StartedAt: string | null;
     readonly EndedAt: string | null;
     readonly DurationMs: number;
@@ -47,7 +47,7 @@ export interface BatchGroupReport {
     readonly Result: RunGroupResult | null;
 }
 
-export type BatchFailurePolicy = BatchFailurePolicyEnum;
+export type BatchFailurePolicy = BatchFailurePolicyType;
 
 export interface RunBatchOptions {
     readonly db: StepLibraryDb;
@@ -161,8 +161,8 @@ async function iterateGroups(
             continue;
         }
         const outcome = await runOneGroup(opts, reports, i, now);
-        if (outcome.isSuccess) succeeded++; else failed++;
-        if (outcome.isFail && policy === "StopOnFailure") aborted = true;
+        if (outcome.ok) succeeded++; else failed++;
+        if (!outcome.ok && policy === 'StopOnFailure') aborted = true;
     }
     return { succeeded, failed };
 }

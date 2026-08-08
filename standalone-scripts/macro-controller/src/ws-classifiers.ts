@@ -1,6 +1,6 @@
 import type { WorkspaceCredit } from './types';
 import { logError } from './error-utils';
-import { WsTierValue } from './types/subscription-status';
+import { WsTierValueType } from './types/subscription-status';
 import { getEffectiveStatus, getWorkspaceLifecycleConfig } from './credit-fetch';
 import { classifyFromStatus } from './workspace-display-status';
 
@@ -30,8 +30,8 @@ export function isExpiringWs(ws: WorkspaceCredit): boolean {
 
 export function isProExpiringWs(ws: WorkspaceCredit): boolean {
   try {
-    const tier = (ws.tier || WsTierValue.FREE).toUpperCase().trim();
-    if (tier === WsTierValue.FREE) return false;
+    const tier = (ws.tier || WsTierValueType.FREE).toUpperCase().trim();
+    if (tier === WsTierValueType.FREE) return false;
     const config = getWorkspaceLifecycleConfig();
     const source = getEffectiveStatus(ws, config);
     const display = classifyFromStatus(source, ws);

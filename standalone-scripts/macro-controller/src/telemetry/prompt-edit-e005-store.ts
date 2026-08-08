@@ -8,12 +8,12 @@
  * summary and produce a downloadable diagnostics ZIP without re-querying
  * the DB.
  *
- * Storage layout (localStorage[StorageKey.PromptEditE005Store]):
+ * Storage layout (localStorage[StorageKeyType.PromptEditE005Store]):
  *   { entries: PromptEditE005Entry[] }
  * Bounded to MAX_ENTRIES most-recent records (FIFO eviction).
  */
 
-import { StorageKey } from '../types/storage-keys';
+import { StorageKeyType } from '../types/storage-keys';
 import type { DiagnosticContext } from '../errors/diagnostic-error';
 import type { PromptRole } from '../types/prompt-role';
 import { logError } from '../error-utils';
@@ -34,7 +34,7 @@ interface Envelope { entries: PromptEditE005Entry[]; }
 
 function safeRead(): Envelope {
   try {
-    const raw = localStorage.getItem(StorageKey.PromptEditE005Store);
+    const raw = localStorage.getItem(StorageKeyType.PromptEditE005Store);
     if (!raw) return { entries: [] };
     const parsed = JSON.parse(raw) as Envelope;
     if (!parsed || !Array.isArray(parsed.entries)) return { entries: [] };
@@ -47,7 +47,7 @@ function safeRead(): Envelope {
 
 function safeWrite(env: Envelope): void {
   try {
-    localStorage.setItem(StorageKey.PromptEditE005Store, JSON.stringify(env));
+    localStorage.setItem(StorageKeyType.PromptEditE005Store, JSON.stringify(env));
   } catch (err) {
     logError('PromptEditE005Store', 'write failed', err);
   }
@@ -88,7 +88,7 @@ export function readLatestPromptEditE005ByRole(): Record<string, PromptEditE005E
 
 export function clearPromptEditE005Entries(): void {
   try {
-    localStorage.removeItem(StorageKey.PromptEditE005Store);
+    localStorage.removeItem(StorageKeyType.PromptEditE005Store);
   } catch (err) {
     logError('PromptEditE005Store', 'clear failed', err);
   }

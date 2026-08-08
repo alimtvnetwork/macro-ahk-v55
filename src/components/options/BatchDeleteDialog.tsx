@@ -30,7 +30,7 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import type { StepGroupRow } from "@/background/recorder/step-library/db";
@@ -108,7 +108,7 @@ function BatchDeleteRows({ rows }: { rows: ReadonlyArray<BatchDeleteRow> }): JSX
 }
 
 function ConfirmPhraseInput(props: { phrase: string; setPhrase: (value: string) => void }): JSX.Element {
-    return <div className="space-y-1.5"><Label htmlFor="batch-delete-confirm" className="text-xs">Type <span className="font-mono font-semibold">{CONFIRM_PHRASE}</span> to confirm</Label><Input id="batch-delete-confirm" value={props.phrase} onChange={(event) => props.setPhrase(event.target.value)} placeholder={CONFIRM_PHRASE} autoComplete="off" /></div>;
+    return <div className="space-y-1.5"><LabelType htmlFor="batch-delete-confirm" className="text-xs">Type <span className="font-mono font-semibold">{CONFIRM_PHRASE}</span> to confirm</LabelType><Input id="batch-delete-confirm" value={props.phrase} onChange={(event) => props.setPhrase(event.target.value)} placeholder={CONFIRM_PHRASE} autoComplete="off" /></div>;
 }
 
 function BatchDeleteFooter(props: { count: number; canConfirm: boolean; onConfirm: () => void }): JSX.Element {

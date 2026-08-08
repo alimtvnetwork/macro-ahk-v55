@@ -1,7 +1,7 @@
 /**
  * DiagnosticError: the single Error subclass every migrated call site throws.
  *
- * Plan 26 / step 3. Wraps a frozen `code` from `ERROR_CODES` with a fully
+ * PlanTierType 26 / step 3. Wraps a frozen `code` from `ERROR_CODES` with a fully
  * captured `context` object. Enforces two invariants at throw time so bugs
  * surface immediately, not deep inside a toast:
  *

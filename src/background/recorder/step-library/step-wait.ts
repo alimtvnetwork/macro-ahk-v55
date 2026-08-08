@@ -1,4 +1,4 @@
-import { KindEnum2, WaitConditionEnum, Enum_4085bbd6, ReasonEnum3 } from "../../../types/enums";
+import { PredicateEvaluationKind, WaitConditionEnum, EvaluateSelectorConfig, WaitForOutcomeReason } from "../../../types/enums";
 
 /**
  * Marco Extension — Post-Step Wait-For-Selector
@@ -40,7 +40,7 @@ const POLL_INTERVAL_MS = 100;
 /*  Public types                                                       */
 /* ------------------------------------------------------------------ */
 
-export type SelectorKind = KindEnum2;
+export type SelectorKind = PredicateEvaluationKind;
 export type WaitCondition = WaitConditionEnum;
 
 export interface WaitConfig {
@@ -302,7 +302,7 @@ function evaluateCss(
 
 /** Returns the matching elements for a config in the current document. */
 export function evaluateSelector(
-    config: Pick<WaitConfig, Enum_4085bbd6>,
+    config: Pick<WaitConfig, EvaluateSelectorConfig>,
     deps: EvaluateDeps = {},
 ): ReadonlyArray<ElementLike> {
     const doc = deps.doc ?? (typeof document !== "undefined" ? document : null);
@@ -358,7 +358,7 @@ export type WaitOutcome =
     }
     | {
         readonly Ok: false;
-        readonly Reason: ReasonEnum3;
+        readonly Reason: WaitForOutcomeReason;
         readonly DurationMs: number;
         readonly Detail: string;
     };

@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * Tests for prompt-library-modal (plan-14 step 10).
  * Covers the pure `uniqueDupSlug` helper AND a smoke test that
@@ -11,8 +12,8 @@ vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 
 const rows: Record<string, unknown[]> = {
     plan: [
-        { Id: 1, Slug: 'plan-default', Name: 'Plan (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
-        { Id: 2, Slug: 'plan-concise', Name: 'Plan (concise)', Body: 'A {{n}} B', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 1, Slug: 'plan-default', Name: 'PlanTierType (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 2, Slug: 'plan-concise', Name: 'PlanTierType (concise)', Body: 'A {{n}} B', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
     ],
     next: [
         { Id: 3, Slug: 'next-default', Name: 'Next (default)', Body: 'N {{n}}', Role: 'next', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
@@ -22,9 +23,9 @@ const rows: Record<string, unknown[]> = {
 
 const mocks = vi.hoisted(() => ({
     listPromptsByRole: vi.fn(),
-    setDefaultPromptForRole: vi.fn(async () => ({ ok: true })),
-    deletePromptById: vi.fn(async () => ({ ok: true })),
-    upsertPrompt: vi.fn(async () => ({ ok: true, value: 99 })),
+    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+    upsertPrompt: vi.fn(async () => (new DbResult(true, 99))),
 }));
 vi.mock('../../db/prompt-db', () => mocks);
 
@@ -43,7 +44,7 @@ describe('uniqueDupSlug (pure helper)', () => {
 describe('openPromptLibraryModal', () => {
     beforeEach(() => {
         document.body.innerHTML = '';
-        mocks.listPromptsByRole.mockImplementation(async (role: string) => ({ ok: true, value: rows[role] ?? [] }));
+        mocks.listPromptsByRole.mockImplementation(async (role: string) => (new DbResult(true, rows[role] ?? [])));
         mocks.setDefaultPromptForRole.mockClear();
         mocks.deletePromptById.mockClear();
         mocks.upsertPrompt.mockClear();
@@ -54,10 +55,10 @@ describe('openPromptLibraryModal', () => {
         await openPromptLibraryModal();
         const modal = document.getElementById('macro-prompt-library-modal');
         expect(modal).not.toBeNull();
-        // Two Plan rows + one Next row = 3 row elements with data-prompt-id.
+        // Two PlanTierType rows + one Next row = 3 row elements with data-prompt-id.
         const rowEls = modal!.querySelectorAll('[data-prompt-id]');
         expect(rowEls.length).toBe(3);
-        // The Plan default row is starred.
+        // The PlanTierType default row is starred.
         const planDefault = modal!.querySelector('[data-prompt-slug="plan-default"]');
         expect(planDefault!.textContent).toContain('★');
     });
@@ -113,7 +114,7 @@ describe('openPromptLibraryModal', () => {
     });
 
     it('surfaces a load error inline when listPromptsByRole fails (no swallowed error)', async () => {
-        mocks.listPromptsByRole.mockImplementationOnce(async () => ({ ok: false, error: 'boom' }));
+        mocks.listPromptsByRole.mockImplementationOnce(async () => (new DbResult(false, undefined, 'boom')));
         await openPromptLibraryModal();
         const modal = document.getElementById('macro-prompt-library-modal')!;
         expect(modal.textContent).toContain('Load error: boom');
@@ -139,7 +140,7 @@ describe('openPromptLibraryModal', () => {
         await new Promise(r => setTimeout(r, 0));
         await new Promise(r => setTimeout(r, 0));
         const planSlugs = Array.from(document.querySelectorAll('[data-prompt-slug^="plan-"]')).map(e => (e as HTMLElement).dataset.promptSlug);
-        // 'Plan (concise)' < 'Plan (default)' alphabetically.
+        // 'PlanTierType (concise)' < 'PlanTierType (default)' alphabetically.
         expect(planSlugs).toEqual(['plan-concise', 'plan-default']);
     });
 

@@ -1,3 +1,4 @@
+import { DbResult } from '../db/db-result';
 /**
  * prompt-revision-db.ts - append-only revision history for the Prompt table.
  *
@@ -26,7 +27,7 @@ import { runSql as runSqlBridge, type SqlBridgeResp } from './sql-bridge';
 import { sqlLit } from './prompt-role-db';
 import type { PromptRow } from './prompt-db';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
-import { MethodEnum1 } from "../types/enums";
+import { RunSqlMethod } from "../types/enums";
 
 /** Maximum revisions retained per Slug. Older revisions are trimmed on write. */
 export const PROMPT_REVISION_LIMIT_PER_SLUG = 20;
@@ -52,7 +53,7 @@ export interface DbResult<T> {
 
 type RawSqlOk = SqlBridgeResp;
 
-async function runSql(method: MethodEnum1, sql: string): Promise<RawSqlOk> {
+async function runSql(method: RunSqlMethod, sql: string): Promise<RawSqlOk> {
     void DB_NAME;
     return runSqlBridge(method, sql);
 }
@@ -60,7 +61,7 @@ async function runSql(method: MethodEnum1, sql: string): Promise<RawSqlOk> {
 function fail<T>(where: string, message: string, context?: unknown): DbResult<T> {
     const slug = extractSlugFromContext(context);
     logDiagnosticFromCode('DB_REVISION_E001', { where, slug, reason: message }, context);
-    return { ok: false, error: message };
+    return new DbResult(false, undefined, message);
 }
 
 function extractSlugFromContext(context: unknown): string {
@@ -144,7 +145,7 @@ export async function recordPromptRevision(input: RecordRevisionInput): Promise<
         // (just over-cap). Log so we notice recurring cases.
         logDiagnosticFromCode('DB_REVISION_TRIM_E001', { stage: 'record', slug: previous.Slug, reason: trimResp.errorMessage ?? 'unknown error' });
     }
-    return { ok: true, value: insertedId };
+    return new DbResult(true, insertedId);
 }
 
 /**
@@ -161,7 +162,7 @@ export async function listPromptRevisions(slug: string): Promise<DbResult<Prompt
     const resp = await runSql('QUERY', sql);
     if (!resp.isOk) return fail('listPromptRevisions', resp.errorMessage ?? 'query failed');
     const rows = Array.isArray(resp.rows) ? resp.rows.map(rowToRevision) : [];
-    return { ok: true, value: rows };
+    return new DbResult(true, rows);
 }
 
 /** Fetch one revision by Id (used by the future restore UI). */
@@ -173,8 +174,8 @@ export async function getPromptRevisionById(id: number): Promise<DbResult<Prompt
     const resp = await runSql('QUERY', sql);
     if (!resp.isOk) return fail('getPromptRevisionById', resp.errorMessage ?? 'query failed');
     const rows = Array.isArray(resp.rows) ? resp.rows : [];
-    if (rows.length === 0) return { ok: true, value: undefined };
-    return { ok: true, value: rowToRevision(rows[0]) };
+    if (rows.length === 0) return new DbResult(true, undefined);
+    return new DbResult(true, rowToRevision(rows[0]));
 }
 
 /**
@@ -206,7 +207,7 @@ export async function insertImportedRevisions(
         return fail('insertImportedRevisions', 'slug must be a non-empty string');
     }
     if (!Array.isArray(rows) || rows.length === 0) {
-        return { ok: true, value: 0 };
+        return new DbResult(true, 0);
     }
     let inserted = 0;
     for (const r of rows) {
@@ -244,7 +245,7 @@ export async function insertImportedRevisions(
     if (!trimResp.isOk) {
         logDiagnosticFromCode('DB_REVISION_TRIM_E001', { stage: 'import', slug, reason: trimResp.errorMessage ?? 'unknown error' });
     }
-    return { ok: true, value: inserted };
+    return new DbResult(true, inserted);
 }
 
 /**
@@ -261,7 +262,7 @@ export async function getMaxRevisionId(): Promise<DbResult<number>> {
     const first = rows.length > 0 ? (rows[0] as Record<string, unknown>) : {};
     const raw = first.MaxId;
     const n = typeof raw === 'number' ? raw : Number(raw);
-    return { ok: true, value: Number.isFinite(n) ? n : 0 };
+    return new DbResult(true, Number.isFinite(n) ? n : 0);
 }
 
 /**
@@ -291,7 +292,7 @@ export async function deleteImportedRevisionsAfter(
     // rawSql does not surface a changes() count reliably across all shims,
     // so callers should not rely on the returned number for anything beyond
     // "the DELETE ran without error". Return 0 as a stable sentinel.
-    return { ok: true, value: 0 };
+    return new DbResult(true, 0);
 }
 
 

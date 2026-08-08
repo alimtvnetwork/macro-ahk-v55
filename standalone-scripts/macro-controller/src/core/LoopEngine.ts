@@ -10,7 +10,7 @@
 import type { LoopEngineInterface } from './controller-state';
 import { setLoopInterval } from '../ui/ui-updaters';
 import { state } from '../shared-state';
-import { LoopDirection } from '../types';
+import { LoopDirectionType } from '../types';
 
 import {
   dispatchDelegateSignal, performDirectMove, runCheck, startLoop, stopLoop,
@@ -50,8 +50,8 @@ export class LoopEngine implements LoopEngineInterface {
   }
 
   /** Perform a direct API move in a direction */
-  directMove(direction: LoopDirection | string): void {
-    performDirectMove(direction as LoopDirection);
+  directMove(direction: LoopDirectionType | string): void {
+    performDirectMove(direction as LoopDirectionType);
   }
 
   /** Signal that a delegated move completed */

@@ -1,4 +1,4 @@
-import { ReasonEnum6 } from "../types/enums";
+import { FetchDecisionReasonType } from "../types/enums";
 
 /**
  * MacroLoop Controller — Credit Balance Throttle Gate
@@ -40,7 +40,7 @@ let lastAnyFetchAt = 0;
 export interface ShouldFetchDecision {
     readonly allowed: boolean;
     readonly waitMs: number;
-    readonly reason: ReasonEnum6;
+    readonly reason: FetchDecisionReasonType;
 }
 
 /**

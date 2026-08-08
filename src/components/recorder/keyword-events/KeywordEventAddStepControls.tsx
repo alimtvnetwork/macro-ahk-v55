@@ -1,6 +1,6 @@
 /**
  * Two-column footer for {@link KeywordEventCard} that lets a user append a
- * new Key or Wait step. Extracted in Plan 25 Step 14 so the parent stays
+ * new Key or Wait step. Extracted in PlanTierType 25 Step 14 so the parent stays
  * under the line/complexity ceilings.
  *
  * Owns its own draft state — parent only receives fully-validated adds.
@@ -22,7 +22,7 @@ export interface KeywordEventAddStepControlsProps {
     readonly onAddStep: (step: Omit<KeywordEventStep, "Id">) => void;
 }
 
-// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf; Plan 25 Step 14
+// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf; PlanTierType 25 Step 14
 export function KeywordEventAddStepControls(props: KeywordEventAddStepControlsProps): JSX.Element {
     const { eventId, onAddStep } = props;
     const [keyCombo, setKeyCombo] = useState("");

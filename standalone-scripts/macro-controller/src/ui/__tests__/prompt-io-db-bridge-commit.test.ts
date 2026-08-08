@@ -1,5 +1,6 @@
+import { DbResult } from '../../db/db-result';
 /**
- * Plan 22 gap #10 (DB side): `commitDbEntries` end-to-end routing.
+ * PlanTierType 22 gap #10 (DB side): `commitDbEntries` end-to-end routing.
  *
  * Root cause pinned: `commitDbEntries` routes every role-tagged import
  * entry through `commitOneEntry` -> `findExistingRow` -> `upsertPrompt`,
@@ -16,6 +17,9 @@ const listPromptsByRoleMock = vi.fn();
 const upsertPromptMock = vi.fn();
 
 vi.mock('../../db/prompt-db', () => ({
+    DbResult,
+    DbResult,
+    DbResult,
     listPromptsByRole: (...args: unknown[]) => listPromptsByRoleMock(...args),
     upsertPrompt: (...args: unknown[]) => upsertPromptMock(...args),
 }));
@@ -30,12 +34,12 @@ beforeEach(() => {
     upsertPromptMock.mockReset();
 });
 
-describe('commitDbEntries (Plan 22 gap #10 DB-side integration)', () => {
+describe('commitDbEntries (PlanTierType 22 gap #10 DB-side integration)', () => {
     it('C1: routes a valid plan entry to upsertPrompt with previousBody/replaceKey carried over', async () => {
         listPromptsByRoleMock.mockResolvedValue({
             ok: true, value: [{ Id: 5, Slug: 's1', Body: 'old {{n}}', ReplaceKey: 'n' }],
         });
-        upsertPromptMock.mockResolvedValue({ ok: true, value: 5 });
+        upsertPromptMock.mockResolvedValue(new DbResult(true, 5));
         const entries: CachedPromptEntry[] = [
             { name: 'S1', text: 'new {{n}}', slug: 's1', role: 'plan', replaceKey: 'n' },
         ];
@@ -71,8 +75,8 @@ describe('commitDbEntries (Plan 22 gap #10 DB-side integration)', () => {
     });
 
     it('C4: upsertPrompt failure surfaces per-entry with slug prefix', async () => {
-        listPromptsByRoleMock.mockResolvedValue({ ok: true, value: [] });
-        upsertPromptMock.mockResolvedValue({ ok: false, error: 'token drift' });
+        listPromptsByRoleMock.mockResolvedValue(new DbResult(true, []));
+        upsertPromptMock.mockResolvedValue(new DbResult(false, undefined, 'token drift'));
         const entries: CachedPromptEntry[] = [
             { name: 'A', text: 'no tokens', slug: 'plan-a', role: 'plan' },
         ];
@@ -83,10 +87,10 @@ describe('commitDbEntries (Plan 22 gap #10 DB-side integration)', () => {
 
     it('C5: mixed batch tallies successes and failures independently (no all-or-nothing)', async () => {
         // Two entries: first succeeds, second fails -> upserted=1, one error.
-        listPromptsByRoleMock.mockResolvedValue({ ok: true, value: [] });
+        listPromptsByRoleMock.mockResolvedValue(new DbResult(true, []));
         upsertPromptMock
-            .mockResolvedValueOnce({ ok: true, value: 10 })
-            .mockResolvedValueOnce({ ok: false, error: 'body empty' });
+            .mockResolvedValueOnce(new DbResult(true, 10))
+            .mockResolvedValueOnce(new DbResult(false, undefined, 'body empty'));
         const entries: CachedPromptEntry[] = [
             { name: 'good', text: 'ok', slug: 'g', role: 'generic' },
             { name: 'bad', text: '', slug: 'b', role: 'generic' },
@@ -97,8 +101,8 @@ describe('commitDbEntries (Plan 22 gap #10 DB-side integration)', () => {
     });
 
     it('C6: creates new row when findExistingRow returns null (no id, no previousBody)', async () => {
-        listPromptsByRoleMock.mockResolvedValue({ ok: true, value: [] });
-        upsertPromptMock.mockResolvedValue({ ok: true, value: 99 });
+        listPromptsByRoleMock.mockResolvedValue(new DbResult(true, []));
+        upsertPromptMock.mockResolvedValue(new DbResult(true, 99));
         const entries: CachedPromptEntry[] = [
             { name: 'New', text: 'body', slug: 'new-slug', role: 'generic' },
         ];

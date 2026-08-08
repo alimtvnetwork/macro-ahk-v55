@@ -1,5 +1,5 @@
 /**
- * Plan 01 Step 8b — resolver Pending vs. resolved render contract.
+ * PlanTierType 01 Step 8b — resolver Pending vs. resolved render contract.
  *
  * Asserts the placeholder bar logic in `ws-list-renderer.ts`:
  *  - source==='Pending' → animated `.marco-skeleton` shimmer (height 8px).

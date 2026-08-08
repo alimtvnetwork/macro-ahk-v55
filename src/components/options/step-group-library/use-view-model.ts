@@ -7,7 +7,7 @@
  * and delete preview. Also owns the "settle-and-clear" effects that
  * drop pending reorder overrides once the loaded snapshot matches.
  *
- * Extracted per Plan 24 / SS-04a Phase 5 to shrink the panel body
+ * Extracted per PlanTierType 24 / SS-04a Phase 5 to shrink the panel body
  * below the ESLint `max-lines-per-function` limit. No behaviour
  * change: every memo/effect and its dependency list is a verbatim
  * lift from the panel.

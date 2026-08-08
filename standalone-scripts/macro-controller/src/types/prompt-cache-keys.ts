@@ -1,7 +1,7 @@
 /**
  * IndexedDB constants for the prompt cache.
  */
-export enum PromptCacheKey {
+export enum PromptCacheKeyType {
   DbName = 'marco_prompts_cache',
   Store = 'prompts',
   UiStore = 'ui_snapshots',

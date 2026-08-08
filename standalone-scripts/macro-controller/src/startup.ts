@@ -49,7 +49,7 @@ import { setupPersistenceObserver } from './startup-persistence';
 import { setupGlobalErrorHandlers, setupDiagnosticDump } from './startup-global-handlers';
 import { installSpaRouteGuard } from './spa-route-guard';
 import { MAX_SDK_ATTEMPTS, SDK_RETRY_DELAY_MS, MAX_UI_CREATE_RETRIES, STARTUP_WS_MAX_RETRIES } from './constants';
-import { Label } from './types';
+import { LabelType } from './types';
 import { loadSettingsOverrides, onSettingsChange } from './settings-store';
 import { setTimeoutMs as setCreditFetchTimeoutMs, subscribeCreditFetchSettings } from './credit-balance-update/credit-fetch-controller';
 import { hydrateCreditBalanceFromCache } from './credit-balance/hydrate';
@@ -117,7 +117,7 @@ export function bootstrap(deps: {
   registerTokenBroadcastListener();
   registerPageWorkspaceResponder();
   scheduleUiCreationFallback();
-  timingStart(Label.PromptPrewarm, 'Prompt Pre-warm');
+  timingStart(LabelType.PromptPrewarm, 'Prompt Pre-warm');
   _preWarmPrompts(0);
   loadWorkspacesOnStartup();
 }
@@ -139,7 +139,7 @@ function initializeMacroDbAndCapture(): void {
     installReseedCommandGlobal();
     try {
       const result = await seedPlanNextPrompts();
-      if (result.isFail) {
+      if (!result.ok) {
         logError('Startup', 'first-run prompt seed failed: ' + (result.error || 'Unknown'));
       }
     } catch (err: unknown) {
@@ -278,7 +278,7 @@ function _preWarmPrompts(attempt: number): void {
     sdk.prompts.preWarm().then(function(prompts: unknown[]) {
       if (prompts && prompts.length > 0) {
         log('Startup: 📋 Pre-warmed ' + prompts.length + ' prompts via SDK (attempt ' + (attempt + 1) + ')', 'success');
-        timingEnd(Label.PromptPrewarm, 'ok', prompts.length + ' prompts via SDK');
+        timingEnd(LabelType.PromptPrewarm, 'ok', prompts.length + ' prompts via SDK');
       } else {
         log('Startup: ⚠️ SDK prompt pre-warm returned empty, falling back to loader', 'warn');
         _preWarmViaLoader();
@@ -306,15 +306,15 @@ function _preWarmViaLoader(): void {
     mod.loadPromptsFromJson().then(function(prompts) {
       if (prompts && prompts.length > 0) {
         log('Startup: 📋 Pre-warmed ' + prompts.length + ' prompts via loader fallback', 'success');
-        timingEnd(Label.PromptPrewarm, 'ok', prompts.length + ' prompts via loader');
+        timingEnd(LabelType.PromptPrewarm, 'ok', prompts.length + ' prompts via loader');
       } else {
         log('Startup: ⚠️ Prompt pre-warm returned empty, will use defaults on dropdown open', 'warn');
-        timingEnd(Label.PromptPrewarm, 'warn', 'empty result');
+        timingEnd(LabelType.PromptPrewarm, 'warn', 'empty result');
       }
     });
   }).catch(function(e: unknown) {
     logError('Startup', 'Prompt pre-warm loader import failed, ' + (e instanceof Error ? e.message : String(e)));
-    timingEnd(Label.PromptPrewarm, 'error', 'loader import failed');
+    timingEnd(LabelType.PromptPrewarm, 'error', 'loader import failed');
   });
 }
 
@@ -579,7 +579,7 @@ function launchCreditAndWorkspaceLoad(): void {
   timingStart('credits', 'Credit Fetch');
   const creditPromise = fetchLoopCreditsAsync(false);
 
-  timingStart(Label.WsPrefetch, 'WS Tier1 Prefetch');
+  timingStart(LabelType.WsPrefetch, 'WS Tier1 Prefetch');
   const currentProjectId = extractProjectIdFromUrl();
   const startupToken = resolveToken();
   let tier1Data: MarkViewedResponse | null = null;
@@ -590,7 +590,7 @@ function launchCreditAndWorkspaceLoad(): void {
         return data;
       })
     : Promise.resolve(null).then(function () {
-        timingEnd(Label.WsPrefetch, 'warn', 'No projectId or token');
+        timingEnd(LabelType.WsPrefetch, 'warn', 'No projectId or token');
         return null;
       });
 
@@ -669,7 +669,7 @@ function fetchTier1Prefetch(projectId: string, _token: string): Promise<MarkView
     const isMissingMarkViewed = isMissingWorkspaceApi || typeof workspaceApi.markViewed !== 'function';
     if (isMissingMarkViewed) {
       log('Startup: Tier 1 prefetch skipped, marco-sdk workspace API unavailable', 'warn');
-      timingEnd(Label.WsPrefetch, 'warn', 'SDK workspace API unavailable');
+      timingEnd(LabelType.WsPrefetch, 'warn', 'SDK workspace API unavailable');
       return Promise.resolve(null);
     }
     return workspaceApi.markViewed(projectId)
@@ -677,25 +677,25 @@ function fetchTier1Prefetch(projectId: string, _token: string): Promise<MarkView
       .catch(handleTier1Error);
   } catch (err: unknown) {
     logError('Startup', 'Tier 1 prefetch error', err);
-    timingEnd(Label.WsPrefetch, 'warn', toErrorMessage(err));
+    timingEnd(LabelType.WsPrefetch, 'warn', toErrorMessage(err));
     return Promise.resolve(null);
   }
 }
 
 function handleTier1Response(resp: { ok: boolean; status?: number; data?: unknown }): MarkViewedResponse | null {
-  const isFailed = resp.isFail;
+  const isFailed = !resp.ok;
   if (isFailed) {
     log('Startup: Tier 1 prefetch HTTP ' + resp.status, 'warn');
-    timingEnd(Label.WsPrefetch, 'warn', 'HTTP ' + resp.status);
+    timingEnd(LabelType.WsPrefetch, 'warn', 'HTTP ' + resp.status);
     return null;
   }
-  timingEnd(Label.WsPrefetch, 'ok');
+  timingEnd(LabelType.WsPrefetch, 'ok');
   return (resp.data ?? null) as MarkViewedResponse | null;
 }
 
 function handleTier1Error(err: unknown): null {
   log('Startup: Tier 1 prefetch error: ' + toErrorMessage(err), 'warn');
-  timingEnd(Label.WsPrefetch, 'warn', toErrorMessage(err));
+  timingEnd(LabelType.WsPrefetch, 'warn', toErrorMessage(err));
   return null;
 }
 
@@ -783,12 +783,12 @@ function scheduleWorkspaceRetry(attempt: number): void {
     let retryToken = '';
 
     if (attempt === 1) {
-      log(Label.StartupRetry + attempt + ', forcing cookie read before retry', 'check');
+      log(LabelType.StartupRetry + attempt + ', forcing cookie read before retry', 'check');
       retryToken = getBearerTokenFromCookie();
       if (retryToken) {
-        log(Label.StartupRetry + attempt + ', cookie token resolved, using refreshed token for retry', 'success');
+        log(LabelType.StartupRetry + attempt + ', cookie token resolved, using refreshed token for retry', 'success');
       } else {
-        log(Label.StartupRetry + attempt + ', cookie read returned no token, falling back to current resolver', 'warn');
+        log(LabelType.StartupRetry + attempt + ', cookie read returned no token, falling back to current resolver', 'warn');
       }
     }
 
@@ -799,12 +799,12 @@ function scheduleWorkspaceRetry(attempt: number): void {
 
     const isMissingRetryToken2 = !retryToken;
     if (isMissingRetryToken2) {
-      log(Label.StartupRetry + attempt + ', no token available after cookie fallback, moving to next retry', 'warn');
+      log(LabelType.StartupRetry + attempt + ', no token available after cookie fallback, moving to next retry', 'warn');
       scheduleWorkspaceRetry(attempt + 1);
       return;
     }
 
-    log(Label.StartupRetry + attempt + '/' + STARTUP_WS_MAX_RETRIES + ', re-fetching credits + workspace detection...', 'check');
+    log(LabelType.StartupRetry + attempt + '/' + STARTUP_WS_MAX_RETRIES + ', re-fetching credits + workspace detection...', 'check');
     state.workspaceFromApi = false;
 
     fetchLoopCreditsAsync(false).then(function () {
@@ -816,11 +816,11 @@ function scheduleWorkspaceRetry(attempt: number): void {
         log('Startup: ✅ Retry #' + attempt + ' succeeded, workspace: "' + state.workspaceName + '"', 'success');
         cacheWorkspaceName(state.workspaceName, loopCreditState.currentWs ? loopCreditState.currentWs.id : undefined);
       } else {
-        log(Label.StartupRetry + attempt + ', workspace still empty, scheduling next retry', 'warn');
+        log(LabelType.StartupRetry + attempt + ', workspace still empty, scheduling next retry', 'warn');
         scheduleWorkspaceRetry(attempt + 1);
       }
     }).catch(function (err: unknown) {
-      log(Label.StartupRetry + attempt + ' failed: ' + toErrorMessage(err) + ', scheduling next retry', 'warn');
+      log(LabelType.StartupRetry + attempt + ' failed: ' + toErrorMessage(err) + ', scheduling next retry', 'warn');
       scheduleWorkspaceRetry(attempt + 1);
     });
   }, delayMs);
@@ -859,21 +859,21 @@ function tryAutoAuthResync(trigger: string): void {
   if (authResyncState.inFlight) return;
   authResyncState.inFlight = true;
 
-  log(Label.AuthAutoResync + trigger + '): checking bridge for restored session...', 'check');
+  log(LabelType.AuthAutoResync + trigger + '): checking bridge for restored session...', 'check');
 
   refreshBearerTokenFromBestSource(function (token: string, source: string) {
     authResyncState.inFlight = false;
     const hasNoToken = !token;
 
     if (hasNoToken) {
-      log(Label.AuthAutoResync + trigger + '): no token yet (user may still be logged out)', 'warn');
+      log(LabelType.AuthAutoResync + trigger + '): no token yet (user may still be logged out)', 'warn');
       updateAuthBadge(false, 'none');
       return;
     }
 
     setLastTokenSource(source || getLastTokenSource() || 'bridge');
     updateAuthBadge(true, getLastTokenSource());
-    log(Label.AuthAutoResync + trigger + '): ✅ token restored from ' + getLastTokenSource(), 'success');
+    log(LabelType.AuthAutoResync + trigger + '): ✅ token restored from ' + getLastTokenSource(), 'success');
 
     if (state.running) return;
 
@@ -884,10 +884,10 @@ function tryAutoAuthResync(trigger: string): void {
       .then(function () {
         syncCreditStateFromApi();
         updateUI();
-        log(Label.AuthAutoResync + trigger + '): workspace/credit UI refreshed', 'success');
+        log(LabelType.AuthAutoResync + trigger + '): workspace/credit UI refreshed', 'success');
       })
       .catch(function (err: Error) {
-        log(Label.AuthAutoResync + trigger + '): UI refresh failed: ' + (err && err.message ? err.message : String(err)), 'warn');
+        log(LabelType.AuthAutoResync + trigger + '): UI refresh failed: ' + (err && err.message ? err.message : String(err)), 'warn');
       });
   });
 }

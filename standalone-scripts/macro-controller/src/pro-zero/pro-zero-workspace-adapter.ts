@@ -30,7 +30,7 @@ function readMembership(src: Record<string, unknown>): WorkspaceMembership {
 }
 
 /**
- * Plan-10 follow-up: `pickWorkspaceSection` now consumes the Plan-10 wide
+ * PlanTierType-10 follow-up: `pickWorkspaceSection` now consumes the PlanTierType-10 wide
  * `WireWorkspaceRaw` surface. Both the top-level row and its nested
  * `.workspace` object are narrowed through `toWireWorkspaceRaw` so the
  * adapter never touches `ws.rawApi` via a raw `Record<string, unknown>`
@@ -46,7 +46,7 @@ function pickWorkspaceSection(rawApi: WireWorkspaceRaw): WireWorkspaceRaw {
 export function adaptWorkspaceInfoTyped(rawApi: unknown): WorkspaceInfoTyped {
     const wire = toWireWorkspaceRaw(rawApi) ?? ({} as WireWorkspaceRaw);
     const ws = pickWorkspaceSection(wire);
-    // Plan-10 follow-up: numeric + billing-date fields flow through the
+    // PlanTierType-10 follow-up: numeric + billing-date fields flow through the
     // sibling `WireWorkspaceCredits` guard so the pro-zero adapter no
     // longer duplicates `readNum` invocations.
     const credits = toWireWorkspaceCredits(ws as Record<string, unknown>);

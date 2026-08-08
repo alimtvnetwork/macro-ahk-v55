@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * v4.170.5 regression: the ▶ Next selector control mounted on the Repeat
  * strip populates from `listPromptsByRole('next')`, marks the IsDefault row,
@@ -13,6 +14,9 @@ const setDefaultPromptForRoleMock = vi.fn();
 const openPromptEditorMock = vi.fn();
 
 vi.mock('../../db/prompt-db', () => ({
+    DbResult,
+    DbResult,
+    DbResult,
   listPromptsByRole: (...args: unknown[]) => listPromptsByRoleMock(...args),
   setDefaultPromptForRole: (...args: unknown[]) => setDefaultPromptForRoleMock(...args),
 }));
@@ -61,7 +65,7 @@ async function flush(): Promise<void> {
 
 describe('next-selector-control', () => {
   it('populates the select and marks the IsDefault row as selected', async () => {
-    listPromptsByRoleMock.mockResolvedValue({ ok: true, value: rows });
+    listPromptsByRoleMock.mockResolvedValue(new DbResult(true, rows));
     const node = buildNextSelectorControl();
     document.body.appendChild(node);
     await flush();
@@ -72,8 +76,8 @@ describe('next-selector-control', () => {
   });
 
   it('calls setDefaultPromptForRole with the chosen id when changed', async () => {
-    listPromptsByRoleMock.mockResolvedValue({ ok: true, value: rows });
-    setDefaultPromptForRoleMock.mockResolvedValue({ ok: true, value: undefined });
+    listPromptsByRoleMock.mockResolvedValue(new DbResult(true, rows));
+    setDefaultPromptForRoleMock.mockResolvedValue(new DbResult(true, undefined));
     const node = buildNextSelectorControl();
     document.body.appendChild(node);
     await flush();
@@ -85,7 +89,7 @@ describe('next-selector-control', () => {
   });
 
   it('opens the prompt editor with the selected id when ✎ is clicked', async () => {
-    listPromptsByRoleMock.mockResolvedValue({ ok: true, value: rows });
+    listPromptsByRoleMock.mockResolvedValue(new DbResult(true, rows));
     openPromptEditorMock.mockResolvedValue(undefined);
     const node = buildNextSelectorControl();
     document.body.appendChild(node);
@@ -97,7 +101,7 @@ describe('next-selector-control', () => {
   });
 
   it('renders (unavailable) hint when listPromptsByRole fails', async () => {
-    listPromptsByRoleMock.mockResolvedValue({ ok: false, error: 'boom' });
+    listPromptsByRoleMock.mockResolvedValue(new DbResult(false, undefined, 'boom'));
     const node = buildNextSelectorControl();
     document.body.appendChild(node);
     await flush();
@@ -108,7 +112,7 @@ describe('next-selector-control', () => {
   });
 
   it('renders (no prompts) hint when the DB returns an empty list', async () => {
-    listPromptsByRoleMock.mockResolvedValue({ ok: true, value: [] });
+    listPromptsByRoleMock.mockResolvedValue(new DbResult(true, []));
     const node = buildNextSelectorControl();
     document.body.appendChild(node);
     await flush();

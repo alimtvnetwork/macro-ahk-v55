@@ -11,7 +11,7 @@ import { ScriptsConfigEditor } from "./editor/ScriptsConfigEditor";
 import { CookieBindingsEditor } from "./editor/CookieBindingsEditor";
 import { VariablesEditor } from "./editor/VariablesEditor";
 import { Toast } from "../shared/Toast";
-import { RoleEnum1, VariantEnum2 } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { CookieBindingRoleType, AlertVariantType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -26,7 +26,7 @@ interface StoredProject {
     targetUrls: { pattern: string; matchType: string }[];
     scripts: { path: string; order: number; configBinding?: string; code?: string }[];
     configs?: { id: string; name: string }[];
-    cookies?: Array<{ cookieName: string; url: string; role: RoleEnum1; description?: string }>;
+    cookies?: Array<{ cookieName: string; url: string; role: CookieBindingRoleType; description?: string }>;
     settings?: Record<string, unknown>;
     createdAt: string;
     updatedAt: string;
@@ -50,7 +50,7 @@ export function ProjectEditor({ project, onBack }: ProjectEditorProps) {
     const [name, setName] = useState(project?.name ?? "");
     const [description, setDescription] = useState(project?.description ?? "");
     const [rules, setRules] = useState(project?.targetUrls ?? []);
-    const [cookies, setCookies] = useState<Array<{ cookieName: string; url: string; role: RoleEnum1; description?: string }>>(project?.cookies ?? []);
+    const [cookies, setCookies] = useState<Array<{ cookieName: string; url: string; role: CookieBindingRoleType; description?: string }>>(project?.cookies ?? []);
     const [variablesJson, setVariablesJson] = useState(() => {
         if (!project?.settings) return "{}";
         const vars = (project.settings as Record<string, unknown>).variables;
@@ -58,7 +58,7 @@ export function ProjectEditor({ project, onBack }: ProjectEditorProps) {
         try { return JSON.stringify(vars, null, 2); } catch { return "{}"; }
     });
     const [isSaving, setIsSaving] = useState(false);
-    const [toast, setToast] = useState<{ message: string; variant: VariantEnum2 } | null>(null);
+    const [toast, setToast] = useState<{ message: string; variant: AlertVariantType } | null>(null);
 
     // Script rows are managed by ScriptsConfigEditor via ref
     const [scriptRows, setScriptRows] = useState<Array<{ scriptName: string; runAt: string; configId?: string }>>([]);

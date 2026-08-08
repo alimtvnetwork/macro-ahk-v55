@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * G8: prompt-library-modal Import / Export wiring.
  *
@@ -19,10 +20,10 @@ const logErrorMock = mocks.logError;
 const toastMock = mocks.showToast;
 
 const dbMocks = vi.hoisted(() => ({
-    listPromptsByRole: vi.fn(async (_role: string) => ({ ok: true, value: [] as unknown[] })),
-    setDefaultPromptForRole: vi.fn(async () => ({ ok: true })),
-    deletePromptById: vi.fn(async () => ({ ok: true })),
-    upsertPrompt: vi.fn(async () => ({ ok: true, value: 99 })),
+    listPromptsByRole: vi.fn(async (_role: string) => (new DbResult(true, [] as unknown[]))),
+    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+    upsertPrompt: vi.fn(async () => (new DbResult(true, 99))),
 }));
 vi.mock('../../db/prompt-db', () => dbMocks);
 

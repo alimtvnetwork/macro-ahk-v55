@@ -11,7 +11,7 @@ import { pasteIntoEditor, showPasteToast } from './ui/prompt-utils';
 import { getPromptsConfig } from './ui/prompt-loader';
 // import { MacroController } from './core/MacroController';
 import { saveCommunication } from './db/macro-db';
-import { LevelEnum4 } from "./types/enums";
+import { ToastEntryLevelType } from "./types/enums";
 
 export class TaskQueueManager {
   private static _instance: TaskQueueManager | null = null;
@@ -22,7 +22,7 @@ export class TaskQueueManager {
   private _executionLogs: string[] = [];
   private _onLogUpdate: ((logs: string[]) => void) | null = null;
 
-  private _logExecution(msg: string, level: LevelEnum4 = 'info'): void {
+  private _logExecution(msg: string, level: ToastEntryLevelType = 'info'): void {
     const time = new Date().toLocaleTimeString();
     const logMsg = `[${time}] ${msg}`;
     this._executionLogs.push(logMsg);

@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { State, SideEnum1, VariantEnum1, CollapsibleEnum, SizeEnum } from "../../types/enums";
+import { State, SemanticSemanticSideEnum, SemanticSemanticVariantEnum, CollapsibleEnum, SizeEnum } from "../../types/enums";
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -133,8 +133,8 @@ SidebarProvider.displayName = "SidebarProvider";
 const Sidebar = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
-    side?: SideEnum1;
-    variant?: VariantEnum1;
+    side?: SemanticSemanticSideEnum;
+    variant?: SemanticSemanticVariantEnum;
     collapsible?: CollapsibleEnum;
   }
 // eslint-disable-next-line max-lines-per-function

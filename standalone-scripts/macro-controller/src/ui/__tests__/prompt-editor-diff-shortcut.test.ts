@@ -35,7 +35,7 @@ function openEditModalOnSeed(): {
   const seedRow = PLAN_NEXT_SEED_ROWS.find((r) => r.slug === 'plan-default')!;
   const editPrompt = { id: 'db-row-1', slug: seedRow.slug, name: seedRow.name, text: seedRow.body };
   openPromptCreationModal({} as never, {} as never, editPrompt as never, undefined, {
-    requiredTokens: ['n'], roleLabel: 'Plan', role: 'plan',
+    requiredTokens: ['n'], roleLabel: 'PlanTierType', role: 'plan',
   });
   const overlay = document.getElementById('marco-prompt-modal')!;
   const diffBtn = overlay.querySelector<HTMLButtonElement>('[data-testid="prompt-editor-diff-toggle"]')!;

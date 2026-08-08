@@ -5,7 +5,7 @@
  * `{{key}}` AND `${key}` occurrence in `body` with `value`, using the
  * caller-supplied `key` from the DB `ReplaceKey` column. Whitespace inside
  * `{{ ... }}` / `${ ... }` is tolerated so `{{ n }}` and `{{n}}` both
- * substitute. Legacy Plan/Next rows are also tolerated when the stored
+ * substitute. Legacy PlanTierType/Next rows are also tolerated when the stored
  * ReplaceKey drifted between `N` and `n`, because old database rows can keep
  * the uppercase key while the current bundled default body uses lowercase.
  *

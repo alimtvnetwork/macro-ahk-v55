@@ -108,7 +108,7 @@ function TraceRow({ entry }: { entry: RunStepTraceEntry }) {
     const indentPx = depth * 12;
 
     const isMarker = entry.Outcome === "EnteredGroup" || entry.Outcome === "ExitedGroup";
-    const labelText = entry.Label ?? (isMarker ? "" : "(no label)");
+    const labelText = entry.LabelType ?? (isMarker ? "" : "(no label)");
     const muted = entry.Outcome === "Skipped";
 
     return (

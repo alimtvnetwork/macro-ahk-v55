@@ -80,7 +80,7 @@ Full entry with every optional field:
 
 Required: name, text. Recommended: slug (kebab-case, unique).
 
-### Dynamic entries (Next N, Plan N patterns)
+### Dynamic entries (Next N, PlanTierType N patterns)
 
 \`\`\`json
 {

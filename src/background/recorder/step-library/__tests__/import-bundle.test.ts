@@ -83,19 +83,19 @@ function makeSource(): SourceFixture {
     lib.appendStep({
         StepGroupId: root,
         StepKindId: StepKindId.Click,
-        Label: "Click Start",
+        LabelType: "Click Start",
         PayloadJson: JSON.stringify({ Selector: "#start" }),
     });
     lib.appendStep({
         StepGroupId: root,
         StepKindId: StepKindId.RunGroup,
-        Label: "Run Login",
+        LabelType: "Run Login",
         TargetStepGroupId: child,
     });
     lib.appendStep({
         StepGroupId: child,
         StepKindId: StepKindId.Type,
-        Label: "Type email",
+        LabelType: "Type email",
         PayloadJson: JSON.stringify({ Selector: "#email", Value: "{{Email}}" }),
     });
     return { Lib: lib, ProjectId: projectId, Root: root, Child: child };
@@ -180,7 +180,7 @@ describe("runStepGroupImport, roundtrip", () => {
         expect(newChild.ParentStepGroupId).toBe(newRoot.StepGroupId);
 
         const rootSteps = dst.Lib.listSteps(newRoot.StepGroupId);
-        expect(rootSteps.map((s) => s.Label)).toEqual(["Click Start", "Run Login"]);
+        expect(rootSteps.map((s) => s.LabelType)).toEqual(["Click Start", "Run Login"]);
         const runGroupStep = rootSteps.find((s) => s.StepKindId === StepKindId.RunGroup)!;
         // RunGroup target must point at the newly-minted child id, not the source id.
         expect(runGroupStep.TargetStepGroupId).toBe(newChild.StepGroupId);
@@ -188,7 +188,7 @@ describe("runStepGroupImport, roundtrip", () => {
         expect(newRoot.StepGroupId).not.toBe(src.Root);
 
         const childSteps = dst.Lib.listSteps(newChild.StepGroupId);
-        expect(childSteps.map((s) => s.Label)).toEqual(["Type email"]);
+        expect(childSteps.map((s) => s.LabelType)).toEqual(["Type email"]);
     });
 
     it("attaches imported roots under the requested parent group", async () => {

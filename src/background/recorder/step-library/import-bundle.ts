@@ -37,7 +37,7 @@ import {
     STEP_GROUP_BUNDLE_FORMAT_VERSION,
     type StepGroupExportManifest,
 } from "./export-bundle";
-import { ConflictPolicyEnum, ImportReasonEnum, KindEnum7 } from "../../../types/enums";
+import { ConflictPolicyEnum, ImportReasonEnum, RootOutcomeKind } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -294,7 +294,7 @@ function readGroupsFromSource(db: Database): StepGroupRow[] {
 
 function readStepsForGroup(db: Database, stepGroupId: number): StepRow[] {
     const stmt = db.prepare(
-        `SELECT StepId, StepGroupId, OrderIndex, StepKindId, Label,
+        `SELECT StepId, StepGroupId, OrderIndex, StepKindId, LabelType,
                 PayloadJson, TargetStepGroupId, IsDisabled, CreatedAt, UpdatedAt
          FROM Step
          WHERE StepGroupId = ?
@@ -549,7 +549,7 @@ function resolveNameConflicts(input: ResolveNameConflictsInput): NameConflictPla
 }
 
 type RootOutcome =
-    | { Kind: KindEnum7; Name: string }
+    | { Kind: RootOutcomeKind; Name: string }
     | { Kind: "Rename"; OldName: string; NewName: string }
     | ImportFailure;
 
@@ -577,7 +577,7 @@ function resolveRootNameConflict(
 }
 
 function applyRootOutcome(
-    outcome: { Kind: KindEnum7; Name: string } | { Kind: "Rename"; OldName: string; NewName: string },
+    outcome: { Kind: RootOutcomeKind; Name: string } | { Kind: "Rename"; OldName: string; NewName: string },
     g: StepGroupRow,
     effectiveName: Map<number, string>,
     destSiblingNamesLower: Set<string>,
@@ -709,7 +709,7 @@ function insertSteps(input: InsertStepsInput): number {
         destLib.appendStep({
             StepGroupId: newGroupId,
             StepKindId: s.StepKindId,
-            Label: s.Label,
+            LabelType: s.LabelType,
             PayloadJson: s.PayloadJson,
         });
         stepCount += 1;
@@ -729,7 +729,7 @@ function insertSteps(input: InsertStepsInput): number {
         destLib.appendStep({
             StepGroupId: newGroupId,
             StepKindId: StepKindId.RunGroup,
-            Label: s.Label,
+            LabelType: s.LabelType,
             TargetStepGroupId: newTarget,
         });
         stepCount += 1;

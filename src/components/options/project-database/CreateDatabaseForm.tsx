@@ -10,7 +10,7 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -133,7 +133,7 @@ export function CreateDatabaseForm({
       <CardContent className="px-4 pb-4 space-y-3">
         {/* Namespace */}
         <div className="space-y-1">
-          <Label className="text-xs">Namespace</Label>
+          <LabelType className="text-xs">Namespace</LabelType>
           <Input
             placeholder="MyPlugin.Config"
             value={namespace}
@@ -154,7 +154,7 @@ export function CreateDatabaseForm({
 
         {/* Database Name */}
         <div className="space-y-1">
-          <Label className="text-xs">Database Name</Label>
+          <LabelType className="text-xs">Database Name</LabelType>
           <Input
             placeholder="MyStore"
             value={dbName}
@@ -172,7 +172,7 @@ export function CreateDatabaseForm({
 
         {/* Database Kind */}
         <div className="space-y-1">
-          <Label className="text-xs">Database Kind</Label>
+          <LabelType className="text-xs">Database Kind</LabelType>
           <Select value={kindId} onValueChange={setKindId} disabled={atLimit}>
             <SelectTrigger className="h-8 text-xs">
               <SelectValue />
@@ -189,7 +189,7 @@ export function CreateDatabaseForm({
 
         {/* Description */}
         <div className="space-y-1">
-          <Label className="text-xs">Description (optional)</Label>
+          <LabelType className="text-xs">Description (optional)</LabelType>
           <Input
             placeholder="What is this database for?"
             value={description}

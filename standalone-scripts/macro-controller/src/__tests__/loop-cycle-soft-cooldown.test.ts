@@ -21,7 +21,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-// Plan-17 step 13: fallback fetch flow moved to `loop-cycle-fallback.ts`.
+// PlanTierType-17 step 13: fallback fetch flow moved to `loop-cycle-fallback.ts`.
 // The soft-cooldown contract applies across BOTH files; concatenate them
 // so the same regression assertions still catch a stopLoop() reintroduction.
 const SRC_CYCLE = resolve(__dirname, '../loop-cycle.ts');

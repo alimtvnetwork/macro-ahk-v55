@@ -13,7 +13,7 @@ import { ServiceResult } from '../utils/result-wrapper';
  * Emission surfaces (all best-effort, never throws to callers):
  *   1. `log('[PromptSeed:<event>] ...', level)` — visible in the standard
  *      MacroLoop activity log stream.
- *   2. `localStorage[StorageKey.PromptSeedTrace]` — bounded ring buffer
+ *   2. `localStorage[StorageKeyType.PromptSeedTrace]` — bounded ring buffer
  *      of the last {@link PROMPT_SEED_TRACE_MAX} events for post-mortem.
  *   3. `window.dispatchEvent(new CustomEvent('marco:prompt-seed-trace'))`
  *      so tests / dev tools can subscribe without patching the module.
@@ -25,17 +25,17 @@ import { ServiceResult } from '../utils/result-wrapper';
 
 import { log } from '../logger';
 import { logError } from '../error-utils';
-import { StorageKey } from '../types/storage-keys';
+import { StorageKeyType } from '../types/storage-keys';
 import type { PromptRole } from '../types/prompt-role';
-import { PromptSeedEventNameEnum, SeedStageStatus } from "../types/enums";
-import { LevelEnum3 } from "../../../../src/types/enums";
+import { PromptSeedEventType, SeedStageStatusType } from "../types/enums";
+import { StepNotifyLevel } from "../../../../src/types/enums";
 
 export const PROMPT_SEED_TRACE_MAX = 50;
 
 export type PromptSeedEventName =
-  PromptSeedEventNameEnum;
+  PromptSeedEventType;
 
-export type PromptSeedOutcome = SeedStageStatus;
+export type PromptSeedOutcome = SeedStageStatusType;
 
 export interface PromptSeedEvent {
   /** ISO timestamp, always in UTC (see mem://localization/timezone). */
@@ -59,7 +59,7 @@ interface EmitInput {
   detail?: string;
 }
 
-function levelFor(outcome: PromptSeedOutcome): LevelEnum3 {
+function levelFor(outcome: PromptSeedOutcome): StepNotifyLevel {
   if (outcome === 'failed') return 'error';
   if (outcome === 'skipped') return 'warning';
   return 'success';
@@ -79,12 +79,12 @@ function formatLine(evt: PromptSeedEvent): string {
 
 function appendToTraceBuffer(evt: PromptSeedEvent): void {
   try {
-    const raw = localStorage.getItem(StorageKey.PromptSeedTrace);
+    const raw = localStorage.getItem(StorageKeyType.PromptSeedTrace);
     const parsed = raw ? (JSON.parse(raw) as unknown) : [];
     const buf: PromptSeedEvent[] = Array.isArray(parsed) ? (parsed as PromptSeedEvent[]) : [];
     buf.push(evt);
     while (buf.length > PROMPT_SEED_TRACE_MAX) buf.shift();
-    localStorage.setItem(StorageKey.PromptSeedTrace, JSON.stringify(buf));
+    localStorage.setItem(StorageKeyType.PromptSeedTrace, JSON.stringify(buf));
   } catch (err) {
     logError('PromptSeedTelemetry', 'appendToTraceBuffer failed', err);
   }
@@ -125,7 +125,7 @@ export function emitPromptSeedEvent(input: EmitInput): PromptSeedEvent {
 /** Read the trace ring buffer for tests / debugging surfaces. */
 export function readPromptSeedTrace(): PromptSeedEvent[] {
   try {
-    const raw = localStorage.getItem(StorageKey.PromptSeedTrace);
+    const raw = localStorage.getItem(StorageKeyType.PromptSeedTrace);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
     return Array.isArray(parsed) ? (parsed as PromptSeedEvent[]) : [];
@@ -138,7 +138,7 @@ export function readPromptSeedTrace(): PromptSeedEvent[] {
 /** Clear the trace buffer (test helper). */
 export function clearPromptSeedTrace(): void {
   try {
-    localStorage.removeItem(StorageKey.PromptSeedTrace);
+    localStorage.removeItem(StorageKeyType.PromptSeedTrace);
   } catch (err) {
     logError('PromptSeedTelemetry', 'clearPromptSeedTrace failed', err);
   }

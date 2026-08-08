@@ -15,8 +15,8 @@ import { buildFilterBar } from './database-data-filter';
 import { escapeHtml, buildPagination, buildDataTableElement } from './database-data-table';
 
 import { MACRO_CONTROLLER_NS, DB_PAGE_SIZE } from '../constants';
-import { DomId } from '../types';
-import { Enum_7dc824d7 } from "../types/enums";
+import { DomIdType } from '../types';
+import { FilterStateModeType } from "../types/enums";
 
 const PAGE_SIZE = DB_PAGE_SIZE;
 
@@ -24,7 +24,7 @@ const PAGE_SIZE = DB_PAGE_SIZE;
 export interface FilterState {
   column: string;
   value: string;
-  mode: Enum_7dc824d7;
+  mode: FilterStateModeType;
   caseSensitive: boolean;
   columns: string[];
 }
@@ -103,7 +103,7 @@ function renderTableListError(
 ): void {
   tableList.textContent = '';
   const failDiv = document.createElement('div');
-  failDiv.className = DomId.DbEmpty;
+  failDiv.className = DomIdType.DbEmpty;
   failDiv.textContent = 'Failed to load';
   tableList.appendChild(failDiv);
   statusBar.textContent = 'Error: ' + (response?.errorMessage || 'unknown');
@@ -115,7 +115,7 @@ function renderEmptyTableList(
 ): void {
   tableList.textContent = '';
   const emptyDiv = document.createElement('div');
-  emptyDiv.className = DomId.DbEmpty;
+  emptyDiv.className = DomIdType.DbEmpty;
   emptyDiv.style.padding = '12px';
   emptyDiv.textContent = 'No tables found';
   tableList.appendChild(emptyDiv);
@@ -275,7 +275,7 @@ function renderDataError(
 ): void {
   content.textContent = '';
   const errorDiv = document.createElement('div');
-  errorDiv.className = DomId.DbEmpty;
+  errorDiv.className = DomIdType.DbEmpty;
   errorDiv.textContent = '❌ ' + (response?.errorMessage || 'Failed to load data');
   content.appendChild(errorDiv);
 }
@@ -327,7 +327,7 @@ function renderEmptyTableState(
     : 'Table <b>' + escapeHtml(tableName) + '</b> is empty';
 
   const emptyDiv = document.createElement('div');
-  emptyDiv.className = DomId.DbEmpty;
+  emptyDiv.className = DomIdType.DbEmpty;
   emptyDiv.innerHTML = emptyMessage;
   content.appendChild(emptyDiv);
   statusBar.textContent = tableName + ' — 0 rows';

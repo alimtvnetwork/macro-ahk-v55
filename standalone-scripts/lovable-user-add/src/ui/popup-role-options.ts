@@ -11,14 +11,14 @@ import { UserAddMembershipRoleCode } from "../migrations/membership-role-seed";
 
 export interface RoleOption {
     Value: string;
-    Label: string;
+    LabelType: string;
 }
 
 export const DEFAULT_ROLE_OPTIONS: ReadonlyArray<RoleOption> = Object.freeze([
-    { Value: UserAddMembershipRoleCode.Owner, Label: "Owner (triggers Step B promotion)" },
-    { Value: UserAddMembershipRoleCode.Admin, Label: "Admin" },
-    { Value: UserAddMembershipRoleCode.Member, Label: "Member" },
-    { Value: "Editor", Label: "Editor (normalized to Member)" },
+    { Value: UserAddMembershipRoleCode.Owner, LabelType: "Owner (triggers Step B promotion)" },
+    { Value: UserAddMembershipRoleCode.Admin, LabelType: "Admin" },
+    { Value: UserAddMembershipRoleCode.Member, LabelType: "Member" },
+    { Value: "Editor", LabelType: "Editor (normalized to Member)" },
 ]);
 
 export const DEFAULT_ROLE_VALUE: string = UserAddMembershipRoleCode.Member;

@@ -3,7 +3,7 @@
  *
  * Compact row inside `KeywordEventCard` that selects the dispatch target
  * (active element, `document.body`, or a CSS selector). Extracted from
- * `KeywordEventsPanel.tsx` in Plan 25 step 12: the inline version was 97
+ * `KeywordEventsPanel.tsx` in PlanTierType 25 step 12: the inline version was 97
  * lines with CC 18. Splitting the kind-selector, the selector input, and
  * the non-selector hint into three leaves keeps every function under both
  * ceilings.
@@ -13,7 +13,7 @@ import type { JSX } from "react";
 import { Crosshair, Keyboard, Target } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -24,7 +24,7 @@ import {
 import type { KeywordEventTarget } from "@/hooks/use-keyword-events";
 import { cn } from "@/lib/utils";
 import { classifySelector, type SelectorStatus } from "./target-picker-status";
-import { KindEnum9 } from "../../../types/enums";
+import { SemanticSemanticKindEnum1 } from "../../../types/enums";
 
 const CSS_INPUT_INVALID = "border-destructive focus-visible:ring-destructive";
 
@@ -43,7 +43,7 @@ function KindSelector(props: {
     return (
         <div className="flex items-center gap-2">
             <Target className="h-3.5 w-3.5 text-muted-foreground" />
-            <Label className="text-xs font-medium">Dispatch target</Label>
+            <LabelType className="text-xs font-medium">Dispatch target</LabelType>
             <Select value={kind} onValueChange={onKindChange}>
                 <SelectTrigger
                     className="h-7 w-44 text-xs ml-auto"
@@ -117,7 +117,7 @@ function SelectorInputRow(props: {
     );
 }
 
-function NonSelectorHint(props: { kind: KindEnum9 }): JSX.Element {
+function NonSelectorHint(props: { kind: SemanticSemanticKindEnum1 }): JSX.Element {
     return (
         <p className="text-[10px] text-muted-foreground">
             {props.kind === "ActiveElement"
@@ -152,7 +152,7 @@ export function TargetPickerRow(props: TargetPickerRowProps): JSX.Element {
             <KindSelector eventId={eventId} kind={value.Kind} onKindChange={handleKindChange} />
             {isSelector
                 ? <SelectorInputRow eventId={eventId} selectorText={selectorText} status={status} onChange={onChange} />
-                : <NonSelectorHint kind={value.Kind as KindEnum9} />}
+                : <NonSelectorHint kind={value.Kind as SemanticSemanticKindEnum1} />}
         </div>
     );
 }

@@ -1,7 +1,7 @@
 /**
  * Marco Extension — shared React-Testing-Library `act(...)` helpers.
  *
- * Plan 10 Step 2 deliverable. Every helper stays under the 15-line
+ * PlanTierType 10 Step 2 deliverable. Every helper stays under the 15-line
  * function cap (see `.lovable/spec/commands/06-function-size-cap-15-lines.md`).
  *
  * Categories these helpers cover (see

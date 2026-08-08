@@ -4,7 +4,7 @@
  * Spec: spec/22-app-issues/110-macro-controller-pro-zero-credit-balance.md §3, §8, §12.6
  * Spec: spec/22-app-issues/114-pro-zero-credit-balance-calculation.md §5 Step 2
  *
- * Branches on WorkspacePlan. For PRO_ZERO: read IDB cache → fetch → write
+ * Branches on WorkspacePlanType. For PRO_ZERO: read IDB cache → fetch → write
  * cache + async SQLite upsert. For OTHER: skip credit-balance call entirely
  * (caller falls back to existing in-controller calculation).
  *
@@ -12,8 +12,8 @@
  * `calculateProZeroCreditSummary` — no inline mapping, no derived sums.
  */
 
-import { WorkspacePlan } from './workspace-plan';
-import { CreditBalanceFetchStatus } from './credit-balance-fetch-status';
+import { WorkspacePlanType } from './workspace-plan';
+import { CreditBalanceFetchStatusType } from './credit-balance-fetch-status';
 import { mapWorkspacePlan, isProZeroPlan } from './workspace-plan-mapper';
 import { fetchProZeroCreditBalance } from './pro-zero-credit-balance-client';
 import { readProZeroCache, writeProZeroCache } from './pro-zero-balance-cache';
@@ -35,7 +35,7 @@ export function buildSummary(balance: CreditBalanceResponseTyped): MacroCreditSu
 
 async function resolveBalance(workspaceId: string): Promise<CreditBalanceFetchResult> {
     const cached = await readProZeroCache(workspaceId);
-    if (cached) return { status: CreditBalanceFetchStatus.SUCCESS, data: cached };
+    if (cached) return { status: CreditBalanceFetchStatusType.SUCCESS, data: cached };
 
     return fetchProZeroCreditBalance(workspaceId);
 }
@@ -49,12 +49,12 @@ export async function buildProZeroCreditSummary(workspace: WorkspaceInfoTyped): 
     const plan = mapWorkspacePlan(workspace.plan);
     if (!isProZeroPlan(plan)) { logSkippedNonProZero(plan); return skippedFailure(plan); }
     const result = await resolveBalance(workspace.id);
-    if (result.status !== CreditBalanceFetchStatus.SUCCESS) return { isOk: false, failure: result };
+    if (result.status !== CreditBalanceFetchStatusType.SUCCESS) return { isOk: false, failure: result };
     persistOnSuccess(workspace, result.data);
 
     return { isOk: true, summary: buildSummary(result.data), balance: result.data };
 }
 
-function skippedFailure(_plan: WorkspacePlan): ProZeroSummaryOutcome {
-    return { isOk: false, failure: { status: CreditBalanceFetchStatus.PARSE_ERROR, reason: 'NON_PRO_ZERO_PLAN' } };
+function skippedFailure(_plan: WorkspacePlanType): ProZeroSummaryOutcome {
+    return { isOk: false, failure: { status: CreditBalanceFetchStatusType.PARSE_ERROR, reason: 'NON_PRO_ZERO_PLAN' } };
 }

@@ -7,12 +7,12 @@ import {
   formatWebhookDeliveryLog,
   type WebhookDeliveryResult,
 } from "./format-webhook-log";
-import { SizeEnum1 } from "../../types/enums";
+import { CopyLogButtonPropsSize } from "../../types/enums";
 
 interface CopyLogButtonProps {
   entry: WebhookDeliveryResult;
   className?: string;
-  size?: SizeEnum1;
+  size?: CopyLogButtonPropsSize;
 }
 
 async function writeToClipboard(text: string): Promise<boolean> {

@@ -1,5 +1,5 @@
 /**
- * Marco Extension — Label → PascalCase Variable Suggester
+ * Marco Extension — LabelType → PascalCase Variable Suggester
  *
  * Phase 06 — Macro Recorder.
  *

@@ -13,7 +13,7 @@ describe('PromptRole', () => {
     });
 
     it('isPromptRole rejects unknown strings, wrong types, and empty values', () => {
-        for (const bad of ['', 'PLAN', 'planner', 'Plan ', null, undefined, 0, {}, []]) {
+        for (const bad of ['', 'PLAN', 'planner', 'PlanTierType ', null, undefined, 0, {}, []]) {
             expect(isPromptRole(bad)).toBe(false);
         }
     });
@@ -21,13 +21,13 @@ describe('PromptRole', () => {
     it('switch over PromptRole is exhaustive (assertNeverRole guards drift)', () => {
         const label = (r: PromptRole): string => {
             switch (r) {
-                case 'plan': return 'Plan';
+                case 'plan': return 'PlanTierType';
                 case 'next': return 'Next';
                 case 'generic': return 'Generic';
                 default: return assertNeverRole(r);
             }
         };
-        expect(PROMPT_ROLES.map(label)).toEqual(['Plan', 'Next', 'Generic']);
+        expect(PROMPT_ROLES.map(label)).toEqual(['PlanTierType', 'Next', 'Generic']);
     });
 
     it('assertNeverRole throws when a bogus role slips through at runtime', () => {

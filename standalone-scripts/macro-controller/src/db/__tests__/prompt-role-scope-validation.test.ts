@@ -65,7 +65,7 @@ const INVALID_ROLES: readonly unknown[] = [
     '',
     ' ',
     'PLAN',
-    'Plan',
+    'PlanTierType',
     'admin',
     'root',
     'bogus',
@@ -88,7 +88,7 @@ const INVALID_ROLES: readonly unknown[] = [
 describe('role-scope validation - invalid roles are rejected before DB', () => {
     it.each(INVALID_ROLES)('listPromptsByRole rejects %p without emitting SQL', async (bad) => {
         const r = await listPromptsByRole(bad as PromptRole);
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toBeTruthy();
         expect(r.error).toMatch(/invalid role/i);
         expect(captured).toHaveLength(0);
@@ -96,21 +96,21 @@ describe('role-scope validation - invalid roles are rejected before DB', () => {
 
     it.each(INVALID_ROLES)('getDefaultPromptForRole rejects %p without emitting SQL', async (bad) => {
         const r = await getDefaultPromptForRole(bad as PromptRole);
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/invalid role/i);
         expect(captured).toHaveLength(0);
     });
 
     it.each(INVALID_ROLES)('setDefaultPromptForRole rejects %p without emitting SQL', async (bad) => {
         const r = await setDefaultPromptForRole(1, bad as PromptRole);
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/invalid role/i);
         expect(captured).toHaveLength(0);
     });
 
     it.each(INVALID_ROLES)('enforceSingleDefaultPerRole rejects %p without emitting SQL', async (bad) => {
         const r = await enforceSingleDefaultPerRole(bad as PromptRole, 1);
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/invalid role/i);
         expect(captured).toHaveLength(0);
     });
@@ -119,7 +119,7 @@ describe('role-scope validation - invalid roles are rejected before DB', () => {
         const r = await upsertPrompt({
             slug: 'x', name: 'X', body: 'B', role: bad as PromptRole,
         });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/invalid role/i);
         expect(captured).toHaveLength(0);
     });
@@ -132,7 +132,7 @@ describe('role-scope validation - every valid role is accepted and scoped', () =
 
     it.each(PROMPT_ROLES)('listPromptsByRole(%s) emits SELECT scoped by that role literal', async (role) => {
         const r = await listPromptsByRole(role);
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(captured).toHaveLength(1);
         expect(captured[0].sql).toContain("WHERE Role = '" + role + "'");
         // No other role literal leaks into the query.
@@ -145,14 +145,14 @@ describe('role-scope validation - every valid role is accepted and scoped', () =
 
     it.each(PROMPT_ROLES)('getDefaultPromptForRole(%s) filters by that role AND IsDefault = 1', async (role) => {
         const r = await getDefaultPromptForRole(role);
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(captured[0].sql).toContain("WHERE Role = '" + role + "'");
         expect(captured[0].sql).toContain('IsDefault = 1');
     });
 
     it.each(PROMPT_ROLES)('enforceSingleDefaultPerRole(%s, 42) scopes BOTH UPDATEs by role', async (role) => {
         const r = await enforceSingleDefaultPerRole(role, 42);
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         const sql = captured[0].sql;
         expect(sql).toContain("UPDATE Prompt SET IsDefault = 0 WHERE Role = '" + role + "' AND Id <> 42");
         expect(sql).toContain("UPDATE Prompt SET IsDefault = 1 WHERE Id = 42 AND Role = '" + role + "'");
@@ -162,7 +162,7 @@ describe('role-scope validation - every valid role is accepted and scoped', () =
 describe('role-scope validation - error message shape', () => {
     it('names the offending role value in the error string', async () => {
         const r = await listPromptsByRole('admin' as PromptRole);
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toContain('admin');
     });
 
@@ -170,7 +170,7 @@ describe('role-scope validation - error message shape', () => {
         for (const bad of [0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY]) {
             captured.length = 0;
             const r = await enforceSingleDefaultPerRole('plan', bad);
-            expect(r.isSuccess).toBe(false);
+            expect(r.ok).toBe(false);
             expect(r.error).toMatch(/positive integer/);
             expect(captured).toHaveLength(0);
         }
@@ -179,7 +179,7 @@ describe('role-scope validation - error message shape', () => {
     it('rejects SQL-injection role payload without executing it', async () => {
         const evil = "plan'; DROP TABLE Prompt; --";
         const r = await listPromptsByRole(evil as PromptRole);
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(captured).toHaveLength(0);
         // Sanity: the invalid role never becomes a SQL fragment anywhere.
         expect(captured.some((c) => c.sql.includes('DROP'))).toBe(false);

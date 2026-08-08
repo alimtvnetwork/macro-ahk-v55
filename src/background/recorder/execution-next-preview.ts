@@ -1,4 +1,4 @@
-import { BranchEnum1 } from "../../types/enums";
+import { NextNodeBranch } from "../../types/enums";
 
 /**
  * Marco Extension — Execution Next Preview
@@ -27,7 +27,7 @@ export interface PreviewStep {
     readonly StepId: number;
     readonly OrderIndex: number;
     readonly VariableName: string;
-    readonly Label: string;
+    readonly LabelType: string;
 }
 
 export interface StepLinks {
@@ -44,7 +44,7 @@ export interface ProjectSummary {
 
 export type NextNode =
     | { readonly Kind: "Step";    readonly Step: PreviewStep }
-    | { readonly Kind: "Project"; readonly Project: ProjectSummary; readonly Branch: BranchEnum1 }
+    | { readonly Kind: "Project"; readonly Project: ProjectSummary; readonly Branch: NextNodeBranch }
     | { readonly Kind: "End" };
 
 export interface ExecutionNextPreview {
@@ -72,7 +72,7 @@ export interface BuildPreviewInput {
  */
 function resolveBranchNode(
     slug: string | null | undefined,
-    branch: BranchEnum1,
+    branch: NextNodeBranch,
     projects: ReadonlyMap<string, ProjectSummary>,
 ): NextNode | null {
     return slug !== undefined && slug !== null ? projectNode(slug, branch, projects) : null;
@@ -111,7 +111,7 @@ export function describeNextNode(node: NextNode): string {
 
 function projectNode(
     slug: string,
-    branch: BranchEnum1,
+    branch: NextNodeBranch,
     projects: ReadonlyMap<string, ProjectSummary>,
 ): NextNode {
     const summary = projects.get(slug) ?? { Slug: slug, Name: slug };

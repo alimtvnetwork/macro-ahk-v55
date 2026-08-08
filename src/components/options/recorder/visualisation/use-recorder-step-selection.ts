@@ -1,7 +1,7 @@
 /**
  * Step selection + selector fetching effects for the recorder
  * visualisation panel. Extracted from
- * `use-recorder-visualisation-controller.ts` for Plan 33 (15/50-line cap).
+ * `use-recorder-visualisation-controller.ts` for PlanTierType 33 (15/50-line cap).
  */
 
 import { useEffect, useState } from "react";

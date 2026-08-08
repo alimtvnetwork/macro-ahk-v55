@@ -41,7 +41,7 @@ import { sendToExtension } from './extension-relay';
 export interface OverlayError {
   readonly id: number;
   readonly timestamp: string;
-  readonly level: LevelEnum5;
+  readonly level: OverlayErrorLevelType;
   readonly message: string;
   readonly stack?: string | undefined;
   readonly source?: string | undefined;
@@ -52,8 +52,8 @@ export interface OverlayError {
 // ============================================
 
 import { MAX_OVERLAY_ERRORS } from '../constants';
-import { DomId } from '../types';
-import { LevelEnum5 } from "../types/enums";
+import { DomIdType } from '../types';
+import { OverlayErrorLevelType } from "../types/enums";
 
 class ErrorOverlayState {
   private _errors: OverlayError[] = [];
@@ -137,7 +137,7 @@ class ErrorOverlayState {
     this._dragOffsetY = v;
   }
 
-  addError(level: LevelEnum5, message: string, stack?: string, source?: string): OverlayError {
+  addError(level: OverlayErrorLevelType, message: string, stack?: string, source?: string): OverlayError {
     const entry: OverlayError = {
       id: this._nextId++,
       timestamp: new Date().toLocaleTimeString('en-US', {
@@ -178,7 +178,7 @@ const overlayState = new ErrorOverlayState();
 // Overlay Container ID
 // ============================================
 
-const OVERLAY_ID = DomId.ErrorOverlay;
+const OVERLAY_ID = DomIdType.ErrorOverlay;
 
 // ============================================
 // Styles
@@ -748,7 +748,7 @@ export function ensureErrorOverlay(): void {
  * Called from global error handlers and toast system.
  */
 export function pushOverlayError(
-  level: LevelEnum5,
+  level: OverlayErrorLevelType,
   message: string,
   stack?: string,
   source?: string,

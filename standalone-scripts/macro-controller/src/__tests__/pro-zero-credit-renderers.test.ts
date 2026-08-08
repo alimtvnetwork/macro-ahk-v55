@@ -12,7 +12,7 @@ import { renderCreditBar, calcTotalCredits } from '../credit-api';
 import { applySummaryToRow } from '../pro-zero/pro-zero-enrichment';
 import { calculateProZeroCreditSummary } from '../pro-zero/pro-zero-credit-calculator';
 import { CreditGrantType } from '../pro-zero/credit-grant-type';
-import { MacroCreditSource } from '../pro-zero/macro-credit-source';
+import { MacroCreditSourceType } from '../pro-zero/macro-credit-source';
 import type { CreditBalanceResponseTyped } from '../pro-zero/credit-balance-response-typed';
 import type { WorkspaceCredit } from '../types';
 
@@ -103,7 +103,7 @@ describe('Group C — renderer integration', () => {
         const workspaceJson = JSON.stringify(ws.rawApi, null, 2);
         const balanceRaw = ws['proZeroCreditBalanceJson'];
         const source = ws['proZeroSource'];
-        expect(source).toBe(MacroCreditSource.CREDIT_BALANCE);
+        expect(source).toBe(MacroCreditSourceType.CREDIT_BALANCE);
         expect(typeof balanceRaw).toBe('string');
         const wrapped = {
             Source: source,

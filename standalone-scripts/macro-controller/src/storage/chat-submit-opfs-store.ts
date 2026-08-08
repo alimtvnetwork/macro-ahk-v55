@@ -7,7 +7,7 @@
  *
  * Layout: `chat-submits/<projectId>/<fileId>.txt`
  *
- * Plan 13, step 3. See `.lovable/plans/pending/13-per-project-chat-submit-tracker.md`.
+ * PlanTierType 13, step 3. See `.lovable/plans/pending/13-per-project-chat-submit-tracker.md`.
  *
  * All hard errors go through `logError` (namespace logger). Silent
  * catches are forbidden per project error-management policy.

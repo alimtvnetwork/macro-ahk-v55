@@ -11,7 +11,7 @@
 import type { MacroControllerConfig, MacroThemeRoot, PromptEntry } from './types';
 import type { PromptHealthReport } from './seed/prompt-health-check';
 import type { ReseedResult } from './seed/reseed-command';
-import { SourceEnum3, BridgeOutcomeEnum, InjectionLaunchSourceEnum } from "./types/enums";
+import { AuthResolutionDiagSourceType, BridgeOutcomeType, InjectionLaunchSourceType } from "./types/enums";
 
 declare global {
 
@@ -107,9 +107,9 @@ interface MarcoSDKApiModule {
 }
 
 interface MarcoSDKAuthResolutionDiag {
-  source: SourceEnum3;
+  source: AuthResolutionDiagSourceType;
   durationMs: number;
-  bridgeOutcome: BridgeOutcomeEnum;
+  bridgeOutcome: BridgeOutcomeType;
 }
 
 interface MarcoSDK {
@@ -190,7 +190,7 @@ interface MarcoSDK {
     __marcoRelayActive?: boolean;
 
     /** Injection launch source set by the extension before user script execution */
-    __MARCO_LAUNCH_SOURCE__?: InjectionLaunchSourceEnum;
+    __MARCO_LAUNCH_SOURCE__?: InjectionLaunchSourceType;
 
     // MacroController class — proper name, not a __* global
     MacroController: MacroControllerFacade;

@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { BannerLocator } from "./banner-locator";
 import { PaymentBannerHider } from "./index";
-import { BannerState, REMOVE_DELAY_MS, STATE_ATTR } from "./types";
+import { BannerStateType, REMOVE_DELAY_MS, STATE_ATTR } from "./types";
 
 function buildPattern1(): { banner: HTMLElement; wrapper: HTMLElement } {
     // /html/body/div[2]/main/div/div[1] — banner has its own wrapper.
@@ -60,10 +60,10 @@ describe("PaymentBannerHider collapse", () => {
         const hider = new PaymentBannerHider(new BannerLocator());
         hider.check();
 
-        expect(banner.getAttribute(STATE_ATTR)).toBe(BannerState.Fading);
+        expect(banner.getAttribute(STATE_ATTR)).toBe(BannerStateType.Fading);
 
         await vi.advanceTimersByTimeAsync(REMOVE_DELAY_MS + 10);
-        expect(banner.getAttribute(STATE_ATTR)).toBe(BannerState.Done);
+        expect(banner.getAttribute(STATE_ATTR)).toBe(BannerStateType.Done);
     });
 
     it("collapses pattern 2 (inner div) including its single-child wrapper", async () => {
@@ -72,13 +72,13 @@ describe("PaymentBannerHider collapse", () => {
         const hider = new PaymentBannerHider(new BannerLocator());
         hider.check();
 
-        expect(inner.getAttribute(STATE_ATTR)).toBe(BannerState.Fading);
+        expect(inner.getAttribute(STATE_ATTR)).toBe(BannerStateType.Fading);
         // outer is a single-child wrapper around inner → must collapse too.
-        expect(outer.getAttribute(STATE_ATTR)).toBe(BannerState.Fading);
+        expect(outer.getAttribute(STATE_ATTR)).toBe(BannerStateType.Fading);
 
         await vi.advanceTimersByTimeAsync(REMOVE_DELAY_MS + 10);
-        expect(inner.getAttribute(STATE_ATTR)).toBe(BannerState.Done);
-        expect(outer.getAttribute(STATE_ATTR)).toBe(BannerState.Done);
+        expect(inner.getAttribute(STATE_ATTR)).toBe(BannerStateType.Done);
+        expect(outer.getAttribute(STATE_ATTR)).toBe(BannerStateType.Done);
     });
 
     it("falls back to text-scan when XPath structure does not match", async () => {
@@ -94,9 +94,9 @@ describe("PaymentBannerHider collapse", () => {
         const hider = new PaymentBannerHider(new BannerLocator());
         hider.check();
 
-        expect(target.getAttribute(STATE_ATTR)).toBe(BannerState.Fading);
+        expect(target.getAttribute(STATE_ATTR)).toBe(BannerStateType.Fading);
         await vi.advanceTimersByTimeAsync(REMOVE_DELAY_MS + 10);
-        expect(target.getAttribute(STATE_ATTR)).toBe(BannerState.Done);
+        expect(target.getAttribute(STATE_ATTR)).toBe(BannerStateType.Done);
     });
 
     it("does not collapse <body> or <main> via text fallback", () => {

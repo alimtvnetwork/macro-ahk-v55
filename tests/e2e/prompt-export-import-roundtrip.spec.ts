@@ -127,7 +127,7 @@ test.describe('prompt export -> import round trip', () => {
             }
             const api = (window as unknown as { __roundtrip: Api }).__roundtrip;
             await api.writeJsonCopy([
-                { name: 'Plan default', text: 'plan body v2', category: 'plan', slug: slugA, role: 'plan', isFavorite: false, isDefault: false },
+                { name: 'PlanTierType default', text: 'plan body v2', category: 'plan', slug: slugA, role: 'plan', isFavorite: false, isDefault: false },
                 { name: 'Next default', text: 'next body v2', category: 'next', slug: slugB, role: 'next', isFavorite: false, isDefault: false },
             ]);
         }, { slugA: SLUG_A, slugB: SLUG_B });
@@ -162,8 +162,8 @@ test.describe('prompt export -> import round trip', () => {
         const synthesised = {
             ...exportedBundle,
             revisions: [
-                { Slug: SLUG_A, Name: 'Plan default', Body: 'plan body v1', Role: 'plan', ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_000_000, Reason: 'import' },
-                { Slug: SLUG_A, Name: 'Plan default', Body: 'plan body v2', Role: 'plan', ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_100_000, Reason: 'import' },
+                { Slug: SLUG_A, Name: 'PlanTierType default', Body: 'plan body v1', Role: 'plan', ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_000_000, Reason: 'import' },
+                { Slug: SLUG_A, Name: 'PlanTierType default', Body: 'plan body v2', Role: 'plan', ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_100_000, Reason: 'import' },
                 { Slug: SLUG_B, Name: 'Next default', Body: 'next body v1', Role: 'next', ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_200_000, Reason: 'import' },
                 { Slug: SLUG_B, Name: 'Next default', Body: 'next body v2', Role: 'next', ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_300_000, Reason: 'import' },
             ],
@@ -202,8 +202,8 @@ test.describe('prompt export -> import round trip', () => {
                 Role: string; ReplaceKey: string; ReplaceValues: string; CreatedAt: number; Reason: string;
             }
             const importedRows: RevRow[] = [
-                { Id: 501, PromptId: 0, Slug: slug, Name: 'Plan default', Body: 'plan body v1', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_000_000, Reason: 'import' },
-                { Id: 502, PromptId: 0, Slug: slug, Name: 'Plan default', Body: 'plan body v2', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_100_000, Reason: 'import' },
+                { Id: 501, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'plan body v1', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_000_000, Reason: 'import' },
+                { Id: 502, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'plan body v2', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_100_000, Reason: 'import' },
             ];
             interface DbOk<T> { ok: boolean; value?: T; error?: string }
             const deps = {

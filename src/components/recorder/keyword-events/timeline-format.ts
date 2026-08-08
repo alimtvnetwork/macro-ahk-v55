@@ -1,7 +1,7 @@
 /**
  * Marco Extension, Keyword Events, Timeline formatting helpers
  *
- * Split from `TimelineRow.tsx` (Plan 25 step 10) so the component module
+ * Split from `TimelineRow.tsx` (PlanTierType 25 step 10) so the component module
  * only exports components (`react-refresh/only-export-components`).
  */
 

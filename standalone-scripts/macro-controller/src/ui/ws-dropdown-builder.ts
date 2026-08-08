@@ -20,7 +20,7 @@ import type { RenameHistoryEntry, UndoRenameResults } from '../types';
 import { logError } from '../error-utils';
 import { buildWsFilterMenuButton } from './ws-filter-menu';
 
-import { DomId } from '../types';
+import { DomIdType } from '../types';
 export interface WsDropdownDeps {
   populateLoopWorkspaceDropdown: () => void;
   updateWsSelectionUI: () => void;
@@ -57,7 +57,7 @@ export interface WsDropdownResult {
 
 /** Scroll to and highlight the current workspace item in the list. */
 function scrollToCurrentItem(setLoopWsNavIndex: (v: number) => void, label: string): void {
-  const listEl = document.getElementById(DomId.LoopWsList);
+  const listEl = document.getElementById(DomIdType.LoopWsList);
   if (!listEl) return;
   const currentItem = listEl.querySelector('.loop-ws-item[data-ws-current="true"]');
   if (currentItem) {
@@ -113,7 +113,7 @@ export function buildWsDropdownSection(deps: WsDropdownDeps): WsDropdownResult {
   const wsSearchInput = _buildWsSearchInput(populateLoopWorkspaceDropdown, setLoopWsNavIndex, getLoopWsNavIndex, triggerLoopMoveFromSelection);
 
   const wsList = document.createElement('div');
-  wsList.id = DomId.LoopWsList;
+  wsList.id = DomIdType.LoopWsList;
   wsList.style.cssText = 'max-height:160px;overflow-y:auto;border:1px solid ' + cPrimaryBorderA + ';border-radius:3px;background:rgba(0,0,0,.3);';
   wsList.appendChild(createWorkspaceListSkeleton());
 
@@ -265,7 +265,7 @@ function _buildWsSearchInput(
   wsSearchInput.onblur = function() { (this as HTMLElement).style.borderColor = cPrimary; };
   wsSearchInput.oninput = function() { populateLoopWorkspaceDropdown(); };
   wsSearchInput.onkeydown = function(e: KeyboardEvent) {
-    const listEl = document.getElementById(DomId.LoopWsList);
+    const listEl = document.getElementById(DomIdType.LoopWsList);
     if (!listEl) return;
     const items = listEl.querySelectorAll('.loop-ws-item');
     if (items.length === 0) return;

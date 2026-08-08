@@ -9,7 +9,7 @@
  * failed (no rollback policy — failure marking only).
  */
 
-import { LogPhase, LogSeverity, buildEntry } from "./log-sink";
+import { LogPhaseType, LogSeverityType, buildEntry } from "./log-sink";
 import type { LogSink } from "./log-sink";
 import type { RowExecutionContext, RowExecutionResult } from "./row-types";
 import type { RowStateStore, RowStateUpdate } from "./row-state-store";
@@ -31,8 +31,8 @@ export const finalizeRow = (
     result: RowExecutionResult,
 ): RowExecutionResult => {
     sink.write(buildEntry(
-        ctx.Task.TaskId, ctx.Row.RowIndex, LogPhase.Row,
-        result.HasError ? LogSeverity.Error : LogSeverity.Info,
+        ctx.Task.TaskId, ctx.Row.RowIndex, LogPhaseType.Row,
+        result.HasError ? LogSeverityType.Error : LogSeverityType.Info,
         `Row ${ctx.Row.RowIndex} → ${result.Outcome} in ${result.DurationMs}ms`,
     ));
     store.update(buildUpdate(ctx.Row.RowIndex, result));

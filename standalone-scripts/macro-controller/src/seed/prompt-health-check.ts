@@ -18,7 +18,7 @@ import { ServiceResult } from '../utils/result-wrapper';
  * Root cause this closes: seeding + on-demand recovery can still leave the
  * DB in a subtly broken state (row exists but body missing `{{n}}`, or
  * `IsDefault=0`, or `ReplaceKey` empty). Without a health check the user
- * only discovers this when a Plan/Next fire silently produces garbage. This
+ * only discovers this when a PlanTierType/Next fire silently produces garbage. This
  * module makes the failure loud, at boot, with actionable info.
  */
 
@@ -31,13 +31,13 @@ import { PLAN_NEXT_SEED_ROWS } from './plan-next-prompts';
 import { logDiagnosticFromCode } from '../error-utils';
 import { showToast } from '../toast';
 import { emitPromptSeedEvent } from '../telemetry/prompt-seed-telemetry';
-import { CodeEnum1 } from "../types/enums";
+import { PromptHealthIssueType } from "../types/enums";
 
 export interface PromptHealthIssue {
   role: PromptRole;
   slug: string;
   code:
-    CodeEnum1;
+    PromptHealthIssueType;
   detail: string;
 }
 
@@ -107,7 +107,7 @@ export async function runPromptHealthCheck(opts: RunHealthCheckOptions = {}): Pr
     const seedSlug = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault)?.slug ?? (role + '-default');
     try {
       const res = await getDefaultPromptForRole(role);
-      if (res.isFail) {
+      if (!res.ok) {
         issues.push({ role, slug: seedSlug, code: 'query-failed', detail: res.error ?? 'unknown query error' });
         continue;
       }
@@ -135,8 +135,8 @@ function publishReport(report: PromptHealthReport, silent: boolean): void {
     // window may be locked down in some sandboxes; safe to ignore.
   }
 
-  if (report.isSuccess) {
-    emitPromptSeedEvent({ event: 'health.default.isSuccess', role: 'generic', outcome: 'ok', detail: 'all defaults healthy' });
+  if (report.ok) {
+    emitPromptSeedEvent({ event: 'health.default.ok', role: 'generic', outcome: 'ok', detail: 'all defaults healthy' });
     return;
   }
 

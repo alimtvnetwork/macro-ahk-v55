@@ -1,5 +1,5 @@
 
-import { DataAttr } from '../types';
+import { DataAttrType } from '../types';
 /**
  * Skeleton UI — Shimmer loading placeholders for macro controller panel.
  *
@@ -93,7 +93,7 @@ export function createSkeletonBar(opts?: SkeletonBarOpts): HTMLElement {
  */
 export function createStatusSkeleton(): HTMLElement {
   const wrap = document.createElement('div');
-  wrap.setAttribute(DataAttr.Skeleton, 'status');
+  wrap.setAttribute(DataAttrType.Skeleton, 'status');
   wrap.style.cssText = 'padding:2px 0;';
 
   // Line 1: workspace + status text
@@ -129,7 +129,7 @@ export function createStatusSkeleton(): HTMLElement {
  */
 export function createWorkspaceListSkeleton(): HTMLElement {
   const wrap = document.createElement('div');
-  wrap.setAttribute(DataAttr.Skeleton, 'ws-list');
+  wrap.setAttribute(DataAttrType.Skeleton, 'ws-list');
   wrap.style.cssText = 'display:flex;flex-direction:column;gap:6px;padding:4px;';
 
   for (let i = 0; i < 3; i++) {
@@ -149,7 +149,7 @@ export function createWorkspaceListSkeleton(): HTMLElement {
  */
 export function createPromptsListSkeleton(): HTMLElement {
   const wrap = document.createElement('div');
-  wrap.setAttribute(DataAttr.Skeleton, 'prompts-list');
+  wrap.setAttribute(DataAttrType.Skeleton, 'prompts-list');
   wrap.style.cssText = 'display:flex;flex-direction:column;gap:4px;padding:8px 12px;';
 
   for (let i = 0; i < 4; i++) {

@@ -8,9 +8,9 @@
  */
 
 import type { ProjectInstruction } from "../../types/instruction/project-instruction";
-import { InjectionWorld } from "../../types/instruction/enums/injection-world";
-import { InjectionRunAt } from "../../types/instruction/enums/injection-run-at";
-import { MatchType } from "../../types/instruction/enums/match-type";
+import { InjectionWorldType } from "../../types/instruction/enums/injection-world";
+import { InjectionRunAtType } from "../../types/instruction/enums/injection-run-at";
+import { MatchRuleType } from "../../types/instruction/enums/match-type";
 import type { EmptySettings } from "../../types/instruction/seed/empty-settings";
 import { VERSION } from "../../shared-version";
 
@@ -22,7 +22,7 @@ const instruction: ProjectInstruction<{ OnlyRunAsDependency: boolean }> = {
     DisplayName: "Rise Up Macro SDK",
     Version: VERSION,
     Description: "Core SDK — creates and freezes window.marco namespace",
-    World: InjectionWorld.Main,
+    World: InjectionWorldType.Main,
     IsGlobal: true,
     Dependencies: [],
     LoadOrder: 0,
@@ -31,11 +31,11 @@ const instruction: ProjectInstruction<{ OnlyRunAsDependency: boolean }> = {
         SeedOnInstall: true,
         IsRemovable: false,
         AutoInject: true,
-        RunAt: InjectionRunAt.DocumentStart,
+        RunAt: InjectionRunAtType.DocumentStart,
         TargetUrls: [
-            { Pattern: "https://lovable.dev/projects/*", MatchType: MatchType.Glob },
-            { Pattern: "https://*.lovable.app/*", MatchType: MatchType.Glob },
-            { Pattern: "https://*.lovableproject.com/*", MatchType: MatchType.Glob },
+            { Pattern: "https://lovable.dev/projects/*", MatchRuleType: MatchRuleType.Glob },
+            { Pattern: "https://*.lovable.app/*", MatchRuleType: MatchRuleType.Glob },
+            { Pattern: "https://*.lovableproject.com/*", MatchRuleType: MatchRuleType.Glob },
         ],
         Cookies: [
             { CookieName: "lovable-session-id.id", Url: LOVABLE_BASE_URL, Role: "session", Description: "Primary session cookie — JWT bearer token" },

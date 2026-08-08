@@ -4,7 +4,7 @@
  * component stays within the ESLint max-lines-per-function budget.
  */
 
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 import type { StepGroupRow } from "@/background/recorder/step-library/db";
@@ -57,7 +57,7 @@ export function StepEditorKindBody(props: StepEditorKindBodyProps): JSX.Element 
     }
     return (
         <div className="space-y-1">
-            <Label htmlFor="step-payload">Payload JSON</Label>
+            <LabelType htmlFor="step-payload">Payload JSON</LabelType>
             <Textarea
                 id="step-payload"
                 value={props.payloadJson}

@@ -1,5 +1,5 @@
 /**
- * End-to-end regression: the shipped Plan prompt body (canonical +
+ * End-to-end regression: the shipped PlanTierType prompt body (canonical +
  * mirror) MUST substitute `{{n}}` with the caller-supplied number via
  * the same `substituteToken` helper the chip uses at paste time. If
  * anyone edits the prompt and drops `{{n}}`, or renames `ReplaceKey`

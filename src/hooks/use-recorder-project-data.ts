@@ -16,7 +16,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { sendMessage } from "@/lib/message-client";
-import { StepLinkSlotEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { StepLinkSlotType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  PascalCase row shapes (mirror server records)                      */
@@ -28,7 +28,7 @@ export interface StepRow {
     readonly StepStatusId: number;
     readonly OrderIndex: number;
     readonly VariableName: string;
-    readonly Label: string;
+    readonly LabelType: string;
     readonly InlineJs: string | null;
     readonly IsBreakpoint: number;
     readonly CapturedAt: string;
@@ -43,14 +43,14 @@ export interface StepRow {
 }
 
 export interface StepMetaPatch {
-    readonly Label?: string;
+    readonly LabelType?: string;
     readonly Description?: string | null;
     readonly IsDisabled?: boolean;
     readonly RetryCount?: number;
     readonly TimeoutMs?: number | null;
 }
 
-export type StepLinkSlot = StepLinkSlotEnum;
+export type StepLinkSlot = StepLinkSlotType;
 
 export interface SelectorRow {
     readonly SelectorId: number;

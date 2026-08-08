@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * openPromptHistoryPanel:
@@ -13,10 +14,13 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 vi.mock('../../db/prompt-revision-db', () => ({
   listPromptRevisions: vi.fn(),
   insertImportedRevisions: vi.fn(),
-  getMaxRevisionId: vi.fn(async () => ({ ok: true, value: 100 })),
-  deleteImportedRevisionsAfter: vi.fn(async () => ({ ok: true, value: 0 })),
+  getMaxRevisionId: vi.fn(async () => (new DbResult(true, 100))),
+  deleteImportedRevisionsAfter: vi.fn(async () => (new DbResult(true, 0))),
 }));
 vi.mock('../../db/prompt-db', () => ({
+    DbResult,
+    DbResult,
+    DbResult,
   listPromptsByRole: vi.fn(),
   getDefaultPromptForRole: vi.fn(),
   upsertPrompt: vi.fn(),
@@ -34,7 +38,7 @@ const makeRev = (over: Partial<Record<string, unknown>> = {}) => ({
   Id: 10,
   PromptId: 1,
   Slug: 'plan-default',
-  Name: 'Plan default',
+  Name: 'PlanTierType default',
   Body: 'old body {{n}}',
   Role: 'plan',
   ReplaceKey: 'n',
@@ -53,7 +57,7 @@ beforeEach(() => {
 describe('openPromptHistoryPanel', () => {
   it('renders one row per revision with restore button and preview', async () => {
     const toast = vi.fn();
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [makeRev(), makeRev({ Id: 11, Body: 'older body {{n}}' })] });
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, [makeRev(), makeRev({ Id: 11, Body: 'older body {{n}}'))] });
     await openPromptHistoryPanel(
       { role: 'plan', slug: 'plan-default' },
       { listRevisions, toast },
@@ -65,14 +69,14 @@ describe('openPromptHistoryPanel', () => {
   });
 
   it('shows empty-state copy when there are zero revisions', async () => {
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [] });
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, []));
     await openPromptHistoryPanel({ role: 'plan', slug: 'plan-default' }, { listRevisions });
     expect(document.body.textContent).toContain('No revisions yet');
   });
 
   it('resolves slug from getDefaultPromptForRole when input.slug omitted', async () => {
-    const getDefault = vi.fn().mockResolvedValue({ ok: true, value: { Slug: 'next-default' } });
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [] });
+    const getDefault = vi.fn().mockResolvedValue(new DbResult(true, { Slug: 'next-default') });
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, []));
     await openPromptHistoryPanel({ role: 'next' }, { getDefault, listRevisions });
     expect(getDefault).toHaveBeenCalledWith('next');
     expect(listRevisions).toHaveBeenCalledWith('next-default');
@@ -80,19 +84,19 @@ describe('openPromptHistoryPanel', () => {
 
   it('toasts error and renders nothing when listRevisions fails', async () => {
     const toast = vi.fn();
-    const listRevisions = vi.fn().mockResolvedValue({ ok: false, error: 'boom' });
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(false, undefined, 'boom'));
     await openPromptHistoryPanel({ role: 'plan', slug: 's' }, { listRevisions, toast });
     expect(toast).toHaveBeenCalledWith(expect.stringContaining('boom'), 'error');
     expect(document.getElementById('marco-prompt-history-panel')).toBeNull();
   });
 
   it('restore calls upsertPrompt with parsed ReplaceValues and current row Id', async () => {
-    const upsert = vi.fn().mockResolvedValue({ ok: true, value: 42 });
+    const upsert = vi.fn().mockResolvedValue(new DbResult(true, 42));
     const listByRole = vi.fn().mockResolvedValue({
       ok: true,
       value: [{ Id: 42, Slug: 'plan-default', Body: 'live body', Role: 'plan', ReplaceKey: 'n' }],
     });
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [makeRev()] });
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, [makeRev()]));
     const toast = vi.fn();
     const undoToast = vi.fn();
     await openPromptHistoryPanel(
@@ -116,7 +120,7 @@ describe('openPromptHistoryPanel', () => {
 
   it('restore aborts when user cancels the confirm', async () => {
     const upsert = vi.fn();
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [makeRev()] });
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, [makeRev()]));
     await openPromptHistoryPanel(
       { role: 'plan', slug: 'plan-default' },
       { listRevisions, upsert, confirmFn: () => false },
@@ -127,9 +131,9 @@ describe('openPromptHistoryPanel', () => {
   });
 
   it('restore surfaces upsert failures as error toast', async () => {
-    const upsert = vi.fn().mockResolvedValue({ ok: false, error: 'drift guard' });
-    const listByRole = vi.fn().mockResolvedValue({ ok: true, value: [] });
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [makeRev()] });
+    const upsert = vi.fn().mockResolvedValue(new DbResult(false, undefined, 'drift guard'));
+    const listByRole = vi.fn().mockResolvedValue(new DbResult(true, []));
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, [makeRev()]));
     const toast = vi.fn();
     await openPromptHistoryPanel(
       { role: 'plan', slug: 'plan-default' },
@@ -141,7 +145,7 @@ describe('openPromptHistoryPanel', () => {
   });
 
   it('close button removes the panel', async () => {
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [] });
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, []));
     await openPromptHistoryPanel({ role: 'plan', slug: 's' }, { listRevisions });
     const panel = document.getElementById('marco-prompt-history-panel');
     expect(panel).not.toBeNull();
@@ -150,7 +154,7 @@ describe('openPromptHistoryPanel', () => {
   });
 
   it('renders an Export JSON button that triggers a download anchor click', async () => {
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [makeRev()] });
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, [makeRev()]));
     // Stub URL.createObjectURL / revokeObjectURL (not implemented in jsdom).
     const created: string[] = [];
     const originalCreate = URL.createObjectURL;
@@ -189,7 +193,7 @@ describe('openPromptHistoryPanel', () => {
   it('parseRevisionImportPayload accepts a matching schema-v1 payload (v4.183.0)', () => {
     const payload = buildRevisionExportPayload('plan-default', 'plan', [makeRev()], 1_700_000_000_000);
     const parsed = parseRevisionImportPayload(JSON.stringify(payload), 'plan-default', 'plan');
-    expect(parsed.isSuccess).toBe(true);
+    expect(parsed.ok).toBe(true);
     expect(parsed.rows).toHaveLength(1);
     expect(parsed.rows?.[0].Body).toBe('old body {{n}}');
     expect(parsed.rows?.[0].CreatedAt).toBe(1_700_000_000_000);
@@ -206,12 +210,12 @@ describe('openPromptHistoryPanel', () => {
 
   // ── v4.185.0: undo-toast on restore ─────────────────────────────────
   it('restore invokes undoToast with the success message when a current row exists', async () => {
-    const upsert = vi.fn().mockResolvedValue({ ok: true, value: 42 });
+    const upsert = vi.fn().mockResolvedValue(new DbResult(true, 42));
     const listByRole = vi.fn().mockResolvedValue({
       ok: true,
       value: [{ Id: 42, Slug: 'plan-default', Body: 'live body', Role: 'plan', ReplaceKey: 'n', ReplaceValues: '["7"]' }],
     });
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [makeRev()] });
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, [makeRev()]));
     const toast = vi.fn();
     const undoToast = vi.fn();
     await openPromptHistoryPanel(
@@ -228,12 +232,12 @@ describe('openPromptHistoryPanel', () => {
   });
 
   it('undoToast onUndo callback re-upserts the pre-restore body', async () => {
-    const upsert = vi.fn().mockResolvedValue({ ok: true, value: 42 });
+    const upsert = vi.fn().mockResolvedValue(new DbResult(true, 42));
     const listByRole = vi.fn().mockResolvedValue({
       ok: true,
       value: [{ Id: 42, Slug: 'plan-default', Body: 'live body', Role: 'plan', ReplaceKey: 'n', ReplaceValues: '["7"]' }],
     });
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [makeRev()] });
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, [makeRev()]));
     const undoToast = vi.fn();
     const toast = vi.fn();
     await openPromptHistoryPanel(
@@ -256,10 +260,10 @@ describe('openPromptHistoryPanel', () => {
   });
 
   it('restore wraps insert-path success in undoToast; onUndo deletes the just-inserted row', async () => {
-    const upsert = vi.fn().mockResolvedValue({ ok: true, value: 99 });
-    const listByRole = vi.fn().mockResolvedValue({ ok: true, value: [] });
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [makeRev()] });
-    const deletePrompt = vi.fn().mockResolvedValue({ ok: true, value: undefined });
+    const upsert = vi.fn().mockResolvedValue(new DbResult(true, 99));
+    const listByRole = vi.fn().mockResolvedValue(new DbResult(true, []));
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, [makeRev()]));
+    const deletePrompt = vi.fn().mockResolvedValue(new DbResult(true, undefined));
     const undoToast = vi.fn();
     const toast = vi.fn();
     await openPromptHistoryPanel(
@@ -280,10 +284,10 @@ describe('openPromptHistoryPanel', () => {
   });
 
   it('restore insert-path undo surfaces a toast when deletePromptById fails (last-row guard)', async () => {
-    const upsert = vi.fn().mockResolvedValue({ ok: true, value: 42 });
-    const listByRole = vi.fn().mockResolvedValue({ ok: true, value: [] });
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [makeRev()] });
-    const deletePrompt = vi.fn().mockResolvedValue({ ok: false, error: 'refuse to delete last row for role plan' });
+    const upsert = vi.fn().mockResolvedValue(new DbResult(true, 42));
+    const listByRole = vi.fn().mockResolvedValue(new DbResult(true, []));
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, [makeRev()]));
+    const deletePrompt = vi.fn().mockResolvedValue(new DbResult(false, undefined, 'refuse to delete last row for role plan'));
     const undoToast = vi.fn();
     const toast = vi.fn();
     await openPromptHistoryPanel(
@@ -301,7 +305,7 @@ describe('openPromptHistoryPanel', () => {
   it('handleImportFile dedupes identical rejection logs within the window', async () => {
     const errMod = await import('../../error-utils');
     const logDiag = vi.mocked(errMod.logDiagnosticFromCode);
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [] });
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, []));
     await openPromptHistoryPanel({ role: 'plan', slug: 'plan-default' }, { listRevisions });
     const input = document.querySelector('[data-testid="history-import-input"]') as HTMLInputElement;
     for (let i = 0; i < 3; i += 1) {
@@ -323,7 +327,7 @@ describe('openPromptHistoryPanel', () => {
   it('handleImportFile caps oversized emissions at 5/hour even across dedupe windows', async () => {
     const errMod = await import('../../error-utils');
     const logDiag = vi.mocked(errMod.logDiagnosticFromCode);
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [] });
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, []));
     await openPromptHistoryPanel({ role: 'plan', slug: 'plan-default' }, { listRevisions });
     const input = document.querySelector('[data-testid="history-import-input"]') as HTMLInputElement;
 
@@ -352,7 +356,7 @@ describe('openPromptHistoryPanel', () => {
   it('diagnostic dedupe is keyed per code: distinct stages still emit within window', async () => {
     const errMod = await import('../../error-utils');
     const logDiag = vi.mocked(errMod.logDiagnosticFromCode);
-    const listRevisions = vi.fn().mockResolvedValue({ ok: true, value: [] });
+    const listRevisions = vi.fn().mockResolvedValue(new DbResult(true, []));
     await openPromptHistoryPanel({ role: 'plan', slug: 'plan-default' }, { listRevisions });
     const input = document.querySelector('[data-testid="history-import-input"]') as HTMLInputElement;
 
@@ -385,10 +389,10 @@ describe('openPromptHistoryPanel', () => {
       getMaxRevisionId: vi.mocked(revDbMod.getMaxRevisionId),
       deleteImportedRevisionsAfter: vi.mocked(revDbMod.deleteImportedRevisionsAfter),
     };
-    revDb.listPromptRevisions.mockResolvedValue({ ok: true, value: [] });
-    revDb.getMaxRevisionId.mockResolvedValue({ ok: true, value: 42 });
-    revDb.insertImportedRevisions.mockResolvedValue({ ok: true, value: 3 });
-    revDb.deleteImportedRevisionsAfter.mockResolvedValue({ ok: true, value: 0 });
+    revDb.listPromptRevisions.mockResolvedValue(new DbResult(true, []));
+    revDb.getMaxRevisionId.mockResolvedValue(new DbResult(true, 42));
+    revDb.insertImportedRevisions.mockResolvedValue(new DbResult(true, 3));
+    revDb.deleteImportedRevisionsAfter.mockResolvedValue(new DbResult(true, 0));
     const undoToast = vi.fn();
     const toast = vi.fn();
     await openPromptHistoryPanel({ role: 'plan', slug: 'plan-default' }, {

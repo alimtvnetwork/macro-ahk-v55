@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * prompt-library-modal - end-to-end drag-and-drop import flow.
  *
@@ -47,10 +48,13 @@ vi.mock('../prompt-io-db-bridge', () => ({
 
 vi.mock('../prompt-loader', () => buildPromptLoaderMock({ invalidatePromptCache: vi.fn() }));
 vi.mock('../../db/prompt-db', () => ({
-    listPromptsByRole: vi.fn(async () => ({ ok: true, value: [] })),
-    setDefaultPromptForRole: vi.fn(async () => ({ ok: true })),
-    deletePromptById: vi.fn(async () => ({ ok: true })),
-    upsertPrompt: vi.fn(async () => ({ ok: true, value: 1 })),
+    DbResult,
+    DbResult,
+    DbResult,
+    listPromptsByRole: vi.fn(async () => (new DbResult(true, []))),
+    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+    upsertPrompt: vi.fn(async () => (new DbResult(true, 1))),
 }));
 
 import { openPromptLibraryModal } from '../prompt-library-modal';
@@ -124,14 +128,14 @@ describe('prompt-library-modal - drag-drop import end-to-end', () => {
 
     it('never overwrites an isDefault row and counts it under defaultsProtected', async () => {
         cache.readJsonCopy.mockResolvedValue({
-            entries: [{ slug: 'plan-default', name: 'Plan default', text: 'canon', isDefault: true }],
+            entries: [{ slug: 'plan-default', name: 'PlanTierType default', text: 'canon', isDefault: true }],
         });
         await openPromptLibraryModal();
         await flush();
         const root = getRoot();
 
         const payload = JSON.stringify([
-            { slug: 'plan-default', name: 'Plan default', text: 'attacker body' },
+            { slug: 'plan-default', name: 'PlanTierType default', text: 'attacker body' },
         ]);
         fireDrop(root, payload, 'evil.json');
         await flush();

@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 
 /* ─── Hard-throw act(...) ratchet ────────────────────────────────────
- * Plan 10 Step 8: any React "not wrapped in act(...)" warning becomes a
+ * PlanTierType 10 Step 8: any React "not wrapped in act(...)" warning becomes a
  * test failure. Baseline is zero (Steps 1-3 cleared all 54). Escape hatch:
  * set env `MARCO_ALLOW_ACT_WARNINGS=1` to downgrade to log-only.
  */

@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -36,12 +37,15 @@ vi.mock('../prompt-manager', () => ({
   getPromptsConfig: () => ({ entries: [] }),
 }));
 vi.mock('../../db/prompt-db', () => ({
+    DbResult,
+    DbResult,
+    DbResult,
   getDefaultPromptForRole: mocks.getDefaultPromptForRole,
 }));
 
 import { getLastPlanPromptSource, triggerPlanPasteFromInline } from '../task-splitter-ui';
 
-describe('task splitter Plan strip resolver', () => {
+describe('task splitter PlanTierType strip resolver', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
     mocks.getDefaultPromptForRole.mockReset();
@@ -52,18 +56,18 @@ describe('task splitter Plan strip resolver', () => {
   it('uses the managed plan default row before the hidden prompt library', async () => {
     mocks.getDefaultPromptForRole.mockResolvedValue({
       ok: true,
-      value: { Body: 'DB Plan {{n}} body', ReplaceKey: 'n' },
+      value: { Body: 'DB PlanTierType {{n}} body', ReplaceKey: 'n' },
     });
 
     await triggerPlanPasteFromInline(12);
 
-    expect(mocks.pasteIntoEditor.mock.calls[0]?.[0]).toBe('DB Plan 12 body');
+    expect(mocks.pasteIntoEditor.mock.calls[0]?.[0]).toBe('DB PlanTierType 12 body');
     expect(getLastPlanPromptSource()).toBe('db-default');
     expect(mocks.showPasteToast).not.toHaveBeenCalledWith(expect.stringContaining('not found'), true);
   });
 
-  it('falls back to the bundled Plan v4.1 body when no prompt row exists', async () => {
-    mocks.getDefaultPromptForRole.mockResolvedValue({ ok: true, value: undefined });
+  it('falls back to the bundled PlanTierType v4.1 body when no prompt row exists', async () => {
+    mocks.getDefaultPromptForRole.mockResolvedValue(new DbResult(true, undefined));
 
     await triggerPlanPasteFromInline(50);
 

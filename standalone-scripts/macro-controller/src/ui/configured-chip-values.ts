@@ -1,6 +1,6 @@
 import { ServiceResult } from '../utils/result-wrapper';
 /**
- * Plan-15 Task 9: Resolve the chip-value list for a given prompt role from
+ * PlanTierType-15 Task 9: Resolve the chip-value list for a given prompt role from
  * the database (`Prompt.ReplaceValues`), falling back to the caller-supplied
  * legacy list on any miss.
  *
@@ -14,7 +14,7 @@ import { ServiceResult } from '../utils/result-wrapper';
 
 import { logError } from '../error-utils';
 import { decodeReplaceValues, REPLACE_VALUES_DEFAULT } from '../db/prompt-defaults';
-import { RoleEnum5 } from "../types/enums";
+import { CachedPromptRoleType } from "../types/enums";
 
 /** Parse a JSON-encoded/persisted values list into positive integers. */
 export function parseNumericValues(raw: readonly string[]): number[] {
@@ -36,17 +36,17 @@ export function parseNumericValues(raw: readonly string[]): number[] {
  * are number-only surfaces (v4.74.0).
  */
 export async function resolveConfiguredChipValues(
-    role: RoleEnum5,
+    role: CachedPromptRoleType,
     fallback: readonly number[],
 ): Promise<number[]> {
     try {
         const mod = await import('../db/prompt-db');
         const result = await mod.getDefaultPromptForRole(role);
-        if (result.isFail || !result.value) return [...fallback];
+        if (!result.ok || !result.value) return [...fallback];
         const raw = decodeReplaceValues((result.value as { ReplaceValues?: unknown }).ReplaceValues);
         // Only override the fallback if the row diverges from the plan-14
         // default set — otherwise we would replace tuned legacy chip lists
-        // (e.g. Plan preset ramp 5..200) with the seed default ["1","2","3","5","8"].
+        // (e.g. PlanTierType preset ramp 5..200) with the seed default ["1","2","3","5","8"].
         const isDefault = raw.length === REPLACE_VALUES_DEFAULT.length
             && raw.every((v, i) => v === REPLACE_VALUES_DEFAULT[i]);
         if (isDefault) return [...fallback];

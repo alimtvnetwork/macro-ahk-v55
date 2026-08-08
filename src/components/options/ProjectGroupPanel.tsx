@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -230,7 +230,7 @@ function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: GroupFormDi
 
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label className="text-xs">Group Name</Label>
+            <LabelType className="text-xs">Group Name</LabelType>
             <Input
               value={name}
               onChange={e => setName(e.target.value)}
@@ -242,7 +242,7 @@ function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: GroupFormDi
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs">Shared Settings (JSON, optional)</Label>
+            <LabelType className="text-xs">Shared Settings (JSON, optional)</LabelType>
             <Textarea
               value={settings}
               onChange={e => setSettings(e.target.value)}

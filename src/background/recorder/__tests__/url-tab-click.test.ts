@@ -133,7 +133,7 @@ describe("validateUrlTabClickParams", () => {
         const err = validateUrlTabClickParams({
             UrlPattern: "https://x/*",
             UrlMatch: "Glob",
-            Mode: "OpenNew",
+            OperationModeType: "OpenNew",
             DirectOpen: true,
             Url: "",
         });
@@ -144,7 +144,7 @@ describe("validateUrlTabClickParams", () => {
         const err = validateUrlTabClickParams({
             UrlPattern: "(unclosed",
             UrlMatch: "Regex",
-            Mode: "OpenNew",
+            OperationModeType: "OpenNew",
             DirectOpen: true,
             Url: "https://x",
         });
@@ -155,7 +155,7 @@ describe("validateUrlTabClickParams", () => {
         const err = validateUrlTabClickParams({
             UrlPattern: "https://x",
             UrlMatch: "Exact",
-            Mode: "FocusExisting",
+            OperationModeType: "FocusExisting",
             DirectOpen: true,
             Url: "https://x",
         });
@@ -166,7 +166,7 @@ describe("validateUrlTabClickParams", () => {
         const err = validateUrlTabClickParams({
             UrlPattern: "https://app/*",
             UrlMatch: "Glob",
-            Mode: "FocusExisting",
+            OperationModeType: "FocusExisting",
         });
         expect(err).toBeNull();
     });
@@ -239,7 +239,7 @@ describe("deriveGlobPattern", () => {
 const baseParams: UrlTabClickParams = {
     UrlPattern: "https://app.example.com/orders/*",
     UrlMatch: "Glob",
-    Mode: "FocusExisting",
+    OperationModeType: "FocusExisting",
     TimeoutMs: 1000,
 };
 
@@ -274,7 +274,7 @@ describe("executeUrlTabClick — OpenOrFocus", () => {
             OpenedTab: { Id: 50, Url: "https://app.example.com/orders/99" },
         });
         const res = await executeUrlTabClick({
-            Params: { ...baseParams, Mode: "OpenOrFocus", Selector: "#open" },
+            Params: { ...baseParams, OperationModeType: "OpenOrFocus", Selector: "#open" },
             Tabs: adapter,
         });
         expect(res.Reason).toBe("Ok");
@@ -287,7 +287,7 @@ describe("executeUrlTabClick — OpenOrFocus", () => {
             Tabs: [{ Id: 7, Url: "https://app.example.com/orders/12" }],
         });
         const res = await executeUrlTabClick({
-            Params: { ...baseParams, Mode: "OpenOrFocus" },
+            Params: { ...baseParams, OperationModeType: "OpenOrFocus" },
             Tabs: adapter,
         });
         expect(res.Reason).toBe("Ok");
@@ -305,7 +305,7 @@ describe("executeUrlTabClick — OpenNew", () => {
         const res = await executeUrlTabClick({
             Params: {
                 ...baseParams,
-                Mode: "OpenNew",
+                OperationModeType: "OpenNew",
                 DirectOpen: true,
                 Url: "https://app.example.com/orders/55",
             },
@@ -324,7 +324,7 @@ describe("executeUrlTabClick — OpenNew", () => {
         const res = await executeUrlTabClick({
             Params: {
                 ...baseParams,
-                Mode: "OpenNew",
+                OperationModeType: "OpenNew",
                 DirectOpen: true,
                 Url: "https://app.example.com/orders/55",
             },
@@ -340,7 +340,7 @@ describe("executeUrlTabClick — OpenNew", () => {
         const res = await executeUrlTabClick({
             Params: {
                 ...baseParams,
-                Mode: "OpenNew",
+                OperationModeType: "OpenNew",
                 Selector: "#go",
             },
             Tabs: adapter,
@@ -354,7 +354,7 @@ describe("executeUrlTabClick — OpenNew", () => {
         const res = await executeUrlTabClick({
             Params: {
                 ...baseParams,
-                Mode: "OpenNew",
+                OperationModeType: "OpenNew",
                 DirectOpen: true,
                 Url: "",
             },

@@ -44,7 +44,7 @@ export function RecorderStepGraph({ steps, selectedStepId, onSelect, onDelete, l
                 StepId: s.StepId,
                 OrderIndex: s.OrderIndex,
                 VariableName: s.VariableName,
-                Label: s.Label,
+                LabelType: s.LabelType,
             })),
             links,
             projects,
@@ -88,7 +88,7 @@ export function RecorderStepGraph({ steps, selectedStepId, onSelect, onDelete, l
                                     {STEP_KIND_LABEL[step.StepKindId] ?? `Kind${step.StepKindId}`}
                                 </span>
                                 <span className="font-medium truncate">{step.VariableName}</span>
-                                <span className="text-muted-foreground truncate">— {step.Label}</span>
+                                <span className="text-muted-foreground truncate">— {step.LabelType}</span>
                                 <ChevronRight className="h-3 w-3 ml-auto shrink-0 text-muted-foreground" />
                             </button>
                             <Button

@@ -3,7 +3,7 @@
  */
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -23,7 +23,7 @@ export function UrlTabClickPatternRow(props: UrlTabClickPatternRowProps): JSX.El
     return (
         <div className="grid grid-cols-3 gap-2">
             <div className="space-y-1 col-span-2">
-                <Label htmlFor="utc-pattern">URL pattern</Label>
+                <LabelType htmlFor="utc-pattern">URL pattern</LabelType>
                 <Input
                     id="utc-pattern"
                     value={value.UrlPattern}
@@ -32,7 +32,7 @@ export function UrlTabClickPatternRow(props: UrlTabClickPatternRowProps): JSX.El
                 />
             </div>
             <div className="space-y-1">
-                <Label htmlFor="utc-match">Match</Label>
+                <LabelType htmlFor="utc-match">Match</LabelType>
                 <Select
                     value={value.UrlMatch}
                     onValueChange={(v) => onPatch({ UrlMatch: v as UrlMatchDialect })}

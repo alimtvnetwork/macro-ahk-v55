@@ -103,11 +103,11 @@ test.describe('prompt history restore undo round-trip', () => {
             interface DbOk<T> { ok: boolean; value?: T; error?: string }
 
             const revisions: RevRow[] = [
-                { Id: 92, PromptId: 7, Slug: slug, Name: 'Plan default', Body: 'v2 body', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_100_000, Reason: 'upsert' },
-                { Id: 91, PromptId: 7, Slug: slug, Name: 'Plan default', Body: 'v1 body', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_000_000, Reason: 'upsert' },
-                { Id: 103, PromptId: 0, Slug: slug, Name: 'Plan default', Body: 'imported C', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_400_000, Reason: 'import' },
-                { Id: 102, PromptId: 0, Slug: slug, Name: 'Plan default', Body: 'imported B', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_300_000, Reason: 'import' },
-                { Id: 101, PromptId: 0, Slug: slug, Name: 'Plan default', Body: 'imported A', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_200_000, Reason: 'import' },
+                { Id: 92, PromptId: 7, Slug: slug, Name: 'PlanTierType default', Body: 'v2 body', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_100_000, Reason: 'upsert' },
+                { Id: 91, PromptId: 7, Slug: slug, Name: 'PlanTierType default', Body: 'v1 body', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_000_000, Reason: 'upsert' },
+                { Id: 103, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'imported C', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_400_000, Reason: 'import' },
+                { Id: 102, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'imported B', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_300_000, Reason: 'import' },
+                { Id: 101, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'imported A', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_200_000, Reason: 'import' },
             ];
 
             interface UpsertArgs {
@@ -130,7 +130,7 @@ test.describe('prompt history restore undo round-trip', () => {
                 value: [{
                     Id: state.currentId,
                     Slug: slug,
-                    Name: 'Plan default',
+                    Name: 'PlanTierType default',
                     Body: state.currentBody,
                     Role: role,
                     ReplaceKey: state.currentReplaceKey,

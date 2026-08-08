@@ -82,9 +82,9 @@ describe("runGroup, linear execution", () => {
         const db = freshDb();
         const projectId = setupProject(db);
         const groupId = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Login" });
-        const s1 = db.appendStep({ StepGroupId: groupId, StepKindId: StepKindId.Click, Label: "Open" });
-        const s2 = db.appendStep({ StepGroupId: groupId, StepKindId: StepKindId.Type, Label: "Email" });
-        const s3 = db.appendStep({ StepGroupId: groupId, StepKindId: StepKindId.Click, Label: "Submit" });
+        const s1 = db.appendStep({ StepGroupId: groupId, StepKindId: StepKindId.Click, LabelType: "Open" });
+        const s2 = db.appendStep({ StepGroupId: groupId, StepKindId: StepKindId.Type, LabelType: "Email" });
+        const s3 = db.appendStep({ StepGroupId: groupId, StepKindId: StepKindId.Click, LabelType: "Submit" });
 
         const log: Array<{ id: number; path: ReadonlyArray<string> }> = [];
         const result = asSuccess(await runGroup({
@@ -108,16 +108,16 @@ describe("runGroup, nested RunGroup composition", () => {
         const parent = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Checkout" });
         const child  = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Login" });
 
-        db.appendStep({ StepGroupId: child, StepKindId: StepKindId.Click, Label: "ChildClick" });
+        db.appendStep({ StepGroupId: child, StepKindId: StepKindId.Click, LabelType: "ChildClick" });
 
-        db.appendStep({ StepGroupId: parent, StepKindId: StepKindId.Click, Label: "Before" });
+        db.appendStep({ StepGroupId: parent, StepKindId: StepKindId.Click, LabelType: "Before" });
         db.appendStep({
             StepGroupId: parent,
             StepKindId: StepKindId.RunGroup,
-            Label: "InvokeLogin",
+            LabelType: "InvokeLogin",
             TargetStepGroupId: child,
         });
-        db.appendStep({ StepGroupId: parent, StepKindId: StepKindId.Click, Label: "After" });
+        db.appendStep({ StepGroupId: parent, StepKindId: StepKindId.Click, LabelType: "After" });
 
         const log: Array<{ id: number; path: ReadonlyArray<string> }> = [];
         const result = asSuccess(await runGroup({
@@ -141,9 +141,9 @@ describe("runGroup, nested RunGroup composition", () => {
         const parent = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Twice" });
         const child  = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Helper" });
 
-        db.appendStep({ StepGroupId: child, StepKindId: StepKindId.Click, Label: "X" });
-        db.appendStep({ StepGroupId: parent, StepKindId: StepKindId.RunGroup, TargetStepGroupId: child, Label: "Call#1" });
-        db.appendStep({ StepGroupId: parent, StepKindId: StepKindId.RunGroup, TargetStepGroupId: child, Label: "Call#2" });
+        db.appendStep({ StepGroupId: child, StepKindId: StepKindId.Click, LabelType: "X" });
+        db.appendStep({ StepGroupId: parent, StepKindId: StepKindId.RunGroup, TargetStepGroupId: child, LabelType: "Call#1" });
+        db.appendStep({ StepGroupId: parent, StepKindId: StepKindId.RunGroup, TargetStepGroupId: child, LabelType: "Call#2" });
 
         const result = asSuccess(await runGroup({
             db, projectId, rootGroupId: parent, executeLeafStep: noopExecutor(),
@@ -158,7 +158,7 @@ describe("runGroup, safety: cycles & depth", () => {
         const db = freshDb();
         const projectId = setupProject(db);
         const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Loop" });
-        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.RunGroup, TargetStepGroupId: g, Label: "Self" });
+        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.RunGroup, TargetStepGroupId: g, LabelType: "Self" });
 
         const failure = asFailure(await runGroup({
             db, projectId, rootGroupId: g, executeLeafStep: noopExecutor(),
@@ -174,8 +174,8 @@ describe("runGroup, safety: cycles & depth", () => {
         const projectId = setupProject(db);
         const a = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "A" });
         const b = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "B" });
-        db.appendStep({ StepGroupId: a, StepKindId: StepKindId.RunGroup, TargetStepGroupId: b, Label: "A→B" });
-        db.appendStep({ StepGroupId: b, StepKindId: StepKindId.RunGroup, TargetStepGroupId: a, Label: "B→A" });
+        db.appendStep({ StepGroupId: a, StepKindId: StepKindId.RunGroup, TargetStepGroupId: b, LabelType: "A→B" });
+        db.appendStep({ StepGroupId: b, StepKindId: StepKindId.RunGroup, TargetStepGroupId: a, LabelType: "B→A" });
 
         const failure = asFailure(await runGroup({
             db, projectId, rootGroupId: a, executeLeafStep: noopExecutor(),
@@ -200,7 +200,7 @@ describe("runGroup, safety: cycles & depth", () => {
                 StepGroupId: ids[i],
                 StepKindId: StepKindId.RunGroup,
                 TargetStepGroupId: ids[i + 1],
-                Label: `→G${i + 1}`,
+                LabelType: `→G${i + 1}`,
             });
         }
 
@@ -224,7 +224,7 @@ describe("runGroup, target validation", () => {
         const parent = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Parent" });
         const child  = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Child" });
         const stepId = db.appendStep({
-            StepGroupId: parent, StepKindId: StepKindId.RunGroup, TargetStepGroupId: child, Label: "Call",
+            StepGroupId: parent, StepKindId: StepKindId.RunGroup, TargetStepGroupId: child, LabelType: "Call",
         });
 
         db.raw.exec("PRAGMA foreign_keys = OFF;");
@@ -266,8 +266,8 @@ describe("runGroup, disabled steps & leaf failures", () => {
         const db = freshDb();
         const projectId = setupProject(db);
         const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Mixed" });
-        const s1 = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, Label: "On" });
-        const s2 = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, Label: "Off" });
+        const s1 = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "On" });
+        const s2 = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "Off" });
         db.raw.exec(`UPDATE Step SET IsDisabled = 1 WHERE StepId = ${s2};`);
 
         const log: Array<{ id: number; path: ReadonlyArray<string> }> = [];
@@ -284,7 +284,7 @@ describe("runGroup, disabled steps & leaf failures", () => {
         const db = freshDb();
         const projectId = setupProject(db);
         const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Boom" });
-        const failingId = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, Label: "X" });
+        const failingId = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "X" });
 
         const fakeReport: FailureReport = {
             Phase: "Replay",
@@ -323,7 +323,7 @@ describe("runGroup, disabled steps & leaf failures", () => {
         const db = freshDb();
         const projectId = setupProject(db);
         const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Throwy" });
-        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, Label: "X" });
+        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "X" });
 
         const failure = asFailure(await runGroup({
             db, projectId, rootGroupId: g,
@@ -343,9 +343,9 @@ describe("runGroup, disabled steps & leaf failures", () => {
         const db = freshDb();
         const projectId = setupProject(db);
         const g = db.createGroup({ ProjectId: projectId, ParentStepGroupId: null, Name: "Halt" });
-        const s1 = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, Label: "First" });
-        const s2 = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, Label: "Boom" });
-        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, Label: "NeverRun" });
+        const s1 = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "First" });
+        const s2 = db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "Boom" });
+        db.appendStep({ StepGroupId: g, StepKindId: StepKindId.Click, LabelType: "NeverRun" });
 
         const seen: number[] = [];
         const failure = asFailure(await runGroup({

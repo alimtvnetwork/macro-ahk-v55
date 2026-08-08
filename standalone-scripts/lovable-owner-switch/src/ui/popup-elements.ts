@@ -14,7 +14,7 @@ import {
 
 export interface FieldSpec {
     Id: string;
-    Label: string;
+    LabelType: string;
     Type: "text" | "password" | "url" | "checkbox" | "file";
     Placeholder?: string;
 }
@@ -44,7 +44,7 @@ const buildInput = (spec: FieldSpec): HTMLInputElement => {
 export const buildField = (spec: FieldSpec): HTMLDivElement => {
     const wrap = document.createElement("div");
     wrap.className = CSS_FIELD;
-    wrap.appendChild(buildLabel(spec.Id, spec.Label));
+    wrap.appendChild(buildLabel(spec.Id, spec.LabelType));
     wrap.appendChild(buildInput(spec));
 
     return wrap;

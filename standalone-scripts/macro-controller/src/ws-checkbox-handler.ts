@@ -18,7 +18,7 @@ import { moveToWorkspace, updateLoopMoveStatus } from './workspace-management';
 import { showToast } from './toast';
 
 import { SEL_LOOP_WS_ITEM } from './constants';
-import { DataAttr, DomId } from './types';
+import { DataAttrType, DomIdType } from './types';
 
 // ============================================
 // CQ11/CQ17: Encapsulated keyboard navigation state
@@ -62,13 +62,13 @@ export function getLoopWsNavIndex(): number { return navState().getIndex(); }
 
 /** v2.148.0: check every visible row whose data-ws-idx falls within [lo,hi]. */
 function checkVisibleRange(lo: number, hi: number): void {
-  const listEl = document.getElementById(DomId.LoopWsList);
+  const listEl = document.getElementById(DomIdType.LoopWsList);
   if (!listEl) return;
   const visibleItems = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);
   for (const item of Array.from(visibleItems)) {
     const visIdx = parseInt(item.getAttribute('data-ws-idx') || '-1', 10);
     if (visIdx < lo || visIdx > hi) continue;
-    const id = item.getAttribute(DataAttr.WsId);
+    const id = item.getAttribute(DataAttrType.WsId);
     if (id) getLoopWsCheckedIds()[id] = true;
   }
 }
@@ -106,7 +106,7 @@ export function handleWsCheckboxClick(
 
 /** Sync checkbox visuals in the workspace list to match checked state. */
 function syncCheckboxVisuals(): void {
-  const listEl = document.getElementById(DomId.LoopWsList);
+  const listEl = document.getElementById(DomIdType.LoopWsList);
   if (!listEl) return;
 
   const items = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);
@@ -114,7 +114,7 @@ function syncCheckboxVisuals(): void {
     const cb = item.querySelector('.loop-ws-checkbox');
     if (!cb) continue;
 
-    const wsId = item.getAttribute(DataAttr.WsId);
+    const wsId = item.getAttribute(DataAttrType.WsId);
     const isChecked = !!getLoopWsCheckedIds()[wsId!];
     cb.textContent = isChecked ? '☑' : '☐';
     (cb as HTMLElement).style.color = isChecked ? '#a78bfa' : '#64748b';
@@ -153,13 +153,13 @@ export function updateWsSelectionUI(): void {
 
 /** Resolve workspace from the keyboard-navigated row (Fallback 1). */
 function resolveFromKeyboardNav(): { wsId: string; wsName: string } | null {
-  const listEl = document.getElementById(DomId.LoopWsList);
+  const listEl = document.getElementById(DomIdType.LoopWsList);
   const currentNavIndex = navState().getIndex();
   if (!listEl || currentNavIndex < 0) return null;
   const items = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);
   const navItem = items[currentNavIndex] as HTMLElement | undefined;
   if (!navItem) return null;
-  const wsId = navItem.getAttribute(DataAttr.WsId) || '';
+  const wsId = navItem.getAttribute(DataAttrType.WsId) || '';
   const wsName = navItem.getAttribute('data-ws-name') || '';
   log('Move fallback: using keyboard-navigated item idx=' + currentNavIndex + ' (' + wsName + ')', 'info');
   return { wsId, wsName };
@@ -170,9 +170,9 @@ function resolveFromCheckedBox(): { wsId: string; wsName: string } | null {
   const checkedIds = Object.keys(getLoopWsCheckedIds());
   if (checkedIds.length === 0) return null;
   const firstCheckedId = checkedIds[0];
-  const listEl = document.getElementById(DomId.LoopWsList);
+  const listEl = document.getElementById(DomIdType.LoopWsList);
   const matchedItem = listEl
-    ? listEl.querySelector('[' + DataAttr.WsId + '="' + firstCheckedId + '"]') as HTMLElement | null
+    ? listEl.querySelector('[' + DataAttrType.WsId + '="' + firstCheckedId + '"]') as HTMLElement | null
     : null;
   const wsName = matchedItem ? (matchedItem.getAttribute('data-ws-name') || '') : '';
   log('Move fallback: using first checked workspace id=' + firstCheckedId + ' (' + wsName + ')'
@@ -235,7 +235,7 @@ function updateSelectedIndicator(item: Element): void {
   const selectedEl = document.getElementById('loop-ws-selected');
   if (!selectedEl) return;
 
-  const wsId = item.getAttribute(DataAttr.WsId) || '';
+  const wsId = item.getAttribute(DataAttrType.WsId) || '';
   const wsName = item.getAttribute('data-ws-name') || '';
   selectedEl.setAttribute('data-selected-id', wsId);
   selectedEl.setAttribute('data-selected-name', wsName);
@@ -262,7 +262,7 @@ function resetItemStyles(item: Element): void {
  */
 export function setLoopWsNavIndex(idx: number): void {
   navState().setIndex(idx);
-  const listEl = document.getElementById(DomId.LoopWsList);
+  const listEl = document.getElementById(DomIdType.LoopWsList);
   if (!listEl) return;
 
   const items = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);

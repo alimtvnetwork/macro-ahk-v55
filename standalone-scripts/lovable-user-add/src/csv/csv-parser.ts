@@ -13,7 +13,7 @@
  *   - hard cap of `MAX_ROWS` data rows to prevent runaway sessions
  */
 
-import { UserAddCsvColumn } from "./csv-column";
+import { UserAddCsvColumnType } from "./csv-column";
 import { splitCsv } from "./csv-splitter";
 import { resolveHeader } from "./csv-header";
 import { readOptional, readRequired } from "./csv-cell";
@@ -28,31 +28,31 @@ const stripBom = (text: string): string => (text.startsWith(BOM) ? text.slice(BO
 
 const buildRow = (
     raw: ReadonlyArray<string>,
-    indices: ReadonlyMap<UserAddCsvColumn, number>,
+    indices: ReadonlyMap<UserAddCsvColumnType, number>,
     rowIndex: number,
     errors: CsvParseError[],
 ): UserAddCsvRow => {
-    const rawRole = readOptional(raw, indices, UserAddCsvColumn.Role);
+    const rawRole = readOptional(raw, indices, UserAddCsvColumnType.Role);
     const role = normalizeRole(rawRole);
 
     if (role.Error !== null) {
-        errors.push({ RowIndex: rowIndex, Column: UserAddCsvColumn.Role, Message: role.Error });
+        errors.push({ RowIndex: rowIndex, Column: UserAddCsvColumnType.Role, Message: role.Error });
     }
 
     return {
         RowIndex: rowIndex,
-        WorkspaceUrl: readRequired(raw, indices, UserAddCsvColumn.WorkspaceUrl),
-        MemberEmail: readRequired(raw, indices, UserAddCsvColumn.MemberEmail),
+        WorkspaceUrl: readRequired(raw, indices, UserAddCsvColumnType.WorkspaceUrl),
+        MemberEmail: readRequired(raw, indices, UserAddCsvColumnType.MemberEmail),
         RawRole: rawRole,
         RoleCode: role.RoleCode,
         WasEditorNormalized: role.WasEditorNormalized,
-        Notes: readOptional(raw, indices, UserAddCsvColumn.Notes),
+        Notes: readOptional(raw, indices, UserAddCsvColumnType.Notes),
     };
 };
 
 const tryBuildRow = (
     raw: ReadonlyArray<string>,
-    indices: ReadonlyMap<UserAddCsvColumn, number>,
+    indices: ReadonlyMap<UserAddCsvColumnType, number>,
     rowIndex: number,
     errors: CsvParseError[],
 ): UserAddCsvRow | null => {

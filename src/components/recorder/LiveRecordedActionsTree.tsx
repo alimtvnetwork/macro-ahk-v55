@@ -48,17 +48,17 @@ import type {
 
 interface KindMeta {
     readonly Icon: typeof MousePointerClick;
-    readonly Label: string;
+    readonly LabelType: string;
     readonly Tone: string;
 }
 
 const KIND_META: Record<RecordedStepKind, KindMeta> = {
-    Click:    { Icon: MousePointerClick, Label: "Click",  Tone: "text-primary" },
-    Type:     { Icon: TypeIcon,          Label: "Type",   Tone: "text-blue-400" },
-    Select:   { Icon: SquareCheck,       Label: "Select", Tone: "text-emerald-400" },
-    Submit:   { Icon: Send,              Label: "Submit", Tone: "text-purple-400" },
-    Wait:     { Icon: Clock,             Label: "Wait",   Tone: "text-amber-400" },
-    JsInline: { Icon: FileCode2,         Label: "JS",     Tone: "text-pink-400" },
+    Click:    { Icon: MousePointerClick, LabelType: "Click",  Tone: "text-primary" },
+    Type:     { Icon: TypeIcon,          LabelType: "Type",   Tone: "text-blue-400" },
+    Select:   { Icon: SquareCheck,       LabelType: "Select", Tone: "text-emerald-400" },
+    Submit:   { Icon: Send,              LabelType: "Submit", Tone: "text-purple-400" },
+    Wait:     { Icon: Clock,             LabelType: "Wait",   Tone: "text-amber-400" },
+    JsInline: { Icon: FileCode2,         LabelType: "JS",     Tone: "text-pink-400" },
 };
 
 const HIGHLIGHT_PULSE_MS = 1200;
@@ -255,7 +255,7 @@ function ActionRow(props: ActionRowProps): JSX.Element {
                 <Icon className={cn("h-3.5 w-3.5 shrink-0 mt-0.5", meta.Tone)} />
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                        <span className="font-medium">{meta.Label}</span>
+                        <span className="font-medium">{meta.LabelType}</span>
                         {step.VariableName ? (
                             <code className="text-[10px] text-muted-foreground font-mono truncate">
                                 ${step.VariableName}
@@ -263,7 +263,7 @@ function ActionRow(props: ActionRowProps): JSX.Element {
                         ) : null}
                     </div>
                     <div className="text-[10px] text-muted-foreground truncate">
-                        {step.Label || selectorPreview || "—"}
+                        {step.LabelType || selectorPreview || "—"}
                     </div>
                 </div>
             </button>

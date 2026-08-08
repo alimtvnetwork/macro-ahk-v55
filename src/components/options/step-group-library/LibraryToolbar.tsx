@@ -2,7 +2,7 @@
  * Marco Extension, Step Group Library toolbar.
  *
  * Presentational header extracted from `StepGroupLibraryPanel` as
- * Plan 24 SS-04a Phase 2. Owns no state, every flag and setter is
+ * PlanTierType 24 SS-04a Phase 2. Owns no state, every flag and setter is
  * passed in so the panel stays the single source of truth.
  *
  * Split into `LibraryToolbarTitle` and `LibraryToolbarActions` so

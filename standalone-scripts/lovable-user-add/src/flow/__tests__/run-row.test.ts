@@ -13,7 +13,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { runUserAddRow } from "../run-row";
 import { UserAddRowOutcomeCode } from "../row-types";
-import { UserAddLogPhase, UserAddLogSeverity } from "../log-sink";
+import { UserAddLogPhaseType, UserAddLogSeverityType } from "../log-sink";
 import { UserAddMembershipRoleCode } from "../../migrations/membership-role-seed";
 import { MembershipRoleApiCode } from "../../../../lovable-common/src/api/membership-role-api-code";
 import type { UserAddLogEntry, UserAddLogSink } from "../log-sink";
@@ -76,7 +76,7 @@ describe("runUserAddRow — failure marking, no rollback", () => {
         expect(result.HasError).toBe(true);
 
         const warnEntry = entries.find(
-            (e) => e.Phase === UserAddLogPhase.StepB && e.Severity === UserAddLogSeverity.Warn,
+            (e) => e.Phase === UserAddLogPhaseType.StepB && e.Severity === UserAddLogSeverityType.Warn,
         );
         expect(warnEntry).toBeDefined();
         expect(warnEntry?.Message).toMatch(/No rollback performed/);
@@ -108,7 +108,7 @@ describe("runUserAddRow — failure marking, no rollback", () => {
         expect(result.WorkspaceId).toBeNull();
         expect(result.UserId).toBeNull();
 
-        const warnEntries = entries.filter((e) => e.Severity === UserAddLogSeverity.Warn);
+        const warnEntries = entries.filter((e) => e.Severity === UserAddLogSeverityType.Warn);
         expect(warnEntries).toHaveLength(0);
 
         expect(updates[0].StepASucceeded).toBe(false);

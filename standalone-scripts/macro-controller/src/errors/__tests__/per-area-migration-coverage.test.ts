@@ -1,5 +1,5 @@
 /**
- * Plan 26 / step 18 — Per-area migration coverage suite.
+ * PlanTierType 26 / step 18 — Per-area migration coverage suite.
  *
  * Root cause this suite guards against (one sentence):
  * Steps 15-17 gate the registry itself, but nothing proves the migrated call
@@ -112,22 +112,22 @@ const MIGRATED_MODULES: readonly {
  */
 const INTENTIONALLY_UNEMITTED: ReadonlySet<string> = new Set([
   'PROMPT_EDIT_E001',   // superseded at throw sites by PROMPT_EDIT_E002..E007; kept as PROMPT area anchor.
-  'HTTP_REQUEST_E001',  // area anchor for HTTP; migration lands in Plan 27.
-  // SDK_NOT_READY_E001 graduated in Plan 27 step 9 (projects-modal.ts).
+  'HTTP_REQUEST_E001',  // area anchor for HTTP; migration lands in PlanTierType 27.
+  // SDK_NOT_READY_E001 graduated in PlanTierType 27 step 9 (projects-modal.ts).
   'DB_WRITE_E001',      // generic DB.WRITE anchor; concrete emitters are DB_WRITE_E002..E004 + DB_MACRO_WRITE_E001.
-  // Plan 27 step 3 reservations — graduate as steps 5..13 migrate each file.
-  // CREDIT_ASSERT_E001 graduated in Plan 27 step 5 (credit-api.ts).
-  // REMIX_* graduated in Plan 27 step 6 (remix-fetch/bulk/name-resolver).
-  // WS_MEMBERS_* + WS_CONTEXT_ADJACENT_* graduated in Plan 27 step 7 (ws-members-fetch/mutations, ws-adjacent).
-  // RENAME_* + SETTINGS_* graduated in Plan 27 step 8 (rename-api, settings-store, settings-modal).
-  // UI_* + SPLITTER_* + PROMPT_IO_ENVELOPE_E001 graduated in Plan 27 step 9 (template-renderer, task-splitter-prompt, projects-modal, section-open-tabs, prompt-import-modal).
-  // PROMPT_IO_AUDIT_* + PROMPT_IO_FORMAT_* + PROMPT_IO_SQLITE_E001..E004 + PROMPT_IO_ZIP_* graduated in Plan 27 step 12 (prompt-io-sqlite-reader, prompt-io-zip-reader, prompt-io-format-detect, prompt-import-audit).
+  // PlanTierType 27 step 3 reservations — graduate as steps 5..13 migrate each file.
+  // CREDIT_ASSERT_E001 graduated in PlanTierType 27 step 5 (credit-api.ts).
+  // REMIX_* graduated in PlanTierType 27 step 6 (remix-fetch/bulk/name-resolver).
+  // WS_MEMBERS_* + WS_CONTEXT_ADJACENT_* graduated in PlanTierType 27 step 7 (ws-members-fetch/mutations, ws-adjacent).
+  // RENAME_* + SETTINGS_* graduated in PlanTierType 27 step 8 (rename-api, settings-store, settings-modal).
+  // UI_* + SPLITTER_* + PROMPT_IO_ENVELOPE_E001 graduated in PlanTierType 27 step 9 (template-renderer, task-splitter-prompt, projects-modal, section-open-tabs, prompt-import-modal).
+  // PROMPT_IO_AUDIT_* + PROMPT_IO_FORMAT_* + PROMPT_IO_SQLITE_E001..E004 + PROMPT_IO_ZIP_* graduated in PlanTierType 27 step 12 (prompt-io-sqlite-reader, prompt-io-zip-reader, prompt-io-format-detect, prompt-import-audit).
   'PROMPT_IO_SQLITE_E005', // SQLITE_INIT (sql.js init failure) — anchor kept for future wiring in the reader open path.
-  // QUEUE_INVARIANT_E001 graduated in Plan 27 step 10 (queue-control/task-queue.ts).
-  // LOOP_FALLBACK_SDK_E001 + LOOP_FALLBACK_HTTP_E001 graduated in Plan 27 step 10 (loop-cycle-fallback.ts).
-  // GITSYNC_PROBE_E001..E003 graduated in Plan 27 step 11 (gitsync/progress-probe.ts).
-  // PROZERO_ADAPTER_E001 graduated in Plan 27 step 11 (pro-zero/pro-zero-sdk-adapter.ts).
-  // ASYNC_RETRY_E001 + TYPE_EXHAUSTIVE_E001 graduated in Plan 27 step 13 (async-utils.ts, types/prompt-role.ts).
+  // QUEUE_INVARIANT_E001 graduated in PlanTierType 27 step 10 (queue-control/task-queue.ts).
+  // LOOP_FALLBACK_SDK_E001 + LOOP_FALLBACK_HTTP_E001 graduated in PlanTierType 27 step 10 (loop-cycle-fallback.ts).
+  // GITSYNC_PROBE_E001..E003 graduated in PlanTierType 27 step 11 (gitsync/progress-probe.ts).
+  // PROZERO_ADAPTER_E001 graduated in PlanTierType 27 step 11 (pro-zero/pro-zero-sdk-adapter.ts).
+  // ASYNC_RETRY_E001 + TYPE_EXHAUSTIVE_E001 graduated in PlanTierType 27 step 13 (async-utils.ts, types/prompt-role.ts).
 ]);
 
 function readMigrated(relativePath: string): string {

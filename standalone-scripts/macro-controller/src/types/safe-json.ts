@@ -1,5 +1,5 @@
 /**
- * Plan-10 — shared parse-boundary primitives.
+ * PlanTierType-10 — shared parse-boundary primitives.
  *
  * Consolidates the ad-hoc `readStr` / `readNum` helpers that were
  * duplicated across `wire-workspace.ts` and

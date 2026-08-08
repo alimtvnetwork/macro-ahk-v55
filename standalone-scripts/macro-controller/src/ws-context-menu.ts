@@ -26,7 +26,7 @@ import { log } from './logger';
 import { renameWorkspace } from './workspace-rename';
 import { logError } from './error-utils';
 import { showToast } from './toast';
-// Plan-17 step 21: dynamic imports break the ws-list-renderer ↔ ws-context-menu cycle.
+// PlanTierType-17 step 21: dynamic imports break the ws-list-renderer ↔ ws-context-menu cycle.
 // These helpers are only invoked inside event handlers, so runtime-lazy loading is safe.
 function populateLoopWorkspaceDropdown(): void {
   import('./ws-list-renderer')
@@ -44,9 +44,9 @@ import { getSelectedWsIds } from './selected-workspaces-store';
 import { actionRemixManual, actionRemixNext } from './remix-dropdown';
 import { extractProjectIdFromUrl } from './workspace-detection';
 import { getDisplayProjectName } from './logger';
-import { DataAttr, DomId } from './types';
+import { DataAttrType, DomIdType } from './types';
 import { PRO_ZERO_BALANCE_JSON_FIELD, PRO_ZERO_SOURCE_FIELD } from './pro-zero/pro-zero-enrichment';
-import { MacroCreditSource } from './pro-zero/macro-credit-source';
+import { MacroCreditSourceType } from './pro-zero/macro-credit-source';
 import {
   getGitsyncCache,
   setGitsyncCache,
@@ -105,12 +105,12 @@ async function buildCopyJsonPayload(ws: import('./types').WorkspaceCredit): Prom
     // PRO_ZERO: append the verbatim /credit-balance JSON captured during enrichment.
     const balanceRaw = ws[PRO_ZERO_BALANCE_JSON_FIELD];
     const source = ws[PRO_ZERO_SOURCE_FIELD];
-    const isBalanceSource = source === MacroCreditSource.CREDIT_BALANCE;
+    const isBalanceSource = source === MacroCreditSourceType.CREDIT_BALANCE;
     const hasBalanceRaw = typeof balanceRaw === 'string';
     const isBalanceNonEmpty = hasBalanceRaw && balanceRaw.length > 0;
     if (isBalanceSource && isBalanceNonEmpty) {
         return JSON.stringify({
-            Source: MacroCreditSource.CREDIT_BALANCE,
+            Source: MacroCreditSourceType.CREDIT_BALANCE,
             Workspace: JSON.parse(workspaceJson) as unknown,
             CreditBalance: JSON.parse(balanceRaw as string) as unknown,
         }, null, 2);
@@ -123,7 +123,7 @@ async function buildCopyJsonPayload(ws: import('./types').WorkspaceCredit): Prom
             try {
                 return JSON.stringify({
                     Source: 'credit_balance_cache',
-                    Plan: 'pro_1',
+                    PlanTierType: 'pro_1',
                     Workspace: JSON.parse(workspaceJson) as unknown,
                     CreditBalance: JSON.parse(row.RawJson) as unknown,
                     CreditBalanceCacheRow: row,
@@ -171,7 +171,7 @@ function copyWorkspaceJson(wsId: string, wsName: string): void {
 function buildCreditRefreshItem(wsId: string, wsName: string): HTMLElement {
   return buildCtxMenuItem('💰 Credit Refresh', function () {
     removeWsContextMenu();
-    // Plan-10: route the manual per-workspace refresh through the sanctioned
+    // PlanTierType-10: route the manual per-workspace refresh through the sanctioned
     // wire entry so the mapper + predicate + telemetry match the batch path.
     // `allowPlan0: true` lets pro_0 workspaces reach `fetchAndPersist` for
     // manual refreshes (batch path still excludes them by default).
@@ -483,11 +483,11 @@ function commitRename(wsId: string, currentName: string, newName: string): void 
 }
 
 function findNameDiv(wsId: string): HTMLElement | null {
-  const listEl = document.getElementById(DomId.LoopWsList);
+  const listEl = document.getElementById(DomIdType.LoopWsList);
   if (!listEl) return null;
   const items = listEl.querySelectorAll(CSS_WS_ITEM);
   for (const item of Array.from(items)) {
-    if (item.getAttribute(DataAttr.WsId) !== wsId) continue;
+    if (item.getAttribute(DataAttrType.WsId) !== wsId) continue;
     return item.querySelector(CSS_WS_NAME);
   }
   return null;

@@ -9,7 +9,7 @@
  *   • Expanded — Compact + space for future panels (last captured step,
  *                quick-actions). MVP renders the chips only.
  *
- * Position: draggable with bottom-right default. Mode persists in
+ * Position: draggable with bottom-right default. OperationModeType persists in
  * `chrome.storage.local` via a tiny adapter so the user's preference
  * survives reloads. Phase + dispatchers come from
  * {@link useRecordingSession} so this component is purely presentational.
@@ -70,7 +70,7 @@ export interface FloatingControllerProps {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Mode persistence                                                   */
+/*  OperationModeType persistence                                                   */
 /* ------------------------------------------------------------------ */
 
 function loadMode(): ControllerMode {
@@ -381,7 +381,7 @@ function HotkeyQuickAdd(props: { onClose: () => void }): JSX.Element {
             lib.appendStep({
                 StepGroupId: targetGroup.StepGroupId,
                 StepKindId: StepKindId.Hotkey,
-                Label: label.trim() === "" ? null : label.trim(),
+                LabelType: label.trim() === "" ? null : label.trim(),
                 PayloadJson: JSON.stringify(payload),
             });
             setChords([]);
@@ -412,7 +412,7 @@ function HotkeyQuickAdd(props: { onClose: () => void }): JSX.Element {
             <Input
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
-                placeholder="Label (optional)"
+                placeholder="LabelType (optional)"
                 className="h-7 text-xs"
             />
             <Input

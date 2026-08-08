@@ -88,7 +88,7 @@ export async function disconnectGithubRepo(
     log('[GitsyncDisconnect] HTTP 404 ws=' + wsId + ' pid=' + pid + ' → already not_linked', 'info');
     return { status: 'not_linked' };
   }
-  if (resp.isFail) {
+  if (!resp.ok) {
     logError('GitsyncDisconnect',
       'HTTP ' + resp.status + ' for ws=' + wsId + ' pid=' + pid
       + ' bodyPreview=' + JSON.stringify(resp.data).substring(0, 200));

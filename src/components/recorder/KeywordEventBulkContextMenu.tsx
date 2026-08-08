@@ -54,7 +54,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -164,7 +164,7 @@ interface BulkContextMenuContentProps {
     readonly onOpenDialog: (kind: Exclude<DialogKind, null>) => void;
 }
 
-// eslint-disable-next-line max-lines-per-function -- flat menu-item list; Plan 25 Step 18
+// eslint-disable-next-line max-lines-per-function -- flat menu-item list; PlanTierType 25 Step 18
 function BulkContextMenuContent(p: BulkContextMenuContentProps): JSX.Element {
     const { count, onEnable, onOpenDialog } = p;
     return (
@@ -246,7 +246,7 @@ interface BulkDialogsHostProps {
     readonly onDeleteConfirmed: () => void;
 }
 
-// eslint-disable-next-line max-lines-per-function -- eight sibling <Dialog/> instances; Plan 25 Step 18
+// eslint-disable-next-line max-lines-per-function -- eight sibling <Dialog/> instances; PlanTierType 25 Step 18
 function BulkDialogsHost(p: BulkDialogsHostProps): JSX.Element {
     const { dialog, setDialog, selectedEvents, allEvents, onUpdateEvent, onDeleteConfirmed } = p;
     return (
@@ -471,7 +471,7 @@ function clearPersistedSequence(): void {
     }
 }
 
-// eslint-disable-next-line max-lines-per-function -- JSX-heavy form + preview leaf; Plan 25 Step 19
+// eslint-disable-next-line max-lines-per-function -- JSX-heavy form + preview leaf; PlanTierType 25 Step 19
 export function BulkRenameSequenceDialog(props: BulkRenameSequenceDialogProps): JSX.Element {
     const { open, onOpenChange, selectedEvents, allEvents, onApply } = props;
     const [input, setInput] = useState<SequenceRenameInput>(loadPersistedSequence);
@@ -591,7 +591,7 @@ export function BulkRenameSequenceDialog(props: BulkRenameSequenceDialogProps): 
                 <form onSubmit={handleSubmit} data-testid="keyword-events-bulk-rename-form">
                     <div className="grid grid-cols-2 gap-3">
                         <div className="col-span-2 space-y-1.5">
-                            <Label htmlFor="bulk-rename-base">Base name</Label>
+                            <LabelType htmlFor="bulk-rename-base">Base name</LabelType>
                             <Input
                                 id="bulk-rename-base"
                                 value={input.Base}
@@ -602,7 +602,7 @@ export function BulkRenameSequenceDialog(props: BulkRenameSequenceDialogProps): 
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <Label htmlFor="bulk-rename-start">Start number</Label>
+                            <LabelType htmlFor="bulk-rename-start">Start number</LabelType>
                             <Input
                                 id="bulk-rename-start"
                                 type="number"
@@ -614,7 +614,7 @@ export function BulkRenameSequenceDialog(props: BulkRenameSequenceDialogProps): 
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <Label htmlFor="bulk-rename-padding">Padding</Label>
+                            <LabelType htmlFor="bulk-rename-padding">Padding</LabelType>
                             <Input
                                 id="bulk-rename-padding"
                                 type="number"
@@ -627,12 +627,12 @@ export function BulkRenameSequenceDialog(props: BulkRenameSequenceDialogProps): 
                             />
                         </div>
                         <div className="col-span-2 space-y-1.5">
-                            <Label htmlFor="bulk-rename-separator" className="flex items-baseline justify-between gap-2">
+                            <LabelType htmlFor="bulk-rename-separator" className="flex items-baseline justify-between gap-2">
                                 <span>Separator</span>
                                 <span className="text-[11px] font-normal text-muted-foreground">
                                     Only applied when <code className="rounded bg-muted px-1 py-0.5">{"{n}"}</code> is not in the base
                                 </span>
-                            </Label>
+                            </LabelType>
                             <Input
                                 id="bulk-rename-separator"
                                 value={input.Separator}
@@ -890,9 +890,9 @@ function BulkImportDialog(props: BulkImportDialogProps): JSX.Element {
                 ) : (
                     <div className="space-y-3">
                         <div className="space-y-1">
-                            <Label htmlFor="kw-import-file" className="text-xs">
+                            <LabelType htmlFor="kw-import-file" className="text-xs">
                                 ZIP file
-                            </Label>
+                            </LabelType>
                             <Input
                                 id="kw-import-file"
                                 type="file"
@@ -919,12 +919,12 @@ function BulkImportDialog(props: BulkImportDialogProps): JSX.Element {
                                 data-testid="keyword-events-bulk-import-strict-uid"
                             />
                             <div className="grid gap-0.5 leading-tight">
-                                <Label
+                                <LabelType
                                     htmlFor="kw-import-strict-uid"
                                     className="text-xs cursor-pointer"
                                 >
                                     Match by Uid only (no keyword fallback)
-                                </Label>
+                                </LabelType>
                                 <p className="text-[11px] text-muted-foreground">
                                     Skip rows whose Uid isn&apos;t in your selection instead of
                                     falling back to Keyword.
@@ -976,7 +976,7 @@ function BulkImportDialog(props: BulkImportDialogProps): JSX.Element {
                                     Field-by-field preview
                                 </div>
                                 <ul className="divide-y divide-border/40">
-                                    {/* eslint-disable-next-line max-lines-per-function -- per-row diff renderer; Plan 25 Step 19 */}
+                                    {/* eslint-disable-next-line max-lines-per-function -- per-row diff renderer; PlanTierType 25 Step 19 */}
                                     {plan.matches.map((m) => {
                                         const diffs = diffMatchedFields(m.target, m.source);
                                         return (

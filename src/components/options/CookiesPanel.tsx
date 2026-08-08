@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Cookie, Plus, Trash2, GripVertical, Code } from "lucide-react";
-import { RoleEnum1, MatchStrategyEnum } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { CookieBindingRoleType, MatchStrategyType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -22,7 +22,7 @@ import { RoleEnum1, MatchStrategyEnum } from "../../../standalone-scripts/macro-
 export interface CookieBinding {
   cookieName: string;
   url: string;
-  role: RoleEnum1;
+  role: CookieBindingRoleType;
   description?: string;
 }
 
@@ -31,7 +31,7 @@ export interface CookieRule {
   id: string;
   name: string;
   domain: string;
-  matchStrategy: MatchStrategyEnum;
+  matchStrategy: MatchStrategyType;
   bindTo: string;
 }
 

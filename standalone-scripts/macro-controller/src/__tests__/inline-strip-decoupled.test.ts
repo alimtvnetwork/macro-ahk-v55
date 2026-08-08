@@ -1,5 +1,6 @@
+import { DbResult } from '../db/db-result';
 /**
- * Plan 09 invariant: the inline Plan/Next strips are paste-only stagers.
+ * PlanTierType 09 invariant: the inline PlanTierType/Next strips are paste-only stagers.
  * Only the Repeat strip is allowed to submit/loop. This test pins the
  * INLINE_AUTOCHAIN_DISABLED guard and verifies stageNextPrompt never calls
  * a submit dispatcher.
@@ -43,7 +44,10 @@ vi.mock('../ui/task-next-ui', () => ({
 // prefers the DB `next-default` row. Force the miss path so the JSON-library
 // resolver still runs — that's what these tests pin.
 vi.mock('../db/prompt-db', () => ({
-  getDefaultPromptForRole: vi.fn(async () => ({ ok: true, value: undefined })),
+    DbResult,
+    DbResult,
+    DbResult,
+  getDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
 }));
 
 import {

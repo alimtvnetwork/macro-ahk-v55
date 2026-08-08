@@ -1,5 +1,5 @@
 import type { WorkspaceCredit } from './types';
-import { WsTierValue } from './types/subscription-status';
+import { WsTierValueType } from './types/subscription-status';
 import { calcTotalCredits } from './credit-api';
 import {
   isExpiredWs,
@@ -9,7 +9,7 @@ import {
 
 function buildTooltipProfileLines(ws: WorkspaceCredit): string[] {
   const lines: string[] = ['🪪 PROFILE:'];
-  lines.push('  Plan: ' + (ws.planType || ws.tier || WsTierValue.FREE));
+  lines.push('  PlanTierType: ' + (ws.planType || ws.tier || WsTierValueType.FREE));
   lines.push('  Role: ' + (ws.membershipRole || ws.role || 'N/A'));
   if (typeof ws.numProjects === 'number' && ws.numProjects > 0) {
     lines.push('  Projects: ' + ws.numProjects);

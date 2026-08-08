@@ -1,6 +1,6 @@
 import { ServiceResult } from '../utils/result-wrapper';
 /**
- * reseed-command.ts — on-demand recovery for the Plan/Next prompt library.
+ * reseed-command.ts — on-demand recovery for the PlanTierType/Next prompt library.
  *
  * Root cause it addresses: users can end up with missing default rows (e.g.
  * a partial seed on first boot) or stale bodies (user-customized entries
@@ -33,7 +33,7 @@ import { sqlLit } from '../db/prompt-role-db';
 import { PLAN_NEXT_SEED_ROWS } from './plan-next-prompts';
 import { seedPlanNextPrompts } from './seed-plan-next';
 import { emitPromptSeedEvent } from '../telemetry/prompt-seed-telemetry';
-import { Mode4, MethodEnum1 } from "../types/enums";
+import { ReseedModeType, RunSqlMethod } from "../types/enums";
 
 export interface ReseedOptions {
   /** When true, overwrite existing default rows (destructive). */
@@ -42,7 +42,7 @@ export interface ReseedOptions {
 
 export interface ReseedResult {
   ok: boolean;
-  mode: Mode4;
+  mode: ReseedModeType;
   /** Number of default rows overwritten in force mode. */
   forcedUpdates?: number;
   error?: string;
@@ -54,7 +54,7 @@ const EV_RESEED_COMPLETE = 'reseed.complete' as const;
 
 
 
-async function rawSql(method: MethodEnum1, sql: string): Promise<RawSqlResp> {
+async function rawSql(method: RunSqlMethod, sql: string): Promise<RawSqlResp> {
   void DB_NAME;
   return runSqlBridge(method, sql);
 }
@@ -89,18 +89,18 @@ async function forceResetDefaultBodies(): Promise<{ forced: number; error?: stri
 }
 
 /**
- * Re-seed and (optionally) hard-reset the Plan/Next default prompts.
+ * Re-seed and (optionally) hard-reset the PlanTierType/Next default prompts.
  * Idempotent by default. Safe to call multiple times.
  */
 export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<ReseedResult> {
   const force = opts.force === true;
-  const mode: Mode4 = force ? 'force' : 'idempotent';
+  const mode: ReseedModeType = force ? 'force' : 'idempotent';
   emitPromptSeedEvent({ event: 'reseed.start', outcome: 'ok', detail: mode });
   try {
     // Always run the normal seeder first so missing rows are inserted and
     // legacy bodies get their non-destructive checksum upgrade.
     const seedResult = await seedPlanNextPrompts();
-    if (seedResult.isFail) {
+    if (!seedResult.ok) {
       emitPromptSeedEvent({
         event: EV_RESEED_COMPLETE, outcome: 'failed',
         detail: 'seedPlanNextPrompts: ' + (seedResult.error ?? '?'),

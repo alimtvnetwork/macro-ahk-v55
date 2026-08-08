@@ -1,3 +1,4 @@
+import { DbResult } from './db/db-result';
 import { ServiceResult } from './utils/result-wrapper';
 /**
  * Settings Store — v2.218.0
@@ -219,11 +220,11 @@ function readFromLocalStorage(): unknown {
   } catch (_e: unknown) { return undefined; } // allow-swallow: corrupt JSON falls back to defaults.
 }
 
-function writeToLocalStorage(value: SettingsOverrides): { ok: true } | { ok: false; reason: string } {
+function writeToLocalStorage(value: SettingsOverrides): new DbResult(true, undefined) | { ok: false; reason: string } {
   if (!hasLocalStorage()) return { ok: false, reason: 'localStorage unavailable' };
   try {
     window.localStorage.setItem(LS_KEY, JSON.stringify(value));
-    return { ok: true };
+    return new DbResult(true, undefined);
   } catch (e: unknown) {
     return { ok: false, reason: e instanceof Error ? e.message : String(e) };
   }
@@ -265,7 +266,7 @@ export async function saveSettingsOverrides(next: SettingsOverrides): Promise<vo
   } else {
     // MAIN-world fallback: persist to localStorage so the user's edits survive reload.
     const result = writeToLocalStorage(sanitized);
-    if (result.isFail) {
+    if (!result.ok) {
       throwDiagnostic('SETTINGS_PERSIST_E001', {
         reason: result.reason,
         fallbackStage: 'localStorage',

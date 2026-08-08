@@ -2,7 +2,7 @@
  * Marco Extension — Step Group Library two-pane body.
  *
  * Renders the tree pane + step pane grid. Extracted from
- * `StepGroupLibraryBody` per Plan 24 SS-06 Phase 3 to keep each
+ * `StepGroupLibraryBody` per PlanTierType 24 SS-06 Phase 3 to keep each
  * function under the ESLint `max-lines-per-function` ceiling.
  */
 
@@ -102,12 +102,12 @@ export function LibraryTwoPaneBody(props: Props) {
                     lib.setStepDisabled(step.StepId, nextDisabled);
                     toast.success(
                         nextDisabled
-                            ? `Step "${step.Label ?? step.StepId}" disabled, will be skipped on run`
-                            : `Step "${step.Label ?? step.StepId}" enabled`,
+                            ? `Step "${step.LabelType ?? step.StepId}" disabled, will be skipped on run`
+                            : `Step "${step.LabelType ?? step.StepId}" enabled`,
                     );
                 }}
                 onStepEdit={(step) => setStepEditor({ open: true, mode: { Kind: "edit", Step: step } })}
-                onStepEditWait={(step) => setWaitDialog({ open: true, stepId: step.StepId, stepLabel: step.Label })}
+                onStepEditWait={(step) => setWaitDialog({ open: true, stepId: step.StepId, stepLabel: step.LabelType })}
                 onStepDelete={(step) => setDeleteStepDialog({ open: true, step })}
             />
         </div>

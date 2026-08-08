@@ -1,5 +1,5 @@
 /**
- * WorkspacePlan — sole Enum for plan branching.
+ * WorkspacePlanType — sole Enum for plan branching.
  *
  * Spec: spec/22-app-issues/110-macro-controller-pro-zero-credit-balance.md §4
  *
@@ -7,7 +7,7 @@
  * Every other module references the Enum.
  */
 
-export enum WorkspacePlan {
+export enum WorkspacePlanType {
     PRO_ZERO = 'PRO_ZERO',
     OTHER = 'OTHER',
 }

@@ -1,3 +1,4 @@
+import { DbResult } from '../db/db-result';
 /**
  * v4.400.0: exportPromptsToJson MUST filter out isDefault=true rows.
  * Covers the JSON path end-to-end: default+user mix in, only user rows
@@ -5,7 +6,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const defaultEntry = { name: 'Plan default', text: 'body-plan', slug: 'plan-default', role: 'plan', isDefault: true };
+const defaultEntry = { name: 'PlanTierType default', text: 'body-plan', slug: 'plan-default', role: 'plan', isDefault: true };
 const userEntry = { name: 'My custom', text: 'body-user', slug: 'my-custom', role: 'plan', isDefault: false };
 
 vi.mock('../ui/prompt-cache', () => ({ readJsonCopy: vi.fn(async () => ({ entries: [] })) }));
@@ -17,8 +18,8 @@ vi.mock('../toast', () => ({ showToast: vi.fn() }));
 vi.mock('../logger', () => ({ log: vi.fn() }));
 vi.mock('../shared-state', () => ({ VERSION: '0.1.0' }));
 vi.mock('../db/prompt-revision-db', () => ({
-    listPromptRevisions: vi.fn(async () => ({ ok: true, value: [] })),
-    insertImportedRevisions: vi.fn(async () => ({ ok: true })),
+    listPromptRevisions: vi.fn(async () => (new DbResult(true, []))),
+    insertImportedRevisions: vi.fn(async () => (new DbResult(true, undefined))),
 }));
 vi.mock('../ui/prompt-drag-order', () => ({ getEffectivePromptOrder: () => [] }));
 

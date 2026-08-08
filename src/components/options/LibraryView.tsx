@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -100,7 +100,7 @@ interface AssetLink {
   Id: number;
   SharedAssetId: number;
   ProjectId: number;
-  LinkState: LinkState;
+  LinkStateType: LinkStateType;
   PinnedVersion: string | null;
   LocalOverrideJson: string | null;
   SyncedAt: string;
@@ -120,8 +120,8 @@ interface ProjectGroup {
 /* ------------------------------------------------------------------ */
 
 import { SyncBadge } from "./SyncBadge";
-import { AssetType, ActionEnum, Enum_48fffa10 } from "../../types/enums";
-import { LinkState } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { AssetType, ActionEnum, SemanticSemantic48fffa } from "../../types/enums";
+import { LinkStateType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 export { SyncBadge };
 
@@ -155,8 +155,8 @@ interface AssetCardProps {
 // eslint-disable-next-line max-lines-per-function -- single card with delete dialog, splitting would reduce cohesion
 export function AssetCard({ asset, links, onSync, onDelete, onViewDetail }: AssetCardProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const syncedCount = links.filter(l => l.LinkState === "synced").length;
-  const pinnedCount = links.filter(l => l.LinkState === "pinned").length;
+  const syncedCount = links.filter(l => l.LinkStateType === "synced").length;
+  const pinnedCount = links.filter(l => l.LinkStateType === "pinned").length;
   const totalLinked = links.length;
 
   return (
@@ -388,17 +388,17 @@ export function PromoteDialog({ open, onOpenChange, onPromoted }: PromoteDialogP
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs">Name</Label>
+                <LabelType className="text-xs">Name</LabelType>
                 <Input value={name} onChange={e => setName(e.target.value)} placeholder="My Prompt" className="h-8 text-sm" />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Slug</Label>
+                <LabelType className="text-xs">Slug</LabelType>
                 <Input value={slug} onChange={e => setSlug(e.target.value)} placeholder="my-prompt" className="h-8 text-sm font-mono" />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs">Type</Label>
+              <LabelType className="text-xs">Type</LabelType>
               <Select value={type} onValueChange={v => setType(v as AssetType)}>
                 <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -411,7 +411,7 @@ export function PromoteDialog({ open, onOpenChange, onPromoted }: PromoteDialogP
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs">Content (JSON)</Label>
+              <LabelType className="text-xs">Content (JSON)</LabelType>
               <Textarea
                 value={content}
                 onChange={e => setContent(e.target.value)}
@@ -444,7 +444,7 @@ interface AssetDetailPanelProps {
   onBack: () => void;
   onSync: (assetId: number) => void;
   onDelete: (assetId: number) => void;
-  onLinkStateChange: (link: AssetLink, newState: LinkState) => void;
+  onLinkStateChange: (link: AssetLink, newState: LinkStateType) => void;
   onRefresh: () => void;
 }
 
@@ -483,13 +483,13 @@ const LINK_STATE_CONFIRM: Record<string, { title: string; desc: string; action: 
 };
 
 /** Available transitions per current state */
-const LINK_STATE_OPTIONS: Record<LinkState, LinkState[]> = {
+const LINK_STATE_OPTIONS: Record<LinkStateType, LinkStateType[]> = {
   synced: ["pinned", "detached"],
   pinned: ["synced", "detached"],
   detached: ["synced", "pinned"],
 };
 
-const LINK_STATE_ICONS: Record<LinkState, typeof RefreshCw> = {
+const LINK_STATE_ICONS: Record<LinkStateType, typeof RefreshCw> = {
   synced: RefreshCw,
   pinned: Pin,
   detached: Unlink,
@@ -497,10 +497,10 @@ const LINK_STATE_ICONS: Record<LinkState, typeof RefreshCw> = {
 
 // eslint-disable-next-line max-lines-per-function -- detail panel with meta cards + link state toggles + actions
 function AssetDetailPanel({ asset, links, onBack, onSync, onDelete, onLinkStateChange, onRefresh }: AssetDetailPanelProps) {
-  const [confirmState, setConfirmState] = useState<{ link: AssetLink; newState: LinkState } | null>(null);
+  const [confirmState, setConfirmState] = useState<{ link: AssetLink; newState: LinkStateType } | null>(null);
 
   const confirmKey = confirmState
-    ? `${confirmState.link.LinkState}→${confirmState.newState}` as const
+    ? `${confirmState.link.LinkStateType}→${confirmState.newState}` as const
     : null;
   const confirmCfg = confirmKey ? LINK_STATE_CONFIRM[confirmKey] : null;
 
@@ -538,15 +538,15 @@ function AssetDetailPanel({ asset, links, onBack, onSync, onDelete, onLinkStateC
             ) : (
               <div className="space-y-2">
                 {links.map(link => {
-                  const options = LINK_STATE_OPTIONS[link.LinkState];
+                  const options = LINK_STATE_OPTIONS[link.LinkStateType];
                   return (
                     <div key={link.Id} className="flex items-center justify-between text-xs gap-2">
                       <span className="text-muted-foreground shrink-0">Project #{link.ProjectId}</span>
                       <div className="flex items-center gap-1.5">
                         <SyncBadge
-                          state={link.LinkState}
+                          state={link.LinkStateType}
                           pinnedVersion={link.PinnedVersion}
-                          updateAvailable={link.LinkState === "pinned" && link.PinnedVersion !== null && link.PinnedVersion !== asset.Version}
+                          updateAvailable={link.LinkStateType === "pinned" && link.PinnedVersion !== null && link.PinnedVersion !== asset.Version}
                         />
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -659,7 +659,7 @@ export function LibraryView() {
   const [promoteOpen, setPromoteOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<SharedAsset | null>(null);
   const [importExportLoading, setImportExportLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<Enum_48fffa10>("assets");
+  const [activeTab, setActiveTab] = useState<SemanticSemantic48fffa>("assets");
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -830,7 +830,7 @@ export function LibraryView() {
 
   const linksForAsset = (assetId: number) => links.filter(l => l.SharedAssetId === assetId);
 
-  const handleLinkStateChange = useCallback(async (link: AssetLink, newState: LinkState) => {
+  const handleLinkStateChange = useCallback(async (link: AssetLink, newState: LinkStateType) => {
     try {
       await sendMessage({
         type: "LIBRARY_SAVE_LINK" as never,
@@ -838,12 +838,12 @@ export function LibraryView() {
           Id: link.Id,
           SharedAssetId: link.SharedAssetId,
           ProjectId: link.ProjectId,
-          LinkState: newState,
+          LinkStateType: newState,
           PinnedVersion: newState === "pinned" ? (selectedAsset?.Version ?? link.PinnedVersion) : null,
           LocalOverrideJson: link.LocalOverrideJson,
         },
       } as never);
-      const labels: Record<LinkState, string> = { synced: "Synced", pinned: "Pinned", detached: "Detached" };
+      const labels: Record<LinkStateType, string> = { synced: "Synced", pinned: "Pinned", detached: "Detached" };
       toast.success(`Project #${link.ProjectId} → ${labels[newState]}`);
       loadData();
     } catch (err) {
@@ -899,7 +899,7 @@ export function LibraryView() {
       </div>
 
       {/* Top-level Assets / Groups tabs */}
-      <Tabs value={activeTab} onValueChange={v => setActiveTab(v as Enum_48fffa10)}>
+      <Tabs value={activeTab} onValueChange={v => setActiveTab(v as SemanticSemantic48fffa)}>
         <TabsList className="h-9">
           <TabsTrigger value="assets" className="text-xs px-3 gap-1.5" data-testid="library-tab-assets">
             <Library className="h-3.5 w-3.5" />

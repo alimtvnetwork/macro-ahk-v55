@@ -1,5 +1,5 @@
 /**
- * Plan-10 follow-up regression — freshness probe must be true iff the
+ * PlanTierType-10 follow-up regression — freshness probe must be true iff the
  * in-memory tier of the credit-balance cache holds a live entry for the
  * workspace id.
  */
@@ -10,12 +10,12 @@ import {
   __writeCreditBalanceUpdateMemoryCacheForTests,
   clearCreditBalanceUpdateMemoryCache,
 } from '../../credit-balance-update/credit-balance-cache';
-import { CreditFetchOutcome } from '../../credit-balance-update/credit-fetch-outcome';
+import { CreditFetchOutcomeType } from '../../credit-balance-update/credit-fetch-outcome';
 import type { CreditFetchResult } from '../../credit-balance-update/credit-balance-types';
 
 function makeResult(): CreditFetchResult {
   return {
-    outcome: CreditFetchOutcome.ApiHit,
+    outcome: CreditFetchOutcomeType.ApiHit,
     balance: {
       workspaceId: 'ws-1',
       totalGranted: 100,

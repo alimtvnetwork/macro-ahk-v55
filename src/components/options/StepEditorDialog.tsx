@@ -33,7 +33,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -72,7 +72,7 @@ export interface StepEditorDialogProps {
     readonly onCancel: () => void;
     readonly onSubmit: (input: {
         StepKindId: StepKindId;
-        Label: string | null;
+        LabelType: string | null;
         PayloadJson: string | null;
         TargetStepGroupId: number | null;
     }) => void;
@@ -155,7 +155,7 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
         }
         const step = mode.Step;
         setKind(step.StepKindId);
-        setLabel(step.Label ?? "");
+        setLabel(step.LabelType ?? "");
         setPayloadJson(step.PayloadJson ?? "");
         setTargetGroupId(step.TargetStepGroupId);
         const hotkey = step.StepKindId === StepKindId.Hotkey
@@ -235,7 +235,7 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
 
                 <div className="space-y-3">
                     <div className="space-y-1">
-                        <Label htmlFor="step-kind">Kind</Label>
+                        <LabelType htmlFor="step-kind">Kind</LabelType>
                         <Select
                             value={String(kind)}
                             onValueChange={(value) => {
@@ -256,7 +256,7 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
                     </div>
 
                     <div className="space-y-1">
-                        <Label htmlFor="step-label">Label</Label>
+                        <LabelType htmlFor="step-label">LabelType</LabelType>
                         <Input
                             id="step-label"
                             value={label}

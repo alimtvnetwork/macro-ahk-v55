@@ -1,8 +1,8 @@
 /**
  * Prompt Dropdown Header cluster
  *
- * Plan-17 Step 26: extracted from ui/prompt-dropdown.ts to keep that file
- * under the 500 LOC guideline cap. Owns the sticky header row (Plan marker,
+ * PlanTierType-17 Step 26: extracted from ui/prompt-dropdown.ts to keep that file
+ * under the 500 LOC guideline cap. Owns the sticky header row (PlanTierType marker,
  * hidden Next marker, Library / Export / Import / IO / Load pills).
  *
  * Accepts a `rerender` callback so we never import back into prompt-dropdown
@@ -62,7 +62,7 @@ function buildReadMemoryAdminButton(): HTMLElement {
 
 
 
-/** Plan-14 step 10 launcher: opens the DB-backed Prompt Library modal. */
+/** PlanTierType-14 step 10 launcher: opens the DB-backed Prompt Library modal. */
 function buildLibraryButton(): HTMLElement {
   return buildHeaderPill('🗂 Library', 'Open Prompt Library (edit / duplicate / delete)', function(e: Event) {
     e.stopPropagation();
@@ -88,14 +88,14 @@ function buildHiddenNextCompatibilityMarker(): HTMLElement {
 }
 
 /**
- * Legacy Plan tab marker retained for CI/tests and back-compat. The Plan
+ * Legacy PlanTierType tab marker retained for CI/tests and back-compat. The PlanTierType
  * feature itself lives inline, so this element is a lightweight label only.
  */
 function buildPlanTabMarker(): HTMLElement {
   const marker = document.createElement('span');
   marker.setAttribute('data-plan-toggle', '1');
   marker.setAttribute('data-tab-active', '1');
-  marker.textContent = 'Plan';
+  marker.textContent = 'PlanTierType';
   marker.style.cssText = 'font-size:10px;color:' + cPrimaryLight + ';padding:2px 6px;';
   return marker;
 }

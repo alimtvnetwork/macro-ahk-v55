@@ -1,6 +1,6 @@
 /**
  * Issue 129 Step 2 — Prompts dropdown must paint synchronously from the
- * in-memory snapshot mirror, so Plan Task + Task Next buttons appear in
+ * in-memory snapshot mirror, so PlanTierType Task + Task Next buttons appear in
  * the same tick the user clicks the prompts trigger.
  *
  * These are source-level invariants: the render path must NOT gate paint

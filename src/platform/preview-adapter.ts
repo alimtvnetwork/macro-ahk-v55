@@ -67,7 +67,7 @@ interface MockRecorderStep {
     StepId: number;
     StepKindId: number;
     VariableName: string;
-    Label: string;
+    LabelType: string;
     InlineJs: string | null;
     ParamsJson: string | null;
     IsBreakpoint: boolean;
@@ -84,7 +84,7 @@ interface MockRecorderMessage {
     draft?: {
         StepKindId: number;
         VariableName: string;
-        Label?: string;
+        LabelType?: string;
         InlineJs: string | null;
         ParamsJson: string | null;
         IsBreakpoint: boolean;
@@ -106,7 +106,7 @@ function handleRecorderMock(message: MockRecorderMessage): object | null {
             StepId: ++mockRecorderStepIdSeq,
             StepKindId: draft.StepKindId,
             VariableName: draft.VariableName,
-            Label: draft.Label ?? "",
+            LabelType: draft.LabelType ?? "",
             InlineJs: draft.InlineJs,
             ParamsJson: draft.ParamsJson,
             IsBreakpoint: draft.IsBreakpoint,
@@ -648,9 +648,9 @@ function getMockResponse(message: MessagePayload): string | number | boolean | n
                 { id: "8", name: "Major Bump", text: "Bump the MAJOR version across all unified-version sites, add changelog, pin root readme, update version.json, update changed default prompts, then run version sync.", order: 7, isDefault: true, category: "versioning", createdAt: "2026-01-01T00:00:00Z", updatedAt: "2026-06-19T00:00:00Z" },
                 { id: "9", name: "Patch Bump", text: "Bump the PATCH version across all unified-version sites, add changelog, pin root readme, update version.json, update changed default prompts, then run version sync.", order: 8, isDefault: true, category: "versioning", createdAt: "2026-01-01T00:00:00Z", updatedAt: "2026-06-19T00:00:00Z" },
                 { id: "10", name: "Code Coverage Basic", text: "Based on low-coverage packages, plan 200-line segments for coverage tests.", order: 9, isDefault: true, category: "code-coverage", createdAt: "2026-03-21T00:00:00Z", updatedAt: "2026-03-21T00:00:00Z" },
-                { id: "11", name: "Code Coverage Details", text: "Plan 200-line segments for low-coverage packages. Follow AAA format.", order: 10, isDefault: true, category: "code-coverage", createdAt: "2026-03-21T00:00:00Z", updatedAt: "2026-03-21T00:00:00Z" },
+                { id: "11", name: "Code Coverage Details", text: "PlanTierType 200-line segments for low-coverage packages. Follow AAA format.", order: 10, isDefault: true, category: "code-coverage", createdAt: "2026-03-21T00:00:00Z", updatedAt: "2026-03-21T00:00:00Z" },
                 { id: "12", name: "Next Tasks", text: "Next, execute the next pending task now, then end with a flat numbered remaining-tasks list. Never auto-repeat; use Repeat Start for repeated submissions.", order: 11, isDefault: true, category: "automation", createdAt: "2026-03-21T00:00:00Z", updatedAt: "2026-06-19T00:00:00Z" },
-                { id: "13", name: "Plan Steps", text: "# Plan in ${N}-Steps Plan (v7) — Evidence Enforcement\n\nWrite exactly N steps into .lovable/plans/pending and do not execute or auto-submit.", order: 12, isDefault: true, category: "Plan", createdAt: "2026-06-19T00:00:00Z", updatedAt: "2026-06-19T00:00:00Z" },
+                { id: "13", name: "PlanTierType Steps", text: "# PlanTierType in ${N}-Steps PlanTierType (v7) — Evidence Enforcement\n\nWrite exactly N steps into .lovable/plans/pending and do not execute or auto-submit.", order: 12, isDefault: true, category: "PlanTierType", createdAt: "2026-06-19T00:00:00Z", updatedAt: "2026-06-19T00:00:00Z" },
                 { id: "14", name: "Deploy Check", text: "Verify the deployment pipeline is green and all checks pass before merging.", order: 13, isDefault: false, category: "Deploy", createdAt: "2026-03-15T10:00:00Z", updatedAt: "2026-03-15T10:00:00Z" },
                 { id: "15", name: "Context Dump", text: "Print the full context of the current file and its dependencies for review.", order: 14, isDefault: false, category: "Debug", isFavorite: true, createdAt: "2026-03-16T08:00:00Z", updatedAt: "2026-03-16T08:00:00Z" },
                 { id: "16", name: "Read Memory", text: "Mandatory AI onboarding sequence — read .lovable/overview.md, strictly-avoid.md, memory/index.md, plan.md, suggestions.md; then spec/17-consolidated-guidelines/ and spec/01-spec-authoring-guide/; then CI/CD issues. Trigger phrase: 'read memory'.", order: 15, isDefault: true, category: "onboarding", createdAt: "2026-05-14T00:00:00Z", updatedAt: "2026-05-14T00:00:00Z" },
@@ -757,10 +757,10 @@ function getMockResponse(message: MessagePayload): string | number | boolean | n
         },
         LIBRARY_GET_LINKS: {
             links: [
-                { Id: 1, SharedAssetId: 1, ProjectId: 1, LinkState: "synced", PinnedVersion: null, LocalOverrideJson: null, SyncedAt: "2026-04-01T14:30:00Z" },
-                { Id: 2, SharedAssetId: 1, ProjectId: 2, LinkState: "pinned", PinnedVersion: "2.0.0", LocalOverrideJson: null, SyncedAt: "2026-03-28T10:00:00Z" },
-                { Id: 3, SharedAssetId: 2, ProjectId: 1, LinkState: "synced", PinnedVersion: null, LocalOverrideJson: null, SyncedAt: "2026-03-20T09:00:00Z" },
-                { Id: 4, SharedAssetId: 3, ProjectId: 3, LinkState: "detached", PinnedVersion: null, LocalOverrideJson: '{"steps":["summarize-v2"]}', SyncedAt: "2026-04-02T16:00:00Z" },
+                { Id: 1, SharedAssetId: 1, ProjectId: 1, LinkStateType: "synced", PinnedVersion: null, LocalOverrideJson: null, SyncedAt: "2026-04-01T14:30:00Z" },
+                { Id: 2, SharedAssetId: 1, ProjectId: 2, LinkStateType: "pinned", PinnedVersion: "2.0.0", LocalOverrideJson: null, SyncedAt: "2026-03-28T10:00:00Z" },
+                { Id: 3, SharedAssetId: 2, ProjectId: 1, LinkStateType: "synced", PinnedVersion: null, LocalOverrideJson: null, SyncedAt: "2026-03-20T09:00:00Z" },
+                { Id: 4, SharedAssetId: 3, ProjectId: 3, LinkStateType: "detached", PinnedVersion: null, LocalOverrideJson: '{"steps":["summarize-v2"]}', SyncedAt: "2026-04-02T16:00:00Z" },
             ],
         },
         LIBRARY_GET_GROUPS: {

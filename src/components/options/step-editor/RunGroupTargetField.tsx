@@ -3,7 +3,7 @@
  * StepEditorDialog to shrink its render body.
  */
 
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -23,7 +23,7 @@ export function RunGroupTargetField(props: RunGroupTargetFieldProps): JSX.Elemen
     const { value, candidates, onChange } = props;
     return (
         <div className="space-y-1">
-            <Label htmlFor="step-target">Target group</Label>
+            <LabelType htmlFor="step-target">Target group</LabelType>
             <Select
                 value={value === null ? "" : String(value)}
                 onValueChange={(next) => onChange(next === "" ? null : Number(next))}

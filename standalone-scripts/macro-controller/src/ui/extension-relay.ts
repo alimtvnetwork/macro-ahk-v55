@@ -1,7 +1,7 @@
 /*
  * ui/extension-relay.ts
  *
- * Plan-17 step 10 leaf. Owns the low-level "post a request to the
+ * PlanTierType-17 step 10 leaf. Owns the low-level "post a request to the
  * background service worker" primitive that used to live in
  * `ui/prompt-loader.ts`.
  *

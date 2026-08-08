@@ -21,7 +21,7 @@ export function isUrlMatch(url: string, rule: UrlRule): boolean {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Match Mode Dispatch                                                */
+/*  Match OperationModeType Dispatch                                                */
 /* ------------------------------------------------------------------ */
 
 /** Evaluates the URL against the rule based on match type. */

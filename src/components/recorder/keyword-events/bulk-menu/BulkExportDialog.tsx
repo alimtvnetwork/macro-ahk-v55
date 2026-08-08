@@ -1,6 +1,6 @@
 /**
  * BulkExportDialog: extracted from `KeywordEventBulkContextMenu.tsx`
- * in Plan 25 Step 17. Behaviour and testids are byte-identical.
+ * in PlanTierType 25 Step 17. Behaviour and testids are byte-identical.
  */
 
 import { useState } from "react";
@@ -27,7 +27,7 @@ export interface BulkExportDialogProps {
     readonly selectedEvents: ReadonlyArray<KeywordEvent>;
 }
 
-// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf dialog; Plan 25 Step 17
+// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf dialog; PlanTierType 25 Step 17
 export function BulkExportDialog(props: BulkExportDialogProps): JSX.Element {
     const { open, onOpenChange, selectedEvents } = props;
     const [busy, setBusy] = useState(false);

@@ -370,7 +370,7 @@ export interface ThemeTypography {
 /* ================================================================== */
 
 /** Loop scroll direction. */
-export enum LoopDirection {
+export enum LoopDirectionType {
   Up = 'up',
   Down = 'down',
 }
@@ -426,12 +426,12 @@ export interface ElementIds {
 
 export interface ControllerState {
   running: boolean;
-  direction: LoopDirection;
+  direction: LoopDirectionType;
   cycleCount: number;
   countdown: number;
   isIdle: boolean;
   isDelegating: boolean;
-  forceDirection: LoopDirection | null;
+  forceDirection: LoopDirectionType | null;
   delegateStartTime: number;
   loopIntervalId: ReturnType<typeof setInterval> | null;
   countdownIntervalId: ReturnType<typeof setInterval> | null;

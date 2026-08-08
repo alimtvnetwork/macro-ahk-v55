@@ -2,7 +2,7 @@
  * Tasks toggle — hover-open behavior.
  *
  * The "🎯 Tasks" pill in the prompts dropdown header must open on hover
- * (mouseenter) — not only on click — so the Plan Task + Task Next floating
+ * (mouseenter) — not only on click — so the PlanTierType Task + Task Next floating
  * panel is reachable without an extra click. Clicking still toggles, and
  * leaving both the button and the panel auto-closes the group.
  *

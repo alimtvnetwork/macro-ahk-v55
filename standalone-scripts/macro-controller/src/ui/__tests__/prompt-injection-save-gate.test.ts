@@ -1,8 +1,9 @@
+import { DbResult } from '../../db/db-result';
 /**
- * Plan 22 gap #5: Rule-0 save-time gate in `saveRoleScopedPrompt`
+ * PlanTierType 22 gap #5: Rule-0 save-time gate in `saveRoleScopedPrompt`
  * (standalone-scripts/macro-controller/src/ui/prompt-injection.ts:564-597).
  *
- * Root cause pinned: The Plan/Next save path routes through
+ * Root cause pinned: The PlanTierType/Next save path routes through
  * `saveRoleScopedPrompt`, which runs `validateRuleZero(input.text)` and
  * short-circuits with a `PROMPT_VALIDATE_E001` diagnostic + structured
  * `failure` payload BEFORE `upsertPrompt` is called. The live indicator
@@ -17,6 +18,9 @@ const upsertPromptMock = vi.fn();
 const logDiagnosticMock = vi.fn();
 
 vi.mock('../../db/prompt-db', () => ({
+    DbResult,
+    DbResult,
+    DbResult,
     upsertPrompt: (...args: unknown[]) => upsertPromptMock(...args),
 }));
 vi.mock('../../error-utils', () => ({
@@ -30,11 +34,11 @@ import { saveRoleScopedPrompt } from '../prompt-injection';
 beforeEach(() => {
     upsertPromptMock.mockReset();
     logDiagnosticMock.mockReset();
-    upsertPromptMock.mockResolvedValue({ ok: true, value: 1 });
+    upsertPromptMock.mockResolvedValue(new DbResult(true, 1));
 });
 
 const baseInput = {
-    name: 'Plan',
+    name: 'PlanTierType',
     category: '',
     tags: [],
     excludeFromExport: false,
@@ -42,7 +46,7 @@ const baseInput = {
     editPrompt: null,
 };
 
-describe('saveRoleScopedPrompt Rule-0 save gate (Plan 22 gap #5)', () => {
+describe('saveRoleScopedPrompt Rule-0 save gate (PlanTierType 22 gap #5)', () => {
     it('S1: role=plan with Steps:N mismatch blocks save BEFORE upsertPrompt', async () => {
         const body = 'EXACTLY 3 steps\n\n1. a\n2. b\n';
         const res = await saveRoleScopedPrompt({ ...baseInput, text: body }, 'plan');
@@ -87,7 +91,7 @@ describe('saveRoleScopedPrompt Rule-0 save gate (Plan 22 gap #5)', () => {
         expect(logDiagnosticMock).not.toHaveBeenCalled();
     });
 
-    it('S5: valid Plan body with matching step count passes to upsertPrompt', async () => {
+    it('S5: valid PlanTierType body with matching step count passes to upsertPrompt', async () => {
         const body = 'EXACTLY 2 steps\n\n1. first\n2. second\n';
         const res = await saveRoleScopedPrompt({ ...baseInput, text: body }, 'plan');
         expect(res.isOk).toBe(true);

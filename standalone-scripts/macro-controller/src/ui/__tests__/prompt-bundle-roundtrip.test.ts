@@ -52,7 +52,7 @@ describe('Prompts round-trip — JSON envelope', () => {
   it('preserves replaceKey and replaceValues on a role-scoped non-dynamic entry (plan-15 task 4)', () => {
     const entries: PromptEntry[] = [
       {
-        name: 'Plan default', text: 'plan {{count}} steps',
+        name: 'PlanTierType default', text: 'plan {{count}} steps',
         slug: 'plan-default', role: 'plan',
         replaceKey: 'count', replaceValues: ['2', '4', '8'],
       },

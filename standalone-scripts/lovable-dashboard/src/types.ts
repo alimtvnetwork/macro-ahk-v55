@@ -20,7 +20,7 @@ export interface WorkspaceDictionary {
     selectedIndex: number | null;
 }
 
-export enum NavDirection {
+export enum NavDirectionType {
     UP = "up",
     DOWN = "down",
 }

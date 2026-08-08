@@ -99,7 +99,7 @@ async function insertDummyStep(projectSlug: string, variableName: string): Promi
             draft: {
                 StepKindId: STEP_KIND_WAIT,
                 VariableName: variableName,
-                Label: "Recorder self-test (auto-cleanup)",
+                LabelType: "Recorder self-test (auto-cleanup)",
                 InlineJs: null,
                 ParamsJson: null,
                 IsBreakpoint: false,

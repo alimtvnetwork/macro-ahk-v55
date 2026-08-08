@@ -1,5 +1,5 @@
 /**
- * Plan-10 — `needsBalanceEnrichment` helper.
+ * PlanTierType-10 — `needsBalanceEnrichment` helper.
  *
  * Pure predicate that decides whether a single `WorkspaceCredit` row
  * requires a `/workspaces/{id}/credit-balance` enrichment fetch.
@@ -20,16 +20,16 @@
  */
 
 import type { WorkspaceCredit } from '../types/credit-types';
-import { Enum_75c5b314, ReasonEnum5 } from "../types/enums";
+import { WorkspaceEnrichmentFieldType, BalanceEnrichmentReasonType } from "../types/enums";
 
-/** Plan literals eligible for /credit-balance enrichment. */
+/** PlanTierType literals eligible for /credit-balance enrichment. */
 const ENRICHABLE_PLANS: ReadonlySet<string> = new Set(['pro_0', 'pro_1']);
 
 /** FREE tier variants that must never be enriched. */
 const FREE_TIER_LITERALS: ReadonlySet<string> = new Set(['free', 'free_tier', 'starter']);
 
 export interface NeedsBalanceEnrichmentInput {
-  readonly workspace: Pick<WorkspaceCredit, Enum_75c5b314>;
+  readonly workspace: Pick<WorkspaceCredit, WorkspaceEnrichmentFieldType>;
   /** True when a fresh (non-stale) cache row already exists for this workspace. */
   readonly hasFreshCache: boolean;
 }
@@ -38,7 +38,7 @@ export interface NeedsBalanceEnrichmentResult {
   readonly needs: boolean;
   /** Stable machine code so callers/log lines can reason about the decision. */
   readonly reason:
-    ReasonEnum5;
+    BalanceEnrichmentReasonType;
 }
 
 function normalize(value: string | null | undefined): string {

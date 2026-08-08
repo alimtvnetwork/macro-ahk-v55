@@ -1,7 +1,7 @@
 /**
  * Marco Extension — Step Group Library dialog state shapes.
  *
- * Extracted from `StepGroupLibraryPanel.tsx` (Plan 24 · SS-04a, phase 1).
+ * Extracted from `StepGroupLibraryPanel.tsx` (PlanTierType 24 · SS-04a, phase 1).
  * The panel and the `LibraryDialogs` presentational component both need
  * these shapes; declaring them once keeps the two files honest.
  */

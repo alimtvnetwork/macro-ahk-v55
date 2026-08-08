@@ -16,7 +16,7 @@ import {
 import { ClipboardCopy, Check, Loader2 } from "lucide-react";
 import { sendMessage } from "@/lib/message-client";
 import { toast } from "sonner";
-import { Enum_43ebc56c } from "../../types/enums";
+import { SessionCopyStateType } from "../../types/enums";
 
 /** Unified log entry supporting both camelCase (normalized) and PascalCase (raw SQLite) field names. */
 interface SessionLog {
@@ -134,7 +134,7 @@ const CURRENT_SESSION_VALUE = "__current__";
 
 // eslint-disable-next-line max-lines-per-function -- session selector + copy button with loading/copied states
 export function SessionCopyButton() {
-  const [state, setState] = useState<Enum_43ebc56c>("idle");
+  const [state, setState] = useState<SessionCopyStateType>("idle");
   const [sessions, setSessions] = useState<SessionInfoEntry[]>([]);
   const [selectedSession, setSelectedSession] = useState<string>(CURRENT_SESSION_VALUE);
   const [loadingSessions, setLoadingSessions] = useState(false);

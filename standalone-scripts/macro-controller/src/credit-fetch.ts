@@ -24,7 +24,7 @@ import { MacroController } from './core/MacroController';
 import { CREDIT_API_BASE, loopCreditState } from './shared-state';
 import { parseLoopApiResponse, syncCreditStateFromApi, applyProZeroEnrichment, applyProOneEnrichment } from './credit-parser';
 import { logError } from './error-utils';
-import { ApiPath } from './types';
+import { ApiPathType } from './types';
 import { throwDiagnostic } from './errors/diagnostic-error';
 import { enrichCreditBalanceUpdateWorkspaces } from './credit-balance-update/enrichment';
 // Dynamic import: `ws-list-renderer` legitimately depends on many symbols from
@@ -107,7 +107,7 @@ function buildAuthFailureDetail(): string {
   const snapshot = getAuthDebugSnapshot();
   const bridgeText = !snapshot.bridgeOutcome.hasAttempted
     ? 'not attempted'
-    : (snapshot.bridgeOutcome.isSuccess
+    : (snapshot.bridgeOutcome.ok
       ? 'success via ' + snapshot.bridgeOutcome.source
       : 'failed' + (snapshot.bridgeOutcome.error ? ' — ' + snapshot.bridgeOutcome.error : ''));
 
@@ -135,7 +135,7 @@ function emitAuthFailureToast(status: number, statusText: string): void {
     {
       noStop: true,
       requestDetail: {
-        method: 'GET', url: CREDIT_API_BASE + ApiPath.UserWorkspaces, headers: {}, status, statusText, responseBody: detail,
+        method: 'GET', url: CREDIT_API_BASE + ApiPathType.UserWorkspaces, headers: {}, status, statusText, responseBody: detail,
       },
     },
   );
@@ -154,7 +154,7 @@ async function handleAuthRecovery(
   if (token) { invalidateSessionBridgeKey(token); }
 
   log('Credit API: Auth ' + status + ' — forcing token refresh before retry...', 'warn');
-  const userWorkspacesPath = ApiPath.UserWorkspaces;
+  const userWorkspacesPath = ApiPathType.UserWorkspaces;
   showToast('Auth ' + status + ' — recovering session...', 'warn', {
     noStop: true,
     requestDetail: { method: 'GET', url: CREDIT_API_BASE + userWorkspacesPath, headers: {}, status, statusText },
@@ -200,7 +200,7 @@ function handleNonAuthError(resp: SdkApiResponse): void {
   showToast('Credit API error: HTTP ' + resp.status, 'error', {
     noStop: true,
     requestDetail: {
-      method: 'GET', url: CREDIT_API_BASE + ApiPath.UserWorkspaces, headers: {}, status: resp.status, statusText: '', responseBody: bodyPreview,
+      method: 'GET', url: CREDIT_API_BASE + ApiPathType.UserWorkspaces, headers: {}, status: resp.status, statusText: '', responseBody: bodyPreview,
     },
   });
 }
@@ -311,7 +311,7 @@ export function fetchLoopCredits(
 
     apiFetchWorkspaces()
       .then(async function (resp: SdkApiResponse): Promise<Record<string, unknown> | undefined> {
-        if (resp.isFail) {
+        if (!resp.ok) {
           if (isAuthFailure(resp.status) && !isRetry) {
             const recovered = await handleAuthRecovery(token, resp.status, '');
             if (!recovered) { mc().updateUI(); return undefined; }
@@ -323,7 +323,7 @@ export function fetchLoopCredits(
           handleNonAuthError(resp);
           throwDiagnostic('CREDIT_FETCH_E002', {
             status: resp.status,
-            url: CREDIT_API_BASE + ApiPath.UserWorkspaces,
+            url: CREDIT_API_BASE + ApiPathType.UserWorkspaces,
             op: 'fetchLoopCredits',
             isRetry: isRetry === true,
           });
@@ -433,7 +433,7 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
 
   const resp = await apiFetchWorkspaces();
 
-  if (resp.isFail) {
+  if (!resp.ok) {
     if (isAuthFailure(resp.status) && !isRetry) {
       return handleAsyncAuthFailure(resp, token);
     }
@@ -441,7 +441,7 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
     if (isAuthFailure(resp.status)) { markBearerTokenExpired(CREDIT_FETCH_ASYNC_SCOPE); }
     throwDiagnostic('CREDIT_FETCH_E002', {
       status: resp.status,
-      url: CREDIT_API_BASE + ApiPath.UserWorkspaces,
+      url: CREDIT_API_BASE + ApiPathType.UserWorkspaces,
       op: 'fetchLoopCreditsAsync',
       isRetry: isRetry === true,
     });
@@ -470,7 +470,7 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
 // ============================================
 // Barrel re-exports from credit-parser
 // ============================================
-// Plan-17 Step 27: pruned unused re-exports (WsTier, formatDaysAgo, formatDaysIn).
+// PlanTierType-17 Step 27: pruned unused re-exports (WsTierType, formatDaysAgo, formatDaysIn).
 export { parseLoopApiResponse, syncCreditStateFromApi, applyProZeroEnrichment, resolveWsTier, WS_TIER_LABELS, isExpiredWs, expiredDays, formatExpiryStartDate, formatExpiredDuration } from './credit-parser';
 export {
   getEffectiveStatus,
@@ -481,6 +481,6 @@ export {
   formatDateDDMMMYY,
   formatDayCount,
 } from './workspace-status';
-export type { WorkspaceStatus, WorkspaceStatusKind } from './workspace-status';
+export type { WorkspaceStatus, WorkspaceStatusKindType } from './workspace-status';
 export { getWorkspaceLifecycleConfig } from './workspace-lifecycle-config';
 export type { WorkspaceLifecycleConfig } from './workspace-lifecycle-config';

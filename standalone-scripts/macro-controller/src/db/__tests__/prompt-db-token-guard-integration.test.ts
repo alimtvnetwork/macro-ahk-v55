@@ -1,6 +1,6 @@
 import { ServiceResult } from '../../utils/result-wrapper';
 /**
- * Plan 22 gap #4: token-guard integration at `upsertPrompt` (not just as a
+ * PlanTierType 22 gap #4: token-guard integration at `upsertPrompt` (not just as a
  * standalone `assertParamTokensUnchanged` unit).
  *
  * Root cause pinned: `checkTokenGuard` runs inside `upsertPrompt` only for
@@ -43,14 +43,14 @@ beforeEach(() => {
     nextResponse = { isOk: true, rows: [], lastInsertId: 42 };
 });
 
-describe('upsertPrompt token-guard integration (Plan 22 gap #4)', () => {
+describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => {
     it('G1: role=plan blocks a dropped {{n}} token BEFORE any DB write', async () => {
         const r = await upsertPrompt({
-            slug: 'plan-default', name: 'Plan', role: 'plan',
+            slug: 'plan-default', name: 'PlanTierType', role: 'plan',
             previousBody: 'Task {{n}} of {{n}}',
             body: 'Task of', // both tokens dropped
         });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/token/i);
         // No SQL round-trip; the guard fires before runSql.
         expect(captured).toHaveLength(0);
@@ -62,7 +62,7 @@ describe('upsertPrompt token-guard integration (Plan 22 gap #4)', () => {
             previousBody: '{{n}} more',
             body: 'no token here',
         });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/token/i);
         expect(captured).toHaveLength(0);
     });
@@ -75,19 +75,19 @@ describe('upsertPrompt token-guard integration (Plan 22 gap #4)', () => {
         });
         // Generic prompts do not carry the required-token contract; guard
         // MUST NOT block them. Write proceeds and hits the DB.
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(captured.length).toBeGreaterThan(0);
     });
 
     it('G4: legitimate rename via oldKey/newKey escape hatch does NOT throw', async () => {
         const r = await upsertPrompt({
-            slug: 'plan-default', name: 'Plan', role: 'plan',
+            slug: 'plan-default', name: 'PlanTierType', role: 'plan',
             previousBody: 'iterate {{n}} times',
             previousReplaceKey: 'n',
             replaceKey: 'count',
             body: 'iterate {{count}} times',
         });
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
     });
 
 
@@ -98,15 +98,15 @@ describe('upsertPrompt token-guard integration (Plan 22 gap #4)', () => {
             slug: 'brand-new', name: 'New', role: 'plan',
             body: 'anything without tokens',
         });
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
     });
 
     it('G6: unchanged tokens pass through cleanly (positive baseline)', async () => {
         const r = await upsertPrompt({
-            slug: 'plan-default', name: 'Plan', role: 'plan',
+            slug: 'plan-default', name: 'PlanTierType', role: 'plan',
             previousBody: 'do {{n}} steps',
             body: 'please do {{n}} steps carefully',
         });
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
     });
 });

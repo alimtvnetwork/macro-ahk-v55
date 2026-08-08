@@ -30,7 +30,7 @@ import { destroyPanel, updateUI } from './ui-updaters';
 import type { PanelBuilderDeps } from './panel-builder';
 import type { PanelLayoutCtx } from './panel-layout';
 import { logError } from '../error-utils';
-import { CssFragment } from '../types';
+import { CssFragmentType } from '../types';
 import { getCurrentWorkspaceDisplayName, getTitleBarDisplayState } from './title-bar-display';
 import { buildHeaderRemixSplitButton } from '../remix-dropdown';
 import { extractProjectIdFromUrl } from '../workspace-detection';
@@ -74,7 +74,7 @@ function _buildTitleElements(deps: PanelBuilderDeps, plCtx: PanelLayoutCtx) {
   const wsNameEl = buildWorkspaceNameBadge(deps);
 
   const versionSpan = document.createElement('span');
-  versionSpan.style.cssText = CssFragment.FontSize + tFontTiny + ';color:' + cPrimaryLight + ';margin-right:4px;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;';
+  versionSpan.style.cssText = CssFragmentType.FontSize + tFontTiny + ';color:' + cPrimaryLight + ';margin-right:4px;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;';
   versionSpan.textContent = 'v' + VERSION;
   versionSpan.title = 'Click to see About info';
   versionSpan.onclick = function(e: Event) { e.stopPropagation(); showAboutModal(); };
@@ -96,14 +96,14 @@ function _buildTitleElements(deps: PanelBuilderDeps, plCtx: PanelLayoutCtx) {
   // The Macro Settings modal exposed credits/grace-period fields the user cannot modify.
 
   const panelToggleSpan = document.createElement('span');
-  panelToggleSpan.style.cssText = CssFragment.FontSize + tFontTiny + ';color:' + cNeutral500 + ';cursor:pointer;margin-right:4px;white-space:nowrap;flex-shrink:0;';
+  panelToggleSpan.style.cssText = CssFragmentType.FontSize + tFontTiny + ';color:' + cNeutral500 + ';cursor:pointer;margin-right:4px;white-space:nowrap;flex-shrink:0;';
   panelToggleSpan.textContent = plCtx.panelState === 'minimized' ? '[ + ]' : '[ - ]';
   panelToggleSpan.title = 'Minimize / Expand panel';
   panelToggleSpan.onclick = function(e: Event) { e.stopPropagation(); toggleMinimize(plCtx); };
   plCtx.panelToggleSpan = panelToggleSpan;
 
   const hideBtn = document.createElement('span');
-  hideBtn.style.cssText = CssFragment.FontSize + tFontTiny + ';color:' + cNeutral500 + ';cursor:pointer;white-space:nowrap;flex-shrink:0;';
+  hideBtn.style.cssText = CssFragmentType.FontSize + tFontTiny + ';color:' + cNeutral500 + ';cursor:pointer;white-space:nowrap;flex-shrink:0;';
   hideBtn.textContent = '[ x ]';
   hideBtn.title = 'Close and fully remove controller (re-inject to restore)';
   hideBtn.onclick = function(e: Event) { e.stopPropagation(); destroyPanel(); };

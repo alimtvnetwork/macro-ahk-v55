@@ -16,7 +16,7 @@
  * (errors there are pushed as parse errors). Never throws.
  */
 
-import { UserAddCsvColumn } from "./csv-column";
+import { UserAddCsvColumnType } from "./csv-column";
 import { isValidEmail } from "./email-validator";
 import type { UserAddCsvRow, CsvParseError } from "./csv-types";
 
@@ -66,7 +66,7 @@ export const validateRow = (row: UserAddCsvRow): ReadonlyArray<CsvParseError> =>
     if (!isValidEmail(row.MemberEmail)) {
         errors.push({
             RowIndex: row.RowIndex,
-            Column: UserAddCsvColumn.MemberEmail,
+            Column: UserAddCsvColumnType.MemberEmail,
             Message: `Invalid email in MemberEmail: ${row.MemberEmail}`,
         });
     }
@@ -75,7 +75,7 @@ export const validateRow = (row: UserAddCsvRow): ReadonlyArray<CsvParseError> =>
     if (!urlCheck.Ok) {
         errors.push({
             RowIndex: row.RowIndex,
-            Column: UserAddCsvColumn.WorkspaceUrl,
+            Column: UserAddCsvColumnType.WorkspaceUrl,
             Message: `Invalid Lovable workspace URL: ${row.WorkspaceUrl} (${urlCheck.Reason})`,
         });
     }
@@ -83,7 +83,7 @@ export const validateRow = (row: UserAddCsvRow): ReadonlyArray<CsvParseError> =>
     if (row.Notes !== null && row.Notes.length > MAX_NOTES_LENGTH) {
         errors.push({
             RowIndex: row.RowIndex,
-            Column: UserAddCsvColumn.Notes,
+            Column: UserAddCsvColumnType.Notes,
             Message: `Notes exceeds max length ${MAX_NOTES_LENGTH} (got ${row.Notes.length})`,
         });
     }
@@ -112,7 +112,7 @@ export const validateFile = (
 
         errors.push({
             RowIndex: row.RowIndex,
-            Column: UserAddCsvColumn.MemberEmail,
+            Column: UserAddCsvColumnType.MemberEmail,
             Message: `Duplicate (WorkspaceUrl, MemberEmail) pair — first seen on row ${firstSeen}`,
         });
     }

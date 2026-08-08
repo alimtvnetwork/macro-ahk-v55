@@ -1,4 +1,4 @@
-import { Status5 } from "./types/enums";
+import { TimingEntryStatusType } from "./types/enums";
 
 /**
  * Startup Timing Waterfall — records elapsed time per bootstrap phase.
@@ -10,7 +10,7 @@ export interface TimingEntry {
   label: string;
   startMs: number;
   endMs: number;
-  status: Status5;
+  status: TimingEntryStatusType;
   detail?: string | undefined;
 }
 

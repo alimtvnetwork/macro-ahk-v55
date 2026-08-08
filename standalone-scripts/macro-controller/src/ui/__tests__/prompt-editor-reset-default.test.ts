@@ -1,5 +1,5 @@
 /**
- * Plan-23 step 4 regression: editor `↺ Reset to default` restores the seed
+ * PlanTierType-23 step 4 regression: editor `↺ Reset to default` restores the seed
  * body for a shipped slug, re-runs the drift-guard chip strip (so Save stays
  * disabled if the seed itself is missing a required token — impossible for
  * ours, but the wiring must be live), and never persists until the user
@@ -27,7 +27,7 @@ function openWithPlanDefault(): { overlay: HTMLElement; textarea: HTMLTextAreaEl
   // ctx and taskNextDeps are unused (`_` prefix in the impl).
   openPromptCreationModal({} as never, {} as never, editPrompt as never, undefined, {
     requiredTokens: ['n'],
-    roleLabel: 'Plan',
+    roleLabel: 'PlanTierType',
   });
 
   const overlay = document.getElementById('marco-prompt-modal')!;

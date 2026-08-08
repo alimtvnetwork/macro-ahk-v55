@@ -9,7 +9,7 @@ import { toErrorMessage, logError } from '../error-utils';
 
 import { log, logSub } from '../logger';
 import type { PromptEntry, PromptsCfg } from '../types';
-import { DomId } from '../types';
+import { DomIdType } from '../types';
 import { showToast } from '../toast';
 import { captureChatSubmit } from '../capture/chat-submit-capture';
 import type { ChatSubmitSource } from '../db/project-chat-submit-db';
@@ -17,7 +17,7 @@ import { TOAST_MAX_STACK } from '../constants';
 import { getProjectKvStore } from '../project-kv-store';
 import { extractProjectIdFromUrl } from '../workspace-detection';
 import { saveCommunication } from '../db/macro-db';
-import { PasteOutcomeEnum, CaptureSourceEnum } from "../types/enums";
+import { PasteOutcomeType, CaptureSourceType } from "../types/enums";
 
 async function capturePasteSubmit(text: string, source: ChatSubmitSource): Promise<void> {
   try { await captureChatSubmit({ source, text }); }
@@ -147,10 +147,10 @@ export function parseWithRecovery(content: string): unknown {
 
 
 function _getOrCreateToastContainer(): HTMLElement {
-  let container = document.getElementById(DomId.ToastStack);
+  let container = document.getElementById(DomIdType.ToastStack);
   if (!container) {
     container = document.createElement('div');
-    container.id = DomId.ToastStack;
+    container.id = DomIdType.ToastStack;
     container.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);' +
       'display:flex;flex-direction:column-reverse;gap:6px;z-index:1000000;pointer-events:none;';
     document.body.appendChild(container);
@@ -220,7 +220,7 @@ export function showPasteToast(message: string, isError: boolean): void {
 
 /**
  * Undo toast for destructive prompt saves (chip edit / restore-from-history /
- * reset-to-default). Renders inside the same `#DomId.ToastStack` container as
+ * reset-to-default). Renders inside the same `#DomIdType.ToastStack` container as
  * `showPasteToast` so stacking + z-index behaviour is identical. Fires
  * `onUndo` at most once, either from the button click or an explicit dismiss.
  * Auto-dismisses after `timeoutMs` (default 8s) — long enough for a human to
@@ -498,7 +498,7 @@ function pasteIntoContentEditable(target: HTMLElement, text: string): boolean {
   return false;
 }
 
-export type PasteOutcome = PasteOutcomeEnum;
+export type PasteOutcome = PasteOutcomeType;
 
 /**
  * Scan text for {{?Variable Name}} and prompt user for values.
@@ -602,7 +602,7 @@ function showVariableInputModal(vars: string[]): Promise<Record<string, string> 
   });
 }
 
-export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, getByXPath: (xpath: string) => Element | null, captureSource: CaptureSourceEnum = 'paste'): Promise<PasteOutcome> {
+export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, getByXPath: (xpath: string) => Element | null, captureSource: CaptureSourceType = 'paste'): Promise<PasteOutcome> {
   // 1. Handle date/time (legacy)
   const now = new Date();
   let text = rawText

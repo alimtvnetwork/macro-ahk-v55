@@ -1,5 +1,5 @@
 /**
- * Plan 12 step 17 (SS-06): append-only audit log for prompt imports.
+ * PlanTierType 12 step 17 (SS-06): append-only audit log for prompt imports.
  *
  * Every commit through `commitPromptImportAtomic()` appends one entry here
  * BEFORE the cache write and one status update AFTER. The log survives
@@ -43,10 +43,10 @@
 
 import { log } from '../logger';
 import { throwDiagnostic } from '../errors/diagnostic-error';
-import { ImportAuditRowActionEnum, ImportAuditStatus, PromptsBundleFormatEnum } from "../types/enums";
+import { ImportAuditRowActionType, ImportAuditStatusType, PromptsBundleFormatType } from "../types/enums";
 
-export type ImportAuditRowAction = ImportAuditRowActionEnum;
-export type ImportAuditFormat = PromptsBundleFormatEnum;
+export type ImportAuditRowAction = ImportAuditRowActionType;
+export type ImportAuditFormat = PromptsBundleFormatType;
 
 export interface ImportAuditActionRecord {
   slug: string;
@@ -66,7 +66,7 @@ export interface ImportAuditEntry {
   timestamp: number;
   filename: string;
   format: ImportAuditFormat;
-  status: ImportAuditStatus;
+  status: ImportAuditStatusType;
   counts: ImportAuditCounts;
   actions: ImportAuditActionRecord[];
   error?: string;

@@ -2,7 +2,7 @@
  * Payment Banner Hider — Shared types & constants.
  */
 
-export enum BannerState {
+export enum BannerStateType {
     Fading = "fading",
     Hiding = "hiding",
     Done = "done",

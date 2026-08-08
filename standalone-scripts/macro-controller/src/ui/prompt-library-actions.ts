@@ -40,7 +40,7 @@ export async function handleDelete(
   refs.status.textContent = 'Deleting...';
   try {
     const res = await deletePromptById(row.Id);
-    if (res.isFail) {
+    if (!res.ok) {
       const reason = res.error ?? 'unknown';
       const msgText = 'Cannot delete "' + row.Name + '": ' + reason;
       refs.status.textContent = 'Delete blocked: ' + reason;
@@ -91,7 +91,7 @@ export async function handleDuplicate(
       body: row.Body,
       role: row.Role,
     });
-    if (result.isFail) {
+    if (!result.ok) {
       refs.status.textContent = 'Failed to duplicate: ' + (result.error ?? 'unknown');
       return;
     }
@@ -128,7 +128,7 @@ export async function handleResetToDefault(
       replaceKey: row.ReplaceKey, replaceValues: row.ReplaceValues,
       previousBody: row.Body, previousReplaceKey: row.ReplaceKey,
     });
-    if (result.isFail) {
+    if (!result.ok) {
       logError(LOG_SCOPE, 'reset-to-default upsertPrompt failed for slug=' + row.Slug, new Error(result.error ?? 'unknown'));
       refs.status.textContent = 'Reset failed: ' + (result.error ?? 'unknown error');
       showToast('❌ Reset failed for ' + row.Slug, TOAST_ERROR);

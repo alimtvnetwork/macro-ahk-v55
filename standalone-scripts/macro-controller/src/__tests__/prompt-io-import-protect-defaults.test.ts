@@ -17,11 +17,11 @@ describe('Prompt import: default protection (v4.400.0)', () => {
 
     it('skips overwrite when existing target is isDefault=true and counts it', () => {
         const existing: CachedPromptEntry[] = [
-            { name: 'Plan Default', text: 'seed body', slug: 'plan-default', isDefault: true },
+            { name: 'PlanTierType Default', text: 'seed body', slug: 'plan-default', isDefault: true },
             { name: 'User', text: 'old body', slug: 'user', isDefault: false },
         ];
         const imported: CachedPromptEntry[] = [
-            { name: 'Plan Default', text: 'HACKED body', slug: 'plan-default', isDefault: false },
+            { name: 'PlanTierType Default', text: 'HACKED body', slug: 'plan-default', isDefault: false },
             { name: 'User', text: 'new body', slug: 'user', isDefault: false },
             { name: 'Fresh', text: 'fresh body', slug: 'fresh', isDefault: false },
         ];

@@ -1,5 +1,5 @@
-/** Plan enum for credit-balance update trigger logic. */
-export const enum Plan {
+/** PlanTierType enum for credit-balance update trigger logic. */
+export const enum PlanTierType {
     Pro0 = 'Pro0',
     Pro1 = 'Pro1',
     Pro3 = 'Pro3',

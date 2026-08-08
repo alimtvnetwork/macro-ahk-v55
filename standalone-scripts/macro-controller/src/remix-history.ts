@@ -12,7 +12,7 @@
 
 import { cPanelBg, cPanelFg, cPanelBorder, cPrimaryLight, lDropdownRadius } from './shared-state';
 import { showToast } from './toast';
-import { Mode } from "./types/enums";
+import { OperationModeType } from "./types/enums";
 
 const HISTORY_PANEL_ID = 'marco-remix-history-panel';
 const MAX_HISTORY_ENTRIES = 50;
@@ -24,7 +24,7 @@ export interface RemixHistoryEntry {
   destination: string;
   workspaceId: string;
   /** 'manual' = Remix… modal, 'next' = Remix Next auto-resolver. */
-  mode: Mode;
+  mode: OperationModeType;
 }
 
 const entries: RemixHistoryEntry[] = [];

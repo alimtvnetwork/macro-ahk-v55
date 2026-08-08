@@ -1,7 +1,7 @@
 /**
  * Token Seeder details list — per-tab breakdown drawer.
  *
- * Extracted from `TokenSeederStatusIndicator.tsx` (Plan 25 · Step 9).
+ * Extracted from `TokenSeederStatusIndicator.tsx` (PlanTierType 25 · Step 9).
  * Pure presentation; parent supplies the targets + `now` tick.
  */
 

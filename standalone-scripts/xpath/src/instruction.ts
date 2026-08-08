@@ -8,9 +8,9 @@
  */
 
 import type { ProjectInstruction } from "../../types/instruction/project-instruction";
-import { InjectionWorld } from "../../types/instruction/enums/injection-world";
-import { InjectionRunAt } from "../../types/instruction/enums/injection-run-at";
-import { MatchType } from "../../types/instruction/enums/match-type";
+import { InjectionWorldType } from "../../types/instruction/enums/injection-world";
+import { InjectionRunAtType } from "../../types/instruction/enums/injection-run-at";
+import { MatchRuleType } from "../../types/instruction/enums/match-type";
 import type { EmptySettings } from "../../types/instruction/seed/empty-settings";
 import { VERSION } from "../../shared-version";
 
@@ -20,7 +20,7 @@ const instruction: ProjectInstruction<EmptySettings> = {
     DisplayName: "XPath Utilities",
     Version: VERSION,
     Description: "Global XPath utility library (getByXPath, findElement, reactClick)",
-    World: InjectionWorld.Main,
+    World: InjectionWorldType.Main,
     IsGlobal: true,
     Dependencies: [],
     LoadOrder: 1,
@@ -30,9 +30,9 @@ const instruction: ProjectInstruction<EmptySettings> = {
         IsRemovable: false,
         AutoInject: true,
         TargetUrls: [
-            { Pattern: "https://lovable.dev/projects/*", MatchType: MatchType.Glob },
-            { Pattern: "https://*.lovable.app/*", MatchType: MatchType.Glob },
-            { Pattern: "https://*.lovableproject.com/*", MatchType: MatchType.Glob },
+            { Pattern: "https://lovable.dev/projects/*", MatchRuleType: MatchRuleType.Glob },
+            { Pattern: "https://*.lovable.app/*", MatchRuleType: MatchRuleType.Glob },
+            { Pattern: "https://*.lovableproject.com/*", MatchRuleType: MatchRuleType.Glob },
         ],
         Cookies: [],
         Settings: {},

@@ -8,7 +8,7 @@
  * Loading + error early returns stay here so we can bail before
  * paying for the presentation hook wiring.
  *
- * See Plan 24 SS-06 Phase 2 for the extraction.
+ * See PlanTierType 24 SS-06 Phase 2 for the extraction.
  *
  * @see src/hooks/use-step-library.ts
  * @see src/components/options/step-group-library/StepGroupLibraryBody.tsx

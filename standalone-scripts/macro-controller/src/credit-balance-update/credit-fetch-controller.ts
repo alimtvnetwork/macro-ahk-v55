@@ -1,10 +1,10 @@
 import type { WorkspaceCredit } from '../types';
 import { onSettingsChange } from '../settings-store';
-import { CreditFetchOutcome } from './credit-fetch-outcome';
+import { CreditFetchOutcomeType } from './credit-fetch-outcome';
 import { fetchWorkspaceCreditBalance } from './credit-balance-fetcher';
 import { readCreditBalanceUpdateCache, writeCreditBalanceUpdateCache, makeCachedResult, invalidateCreditBalanceUpdateCache, CREDIT_BALANCE_UPDATE_CACHE_TTL_MS } from './credit-balance-cache';
 import { mapPlanFromWire, shouldFetchCreditBalanceForPlan } from './plan-mapper';
-import { Plan } from './plan';
+import { PlanTierType } from './plan';
 import type { CreditBalance, CreditFetchResult } from './credit-balance-types';
 import { logError } from '../error-utils';
 import { resolveDisplayAvailable, resolveDisplayTotal } from './credit-balance-display';
@@ -19,7 +19,7 @@ let timeoutMs = DEFAULT_TIMEOUT_MS;
 const inFlight = new Map<string, Promise<CreditFetchResult>>();
 let settingsUnsubscribe: (() => void) | null = null;
 
-// Plan 01 / Step 7: tiny pub-sub so UI layers can re-paint the affected
+// PlanTierType 01 / Step 7: tiny pub-sub so UI layers can re-paint the affected
 // workspace row after the resolver completes (success OR failure). Avoids the
 // "value is in cache but never pushed to DOM until next manual refresh" race
 // from `.lovable/plan.md` RCA #4.
@@ -156,7 +156,7 @@ function buildInlineBalance(ws: WorkspaceCredit): CreditBalance {
     };
 }
 
-function buildResult(outcome: CreditFetchOutcome, balance: CreditBalance | null, errorDetail: string | null): CreditFetchResult {
+function buildResult(outcome: CreditFetchOutcomeType, balance: CreditBalance | null, errorDetail: string | null): CreditFetchResult {
     return {
         outcome,
         balance,
@@ -189,15 +189,15 @@ function cacheTtlFor(result: CreditFetchResult): number {
     return Math.max(MIN_TIMEOUT_MS, timeoutMs);
 }
 
-async function fetchWithSingleAuthRetry(ws: WorkspaceCredit, plan: Plan): Promise<CreditFetchResult> {
+async function fetchWithSingleAuthRetry(ws: WorkspaceCredit, plan: PlanTierType): Promise<CreditFetchResult> {
     const first = await fetchWorkspaceCreditBalance({ workspaceId: ws.id, plan, timeoutMs });
-    if (first.outcome !== CreditFetchOutcome.AuthError) {
+    if (first.outcome !== CreditFetchOutcomeType.AuthError) {
         return first;
     }
     return fetchWorkspaceCreditBalance({ workspaceId: ws.id, plan, timeoutMs, forceTokenRefresh: true });
 }
 
-async function requestCreditsUncached(ws: WorkspaceCredit, plan: Plan): Promise<CreditFetchResult> {
+async function requestCreditsUncached(ws: WorkspaceCredit, plan: PlanTierType): Promise<CreditFetchResult> {
     const result = await fetchWithSingleAuthRetry(ws, plan);
     void writeCreditBalanceUpdateCache(ws.id, result, cacheTtlFor(result));
     if (result.balance) {
@@ -208,16 +208,16 @@ async function requestCreditsUncached(ws: WorkspaceCredit, plan: Plan): Promise<
 
 export async function requestCredits(ws: WorkspaceCredit): Promise<CreditFetchResult> {
     if (!ws.id) {
-        return buildResult(CreditFetchOutcome.Skipped, null, 'Missing workspace id');
+        return buildResult(CreditFetchOutcomeType.Skipped, null, 'Missing workspace id');
     }
 
     const plan = mapPlanFromWire(ws.plan);
     if (!shouldFetchCreditBalanceForPlan(plan)) {
-        return buildResult(CreditFetchOutcome.Skipped, null, 'Plan does not require /credit-balance');
+        return buildResult(CreditFetchOutcomeType.Skipped, null, 'PlanTierType does not require /credit-balance');
     }
 
     if (hasInlineCredits(ws)) {
-        return buildResult(CreditFetchOutcome.InlineHit, buildInlineBalance(ws), null);
+        return buildResult(CreditFetchOutcomeType.InlineHit, buildInlineBalance(ws), null);
     }
 
     const cached = await readCreditBalanceUpdateCache(ws.id);
@@ -241,13 +241,13 @@ export async function requestCredits(ws: WorkspaceCredit): Promise<CreditFetchRe
                 'Path: standalone-scripts/macro-controller/src/credit-balance-update/credit-fetch-controller.ts. Missing item: credit-balance result for workspace ' + ws.id + '. Reason: controller fetch failed without a structured result.',
                 caught,
             );
-            return buildResult(CreditFetchOutcome.HttpError, null, detail);
+            return buildResult(CreditFetchOutcomeType.HttpError, null, detail);
         })
         .finally(function (): void {
             inFlight.delete(ws.id);
         })
         .then(function (settled: CreditFetchResult): CreditFetchResult {
-            // Plan 01 / Step 7: notify subscribers AFTER cache is written and
+            // PlanTierType 01 / Step 7: notify subscribers AFTER cache is written and
             // inFlight is cleared, so the re-render reads the fresh value.
             emitCreditResolved(ws.id, settled);
             return settled;

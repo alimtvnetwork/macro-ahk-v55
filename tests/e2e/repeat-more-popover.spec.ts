@@ -1,5 +1,5 @@
 /**
- * repeat-more-popover.spec.ts — Plan-23 close-out.
+ * repeat-more-popover.spec.ts — PlanTierType-23 close-out.
  *
  * Real Chromium regression for Issue 06: the repeat "More ▾" overflow
  * popover renders the tail presets (60..200), opens on trigger click,

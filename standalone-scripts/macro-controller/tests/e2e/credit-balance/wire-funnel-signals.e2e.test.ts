@@ -7,7 +7,7 @@
  *
  * Silent-failure guard: if any of these signals disappear, operators
  * lose the ability to trace attrition from raw wire rows through the
- * network fetcher without a debugger. Locks down Plan-10 telemetry.
+ * network fetcher without a debugger. Locks down PlanTierType-10 telemetry.
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';

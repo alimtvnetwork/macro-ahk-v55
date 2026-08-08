@@ -13,8 +13,8 @@ import { createCollapsibleSection } from './section-collapsible';
 import { sendToExtension } from './prompt-loader';
 import { log, logSub } from '../logger';
 import { throwDiagnostic } from '../errors/diagnostic-error';
-import { MatchType } from "../types/enums";
-import { OriginEnum1, BindingSourceEnum } from "../../../../src/types/enums";
+import { MatchRuleType } from "../types/enums";
+import { MatchedRuleInfoOrigin, BindingSourceEnum } from "../../../../src/types/enums";
 
 export interface OpenTabsSectionResult {
     section: HTMLElement;
@@ -23,8 +23,8 @@ export interface OpenTabsSectionResult {
 
 interface MatchedRuleInfoView {
     readonly pattern: string;
-    readonly matchType: MatchType;
-    readonly origin: OriginEnum1;
+    readonly matchType: MatchRuleType;
+    readonly origin: MatchedRuleInfoOrigin;
 }
 
 interface OpenLovableTabInfoView {

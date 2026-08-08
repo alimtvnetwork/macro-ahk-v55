@@ -9,9 +9,9 @@
  * Any mutation here is a behavior change — update spec file 02 first,
  * then this enum.
  */
-export enum AllowedHomeUrl {
+export enum AllowedHomeUrlType {
     DASHBOARD = "https://lovable.dev/dashboard",
 }
 
-export const ALLOWED_HOME_URLS: readonly string[] = Object.values(AllowedHomeUrl);
+export const ALLOWED_HOME_URLS: readonly string[] = Object.values(AllowedHomeUrlType);
 

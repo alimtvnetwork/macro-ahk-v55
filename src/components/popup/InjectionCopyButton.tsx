@@ -8,7 +8,7 @@ import {
 import { Bug, Check, Loader2 } from "lucide-react";
 import { sendMessage } from "@/lib/message-client";
 import { toast } from "sonner";
-import { Enum_43ebc56c } from "../../types/enums";
+import { SessionCopyStateType } from "../../types/enums";
 
 interface ErrorEntry {
   id?: number;
@@ -183,7 +183,7 @@ function buildInjectionReport(
 
 // eslint-disable-next-line max-lines-per-function
 export function InjectionCopyButton() {
-  const [state, setState] = useState<Enum_43ebc56c>("idle");
+  const [state, setState] = useState<SessionCopyStateType>("idle");
   const [errorCount, setErrorCount] = useState(0);
   const [isPulsing, setIsPulsing] = useState(false);
 

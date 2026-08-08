@@ -8,7 +8,7 @@ import {
     buildNavWrapper, NAV_ATTR, NAV_DOWN_VALUE, NAV_STEP_VALUE, NAV_UP_VALUE,
 } from "./nav-controls-dom";
 import { findByIndex, getSelected } from "./workspace-dictionary";
-import { NavDirection, type WorkspaceDictionary } from "./types";
+import { NavDirectionType, type WorkspaceDictionary } from "./types";
 
 export { NavControlClasses } from "./nav-controls-dom";
 
@@ -34,10 +34,10 @@ function doMount(getDict: () => WorkspaceDictionary): () => void {
 
 function bindClicks(wrap: HTMLElement, getDict: () => WorkspaceDictionary): void {
     wrap.querySelector(`[${NAV_ATTR}="${NAV_UP_VALUE}"]`)?.addEventListener(
-        "click", () => onNavClick(NavDirection.UP, getDict()),
+        "click", () => onNavClick(NavDirectionType.UP, getDict()),
     );
     wrap.querySelector(`[${NAV_ATTR}="${NAV_DOWN_VALUE}"]`)?.addEventListener(
-        "click", () => onNavClick(NavDirection.DOWN, getDict()),
+        "click", () => onNavClick(NavDirectionType.DOWN, getDict()),
     );
 }
 
@@ -51,8 +51,8 @@ export function readStep(): number {
     }
 }
 
-export function computeTargetIndex(currentOneBased: number, total: number, dir: NavDirection, step: number): number {
-    const delta = dir === NavDirection.UP ? -step : step;
+export function computeTargetIndex(currentOneBased: number, total: number, dir: NavDirectionType, step: number): number {
+    const delta = dir === NavDirectionType.UP ? -step : step;
     const next = currentOneBased + delta;
     if (next >= 1 && next <= total) {
         return next;
@@ -66,7 +66,7 @@ function clampToRange(n: number, total: number): number {
     return n;
 }
 
-export function onNavClick(dir: NavDirection, dict: WorkspaceDictionary): void {
+export function onNavClick(dir: NavDirectionType, dict: WorkspaceDictionary): void {
     try {
         const current = getSelected(dict);
         if (current) {
@@ -77,7 +77,7 @@ export function onNavClick(dir: NavDirection, dict: WorkspaceDictionary): void {
     }
 }
 
-function jumpFromCurrent(currentIndex: number, dir: NavDirection, dict: WorkspaceDictionary): void {
+function jumpFromCurrent(currentIndex: number, dir: NavDirectionType, dict: WorkspaceDictionary): void {
     const target = computeTargetIndex(currentIndex, dict.byIndex.length, dir, readStep());
     const record = findByIndex(dict, target);
     if (record) {

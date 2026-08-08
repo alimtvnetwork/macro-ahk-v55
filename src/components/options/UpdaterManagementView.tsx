@@ -13,7 +13,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -388,7 +388,7 @@ export function UpdaterManagementView() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <Label className="text-xs">Auto-Check Interval</Label>
+              <LabelType className="text-xs">Auto-Check Interval</LabelType>
               <Select
                 value={String(globalSettings.AutoCheckIntervalMinutes)}
                 onValueChange={(v) => setGlobalSettings((s) => ({ ...s, AutoCheckIntervalMinutes: Number(v) }))}
@@ -407,7 +407,7 @@ export function UpdaterManagementView() {
             </div>
 
             <div className="space-y-1">
-              <Label className="text-xs">Redirect Cache Expiry</Label>
+              <LabelType className="text-xs">Redirect Cache Expiry</LabelType>
               <Select
                 value={String(globalSettings.CacheExpiryMinutes)}
                 onValueChange={(v) => setGlobalSettings((s) => ({ ...s, CacheExpiryMinutes: Number(v) }))}
@@ -433,9 +433,9 @@ export function UpdaterManagementView() {
                 onCheckedChange={(v) => setGlobalSettings((s) => ({ ...s, HasUserConfirmBeforeUpdate: v ? 1 : 0 }))}
                 id="global-confirm"
               />
-              <Label htmlFor="global-confirm" className="text-xs cursor-pointer">
+              <LabelType htmlFor="global-confirm" className="text-xs cursor-pointer">
                 Confirm before updating
-              </Label>
+              </LabelType>
             </div>
             <div className="flex items-center gap-2">
               <Switch
@@ -443,9 +443,9 @@ export function UpdaterManagementView() {
                 onCheckedChange={(v) => setGlobalSettings((s) => ({ ...s, HasChangelogFromVersionInfo: v ? 1 : 0 }))}
                 id="global-changelog"
               />
-              <Label htmlFor="global-changelog" className="text-xs cursor-pointer">
+              <LabelType htmlFor="global-changelog" className="text-xs cursor-pointer">
                 Get changelog from version info
-              </Label>
+              </LabelType>
             </div>
           </div>
 
@@ -508,29 +508,29 @@ export function UpdaterManagementView() {
           {/* Row 1: Name + Version Info URL */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-xs">Name *</Label>
+              <LabelType className="text-xs">Name *</LabelType>
               <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="e.g. Main Script" className="h-8 text-xs" />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">Version Info URL</Label>
+              <LabelType className="text-xs">Version Info URL</LabelType>
               <Input value={newVersionUrl} onChange={(e) => setNewVersionUrl(e.target.value)} placeholder="https://…" className="h-8 text-xs" />
             </div>
           </div>
 
           {/* Row 2: Script URL (full width) */}
           <div className="space-y-1">
-            <Label className="text-xs">Script / Download URL *</Label>
+            <LabelType className="text-xs">Script / Download URL *</LabelType>
             <Input value={newScriptUrl} onChange={(e) => setNewScriptUrl(e.target.value)} placeholder="https://…" className="h-8 text-xs" />
           </div>
 
           {/* Row 3: Instruction URL + Changelog URL */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-xs">Instruction URL</Label>
+              <LabelType className="text-xs">Instruction URL</LabelType>
               <Input value={newInstructionUrl} onChange={(e) => setNewInstructionUrl(e.target.value)} placeholder="https://…" className="h-8 text-xs" />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">Changelog URL</Label>
+              <LabelType className="text-xs">Changelog URL</LabelType>
               <Input value={newChangelogUrl} onChange={(e) => setNewChangelogUrl(e.target.value)} placeholder="https://…" className="h-8 text-xs" />
             </div>
           </div>
@@ -539,15 +539,15 @@ export function UpdaterManagementView() {
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             <div className="flex items-center gap-2">
               <Switch checked={newIsGit} onCheckedChange={setNewIsGit} id="new-is-git" />
-              <Label htmlFor="new-is-git" className="text-xs cursor-pointer">Git repository</Label>
+              <LabelType htmlFor="new-is-git" className="text-xs cursor-pointer">Git repository</LabelType>
             </div>
             <div className="flex items-center gap-2">
               <Switch checked={newIsRedirectable} onCheckedChange={setNewIsRedirectable} id="new-is-redirect" />
-              <Label htmlFor="new-is-redirect" className="text-xs cursor-pointer">Allow redirects</Label>
+              <LabelType htmlFor="new-is-redirect" className="text-xs cursor-pointer">Allow redirects</LabelType>
             </div>
             {newIsRedirectable && (
               <div className="flex items-center gap-2">
-                <Label className="text-xs">Max depth</Label>
+                <LabelType className="text-xs">Max depth</LabelType>
                 <Input
                   type="number"
                   min={1}
@@ -560,18 +560,18 @@ export function UpdaterManagementView() {
             )}
             <div className="flex items-center gap-2">
               <Switch checked={newHasChangelogFromVersionInfo} onCheckedChange={setNewHasChangelogFromVersionInfo} id="new-changelog-vi" />
-              <Label htmlFor="new-changelog-vi" className="text-xs cursor-pointer">Changelog from version info</Label>
+              <LabelType htmlFor="new-changelog-vi" className="text-xs cursor-pointer">Changelog from version info</LabelType>
             </div>
             <div className="flex items-center gap-2">
               <Switch checked={newHasUserConfirm} onCheckedChange={setNewHasUserConfirm} id="new-confirm" />
-              <Label htmlFor="new-confirm" className="text-xs cursor-pointer">Confirm before update</Label>
+              <LabelType htmlFor="new-confirm" className="text-xs cursor-pointer">Confirm before update</LabelType>
             </div>
           </div>
 
           {/* Row 5: Interval selects */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-xs">Auto-Check Interval</Label>
+              <LabelType className="text-xs">Auto-Check Interval</LabelType>
               <Select value={String(newAutoCheckInterval)} onValueChange={(v) => setNewAutoCheckInterval(Number(v))}>
                 <SelectTrigger className="h-8 text-xs">
                   <SelectValue />
@@ -584,7 +584,7 @@ export function UpdaterManagementView() {
               </Select>
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">Redirect Cache Expiry</Label>
+              <LabelType className="text-xs">Redirect Cache Expiry</LabelType>
               <Select value={String(newCacheExpiry)} onValueChange={(v) => setNewCacheExpiry(Number(v))}>
                 <SelectTrigger className="h-8 text-xs">
                   <SelectValue />

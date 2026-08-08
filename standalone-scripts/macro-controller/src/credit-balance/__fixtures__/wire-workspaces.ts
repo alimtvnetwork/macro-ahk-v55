@@ -1,5 +1,5 @@
 /**
- * Plan-10 fixtures — canonical `/user/workspaces` wire rows.
+ * PlanTierType-10 fixtures — canonical `/user/workspaces` wire rows.
  *
  * One curated fixture set that every plan-10 test/integration harness
  * reuses. Keeps test intent readable and prevents fixture drift across

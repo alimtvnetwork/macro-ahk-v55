@@ -33,8 +33,8 @@ import {
   state,
 } from '../shared-state';
 import type { SettingsDeps, MakeFieldFn } from './settings-ui';
-import { CssFragment } from '../types';
-import { KindEnum6 } from "../types/enums";
+import { CssFragmentType } from '../types';
+import { NumFieldKindType } from "../types/enums";
 
 // ── Panel Results ──
 
@@ -124,7 +124,7 @@ export function buildTimingPanel(makeField: MakeFieldFn): TimingPanelResult {
 
   // Issue 131 Task 3: Automation Timing section
   const autoTitle = document.createElement('div');
-  autoTitle.style.cssText = CssFragment.FontSize11pxFontWeight700Color + cSectionHeader + ';margin-top:14px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;';
+  autoTitle.style.cssText = CssFragmentType.FontSize11pxFontWeight700Color + cSectionHeader + ';margin-top:14px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;';
   autoTitle.textContent = 'Automation & Queue Timing';
   panel.appendChild(autoTitle);
 
@@ -310,7 +310,7 @@ export function buildLoggingPanel(deps: SettingsDeps): LoggingPanelResult {
   };
 
   const masterTitle = document.createElement('div');
-  masterTitle.style.cssText = CssFragment.FontSize11pxFontWeight700Color + cSectionHeader + ';margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;';
+  masterTitle.style.cssText = CssFragmentType.FontSize11pxFontWeight700Color + cSectionHeader + ';margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;';
   masterTitle.textContent = 'Master Controls';
   panel.appendChild(masterTitle);
 
@@ -329,7 +329,7 @@ export function buildLoggingPanel(deps: SettingsDeps): LoggingPanelResult {
   });
 
   const levelTitle = document.createElement('div');
-  levelTitle.style.cssText = CssFragment.FontSize11pxFontWeight700Color + cSectionHeader + ';margin-top:14px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;';
+  levelTitle.style.cssText = CssFragmentType.FontSize11pxFontWeight700Color + cSectionHeader + ';margin-top:14px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;';
   levelTitle.textContent = 'Log Levels';
   panel.appendChild(levelTitle);
 
@@ -412,7 +412,7 @@ function renderConfigSection(
   configInputs: ConfigDbPanelResult['configInputs'],
 ): void {
   const sectionTitle = document.createElement('div');
-  sectionTitle.style.cssText = CssFragment.FontSize11pxFontWeight700Color + cSectionHeader + ';margin-top:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;';
+  sectionTitle.style.cssText = CssFragmentType.FontSize11pxFontWeight700Color + cSectionHeader + ';margin-top:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;';
   sectionTitle.textContent = sectionName;
   panel.appendChild(sectionTitle);
 
@@ -538,7 +538,7 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
   return { panel };
 }
 
-/** Plan-13 step 9: mount the per-project chat-submit history panel. */
+/** PlanTierType-13 step 9: mount the per-project chat-submit history panel. */
 function _mountSubmitHistoryPanel(panel: HTMLElement): void {
   const submitMount = document.createElement('div');
   submitMount.style.cssText = 'margin-top:12px;border-top:1px solid ' + cPanelBorder + ';padding-top:12px;';
@@ -633,7 +633,7 @@ function _buildPerWorkspaceEditor(): HTMLElement {
   section.style.cssText = 'margin-top:14px;';
 
   const title = document.createElement('div');
-  title.style.cssText = CssFragment.FontSize11pxFontWeight700Color + cSectionHeader
+  title.style.cssText = CssFragmentType.FontSize11pxFontWeight700Color + cSectionHeader
     + ';margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;';
   title.textContent = 'Per-Workspace Lifecycle Overrides';
   section.appendChild(title);
@@ -781,7 +781,7 @@ function _buildPerWsAddRow(onAdded: () => void): HTMLElement {
   return row;
 }
 
-function _numField(initial: number | undefined, kind: KindEnum6): HTMLInputElement {
+function _numField(initial: number | undefined, kind: NumFieldKindType): HTMLInputElement {
   const inp = document.createElement('input');
   inp.type = 'number';
   inp.min = '0';
@@ -811,7 +811,7 @@ async function _persistPerWs(
 function _buildOverrideToggles(panel: HTMLElement): Record<string, HTMLInputElement> {
   const overrides = getSettingsOverrides();
   const title = document.createElement('div');
-  title.style.cssText = CssFragment.FontSize11pxFontWeight700Color + cSectionHeader + ';margin-top:14px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;';
+  title.style.cssText = CssFragmentType.FontSize11pxFontWeight700Color + cSectionHeader + ';margin-top:14px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;';
   title.textContent = 'Workspace Display Overrides';
   panel.appendChild(title);
 
@@ -853,7 +853,7 @@ function _buildDbMaintenancePanel(): HTMLDivElement {
   row.style.cssText = 'margin-top:14px;padding-top:10px;border-top:1px solid ' + cPanelBorder + ';';
   
   const title = document.createElement('div');
-  title.style.cssText = CssFragment.FontSize11pxFontWeight700Color + cSectionHeader + ';margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;';
+  title.style.cssText = CssFragmentType.FontSize11pxFontWeight700Color + cSectionHeader + ';margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;';
   title.textContent = 'Database Maintenance';
   row.appendChild(title);
 

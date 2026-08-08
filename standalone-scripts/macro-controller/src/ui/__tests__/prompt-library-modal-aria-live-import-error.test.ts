@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * prompt-library-modal - aria-live announcement for import errors.
  *
@@ -32,14 +33,17 @@ vi.mock('../prompt-io-db-bridge', () => ({
 }));
 vi.mock('../prompt-loader', () => buildPromptLoaderMock({ invalidatePromptCache: vi.fn() }));
 vi.mock('../../db/prompt-db', () => ({
-    listPromptsByRole: vi.fn(async () => ({ ok: true, value: [] })),
-    setDefaultPromptForRole: vi.fn(async () => ({ ok: true })),
-    deletePromptById: vi.fn(async () => ({ ok: true })),
-    upsertPrompt: vi.fn(async () => ({ ok: true, value: 1 })),
+    DbResult,
+    DbResult,
+    DbResult,
+    listPromptsByRole: vi.fn(async () => (new DbResult(true, []))),
+    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+    upsertPrompt: vi.fn(async () => (new DbResult(true, 1))),
 }));
 
 import { openPromptLibraryModal } from '../prompt-library-modal';
-import { StepEnum } from "../../types/enums";
+import { StepMutationType } from "../../types/enums";
 
 const flush = async (): Promise<void> => {
     await new Promise((r) => setTimeout(r, 0));
@@ -83,7 +87,7 @@ describe('prompt-library-modal - aria-live announcement of import errors', () =>
 
         // Observe the exact sequence of mutations. If content is inserted
         // BEFORE the region is unhidden, screen readers miss the alert.
-        type Step = StepEnum;
+        type Step = StepMutationType;
         const order: Step[] = [];
         const observer = new MutationObserver((records) => {
             for (const r of records) {

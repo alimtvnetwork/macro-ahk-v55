@@ -10,7 +10,7 @@
  *
  * Emission surfaces (all best-effort, never throw to callers):
  *   1. `log('[DiagnosticToast:<code>] ...', level)` for the activity log
- *   2. `localStorage[StorageKey.DiagnosticToastTrace]` bounded ring buffer
+ *   2. `localStorage[StorageKeyType.DiagnosticToastTrace]` bounded ring buffer
  *   3. `window.dispatchEvent(new CustomEvent('marco:diagnostic-toast'))`
  *      so tests / dev tools / audit panels can subscribe without patching.
  *
@@ -20,11 +20,11 @@
 
 import { log } from '../logger';
 import { logError } from '../error-utils';
-import { StorageKey } from '../types/storage-keys';
+import { StorageKeyType } from '../types/storage-keys';
 import type { ErrorCode, ErrorSeverity } from '../errors/error-codes';
 import type { ToastLevel } from '../errors/show-diagnostic-toast';
 import type { RequestDetail, ToastOpts } from '../toast';
-import { LevelEnum3 } from "../../../../src/types/enums";
+import { StepNotifyLevel } from "../../../../src/types/enums";
 
 export const DIAGNOSTIC_TOAST_TRACE_MAX = 50;
 
@@ -136,7 +136,7 @@ function formatLine(evt: DiagnosticToastEvent): string {
 }
 
 
-function levelToLogLevel(level: ToastLevel): LevelEnum3 {
+function levelToLogLevel(level: ToastLevel): StepNotifyLevel {
   if (level === 'error') return 'error';
   if (level === 'warn') return 'warning';
   return 'info';
@@ -144,14 +144,14 @@ function levelToLogLevel(level: ToastLevel): LevelEnum3 {
 
 function appendToTraceBuffer(evt: DiagnosticToastEvent): void {
   try {
-    const raw = localStorage.getItem(StorageKey.DiagnosticToastTrace);
+    const raw = localStorage.getItem(StorageKeyType.DiagnosticToastTrace);
     const parsed = raw ? (JSON.parse(raw) as unknown) : [];
     const buf: DiagnosticToastEvent[] = Array.isArray(parsed)
       ? (parsed as DiagnosticToastEvent[])
       : [];
     buf.push(evt);
     while (buf.length > DIAGNOSTIC_TOAST_TRACE_MAX) buf.shift();
-    localStorage.setItem(StorageKey.DiagnosticToastTrace, JSON.stringify(buf));
+    localStorage.setItem(StorageKeyType.DiagnosticToastTrace, JSON.stringify(buf));
   } catch (err) {
     logError('DiagnosticToastTelemetry', 'appendToTraceBuffer failed', err);
   }
@@ -203,7 +203,7 @@ export function emitDiagnosticToastEvent(input: EmitDiagnosticToastInput): Diagn
 /** Read the trace ring buffer for tests / debug panels. */
 export function readDiagnosticToastTrace(): DiagnosticToastEvent[] {
   try {
-    const raw = localStorage.getItem(StorageKey.DiagnosticToastTrace);
+    const raw = localStorage.getItem(StorageKeyType.DiagnosticToastTrace);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
     return Array.isArray(parsed) ? (parsed as DiagnosticToastEvent[]) : [];
@@ -216,7 +216,7 @@ export function readDiagnosticToastTrace(): DiagnosticToastEvent[] {
 /** Clear the trace buffer (test helper). */
 export function clearDiagnosticToastTrace(): void {
   try {
-    localStorage.removeItem(StorageKey.DiagnosticToastTrace);
+    localStorage.removeItem(StorageKeyType.DiagnosticToastTrace);
   } catch (err) {
     logError('DiagnosticToastTelemetry', 'clearDiagnosticToastTrace failed', err);
   }

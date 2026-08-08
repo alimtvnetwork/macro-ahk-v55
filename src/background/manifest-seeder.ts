@@ -262,22 +262,22 @@ async function seedScriptsFromManifest(
  * (mem://features/auto-attach-policy.md, C2) has data to match against.
  *
  * Returns the legacy `string[]` shape (glob-only). Use `extractUrlMatchRules`
- * for the rich `UrlRule[]` shape that preserves `MatchType`.
+ * for the rich `UrlRule[]` shape that preserves `MatchRuleType`.
  */
 function extractUrlMatches(project: SeedProjectEntry): string[] {
     return (project.TargetUrls ?? []).map((t) => t.Pattern);
 }
 
 /**
- * Extracts target-url rules with `MatchType` preserved. Required for projects
- * like `lovable-dashboard` whose seed declares `MatchType: "exact"` —
+ * Extracts target-url rules with `MatchRuleType` preserved. Required for projects
+ * like `lovable-dashboard` whose seed declares `MatchRuleType: "exact"` —
  * collapsing those to globs causes false negatives on tabs with query
  * strings or trailing-slash differences.
  */
 function extractUrlMatchRules(project: SeedProjectEntry): UrlRule[] {
     return (project.TargetUrls ?? []).map((t) => ({
         pattern: t.Pattern,
-        matchType: t.MatchType,
+        matchType: t.MatchRuleType,
     }));
 }
 
@@ -674,7 +674,7 @@ export function buildStoredProjectFromSeed(project: SeedProjectEntry): StoredPro
 function buildProjectTargetUrls(project: SeedProjectEntry): UrlRule[] {
     return (project.TargetUrls ?? []).map((targetUrl) => ({
         pattern: targetUrl.Pattern,
-        matchType: targetUrl.MatchType,
+        matchType: targetUrl.MatchRuleType,
     }));
 }
 

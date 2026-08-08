@@ -9,8 +9,8 @@
 
 import { el } from './database-schema-helpers';
 
-import { DomId } from '../types';
-import { Type7, OnDeleteEnum1 } from "../types/enums";
+import { DomIdType } from '../types';
+import { ColumnValidationType, ForeignKeyOnDeleteType } from "../types/enums";
 import { Type } from "../../../../src/types/enums";
 
 /* ------------------------------------------------------------------ */
@@ -18,7 +18,7 @@ import { Type } from "../../../../src/types/enums";
 /* ------------------------------------------------------------------ */
 
 export interface ColumnValidation {
-  type: Type7;
+  type: ColumnValidationType;
   startsWith?: string;
   endsWith?: string;
   contains?: string;
@@ -33,8 +33,8 @@ export interface ColumnValidation {
 export interface ForeignKeyDef {
   table: string;
   column: string;
-  onDelete: OnDeleteEnum1;
-  onUpdate: OnDeleteEnum1;
+  onDelete: ForeignKeyOnDeleteType;
+  onUpdate: ForeignKeyOnDeleteType;
 }
 
 export interface ColumnEntry {
@@ -179,10 +179,10 @@ function buildValidationTypeSelector(
   validation: ColumnValidation,
   col: ColumnEntry,
 ): HTMLElement {
-  const typeRow = el('div', DomId.SchemaValRow);
-  typeRow.appendChild(el('span', DomId.SchemaValLabel, 'Type'));
+  const typeRow = el('div', DomIdType.SchemaValRow);
+  typeRow.appendChild(el('span', DomIdType.SchemaValLabel, 'Type'));
 
-  const typeSelect = el('select', DomId.SchemaSelect) as HTMLSelectElement;
+  const typeSelect = el('select', DomIdType.SchemaSelect) as HTMLSelectElement;
 
   for (const validationType of ['string', 'date', 'regex'] as const) {
     const option = el('option');
@@ -222,12 +222,12 @@ function renderTypeSpecificFields(panel: HTMLElement, validation: ColumnValidati
 }
 
 function renderValidationTestArea(panel: HTMLElement, col: ColumnEntry): void {
-  const testLabel = el('div', DomId.SchemaValLabel, 'Test Validation');
+  const testLabel = el('div', DomIdType.SchemaValLabel, 'Test Validation');
   testLabel.style.marginTop = '8px';
   panel.appendChild(testLabel);
 
-  const testRow = el('div', DomId.SchemaValRow);
-  const testInput = el('input', DomId.SchemaValInput) as HTMLInputElement;
+  const testRow = el('div', DomIdType.SchemaValRow);
+  const testInput = el('input', DomIdType.SchemaValInput) as HTMLInputElement;
   testInput.placeholder = 'Enter sample value…';
   testRow.appendChild(testInput);
 
@@ -255,10 +255,10 @@ function addValField(
   label: string,
   placeholder?: string,
 ): void {
-  const row = el('div', DomId.SchemaValRow);
-  row.appendChild(el('span', DomId.SchemaValLabel, label));
+  const row = el('div', DomIdType.SchemaValRow);
+  row.appendChild(el('span', DomIdType.SchemaValLabel, label));
 
-  const input = el('input', DomId.SchemaValInput) as HTMLInputElement;
+  const input = el('input', DomIdType.SchemaValInput) as HTMLInputElement;
   input.value = (validation[key] as string) || '';
   input.placeholder = placeholder || '';
   input.oninput = () => { validation[key] = input.value || undefined; };
@@ -273,10 +273,10 @@ function addValNumField(
   key: string,
   label: string,
 ): void {
-  const row = el('div', DomId.SchemaValRow);
-  row.appendChild(el('span', DomId.SchemaValLabel, label));
+  const row = el('div', DomIdType.SchemaValRow);
+  row.appendChild(el('span', DomIdType.SchemaValLabel, label));
 
-  const input = el('input', DomId.SchemaValInput) as HTMLInputElement;
+  const input = el('input', DomIdType.SchemaValInput) as HTMLInputElement;
   input.type = 'number';
   input.value = validation[key] !== undefined ? String(validation[key]) : '';
   input.placeholder = '—';
@@ -311,10 +311,10 @@ function renderFkTableSelector(
   foreignKey: ForeignKeyDef,
   tables: Array<{ name: string }>,
 ): void {
-  const row = el('div', DomId.SchemaFkRow);
-  row.appendChild(el('span', DomId.SchemaValLabel, 'Ref Table'));
+  const row = el('div', DomIdType.SchemaFkRow);
+  row.appendChild(el('span', DomIdType.SchemaValLabel, 'Ref Table'));
 
-  const tableSelect = el('select', DomId.SchemaSelect) as HTMLSelectElement;
+  const tableSelect = el('select', DomIdType.SchemaSelect) as HTMLSelectElement;
   const emptyOption = el('option');
   emptyOption.value = '';
   emptyOption.textContent = '— select —';
@@ -335,10 +335,10 @@ function renderFkTableSelector(
 }
 
 function renderFkColumnInput(panel: HTMLElement, foreignKey: ForeignKeyDef): void {
-  const row = el('div', DomId.SchemaFkRow);
-  row.appendChild(el('span', DomId.SchemaValLabel, 'Ref Column'));
+  const row = el('div', DomIdType.SchemaFkRow);
+  row.appendChild(el('span', DomIdType.SchemaValLabel, 'Ref Column'));
 
-  const columnInput = el('input', DomId.SchemaValInput) as HTMLInputElement;
+  const columnInput = el('input', DomIdType.SchemaValInput) as HTMLInputElement;
   columnInput.value = foreignKey.column;
   columnInput.placeholder = 'Id';
   columnInput.style.maxWidth = '120px';
@@ -354,10 +354,10 @@ function addCascadeSelect(
   currentValue: string,
   onChange: (value: string) => void,
 ): void {
-  const row = el('div', DomId.SchemaFkRow);
-  row.appendChild(el('span', DomId.SchemaValLabel, label));
+  const row = el('div', DomIdType.SchemaFkRow);
+  row.appendChild(el('span', DomIdType.SchemaValLabel, label));
 
-  const select = el('select', DomId.SchemaSelect) as HTMLSelectElement;
+  const select = el('select', DomIdType.SchemaSelect) as HTMLSelectElement;
 
   for (const cascadeOption of CASCADE_OPTS) {
     const option = el('option');

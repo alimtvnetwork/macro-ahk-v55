@@ -18,8 +18,8 @@ import {
   cSectionHeader,
 } from '../shared-state';
 
-import { StyleId } from '../types';
-const STYLE_ID = StyleId.DbSchema;
+import { StyleIdType } from '../types';
+const STYLE_ID = StyleIdType.DbSchema;
 
 /** Inject scoped CSS for the schema tab (idempotent). */
 export function injectSchemaStyles(): void {

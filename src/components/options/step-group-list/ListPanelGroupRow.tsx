@@ -2,7 +2,7 @@
  * Marco Extension — Step Group List Panel Row
  *
  * Single-row renderer for the flat group list in `StepGroupListPanel`.
- * Extracted (Plan 24, Step 4, Phase 3) so the parent panel's `filtered.map`
+ * Extracted (PlanTierType 24, Step 4, Phase 3) so the parent panel's `filtered.map`
  * callback stops tripping `max-lines-per-function`.
  *
  * Pure presentation: every mutation is a callback prop. `parentName` is

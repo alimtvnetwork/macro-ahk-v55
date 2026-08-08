@@ -2,7 +2,7 @@
 // Logger.error('CreditBalanceUpdate.fetch', …) with the mandatory schema:
 // Reason, ReasonDetail, WorkspaceId, BearerPrefix, ElapsedMs, SourceUrl.
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Plan } from '../credit-balance-update/plan';
+import { PlanTierType } from '../credit-balance-update/plan';
 
 const { getBearerTokenSpy, markBearerTokenExpiredSpy, logErrorSpy, logWarnSpy } = vi.hoisted(() => ({
     getBearerTokenSpy: vi.fn(async () => 'tok_abc123def4567890'),
@@ -48,7 +48,7 @@ beforeEach(() => {
 describe('credit fetch failure logging schema (Step 9)', () => {
     it('MissingToken path logs CreditBalanceUpdate.fetch with full schema', async () => {
         getBearerTokenSpy.mockResolvedValueOnce(null);
-        await fetchWorkspaceCreditBalance({ workspaceId: 'ws_err', plan: Plan.Ktlo, timeoutMs: 1000 });
+        await fetchWorkspaceCreditBalance({ workspaceId: 'ws_err', plan: PlanTierType.Ktlo, timeoutMs: 1000 });
         expect(logErrorSpy).toHaveBeenCalledTimes(1);
         const payload = parseLoggedPayload(0);
         expectSchema(payload);
@@ -58,7 +58,7 @@ describe('credit fetch failure logging schema (Step 9)', () => {
 
     it('AuthError (401) path logs full schema with BearerPrefix redacted', async () => {
         vi.stubGlobal('fetch', vi.fn(async () => new Response('nope', { status: 401 })));
-        await fetchWorkspaceCreditBalance({ workspaceId: 'ws_err', plan: Plan.Pro1, timeoutMs: 1000 });
+        await fetchWorkspaceCreditBalance({ workspaceId: 'ws_err', plan: PlanTierType.Pro1, timeoutMs: 1000 });
         const payload = parseLoggedPayload(0);
         expectSchema(payload);
         expect(payload.Reason).toBe('AuthError');
@@ -68,7 +68,7 @@ describe('credit fetch failure logging schema (Step 9)', () => {
 
     it('Http5xx path logs full schema with BodyPreview', async () => {
         vi.stubGlobal('fetch', vi.fn(async () => new Response('boom', { status: 503 })));
-        await fetchWorkspaceCreditBalance({ workspaceId: 'ws_err', plan: Plan.Pro1, timeoutMs: 1000 });
+        await fetchWorkspaceCreditBalance({ workspaceId: 'ws_err', plan: PlanTierType.Pro1, timeoutMs: 1000 });
         const payload = parseLoggedPayload(0);
         expectSchema(payload);
         expect(payload.Reason).toBe('Http5xx');
@@ -77,7 +77,7 @@ describe('credit fetch failure logging schema (Step 9)', () => {
 
     it('NetworkError path logs full schema', async () => {
         vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('socket reset'); }));
-        await fetchWorkspaceCreditBalance({ workspaceId: 'ws_err', plan: Plan.Pro1, timeoutMs: 1000 });
+        await fetchWorkspaceCreditBalance({ workspaceId: 'ws_err', plan: PlanTierType.Pro1, timeoutMs: 1000 });
         const payload = parseLoggedPayload(0);
         expectSchema(payload);
         expect(payload.Reason).toBe('NetworkError');
@@ -86,7 +86,7 @@ describe('credit fetch failure logging schema (Step 9)', () => {
 
     it('rejects the legacy "Path" key (renamed to SourceUrl)', async () => {
         getBearerTokenSpy.mockResolvedValueOnce(null);
-        await fetchWorkspaceCreditBalance({ workspaceId: 'ws_err', plan: Plan.Ktlo, timeoutMs: 1000 });
+        await fetchWorkspaceCreditBalance({ workspaceId: 'ws_err', plan: PlanTierType.Ktlo, timeoutMs: 1000 });
         const payload = parseLoggedPayload(0);
         expect(payload).not.toHaveProperty('Path');
     });

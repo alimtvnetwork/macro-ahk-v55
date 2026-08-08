@@ -1,5 +1,5 @@
 /**
- * Unit tests — Plan-10 WireWorkspace → enrichment-candidate mapper.
+ * Unit tests — PlanTierType-10 WireWorkspace → enrichment-candidate mapper.
  *
  * v4.130.0: mapper widened to async (`FreshCacheProbe` may be sync or
  * `Promise<boolean>`); tests updated to await and cover the async path.

@@ -1,9 +1,9 @@
 /**
- * Mode + selector + selector-kind fields for UrlTabClickFields.
+ * OperationModeType + selector + selector-kind fields for UrlTabClickFields.
  */
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -27,10 +27,10 @@ export function UrlTabClickTargetSection(props: UrlTabClickTargetSectionProps): 
     return (
         <>
             <div className="space-y-1">
-                <Label htmlFor="utc-mode">Mode</Label>
+                <LabelType htmlFor="utc-mode">OperationModeType</LabelType>
                 <Select
-                    value={value.Mode}
-                    onValueChange={(v) => onPatch({ Mode: v as UrlTabClickMode })}
+                    value={value.OperationModeType}
+                    onValueChange={(v) => onPatch({ OperationModeType: v as UrlTabClickMode })}
                 >
                     <SelectTrigger id="utc-mode"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -42,7 +42,7 @@ export function UrlTabClickTargetSection(props: UrlTabClickTargetSectionProps): 
             </div>
             <div className="grid grid-cols-3 gap-2">
                 <div className="space-y-1 col-span-2">
-                    <Label htmlFor="utc-selector">Selector (optional)</Label>
+                    <LabelType htmlFor="utc-selector">Selector (optional)</LabelType>
                     <Input
                         id="utc-selector"
                         value={value.Selector}
@@ -51,7 +51,7 @@ export function UrlTabClickTargetSection(props: UrlTabClickTargetSectionProps): 
                     />
                 </div>
                 <div className="space-y-1">
-                    <Label htmlFor="utc-sel-kind">Selector kind</Label>
+                    <LabelType htmlFor="utc-sel-kind">Selector kind</LabelType>
                     <Select
                         value={value.SelectorKind}
                         onValueChange={(v) => onPatch({ SelectorKind: v as SelectorKindOption })}

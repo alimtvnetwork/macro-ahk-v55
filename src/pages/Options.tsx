@@ -43,7 +43,7 @@ const ErrorSwallowAuditView = lazy(() => import("@/components/options/ErrorSwall
 
 import { WorkspaceSelector } from "@/components/options/WorkspaceSelector";
 import { RecoveryIndicator } from "@/components/options/RecoveryIndicator";
-import { StepGroupViewEnum, Enum_31dd676d } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { StepGroupViewType, NavigationDirectionType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 const SECTION_STEP_GROUPS: SidebarSection = "step-groups";
 
@@ -177,7 +177,7 @@ const OptionsPage = () => {
    * `/step-groups/list` pages so the panel renders inside the real
    * Options shell (sidebar + header + main).
    */
-  const parseHash = (): { section: SidebarSection; stepGroupView: StepGroupViewEnum } => {
+  const parseHash = (): { section: SidebarSection; stepGroupView: StepGroupViewType } => {
     const hash = window.location.hash.replace("#", "").trim();
     const validSections: SidebarSection[] = [
       "projects", "scripts", "prompts", "activity", "logging",
@@ -203,14 +203,14 @@ const OptionsPage = () => {
    * (richer); the list view is a flat searchable browser. Both panels
    * live inside `<main>` so the user never leaves Options.
    */
-  const [stepGroupView, setStepGroupView] = useState<StepGroupViewEnum>(
+  const [stepGroupView, setStepGroupView] = useState<StepGroupViewType>(
     initialHash.stepGroupView,
   );
   const [isCreating, setIsCreating] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
   const [errorDrawerOpen, setErrorDrawerOpen] = useState(false);
   /** Tracks navigation direction for view transition animation. */
-  const [viewDirection, setViewDirection] = useState<Enum_31dd676d>("forward");
+  const [viewDirection, setViewDirection] = useState<NavigationDirectionType>("forward");
   const extensionVersion = getChromeRuntime()?.getManifest?.().version ?? null;
 
   /**
@@ -564,7 +564,7 @@ const OptionsPage = () => {
               ) : selection.section === SECTION_STEP_GROUPS ? (
                 <StepGroupsSection
                   view={stepGroupView}
-                  onViewChange={(v: StepGroupViewEnum) => {
+                  onViewChange={(v: StepGroupViewType) => {
                     setStepGroupView(v);
                     // Keep the URL in sync so refresh / share preserves the sub-view.
                     const nextHash = v === "list" ? HASH_STEP_GROUPS_LIST : SECTION_STEP_GROUPS;
@@ -640,8 +640,8 @@ export default OptionsPage;
  * dialog behaviour while sitting inside the real sidebar layout.
  */
 function StepGroupsSection(props: {
-  view: StepGroupViewEnum;
-  onViewChange: (view: StepGroupViewEnum) => void;
+  view: StepGroupViewType;
+  onViewChange: (view: StepGroupViewType) => void;
 }) {
   const { view, onViewChange } = props;
   return (

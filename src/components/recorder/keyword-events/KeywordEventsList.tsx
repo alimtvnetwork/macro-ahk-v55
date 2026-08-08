@@ -1,6 +1,6 @@
 /**
  * DnD-enabled sortable list of keyword-event cards. Extracted from
- * `KeywordEventsPanel.tsx` in Plan 25 Step 15 so the editor host stays
+ * `KeywordEventsPanel.tsx` in PlanTierType 25 Step 15 so the editor host stays
  * under the `max-lines-per-function` ceiling.
  */
 
@@ -21,7 +21,7 @@ import {
 import type { KeywordEvent, KeywordEventStep } from "@/hooks/use-keyword-events";
 import { KeywordEventBulkContextMenu } from "../KeywordEventBulkContextMenu";
 import { SortableKeywordEventCard } from "./SortableKeywordEventCard";
-import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { DirectionType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 const NOOP_DRAG_HANDLER = (): void => { /* drag-reorder disabled while filtering */ };
 
@@ -46,13 +46,13 @@ export interface KeywordEventsListProps {
     readonly onRemoveEvent: (id: string) => void;
     readonly onAddStep: (eventId: string, step: Omit<KeywordEventStep, "Id">) => void;
     readonly onRemoveStep: (eventId: string, stepId: string) => void;
-    readonly onMoveStep: (eventId: string, stepId: string, dir: DirectionEnum) => void;
+    readonly onMoveStep: (eventId: string, stepId: string, dir: DirectionType) => void;
     readonly onRemoveSteps: (eventId: string, stepIds: readonly string[]) => void;
     readonly onSetStepsEnabled: (eventId: string, stepIds: readonly string[], enabled: boolean) => void;
     readonly onRelabelSteps: (eventId: string, stepIds: readonly string[], labels: readonly string[]) => void;
 }
 
-// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf; Plan 25 Step 15
+// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf; PlanTierType 25 Step 15
 export function KeywordEventsList(props: KeywordEventsListProps): JSX.Element {
     const {
         visibleEvents, allEvents, isFiltering, selection, playback,

@@ -1,7 +1,7 @@
 import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Negative + idempotency edge coverage for `seed-plan-next.ts`
- * (Plan-22 steps 41-48).
+ * (PlanTierType-22 steps 41-48).
  *
  * The existing `seed-plan-next.test.ts` locks the happy paths and
  * the top-level INSERT failure. This file closes the remaining gaps
@@ -14,7 +14,7 @@ import { ServiceResult } from '../../utils/result-wrapper';
  *      fail the seed as a whole; telemetry `promotedDefault` stays 0.
  *  E3. localStorage.setItem throwing during telemetry persistence is
  *      logged but does NOT flip `ok` to false.
- *  E4. seed SQL carries the Plan-15 ReplaceKey/ReplaceValues literals
+ *  E4. seed SQL carries the PlanTierType-15 ReplaceKey/ReplaceValues literals
  *      (`n` + `["1","2","3","5","8"]`) so cold-boot chip set is intact.
  *  E5. telemetry rows include `replaceKey` and `replaceValueCount`.
  *  E6. an outer throw (rawSql rejects) returns `ok:false` with the
@@ -73,10 +73,10 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
             { isOk: true, rows: [{ '1': 1 }] },                // next default present
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         // With no pre-select data, every seed row is counted as "inserted"
         // (defensive, not misleading: the OR IGNORE below is still safe).
-        const plan = r.telemetry?.find(t => t.role === 'plan');
+        const plan = r.data?.telemetry?.find(t => t.role === 'plan');
         expect(plan?.inserted).toBeGreaterThan(0);
         expect(plan?.skipped).toBe(0);
     });
@@ -94,9 +94,9 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
             { isOk: true },                                    // next promote ok
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
-        const plan = r.telemetry?.find(t => t.role === 'plan');
-        const next = r.telemetry?.find(t => t.role === 'next');
+        expect(r.ok).toBe(true);
+        const plan = r.data?.telemetry?.find(t => t.role === 'plan');
+        const next = r.data?.telemetry?.find(t => t.role === 'next');
         expect(plan?.promotedDefault).toBe(0);
         expect(next?.promotedDefault).toBe(1);
         expect(logDiagnosticFromCode).toHaveBeenCalledWith(
@@ -115,7 +115,7 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
         });
         try {
             const r = await seedPlanNextPrompts();
-            expect(r.isSuccess).toBe(true);
+            expect(r.ok).toBe(true);
             expect(logDiagnosticFromCode).toHaveBeenCalledWith(
                 'SEED_TELEMETRY_E001',
                 expect.objectContaining({ reason: expect.stringContaining('quota') }),
@@ -126,7 +126,7 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
         }
     });
 
-    it('E4: INSERT SQL carries the Plan-15 default ReplaceKey and ReplaceValues literals', async () => {
+    it('E4: INSERT SQL carries the PlanTierType-15 default ReplaceKey and ReplaceValues literals', async () => {
         responsesQueue = [
             { isOk: true, rows: [] }, { isOk: true },
             { isOk: true, rows: [{ '1': 1 }] }, { isOk: true, rows: [{ '1': 1 }] },
@@ -146,8 +146,8 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
             { isOk: true, rows: [{ '1': 1 }] }, { isOk: true, rows: [{ '1': 1 }] },
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
-        for (const bucket of r.telemetry ?? []) {
+        expect(r.ok).toBe(true);
+        for (const bucket of r.data?.telemetry ?? []) {
             expect(bucket.replaceKey).toBe(REPLACE_KEY_DEFAULT);
             expect(bucket.replaceValueCount).toBe(REPLACE_VALUES_DEFAULT.length);
         }
@@ -156,7 +156,7 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
     it('E6: an outer rawSql throw surfaces via ok:false + coded diagnostic, never swallowed', async () => {
         sendImpl = async () => { throw new Error('driver offline'); };
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/driver offline/);
         expect(logDiagnosticFromCode).toHaveBeenCalledWith(
             'SEED_INSERT_E001',

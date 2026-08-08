@@ -11,7 +11,7 @@ import { showPasteToast } from './prompt-utils';
 import { runTaskNextLoop } from './task-next-ui';
 import { openTaskNextSettingsModal } from './task-next-settings-modal';
 import type { SavePromptDeps } from './save-prompt';
-import { CssFragment } from '../types';
+import { CssFragmentType } from '../types';
 /** Build the Task Next hover submenu and attach it to the dropdown. */
 export function buildTaskNextSubmenu(
   dropdown: HTMLElement,
@@ -54,7 +54,7 @@ export function buildTaskNextSubmenu(
   };
 
   taskNextItem.onmouseover = function () {
-    (this as HTMLElement).style.background = CssFragment.Rgba124_58_237_015;
+    (this as HTMLElement).style.background = CssFragmentType.Rgba124_58_237_015;
     positionSubmenu();
     submenu.style.display = 'block';
   };
@@ -92,7 +92,7 @@ function buildPresetCountItems(
     const item = document.createElement('div');
     item.style.cssText = 'padding:5px 12px;cursor:pointer;font-size:10px;color:#e0e0e0;';
     item.textContent = 'Next ' + count + ' task' + (count > 1 ? 's' : '');
-    item.onmouseover = function () { (this as HTMLElement).style.background = CssFragment.Rgba124_58_237_015; };
+    item.onmouseover = function () { (this as HTMLElement).style.background = CssFragmentType.Rgba124_58_237_015; };
     item.onmouseout = function () { (this as HTMLElement).style.background = 'transparent'; };
     item.onclick = function (event) {
       event.stopPropagation();
@@ -161,7 +161,7 @@ function buildSettingsItem(
   const settingsItem = document.createElement('div');
   settingsItem.style.cssText = 'padding:5px 12px;cursor:pointer;font-size:10px;color:#a78bfa;border-top:1px solid rgba(124,58,237,0.2);';
   settingsItem.textContent = '⚙ Settings';
-  settingsItem.onmouseover = function () { (this as HTMLElement).style.background = CssFragment.Rgba124_58_237_015; };
+  settingsItem.onmouseover = function () { (this as HTMLElement).style.background = CssFragmentType.Rgba124_58_237_015; };
   settingsItem.onmouseout = function () { (this as HTMLElement).style.background = 'transparent'; };
   settingsItem.onclick = function (event) {
     event.stopPropagation();

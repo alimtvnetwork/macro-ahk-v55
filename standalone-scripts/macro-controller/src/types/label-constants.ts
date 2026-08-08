@@ -1,7 +1,7 @@
 /**
  * Log/label prefix strings used for structured logging and identification.
  */
-export enum Label {
+export enum LabelType {
   PromptPrewarm = 'prompt-prewarm',
   WsPrefetch = 'ws-prefetch',
   StartupRetry = 'Startup: Retry #',

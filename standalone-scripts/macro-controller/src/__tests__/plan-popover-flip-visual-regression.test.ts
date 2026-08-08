@@ -1,8 +1,8 @@
 /**
- * Plan popover visual regression, flipped (above) vs normal (below).
+ * PlanTierType popover visual regression, flipped (above) vs normal (below).
  *
  * Locks the content-aware positioning contract for the fixed-position
- * Plan/Next "More" popover so regressions cannot silently recur.
+ * PlanTierType/Next "More" popover so regressions cannot silently recur.
  * The popover must:
  *   - anchor as `position: fixed` and LEFT-align to the trigger, so it
  *     drops down to the RIGHT side of the button (grows rightward),
@@ -55,7 +55,7 @@ function setViewport(width: number, height: number): void {
   Object.defineProperty(window, 'innerHeight', { configurable: true, value: height });
 }
 
-describe('Plan popover fixed-position visual regression', () => {
+describe('PlanTierType popover fixed-position visual regression', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
     setViewport(1280, 900);

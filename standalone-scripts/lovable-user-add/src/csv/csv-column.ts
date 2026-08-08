@@ -7,22 +7,22 @@
  * stays purely about column shape.
  */
 
-export enum UserAddCsvColumn {
+export enum UserAddCsvColumnType {
     WorkspaceUrl = "WorkspaceUrl",
     MemberEmail = "MemberEmail",
     Role = "Role",
     Notes = "Notes",
 }
 
-export const REQUIRED_COLUMNS: ReadonlyArray<UserAddCsvColumn> = Object.freeze([
-    UserAddCsvColumn.WorkspaceUrl,
-    UserAddCsvColumn.MemberEmail,
+export const REQUIRED_COLUMNS: ReadonlyArray<UserAddCsvColumnType> = Object.freeze([
+    UserAddCsvColumnType.WorkspaceUrl,
+    UserAddCsvColumnType.MemberEmail,
 ]);
 
-export const OPTIONAL_COLUMNS: ReadonlyArray<UserAddCsvColumn> = Object.freeze([
-    UserAddCsvColumn.Role,
-    UserAddCsvColumn.Notes,
+export const OPTIONAL_COLUMNS: ReadonlyArray<UserAddCsvColumnType> = Object.freeze([
+    UserAddCsvColumnType.Role,
+    UserAddCsvColumnType.Notes,
 ]);
 
-export const ALL_COLUMNS: ReadonlyArray<UserAddCsvColumn> =
+export const ALL_COLUMNS: ReadonlyArray<UserAddCsvColumnType> =
     Object.freeze([...REQUIRED_COLUMNS, ...OPTIONAL_COLUMNS]);

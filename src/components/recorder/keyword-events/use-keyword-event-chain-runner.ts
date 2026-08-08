@@ -1,7 +1,7 @@
 /**
  * Owns the "run chain" side of the keyword-events editor: AbortController,
  * live progress, and the streaming timeline. Extracted from
- * `KeywordEventsPanel.tsx` in Plan 25 Step 15 so the editor host stays
+ * `KeywordEventsPanel.tsx` in PlanTierType 25 Step 15 so the editor host stays
  * under `max-lines-per-function`.
  */
 
@@ -35,7 +35,7 @@ export interface UseKeywordEventChainRunnerResult {
     readonly cancel: () => void;
 }
 
-// eslint-disable-next-line max-lines-per-function -- state + async runner; Plan 25 Step 15
+// eslint-disable-next-line max-lines-per-function -- state + async runner; PlanTierType 25 Step 15
 export function useKeywordEventChainRunner(
     args: UseKeywordEventChainRunnerArgs,
 ): UseKeywordEventChainRunnerResult {
@@ -52,7 +52,7 @@ export function useKeywordEventChainRunner(
         ctrlRef.current = null;
     };
 
-    // eslint-disable-next-line max-lines-per-function -- chain-runner async closure; Plan 25 Step 15
+    // eslint-disable-next-line max-lines-per-function -- chain-runner async closure; PlanTierType 25 Step 15
     const run = async (): Promise<void> => {
         ctrlRef.current?.abort();
         const ctrl = new AbortController();

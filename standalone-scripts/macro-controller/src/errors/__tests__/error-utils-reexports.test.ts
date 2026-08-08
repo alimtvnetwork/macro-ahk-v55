@@ -1,5 +1,5 @@
 /**
- * Plan 26 · Step 7 · error-utils diagnostic surface re-exports + bridges.
+ * PlanTierType 26 · Step 7 · error-utils diagnostic surface re-exports + bridges.
  *
  * Proves that consumers can import the diagnostic surface from `error-utils`
  * (single migration entry point) and that `reportDiagnostic` and `wrapCaught`

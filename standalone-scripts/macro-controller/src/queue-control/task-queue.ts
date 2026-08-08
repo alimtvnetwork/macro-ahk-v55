@@ -1,7 +1,7 @@
 /**
  * Persistent per-project task queue.
  *
- * Plan: .lovable/plans/pending/08-task-splitter-and-next-queue.md (step 3).
+ * PlanTierType: .lovable/plans/pending/08-task-splitter-and-next-queue.md (step 3).
  *
  * Storage is injected via a `QueueStorage` adapter so the queue can be
  * unit-tested without IndexedDB. The production wiring uses
@@ -13,12 +13,12 @@
  */
 
 import { throwDiagnostic } from '../errors/diagnostic-error';
-import { Status9 } from "../types/enums";
+import { TaskQueueItemStatusType } from "../types/enums";
 
 export interface TaskQueueItem {
     readonly id: string;
     readonly text: string;
-    status: Status9;
+    status: TaskQueueItemStatusType;
     readonly createdAt: number;
 }
 

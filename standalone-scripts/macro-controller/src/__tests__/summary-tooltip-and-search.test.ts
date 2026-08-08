@@ -20,7 +20,7 @@ import { applyFilters, type FilterState } from '../ui/credit-totals-modal';
 
 import type { WorkspaceCredit } from '../types/credit-types';
 import type { WorkspaceDisplayKind } from '../workspace-display-status';
-import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
+import { CreditFetchOutcomeType } from '../credit-balance-update/credit-fetch-outcome';
 import { __writeCreditBalanceUpdateMemoryCacheForTests, clearCreditBalanceUpdateMemoryCache } from '../credit-balance-update/credit-balance-cache';
 
 function ws(over: Partial<WorkspaceCredit>): WorkspaceCredit {
@@ -42,7 +42,7 @@ beforeEach(() => {
 
 function seedSummaryCache(workspaceId: string, remaining: number, total: number): void {
     __writeCreditBalanceUpdateMemoryCacheForTests(workspaceId, {
-        outcome: CreditFetchOutcome.ApiHit,
+        outcome: CreditFetchOutcomeType.ApiHit,
         fetchedAt: Date.now(),
         sourceUrl: 'test',
         errorDetail: null,

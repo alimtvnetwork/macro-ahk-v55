@@ -1,4 +1,4 @@
-import { RunAtEnum1 } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { ScriptRunAtType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /**
  * Marco Extension — Script Bundle Types
@@ -14,7 +14,7 @@ export interface BundleJsEntry {
   name: string;
   code: string;
   order: number;
-  runAt?: RunAtEnum1;
+  runAt?: ScriptRunAtType;
 }
 
 /** A single JSON config entry within a bundle. */

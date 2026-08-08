@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * v4.190.0 regression coverage for:
  *   1. `exportPromptsToJson({ includeRevisions: true })` opt-in.
@@ -18,11 +19,11 @@ vi.mock('../prompt-loader', () => buildPromptLoaderMock({ invalidatePromptCache:
 
 // Stub the DB revision layer so we can observe call arguments.
 vi.mock('../../db/prompt-revision-db', () => ({
-    listPromptRevisions: vi.fn(async (_slug: string) => ({ ok: true, value: [] as unknown[] })),
-    insertImportedRevisions: vi.fn(async (_slug: string, rows: readonly unknown[]) => ({ ok: true, value: rows.length })),
-    getMaxRevisionId: vi.fn(async () => ({ ok: true, value: 0 })),
-    deleteImportedRevisionsAfter: vi.fn(async () => ({ ok: true, value: 0 })),
-    recordPromptRevision: vi.fn(async () => ({ ok: true, value: 1 })),
+    listPromptRevisions: vi.fn(async (_slug: string) => (new DbResult(true, [] as unknown[]))),
+    insertImportedRevisions: vi.fn(async (_slug: string, rows: readonly unknown[]) => (new DbResult(true, rows.length))),
+    getMaxRevisionId: vi.fn(async () => (new DbResult(true, 0))),
+    deleteImportedRevisionsAfter: vi.fn(async () => (new DbResult(true, 0))),
+    recordPromptRevision: vi.fn(async () => (new DbResult(true, 1))),
     PROMPT_REVISION_LIMIT_PER_SLUG: 20,
 }));
 

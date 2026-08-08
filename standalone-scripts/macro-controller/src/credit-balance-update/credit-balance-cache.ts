@@ -1,5 +1,5 @@
 import { logError } from '../error-utils';
-import { CreditFetchOutcome } from './credit-fetch-outcome';
+import { CreditFetchOutcomeType } from './credit-fetch-outcome';
 import type { CreditBalance, CreditFetchResult } from './credit-balance-types';
 
 const DB_NAME = 'macro_controller_credit_balance_update_v1';
@@ -174,7 +174,7 @@ export function makeCachedResult(result: CreditFetchResult): CreditFetchResult {
         return result;
     }
     return {
-        outcome: CreditFetchOutcome.ApiCacheHit,
+        outcome: CreditFetchOutcomeType.ApiCacheHit,
         balance: result.balance,
         fetchedAt: result.fetchedAt,
         sourceUrl: result.sourceUrl,
@@ -184,7 +184,7 @@ export function makeCachedResult(result: CreditFetchResult): CreditFetchResult {
 
 export function buildInlineResult(balance: CreditBalance, sourceUrl: string): CreditFetchResult {
     return {
-        outcome: CreditFetchOutcome.InlineHit,
+        outcome: CreditFetchOutcomeType.InlineHit,
         balance,
         fetchedAt: Date.now(),
         sourceUrl,

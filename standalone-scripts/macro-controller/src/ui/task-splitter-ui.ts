@@ -5,7 +5,7 @@ import { ServiceResult } from '../utils/result-wrapper';
  *
  * Mounts as a collapsible section inside the macro-controller panel,
  * next to the Repeat-loop section. UX answers (2026-06-24):
- *   • Split prompt   = `Plan ${N}` (overridable via dropdown)
+ *   • Split prompt   = `PlanTierType ${N}` (overridable via dropdown)
  *   • Per-step prompt = `Next ${N} steps` (overridable via dropdown)
  *   • Splitting      = sends `[pasted text]\n\n[split prompt text]` once
  *   • Delay presets  = 2 / 5 / 10 / 15 / 30 / 60 s
@@ -32,7 +32,7 @@ import { getSettingsOverrides } from '../settings-store';
 import { REPLACE_KEY_DEFAULT } from '../db/prompt-defaults';
 import { PLAN_DEFAULT_BODY } from '../seed/plan-next-prompts';
 import { substituteToken } from '../utils/token-substitute';
-import { Enum_e15ad38, PlanPromptSourceEnum } from "../types/enums";
+import { PromptFieldKeyType, PlanPromptSourceType } from "../types/enums";
 
 const DELAY_PRESETS_SEC = [2, 5, 10, 15, 30, 60] as const;
 const STEP_MIN = 2;
@@ -434,7 +434,7 @@ function populatePromptSelect(sel: HTMLSelectElement, currentSlug: string, autoL
   auto.textContent = autoLabel;
   sel.appendChild(auto);
   const entries = getPromptsConfig().entries || [];
-  // Group by parent title so the giant `Plan ${N}` / `Next ${N} steps` variant lists fold up.
+  // Group by parent title so the giant `PlanTierType ${N}` / `Next ${N} steps` variant lists fold up.
   const seenParents = new Set<string>();
   for (const e of entries) {
     const slug = e.slug || '';
@@ -510,7 +510,7 @@ function buildControl(): HTMLElement {
   const sLbl = document.createElement('span'); sLbl.textContent = 'Split'; sLbl.style.opacity = '0.8';
   const sSel = makeSelect();
   sSel.style.flex = '1';
-  populatePromptSelect(sSel, state.splitPromptSlug, '⚙ Auto: Plan ${N}');
+  populatePromptSelect(sSel, state.splitPromptSlug, '⚙ Auto: PlanTierType ${N}');
   sSel.onchange = function () { state.splitPromptSlug = sSel.value; persist(); };
   row2.appendChild(sLbl); row2.appendChild(sSel);
   body.appendChild(row2);
@@ -591,7 +591,7 @@ export function buildTaskSplitterPanelSection(): HTMLElement {
 
 /**
  * External trigger — used by the inline "✂ Split" strip below the Next strip.
- * Resolves the `Plan ${N}` library prompt for the chosen step count and
+ * Resolves the `PlanTierType ${N}` library prompt for the chosen step count and
  * pastes + submits it. No queue/parse pipeline — the user just wants the
  * planning prompt fired with the selected N.
  */
@@ -611,7 +611,7 @@ export async function triggerSplitFromInline(stepCount: number): Promise<void> {
   try {
     const prompt = await resolvePlanPromptDbFirst(n);
     const ok = await pasteAndSubmit(prompt);
-    if (ok) showPasteToast('✂ Split: sent "Plan ' + n + '"', false);
+    if (ok) showPasteToast('✂ Split: sent "PlanTierType ' + n + '"', false);
     else showPasteToast('❌ Split: paste/submit failed', true);
   } finally {
     state.running = false;
@@ -619,8 +619,8 @@ export async function triggerSplitFromInline(stepCount: number): Promise<void> {
   }
 }
 
-type PlanPromptEntry = Pick<PromptEntry, Enum_e15ad38>;
-export type PlanPromptSource = PlanPromptSourceEnum;
+type PlanPromptEntry = Pick<PromptEntry, PromptFieldKeyType>;
+export type PlanPromptSource = PlanPromptSourceType;
 let lastPlanPromptSource: PlanPromptSource = 'not-found';
 export function getLastPlanPromptSource(): PlanPromptSource { return lastPlanPromptSource; }
 
@@ -637,7 +637,7 @@ async function resolvePlanPromptFromDb(n: number): Promise<string | null> {
   try {
     const mod = await import('../db/prompt-db');
     const result = await mod.getDefaultPromptForRole('plan');
-    if (result.isFail || !result.value || result.value.Body.length === 0) return null;
+    if (!result.ok || !result.value || result.value.Body.length === 0) return null;
     const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
     logPlanSource(n, 'db-default', 'Prompt table plan default');
     return substitutePlanN(result.value.Body, key, n);
@@ -722,7 +722,7 @@ export function isSplitterRunning(): boolean {
 }
 
 /**
- * Plan-paste trigger — appends the `Plan ${N}` library prompt onto whatever
+ * PlanTierType-paste trigger — appends the `PlanTierType ${N}` library prompt onto whatever
  * text is currently in the Lovable chat box. Does NOT submit. The user
  * reviews/edits, then presses Send themselves.
  */
@@ -741,13 +741,13 @@ export async function triggerPlanPasteFromInline(stepCount: number): Promise<voi
     const promptsCfg = getPromptsConfig();
     const outcome = await pasteIntoEditor(combined, promptsCfg, (xp) => getByXPath(xp) as Element | null);
     if (String(outcome) === 'failed') {
-      showPasteToast('❌ Plan: paste failed', true);
+      showPasteToast('❌ PlanTierType: paste failed', true);
       return;
     }
-    showPasteToast('📋 Plan ' + n + ' appended [src:' + getLastPlanPromptSource() + '] — review and Send manually', false);
+    showPasteToast('📋 PlanTierType ' + n + ' appended [src:' + getLastPlanPromptSource() + '] — review and Send manually', false);
   } catch (e) {
     logError('TaskSplitter', 'triggerPlanPasteFromInline threw', e);
-    showPasteToast('❌ Plan: paste threw', true);
+    showPasteToast('❌ PlanTierType: paste threw', true);
   }
 }
 

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { ValidationRuleEditor, type ValidationRule } from "./ValidationRuleEditor";
 import { Type } from "../../../types/enums";
@@ -116,7 +116,7 @@ export function ColumnEditor({
                 disabled={readOnly}
                 className="h-4 w-7"
               />
-              <Label className="text-[10px] text-muted-foreground">Null</Label>
+              <LabelType className="text-[10px] text-muted-foreground">Null</LabelType>
             </div>
 
             {!readOnly && (
@@ -142,7 +142,7 @@ export function ColumnEditor({
                   disabled={readOnly}
                   className="h-4 w-7"
                 />
-                <Label className="text-[10px] text-muted-foreground">Unique</Label>
+                <LabelType className="text-[10px] text-muted-foreground">Unique</LabelType>
               </div>
               <Input
                 placeholder="Default value"

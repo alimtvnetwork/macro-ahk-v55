@@ -45,7 +45,7 @@ export async function buildRoleSection(refs: ModalRefs, role: PromptRole, refres
   wrap.appendChild(h);
 
   const result = await listPromptsByRole(role);
-  if (result.isFail || !result.value) {
+  if (!result.ok || !result.value) {
     const err = document.createElement('div');
     err.textContent = 'Load error: ' + (result.error ?? 'unknown');
     err.style.cssText = 'color:#f5a3a3;font-size:11px;';

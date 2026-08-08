@@ -10,12 +10,12 @@ import { ServiceResult } from '../utils/result-wrapper';
  * The `deletePromptById` guard blocks removal of the last row for a
  * given role: this prevents `getDefaultPromptForRole()` from returning
  * `undefined` after a well-meaning user deletes the wrong row, which
- * would collapse the Plan / Next chip fire path.
+ * would collapse the PlanTierType / Next chip fire path.
  */
 
 import { logDiagnosticFromCode } from '../error-utils';
 import { DB_NAME } from './db-name';
-import { runSql as runSqlBridge, type SqlBridgeResp } from './sql-bridge';
+import { runSql as runSqlBridge, runLoggedQuery, type SqlBridgeResp } from './sql-bridge';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
 import { enforceSingleDefaultPerRole, sqlLit, type EnforceResult } from './prompt-role-db';
 import { assertParamTokensUnchanged } from './prompt-token-guard';
@@ -27,6 +27,10 @@ import {
     normalizeReplaceValues,
     validateReplaceKey,
 } from './prompt-defaults';
+import { DbResult } from './db-result';
+export { DbResult };
+import { DbResult } from './db-result';
+export { DbResult };
 import { MethodEnum1 } from "../types/enums";
 
 export interface PromptRow {
@@ -42,11 +46,7 @@ export interface PromptRow {
     UpdatedAt: number;
 }
 
-export interface DbResult<T> {
-    ok: boolean;
-    value?: T;
-    error?: string;
-}
+
 
 export interface UpsertInput {
     id?: number | undefined;
@@ -77,7 +77,7 @@ async function runSql(method: MethodEnum1, sql: string): Promise<RawSqlOk> {
 
 function fail<T>(where: string, message: string, context?: unknown): DbResult<T> {
     logDiagnosticFromCode('DB_PROMPT_E001', { where, reason: message }, context);
-    return { ok: false, error: message };
+    return new DbResult(false, undefined, message);
 }
 
 function rowToPrompt(r: unknown): PromptRow {
@@ -115,10 +115,10 @@ export async function listPromptsByRole(role: PromptRole): Promise<DbResult<Prom
     if (!isPromptRole(role)) return fail('listPromptsByRole', 'invalid role ' + String(role));
     const sql = 'SELECT * FROM Prompt WHERE Role = ' + sqlLit(role)
         + ' ORDER BY IsDefault DESC, UpdatedAt DESC';
-    const resp = await runSql('QUERY', sql);
-    if (!resp.isOk) return fail('listPromptsByRole', resp.errorMessage ?? 'query failed');
-    const rows = Array.isArray(resp.rows) ? resp.rows.map(rowToPrompt) : [];
-    return { ok: true, value: rows };
+    const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
+    if (!resp.ok) return fail('listPromptsByRole', resp.error?.message || 'query failed');
+    const rows = Array.isArray(resp.data?.rows) ? resp.data?.rows.map(rowToPrompt) : [];
+    return new DbResult(true, rows);
 }
 
 /** Get the single `IsDefault=1` row for `role`, or `undefined` if none. */
@@ -126,11 +126,11 @@ export async function getDefaultPromptForRole(role: PromptRole): Promise<DbResul
     if (!isPromptRole(role)) return fail('getDefaultPromptForRole', 'invalid role ' + String(role));
     const sql = 'SELECT * FROM Prompt WHERE Role = ' + sqlLit(role)
         + ' AND IsDefault = 1 LIMIT 1';
-    const resp = await runSql('QUERY', sql);
-    if (!resp.isOk) return fail('getDefaultPromptForRole', resp.errorMessage ?? 'query failed');
-    const rows = Array.isArray(resp.rows) ? resp.rows : [];
-    if (rows.length === 0) return { ok: true, value: undefined };
-    return { ok: true, value: rowToPrompt(rows[0]) };
+    const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
+    if (!resp.ok) return fail('getDefaultPromptForRole', resp.error?.message || 'query failed');
+    const rows = Array.isArray(resp.data?.rows) ? resp.data?.rows : [];
+    if (rows.length === 0) return new DbResult(true, undefined);
+    return new DbResult(true, rowToPrompt(rows[0]));
 }
 
 /** Get one Prompt row by global slug, regardless of Role. */
@@ -139,14 +139,14 @@ export async function getPromptBySlug(slug: string): Promise<DbResult<PromptRow 
         return fail('getPromptBySlug', 'slug must not be empty');
     }
     const sql = 'SELECT * FROM Prompt WHERE Slug = ' + sqlLit(slug) + ' LIMIT 1';
-    const resp = await runSql('QUERY', sql);
-    if (!resp.isOk) {
-        return fail('getPromptBySlug', resp.errorMessage ?? 'query failed');
+    const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
+    if (!resp.ok) {
+        return fail('getPromptBySlug', resp.error?.message || 'query failed');
     }
-    const rows = Array.isArray(resp.rows) ? resp.rows : [];
+    const rows = Array.isArray(resp.data?.rows) ? resp.data?.rows : [];
     const row = rows.length > 0 ? rowToPrompt(rows[0]) : undefined;
 
-    return { ok: true, value: row };
+    return new DbResult(true, row);
 }
 
 /** Flip the default to `id` for `role` inside a single transaction. */
@@ -183,9 +183,9 @@ async function resolveInsertedPromptId(input: UpsertInput): Promise<number | nul
     const sql = 'SELECT Id FROM Prompt WHERE Slug = ' + sqlLit(input.slug)
         + ' AND Role = ' + sqlLit(input.role)
         + ' LIMIT 1';
-    const resp = await runSql('QUERY', sql);
-    if (!resp.isOk) return null;
-    const rows = Array.isArray(resp.rows) ? resp.rows : [];
+    const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
+    if (!resp.ok) return null;
+    const rows = Array.isArray(resp.data?.rows) ? resp.data?.rows : [];
     const firstRow = rows.length > 0 ? rows[0] as Record<string, object | string | number | null> : null;
     const insertedId = Number(firstRow?.Id ?? 0);
     return Number.isInteger(insertedId) && insertedId > 0 ? insertedId : null;
@@ -236,9 +236,9 @@ export async function upsertPrompt(input: UpsertInput): Promise<DbResult<number>
     const sql = isUpdate
         ? buildUpdateSql({ ...input, id: input.id as number }, resolved, now)
         : buildInsertSql(input, resolved, now);
-    const resp = await runSql('SCHEMA', sql);
-    if (!resp.isOk) return fail('upsertPrompt', resp.errorMessage ?? 'write failed');
-    const insertedId = Number(resp.lastInsertId ?? 0);
+    const resp = await runLoggedQuery('SCHEMA', sql, 'prompt-db');
+    if (!resp.ok) return fail('upsertPrompt', resp.error?.message || 'write failed');
+    const insertedId = Number(resp.data?.lastInsertId ?? 0);
     const resolvedInsertedId = isUpdate || insertedId > 0 ? null : await resolveInsertedPromptId(input);
     const id = isUpdate ? (input.id as number) : insertedId > 0 ? insertedId : resolvedInsertedId;
     if (id === null) return fail('upsertPrompt', 'insert succeeded but inserted Prompt Id could not be resolved');
@@ -247,19 +247,19 @@ export async function upsertPrompt(input: UpsertInput): Promise<DbResult<number>
         // recordPromptRevision; we never fail the upsert on history failure.
         const { recordPromptRevision } = await import('./prompt-revision-db');
         const revResult = await recordPromptRevision({ previous: preImage, reason: 'upsert' });
-        if (revResult.isFail) {
+        if (!revResult.ok) {
             logDiagnosticFromCode('DB_PROMPT_REVISION_SNAPSHOT_E001', { slug: preImage.Slug, reason: revResult.error ?? 'unknown error' });
         }
     }
-    return { ok: true, value: id };
+    return new DbResult(true, id);
 }
 
 async function countRowsForRole(role: PromptRole): Promise<number> {
     const sql = 'SELECT COUNT(*) AS c FROM Prompt WHERE Role = ' + sqlLit(role);
-    const resp = await runSql('QUERY', sql);
-    if (!resp.isOk) return -1;
-    const row = Array.isArray(resp.rows) && resp.rows.length > 0
-        ? (resp.rows[0] as Record<string, unknown>) : null;
+    const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
+    if (!resp.ok) return -1;
+    const row = Array.isArray(resp.data?.rows) && resp.data?.rows.length > 0
+        ? (resp.data?.rows[0] as Record<string, unknown>) : null;
     return row ? Number(row.c ?? 0) : 0;
 }
 
@@ -280,7 +280,7 @@ export async function deletePromptById(id: number): Promise<DbResult<void>> {
     if (row === null) return fail('deletePromptById', 'row ' + id + ' not found');
     const count = await countRowsForRole(row.Role);
     if (count <= 1) return fail('deletePromptById', 'refuse to delete last row for role ' + row.Role);
-    const resp = await runSql('SCHEMA', 'DELETE FROM Prompt WHERE Id = ' + String(id));
-    if (!resp.isOk) return fail('deletePromptById', resp.errorMessage ?? 'delete failed');
-    return { ok: true };
+    const resp = await runLoggedQuery('SCHEMA', 'DELETE FROM Prompt WHERE Id = ' + String(id), 'prompt-db');
+    if (!resp.ok) return fail('deletePromptById', resp.error?.message || 'delete failed');
+    return new DbResult(true, undefined);
 }

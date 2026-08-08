@@ -14,7 +14,7 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import type { WorkspaceCredit } from '../types';
-import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
+import { CreditFetchOutcomeType } from '../credit-balance-update/credit-fetch-outcome';
 import type { CreditFetchResult } from '../credit-balance-update/credit-balance-types';
 import { parseCreditBalance } from '../credit-balance-update/credit-balance-parser';
 import { overlayCreditBalanceOnWorkspace } from '../credit-balance-update/credit-fetch-controller';
@@ -84,7 +84,7 @@ describe('multi-workspace unified-billing fan-out E2E', () => {
                 if (!balance) throw new Error('no fixture for ' + target.id);
                 overlayCreditBalanceOnWorkspace(target, balance);
                 return {
-                    outcome: CreditFetchOutcome.ApiHit,
+                    outcome: CreditFetchOutcomeType.ApiHit,
                     balance,
                     fetchedAt: 1,
                     sourceUrl: 'https://api.test/workspaces/' + target.id + '/credit-balance',

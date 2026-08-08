@@ -2,7 +2,7 @@
  * Marco Extension, Step Group Library, Mutation Handler Bodies
  *
  * Module-scoped handler bodies extracted from useStepGroupMutations
- * (Plan 25 Step 21) so the hook itself stays under the
+ * (PlanTierType 25 Step 21) so the hook itself stays under the
  * `max-lines-per-function` ceiling. Every function here is a verbatim
  * lift; behaviour is unchanged.
  */
@@ -23,14 +23,14 @@ import type {
     RenameDialogState,
     StepEditorDialogState,
 } from "./dialog-state";
-import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { DirectionType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 type StepLibrary = ReturnType<typeof useStepLibrary>;
 type BatchActions = ReturnType<typeof useStepGroupBatchActions>;
 
 export interface StepEditorSubmitInput {
     readonly StepKindId: StepKindId;
-    readonly Label: string | null;
+    readonly LabelType: string | null;
     readonly PayloadJson: string | null;
     readonly TargetStepGroupId: number | null;
 }
@@ -174,7 +174,7 @@ export function doDelete(deps: MutationDeps): void {
     }
 }
 
-export function doMove(deps: MutationDeps, id: number, direction: DirectionEnum): void {
+export function doMove(deps: MutationDeps, id: number, direction: DirectionType): void {
     try { deps.lib.moveGroupWithinParent(id, direction); }
     catch (caught) { toast.error(caught instanceof Error ? caught.message : "Move failed"); }
 }
@@ -197,7 +197,7 @@ function runStepEditorCreate(
     lib.appendStep({
         StepGroupId: mode.StepGroupId,
         StepKindId: input.StepKindId,
-        Label: input.Label,
+        LabelType: input.LabelType,
         PayloadJson: input.PayloadJson,
         TargetStepGroupId: input.TargetStepGroupId,
     });
@@ -212,7 +212,7 @@ function runStepEditorUpdate(
     lib.updateStep({
         StepId: mode.Step.StepId,
         StepKindId: input.StepKindId,
-        Label: input.Label,
+        LabelType: input.LabelType,
         PayloadJson: input.PayloadJson,
         TargetStepGroupId: input.TargetStepGroupId,
     });
@@ -231,7 +231,7 @@ export function doStepEditorSubmit(deps: MutationDeps, input: StepEditorSubmitIn
     }
 }
 
-export function doStepMove(deps: MutationDeps, stepId: number, direction: DirectionEnum): void {
+export function doStepMove(deps: MutationDeps, stepId: number, direction: DirectionType): void {
     try { deps.lib.moveStepWithinGroup(stepId, direction); }
     catch (caught) { toast.error(caught instanceof Error ? caught.message : "Move failed"); }
 }
@@ -241,7 +241,7 @@ export function doStepDeleteConfirm(deps: MutationDeps): void {
     if (target === null) return;
     try {
         deps.lib.deleteStep(target.StepId);
-        toast.success(`Deleted step “${target.Label ?? target.StepId}”`);
+        toast.success(`Deleted step “${target.LabelType ?? target.StepId}”`);
         deps.setDeleteStepDialog({ open: false, step: null });
     } catch (caught) {
         toast.error(caught instanceof Error ? caught.message : "Delete failed");

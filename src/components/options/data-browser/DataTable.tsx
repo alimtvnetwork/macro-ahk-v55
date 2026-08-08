@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { formatDataTimestamp } from "./data-browser-helpers";
 import { LevelBadge, CategoryBadge } from "./DataBadges";
 import type { DataBrowserFilters } from "@/hooks/use-extension-data";
-import { DatabaseEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { DatabaseType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 import { ActiveViewEnum } from "../../../types/enums";
 
 interface BrowserRow {
@@ -38,7 +38,7 @@ interface BrowserRow {
 }
 
 interface DataTableProps {
-  activeDb: DatabaseEnum;
+  activeDb: DatabaseType;
   onDbChange: (db: ActiveViewEnum) => void;
   rows: BrowserRow[];
   isLoading: boolean;
@@ -230,7 +230,7 @@ export function DataTable({
 
 interface DataRowProps {
   row: BrowserRow;
-  activeDb: DatabaseEnum;
+  activeDb: DatabaseType;
 }
 
 /** Single data row displaying a log or error entry. */

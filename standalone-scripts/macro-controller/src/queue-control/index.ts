@@ -12,11 +12,11 @@ import {
     QUEUE_PLAY_BUTTON_XPATH,
     QUEUE_RESUME_ARIA_LABEL,
 } from './selectors';
-import { ReasonEnum9 } from "../types/enums";
+import { QueueClickReasonType } from "../types/enums";
 
 export interface QueueClickResult {
     clicked: boolean;
-    reason: ReasonEnum9;
+    reason: QueueClickReasonType;
 }
 
 function findButton(xpath: string, ariaLabel: string): HTMLElement | null {

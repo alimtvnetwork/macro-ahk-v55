@@ -1,5 +1,5 @@
 import { WorldEnum } from "../types/enums";
-import { OriginEnum, WorldEnum1, RunAtEnum1 } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { PromptOriginType, UserScriptWorldType, ScriptRunAtType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /**
  * Marco — Chrome API Ambient Types
@@ -55,7 +55,7 @@ declare global {
                 target: InjectionTarget;
                 css?: string;
                 files?: string[];
-                origin?: OriginEnum;
+                origin?: PromptOriginType;
             }
             interface InjectionResult { frameId: number; result: any }
             function executeScript(injection: ScriptInjection): Promise<InjectionResult[]>;
@@ -68,14 +68,14 @@ declare global {
                 matches?: string[];
                 excludeMatches?: string[];
                 js?: Array<{ code?: string; file?: string }>;
-                world?: WorldEnum1;
+                world?: UserScriptWorldType;
                 worldId?: string;
-                runAt?: RunAtEnum1;
+                runAt?: ScriptRunAtType;
             }
             interface Injection {
                 target: { tabId: number; frameIds?: number[]; allFrames?: boolean };
                 js?: Array<{ code?: string; file?: string }>;
-                world?: WorldEnum1;
+                world?: UserScriptWorldType;
                 worldId?: string;
                 injectImmediately?: boolean;
             }

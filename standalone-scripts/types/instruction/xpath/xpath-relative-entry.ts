@@ -1,4 +1,4 @@
-import { XPathKind } from "../enums/xpath-kind";
+import { XPathKindType } from "../enums/xpath-kind";
 import type { Identifier } from "../primitives/identifier";
 
 /**
@@ -9,14 +9,14 @@ import type { Identifier } from "../primitives/identifier";
  *
  * Example:
  *   {
- *     kind: XPathKind.Relative,
+ *     kind: XPathKindType.Relative,
  *     name: "payment-banner-close-button",
  *     relativeTo: "payment-banner-root",
  *     value: ".//button[@aria-label='Close']",
  *   }
  */
 export type XPathRelativeEntry = {
-    readonly kind: XPathKind.Relative;
+    readonly kind: XPathKindType.Relative;
     readonly name: Identifier;
     readonly relativeTo: Identifier;
     readonly value: string;

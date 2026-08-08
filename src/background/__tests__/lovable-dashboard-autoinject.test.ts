@@ -42,7 +42,7 @@ function manifest(): SeedManifest {
             Css: [],
             Templates: [],
             Prompts: [],
-            TargetUrls: [{ Pattern: DASHBOARD_URL, MatchType: "exact" }],
+            TargetUrls: [{ Pattern: DASHBOARD_URL, MatchRuleType: "exact" }],
             Cookies: [],
         }],
     };

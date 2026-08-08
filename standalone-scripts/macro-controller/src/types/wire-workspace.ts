@@ -1,16 +1,16 @@
 /**
- * Plan-10 — wide `WireWorkspace` type + parse-boundary guard.
+ * PlanTierType-10 — wide `WireWorkspace` type + parse-boundary guard.
  *
  * The `/user/workspaces` response is a loose JSON blob. Every downstream
  * consumer that peeks into `WorkspaceCredit.rawApi` (see
  * `types/credit-types.ts` line 52) currently re-implements its own
  * `readStr` / `readNum` pattern (see `pro-zero-workspace-adapter.ts`
- * lines 14-24). This module gives Plan-10 a single wide but typed
+ * lines 14-24). This module gives PlanTierType-10 a single wide but typed
  * surface for the wire shape and one guard that narrows a
  * `Record<string, unknown>` at the parse boundary — the only place
  * `unknown` is allowed per `.lovable/coding-guidelines.md` rule #5.
  *
- * Fields kept intentionally minimal — only what Plan-10's enrichment
+ * Fields kept intentionally minimal — only what PlanTierType-10's enrichment
  * mapper and freshness gates consume. Extend as new mappers land.
  */
 

@@ -1,7 +1,7 @@
 /**
  * prompt-undo-toast-regression.spec.ts
  *
- * Browser regression for the undo toast (v4.175.0). When an existing Plan or
+ * Browser regression for the undo toast (v4.175.0). When an existing PlanTierType or
  * Next prompt is edited via the chip gear, the successful Save path must:
  *   1. Fire the undo toast with the correct label.
  *   2. On "Undo" click, issue a second UPDATE Prompt call carrying the
@@ -93,7 +93,7 @@ async function newHarnessPage(): Promise<Page> {
 }
 
 test.describe('undo toast round trip', () => {
-    test('editing a Plan prompt fires the undo toast and Undo reverts via a second UPDATE Prompt', async () => {
+    test('editing a PlanTierType prompt fires the undo toast and Undo reverts via a second UPDATE Prompt', async () => {
         const page = await newHarnessPage();
 
         await page.evaluate(() => {
@@ -122,14 +122,14 @@ test.describe('undo toast round trip', () => {
                 {
                     id: '7',
                     slug: 'plan-default',
-                    name: 'Plan default',
+                    name: 'PlanTierType default',
                     text: 'Original body with {{n}} token',
                     role: 'plan',
                     replaceKey: 'n',
                     replaceValues: ['1', '2', '3', '5', '8'],
                 },
                 undefined,
-                { requiredTokens: ['n'], roleLabel: 'Plan', role: 'plan' },
+                { requiredTokens: ['n'], roleLabel: 'PlanTierType', role: 'plan' },
             );
         });
 
@@ -138,7 +138,7 @@ test.describe('undo toast round trip', () => {
 
         const undoToast = page.locator('[data-testid="undo-toast"]');
         await expect(undoToast).toBeVisible();
-        await expect(undoToast).toContainText('Plan default');
+        await expect(undoToast).toContainText('PlanTierType default');
 
         // First UPDATE = the user save.
         await expect.poll(async () => {

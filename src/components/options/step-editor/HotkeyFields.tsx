@@ -5,7 +5,7 @@
  */
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { HotkeyChordCapture } from "@/components/recorder/HotkeyChordCapture";
 
 export interface HotkeyFieldsProps {
@@ -20,7 +20,7 @@ export function HotkeyFields(props: HotkeyFieldsProps): JSX.Element {
     return (
         <div className="space-y-3">
             <div className="space-y-1">
-                <Label htmlFor="hotkey-capture">Key combinations</Label>
+                <LabelType htmlFor="hotkey-capture">Key combinations</LabelType>
                 <HotkeyChordCapture
                     id="hotkey-capture"
                     value={chords}
@@ -32,7 +32,7 @@ export function HotkeyFields(props: HotkeyFieldsProps): JSX.Element {
                 </p>
             </div>
             <div className="space-y-1">
-                <Label htmlFor="hotkey-wait">Wait after (ms, optional)</Label>
+                <LabelType htmlFor="hotkey-wait">Wait after (ms, optional)</LabelType>
                 <Input
                     id="hotkey-wait"
                     type="number"

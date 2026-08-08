@@ -1,5 +1,5 @@
 /**
- * Integration test — Plan-10 `batchRefreshFromWire` pipes wire rows
+ * Integration test — PlanTierType-10 `batchRefreshFromWire` pipes wire rows
  * through the mapper + predicate + existing pro_1 dispatcher.
  *
  * We mock only the network boundary (`fetcher.fetchAndPersist`) and let
@@ -31,7 +31,7 @@ import {
 
 const mockedFetch = vi.mocked(fetchAndPersist);
 
-describe('batchRefreshFromWire (Plan-10 integration)', () => {
+describe('batchRefreshFromWire (PlanTierType-10 integration)', () => {
   beforeEach(() => {
     mockedFetch.mockClear();
   });

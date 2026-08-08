@@ -139,7 +139,7 @@ export function finalizeBoot(): void {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Persistence Mode                                                   */
+/*  Persistence OperationModeType                                                   */
 /* ------------------------------------------------------------------ */
 
 /** Returns the persistence mode resolved during boot. */

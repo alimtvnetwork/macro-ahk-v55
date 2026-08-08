@@ -1,6 +1,6 @@
 /**
  * BulkDeleteConfirmDialog: extracted from `KeywordEventBulkContextMenu.tsx`
- * in Plan 25 Step 17. Behaviour and testids are byte-identical.
+ * in PlanTierType 25 Step 17. Behaviour and testids are byte-identical.
  */
 
 import {
@@ -21,7 +21,7 @@ export interface BulkDeleteConfirmDialogProps {
     readonly onConfirm: () => void;
 }
 
-// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf dialog; Plan 25 Step 17
+// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf dialog; PlanTierType 25 Step 17
 export function BulkDeleteConfirmDialog(props: BulkDeleteConfirmDialogProps): JSX.Element {
     const { open, onOpenChange, selectedEvents, onConfirm } = props;
     const count = selectedEvents.length;

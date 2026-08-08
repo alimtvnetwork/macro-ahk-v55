@@ -11,7 +11,7 @@
  */
 
 /** Lifecycle phase reported by a banner-hider class to logs and metrics. */
-export const enum BannerLifecyclePhase {
+export const enum BannerLifecyclePhaseType {
     Boot = "boot",
     DomReady = "dom-ready",
     Detected = "detected",
@@ -26,7 +26,7 @@ export const enum BannerLifecyclePhase {
  * `kind` discriminator for `RiseupAsiaMessage<TPayload>` envelopes
  * dispatched by banner-style scripts (Priority 0.16 consumer).
  */
-export const enum BannerEventName {
+export const enum BannerEventNameType {
     Check = "banner:check",
     Hidden = "banner:hidden",
     Error = "banner:error",
@@ -36,7 +36,7 @@ export const enum BannerEventName {
  * Logger `fn` labels — every Logger.error/info call inside a banner
  * script must use one of these constants (no inline strings).
  */
-export const enum BannerLogFn {
+export const enum BannerLogFnType {
     Check = "PaymentBannerHider.check",
     Hide = "PaymentBannerHider.hide",
     SmokeTest = "PaymentBannerHider.smokeTest",

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { sendMessage } from "@/lib/message-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -300,11 +300,11 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-xs">Name *</Label>
+              <LabelType className="text-xs">Name *</LabelType>
               <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="e.g. Riseup Macro SDK" className="h-8 text-xs" />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">Description</Label>
+              <LabelType className="text-xs">Description</LabelType>
               <Input value={newDescription} onChange={(e) => setNewDescription(e.target.value)} placeholder="Purpose of this source" className="h-8 text-xs" />
             </div>
           </div>
@@ -313,19 +313,19 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
             <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">URLs</p>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label className="text-xs">Script URL *</Label>
+                <LabelType className="text-xs">Script URL *</LabelType>
                 <Input value={newScriptUrl} onChange={(e) => setNewScriptUrl(e.target.value)} placeholder="https://..." className="h-8 text-xs font-mono" />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs">Version Info URL</Label>
+                <LabelType className="text-xs">Version Info URL</LabelType>
                 <Input value={newVersionUrl} onChange={(e) => setNewVersionUrl(e.target.value)} placeholder="https://..." className="h-8 text-xs font-mono" />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs">Instruction URL</Label>
+                <LabelType className="text-xs">Instruction URL</LabelType>
                 <Input value={newInstructionUrl} onChange={(e) => setNewInstructionUrl(e.target.value)} placeholder="https://..." className="h-8 text-xs font-mono" />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs">Changelog URL</Label>
+                <LabelType className="text-xs">Changelog URL</LabelType>
                 <Input value={newChangelogUrl} onChange={(e) => setNewChangelogUrl(e.target.value)} placeholder="https://..." className="h-8 text-xs font-mono" />
               </div>
             </div>
@@ -335,7 +335,7 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
             <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Settings</p>
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1">
-                <Label className="text-xs">Auto-Check Interval</Label>
+                <LabelType className="text-xs">Auto-Check Interval</LabelType>
                 <Select value={String(newAutoCheck)} onValueChange={(v) => setNewAutoCheck(Number(v))}>
                   <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -346,7 +346,7 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
                 </Select>
               </div>
               <div className="space-y-1">
-                <Label className="text-xs">Cache Expiry</Label>
+                <LabelType className="text-xs">Cache Expiry</LabelType>
                 <Select value={String(newCacheExpiry)} onValueChange={(v) => setNewCacheExpiry(Number(v))}>
                   <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -357,7 +357,7 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
                 </Select>
               </div>
               <div className="space-y-1">
-                <Label className="text-xs">Max Redirect Depth</Label>
+                <LabelType className="text-xs">Max Redirect Depth</LabelType>
                 <Input type="number" min={0} max={10} value={newMaxRedirectDepth} onChange={(e) => setNewMaxRedirectDepth(Number(e.target.value))} className="h-8 text-xs" />
               </div>
             </div>

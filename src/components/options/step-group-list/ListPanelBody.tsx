@@ -4,7 +4,7 @@
  * Composition-only wrapper. Reads a single `state` bundle from
  * `useListPanelState` plus the shared `mutations` object.
  *
- * v4.213.0 (Plan-24 SS-04b Phase 9b): grid and dialog groups moved into
+ * v4.213.0 (PlanTierType-24 SS-04b Phase 9b): grid and dialog groups moved into
  * `ListPanelGrid.tsx` and `ListPanelDialogsGroup.tsx` so this function
  * stays under `max-lines-per-function`.
  */

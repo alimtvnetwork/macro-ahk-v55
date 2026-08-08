@@ -1,5 +1,5 @@
 /**
- * prompt-modal-theme.ts — Plan-23 Step 1
+ * prompt-modal-theme.ts — PlanTierType-23 Step 1
  *
  * Root cause addressed: when the host OS/page reports
  * `prefers-color-scheme: light`, UA-native controls inside the injected

@@ -10,7 +10,7 @@
  *
  * Replaces the legacy string union `"MAIN" | "ISOLATED"`.
  */
-export const enum InjectionWorld {
+export const enum InjectionWorldType {
     Main = "MAIN",
     Isolated = "ISOLATED",
 }

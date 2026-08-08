@@ -14,9 +14,9 @@ import type {
     FieldBindingRow,
     DataSourceRow,
 } from "@/hooks/use-recorder-project-data";
-import { MimeKindEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { MimeKindType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
-export type ExportFormat = MimeKindEnum;
+export type ExportFormat = MimeKindType;
 
 interface ExportOptions {
     readonly projectSlug: string;
@@ -58,7 +58,7 @@ const CSV_HEADERS: ReadonlyArray<keyof StepRow | "Tags" | "Bindings"> = [
     "StepKindId",
     "StepStatusId",
     "VariableName",
-    "Label",
+    "LabelType",
     "Description",
     "IsBreakpoint",
     "IsDisabled",

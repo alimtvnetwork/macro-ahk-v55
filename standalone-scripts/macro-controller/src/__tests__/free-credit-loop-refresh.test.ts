@@ -20,7 +20,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-// Plan-17 step 13: processWorkspaceData moved to `loop-cycle-fallback.ts`;
+// PlanTierType-17 step 13: processWorkspaceData moved to `loop-cycle-fallback.ts`;
 // contract still applies to that module.
 const LOOP_CYCLE = readFileSync(
   resolve(__dirname, '../loop-cycle-fallback.ts'),

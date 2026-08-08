@@ -1,10 +1,10 @@
-import { DEFAULTREMIXNEXTVCASINGEnum } from "./types/enums";
+import { RemixCasingType } from "./types/enums";
 
 /**
  * MacroLoop Controller — Centralized Constants (non-enum)
  *
  * Enum-groupable constants have been moved to `types/` as string enums:
- *   DomId, DataAttr, StyleId, StorageKey, ApiPath, PromptCacheKey, Label, CssFragment
+ *   DomIdType, DataAttrType, StyleIdType, StorageKeyType, ApiPathType, PromptCacheKeyType, LabelType, CssFragmentType
  *
  * This file retains: numeric limits, timing values, arrays, one-off strings,
  * and other values that don't form logical enum groups.
@@ -180,4 +180,4 @@ export const DEFAULT_REMIX_NEXT_SUFFIX_SEPARATOR = '-';
 export const DEFAULT_REMIX_NEXT_MAX_COLLISION_INCREMENTS = 50;
 export const DEFAULT_REMIX_OPEN_IN_CURRENT_TAB = false;
 /** 'preserve' (default) keeps the V/v casing from input; 'upper' forces V; 'lower' forces v. */
-export const DEFAULT_REMIX_NEXT_V_CASING: DEFAULTREMIXNEXTVCASINGEnum = 'preserve';
+export const DEFAULT_REMIX_NEXT_V_CASING: RemixCasingType = 'preserve';

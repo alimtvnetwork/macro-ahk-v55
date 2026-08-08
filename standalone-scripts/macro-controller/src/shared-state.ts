@@ -54,7 +54,7 @@ if (_configWarnings.length > 0) {
 /** Get config validation warnings (for diagnostics). */
 export function getConfigValidationWarnings(): string[] { return _configWarnings; }
 
-import { StorageKey } from './types';
+import { StorageKeyType } from './types';
 
 export function resolvePreset(key: string): ThemePreset {
   const darkPreset = themeRoot.presets?.dark;
@@ -64,7 +64,7 @@ export function resolvePreset(key: string): ThemePreset {
   return {} as ThemePreset;
 }
 
-const theme = resolvePreset(StorageKey.ForcedTheme);
+const theme = resolvePreset(StorageKeyType.ForcedTheme);
 const TC = theme.colors || {};
 const TP = TC.panel || {};
 const TPri = TC.primary || {};
@@ -304,10 +304,10 @@ export const autoAttachTiming = autoAttachCfg.timing || {};
 export const autoAttachGroups = autoAttachCfg.groups || [];
 
 // Storage constants — centralized in types/ enums and constants.ts
-export { StorageKey } from './types';
-export const LOG_STORAGE_KEY = StorageKey.LogStorage;
-export const WS_HISTORY_KEY = StorageKey.WsHistory;
-export const WS_SHARED_KEY = StorageKey.WsShared;
+export { StorageKeyType } from './types';
+export const LOG_STORAGE_KEY = StorageKeyType.LogStorage;
+export const WS_HISTORY_KEY = StorageKeyType.WsHistory;
+export const WS_SHARED_KEY = StorageKeyType.WsShared;
 export { LOG_MAX_ENTRIES, WS_HISTORY_MAX_ENTRIES, BLOATED_KEY_PATTERNS } from './constants';
 
 // ============================================

@@ -35,14 +35,14 @@ vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
 
 import { runPromptHealthCheck } from '../prompt-health-check';
 import { PLAN_NEXT_SEED_ROWS } from '../plan-next-prompts';
-import { RoleEnum4 } from "../../types/enums";
+import { PromptRowRoleType } from "../../types/enums";
 
 interface DbShape {
     Id: number; Slug: string; Name: string; Body: string; Role: string;
     IsDefault: number; ReplaceKey: string; ReplaceValues: string;
     CreatedAt: number; UpdatedAt: number;
 }
-function healthyRow(role: RoleEnum4, overrides: Partial<DbShape> = {}): DbShape {
+function healthyRow(role: PromptRowRoleType, overrides: Partial<DbShape> = {}): DbShape {
     const seed = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault);
     if (!seed) throw new Error('seed row missing for role=' + role);
     return {
@@ -71,7 +71,7 @@ describe('runPromptHealthCheck', () => {
     it('H1: healthy defaults -> ok=true, no toast', async () => {
         responsesQueue = [ok(healthyRow('plan')), ok(healthyRow('next'))];
         const report = await runPromptHealthCheck();
-        expect(report.isSuccess).toBe(true);
+        expect(report.ok).toBe(true);
         expect(report.issues).toEqual([]);
         expect(toastCalls).toEqual([]);
     });
@@ -79,7 +79,7 @@ describe('runPromptHealthCheck', () => {
     it('H2: missing default row surfaces row-missing + error toast', async () => {
         responsesQueue = [empty(), ok(healthyRow('next'))];
         const report = await runPromptHealthCheck();
-        expect(report.isSuccess).toBe(false);
+        expect(report.ok).toBe(false);
         const codes = report.issues.map(i => i.code);
         expect(codes).toContain('row-missing');
         expect(toastCalls.length).toBe(1);
@@ -92,7 +92,7 @@ describe('runPromptHealthCheck', () => {
             ok(healthyRow('next')),
         ];
         const report = await runPromptHealthCheck();
-        expect(report.isSuccess).toBe(false);
+        expect(report.ok).toBe(false);
         const codes = report.issues.map(i => i.code);
         expect(codes).toContain('missing-required-token');
     });
@@ -103,14 +103,14 @@ describe('runPromptHealthCheck', () => {
             ok(healthyRow('next')),
         ];
         const report = await runPromptHealthCheck();
-        expect(report.isSuccess).toBe(false);
+        expect(report.ok).toBe(false);
         expect(report.issues.map(i => i.code)).toContain('not-flagged-default');
     });
 
     it('H5: DB query error surfaces query-failed and does not throw', async () => {
         responsesQueue = [{ isOk: false, errorMessage: 'boom' }, ok(healthyRow('next'))];
         const report = await runPromptHealthCheck();
-        expect(report.isSuccess).toBe(false);
+        expect(report.ok).toBe(false);
         const planIssue = report.issues.find(i => i.role === 'plan');
         expect(planIssue?.code).toBe('query-failed');
         expect(planIssue?.detail).toContain('boom');

@@ -15,7 +15,7 @@ import { collectTypedRows, type JsonValue } from "./handler-types";
 import { bindOpt, missingFieldError, requireField, type HandlerErrorResponse } from "./handler-guards";
 import { logBgWarnError, logSampledDebug, BgLogTag } from "../utils/logger";
 import { AssetType, ActionEnum } from "../../types/enums";
-import { LinkState } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { LinkStateType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Message Interfaces                                                 */
@@ -132,7 +132,7 @@ export interface AssetLink {
     Id: number;
     SharedAssetId: number;
     ProjectId: number;
-    LinkState: LinkState;
+    LinkStateType: LinkStateType;
     PinnedVersion: string | null;
     LocalOverrideJson: string | null;
     SyncedAt: string;
@@ -232,19 +232,19 @@ export async function handleDeleteSharedAsset(payload: AssetIdMsg): Promise<{ is
 
     // Per spec §6.3: synced links become detached (preserving local copies)
     const syncedLinks = db.exec(
-        "SELECT Id FROM AssetLink WHERE SharedAssetId = ? AND LinkState = 'synced'",
+        "SELECT Id FROM AssetLink WHERE SharedAssetId = ? AND LinkStateType = 'synced'",
         [assetId],
     );
     const detachedCount = syncedLinks.length > 0 ? syncedLinks[0].values.length : 0;
 
     db.run(
-        "UPDATE AssetLink SET LinkState = 'detached', SyncedAt = datetime('now') WHERE SharedAssetId = ? AND LinkState = 'synced'",
+        "UPDATE AssetLink SET LinkStateType = 'detached', SyncedAt = datetime('now') WHERE SharedAssetId = ? AND LinkStateType = 'synced'",
         [assetId],
     );
 
     // CASCADE will delete remaining links (pinned become orphans too — detach first)
     db.run(
-        "UPDATE AssetLink SET LinkState = 'detached', SyncedAt = datetime('now') WHERE SharedAssetId = ? AND LinkState = 'pinned'",
+        "UPDATE AssetLink SET LinkStateType = 'detached', SyncedAt = datetime('now') WHERE SharedAssetId = ? AND LinkStateType = 'pinned'",
         [assetId],
     );
 
@@ -294,11 +294,11 @@ export async function handleSaveAssetLink(payload: SaveLinkMsg): Promise<{ linkI
     if (typeof link.ProjectId !== "number") return missingFieldError("link.ProjectId", "LIBRARY_SAVE_LINK");
 
     const db = getDb();
-    const linkState = bindOpt(link.LinkState) ?? "synced";
+    const linkState = bindOpt(link.LinkStateType) ?? "synced";
 
     if (link.Id) {
         db.run(
-            `UPDATE AssetLink SET LinkState = ?, PinnedVersion = ?, LocalOverrideJson = ?, SyncedAt = datetime('now') WHERE Id = ?`,
+            `UPDATE AssetLink SET LinkStateType = ?, PinnedVersion = ?, LocalOverrideJson = ?, SyncedAt = datetime('now') WHERE Id = ?`,
             [linkState, bindOpt(link.PinnedVersion), bindOpt(link.LocalOverrideJson), link.Id],
         );
         markDirty();
@@ -306,7 +306,7 @@ export async function handleSaveAssetLink(payload: SaveLinkMsg): Promise<{ linkI
     }
 
     db.run(
-        `INSERT OR REPLACE INTO AssetLink (SharedAssetId, ProjectId, LinkState, PinnedVersion, LocalOverrideJson) VALUES (?, ?, ?, ?, ?)`,
+        `INSERT OR REPLACE INTO AssetLink (SharedAssetId, ProjectId, LinkStateType, PinnedVersion, LocalOverrideJson) VALUES (?, ?, ?, ?, ?)`,
         [link.SharedAssetId, link.ProjectId, linkState, bindOpt(link.PinnedVersion), bindOpt(link.LocalOverrideJson)],
     );
     const idResult = db.exec(SQL_LAST_INSERT_ROWID);
@@ -340,21 +340,21 @@ export async function handleSyncLibraryAsset(payload: AssetIdMsg): Promise<{ syn
 
     // Update all synced links — overwrite project copies
     const syncedLinks = db.exec(
-        "SELECT Id FROM AssetLink WHERE SharedAssetId = ? AND LinkState = 'synced'",
+        "SELECT Id FROM AssetLink WHERE SharedAssetId = ? AND LinkStateType = 'synced'",
         [assetId],
     );
     const syncedCount = syncedLinks.length > 0 ? syncedLinks[0].values.length : 0;
 
     if (syncedCount > 0) {
         db.run(
-            `UPDATE AssetLink SET LocalOverrideJson = NULL, PinnedVersion = NULL, SyncedAt = datetime('now') WHERE SharedAssetId = ? AND LinkState = 'synced'`,
+            `UPDATE AssetLink SET LocalOverrideJson = NULL, PinnedVersion = NULL, SyncedAt = datetime('now') WHERE SharedAssetId = ? AND LinkStateType = 'synced'`,
             [assetId],
         );
     }
 
     // Count pinned links (they get "update available" badge — UI responsibility)
     const pinnedLinks = db.exec(
-        "SELECT Id FROM AssetLink WHERE SharedAssetId = ? AND LinkState = 'pinned'",
+        "SELECT Id FROM AssetLink WHERE SharedAssetId = ? AND LinkStateType = 'pinned'",
         [assetId],
     );
     const pinnedNotified = pinnedLinks.length > 0 ? pinnedLinks[0].values.length : 0;

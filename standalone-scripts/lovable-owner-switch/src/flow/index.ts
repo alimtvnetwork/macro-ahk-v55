@@ -19,7 +19,7 @@ export type { SignOutResult } from "./run-sign-out";
 export { runRow } from "./run-row";
 export { RowOutcomeCode } from "./row-types";
 export type { PromotedOwnerRecord, RowExecutionContext, RowExecutionResult, TaskExecutionParams } from "./row-types";
-export { LogPhase, LogSeverity, buildEntry } from "./log-sink";
+export { LogPhaseType, LogSeverityType, buildEntry } from "./log-sink";
 export type { LogEntry, LogSink } from "./log-sink";
 export type { RowStateStore, RowStateUpdate } from "./row-state-store";
 export { toLogViewerEntries } from "./log-viewer-adapter";

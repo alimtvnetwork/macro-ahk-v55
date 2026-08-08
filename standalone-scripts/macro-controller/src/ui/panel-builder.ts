@@ -220,7 +220,7 @@ export function createUI(deps: PanelBuilderDeps): void {
   // child, so it is excluded from this list.
   // Repeat-loop control — chat-box repeat selector (Ambiguity 126)
   const repeatPanelSection = buildRepeatPanelSection();
-  // Task Splitter — paste long instruction → Plan N → Next N steps (2026-06-24)
+  // Task Splitter — paste long instruction → PlanTierType N → Next N steps (2026-06-24)
   const taskSplitterSection = buildTaskSplitterPanelSection();
 
   plCtx.bodyElements = [status, infoRow, summaryBar.root, btnRow, wsDropSection, taskQueueSection, repeatPanelSection, taskSplitterSection, toolsSection];
@@ -246,7 +246,7 @@ export function createUI(deps: PanelBuilderDeps): void {
   // Record indicator (fixed position)
   document.body.appendChild(createRecordIndicator());
 
-  // Inline strips above chat: Plan → Next → Repeat (the only executor with delay control)
+  // Inline strips above chat: PlanTierType → Next → Repeat (the only executor with delay control)
   mountNextInlineStrip(taskNextDeps);
   mountRepeatInlineStrip();
 

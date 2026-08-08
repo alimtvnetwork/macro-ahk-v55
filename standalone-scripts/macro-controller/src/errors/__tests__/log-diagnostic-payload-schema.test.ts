@@ -18,7 +18,7 @@
  *     cause?:     { name: string, message: string, stack?: string }
  *   }
  *
- * Extra keys are forbidden — the diagnostics ZIP exporter (Plan 26 step 18)
+ * Extra keys are forbidden — the diagnostics ZIP exporter (PlanTierType 26 step 18)
  * indexes by `code` and expects a stable column set. If a new field is
  * genuinely required, add it to `reportToLogArg` AND to `SCHEMA_KEYS_ALL`
  * below in the same commit, then bump MINOR.

@@ -11,7 +11,7 @@ vi.mock('../credit-balance-update/credit-balance-fetcher', () => ({
 
 import { resolveCreditSummary } from '../credit-balance-update/credit-summary-resolver';
 import { __writeCreditBalanceUpdateMemoryCacheForTests, clearCreditBalanceUpdateMemoryCache } from '../credit-balance-update/credit-balance-cache';
-import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
+import { CreditFetchOutcomeType } from '../credit-balance-update/credit-fetch-outcome';
 
 function ws(partial: Partial<WorkspaceCredit>): WorkspaceCredit {
     return {
@@ -79,7 +79,7 @@ describe('resolveCreditSummary — Pending state (RCA 2026-06-06)', () => {
 
     it('uses daily credits when cached aggregate totals are zero', () => {
         __writeCreditBalanceUpdateMemoryCacheForTests('daily_only', {
-            outcome: CreditFetchOutcome.ApiHit,
+            outcome: CreditFetchOutcomeType.ApiHit,
             fetchedAt: Date.now(),
             sourceUrl: 'test',
             errorDetail: null,

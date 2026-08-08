@@ -1,5 +1,6 @@
+import { DbResult } from '../db/db-result';
 /**
- * Plan 22 gap #11: `performPromptImport` revision round-trip.
+ * PlanTierType 22 gap #11: `performPromptImport` revision round-trip.
  *
  * Locks the six branches of `commitRevisions` (prompt-io.ts:427-459):
  *  RR1: revisions inserted for every slug present in the committed entries.
@@ -34,15 +35,15 @@ vi.mock('../shared-state', () => ({ VERSION: 'v0.test.0' }));
 
 const insertImportedRevisions = vi.fn();
 vi.mock('../db/prompt-revision-db', () => ({
-    listPromptRevisions: vi.fn(async () => ({ ok: true, value: [] })),
+    listPromptRevisions: vi.fn(async () => (new DbResult(true, []))),
     insertImportedRevisions: (...args: unknown[]) => insertImportedRevisions(...args),
 }));
 
 import { performPromptImport } from '../ui/prompt-io';
 import type { BundleRevisionRow } from '../ui/prompt-bundle-types';
-import { RoleEnum4 } from "../types/enums";
+import { PromptRowRoleType } from "../types/enums";
 
-const entry = (slug: string, role: RoleEnum4 = 'plan') => ({
+const entry = (slug: string, role: PromptRowRoleType = 'plan') => ({
     id: slug, title: slug, body: 'x {{n}} y', role, slug, updatedAt: 1,
 }) as unknown as Parameters<typeof performPromptImport>[0][number];
 
@@ -50,11 +51,11 @@ const rev = (slug: string, revisionId = 1): BundleRevisionRow => ({
     Slug: slug, RevisionId: revisionId, Body: 'body-' + revisionId, CreatedAt: 1,
 } as unknown as BundleRevisionRow);
 
-describe('performPromptImport: revision round-trip (Plan 22 gap #11)', () => {
+describe('performPromptImport: revision round-trip (PlanTierType 22 gap #11)', () => {
     beforeEach(() => { insertImportedRevisions.mockReset(); });
 
     it('RR1+RR4+RR5: inserts revisions for committed slugs and emits progress', async () => {
-        insertImportedRevisions.mockResolvedValue({ ok: true });
+        insertImportedRevisions.mockResolvedValue(new DbResult(true, undefined));
         const events: string[] = [];
         const res = await performPromptImport(
             [entry('alpha'), entry('beta')],
@@ -74,7 +75,7 @@ describe('performPromptImport: revision round-trip (Plan 22 gap #11)', () => {
     });
 
     it('RR2: orphan revisions (slug not in committed entries) are dropped and reported', async () => {
-        insertImportedRevisions.mockResolvedValue({ ok: true });
+        insertImportedRevisions.mockResolvedValue(new DbResult(true, undefined));
         const res = await performPromptImport(
             [entry('alpha')],
             { revisions: [rev('alpha'), rev('ghost'), rev('ghost', 2)] },
@@ -87,7 +88,7 @@ describe('performPromptImport: revision round-trip (Plan 22 gap #11)', () => {
 
     it('RR3: per-slug insertion failure is recorded but the loop continues', async () => {
         insertImportedRevisions.mockImplementation(async (slug: string) =>
-            slug === 'alpha' ? { ok: false, error: 'DB_LOCKED' } : { ok: true },
+            slug === 'alpha' ? new DbResult(false, undefined, 'DB_LOCKED') : new DbResult(true, undefined),
         );
         const res = await performPromptImport(
             [entry('alpha'), entry('beta')],
@@ -99,7 +100,7 @@ describe('performPromptImport: revision round-trip (Plan 22 gap #11)', () => {
     });
 
     it('RR5: revisionsImported is undefined when zero rows insert', async () => {
-        insertImportedRevisions.mockResolvedValue({ ok: false, error: 'x' });
+        insertImportedRevisions.mockResolvedValue(new DbResult(false, undefined, 'x'));
         const res = await performPromptImport(
             [entry('alpha')],
             { revisions: [rev('alpha')] },

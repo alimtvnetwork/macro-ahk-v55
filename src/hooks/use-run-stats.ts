@@ -4,14 +4,14 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { sendMessage } from "@/lib/message-client";
-import { Status1 } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { MessageRequestStatusType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 export interface CycleMetric {
     cycleNumber: number;
     startTime: string;
     endTime: string;
     durationMs: number;
-    status: Status1;
+    status: MessageRequestStatusType;
     errorMessage?: string;
 }
 

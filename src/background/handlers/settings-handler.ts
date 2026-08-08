@@ -12,7 +12,7 @@ import type { MessageRequest, OkResponse } from "../../shared/messages";
 import { DEFAULT_CHATBOX_XPATH } from "../../shared/defaults";
 import { invalidateSettingsNsCache } from "../settings-ns-cache";
 import { setVerboseLogging } from "../recorder/verbose-logging";
-import { RunAtEnum1 } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { ScriptRunAtType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 import { ThemeEnum } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
@@ -28,7 +28,7 @@ const STORAGE_KEY = "marco_extension_settings";
 export interface ExtensionSettings {
     autoRunOnPageLoad: boolean;
     showNotifications: boolean;
-    defaultRunAt: RunAtEnum1;
+    defaultRunAt: ScriptRunAtType;
     debugMode: boolean;
     maxCycleCount: number;
     idleTimeout: number;

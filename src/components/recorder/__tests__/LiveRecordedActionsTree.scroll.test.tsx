@@ -24,7 +24,7 @@ function makeStep(stepId: string, index: number): RecordedStep {
         StepId: stepId,
         Index: index,
         Kind: "Click",
-        Label: `Step ${index}`,
+        LabelType: `Step ${index}`,
         VariableName: `var${index}`,
         Selector: {
             XPathFull: "/html/body",

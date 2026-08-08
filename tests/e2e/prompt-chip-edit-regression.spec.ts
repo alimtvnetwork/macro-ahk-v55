@@ -1,7 +1,7 @@
 /**
  * prompt-chip-edit-regression.spec.ts
  *
- * Browser regression for chip gear editing. Plan and Next chip edits must
+ * Browser regression for chip gear editing. PlanTierType and Next chip edits must
  * update the role-scoped Prompt table row through PROJECT_API/rawSql and must
  * never call the legacy SAVE_PROMPT list path that creates extra prompt rows.
  */
@@ -87,7 +87,7 @@ async function newHarnessPage(): Promise<Page> {
 }
 
 const CHIP_EDIT_CASES = [
-    { role: 'plan', label: 'Plan', id: '7', slug: 'plan-default' },
+    { role: 'plan', label: 'PlanTierType', id: '7', slug: 'plan-default' },
     { role: 'next', label: 'Next', id: '8', slug: 'next-default' },
 ] as const;
 

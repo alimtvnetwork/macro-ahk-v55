@@ -18,11 +18,11 @@ import {
 } from '../shared-state';
 import { logSub } from '../logger';
 import { logError } from '../error-utils';
-import { DataAttr } from '../types';
+import { DataAttrType } from '../types';
 import {
   getLoopWsCreditSortMode,
   setLoopWsCreditSortMode,
-  type CreditSortMode,
+  type CreditSortModeType,
 } from '../ws-list-renderer';
 
 // ── Centralized DOM IDs (single source of truth) ──
@@ -44,7 +44,7 @@ const ID_CREDIT_SORT_LOW = 'loop-ws-credit-sort-low';
 const ID_CREDIT_SORT_PRO_HIGH = 'loop-ws-credit-sort-pro-high';
 const ID_CREDIT_SORT_PRO_LOW = 'loop-ws-credit-sort-pro-low';
 
-const CREDIT_SORT_ROW_IDS: ReadonlyArray<{ id: string; mode: CreditSortMode }> = [
+const CREDIT_SORT_ROW_IDS: ReadonlyArray<{ id: string; mode: CreditSortModeType }> = [
   { id: ID_CREDIT_SORT_HIGH, mode: 'high' },
   { id: ID_CREDIT_SORT_LOW, mode: 'low' },
   { id: ID_CREDIT_SORT_PRO_HIGH, mode: 'pro-high' },
@@ -82,7 +82,7 @@ function buildFilterRow(config: FilterRowConfig, populate: () => void): HTMLElem
   row.style.cssText =
     'display:flex;align-items:center;gap:6px;padding:5px 8px;cursor:pointer;' +
     'border-radius:3px;transition:background 0.12s;font-size:10px;color:#e2e8f0;';
-  row.setAttribute(DataAttr.Active, config.initialActive ? 'true' : 'false');
+  row.setAttribute(DataAttrType.Active, config.initialActive ? 'true' : 'false');
 
   // The id-bearing chip is what readFilterState() queries — it must exist in
   // the DOM with the data-active attribute even when the popover is closed,
@@ -115,9 +115,9 @@ function buildFilterRow(config: FilterRowConfig, populate: () => void): HTMLElem
   row.onclick = function (e: Event) {
     e.preventDefault();
     e.stopPropagation();
-    const wasActive = row.getAttribute(DataAttr.Active) === 'true';
+    const wasActive = row.getAttribute(DataAttrType.Active) === 'true';
     const next = !wasActive;
-    row.setAttribute(DataAttr.Active, next ? 'true' : 'false');
+    row.setAttribute(DataAttrType.Active, next ? 'true' : 'false');
     checkChip.textContent = next ? '☑' : '☐';
     config.onToggle(next);
     populate();
@@ -251,18 +251,18 @@ function buildCreditSortHeader(): HTMLElement {
 function buildCreditSortRows(populate: () => void): HTMLElement[] {
   const rows: HTMLElement[] = [];
 
-  function syncVisualState(activeMode: CreditSortMode): void {
+  function syncVisualState(activeMode: CreditSortModeType): void {
     for (const { id, mode } of CREDIT_SORT_ROW_IDS) {
       const el = document.getElementById(id);
       if (!el) continue;
       const isActive = mode === activeMode;
-      el.setAttribute(DataAttr.Active, isActive ? 'true' : 'false');
+      el.setAttribute(DataAttrType.Active, isActive ? 'true' : 'false');
       const chip = el.querySelector('.marco-credit-sort-chip') as HTMLElement | null;
       if (chip) chip.textContent = isActive ? '◉' : '○';
     }
   }
 
-  const meta: ReadonlyArray<{ id: string; mode: CreditSortMode; icon: string; label: string; hint: string }> = [
+  const meta: ReadonlyArray<{ id: string; mode: CreditSortModeType; icon: string; label: string; hint: string }> = [
     { id: ID_CREDIT_SORT_HIGH, mode: 'high', icon: '⬇', label: 'High credit', hint: 'all, desc' },
     { id: ID_CREDIT_SORT_LOW, mode: 'low', icon: '⬆', label: 'Low credit', hint: 'all, asc' },
     { id: ID_CREDIT_SORT_PRO_HIGH, mode: 'pro-high', icon: '💎⬇', label: 'Pro high', hint: 'pro expiring, desc' },
@@ -275,7 +275,7 @@ function buildCreditSortRows(populate: () => void): HTMLElement[] {
     const row = document.createElement('div');
     row.id = m.id;
     const isActive = currentMode === m.mode;
-    row.setAttribute(DataAttr.Active, isActive ? 'true' : 'false');
+    row.setAttribute(DataAttrType.Active, isActive ? 'true' : 'false');
     row.style.cssText =
       'display:flex;align-items:center;gap:6px;padding:5px 8px;cursor:pointer;' +
       'border-radius:3px;transition:background 0.12s;font-size:10px;color:#e2e8f0;';
@@ -307,9 +307,9 @@ function buildCreditSortRows(populate: () => void): HTMLElement[] {
     row.onclick = function (e: Event) {
       e.preventDefault();
       e.stopPropagation();
-      const wasActive = row.getAttribute(DataAttr.Active) === 'true';
+      const wasActive = row.getAttribute(DataAttrType.Active) === 'true';
       // Radio behavior: clicking the active row clears it; otherwise activate it.
-      const nextMode: CreditSortMode = wasActive ? 'none' : m.mode;
+      const nextMode: CreditSortModeType = wasActive ? 'none' : m.mode;
       setLoopWsCreditSortMode(nextMode);
       syncVisualState(nextMode);
       populate();

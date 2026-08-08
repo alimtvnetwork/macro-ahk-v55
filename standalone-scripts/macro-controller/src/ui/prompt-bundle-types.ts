@@ -7,20 +7,20 @@
  *
  * The `PromptEntry` fields intentionally match
  * `standalone-scripts/macro-controller/src/types/ui-types.ts` L47-70 so
- * dynamic-expansion prompts (`Next ${N}`, `Plan ${N}`) round-trip without
+ * dynamic-expansion prompts (`Next ${N}`, `PlanTierType ${N}`) round-trip without
  * loss — the exact gap identified in
  * `.lovable/plans/subtasks/12-prompts-import-export-menu/notes-01-call-graph.md`.
  */
 
 import type { PromptEntry } from '../types/ui-types';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
-import { PromptsBundleFormatEnum } from "../types/enums";
+import { PromptsBundleFormatType } from "../types/enums";
 
 /** Envelope schema version. Bump only for breaking changes. */
 export const PROMPTS_BUNDLE_SCHEMA_VERSION = 1 as const;
 
 /** Serialization format the entries travelled through. */
-export type PromptsBundleFormat = PromptsBundleFormatEnum;
+export type PromptsBundleFormat = PromptsBundleFormatType;
 
 /**
  * Revision history rows carried inside a bundle when the exporter is

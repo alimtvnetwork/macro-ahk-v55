@@ -15,7 +15,7 @@ import { reactClick, getByXPath, getAllByXPath, findElement, ML_ELEMENTS } from 
 import { collectWorkspaceNameCandidatesFromNode, matchWorkspaceByName, normalizeWorkspaceName, isValidWorkspaceCandidateName } from './ws-name-matching';
 import type { WorkspaceCredit, WorkspaceMatchCandidate } from './types';
 
-import { Label } from './types';
+import { LabelType } from './types';
 
 // ============================================
 // Tier 2: Detect workspace via Project Dialog XPath
@@ -59,7 +59,7 @@ export function detectWorkspaceViaProjectDialog(callerFn?: string, perWs?: Works
   return findProjectButtonWithRetry(fn, 3, 1000).then(function(btn: Element | null) {
     if (!btn) {
       logError('ws-dialog-detection', 'Project button NOT found after retries — cannot open dialog. XPath=' + CONFIG.PROJECT_BUTTON_XPATH);
-      log(fn + Label.KeepingExistingWs + (state.workspaceName || '(none)'), 'warn');
+      log(fn + LabelType.KeepingExistingWs + (state.workspaceName || '(none)'), 'warn');
       return Promise.resolve(null);
     }
     return openDialogAndPoll(fn, btn, perWs!, !!keepDialogOpen).then(function() {
@@ -195,7 +195,7 @@ function applyChosenWorkspace(
 
   if (!isEmptyWorkspaceList || !hasFirstRaw) {
     log(fn + ': XPath returned ' + allNodes.length + ' nodes but no unambiguous exact match. First node: "' + firstRaw + '" (checked ' + perWs.length + ' workspaces)', 'warn');
-    log(fn + Label.KeepingExistingWs + (state.workspaceName || '(none)'), 'warn');
+    log(fn + LabelType.KeepingExistingWs + (state.workspaceName || '(none)'), 'warn');
     return;
   }
 
@@ -309,7 +309,7 @@ function closeDialogAndDefault(fn: string, btn: Element, _perWs: WorkspaceCredit
   if (!state.workspaceName) {
     log(fn + ': No reliable workspace match — keeping workspace empty after fallback miss', 'warn');
   } else {
-    log(fn + Label.KeepingExistingWs + state.workspaceName, 'warn');
+    log(fn + LabelType.KeepingExistingWs + state.workspaceName, 'warn');
   }
   closeProjectDialogSafe(btn);
   resolve();

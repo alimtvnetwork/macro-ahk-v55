@@ -46,7 +46,7 @@ import {
     captureFormSnapshot,
     type FormSnapshot,
 } from "./form-snapshot";
-import { FailurePhaseEnum, FailureReasonCodeEnum, Enum_3f9b995 } from "../../types/enums";
+import { FailurePhaseEnum, FailureReasonCodeEnum, SemanticSemantic3f9b } from "../../types/enums";
 
 export type { VariableContext } from "./field-reference-resolver";
 export type { FormSnapshot } from "./form-snapshot";
@@ -225,7 +225,7 @@ interface FailureReportContext {
 function buildContextCore(
     input: BuildFailureReportInput,
     now: () => Date,
-): Pick<FailureReportContext, Enum_3f9b995> {
+): Pick<FailureReportContext, SemanticSemantic3f9b> {
     const message = extractMessage(input.Error);
     const attempts = resolveAttempts(input);
     const variables: ReadonlyArray<VariableContext> = input.Variables ?? [];

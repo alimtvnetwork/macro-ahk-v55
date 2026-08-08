@@ -7,7 +7,7 @@
  */
 
 import type { BundlePreview, DiffItem } from "@/lib/sqlite-bundle";
-import { Enum_7b1045ad } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { PopupActionsModeType } from "../../standalone-scripts/macro-controller/src/types/enums";
 import { LabelEnum } from "../types/enums";
 
 export interface CategoryCounts {
@@ -26,7 +26,7 @@ export interface CategoryCounts {
 export function countCategory(
   items: DiffItem[],
   existing: number,
-  mode: Enum_7b1045ad,
+  mode: PopupActionsModeType,
 ): CategoryCounts {
   const matched = items.filter((i) => i.status === "overwrite").length;
   const unmatched = items.filter((i) => i.status === "new").length;
@@ -55,7 +55,7 @@ export const SUMMARY_CATEGORY_ORDER: ReadonlyArray<{
   { label: "Configs", pick: (p) => ({ items: p.configItems, existing: p.existingConfigCount }) },
 ];
 
-export function buildImportSummary(preview: BundlePreview, mode: Enum_7b1045ad): string {
+export function buildImportSummary(preview: BundlePreview, mode: PopupActionsModeType): string {
   const lines: string[] = [];
   let totalMatched = 0;
   let totalUnmatched = 0;

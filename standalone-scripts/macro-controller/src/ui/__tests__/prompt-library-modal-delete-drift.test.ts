@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * G6: prompt-library-modal Delete flow + token-drift guard integration on Save.
  *
@@ -14,8 +15,8 @@ vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 
 const rows: Record<string, unknown[]> = {
     plan: [
-        { Id: 1, Slug: 'plan-default', Name: 'Plan (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
-        { Id: 2, Slug: 'plan-concise', Name: 'Plan (concise)', Body: 'A {{n}} B', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 1, Slug: 'plan-default', Name: 'PlanTierType (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 2, Slug: 'plan-concise', Name: 'PlanTierType (concise)', Body: 'A {{n}} B', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
     ],
     next: [],
     generic: [],
@@ -23,9 +24,9 @@ const rows: Record<string, unknown[]> = {
 
 const mocks = vi.hoisted(() => ({
     listPromptsByRole: vi.fn(),
-    setDefaultPromptForRole: vi.fn(async () => ({ ok: true })),
-    deletePromptById: vi.fn(async () => ({ ok: true })),
-    upsertPrompt: vi.fn(async () => ({ ok: true, value: 99 })),
+    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+    upsertPrompt: vi.fn(async () => (new DbResult(true, 99))),
 }));
 vi.mock('../../db/prompt-db', () => mocks);
 
@@ -39,9 +40,9 @@ async function flush(): Promise<void> {
 describe('prompt-library-modal — Delete flow', () => {
     beforeEach(() => {
         document.body.innerHTML = '';
-        mocks.listPromptsByRole.mockImplementation(async (role: string) => ({ ok: true, value: rows[role] ?? [] }));
+        mocks.listPromptsByRole.mockImplementation(async (role: string) => (new DbResult(true, rows[role] ?? [])));
         mocks.deletePromptById.mockClear();
-        mocks.deletePromptById.mockImplementation(async () => ({ ok: true }));
+        mocks.deletePromptById.mockImplementation(async () => (new DbResult(true, undefined)));
         mocks.upsertPrompt.mockClear();
     });
     afterEach(() => {
@@ -72,7 +73,7 @@ describe('prompt-library-modal — Delete flow', () => {
 
     it('deletePromptById returning ok:false surfaces "Delete blocked: <error>" in status', async () => {
         vi.spyOn(window, 'confirm').mockReturnValue(true);
-        mocks.deletePromptById.mockImplementationOnce(async () => ({ ok: false, error: 'last-row-guard' }));
+        mocks.deletePromptById.mockImplementationOnce(async () => (new DbResult(false, undefined, 'last-row-guard')));
         await openPromptLibraryModal();
         const row = document.querySelector('[data-prompt-slug="plan-concise"]')!;
         const btn = Array.from(row.querySelectorAll('button')).find((b) => b.textContent === 'Delete')!;
@@ -88,13 +89,13 @@ describe('prompt-library-modal — Delete flow', () => {
 describe('prompt-library-modal — token-drift guard integration on Save', () => {
     beforeEach(() => {
         document.body.innerHTML = '';
-        mocks.listPromptsByRole.mockImplementation(async (role: string) => ({ ok: true, value: rows[role] ?? [] }));
+        mocks.listPromptsByRole.mockImplementation(async (role: string) => (new DbResult(true, rows[role] ?? [])));
         mocks.upsertPrompt.mockReset();
     });
     afterEach(() => { document.body.innerHTML = ''; vi.restoreAllMocks(); });
 
     it('DB rejects with token-drift -> status shows "Save failed: ..." and modal stays open', async () => {
-        mocks.upsertPrompt.mockImplementation(async () => ({ ok: false, error: 'token drift: {{n}} missing' }));
+        mocks.upsertPrompt.mockImplementation(async () => (new DbResult(false, undefined, 'token drift: {{n}} missing')));
         await openPromptLibraryModal();
         const row = document.querySelector('[data-prompt-slug="plan-concise"]')!;
         const editBtn = Array.from(row.querySelectorAll('button')).find((b) => b.textContent === 'Edit')!;

@@ -6,7 +6,7 @@
 
 import type { TriggerType, TriggerConfig as TriggerConfigType } from "@/lib/automation-types";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Props {
@@ -28,7 +28,7 @@ export function TriggerConfigPanel({ triggerType, triggerConfig, onChange }: Pro
   return (
     <div className="space-y-3">
       <div className="space-y-1.5">
-        <Label className="text-xs font-medium">Trigger</Label>
+        <LabelType className="text-xs font-medium">Trigger</LabelType>
         <Select
           value={triggerType}
           onValueChange={(v) => onChange(v as TriggerType, triggerConfig)}
@@ -44,7 +44,7 @@ export function TriggerConfigPanel({ triggerType, triggerConfig, onChange }: Pro
 
       {triggerType === "on_page_load" && (
         <div className="space-y-1.5">
-          <Label className="text-xs">URL Pattern</Label>
+          <LabelType className="text-xs">URL Pattern</LabelType>
           <Input
             value={triggerConfig.urlPattern ?? ""}
             onChange={(e) => onChange(triggerType, { ...triggerConfig, urlPattern: e.target.value })}
@@ -56,7 +56,7 @@ export function TriggerConfigPanel({ triggerType, triggerConfig, onChange }: Pro
 
       {triggerType === "on_element" && (
         <div className="space-y-1.5">
-          <Label className="text-xs">CSS Selector</Label>
+          <LabelType className="text-xs">CSS Selector</LabelType>
           <Input
             value={triggerConfig.elementSelector ?? ""}
             onChange={(e) => onChange(triggerType, { ...triggerConfig, elementSelector: e.target.value })}
@@ -69,7 +69,7 @@ export function TriggerConfigPanel({ triggerType, triggerConfig, onChange }: Pro
       {triggerType === "interval" && (
         <div className="flex gap-3">
           <div className="space-y-1.5 flex-1">
-            <Label className="text-xs">Every (minutes)</Label>
+            <LabelType className="text-xs">Every (minutes)</LabelType>
             <Input
               type="number" min={1}
               value={triggerConfig.intervalMinutes ?? 5}
@@ -78,7 +78,7 @@ export function TriggerConfigPanel({ triggerType, triggerConfig, onChange }: Pro
             />
           </div>
           <div className="space-y-1.5 flex-1">
-            <Label className="text-xs">Max Runs</Label>
+            <LabelType className="text-xs">Max Runs</LabelType>
             <Input
               type="number" min={1}
               value={triggerConfig.maxRuns ?? 10}
@@ -91,7 +91,7 @@ export function TriggerConfigPanel({ triggerType, triggerConfig, onChange }: Pro
 
       {triggerType === "cron" && (
         <div className="space-y-1.5">
-          <Label className="text-xs">Cron Expression</Label>
+          <LabelType className="text-xs">Cron Expression</LabelType>
           <Input
             value={triggerConfig.cronExpression ?? ""}
             onChange={(e) => onChange(triggerType, { ...triggerConfig, cronExpression: e.target.value })}

@@ -61,10 +61,10 @@ import { showToast } from '../toast';
 import { batchRefreshFromWire } from '../credit-balance/batch-refresh-from-wire';
 import { hasFreshCreditBalanceCache } from '../credit-balance/fresh-cache-probe';
 import { fanOutCreditEnrichment } from '../credit-balance-update/credit-enrichment-fanout';
-import { CssFragment } from '../types';
+import { CssFragmentType } from '../types';
 
 /**
- * Plan-10 follow-up: the freshness probe now reads the in-memory tier of
+ * PlanTierType-10 follow-up: the freshness probe now reads the in-memory tier of
  * `credit-balance-update/credit-balance-cache.ts`. Rows with a live cache
  * entry short-circuit inside `needsBalanceEnrichment`; cold rows still
  * flow through the dispatcher where the per-workspace 10s throttle in
@@ -208,7 +208,7 @@ function buildStartStopButton(deps: PanelBuilderDeps, btnStyle: string): { wrap:
   startStopBtn.id = IDS.START_BTN;
   startStopBtn.textContent = '▶';
   startStopBtn.title = 'Start loop';
-  startStopBtn.style.cssText = btnStyle + CssFragment.Background + cBtnStartGrad + ';color:#fff;border-radius:8px;min-width:36px;width:36px;font-size:14px;text-align:center;padding:6px 0;box-shadow:' + cBtnStartGlow + CssFragment.Border1pxSolidRgba + ';position:relative;';
+  startStopBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnStartGrad + ';color:#fff;border-radius:8px;min-width:36px;width:36px;font-size:14px;text-align:center;padding:6px 0;box-shadow:' + cBtnStartGlow + CssFragmentType.Border1pxSolidRgba + ';position:relative;';
   startStopBtn.onmouseenter = function() { startStopBtn.style.filter = 'brightness(1.12)'; startStopBtn.style.boxShadow = '0 2px 8px rgba(0,200,83,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; };
   startStopBtn.onmouseleave = function() { startStopBtn.style.filter = ''; startStopBtn.style.boxShadow = cBtnStartGlow; };
   startStopBtn.onclick = function() {
@@ -274,7 +274,7 @@ function executeCreditFetch(ctx: CreditFetchCtx): void {
     },
     { intervalMs: 500, timeoutMs: 15000 },
   ).then(function () {
-    // Plan-10: route raw `/user/workspaces` rows (rawApi) through the
+    // PlanTierType-10: route raw `/user/workspaces` rows (rawApi) through the
     // typed guard + `needsBalanceEnrichment` predicate instead of the
     // previous ad-hoc `plan === 'pro_1'` filter. The dispatcher still
     // enforces pro_1-only scope + 5s gap + 10s per-ws throttle.
@@ -312,7 +312,7 @@ function buildCreditButton(deps: PanelBuilderDeps, btnStyle: string): HTMLElemen
   const creditBtn = document.createElement('button');
   creditBtn.textContent = '💰 Credits';
   creditBtn.title = 'Fetch credit status via API and refresh workspace bars';
-  creditBtn.style.cssText = btnStyle + CssFragment.Background + cBtnCreditGrad + ';color:#1a1a2e;font-size:' + tFontTiny + ';padding:6px 12px;box-shadow:' + cBtnCreditGlow + CssFragment.Border1pxSolidRgba;
+  creditBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnCreditGrad + ';color:#1a1a2e;font-size:' + tFontTiny + ';padding:6px 12px;box-shadow:' + cBtnCreditGlow + CssFragmentType.Border1pxSolidRgba;
   creditBtn.onmouseenter = function() { creditBtn.style.filter = 'brightness(1.12)'; creditBtn.style.boxShadow = '0 2px 8px rgba(245,158,11,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; };
   creditBtn.onmouseleave = function() { creditBtn.style.filter = ''; creditBtn.style.boxShadow = cBtnCreditGlow; };
 
@@ -358,7 +358,7 @@ function buildPromptsDropdown(_deps: PanelBuilderDeps, btnStyle: string): Prompt
   const promptsBtn = document.createElement('button');
   promptsBtn.textContent = '📋 Prompts';
   promptsBtn.title = 'Select a prompt to paste or copy';
-  promptsBtn.style.cssText = btnStyle + CssFragment.Background + cBtnPromptGrad + ';color:#fff;font-size:' + tFontTiny + ';padding:6px 12px;box-shadow:' + cBtnPromptGlow + CssFragment.Border1pxSolidRgba;
+  promptsBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnPromptGrad + ';color:#fff;font-size:' + tFontTiny + ';padding:6px 12px;box-shadow:' + cBtnPromptGlow + CssFragmentType.Border1pxSolidRgba;
   promptsBtn.onmouseenter = function() { promptsBtn.style.filter = 'brightness(1.15)'; promptsBtn.style.boxShadow = '0 0 20px rgba(0,198,255,0.55)'; };
   promptsBtn.onmouseleave = function() { promptsBtn.style.filter = ''; promptsBtn.style.boxShadow = cBtnPromptGlow; };
 

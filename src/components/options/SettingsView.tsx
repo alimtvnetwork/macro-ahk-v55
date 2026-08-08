@@ -4,7 +4,7 @@ import { PromptVariablesCard } from "./PromptVariablesCard";
 import { DismissedSitesCard } from "./DismissedSitesCard";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +37,7 @@ import { sendMessage } from "@/lib/message-client";
 import { toast } from "sonner";
 import { DEFAULT_CHATBOX_XPATH } from "@/shared/defaults";
 import { logError } from "./options-logger";
-import { RunAtEnum1 } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { ScriptRunAtType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 import { ThemeEnum } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
@@ -48,7 +48,7 @@ interface SettingsData {
   autoRunOnPageLoad: boolean;
   showNotifications: boolean;
   showInjectionToast: boolean;
-  defaultRunAt: RunAtEnum1;
+  defaultRunAt: ScriptRunAtType;
   debugMode: boolean;
   verboseLogging: boolean;
   maxCycleCount: number;
@@ -493,7 +493,7 @@ function SettingRow({
   return (
     <div className="flex items-center justify-between gap-4">
       <div className="space-y-0.5">
-        <Label className="text-sm font-medium">{label}</Label>
+        <LabelType className="text-sm font-medium">{label}</LabelType>
         <p className="text-xs text-muted-foreground">{description}</p>
       </div>
       {children}

@@ -9,7 +9,7 @@
 
 import { logError } from '../error-utils';
 
-// Plan-17 step 22: dynamic import breaks the database-modal-data ↔ database-data-table cycle.
+// PlanTierType-17 step 22: dynamic import breaks the database-modal-data ↔ database-data-table cycle.
 // loadTableData is only called inside pagination click handlers, so runtime-lazy loading is safe.
 function loadTableData(
   tableName: string,
@@ -24,7 +24,7 @@ function loadTableData(
     });
 }
 import { DB_PAGE_SIZE as PAGE_SIZE } from '../constants';
-// Plan-17 step 16: escapeHtml re-exported from leaf so consumers that only
+// PlanTierType-17 step 16: escapeHtml re-exported from leaf so consumers that only
 // need escaping (e.g. database-data-filter) do NOT import data-table and
 // re-close the modal-data ↔ filter ↔ data-table cycle.
 export { escapeHtml } from './database-html-escape';

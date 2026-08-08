@@ -14,13 +14,13 @@ import { PANEL_DEFAULT_WIDTH, PANEL_DEFAULT_HEIGHT } from '../shared-state';
 // See: spec/22-app-issues/63-button-layout-collapse-reload.md
 // ============================================
 import { PANEL_EDGE_MARGIN, PANEL_MIN_VISIBLE_HEIGHT, PANEL_MIN_VISIBLE_WIDTH, DEFAULT_BACKDROP_OPACITY } from '../constants';
-import { DomId, StorageKey } from '../types';
+import { DomIdType, StorageKeyType } from '../types';
 function savePanelState(state: string): void {
-  try { localStorage.setItem(StorageKey.PanelState, state); } catch (_e) { logSub('Failed to save panel state: ' + (_e instanceof Error ? _e.message : String(_e)), 1); }
+  try { localStorage.setItem(StorageKeyType.PanelState, state); } catch (_e) { logSub('Failed to save panel state: ' + (_e instanceof Error ? _e.message : String(_e)), 1); }
 }
 
 function loadPanelState(): string {
-  try { return localStorage.getItem(StorageKey.PanelState) || 'expanded'; } catch (_e) { logSub('Failed to load panel state: ' + (_e instanceof Error ? _e.message : String(_e)), 1); return 'expanded'; }
+  try { return localStorage.getItem(StorageKeyType.PanelState) || 'expanded'; } catch (_e) { logSub('Failed to load panel state: ' + (_e instanceof Error ? _e.message : String(_e)), 1); return 'expanded'; }
 }
 
 interface PanelGeometry {
@@ -38,7 +38,7 @@ function savePanelGeometry(ui: HTMLElement): void {
       width: ui.style.width || '',
       height: ui.style.height || '',
     };
-    localStorage.setItem(StorageKey.PanelGeometry, JSON.stringify(geo));
+    localStorage.setItem(StorageKeyType.PanelGeometry, JSON.stringify(geo));
   } catch (_e) { logSub('Failed to save panel geometry: ' + (_e instanceof Error ? _e.message : String(_e)), 1); }
 }
 
@@ -49,7 +49,7 @@ function savePanelGeometry(ui: HTMLElement): void {
 // "buttons crammed left after reload-while-minimized" bug from spec 63.
 export function loadPanelGeometry(): PanelGeometry | null {
   try {
-    const raw = localStorage.getItem(StorageKey.PanelGeometry);
+    const raw = localStorage.getItem(StorageKeyType.PanelGeometry);
     if (!raw) return null;
     return JSON.parse(raw) as PanelGeometry;
   } catch (_e) { logSub('Failed to parse panel geometry: ' + (_e instanceof Error ? _e.message : String(_e)), 1); return null; }
@@ -153,7 +153,7 @@ export function createPanelLayoutCtx(ui: HTMLElement, floatW: string, floatSh: s
   };
 }
 
-const BACKDROP_ID = DomId.PanelBackdrop;
+const BACKDROP_ID = DomIdType.PanelBackdrop;
 
 export function getBackdropOpacity(): number {
   return DEFAULT_BACKDROP_OPACITY;
@@ -161,7 +161,7 @@ export function getBackdropOpacity(): number {
 
 export function setBackdropOpacity(opacity: number): void {
   const clamped = Math.min(1, Math.max(0, opacity));
-  try { localStorage.setItem(StorageKey.BackdropOpacity, String(clamped)); } catch (_e) { logSub('Failed to save backdrop opacity: ' + (_e instanceof Error ? _e.message : String(_e)), 1); }
+  try { localStorage.setItem(StorageKeyType.BackdropOpacity, String(clamped)); } catch (_e) { logSub('Failed to save backdrop opacity: ' + (_e instanceof Error ? _e.message : String(_e)), 1); }
   const backdrop = document.getElementById(BACKDROP_ID);
   if (!backdrop) return;
   if (clamped === 0) {

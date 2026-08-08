@@ -8,7 +8,7 @@
 
 import { describe, it, expect } from "vitest";
 import { validateRow, validateFile } from "../csv-validator";
-import { UserAddCsvColumn } from "../csv-column";
+import { UserAddCsvColumnType } from "../csv-column";
 import type { UserAddCsvRow } from "../csv-types";
 import { UserAddMembershipRoleCode } from "../../migrations/membership-role-seed";
 
@@ -44,7 +44,7 @@ describe("validateRow (user-add) — workspace URL", () => {
     ])("rejects: %s (%s)", (url) => {
         const errs = validateRow(baseRow({ WorkspaceUrl: url }));
         expect(errs).toHaveLength(1);
-        expect(errs[0].Column).toBe(UserAddCsvColumn.WorkspaceUrl);
+        expect(errs[0].Column).toBe(UserAddCsvColumnType.WorkspaceUrl);
     });
 });
 
@@ -52,7 +52,7 @@ describe("validateRow (user-add) — Notes cap", () => {
     it("flags Notes > 500 chars", () => {
         const errs = validateRow(baseRow({ Notes: "x".repeat(501) }));
         expect(errs).toHaveLength(1);
-        expect(errs[0].Column).toBe(UserAddCsvColumn.Notes);
+        expect(errs[0].Column).toBe(UserAddCsvColumnType.Notes);
     });
 });
 

@@ -9,7 +9,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Plus, Trash2, Link } from "lucide-react";
 import { OnDeleteEnum } from "../../../types/enums";
 
@@ -90,7 +90,7 @@ export function ForeignKeyEditor({
         >
           {/* Source column */}
           <div className="space-y-0.5 flex-1">
-            <Label className="text-[9px] text-muted-foreground">Source Column</Label>
+            <LabelType className="text-[9px] text-muted-foreground">Source Column</LabelType>
             {availableColumns.length > 0 ? (
               <Select
                 value={rel.sourceColumn}
@@ -121,7 +121,7 @@ export function ForeignKeyEditor({
 
           {/* Target table */}
           <div className="space-y-0.5 flex-1">
-            <Label className="text-[9px] text-muted-foreground">Target Table</Label>
+            <LabelType className="text-[9px] text-muted-foreground">Target Table</LabelType>
             {availableTables.length > 0 ? (
               <Select
                 value={rel.targetTable}
@@ -150,7 +150,7 @@ export function ForeignKeyEditor({
 
           {/* Target column */}
           <div className="space-y-0.5 w-16">
-            <Label className="text-[9px] text-muted-foreground">Target Col</Label>
+            <LabelType className="text-[9px] text-muted-foreground">Target Col</LabelType>
             <Input
               value={rel.targetColumn}
               onChange={(e) => updateRelation(i, { targetColumn: e.target.value })}
@@ -162,7 +162,7 @@ export function ForeignKeyEditor({
 
           {/* ON DELETE */}
           <div className="space-y-0.5 w-24">
-            <Label className="text-[9px] text-muted-foreground">On Delete</Label>
+            <LabelType className="text-[9px] text-muted-foreground">On Delete</LabelType>
             <Select
               value={rel.onDelete}
               onValueChange={(v) => updateRelation(i, { onDelete: v as OnDeleteAction })}

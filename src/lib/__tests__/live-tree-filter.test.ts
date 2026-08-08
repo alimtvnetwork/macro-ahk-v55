@@ -28,7 +28,7 @@ function makeStep(id: number, groupId: number, label: string | null, kind: StepK
         StepGroupId: groupId,
         OrderIndex: id,
         StepKindId: kind,
-        Label: label,
+        LabelType: label,
         PayloadJson: "{}",
         TargetStepGroupId: null,
         IsDisabled: false,
@@ -97,7 +97,7 @@ describe("filterLiveTree", () => {
         expect(r.Forest[0].Children).toHaveLength(1);
         expect(r.Forest[0].Children[0].Group.Name).toBe("Forms");
         expect(r.StepsByGroup.get(2)).toHaveLength(1);
-        expect(r.StepsByGroup.get(2)?.[0].Label).toBe("Submit button");
+        expect(r.StepsByGroup.get(2)?.[0].LabelType).toBe("Submit button");
         expect(r.StepMatchCount).toBe(1);
         // Both ancestors should be flagged for auto-expansion.
         expect(r.ExpandIds.has(1)).toBe(true);
@@ -108,7 +108,7 @@ describe("filterLiveTree", () => {
         const { forest, stepsByGroup } = fixture();
         const r = filterLiveTree(forest, stepsByGroup, "type");
         expect(r.StepMatchCount).toBe(1);
-        expect(r.StepsByGroup.get(2)?.[0].Label).toBe("Email field");
+        expect(r.StepsByGroup.get(2)?.[0].LabelType).toBe("Email field");
     });
 
     it("returns an empty forest when nothing matches", () => {

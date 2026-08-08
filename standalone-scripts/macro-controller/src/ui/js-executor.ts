@@ -8,7 +8,7 @@ import { VERSION, IDS, cPanelFg, cPanelFgDim } from '../shared-state';
 import { log, logSub } from '../logger';
 import { logError } from '../error-utils';
 import { LOOP_JS_HISTORY_MAX } from '../constants';
-import { CssFragment } from '../types';
+import { CssFragmentType } from '../types';
 // === Module-level state ===
 const loopJsHistory: Array<{time: string, code: string, success: boolean, result: string}> = [];
 // CQ11: Singleton for JS history navigation index
@@ -53,9 +53,9 @@ export function renderLoopJsHistory(): void {
     html += '<div class="loop-js-hist-item" data-hist-idx="' + histIndex + '" style="display:flex;gap:4px;align-items:flex-start;padding:3px 4px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;font-family:monospace;"'
       + ' onmouseover="(this as HTMLElement).style.background=\'rgba(139,92,246,0.15)\'"'
       + ' onmouseout="(this as HTMLElement).style.background=\'transparent\'">'
-      + CssFragment.SpanStyleColor + statusColor + ';font-size:10px;">' + statusIcon + '</span>'
-      + CssFragment.SpanStyleColor + cPanelFgDim + ';font-size:9px;min-width:40px;">' + e.time + '</span>'
-      + CssFragment.SpanStyleColor + cPanelFg + ';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + e.code.substring(0, 60) + '</span>'
+      + CssFragmentType.SpanStyleColor + statusColor + ';font-size:10px;">' + statusIcon + '</span>'
+      + CssFragmentType.SpanStyleColor + cPanelFgDim + ';font-size:9px;min-width:40px;">' + e.time + '</span>'
+      + CssFragmentType.SpanStyleColor + cPanelFg + ';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + e.code.substring(0, 60) + '</span>'
       + '</div>';
   }
   el.innerHTML = html;

@@ -1,5 +1,6 @@
+import { DbResult } from '../db/db-result';
 /**
- * Step 3 (Plan Task RCA) — Tests for plan-task-ui.ts.
+ * Step 3 (PlanTierType Task RCA) — Tests for plan-task-ui.ts.
  *
  * Covers:
  *  - buildPlanTaskPrompt(n) shape for several N values (unit).
@@ -37,11 +38,14 @@ vi.mock('../ui/prompt-loader', () => buildPromptLoaderMock({
 vi.mock('../xpath-utils', () => ({
   getByXPath: () => document.createElement('div'),
 }));
-// Plan-14 step 15: injection now reads plan-default from the Prompt table.
+// PlanTierType-14 step 15: injection now reads plan-default from the Prompt table.
 // Return `undefined` so the code path exercises the hardcoded fallback,
 // preserving the pre-existing PasteOutcome behaviour these tests assert.
 vi.mock('../db/prompt-db', () => ({
-  getDefaultPromptForRole: async () => ({ ok: true, value: undefined }),
+    DbResult,
+    DbResult,
+    DbResult,
+  getDefaultPromptForRole: async () => (new DbResult(true, undefined)),
 }));
 
 interface PromptContextLike {
@@ -97,7 +101,7 @@ describe('renderPlanTaskSubmenu — toast surface', () => {
     const header = container.querySelector('div') as HTMLElement;
     header.click(); // open sub
     const presets = container.querySelectorAll('[data-plan-preset]');
-    (presets[0] as HTMLElement).click(); // "Plan 2"
+    (presets[0] as HTMLElement).click(); // "PlanTierType 2"
 
     expect(showPasteToastSpy).not.toHaveBeenCalled();
   });

@@ -48,7 +48,7 @@ export interface AuthDiagResult {
   updateAuthDiagRow: () => void;
 }
 
-import { CssFragment } from '../types';
+import { CssFragmentType } from '../types';
 // CQ16: Extracted auth diag update context + function
 interface AuthDiagUpdateCtx {
   deps: AuthDiagDeps;
@@ -140,7 +140,7 @@ export function createAuthDiagRow(deps: AuthDiagDeps): AuthDiagResult {
   const jwtRow = buildDiagRow(dimStyle, valStyle, 'JWT:', '110px', '8px');
 
   const jwtDetailRow = document.createElement('div');
-  jwtDetailRow.style.cssText = CssFragment.RowDiag + 'flex-wrap:wrap;';
+  jwtDetailRow.style.cssText = CssFragmentType.RowDiag + 'flex-wrap:wrap;';
   const jwtDetailVal = document.createElement('span');
   jwtDetailVal.style.cssText = dimStyle + 'font-size:9px;flex:1;';
   jwtDetailVal.appendChild(createSkeletonBar({ width: '180px', height: '7px' }));

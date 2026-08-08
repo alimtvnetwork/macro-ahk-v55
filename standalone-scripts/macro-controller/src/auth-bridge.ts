@@ -18,7 +18,7 @@ import {
 } from './auth-resolve';
 
 import { BRIDGE_TIMEOUT_MS } from './constants';
-import { Label } from './types';
+import { LabelType } from './types';
 
 // ============================================
 // Bridge Constants & Outcome Tracking
@@ -195,7 +195,7 @@ function handleAttemptResult(
     const errorMsg = attempt.errorMessage || 'No token returned';
 
     if (attempt.errorMessage) {
-      log(Label.ExtensionBridge + messageType + ' failed: ' + errorMsg, 'warn');
+      log(LabelType.ExtensionBridge + messageType + ' failed: ' + errorMsg, 'warn');
     }
 
     recordBridgeOutcome(false, 'none', errorMsg);
@@ -222,7 +222,7 @@ export function requestTokenFromExtension(
     if (handleAttemptResult(firstAttempt, messageType, onDone)) return;
 
     // Retry once on timeout (handles MV3 service worker cold-start)
-    log(Label.ExtensionBridge + messageType + ' timed out — retrying once...', 'warn');
+    log(LabelType.ExtensionBridge + messageType + ' timed out — retrying once...', 'warn');
 
     _requestTokenFromExtensionAttempt(isForceRefresh, function (secondAttempt: ExtensionBridgeAttemptResult) {
       if (handleAttemptResult(secondAttempt, messageType, onDone)) return;
@@ -270,7 +270,7 @@ function handleBridgeResponse(ctx: BridgeAttemptCtxFull, event: MessageEvent): v
   const source = token ? 'extension-bridge[' + ctx.messageType + ']' : 'none';
 
   if (token) {
-    log(Label.ExtensionBridge + ctx.messageType + ' resolved in ' + (Date.now() - ctx.startedAt) + 'ms', 'sub');
+    log(LabelType.ExtensionBridge + ctx.messageType + ' resolved in ' + (Date.now() - ctx.startedAt) + 'ms', 'sub');
   }
 
   finishBridgeAttempt(ctx, { token, source, isTimeout: false, errorMessage });

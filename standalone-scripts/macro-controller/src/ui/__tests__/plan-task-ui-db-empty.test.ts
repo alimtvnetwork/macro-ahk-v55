@@ -1,5 +1,6 @@
+import { DbResult } from '../../db/db-result';
 /**
- * Negative UI test: Plan chip when Prompt DB has no `plan-default` row.
+ * Negative UI test: PlanTierType chip when Prompt DB has no `plan-default` row.
  *
  * Root cause of the design under test: `resolvePlanBody()` (plan-task-ui.ts:98)
  * treats "no default row" as a soft miss — it emits a `console.warn` with the
@@ -31,6 +32,9 @@ const logErrorMock = vi.hoisted(() => vi.fn());
 const resolveConfiguredChipValuesMock = vi.hoisted(() => vi.fn());
 
 vi.mock('../../db/prompt-db', () => ({
+    DbResult,
+    DbResult,
+    DbResult,
     getDefaultPromptForRole: getDefaultMock,
 }));
 vi.mock('../prompt-utils', async (importOriginal) => {
@@ -107,7 +111,7 @@ afterEach(() => {
 
 describe('plan-task-ui — DB empty for plan role (negative path)', () => {
     it('warns and falls back to hardcoded prompt when no plan-default row exists', async () => {
-        getDefaultMock.mockResolvedValueOnce({ ok: true, value: undefined });
+        getDefaultMock.mockResolvedValueOnce(new DbResult(true, undefined));
 
         const container = document.createElement('div');
         renderPlanTaskSubmenu(container, makeCtx());
@@ -168,7 +172,7 @@ describe('plan-task-ui — DB empty for plan role (negative path)', () => {
     });
 
     it('surfaces a hard-failure toast only when pasteIntoEditor reports failed', async () => {
-        getDefaultMock.mockResolvedValueOnce({ ok: true, value: undefined });
+        getDefaultMock.mockResolvedValueOnce(new DbResult(true, undefined));
         pasteMock.mockResolvedValueOnce('failed');
 
         const container = document.createElement('div');
@@ -181,6 +185,6 @@ describe('plan-task-ui — DB empty for plan role (negative path)', () => {
             await new Promise((r) => setTimeout(r, 5));
         }
 
-        expect(toastMock).toHaveBeenCalledWith('❌ Plan prompt: injection failed', true);
+        expect(toastMock).toHaveBeenCalledWith('❌ PlanTierType prompt: injection failed', true);
     });
 });

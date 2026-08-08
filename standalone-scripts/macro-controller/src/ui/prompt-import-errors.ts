@@ -1,5 +1,5 @@
 /**
- * Plan 12 step 19-20: structured error codes + typed log helper for the
+ * PlanTierType 12 step 19-20: structured error codes + typed log helper for the
  * prompts import pipeline.
  *
  * WHY: modal error panel showed `String(err)`; ops could not grep on a
@@ -11,10 +11,10 @@
  */
 
 import { log } from '../logger';
-import { ImportErrorCodeEnum, PhaseEnum2, ToastLevelEnum } from "../types/enums";
+import { ImportErrorCodeType, ImportErrorPhaseType, ToastLevelType } from "../types/enums";
 
 export type ImportErrorCode =
-  ImportErrorCodeEnum;
+  ImportErrorCodeType;
 
 export interface ClassifiedImportError {
   code: ImportErrorCode;
@@ -80,7 +80,7 @@ function classifyParseError(err: unknown, message: string): ClassifiedImportErro
  * Delegates to phase-specific helpers so each stays under the
  * cognitive-complexity threshold.
  */
-export function classifyImportError(err: unknown, phase: PhaseEnum2): ClassifiedImportError {
+export function classifyImportError(err: unknown, phase: ImportErrorPhaseType): ClassifiedImportError {
   const message = err instanceof Error ? err.message : String(err);
   const name = err instanceof Error ? err.name : '';
   return phase === 'commit'
@@ -121,7 +121,7 @@ export class ImportCommitError extends Error {
 export function logStructured(input: {
   namespace: string;
   code: string;
-  level: ToastLevelEnum;
+  level: ToastLevelType;
   fields?: Record<string, string | number | boolean | null | undefined>;
 }): void {
   const parts: string[] = ['code=' + input.code];

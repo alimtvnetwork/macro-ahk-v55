@@ -8,7 +8,7 @@
  * This barrel preserves backward compatibility for all existing imports.
  */
 
-// Plan-17 Step 27: pruned barrel to remove dead re-exports (symbols with
+// PlanTierType-17 Step 27: pruned barrel to remove dead re-exports (symbols with
 // zero consumers outside their source module: authRecoveryManager,
 // extractTokenFromAuthBridgeResponse, getRawToken, getTokenAge,
 // getTokenSavedAt, isRelayActive, saveTokenWithTimestamp,

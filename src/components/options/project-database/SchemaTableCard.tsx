@@ -6,7 +6,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
@@ -98,7 +98,7 @@ function ColumnValidationSection({
 
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs font-medium text-muted-foreground">Column Validation</Label>
+      <LabelType className="text-xs font-medium text-muted-foreground">Column Validation</LabelType>
       {namedCols.map((col, colIdx) => {
         const realIdx = table.columns.indexOf(col);
         return (

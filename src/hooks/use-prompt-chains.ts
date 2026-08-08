@@ -6,7 +6,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { sendMessage } from "@/lib/message-client";
 import type { PromptEntry } from "./use-prompts";
-import { ChainStepStatus } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { ChainStepStatusType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -31,7 +31,7 @@ export interface ChainExecutionState {
     chainId: string;
     currentStep: number;
     totalSteps: number;
-    stepStatuses: ChainStepStatus[];
+    stepStatuses: ChainStepStatusType[];
     isRunning: boolean;
     error?: string;
 }
@@ -147,7 +147,7 @@ export function usePromptChains() {
             chainId: chain.id,
             currentStep: 0,
             totalSteps: orderedPrompts.length,
-            stepStatuses: orderedPrompts.map((): ChainStepStatus => "pending"),
+            stepStatuses: orderedPrompts.map((): ChainStepStatusType => "pending"),
             isRunning: true,
         };
         setExecution({ ...state });

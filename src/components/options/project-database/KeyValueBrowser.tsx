@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import {
   Plus, Trash2, Edit2, RefreshCw, Loader2, Search, Save, X,
 } from "lucide-react";
@@ -300,7 +300,7 @@ export function KeyValueBrowser({ projectSlug }: KeyValueBrowserProps) {
 
           <div className="space-y-3">
             <div className="space-y-1">
-              <Label className="text-xs">Namespace</Label>
+              <LabelType className="text-xs">Namespace</LabelType>
               <Input
                 value={formNs}
                 onChange={(e) => setFormNs(e.target.value)}
@@ -309,7 +309,7 @@ export function KeyValueBrowser({ projectSlug }: KeyValueBrowserProps) {
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">Key</Label>
+              <LabelType className="text-xs">Key</LabelType>
               <Input
                 value={formKey}
                 onChange={(e) => setFormKey(e.target.value)}
@@ -319,7 +319,7 @@ export function KeyValueBrowser({ projectSlug }: KeyValueBrowserProps) {
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">Value</Label>
+              <LabelType className="text-xs">Value</LabelType>
               <textarea
                 value={formValue}
                 onChange={(e) => setFormValue(e.target.value)}
@@ -328,7 +328,7 @@ export function KeyValueBrowser({ projectSlug }: KeyValueBrowserProps) {
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">Value Type</Label>
+              <LabelType className="text-xs">Value Type</LabelType>
               <Select value={formType} onValueChange={setFormType}>
                 <SelectTrigger className="h-8 text-xs">
                   <SelectValue />

@@ -1,7 +1,7 @@
 /**
  * MacroController API namespace - shared type definitions.
  *
- * Split out from `api-namespace.ts` (Plan-17 step 13) to keep the runtime
+ * Split out from `api-namespace.ts` (PlanTierType-17 step 13) to keep the runtime
  * module under the 500 LOC cap. Types only; no side effects, no imports
  * from `api-namespace.ts` (would recreate a cycle).
  */

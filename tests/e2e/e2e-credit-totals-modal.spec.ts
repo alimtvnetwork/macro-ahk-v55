@@ -1,5 +1,5 @@
 /**
- * E2E — Credit Totals modal (Plan 20-step, Step 16 — fixtures wired in Phase B Step 52)
+ * E2E — Credit Totals modal (PlanTierType 20-step, Step 16 — fixtures wired in Phase B Step 52)
  *
  * Coverage (target): open modal → sort by Rem asc → drag row 3 above row 1 →
  * filter "Refill-soon" → click CSV → assert downloaded CSV contains exactly
@@ -92,7 +92,7 @@ test.describe('Credit Totals modal — sort → drag → filter → CSV export r
                 stream.on('error', reject);
             });
             const csv = Buffer.concat(chunks).toString('utf8');
-            expect(csv).toContain('Workspace,Plan,Projects,Used,Remaining,Total,Daily,DailyLimit,Source');
+            expect(csv).toContain('Workspace,PlanTierType,Projects,Used,Remaining,Total,Daily,DailyLimit,Source');
             expect(csv).toContain('Cancelled Pro Workspace');
         } finally {
             await context.close();

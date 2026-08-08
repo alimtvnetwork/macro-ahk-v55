@@ -1,5 +1,5 @@
 /**
- * Verify Plan and Next tabs are always visible in the prompts dropdown
+ * Verify PlanTierType and Next tabs are always visible in the prompts dropdown
  * across initial open, re-render (sync paint), and scrolled state.
  * v4.15.0 — Issue: tabs must never disappear from the chatbox dropdown.
  */
@@ -53,28 +53,28 @@ function makeCtx() {
   return { promptsDropdown: dropdown } as never;
 }
 
-describe('Plan tab always visible in prompts dropdown', () => {
+describe('PlanTierType tab always visible in prompts dropdown', () => {
   beforeEach(() => { document.body.innerHTML = ''; });
 
-  it('renders Plan tab button on initial open and keeps Next hidden in the inline strip', () => {
+  it('renders PlanTierType tab button on initial open and keeps Next hidden in the inline strip', () => {
     const dropdownCtx = makeCtx();
     renderPromptsDropdown(dropdownCtx, {} as never);
     const plan = document.querySelector('[data-plan-toggle]');
     const nextMarker = document.querySelector('[data-next-toggle]') as HTMLElement | null;
     expect(plan).toBeTruthy();
-    expect(plan?.textContent).toContain('Plan');
+    expect(plan?.textContent).toContain('PlanTierType');
     expect(nextMarker).toBeTruthy();
     expect(nextMarker?.style.display).toBe('none');
   });
 
-  it('Plan tab is active by default and hidden Next marker is inactive', () => {
+  it('PlanTierType tab is active by default and hidden Next marker is inactive', () => {
     const dropdownCtx = makeCtx();
     renderPromptsDropdown(dropdownCtx, {} as never);
     expect(document.querySelector('[data-plan-toggle]')?.getAttribute('data-tab-active')).toBe('1');
     expect(document.querySelector('[data-next-toggle]')?.getAttribute('data-tab-active')).toBe('0');
   });
 
-  it('header is sticky so Plan tab remains visible while scrolling', () => {
+  it('header is sticky so PlanTierType tab remains visible while scrolling', () => {
     const dropdownCtx = makeCtx();
     renderPromptsDropdown(dropdownCtx, {} as never);
     const header = document.querySelector('[data-plan-toggle]')?.parentElement?.parentElement as HTMLElement;
@@ -82,7 +82,7 @@ describe('Plan tab always visible in prompts dropdown', () => {
     expect(header.style.top).toBe('0px');
   });
 
-  it('Plan tab re-renders on subsequent open (no stale paint hides it)', () => {
+  it('PlanTierType tab re-renders on subsequent open (no stale paint hides it)', () => {
     const dropdownCtx = makeCtx();
     renderPromptsDropdown(dropdownCtx, {} as never);
     renderPromptsDropdown(dropdownCtx, {} as never);

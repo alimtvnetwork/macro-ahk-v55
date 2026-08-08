@@ -3,7 +3,7 @@
  *
  * Header/toolbar for `StepGroupListPanel`. Extracted from the panel to
  * keep the parent's render function under the `max-lines-per-function`
- * ceiling (Plan 24, Step 4, Phase 2). Pure presentation: every mutation
+ * ceiling (PlanTierType 24, Step 4, Phase 2). Pure presentation: every mutation
  * is a callback prop, no internal state.
  *
  * @see ../StepGroupListPanel.tsx — parent that owns state + handlers.

@@ -9,7 +9,7 @@
  * Spec: spec/22-app-issues/workspace-status-tooltip/01-overview.md
  */
 import { describe, it, expect } from 'vitest';
-import { getEffectiveStatus, type WorkspaceStatusKind } from '../workspace-status';
+import { getEffectiveStatus, type WorkspaceStatusKindType } from '../workspace-status';
 import type { WorkspaceCredit } from '../types';
 import type { WorkspaceLifecycleConfig } from '../workspace-lifecycle-config';
 
@@ -60,7 +60,7 @@ function makeWs(overrides: Partial<WorkspaceCredit>): WorkspaceCredit {
 /* ------------------------------------------------------------------ */
 
 describe('canceled subscription — grace boundary across thresholds', () => {
-  const cases: { grace: number; daysAgo: number; expected: WorkspaceStatusKind }[] = [
+  const cases: { grace: number; daysAgo: number; expected: WorkspaceStatusKindType }[] = [
     { grace: 0,   daysAgo: 0,    expected: 'fully-expired' }, // 0 >= 0 is true → fully-expired immediately
     { grace: 0,   daysAgo: 1,    expected: 'fully-expired' },
     { grace: 7,   daysAgo: 6,    expected: 'expired-canceled' },
@@ -106,7 +106,7 @@ describe('canceled subscription — grace boundary across thresholds', () => {
 /* ------------------------------------------------------------------ */
 
 describe('tier=EXPIRED (active subscription text) — grace boundary', () => {
-  const cases: { grace: number; daysAgo: number; expected: WorkspaceStatusKind }[] = [
+  const cases: { grace: number; daysAgo: number; expected: WorkspaceStatusKindType }[] = [
     { grace: 7,  daysAgo: 6,  expected: 'expired' },
     { grace: 7,  daysAgo: 7,  expected: 'fully-expired' },
     { grace: 30, daysAgo: 29, expected: 'expired' },
@@ -152,7 +152,7 @@ describe('past_due / unpaid — past-due-expiring wins over refill', () => {
 /* ------------------------------------------------------------------ */
 
 describe('about-to-refill — refill window boundary across thresholds', () => {
-  const cases: { refill: number; daysAhead: number; expected: WorkspaceStatusKind }[] = [
+  const cases: { refill: number; daysAhead: number; expected: WorkspaceStatusKindType }[] = [
     { refill: 0,  daysAhead: 0,  expected: 'about-to-refill' }, // ceil yields 1; 1 > 0 → normal? Actually daysAhead=0 + 1ms → ceil = 1, not <= 0
     { refill: 1,  daysAhead: 1,  expected: 'about-to-refill' },
     { refill: 1,  daysAhead: 2,  expected: 'normal' },
@@ -168,7 +168,7 @@ describe('about-to-refill — refill window boundary across thresholds', () => {
   // Note: refill=0, daysAhead=0 — ceil(1ms / day) = 1; 1 <= 0 is false → normal.
   // Adjust the row to its actual behaviour rather than assert a buggy value.
   const adjusted = cases.map(c =>
-    (c.refill === 0 && c.daysAhead === 0) ? { ...c, expected: 'normal' as WorkspaceStatusKind } : c,
+    (c.refill === 0 && c.daysAhead === 0) ? { ...c, expected: 'normal' as WorkspaceStatusKindType } : c,
   );
 
   it.each(adjusted)('refill=$refill daysAhead=$daysAhead → $expected', ({ refill, daysAhead, expected }) => {

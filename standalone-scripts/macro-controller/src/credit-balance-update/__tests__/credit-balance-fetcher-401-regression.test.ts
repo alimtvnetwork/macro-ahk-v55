@@ -2,11 +2,11 @@
 // Locks the contract that a 401 from /credit-balance:
 //   1. Marks the bearer token expired with the 'credit-balance-update' scope,
 //   2. Emits exactly one logError('CreditBalanceUpdate.fetch', …) call,
-//   3. Returns CreditFetchOutcome.AuthError with BearerPrefix redacted,
+//   3. Returns CreditFetchOutcomeType.AuthError with BearerPrefix redacted,
 //   4. Does not swallow the failure into a success outcome.
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Plan } from '../plan';
-import { CreditFetchOutcome } from '../credit-fetch-outcome';
+import { PlanTierType } from '../plan';
+import { CreditFetchOutcomeType } from '../credit-fetch-outcome';
 
 const { getBearerTokenSpy, markBearerTokenExpiredSpy, logErrorSpy, logWarnSpy } = vi.hoisted(() => ({
     getBearerTokenSpy: vi.fn(async () => 'tok_synthetic_401_regression_0000'),
@@ -38,11 +38,11 @@ describe('credit-balance-fetcher synthetic 401 regression', () => {
 
         const result = await fetchWorkspaceCreditBalance({
             workspaceId: 'ws_401_synth',
-            plan: Plan.Pro1,
+            plan: PlanTierType.Pro1,
             timeoutMs: 1000,
         });
 
-        expect(result.outcome).toBe(CreditFetchOutcome.AuthError);
+        expect(result.outcome).toBe(CreditFetchOutcomeType.AuthError);
         expect(result.balance).toBeNull();
         expect(result.errorDetail).toMatch(/HTTP 401/);
 
@@ -65,10 +65,10 @@ describe('credit-balance-fetcher synthetic 401 regression', () => {
         vi.stubGlobal('fetch', vi.fn(async () => new Response('', { status: 401 })));
         const result = await fetchWorkspaceCreditBalance({
             workspaceId: 'ws_401_synth',
-            plan: Plan.Pro1,
+            plan: PlanTierType.Pro1,
             timeoutMs: 1000,
         });
-        expect(result.outcome).not.toBe(CreditFetchOutcome.ApiHit);
-        expect(result.outcome).not.toBe(CreditFetchOutcome.InlineHit);
+        expect(result.outcome).not.toBe(CreditFetchOutcomeType.ApiHit);
+        expect(result.outcome).not.toBe(CreditFetchOutcomeType.InlineHit);
     });
 });

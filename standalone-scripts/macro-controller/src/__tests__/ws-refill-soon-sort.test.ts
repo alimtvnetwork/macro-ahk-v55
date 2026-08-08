@@ -20,7 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { sortByRefillPriority } from '../workspace-refill-priority';
 import { filterAndSortWorkspaces, setLoopWsCreditSortMode } from '../ws-list-renderer';
 import type { WorkspaceCredit } from '../types';
-import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
+import { CreditFetchOutcomeType } from '../credit-balance-update/credit-fetch-outcome';
 import { __writeCreditBalanceUpdateMemoryCacheForTests, clearCreditBalanceUpdateMemoryCache } from '../credit-balance-update/credit-balance-cache';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -74,7 +74,7 @@ describe('sortByRefillPriority — screenshot scenario (all 1d, mixed credits)',
     clearCreditBalanceUpdateMemoryCache();
     setLoopWsCreditSortMode('high');
     __writeCreditBalanceUpdateMemoryCacheForTests('cached', {
-      outcome: CreditFetchOutcome.ApiHit,
+      outcome: CreditFetchOutcomeType.ApiHit,
       fetchedAt: Date.now(),
       sourceUrl: 'test',
       errorDetail: null,

@@ -7,7 +7,7 @@
  * - `Relative` — value is an XPath fragment evaluated from another
  *                entry referenced by `relativeTo`.
  */
-export const enum XPathKind {
+export const enum XPathKindType {
     Direct = "direct",
     Relative = "relative",
 }

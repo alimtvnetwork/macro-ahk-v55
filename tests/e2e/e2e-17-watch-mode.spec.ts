@@ -2,7 +2,7 @@ import { test, expect, chromium } from '@playwright/test';
 import { launchExtension, getExtensionId } from './fixtures';
 
 /**
- * E2E-17 — Watch Mode — File Change Triggers Reload
+ * E2E-17 — Watch OperationModeType — File Change Triggers Reload
  *
  * Verify file changes trigger automatic extension reload.
  * Priority: P1 | Auto: ⚠️ | Est: 4 min
@@ -11,7 +11,7 @@ import { launchExtension, getExtensionId } from './fixtures';
  *   - Only relevant file changes trigger reload
  *   - Update applies immediately
  */
-test.describe('E2E-17 — Watch Mode + Hot Reload', () => {
+test.describe('E2E-17 — Watch OperationModeType + Hot Reload', () => {
   test('file change triggers extension reload', async () => {
     // Step 1: Start watch mode: Watch-Extension.ps1
     // NOTE: Requires FileSystemWatcher — may need child_process for ps1

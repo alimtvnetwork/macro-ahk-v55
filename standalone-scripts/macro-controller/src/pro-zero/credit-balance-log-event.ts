@@ -1,10 +1,10 @@
 /**
- * CreditBalanceLogEvent — log labels for the pro_0 credit-balance flow.
+ * CreditBalanceLogEventType — log labels for the pro_0 credit-balance flow.
  *
  * Spec: spec/22-app-issues/110-macro-controller-pro-zero-credit-balance.md §10
  */
 
-export enum CreditBalanceLogEvent {
+export enum CreditBalanceLogEventType {
     CREDIT_BALANCE_REQUESTED = 'CREDIT_BALANCE_REQUESTED',
     CREDIT_BALANCE_RECEIVED = 'CREDIT_BALANCE_RECEIVED',
     CREDIT_BALANCE_FAILED = 'CREDIT_BALANCE_FAILED',

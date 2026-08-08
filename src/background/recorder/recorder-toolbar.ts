@@ -22,7 +22,7 @@ import {
     recorderReducer,
 } from "./recorder-store";
 import type { RecordingPhase, RecordingSession } from "./recorder-session-types";
-import { Enum_11487e75, ActionEnum1 } from "../../types/enums";
+import { SemanticSemantic11487e, MakeButtonAction } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public contract                                                    */
@@ -339,7 +339,7 @@ function renderHealthChip(
 
 function computeHealthStatus(
     phase: RecordingPhase, stepCount: number, projectOk: boolean,
-): Enum_11487e75 {
+): SemanticSemantic11487e {
     if (!projectOk) { return "error"; }
     if (phase === "Recording") { return stepCount > 0 ? "ok" : "warn"; }
     if (phase === "Paused") { return "warn"; }
@@ -414,7 +414,7 @@ function buildToolbarHandle(
     };
 }
 
-function makeButton(action: ActionEnum1, label: string): HTMLButtonElement {
+function makeButton(action: MakeButtonAction, label: string): HTMLButtonElement {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "btn";

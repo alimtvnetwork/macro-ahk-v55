@@ -105,7 +105,7 @@ describe("FailureReport snapshots, UrlTabClick", () => {
                     Detail: `simulated ${reason}`,
                     UrlPattern: "https://app.example.com/orders/*",
                     UrlMatch: "Glob",
-                    Mode: "OpenOrFocus",
+                    OperationModeType: "OpenOrFocus",
                     ObservedUrl: "https://app.example.com/orders/42",
                     Selector: "a.open-orders",
                     SelectorKind: "Css",
@@ -127,7 +127,7 @@ describe("FailureReport snapshots, UrlTabClick", () => {
                 Detail: "no matching tab",
                 UrlPattern: "https://x.test/",
                 UrlMatch: "Exact",
-                Mode: "FocusExisting",
+                OperationModeType: "FocusExisting",
                 TimeoutMs: 1_000,
                 DurationMs: 1_000,
                 // No ObservedUrl, Selector, or SelectorKind, proves the

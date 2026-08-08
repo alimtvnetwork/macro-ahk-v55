@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * v4.192.0 regression: `performPromptImport({ onProgress })` fires
  * observable progress events for the collection-level import so the
@@ -23,11 +24,11 @@ vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({ invalidatePrompt
 vi.mock('../prompt-loader', () => buildPromptLoaderMock({ invalidatePromptCache: vi.fn() }));
 
 vi.mock('../../db/prompt-revision-db', () => ({
-    listPromptRevisions: vi.fn(async () => ({ ok: true, value: [] })),
-    insertImportedRevisions: vi.fn(async (_slug: string, rows: readonly unknown[]) => ({ ok: true, value: rows.length })),
-    getMaxRevisionId: vi.fn(async () => ({ ok: true, value: 0 })),
-    deleteImportedRevisionsAfter: vi.fn(async () => ({ ok: true, value: 0 })),
-    recordPromptRevision: vi.fn(async () => ({ ok: true, value: 1 })),
+    listPromptRevisions: vi.fn(async () => (new DbResult(true, []))),
+    insertImportedRevisions: vi.fn(async (_slug: string, rows: readonly unknown[]) => (new DbResult(true, rows.length))),
+    getMaxRevisionId: vi.fn(async () => (new DbResult(true, 0))),
+    deleteImportedRevisionsAfter: vi.fn(async () => (new DbResult(true, 0))),
+    recordPromptRevision: vi.fn(async () => (new DbResult(true, 1))),
     PROMPT_REVISION_LIMIT_PER_SLUG: 20,
 }));
 

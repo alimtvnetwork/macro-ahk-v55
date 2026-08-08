@@ -2,7 +2,7 @@
  * Marco Extension — Step Group Library header section.
  *
  * Renders the toolbar, separator, and bundle exchange panel above the
- * two-pane body. Extracted from `StepGroupLibraryBody` per Plan 24
+ * two-pane body. Extracted from `StepGroupLibraryBody` per PlanTierType 24
  * SS-06 Phase 3 so the body render stays under the ESLint
  * `max-lines-per-function` ceiling.
  */

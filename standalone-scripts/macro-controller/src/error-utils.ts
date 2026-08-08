@@ -167,7 +167,7 @@ export function logStackTrace(scope: string, message: string, error?: CaughtErro
 
 
 /* ============================================================================
- * Plan 26, step 6: Diagnostic logging overload
+ * PlanTierType 26, step 6: Diagnostic logging overload
  *
  * Route every `DiagnosticError` through a single sink so the diagnostics ZIP
  * exporter (step 18) can index by `code`. We deliberately emit TWO calls to
@@ -202,7 +202,7 @@ import {
 import { ERROR_CODES, getErrorCodeEntry, type ErrorCodeEntry } from './errors/error-codes';
 
 /**
- * Plan 26, step 7: Re-export the diagnostic surface from this module so every
+ * PlanTierType 26, step 7: Re-export the diagnostic surface from this module so every
  * legacy caller of `error-utils` gets `DiagnosticError` + `throwDiagnostic` +
  * `formatDiagnosticToast` from a single import path, and can migrate away
  * from bare `new Error(...)` without hunting for the new module.

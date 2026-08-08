@@ -1,6 +1,6 @@
 /**
  * Header input row for adding a new keyword event. Extracted from
- * `KeywordEventsPanel.tsx` in Plan 25 Step 15.
+ * `KeywordEventsPanel.tsx` in PlanTierType 25 Step 15.
  */
 
 import { Plus } from "lucide-react";

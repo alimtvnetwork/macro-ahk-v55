@@ -17,7 +17,7 @@ import type { Database as SqlJsDatabase } from "sql.js";
 import { collectRows } from "./logging-queries";
 import { reseedPrompts } from "./prompt-handler";
 import { logSampledDebug, BgLogTag } from "../bg-logger";
-import { DatabaseEnum } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { DatabaseType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  DbManager binding                                                  */
@@ -59,7 +59,7 @@ const BROWSABLE_VIEWS = new Set([
 ]);
 
 /** Which database each table/view lives in. */
-const TABLE_DB_MAP: Record<string, DatabaseEnum> = {
+const TABLE_DB_MAP: Record<string, DatabaseType> = {
     Sessions: "logs",
     Logs: "logs",
     Prompts: "logs",

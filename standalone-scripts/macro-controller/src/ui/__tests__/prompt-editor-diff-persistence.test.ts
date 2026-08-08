@@ -11,7 +11,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { openPromptCreationModal } from '../prompt-injection';
 import { PLAN_NEXT_SEED_ROWS } from '../../seed/plan-next-prompts';
 import { clearDiffPrefs, DIFF_PREF_PREFIX } from './helpers/clear-diff-prefs';
-import { RoleEnum4 } from "../../types/enums";
+import { PromptRowRoleType } from "../../types/enums";
 
 const PLAN_KEY = `${DIFF_PREF_PREFIX}plan`;
 const NEXT_KEY = `${DIFF_PREF_PREFIX}next`;
@@ -22,7 +22,7 @@ beforeEach(() => {
 });
 
 
-function openEditModal(role: RoleEnum4): {
+function openEditModal(role: PromptRowRoleType): {
   overlay: HTMLElement;
   diffBtn: HTMLButtonElement;
   diffHost: HTMLElement;
@@ -73,7 +73,7 @@ describe('Diff-pane persistence per role (v4.192.0)', () => {
     expect(next.diffHost.style.display).toBe('none');
     next.diffBtn.click();
     expect(window.localStorage.getItem(NEXT_KEY)).toBe('1');
-    // Plan key untouched by the Next toggle.
+    // PlanTierType key untouched by the Next toggle.
     expect(window.localStorage.getItem(PLAN_KEY)).toBe('1');
   });
 });

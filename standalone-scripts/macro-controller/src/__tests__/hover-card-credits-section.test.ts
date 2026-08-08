@@ -24,7 +24,7 @@ import {
     __writeCreditBalanceUpdateMemoryCacheForTests,
     clearCreditBalanceUpdateMemoryCache,
 } from '../credit-balance-update/credit-balance-cache';
-import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
+import { CreditFetchOutcomeType } from '../credit-balance-update/credit-fetch-outcome';
 
 function workspaceCredit(id: string): WorkspaceCredit {
     return {
@@ -71,7 +71,7 @@ beforeEach(function () {
 describe('hover-card credits section (resolver-backed)', function () {
     it('renders Source row when summary.source !== Inline', function () {
         __writeCreditBalanceUpdateMemoryCacheForTests('ws_1', {
-            outcome: CreditFetchOutcome.ApiHit,
+            outcome: CreditFetchOutcomeType.ApiHit,
             fetchedAt: Date.now(),
             sourceUrl: 'test',
             errorDetail: null,
@@ -96,7 +96,7 @@ describe('hover-card credits section (resolver-backed)', function () {
 
     it('emits Timeout source with renderDash when cache outcome is Timeout', function () {
         __writeCreditBalanceUpdateMemoryCacheForTests('ws_2', {
-            outcome: CreditFetchOutcome.Timeout,
+            outcome: CreditFetchOutcomeType.Timeout,
             fetchedAt: Date.now(),
             sourceUrl: 'test',
             errorDetail: 'timeout',

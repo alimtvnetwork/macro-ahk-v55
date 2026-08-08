@@ -20,7 +20,7 @@
  */
 
 import { throwDiagnostic } from './errors/diagnostic-error';
-import { DEFAULTREMIXNEXTVCASINGEnum } from "./types/enums";
+import { RemixCasingType } from "./types/enums";
 
 /** Parsed shape of a name like `foo-V12`. */
 interface ParsedName {
@@ -57,7 +57,7 @@ export function buildName(
   parsed: ParsedName,
   n: number,
   fallbackSeparator: string,
-  vCasing: DEFAULTREMIXNEXTVCASINGEnum = 'preserve',
+  vCasing: RemixCasingType = 'preserve',
 ): string {
   const sep = parsed.vLetter ? parsed.separator : fallbackSeparator;
   const inputV = parsed.vLetter || 'V';
@@ -82,7 +82,7 @@ export function resolveNextName(
   config: {
     nextSuffixSeparator: string;
     maxCollisionIncrements: number;
-    nextVCasing?: DEFAULTREMIXNEXTVCASINGEnum;
+    nextVCasing?: RemixCasingType;
   },
 ): { name: string; collisionsResolved: number } {
   if (!currentName || !currentName.trim()) {

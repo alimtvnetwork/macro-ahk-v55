@@ -13,7 +13,7 @@ import { trackedSetInterval, trackedClearInterval } from './interval-registry';
 
 const NS_UPDATE_START_STOP = '_internal.updateStartStopBtn' as const;
 import { showToast, setStopLoopCallback } from './toast';
-import { LoopDirection } from './types';
+import { LoopDirectionType } from './types';
 import { getByXPath } from './xpath-utils';
 import { fetchLoopCreditsAsync, syncCreditStateFromApi } from './credit-fetch';
 import { getSettingsOverrides } from './settings-store';
@@ -57,8 +57,8 @@ function validateLoopPreconditions(): boolean {
   return true;
 }
 
-function initLoopState(direction: LoopDirection | string): void {
-  state.direction = (direction as LoopDirection) || LoopDirection.Down;
+function initLoopState(direction: LoopDirectionType | string): void {
+  state.direction = (direction as LoopDirectionType) || LoopDirectionType.Down;
   state.cycleCount = 0;
   state.isIdle = true;
   state.isDelegating = false;
@@ -182,7 +182,7 @@ function scheduleTimersAfterCheck(checkPromise: Promise<void> | undefined): void
 // ============================================
 // startLoop
 // ============================================
-export function startLoop(direction: LoopDirection | string): boolean {
+export function startLoop(direction: LoopDirectionType | string): boolean {
   // No-autorun guard: refuse any startLoop() that isn't backed by a recent user gesture.
   if (!requireUserGesture('startLoop')) return false;
   if (!validateLoopPreconditions()) return false;

@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -207,7 +207,7 @@ export function UpdaterEntryCard({
           <Section icon={<Settings className="h-3.5 w-3.5" />} title="Advanced Settings" collapsible>
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1">
-                <Label className="text-xs">Auto-Check Interval</Label>
+                <LabelType className="text-xs">Auto-Check Interval</LabelType>
                 <Select value={String(u.autoCheckIntervalMinutes)} onValueChange={(v) => onUpdateField("autoCheckIntervalMinutes", Number(v))}>
                   <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -218,7 +218,7 @@ export function UpdaterEntryCard({
                 </Select>
               </div>
               <div className="space-y-1">
-                <Label className="text-xs">Cache Expiry</Label>
+                <LabelType className="text-xs">Cache Expiry</LabelType>
                 <Select value={String(u.cacheExpiryMinutes)} onValueChange={(v) => onUpdateField("cacheExpiryMinutes", Number(v))}>
                   <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -229,7 +229,7 @@ export function UpdaterEntryCard({
                 </Select>
               </div>
               <div className="space-y-1">
-                <Label className="text-xs">Max Redirect Depth</Label>
+                <LabelType className="text-xs">Max Redirect Depth</LabelType>
                 <Input type="number" min={0} max={10} value={u.maxRedirectDepth} onChange={(e) => onUpdateField("maxRedirectDepth", Number(e.target.value))} className="h-8 text-xs" />
               </div>
             </div>
@@ -257,7 +257,7 @@ export function UpdaterEntryCard({
             </div>
             {u.isInstructionRedirect && (
               <div className="mt-2 w-48">
-                <Label className="text-xs">Instruction redirect depth</Label>
+                <LabelType className="text-xs">Instruction redirect depth</LabelType>
                 <Input type="number" min={0} max={10} value={u.instructionRedirectDepth} onChange={(e) => onUpdateField("instructionRedirectDepth", Number(e.target.value))} className="h-8 text-xs" />
               </div>
             )}
@@ -297,7 +297,7 @@ export function UpdaterEntryCard({
                     <Input value={ep.url} onChange={(e) => onUpdateEndpoint(ep.id, "url", e.target.value)} placeholder="https://..." className="h-7 text-xs font-mono" />
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-1">
-                        <Label className="text-[10px]">Status</Label>
+                        <LabelType className="text-[10px]">Status</LabelType>
                         <Input type="number" value={ep.expectedStatusCode} onChange={(e) => onUpdateEndpoint(ep.id, "expectedStatusCode", Number(e.target.value))} className="h-6 w-16 text-[10px]" />
                       </div>
                       <label className="flex items-center gap-1 text-[10px]">
@@ -306,7 +306,7 @@ export function UpdaterEntryCard({
                       </label>
                       {ep.isRedirectable && (
                         <div className="flex items-center gap-1">
-                          <Label className="text-[10px]">Depth</Label>
+                          <LabelType className="text-[10px]">Depth</LabelType>
                           <Input type="number" min={0} max={10} value={ep.maxRedirectDepth} onChange={(e) => onUpdateEndpoint(ep.id, "maxRedirectDepth", Number(e.target.value))} className="h-6 w-12 text-[10px]" />
                         </div>
                       )}
@@ -346,7 +346,7 @@ export function UpdaterEntryCard({
                   </div>
                   <div className="grid grid-cols-2 gap-2 pl-6">
                     <div className="space-y-1">
-                      <Label className="text-[10px]">Resource Type</Label>
+                      <LabelType className="text-[10px]">Resource Type</LabelType>
                       <Select value={step.resourceType ?? ""} onValueChange={(v) => onUpdateStep(step.id, "resourceType", v as any || undefined)}>
                         <SelectTrigger className="h-7 text-xs"><SelectValue placeholder="None" /></SelectTrigger>
                         <SelectContent>
@@ -410,7 +410,7 @@ function Section({ icon, title, children, collapsible }: { icon: React.ReactNode
 function FieldInput({ label, value, onChange, mono, small }: { label: string; value: string; onChange: (v: string) => void; mono?: boolean; small?: boolean }) {
   return (
     <div className="space-y-1">
-      <Label className={small ? "text-[10px]" : "text-xs"}>{label}</Label>
+      <LabelType className={small ? "text-[10px]" : "text-xs"}>{label}</LabelType>
       <Input value={value} onChange={(e) => onChange(e.target.value)} className={`${small ? "h-7" : "h-8"} text-xs ${mono ? "font-mono" : ""}`} />
     </div>
   );

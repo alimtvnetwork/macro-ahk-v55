@@ -5,7 +5,7 @@ import {
     clearPromptSeedTrace,
     PROMPT_SEED_TRACE_MAX,
 } from '../telemetry/prompt-seed-telemetry';
-import { StorageKey } from '../types/storage-keys';
+import { StorageKeyType } from '../types/storage-keys';
 
 vi.mock('../logging', () => ({ log: vi.fn() }));
 vi.mock('../error-utils', () => ({ logError: vi.fn() }));
@@ -23,13 +23,13 @@ describe('prompt-seed-telemetry', () => {
         expect(new Date(evt.at).toString()).not.toBe('Invalid Date');
     });
 
-    it('persists events to the ring buffer under StorageKey.PromptSeedTrace', () => {
+    it('persists events to the ring buffer under StorageKeyType.PromptSeedTrace', () => {
         emitPromptSeedEvent({ event: 'seed.start' });
         emitPromptSeedEvent({
             event: 'seed.legacy-upgrade', role: 'next', slug: 'next-default',
             outcome: 'ok', metrics: { legacyIndex: 0, newBodyLen: 42 },
         });
-        const raw = localStorage.getItem(StorageKey.PromptSeedTrace);
+        const raw = localStorage.getItem(StorageKeyType.PromptSeedTrace);
         expect(raw).not.toBeNull();
         const trace = readPromptSeedTrace();
         expect(trace).toHaveLength(2);

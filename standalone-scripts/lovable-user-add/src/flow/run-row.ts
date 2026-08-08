@@ -3,7 +3,7 @@
  *
  * Two-step chain per row: Step A (POST membership) → if Owner per
  * `shouldRunStepB`, run Step B (PUT promote). Each step writes its
- * own log line via `UserAddLogPhase.StepA` / `UserAddLogPhase.StepB`
+ * own log line via `UserAddLogPhaseType.StepA` / `UserAddLogPhaseType.StepB`
  * so the P19 logs viewer can distinguish them without parsing text.
  *
  * **No rollback on Step B failure (per operator direction):** when
@@ -24,7 +24,7 @@ import { shouldRunStepB } from "./should-run-step-b";
 import { finalizeUserAddRow } from "./row-finalize";
 import { buildRowFailure, buildRowSuccess } from "./row-result-builders";
 import { UserAddRowOutcomeCode } from "./row-types";
-import { UserAddLogPhase, UserAddLogSeverity, buildUserAddEntry } from "./log-sink";
+import { UserAddLogPhaseType, UserAddLogSeverityType, buildUserAddEntry } from "./log-sink";
 import type { UserAddLogSink } from "./log-sink";
 import type { UserAddRowContext, UserAddRowResult } from "./row-types";
 import type { UserAddRowStateStore } from "./row-state-store";
@@ -36,14 +36,14 @@ const noteEditorNormalization = (ctx: UserAddRowContext, sink: UserAddLogSink): 
     }
 
     sink.write(buildUserAddEntry(
-        ctx.Task.TaskId, ctx.Row.RowIndex, UserAddLogPhase.Row, UserAddLogSeverity.Info,
+        ctx.Task.TaskId, ctx.Row.RowIndex, UserAddLogPhaseType.Row, UserAddLogSeverityType.Info,
         `Row ${ctx.Row.RowIndex} role normalized: Editor → Member (Q3)`,
     ));
 };
 
 const logStep = (
-    ctx: UserAddRowContext, sink: UserAddLogSink, phase: UserAddLogPhase,
-    severity: UserAddLogSeverity, message: string,
+    ctx: UserAddRowContext, sink: UserAddLogSink, phase: UserAddLogPhaseType,
+    severity: UserAddLogSeverityType, message: string,
 ): void => {
     sink.write(buildUserAddEntry(ctx.Task.TaskId, ctx.Row.RowIndex, phase, severity, message));
 };
@@ -51,7 +51,7 @@ const logStep = (
 const logNoRollback = (
     ctx: UserAddRowContext, sink: UserAddLogSink, workspaceId: string, userId: string,
 ): void => {
-    logStep(ctx, sink, UserAddLogPhase.StepB, UserAddLogSeverity.Warn,
+    logStep(ctx, sink, UserAddLogPhaseType.StepB, UserAddLogSeverityType.Warn,
         `No rollback performed (per policy). Member ${ctx.Row.MemberEmail} (UserId=${userId}) ` +
         `remains in workspace ${workspaceId}. Re-run will SKIP Step A and only retry the PUT promote.`);
 };
@@ -64,7 +64,7 @@ const handleStepAFailure = async (
     ctx: UserAddRowContext, sink: UserAddLogSink, store: UserAddRowStateStore,
     startedAt: number, errorMessage: string,
 ): Promise<UserAddRowResult> => {
-    logStep(ctx, sink, UserAddLogPhase.StepA, UserAddLogSeverity.Error, `Step A failed: ${errorMessage}`);
+    logStep(ctx, sink, UserAddLogPhaseType.StepA, UserAddLogSeverityType.Error, `Step A failed: ${errorMessage}`);
     return finalizeUserAddRow(ctx, sink, store, buildRowFailure({
         rowIndex: ctx.Row.RowIndex, startedAt,
         outcome: UserAddRowOutcomeCode.StepAFailed,
@@ -80,7 +80,7 @@ const runStepBPhase = async (
     const stepB = await runStepB(ctx.Api, { WorkspaceId: workspaceId, UserId: userId });
 
     if (stepB.Error !== null) {
-        logStep(ctx, sink, UserAddLogPhase.StepB, UserAddLogSeverity.Error, `Step B promote failed: ${stepB.Error}`);
+        logStep(ctx, sink, UserAddLogPhaseType.StepB, UserAddLogSeverityType.Error, `Step B promote failed: ${stepB.Error}`);
         logNoRollback(ctx, sink, workspaceId, userId);
         return finalizeUserAddRow(ctx, sink, store, buildRowFailure({
             rowIndex: ctx.Row.RowIndex, startedAt,
@@ -90,7 +90,7 @@ const runStepBPhase = async (
         }));
     }
 
-    logStep(ctx, sink, UserAddLogPhase.StepB, UserAddLogSeverity.Info, "Step B PUT promote ok");
+    logStep(ctx, sink, UserAddLogPhaseType.StepB, UserAddLogSeverityType.Info, "Step B PUT promote ok");
     return finalizeUserAddRow(ctx, sink, store, buildRowSuccess({
         rowIndex: ctx.Row.RowIndex, startedAt, stepBRan: true, workspaceId, userId,
     }));
@@ -117,7 +117,7 @@ export const runUserAddRow = async (
             stepA.Error ?? "Step A returned null membership");
     }
 
-    logStep(ctx, sink, UserAddLogPhase.StepA, UserAddLogSeverity.Info,
+    logStep(ctx, sink, UserAddLogPhaseType.StepA, UserAddLogSeverityType.Info,
         `Step A POST membership ok (UserId=${stepA.Membership.UserId})`);
 
     if (!shouldRunStepB(ctx.Row.RoleCode)) {

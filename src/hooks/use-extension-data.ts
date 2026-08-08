@@ -1,7 +1,7 @@
 import type { JsonValue } from "@/background/handlers/handler-types";
 import { useEffect, useState, useCallback } from "react";
 import { sendMessage } from "@/lib/message-client";
-import { DatabaseEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { DatabaseType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 interface StorageStats {
   persistenceMode: string;
@@ -104,7 +104,7 @@ export interface DataBrowserFilters {
   caseSensitive?: boolean;
 }
 
-export function useDataBrowser(database: DatabaseEnum, pageSize = 20, filters: DataBrowserFilters = {}) {
+export function useDataBrowser(database: DatabaseType, pageSize = 20, filters: DataBrowserFilters = {}) {
   const [rows, setRows] = useState<LogRow[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);

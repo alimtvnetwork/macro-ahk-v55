@@ -1,5 +1,5 @@
 /**
- * Inline strip group collapse — single +/- control for Plan, Next, Repeat.
+ * Inline strip group collapse — single +/- control for PlanTierType, Next, Repeat.
  *
  * The inline strips are mounted by two modules (`next-inline-ui.ts` and
  * `repeat-loop-ui.ts`), so this tiny shared controller owns the persisted

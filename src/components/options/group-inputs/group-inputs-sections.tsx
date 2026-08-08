@@ -71,7 +71,7 @@ export function JsonEditor({ text, setText, parseResult }: JsonEditorProps): JSX
             <Textarea
                 value={text}
                 onChange={(event) => setText(event.target.value)}
-                placeholder={'{\n  "Email": "you@example.com",\n  "Plan": "pro"\n}'}
+                placeholder={'{\n  "Email": "you@example.com",\n  "PlanTierType": "pro"\n}'}
                 spellCheck={false}
                 className="h-56 font-mono text-xs"
                 aria-label="JSON input data"

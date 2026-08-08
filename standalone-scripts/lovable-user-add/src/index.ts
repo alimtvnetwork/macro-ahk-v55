@@ -15,7 +15,7 @@ export { default as instruction } from "./instruction";
 export { USER_ADD_MIGRATION_V1 } from "./migrations";
 export { UserAddMembershipRoleCode } from "./migrations/membership-role-seed";
 export { UserAddTaskStatusCode } from "./migrations/task-status-seed";
-export { parseUserAddCsv, normalizeRole, UserAddCsvColumn } from "./csv";
+export { parseUserAddCsv, normalizeRole, UserAddCsvColumnType } from "./csv";
 export type { UserAddCsvRow, UserAddCsvParseResult, RoleNormalizeResult } from "./csv";
 export { mountPopup, DEFAULT_ROLE_OPTIONS, DEFAULT_ROLE_VALUE } from "./ui";
 export type { RoleOption } from "./ui";
@@ -26,7 +26,7 @@ export type { StepBRequest, StepBResult, StepBStepOutcome } from "./flow";
 export {
     runUserAddRow, UserAddRowOutcomeCode, finalizeUserAddRow,
     buildRowFailure, buildRowSuccess,
-    UserAddLogPhase, UserAddLogSeverity, buildUserAddEntry,
+    UserAddLogPhaseType, UserAddLogSeverityType, buildUserAddEntry,
     runTaskSignOut,
 } from "./flow";
 export type {

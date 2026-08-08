@@ -16,8 +16,8 @@ import { applySchema, validateSchema } from './database-json-migrate';
 import { downloadSchemaDocs } from './database-json-docs';
 import { appendLog } from './database-json-log';
 
-import { DomId, StyleId } from '../types';
-const STYLE_ID = StyleId.DbJson;
+import { DomIdType, StyleIdType } from '../types';
+const STYLE_ID = StyleIdType.DbJson;
 
 /* ------------------------------------------------------------------ */
 /*  Styles                                                             */
@@ -85,7 +85,7 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: 
   return e;
 }
 
-// Plan-17 step 16: appendLog moved to leaf `database-json-log.ts` so
+// PlanTierType-17 step 16: appendLog moved to leaf `database-json-log.ts` so
 // `database-json-migrate` can import it without closing a cycle back here.
 // Re-exported to preserve every existing `from './database-json-tab'` import.
 export { appendLog } from './database-json-log';
@@ -126,18 +126,18 @@ export function buildJsonTab(
   applyBtn.onclick = () => applySchema(editor.value, logEl, statusBar);
   actions.appendChild(applyBtn);
 
-  const validateBtn = el('button', DomId.JsonBtn, '✓ Validate');
+  const validateBtn = el('button', DomIdType.JsonBtn, '✓ Validate');
   validateBtn.onclick = () => validateSchema(editor.value, logEl);
   actions.appendChild(validateBtn);
 
-  const sampleBtn = el('button', DomId.JsonBtn, '📋 Load Sample');
+  const sampleBtn = el('button', DomIdType.JsonBtn, '📋 Load Sample');
   sampleBtn.onclick = () => {
     editor.value = JSON.stringify(SAMPLE_SCHEMA, null, 2);
     appendLog(logEl, 'info', 'Loaded sample schema');
   };
   actions.appendChild(sampleBtn);
 
-  const clearBtn = el('button', DomId.JsonBtn, '🗑️ Clear');
+  const clearBtn = el('button', DomIdType.JsonBtn, '🗑️ Clear');
   clearBtn.onclick = () => { editor.value = ''; logEl.textContent = ''; };
   actions.appendChild(clearBtn);
 

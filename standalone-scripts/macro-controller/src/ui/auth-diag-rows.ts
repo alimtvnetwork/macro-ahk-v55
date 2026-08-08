@@ -19,7 +19,7 @@ import {
 } from './auth-jwt-utils';
 import type { AuthDiagDeps } from './section-auth-diag';
 import { logError } from '../error-utils';
-import { CssFragment } from '../types';
+import { CssFragmentType } from '../types';
 // ── Diagnostic Row Elements ──
 
 export interface DiagRowElements {
@@ -36,7 +36,7 @@ export function buildDiagRow(
   skeletonHeight: string,
 ): DiagRowElements {
   const row = document.createElement('div');
-  row.style.cssText = CssFragment.RowDiag;
+  row.style.cssText = CssFragmentType.RowDiag;
 
   const iconEl = document.createElement('span');
   iconEl.style.cssText = 'font-size:11px;';
@@ -87,7 +87,7 @@ export function updateBridgeRow(deps: AuthDiagDeps, bridgeRow: DiagRowElements):
     return;
   }
 
-  if (bridge.isSuccess) {
+  if (bridge.ok) {
     bridgeRow.iconEl.textContent = '✅';
     bridgeRow.valEl.textContent = 'OK via ' + bridge.source;
     bridgeRow.valEl.style.color = '#4ade80';
@@ -220,7 +220,7 @@ export function updateRefreshRow(refreshRow: DiagRowElements): void {
     return;
   }
 
-  if (outcome.isSuccess) {
+  if (outcome.ok) {
     refreshRow.iconEl.textContent = '✅';
     refreshRow.valEl.textContent = 'OK @ ' + outcome.time + ' via ' + outcome.source;
     refreshRow.valEl.style.color = '#4ade80';
@@ -256,7 +256,7 @@ export function updateWsCacheRow(wsCacheRow: DiagRowElements): void {
 
 export function buildProjectIdRow(dimStyle: string, valStyle: string): HTMLElement {
   const pidRow = document.createElement('div');
-  pidRow.style.cssText = CssFragment.RowDiag;
+  pidRow.style.cssText = CssFragmentType.RowDiag;
 
   const pidIcon = document.createElement('span');
   pidIcon.style.cssText = 'font-size:11px;';

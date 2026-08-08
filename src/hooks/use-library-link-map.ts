@@ -11,10 +11,10 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { sendMessage } from "@/lib/message-client";
 import { logError } from "./hook-logger";
-import { LinkState } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { LinkStateType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 export interface LinkInfo {
-  state: LinkState;
+  state: LinkStateType;
   pinnedVersion: string | null;
   updateAvailable: boolean;
 }
@@ -29,7 +29,7 @@ interface SharedAssetMinimal {
 interface AssetLinkMinimal {
   SharedAssetId: number;
   ProjectId: number;
-  LinkState: LinkState;
+  LinkStateType: LinkStateType;
   PinnedVersion: string | null;
 }
 
@@ -79,10 +79,10 @@ export function useLibraryLinkMap(projectId?: number | null): {
     for (const link of projectLinks) {
       const asset = assetById.get(link.SharedAssetId);
       if (asset) {
-        const updateAvailable = link.LinkState === "pinned"
+        const updateAvailable = link.LinkStateType === "pinned"
           && link.PinnedVersion !== null
           && asset.Version !== link.PinnedVersion;
-        map.set(asset.Slug, { state: link.LinkState, pinnedVersion: link.PinnedVersion, updateAvailable });
+        map.set(asset.Slug, { state: link.LinkStateType, pinnedVersion: link.PinnedVersion, updateAvailable });
       }
     }
     return map;

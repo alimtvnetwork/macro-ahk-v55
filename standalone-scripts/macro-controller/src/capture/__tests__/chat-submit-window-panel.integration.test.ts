@@ -1,5 +1,5 @@
 /**
- * Plan 13 integration test — 300-row cap enforcement + rename backfill,
+ * PlanTierType 13 integration test — 300-row cap enforcement + rename backfill,
  * verified end-to-end through the Project History panel.
  *
  * Root cause covered: the enforcer (`chat-submit-window.ts`) and the
@@ -18,7 +18,7 @@ interface Row {
   Id: number;
   ProjectId: string;
   ProjectName: string | null;
-  Source: ChatSubmitSourceEnum;
+  Source: ChatSubmitSourceType;
   FileId: string;
   CharCount: number;
   CreatedAt: number;
@@ -78,7 +78,7 @@ vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 import { enforceChatSubmitWindow, DEFAULT_CHAT_SUBMIT_CAP } from '../chat-submit-window';
 import { renameProjectChatSubmits } from '../../db/project-chat-submit-db';
 import { openProjectHistoryPanel } from '../../ui/project-history-panel';
-import { ChatSubmitSourceEnum } from "../../types/enums";
+import { ChatSubmitSourceType } from "../../types/enums";
 
 const PROJECT_ID = 'proj-integration-1';
 

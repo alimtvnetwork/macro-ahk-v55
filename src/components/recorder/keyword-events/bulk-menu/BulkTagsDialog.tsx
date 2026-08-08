@@ -1,6 +1,6 @@
 /**
  * BulkTagsDialog: extracted from `KeywordEventBulkContextMenu.tsx`
- * in Plan 25 Step 17. Behaviour and testids are byte-identical.
+ * in PlanTierType 25 Step 17. Behaviour and testids are byte-identical.
  */
 
 import { useMemo, useState } from "react";
@@ -15,21 +15,21 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { parseTagInput } from "@/lib/keyword-event-bulk-actions";
 import type { KeywordEvent } from "@/hooks/use-keyword-events";
-import { Mode5 } from "../../../../types/enums";
+import { BulkTagsDialogPropsMode } from "../../../../types/enums";
 
 export interface BulkTagsDialogProps {
-    readonly mode: Mode5;
+    readonly mode: BulkTagsDialogPropsMode;
     readonly open: boolean;
     readonly onOpenChange: (open: boolean) => void;
     readonly selectedEvents: ReadonlyArray<KeywordEvent>;
     readonly onApply: (tags: string[]) => void;
 }
 
-// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf dialog; Plan 25 Step 17
+// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf dialog; PlanTierType 25 Step 17
 export function BulkTagsDialog(props: BulkTagsDialogProps): JSX.Element {
     const { mode, open, onOpenChange, selectedEvents, onApply } = props;
     const [raw, setRaw] = useState("");
@@ -51,7 +51,7 @@ export function BulkTagsDialog(props: BulkTagsDialogProps): JSX.Element {
 
     const title = mode === "add" ? "Add labels" : "Remove labels";
     const desc = mode === "add"
-        ? `Label ${selectedEvents.length} selected event${selectedEvents.length === 1 ? "" : "s"}.`
+        ? `LabelType ${selectedEvents.length} selected event${selectedEvents.length === 1 ? "" : "s"}.`
         : `Remove labels from ${selectedEvents.length} selected event${selectedEvents.length === 1 ? "" : "s"}.`;
 
     return (
@@ -63,7 +63,7 @@ export function BulkTagsDialog(props: BulkTagsDialogProps): JSX.Element {
                 </DialogHeader>
                 <div className="space-y-3">
                     <div className="space-y-1.5">
-                        <Label htmlFor="bulk-tags-input">Labels</Label>
+                        <LabelType htmlFor="bulk-tags-input">Labels</LabelType>
                         <Input
                             id="bulk-tags-input"
                             value={raw}

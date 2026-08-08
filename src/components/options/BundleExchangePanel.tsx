@@ -23,7 +23,7 @@ import { Download, FileArchive, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 
 export interface LastExportSummary {
     readonly FileName: string;
@@ -89,9 +89,9 @@ function IncludeDescendantsField({ checked, onChange, disabled }: { checked: boo
                 aria-describedby="export-include-descendants-help"
             />
             <div className="flex flex-col">
-                <Label htmlFor="export-include-descendants" className="cursor-pointer text-sm font-medium leading-none">
+                <LabelType htmlFor="export-include-descendants" className="cursor-pointer text-sm font-medium leading-none">
                     Include descendants
-                </Label>
+                </LabelType>
                 <span id="export-include-descendants-help" className="mt-1 text-xs text-muted-foreground">
                     {checked
                         ? "Every nested sub-group of each ticked group is packaged too."

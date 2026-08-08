@@ -1,5 +1,5 @@
 /**
- * Tests for the Plan/Next seed rows (plan-14, step 8).
+ * Tests for the PlanTierType/Next seed rows (plan-14, step 8).
  */
 import { describe, it, expect } from 'vitest';
 import {

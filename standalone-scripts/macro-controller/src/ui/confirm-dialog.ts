@@ -11,9 +11,9 @@
 export interface ConfirmOptions {
   readonly title: string;
   readonly message: string;
-  /** Label on the destructive button. Defaults to "Delete". */
+  /** LabelType on the destructive button. Defaults to "Delete". */
   readonly confirmLabel?: string;
-  /** Label on the safe button. Defaults to "Cancel". */
+  /** LabelType on the safe button. Defaults to "Cancel". */
   readonly cancelLabel?: string;
   /** If true, the confirm button is styled red. Defaults to true. */
   readonly destructive?: boolean;

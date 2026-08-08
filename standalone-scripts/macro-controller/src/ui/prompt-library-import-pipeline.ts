@@ -7,7 +7,7 @@ import { renderPartialImportErrors, clearPartialImportErrors, showImportProgress
 import { validateImportFile } from './prompt-library-preview';
 import { ModalRefs, LOG_SCOPE, IMPORT_FAILED_PREFIX, TOAST_ERROR } from './prompt-library-types';
 import { logError } from '../error-utils';
-import { OriginEnum2 } from "../types/enums";
+import { PreviewTriggerType } from "../types/enums";
 
 export function ensureSpinnerStyle(doc: Document): void {
   if (doc.getElementById('mc-spinner-style')) return;
@@ -109,7 +109,7 @@ export async function handleImportFile(
   fileInput: HTMLInputElement,
   importBtn: HTMLButtonElement,
   renderAllRoles: (r: ModalRefs) => Promise<void>,
-  origin: OriginEnum2 = 'click',
+  origin: PreviewTriggerType = 'click',
 ): Promise<void> {
   if (importBtn.disabled) return;
   const retrying = refs.lastImportFailed === true;

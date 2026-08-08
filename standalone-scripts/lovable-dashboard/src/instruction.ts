@@ -11,9 +11,9 @@
  */
 
 import type { ProjectInstruction } from "../../types/instruction/project-instruction";
-import { InjectionWorld } from "../../types/instruction/enums/injection-world";
-import { InjectionRunAt } from "../../types/instruction/enums/injection-run-at";
-import { MatchType } from "../../types/instruction/enums/match-type";
+import { InjectionWorldType } from "../../types/instruction/enums/injection-world";
+import { InjectionRunAtType } from "../../types/instruction/enums/injection-run-at";
+import { MatchRuleType } from "../../types/instruction/enums/match-type";
 import type { EmptySettings } from "../../types/instruction/seed/empty-settings";
 import { VERSION } from "../../shared-version";
 
@@ -23,7 +23,7 @@ const instruction: ProjectInstruction<EmptySettings> = {
     DisplayName: "Lovable Dashboard",
     Version: VERSION,
     Description: "Lovable.dev dashboard home-screen enhancements: search, nav controls, credit panel, workspace tools. Auto-injects only on the exact /dashboard URL.",
-    World: InjectionWorld.Main,
+    World: InjectionWorldType.Main,
     IsGlobal: false,
     Dependencies: ["lovable-common"],
     LoadOrder: 40,
@@ -32,9 +32,9 @@ const instruction: ProjectInstruction<EmptySettings> = {
         SeedOnInstall: true,
         IsRemovable: false,
         AutoInject: true,
-        RunAt: InjectionRunAt.DocumentIdle,
+        RunAt: InjectionRunAtType.DocumentIdle,
         TargetUrls: [
-            { Pattern: "https://lovable.dev/dashboard", MatchType: MatchType.Exact },
+            { Pattern: "https://lovable.dev/dashboard", MatchRuleType: MatchRuleType.Exact },
         ],
         Cookies: [],
         Settings: {},

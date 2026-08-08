@@ -32,7 +32,7 @@ function makeStep(partial: Partial<StepRow> & Pick<StepRow, "StepKindId">): Step
         StepGroupId: 1,
         OrderIndex: 0,
         StepKindId: partial.StepKindId,
-        Label: partial.Label ?? null,
+        LabelType: partial.LabelType ?? null,
         PayloadJson: partial.PayloadJson ?? null,
         TargetStepGroupId: partial.TargetStepGroupId ?? null,
         IsDisabled: false,

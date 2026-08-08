@@ -10,7 +10,7 @@
  *   - stepWaits snapshot + refresher
  *   - pending optimistic reorder overrides
  *
- * Extracted per Plan 24 SS-06 Phase 1 to keep the panel component under
+ * Extracted per PlanTierType 24 SS-06 Phase 1 to keep the panel component under
  * the `max-lines-per-function` ESLint ceiling. Behaviour is unchanged.
  */
 

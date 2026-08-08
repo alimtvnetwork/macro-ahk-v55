@@ -1,5 +1,5 @@
 /**
- * Plan-23 Step 1/2 — prompt-modal-theme: idempotent style injection tied to
+ * PlanTierType-23 Step 1/2 — prompt-modal-theme: idempotent style injection tied to
  * both modal roots. Positive + negative + integration coverage.
  */
 import { describe, it, expect, beforeEach } from 'vitest';

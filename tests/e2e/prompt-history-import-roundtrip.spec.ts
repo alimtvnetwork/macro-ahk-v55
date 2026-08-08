@@ -112,13 +112,13 @@ test.describe('prompt history import round-trip', () => {
                 Role: string; ReplaceKey: string; ReplaceValues: string; CreatedAt: number; Reason: string;
             }
             const nativeRows: RevRow[] = [
-                { Id: 91, PromptId: 7, Slug: slug, Name: 'Plan default', Body: 'v1 body', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_000_000, Reason: 'upsert' },
-                { Id: 92, PromptId: 7, Slug: slug, Name: 'Plan default', Body: 'v2 body', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_100_000, Reason: 'upsert' },
+                { Id: 91, PromptId: 7, Slug: slug, Name: 'PlanTierType default', Body: 'v1 body', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_000_000, Reason: 'upsert' },
+                { Id: 92, PromptId: 7, Slug: slug, Name: 'PlanTierType default', Body: 'v2 body', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_100_000, Reason: 'upsert' },
             ];
             const importedRows: RevRow[] = [
-                { Id: 101, PromptId: 0, Slug: slug, Name: 'Plan default', Body: 'imported A', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_200_000, Reason: 'import' },
-                { Id: 102, PromptId: 0, Slug: slug, Name: 'Plan default', Body: 'imported B', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_300_000, Reason: 'import' },
-                { Id: 103, PromptId: 0, Slug: slug, Name: 'Plan default', Body: 'imported C', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_400_000, Reason: 'import' },
+                { Id: 101, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'imported A', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_200_000, Reason: 'import' },
+                { Id: 102, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'imported B', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_300_000, Reason: 'import' },
+                { Id: 103, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'imported C', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_400_000, Reason: 'import' },
             ];
             const state = { openCount: 0, toasts: [] as Array<{ message: string; kind?: string }> };
             (window as unknown as { __state: typeof state }).__state = state;
@@ -154,9 +154,9 @@ test.describe('prompt history import round-trip', () => {
             exportedAt: 1_700_000_500_000,
             revisionCount: 3,
             revisions: [
-                { Slug: SLUG, Name: 'Plan default', Body: 'imported A', Role: ROLE, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_200_000, Reason: 'import' },
-                { Slug: SLUG, Name: 'Plan default', Body: 'imported B', Role: ROLE, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_300_000, Reason: 'import' },
-                { Slug: SLUG, Name: 'Plan default', Body: 'imported C', Role: ROLE, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_400_000, Reason: 'import' },
+                { Slug: SLUG, Name: 'PlanTierType default', Body: 'imported A', Role: ROLE, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_200_000, Reason: 'import' },
+                { Slug: SLUG, Name: 'PlanTierType default', Body: 'imported B', Role: ROLE, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_300_000, Reason: 'import' },
+                { Slug: SLUG, Name: 'PlanTierType default', Body: 'imported C', Role: ROLE, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_400_000, Reason: 'import' },
             ],
         });
 

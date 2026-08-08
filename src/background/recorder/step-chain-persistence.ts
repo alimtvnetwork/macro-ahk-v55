@@ -15,21 +15,21 @@
 import type { Database as SqlJsDatabase } from "sql.js";
 import { initProjectDb } from "../project-db-manager";
 import { readStepRow, type PersistedStep } from "./step-persistence";
-import { StepLinkSlotEnum } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { StepLinkSlotType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
 /* ------------------------------------------------------------------ */
 
 export interface StepMetaPatch {
-    readonly Label?: string;
+    readonly LabelType?: string;
     readonly Description?: string | null;
     readonly IsDisabled?: boolean;
     readonly RetryCount?: number;
     readonly TimeoutMs?: number | null;
 }
 
-export type StepLinkSlot = StepLinkSlotEnum;
+export type StepLinkSlot = StepLinkSlotType;
 
 /* ------------------------------------------------------------------ */
 /*  Validation constants & helpers (Phase 14 spec constraints)         */
@@ -39,7 +39,7 @@ export type StepLinkSlot = StepLinkSlotEnum;
 export const MAX_RETRY_COUNT = 50;
 /** Upper bound on TimeoutMs — 10 minutes per step attempt. */
 export const MAX_TIMEOUT_MS = 600_000;
-/** Max length of Step.Label. */
+/** Max length of Step.LabelType. */
 export const MAX_LABEL_LENGTH = 200;
 /** Max length of Step.Description. */
 export const MAX_DESCRIPTION_LENGTH = 2_000;
@@ -66,11 +66,11 @@ function assertTimeout(n: number | null): void {
 }
 
 function assertLabel(s: string): void {
-    if (typeof s !== "string") throw new Error("Label must be a string");
+    if (typeof s !== "string") throw new Error("LabelType must be a string");
     const trimmed = s.trim();
-    if (trimmed.length === 0) throw new Error("Label cannot be empty");
+    if (trimmed.length === 0) throw new Error("LabelType cannot be empty");
     if (trimmed.length > MAX_LABEL_LENGTH) {
-        throw new Error(`Label exceeds ${MAX_LABEL_LENGTH} chars: ${trimmed.length}`);
+        throw new Error(`LabelType exceeds ${MAX_LABEL_LENGTH} chars: ${trimmed.length}`);
     }
 }
 
@@ -101,7 +101,7 @@ function assertTagSetSize(n: number): void {
 /* ------------------------------------------------------------------ */
 
 function validateMetaPatch(patch: StepMetaPatch): void {
-    if (patch.Label !== undefined) assertLabel(patch.Label);
+    if (patch.LabelType !== undefined) assertLabel(patch.LabelType);
     if (patch.Description !== undefined) assertDescription(patch.Description ?? null);
     if (patch.RetryCount !== undefined) assertRetry(patch.RetryCount);
     if (patch.TimeoutMs !== undefined) assertTimeout(patch.TimeoutMs);
@@ -113,7 +113,7 @@ function validateMetaPatch(patch: StepMetaPatch): void {
 function buildMetaSets(patch: StepMetaPatch): { sets: string[]; params: Array<string | number | null> } {
     const sets: string[] = [];
     const params: Array<string | number | null> = [];
-    pushIfDefined(patch.Label, "Label", sets, params);
+    pushIfDefined(patch.LabelType, "LabelType", sets, params);
     pushIfDefined(patch.Description ?? undefined, "Description", sets, params);
     pushIfDefinedBool(patch.IsDisabled, "IsDisabled", sets, params);
     pushIfDefined(patch.RetryCount, "RetryCount", sets, params);

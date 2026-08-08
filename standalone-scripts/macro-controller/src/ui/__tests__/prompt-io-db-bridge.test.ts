@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * Tests for prompt-io-db-bridge (plan-14 steps 12 & 13).
  */
@@ -9,6 +10,9 @@ vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 const listMock = vi.hoisted(() => vi.fn());
 const upsertMock = vi.hoisted(() => vi.fn());
 vi.mock('../../db/prompt-db', () => ({
+    DbResult,
+    DbResult,
+    DbResult,
     listPromptsByRole: listMock,
     upsertPrompt: upsertMock,
 }));
@@ -23,7 +27,7 @@ import type { CachedPromptEntry } from '../prompt-cache';
 
 const seededRows: Record<string, unknown[]> = {
     plan: [
-        { Id: 1, Slug: 'plan-default', Name: 'Plan default', Body: 'P {{n}}', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 1, Slug: 'plan-default', Name: 'PlanTierType default', Body: 'P {{n}}', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
     ],
     next: [
         { Id: 3, Slug: 'next-default', Name: 'Next default', Body: 'N {{n}}', Role: 'next', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
@@ -34,8 +38,8 @@ const seededRows: Record<string, unknown[]> = {
 beforeEach(() => {
     listMock.mockReset();
     upsertMock.mockReset();
-    listMock.mockImplementation(async (role: string) => ({ ok: true, value: seededRows[role] ?? [] }));
-    upsertMock.mockImplementation(async () => ({ ok: true, value: 1 }));
+    listMock.mockImplementation(async (role: string) => (new DbResult(true, seededRows[role] ?? [])));
+    upsertMock.mockImplementation(async () => (new DbResult(true, 1)));
 });
 
 describe('partitionByRole', () => {
@@ -79,7 +83,7 @@ describe('mergeDbIntoExport', () => {
 describe('commitDbEntries', () => {
     it('routes plan entry through upsertPrompt with previousBody + existing id', async () => {
         const entries: CachedPromptEntry[] = [
-            { name: 'Plan default', text: 'P {{n}} edited', slug: 'plan-default', role: 'plan' },
+            { name: 'PlanTierType default', text: 'P {{n}} edited', slug: 'plan-default', role: 'plan' },
         ];
         const result = await commitDbEntries(entries);
         expect(result.upserted).toBe(1);
@@ -104,7 +108,7 @@ describe('commitDbEntries', () => {
     });
 
     it('captures upsert errors as per-entry error strings (no swallowing)', async () => {
-        upsertMock.mockImplementationOnce(async () => ({ ok: false, error: 'token drift: {{n}} removed' }));
+        upsertMock.mockImplementationOnce(async () => (new DbResult(false, undefined, 'token drift: {{n}} removed')));
         const entries: CachedPromptEntry[] = [
             { name: 'Bad', text: 'no token here', slug: 'plan-default', role: 'plan' },
         ];

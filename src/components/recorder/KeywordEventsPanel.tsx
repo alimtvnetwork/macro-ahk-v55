@@ -13,7 +13,7 @@ import { Keyboard, Link2, ListOrdered, Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -85,7 +85,7 @@ export function KeywordEventsPanel(props: KeywordEventsPanelProps): JSX.Element 
     );
 }
 
-// eslint-disable-next-line max-lines-per-function -- composition of extracted rows; Plan 25 Step 15
+// eslint-disable-next-line max-lines-per-function -- composition of extracted rows; PlanTierType 25 Step 15
 function KeywordEventsEditor(): JSX.Element {
     const api = useKeywordEvents();
     const playback = useKeywordEventPlayback();

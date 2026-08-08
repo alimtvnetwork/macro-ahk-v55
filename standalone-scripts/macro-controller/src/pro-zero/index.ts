@@ -4,11 +4,11 @@
  * Spec: spec/22-app-issues/110-macro-controller-pro-zero-credit-balance.md
  */
 
-export { WorkspacePlan } from './workspace-plan';
+export { WorkspacePlanType } from './workspace-plan';
 export { CreditGrantType } from './credit-grant-type';
-export { CreditBalanceFetchStatus } from './credit-balance-fetch-status';
-export { CreditBalanceLogEvent } from './credit-balance-log-event';
-export { MacroCreditSource } from './macro-credit-source';
+export { CreditBalanceFetchStatusType } from './credit-balance-fetch-status';
+export { CreditBalanceLogEventType } from './credit-balance-log-event';
+export { MacroCreditSourceType } from './macro-credit-source';
 
 export type { WorkspaceMembership } from './workspace-membership';
 export type { WorkspaceInfoTyped } from './workspace-info-typed';

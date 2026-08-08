@@ -32,7 +32,7 @@
 
 import { logError } from './error-utils';
 import { log } from './logger';
-import { GitsyncStatus } from "./types/enums";
+import { GitsyncStatusType } from "./types/enums";
 
 const KEY_PREFIX = 'MacroGitsyncCache:';
 
@@ -43,7 +43,7 @@ export const GITSYNC_TTL_ERROR_MS = 5 * 60 * 1000;
 export interface GitsyncCacheRow {
   readonly WorkspaceId: string;
   readonly ProjectId: string;
-  readonly Status: GitsyncStatus;
+  readonly Status: GitsyncStatusType;
   readonly RepoUrl?: string | undefined;
   readonly FetchedAt: string;
   readonly ExpiresAt: number;
@@ -66,7 +66,7 @@ function buildKey(wsId: string, pid: string): string {
   return KEY_PREFIX + wsId + ':' + pid;
 }
 
-function ttlFor(status: GitsyncStatus): number {
+function ttlFor(status: GitsyncStatusType): number {
   if (status === 'found') return GITSYNC_TTL_FOUND_MS;
   if (status === 'not_linked') return GITSYNC_TTL_NOT_LINKED_MS;
   return GITSYNC_TTL_ERROR_MS;
@@ -109,7 +109,7 @@ export async function getGitsyncCache(
 export function setGitsyncCache(
   wsId: string,
   pid: string,
-  status: GitsyncStatus,
+  status: GitsyncStatusType,
   repoUrl?: string,
 ): void {
   if (!wsId || !pid) return;

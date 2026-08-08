@@ -28,7 +28,7 @@ import {
 
 import { type MessageRequest } from "../../shared/messages";
 import type { JsonRecord } from "./handler-types";
-import { FormatEnum } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { DocFormatType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  APPLY_JSON_SCHEMA                                                  */
@@ -71,7 +71,7 @@ export async function handleApplyJsonSchema(message: MessageRequest): Promise<{ 
 
 interface GenerateSchemaDocsMessage extends MessageRequest {
     project: string;
-    format?: FormatEnum;
+    format?: DocFormatType;
 }
 
 interface SchemaDocsResponse {

@@ -479,7 +479,7 @@ CREATE TABLE IF NOT EXISTS AssetLink (
     Id               INTEGER PRIMARY KEY AUTOINCREMENT,
     SharedAssetId    INTEGER NOT NULL REFERENCES SharedAsset(Id) ON DELETE CASCADE,
     ProjectId        INTEGER NOT NULL,
-    LinkState        TEXT NOT NULL DEFAULT 'synced' CHECK(LinkState IN ('synced','pinned','detached')),
+    LinkStateType        TEXT NOT NULL DEFAULT 'synced' CHECK(LinkStateType IN ('synced','pinned','detached')),
     PinnedVersion    TEXT,
     LocalOverrideJson TEXT,
     SyncedAt         TEXT DEFAULT (datetime('now')),

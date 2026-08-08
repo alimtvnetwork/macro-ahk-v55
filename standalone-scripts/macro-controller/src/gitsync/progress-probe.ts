@@ -30,7 +30,7 @@ import { logError } from '../error-utils';
 import { throwDiagnostic } from '../errors/diagnostic-error';
 import { log } from '../logger';
 import { CREDIT_API_BASE } from '../shared-state';
-import { GitsyncJobStatus, ReasonEnum7 } from "../types/enums";
+import { GitsyncJobStatusType, GitsyncConnectionReasonType } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -44,7 +44,7 @@ export interface GitsyncProgressResult {
 
 export interface GitsyncProgressBody {
     readonly type?: string;
-    readonly status?: GitsyncJobStatus | string;
+    readonly status?: GitsyncJobStatusType | string;
     readonly step?: string;
     readonly title?: string;
     readonly description?: string;
@@ -53,7 +53,7 @@ export interface GitsyncProgressBody {
 
 export type GitsyncConnectionState =
     | { connected: true; repoUrl: string; repoName: string | null; owner: string | null }
-    | { connected: false; reason: ReasonEnum7; httpStatus?: number };
+    | { connected: false; reason: GitsyncConnectionReasonType; httpStatus?: number };
 
 interface SdkApiResponse {
     readonly ok: boolean;
@@ -140,7 +140,7 @@ export async function probeProgress(
             + ' pid=' + projectId + ' → null', 'info');
         return null;
     }
-    if (resp.isFail) {
+    if (!resp.ok) {
         const preview = JSON.stringify(resp.data).substring(0, 200);
         logError('GitsyncProbe', 'probeProgress HTTP ' + resp.status
             + ' [ws=' + wsId + ' pid=' + projectId + ' job=' + jobId + ']'

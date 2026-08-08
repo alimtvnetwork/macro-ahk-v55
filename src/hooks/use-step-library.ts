@@ -41,7 +41,7 @@ import {
     useAssembleApi,
 } from "./step-library/step-library-hooks";
 import type { StepLibraryLoadError, UseStepLibraryApi, UseStepLibraryState } from "./use-step-library-types";
-import { StageEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { SqlStageType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 export type { StepLibraryLoadError, UseStepLibraryApi, UseStepLibraryState };
 
@@ -79,7 +79,7 @@ const DEFAULT_PROJECT_EXTERNAL_ID = "00000000-0000-0000-0000-000000000001";
 // StepLibraryLoadError type is defined in `use-step-library-types.ts` and re-exported above.
 
 
-function classifyLoadError(err: unknown, stage: StageEnum): StepLibraryLoadError {
+function classifyLoadError(err: unknown, stage: SqlStageType): StepLibraryLoadError {
     const message = err instanceof Error ? err.message : String(err ?? "Unknown error");
     if (stage === "sqljs") {
         return {
@@ -289,13 +289,13 @@ function seedOnboardingClicks(lib: StepLibraryDb, onboarding: number, login: num
     lib.appendStep({
         StepGroupId: onboarding,
         StepKindId: StepKindId.Click,
-        Label: "Click Get Started",
+        LabelType: "Click Get Started",
         PayloadJson: JSON.stringify({ Selector: "#get-started" }),
     });
     lib.appendStep({
         StepGroupId: onboarding,
         StepKindId: StepKindId.RunGroup,
-        Label: "Run Login subroutine",
+        LabelType: "Run Login subroutine",
         TargetStepGroupId: login,
     });
 }
@@ -304,13 +304,13 @@ function seedLoginSteps(lib: StepLibraryDb, login: number): void {
     lib.appendStep({
         StepGroupId: login,
         StepKindId: StepKindId.Type,
-        Label: "Type email",
+        LabelType: "Type email",
         PayloadJson: JSON.stringify({ Selector: "#email", Value: "{{Email}}" }),
     });
     lib.appendStep({
         StepGroupId: login,
         StepKindId: StepKindId.Click,
-        Label: "Click Sign in",
+        LabelType: "Click Sign in",
         PayloadJson: JSON.stringify({ Selector: "#signin" }),
     });
 }

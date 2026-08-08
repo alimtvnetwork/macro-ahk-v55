@@ -1,5 +1,5 @@
 /**
- * Plan 22 gap #10 (applyBundle positive + schema-version-mismatch negative)
+ * PlanTierType 22 gap #10 (applyBundle positive + schema-version-mismatch negative)
  * and part of gap #9 (bundle envelope parsing).
  *
  * Root cause pinned: `parseBundleEnvelope` in `ui/prompt-io.ts` is the only
@@ -28,7 +28,7 @@ function makeEnvelope(overrides: Record<string, unknown> = {}): string {
   return JSON.stringify({ ...base, ...overrides });
 }
 
-describe('parsePromptsText - bundle envelope (Plan 22 gap #9/#10)', () => {
+describe('parsePromptsText - bundle envelope (PlanTierType 22 gap #9/#10)', () => {
   it('B1: accepts a valid v1 envelope and returns typed entries', () => {
     const { valid, errors, revisions } = parsePromptsText(makeEnvelope());
     expect(errors).toEqual([]);
@@ -88,7 +88,7 @@ describe('parsePromptsText - bundle envelope (Plan 22 gap #9/#10)', () => {
   });
 });
 
-describe('applyRoleFilter (Plan 22 gap #9 - role-scoped partitioning)', () => {
+describe('applyRoleFilter (PlanTierType 22 gap #9 - role-scoped partitioning)', () => {
   const entries: CachedPromptEntry[] = [
     { name: 'A', text: 'a', slug: 'a', role: 'plan' },
     { name: 'B', text: 'b', slug: 'b', role: 'next' },

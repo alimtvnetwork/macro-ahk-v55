@@ -1,5 +1,5 @@
 /**
- * Plan 01 Step 8c — component regression for the real 💰 click path.
+ * PlanTierType 01 Step 8c — component regression for the real 💰 click path.
  *
  * Locks the chain that helper-only tests cannot prove:
  * click 💰 → /user/workspaces completion → enrichment fan-out →
@@ -9,7 +9,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import 'fake-indexeddb/auto';
 import type { WorkspaceCredit } from '../types';
-import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
+import { CreditFetchOutcomeType } from '../credit-balance-update/credit-fetch-outcome';
 import { buildButtonRow } from '../ui/panel-controls';
 import { loopCreditState, state } from '../shared-state';
 
@@ -122,7 +122,7 @@ beforeEach(async () => {
     hoisted.getBearerTokenSpy.mockResolvedValue('bearer-token');
     hoisted.proOneRefreshSpy.mockResolvedValue(undefined);
     hoisted.fetchSpy.mockResolvedValue({
-        outcome: CreditFetchOutcome.ApiHit,
+        outcome: CreditFetchOutcomeType.ApiHit,
         balance: {
             totalRemaining: 25, totalGranted: 50,
             dailyRemaining: 5, dailyLimit: 10,

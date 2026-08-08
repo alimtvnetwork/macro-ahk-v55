@@ -1,5 +1,5 @@
 /**
- * Marco Extension — Injection Mode Toggle
+ * Marco Extension — Injection OperationModeType Toggle
  *
  * Debug toggle that forces legacy Blob URL injection
  * instead of chrome.userScripts API.
@@ -8,7 +8,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { logError } from "@/hooks/popup-logger";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Bug } from "lucide-react";
 import { sendMessage } from "@/lib/message-client";
 import {
@@ -56,12 +56,12 @@ export function InjectionModeToggle() {
         <div className="flex items-center justify-between rounded-md border border-border bg-card px-3 py-2">
           <div className="flex items-center gap-2">
             <Bug className="h-3.5 w-3.5 text-muted-foreground" />
-            <Label
+            <LabelType
               htmlFor="force-legacy"
               className="text-[11px] font-medium text-foreground cursor-pointer"
             >
               Force legacy DOM injection
-            </Label>
+            </LabelType>
           </div>
           <Switch
             id="force-legacy"

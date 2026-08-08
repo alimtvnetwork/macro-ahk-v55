@@ -3,7 +3,7 @@
  *
  * Replaces every `as unknown as Message` cast in standalone scripts with
  * a discriminated `RiseupAsiaMessage<TPayload>` envelope keyed on a closed
- * `kind` enum (e.g. `BannerEventName`). The SDK exposes `Messaging.dispatch`
+ * `kind` enum (e.g. `BannerEventNameType`). The SDK exposes `Messaging.dispatch`
  * and `Messaging.on` overloads bound to this envelope so the discriminant
  * narrows `payload` automatically.
  */

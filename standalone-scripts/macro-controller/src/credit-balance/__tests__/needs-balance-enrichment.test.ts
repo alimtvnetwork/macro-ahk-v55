@@ -1,13 +1,13 @@
 /**
- * Unit tests — `needsBalanceEnrichment` (Plan-10 predicate).
+ * Unit tests — `needsBalanceEnrichment` (PlanTierType-10 predicate).
  */
 
 import { describe, it, expect } from 'vitest';
 import { needsBalanceEnrichment } from '../needs-balance-enrichment';
 import type { WorkspaceCredit } from '../../types/credit-types';
-import { Enum_75c5b314 } from "../../types/enums";
+import { WorkspaceEnrichmentFieldType } from "../../types/enums";
 
-function ws(partial: Partial<Pick<WorkspaceCredit, Enum_75c5b314>>): Pick<WorkspaceCredit, Enum_75c5b314> {
+function ws(partial: Partial<Pick<WorkspaceCredit, WorkspaceEnrichmentFieldType>>): Pick<WorkspaceCredit, WorkspaceEnrichmentFieldType> {
   return { id: 'ws-1', plan: 'pro_1', tier: 'PRO', ...partial };
 }
 

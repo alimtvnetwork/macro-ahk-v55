@@ -46,7 +46,7 @@ function makeProject(overrides: Partial<SeedProjectEntry> = {}): SeedProjectEntr
         Css: [],
         Templates: [],
         Prompts: [],
-        TargetUrls: [{ Pattern: "https://lovable.dev/", MatchType: "exact" }],
+        TargetUrls: [{ Pattern: "https://lovable.dev/", MatchRuleType: "exact" }],
         Cookies: [],
         ...overrides,
     };

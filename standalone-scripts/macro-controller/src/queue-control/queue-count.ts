@@ -1,4 +1,4 @@
-import { StrategyEnum } from "../types/enums";
+import { SelectorStrategyType } from "../types/enums";
 
 /**
  * Issue 128 — Read the Lovable Queue section's count badge.
@@ -16,7 +16,7 @@ export const QUEUE_COUNT_XPATH =
 
 interface CountSpanResult {
     element: HTMLElement | null;
-    strategy: StrategyEnum;
+    strategy: SelectorStrategyType;
 }
 
 function tryPrimaryXPath(): HTMLElement | null {

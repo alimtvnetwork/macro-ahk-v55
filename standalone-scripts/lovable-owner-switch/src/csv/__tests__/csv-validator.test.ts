@@ -8,7 +8,7 @@
 
 import { describe, it, expect } from "vitest";
 import { validateRow, validateFile } from "../csv-validator";
-import { OwnerSwitchCsvColumn } from "../csv-column";
+import { OwnerSwitchCsvColumnType } from "../csv-column";
 import type { OwnerSwitchCsvRow } from "../csv-types";
 
 const baseRow = (overrides: Partial<OwnerSwitchCsvRow> = {}): OwnerSwitchCsvRow => ({
@@ -29,7 +29,7 @@ describe("validateRow (owner-switch)", () => {
     it("flags invalid LoginEmail", () => {
         const errs = validateRow(baseRow({ LoginEmail: "not-an-email" }));
         expect(errs).toHaveLength(1);
-        expect(errs[0].Column).toBe(OwnerSwitchCsvColumn.LoginEmail);
+        expect(errs[0].Column).toBe(OwnerSwitchCsvColumnType.LoginEmail);
     });
 
     it("flags duplicate OwnerEmail1 / OwnerEmail2 (case-insensitive)", () => {
@@ -38,20 +38,20 @@ describe("validateRow (owner-switch)", () => {
             OwnerEmail2: "same@example.com",
         }));
         expect(errs).toHaveLength(1);
-        expect(errs[0].Column).toBe(OwnerSwitchCsvColumn.OwnerEmail2);
+        expect(errs[0].Column).toBe(OwnerSwitchCsvColumnType.OwnerEmail2);
         expect(errs[0].Message).toContain("duplicates OwnerEmail1");
     });
 
     it("flags Notes exceeding max length", () => {
         const errs = validateRow(baseRow({ Notes: "x".repeat(501) }));
         expect(errs).toHaveLength(1);
-        expect(errs[0].Column).toBe(OwnerSwitchCsvColumn.Notes);
+        expect(errs[0].Column).toBe(OwnerSwitchCsvColumnType.Notes);
     });
 
     it("flags Password exceeding max length", () => {
         const errs = validateRow(baseRow({ Password: "p".repeat(201) }));
         expect(errs).toHaveLength(1);
-        expect(errs[0].Column).toBe(OwnerSwitchCsvColumn.Password);
+        expect(errs[0].Column).toBe(OwnerSwitchCsvColumnType.Password);
     });
 
     it("does NOT flag distinct owner emails", () => {

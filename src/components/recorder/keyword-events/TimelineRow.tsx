@@ -2,7 +2,7 @@
  * Marco Extension, Keyword Events, Timeline Row
  *
  * Renders a single {@link TimelineEntry} produced by the chain runner.
- * Extracted from `KeywordEventsPanel.tsx` (Plan 25 step 10) to keep the
+ * Extracted from `KeywordEventsPanel.tsx` (PlanTierType 25 step 10) to keep the
  * discriminated-union render under the cognitive-complexity ceiling: the
  * `TimelineRow` shell dispatches to one leaf renderer per `Kind`, so no
  * single function exceeds the 15-branch budget.
@@ -42,7 +42,7 @@ function StepRow(props: { entry: Extract<TimelineEntry, { Kind: "Step" }> }): JS
             <span className="tabular-nums">{formatOffset(entry.AtMs)}</span>
             <Circle className="h-2.5 w-2.5 mt-1 text-muted-foreground/70 shrink-0" />
             <span className="truncate">
-                <span className="opacity-70">#{entry.StepIndex + 1}</span> {entry.Label}
+                <span className="opacity-70">#{entry.StepIndex + 1}</span> {entry.LabelType}
             </span>
         </div>
     );

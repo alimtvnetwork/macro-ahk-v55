@@ -4,7 +4,7 @@
  */
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import type { UrlTabClickFormState } from "./payload-builders";
 
 export interface UrlTabClickAdvancedSectionProps {
@@ -17,7 +17,7 @@ export function UrlTabClickAdvancedSection(props: UrlTabClickAdvancedSectionProp
     return (
         <>
             <div className="space-y-1">
-                <Label htmlFor="utc-timeout">Timeout (ms, optional)</Label>
+                <LabelType htmlFor="utc-timeout">Timeout (ms, optional)</LabelType>
                 <Input
                     id="utc-timeout"
                     type="number"
@@ -34,16 +34,16 @@ export function UrlTabClickAdvancedSection(props: UrlTabClickAdvancedSectionProp
                     checked={value.DirectOpen}
                     onChange={(event) => onPatch({
                         DirectOpen: event.target.checked,
-                        Mode: event.target.checked ? "OpenNew" : value.Mode,
+                        OperationModeType: event.target.checked ? "OpenNew" : value.OperationModeType,
                     })}
                 />
-                <Label htmlFor="utc-direct" className="cursor-pointer">
+                <LabelType htmlFor="utc-direct" className="cursor-pointer">
                     Direct open (skip click, navigate to literal URL)
-                </Label>
+                </LabelType>
             </div>
             {value.DirectOpen && (
                 <div className="space-y-1">
-                    <Label htmlFor="utc-url">Literal URL</Label>
+                    <LabelType htmlFor="utc-url">Literal URL</LabelType>
                     <Input
                         id="utc-url"
                         value={value.Url}
@@ -53,7 +53,7 @@ export function UrlTabClickAdvancedSection(props: UrlTabClickAdvancedSectionProp
                 </div>
             )}
             <p className="text-[11px] text-muted-foreground">
-                Saved as PayloadJson with PascalCase keys (UrlPattern, UrlMatch, Mode...).
+                Saved as PayloadJson with PascalCase keys (UrlPattern, UrlMatch, OperationModeType...).
                 Runner: <code>executeUrlTabClick</code>.
             </p>
         </>

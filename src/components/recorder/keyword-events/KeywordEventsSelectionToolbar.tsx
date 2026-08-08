@@ -1,6 +1,6 @@
 /**
  * Toolbar summarising the current keyword-event selection. Extracted from
- * `KeywordEventsPanel.tsx` in Plan 25 Step 15.
+ * `KeywordEventsPanel.tsx` in PlanTierType 25 Step 15.
  */
 
 import { Button } from "@/components/ui/button";

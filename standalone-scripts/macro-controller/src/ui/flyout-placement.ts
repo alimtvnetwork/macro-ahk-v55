@@ -1,5 +1,5 @@
-import { SideEnum1 } from "../../../../src/types/enums";
-import { DirectionEnum } from "../types/enums";
+import { SemanticSemanticSideEnum } from "../../../../src/types/enums";
+import { DirectionType } from "../types/enums";
 
 /**
  * MacroLoop Controller — Flyout placement resolver (Step A4)
@@ -34,8 +34,8 @@ export interface ViewportLike {
   readonly innerHeight: number;
 }
 
-export type HorizontalPlacement = SideEnum1;
-export type VerticalPlacement = DirectionEnum;
+export type HorizontalPlacement = SemanticSemanticSideEnum;
+export type VerticalPlacement = DirectionType;
 
 export interface PlacementResult {
   readonly top: number;

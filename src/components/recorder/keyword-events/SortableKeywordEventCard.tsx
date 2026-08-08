@@ -1,7 +1,7 @@
 /**
  * Wraps {@link KeywordEventCard} with `useSortable` so the parent list can
  * render it inside a `SortableContext`. Extracted from
- * `KeywordEventsPanel.tsx` in Plan 25 Step 15.
+ * `KeywordEventsPanel.tsx` in PlanTierType 25 Step 15.
  */
 
 import { GripVertical } from "lucide-react";

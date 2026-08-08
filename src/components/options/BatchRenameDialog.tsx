@@ -38,7 +38,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
     Tabs,
@@ -52,7 +52,7 @@ import {
     STEP_GROUP_NAME_MAX_LEN,
     validateStepGroupName,
 } from "./step-group-name-validator";
-import { Mode3, KindEnum5 } from "../../types/enums";
+import { SemanticSemanticMode, SemanticSemanticKindEnum } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -86,10 +86,10 @@ export interface BatchRenameDialogProps {
 /*  Transforms                                                         */
 /* ------------------------------------------------------------------ */
 
-type Mode = Mode3;
+type OperationModeType = SemanticSemanticMode;
 
 interface TransformInput {
-    readonly Mode: Mode;
+    readonly OperationModeType: OperationModeType;
     readonly Find: string;
     readonly Replace: string;
     readonly Prefix: string;
@@ -123,7 +123,7 @@ function applySequence(t: TransformInput, index: number): string {
 }
 
 function applyTransform(name: string, t: TransformInput, index: number): string {
-    switch (t.Mode) {
+    switch (t.OperationModeType) {
         case "replace":
             // Empty Find = identity. Splitting on empty string would
             // explode the name into per-character pieces.
@@ -219,8 +219,8 @@ function buildPreview(
 /* ------------------------------------------------------------------ */
 
 interface BatchRenameFormState {
-    readonly mode: Mode;
-    readonly setMode: (m: Mode) => void;
+    readonly mode: OperationModeType;
+    readonly setMode: (m: OperationModeType) => void;
     readonly find: string;
     readonly setFind: (v: string) => void;
     readonly replace: string;
@@ -241,7 +241,7 @@ interface BatchRenameFormState {
 }
 
 function useBatchRenameForm(): BatchRenameFormState {
-    const [mode, setMode] = useState<Mode>("replace");
+    const [mode, setMode] = useState<OperationModeType>("replace");
     const [find, setFind] = useState("");
     const [replace, setReplace] = useState("");
     const [prefix, setPrefix] = useState("");
@@ -251,7 +251,7 @@ function useBatchRenameForm(): BatchRenameFormState {
     const [sequencePadding, setSequencePadding] = useState(1);
     const [sequenceSeparator, setSequenceSeparator] = useState(" ");
     const transform: TransformInput = {
-        Mode: mode, Find: find, Replace: replace,
+        OperationModeType: mode, Find: find, Replace: replace,
         Prefix: prefix, Suffix: suffix,
         SequenceBase: sequenceBase, SequenceStart: sequenceStart,
         SequencePadding: sequencePadding, SequenceSeparator: sequenceSeparator,
@@ -277,14 +277,14 @@ function ReplaceTab({ find, setFind, replace, setReplace }: {
         <TabsContent value="replace" className="space-y-2 pt-3">
             <div className="grid grid-cols-2 gap-2">
                 <div>
-                    <Label htmlFor="batch-find" className="text-xs">Find</Label>
+                    <LabelType htmlFor="batch-find" className="text-xs">Find</LabelType>
                     <Input id="batch-find" value={find}
                         onChange={(e) => setFind(e.target.value)}
                         placeholder="e.g. Old"
                         maxLength={STEP_GROUP_NAME_MAX_LEN} />
                 </div>
                 <div>
-                    <Label htmlFor="batch-replace" className="text-xs">Replace with</Label>
+                    <LabelType htmlFor="batch-replace" className="text-xs">Replace with</LabelType>
                     <Input id="batch-replace" value={replace}
                         onChange={(e) => setReplace(e.target.value)}
                         placeholder="e.g. New"
@@ -301,11 +301,11 @@ function ReplaceTab({ find, setFind, replace, setReplace }: {
 function AffixTab({ id, label, placeholder, value, setValue, kind }: {
     id: string; label: string; placeholder: string;
     value: string; setValue: (v: string) => void;
-    kind: KindEnum5;
+    kind: SemanticSemanticKindEnum;
 }) {
     return (
         <TabsContent value={kind} className="space-y-2 pt-3">
-            <Label htmlFor={id} className="text-xs">{label}</Label>
+            <LabelType htmlFor={id} className="text-xs">{label}</LabelType>
             <Input id={id} value={value}
                 onChange={(e) => setValue(e.target.value)}
                 placeholder={placeholder}
@@ -330,24 +330,24 @@ function SequenceTab(p: SequenceTabProps) {
         <TabsContent value="sequence" className="space-y-2 pt-3">
             <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2">
                 <div>
-                    <Label htmlFor="batch-seq-base" className="text-xs">Base name</Label>
+                    <LabelType htmlFor="batch-seq-base" className="text-xs">Base name</LabelType>
                     <Input id="batch-seq-base" value={p.base}
                         onChange={(e) => p.setBase(e.target.value)}
                         placeholder="e.g. Login {n}"
                         maxLength={STEP_GROUP_NAME_MAX_LEN} />
                 </div>
                 <div className="w-20">
-                    <Label htmlFor="batch-seq-start" className="text-xs">Start</Label>
+                    <LabelType htmlFor="batch-seq-start" className="text-xs">Start</LabelType>
                     <Input id="batch-seq-start" type="number" min={0} value={p.start}
                         onChange={(e) => p.setStart(Number(e.target.value) || 0)} />
                 </div>
                 <div className="w-20">
-                    <Label htmlFor="batch-seq-padding" className="text-xs">Padding</Label>
+                    <LabelType htmlFor="batch-seq-padding" className="text-xs">Padding</LabelType>
                     <Input id="batch-seq-padding" type="number" min={1} max={6} value={p.padding}
                         onChange={(e) => p.setPadding(Math.max(1, Math.min(6, Number(e.target.value) || 1)))} />
                 </div>
                 <div className="w-16">
-                    <Label htmlFor="batch-seq-sep" className="text-xs">Sep</Label>
+                    <LabelType htmlFor="batch-seq-sep" className="text-xs">Sep</LabelType>
                     <Input id="batch-seq-sep" value={p.separator}
                         onChange={(e) => p.setSeparator(e.target.value)}
                         placeholder=" " maxLength={4} />
@@ -365,7 +365,7 @@ function SequenceTab(p: SequenceTabProps) {
 
 function ModeTabs({ form }: { form: BatchRenameFormState }) {
     return (
-        <Tabs value={form.mode} onValueChange={(v) => form.setMode(v as Mode)}>
+        <Tabs value={form.mode} onValueChange={(v) => form.setMode(v as OperationModeType)}>
             <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="replace">Find &amp; replace</TabsTrigger>
                 <TabsTrigger value="prefix">Add prefix</TabsTrigger>

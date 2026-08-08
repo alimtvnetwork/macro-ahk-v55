@@ -1,5 +1,5 @@
 /**
- * Positive + negative coverage for `db/prompt-defaults.ts` (Plan-22 steps 24-31).
+ * Positive + negative coverage for `db/prompt-defaults.ts` (PlanTierType-22 steps 24-31).
  *
  * Locks the configurable-token defaults and the four helpers that seeder,
  * CRUD, UI, and schema migration all depend on. If any helper silently
@@ -91,7 +91,7 @@ describe('encode/decode ReplaceValues round-trip', () => {
     });
 });
 
-describe('integration: defaults drive substituteToken (Plan-22 step 28-31)', () => {
+describe('integration: defaults drive substituteToken (PlanTierType-22 step 28-31)', () => {
     it('substitutes every default chip value into the default body shape', () => {
         const body = 'do {{n}} things (${n} total)';
         for (const v of REPLACE_VALUES_DEFAULT) {

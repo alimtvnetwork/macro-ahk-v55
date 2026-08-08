@@ -7,12 +7,12 @@
  */
 
 import { useState, type ReactNode } from "react";
-import { usePromptChains, type PromptChain, type ChainStepStatus } from "@/hooks/use-prompt-chains";
+import { usePromptChains, type PromptChain, type ChainStepStatusType } from "@/hooks/use-prompt-chains";
 import { usePrompts, type PromptEntry } from "@/hooks/use-prompts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -48,8 +48,8 @@ import { toast } from "sonner";
 /*  Step status badge                                                   */
 /* ------------------------------------------------------------------ */
 
-function StepStatusBadge({ status }: { status: ChainStepStatus }) {
-    const map: Record<ChainStepStatus, { icon: ReactNode; label: string; cls: string }> = {
+function StepStatusBadge({ status }: { status: ChainStepStatusType }) {
+    const map: Record<ChainStepStatusType, { icon: ReactNode; label: string; cls: string }> = {
         pending: { icon: <Clock className="h-3 w-3" />, label: "Pending", cls: "text-muted-foreground border-border" },
         running: { icon: <Loader2 className="h-3 w-3 animate-spin" />, label: "Running", cls: "text-primary border-primary/40 bg-primary/10" },
         done: { icon: <Check className="h-3 w-3" />, label: "Done", cls: "text-success border-success/40 bg-success/10" },
@@ -158,9 +158,9 @@ function ChainEditor({ chain, prompts, maxLength, onSave, onCancel }: ChainEdito
 
                 <div className="flex items-center gap-3">
                     <Switch id="auto-submit" checked={autoSubmit} onCheckedChange={setAutoSubmit} />
-                    <Label htmlFor="auto-submit" className="text-xs font-medium cursor-pointer">
+                    <LabelType htmlFor="auto-submit" className="text-xs font-medium cursor-pointer">
                         Auto-submit after injection
-                    </Label>
+                    </LabelType>
                 </div>
 
                 {autoSubmit && (

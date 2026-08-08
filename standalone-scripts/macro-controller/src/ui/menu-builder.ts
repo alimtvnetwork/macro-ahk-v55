@@ -11,7 +11,7 @@ import { markUserGesture } from '../user-gesture-guard';
 import { showDatabaseModal } from './database-modal';
 import { exportWorkspacesAsCsv } from '../log-csv-export';
 import { VERSION, cPanelBg, cPanelFgDim, cPanelFgMuted, cPrimary, cBtnMenuBg, cBtnMenuFg, cSectionHeader, lDropdownRadius, lDropdownShadow, tFontSm, trFast, autoAttachCfg, state } from '../shared-state';
-import { LoopDirection, type AutoAttachGroupRuntime, type DiagnosticDump, type ExtensionResponse } from '../types';
+import { LoopDirectionType, type AutoAttachGroupRuntime, type DiagnosticDump, type ExtensionResponse } from '../types';
 import { showToast } from '../toast';
 import { nsWrite, nsCallTyped } from '../api-namespace';
 import { refreshBearerTokenFromBestSource, getAuthDebugSnapshot } from '../auth';
@@ -129,11 +129,11 @@ function _addLoopSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLElem
   const loopMenu = createSubmenu(menuCtx, '🔄', 'Loop');
   loopMenu.panel.appendChild(createMenuItem(menuCtx, '▲', 'Loop Up', 'Start loop in UP direction', function() {
     markUserGesture('menu-builder/loop-up');
-    state.direction = LoopDirection.Up; log('Direction set to: UP'); startLoop('up');
+    state.direction = LoopDirectionType.Up; log('Direction set to: UP'); startLoop('up');
   }));
   loopMenu.panel.appendChild(createMenuItem(menuCtx, '▼', 'Loop Down', 'Start loop in DOWN direction', function() {
     markUserGesture('menu-builder/loop-down');
-    state.direction = LoopDirection.Down; log('Direction set to: DOWN'); startLoop('down');
+    state.direction = LoopDirectionType.Down; log('Direction set to: DOWN'); startLoop('down');
   }));
   menuDropdown.appendChild(loopMenu.el);
 }
@@ -266,7 +266,7 @@ function _addReadSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLElem
   readMenu.panel.appendChild(createMenuItem(menuCtx, '🔍', 'Auth Trace', 'Copy auth trace snapshot to clipboard', function() {
     const s = getAuthDebugSnapshot();
     const bridge = !s.bridgeOutcome.hasAttempted ? 'not attempted'
-      : s.bridgeOutcome.isSuccess ? 'OK via ' + s.bridgeOutcome.source
+      : s.bridgeOutcome.ok ? 'OK via ' + s.bridgeOutcome.source
       : 'FAIL: ' + (s.bridgeOutcome.error || 'unknown');
     const lines = [
       '=== Auth Trace @ ' + new Date().toISOString() + ' ===',

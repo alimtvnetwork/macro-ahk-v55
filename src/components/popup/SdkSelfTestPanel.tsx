@@ -15,13 +15,13 @@ import { useEffect, useState, useCallback } from "react";
 import { CheckCircle2, XCircle, Activity, RefreshCw } from "lucide-react";
 import { sendMessage } from "@/lib/message-client";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { SurfaceEnum } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { StorageSurfaceType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-type Surface = SurfaceEnum;
+type Surface = StorageSurfaceType;
 
 interface SdkSelfTestRow {
     surface: Surface;

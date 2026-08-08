@@ -1,4 +1,4 @@
-import { UrlMatchEnum, Mode2, SelectorKindEnum, UrlTabClickReasonEnum1, KindEnum2, ReasonEnum4 } from "../../types/enums";
+import { UrlMatchEnum, UrlTabClickFailureMode, SelectorKindEnum, SemanticSemanticUrlTabClickReasonEnum, PredicateEvaluationKind, ValidationErrorReason } from "../../types/enums";
 
 /**
  * Marco Extension — UrlTabClick Step (Spec 19 §1)
@@ -24,13 +24,13 @@ import { UrlMatchEnum, Mode2, SelectorKindEnum, UrlTabClickReasonEnum1, KindEnum
 /* ------------------------------------------------------------------ */
 
 export type UrlMatchDialect = UrlMatchEnum;
-export type UrlTabClickMode = Mode2;
+export type UrlTabClickMode = UrlTabClickFailureMode;
 export type SelectorKindOption = SelectorKindEnum;
 
 export interface UrlTabClickParams {
     readonly UrlPattern: string;
     readonly UrlMatch: UrlMatchDialect;
-    readonly Mode: UrlTabClickMode;
+    readonly OperationModeType: UrlTabClickMode;
     readonly Selector?: string;
     readonly SelectorKind?: SelectorKindOption;
     readonly TimeoutMs?: number;
@@ -39,7 +39,7 @@ export interface UrlTabClickParams {
 }
 
 export type UrlTabClickReason =
-    UrlTabClickReasonEnum1;
+    SemanticSemanticUrlTabClickReasonEnum;
 
 export interface UrlTabClickResult {
     readonly Reason: UrlTabClickReason;
@@ -47,7 +47,7 @@ export interface UrlTabClickResult {
     readonly ResolvedUrl?: string;
     readonly Pattern: string;
     readonly Dialect: UrlMatchDialect;
-    readonly Mode: UrlTabClickMode;
+    readonly OperationModeType: UrlTabClickMode;
     readonly DurationMs: number;
     readonly OpenedNewTab: boolean;
     readonly Detail?: string;
@@ -63,7 +63,7 @@ export interface TabsAdapter {
     focusTab(id: number): Promise<void>;
     createTab(url: string): Promise<TabRef>;
     /** Dispatch the captured click; returns the URL of the resulting tab. */
-    dispatchClick?(selector: string, kind: KindEnum2): Promise<TabRef>;
+    dispatchClick?(selector: string, kind: PredicateEvaluationKind): Promise<TabRef>;
     /** Wait for an updated tab whose URL matches `predicate` within deadline. */
     waitForMatchingTab(
         predicate: (url: string) => boolean,
@@ -199,14 +199,14 @@ export function compileUrlPattern(
 /* ------------------------------------------------------------------ */
 
 export interface ValidationError {
-    readonly Reason: ReasonEnum4;
+    readonly Reason: ValidationErrorReason;
     readonly Detail: string;
 }
 
 function validateDirectOpen(params: UrlTabClickParams): ValidationError | null {
     if (params.DirectOpen !== true) return null;
-    if (params.Mode !== "OpenNew") {
-        return { Reason: "BadParams", Detail: "DirectOpen requires Mode='OpenNew'" };
+    if (params.OperationModeType !== "OpenNew") {
+        return { Reason: "BadParams", Detail: "DirectOpen requires OperationModeType='OpenNew'" };
     }
     if (params.Url === undefined || params.Url === "") {
         return { Reason: "InvalidUrlPattern", Detail: "DirectOpen requires a literal Url" };
@@ -292,7 +292,7 @@ function hasCrossOriginAnchorHref(context: CaptureClickContext): boolean {
 /*  Replay                                                              */
 /* ------------------------------------------------------------------ */
 
-function selectorKind(params: UrlTabClickParams): KindEnum2 {
+function selectorKind(params: UrlTabClickParams): PredicateEvaluationKind {
     const kind = params.SelectorKind ?? "Auto";
     if (kind === "XPath") return "XPath";
     if (kind === "Css") return "Css";
@@ -316,7 +316,7 @@ function buildResult(
         Reason: reason,
         Pattern: base.params.UrlPattern,
         Dialect: base.params.UrlMatch,
-        Mode: base.params.Mode,
+        OperationModeType: base.params.OperationModeType,
         DurationMs: base.now() - base.startedAt,
         OpenedNewTab: false,
         ...extras,
@@ -334,7 +334,7 @@ async function tryFocusExisting(
         await tabs.focusTab(hit.Id);
         return buildResult(base, "Ok", { ResolvedTabId: hit.Id, ResolvedUrl: hit.Url });
     }
-    if (base.params.Mode === "FocusExisting") {
+    if (base.params.OperationModeType === "FocusExisting") {
         return buildResult(base, "TabNotFound", { Detail: `no tab matched ${base.params.UrlPattern}` });
     }
     return null;
@@ -423,7 +423,7 @@ async function executeWithBase(base: ResultBase, init: ExecuteUrlTabClickInit): 
     if (hasPrecheckError) return pre.error!;
     
     const test = pre.test as (url: string) => boolean;
-    const mode = init.Params.Mode;
+    const mode = init.Params.OperationModeType;
     const shouldTryFocus = mode === "FocusExisting" || mode === "OpenOrFocus";
     
     if (shouldTryFocus) {

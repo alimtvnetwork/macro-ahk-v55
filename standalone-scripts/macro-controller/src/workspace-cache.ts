@@ -11,7 +11,7 @@ import { logError, logWarn, logDebug } from './error-utils';
  * Ref: .lovable/fixes/macro-controller-toast-crash-and-slow-startup.md
  */
 
-import { StorageKey } from './types';
+import { StorageKeyType } from './types';
 
 /** Extract project ID from the current URL (lovable.dev/projects/{id} or {id}-preview--{uuid}). */
 function resolveProjectId(): string {
@@ -31,7 +31,7 @@ function resolveProjectId(): string {
 }
 
 function cacheKey(projectId: string, suffix: string): string {
-  return StorageKey.WsCachePrefix + projectId + '_' + suffix;
+  return StorageKeyType.WsCachePrefix + projectId + '_' + suffix;
 }
 
 /** Read cached workspace name for the current project (returns '' if missing). */
@@ -73,7 +73,7 @@ export function cacheWorkspaceName(name: string, id?: string): void {
       }
     }
     // Track last project for cross-project detection
-    localStorage.setItem(StorageKey.WsLastProject, pid);
+    localStorage.setItem(StorageKeyType.WsLastProject, pid);
   } catch (e) {
     logError('setCachedWs', 'Failed to persist workspace cache', e);
     // localStorage unavailable — no-op
@@ -87,7 +87,7 @@ export function cacheWorkspaceName(name: string, id?: string): void {
 export function invalidateCacheOnProjectSwitch(): void {
   try {
     const currentPid = resolveProjectId();
-    const lastPid = localStorage.getItem(StorageKey.WsLastProject) || '';
+    const lastPid = localStorage.getItem(StorageKeyType.WsLastProject) || '';
     const hasPreviousProject = lastPid.length > 0;
     const isProjectSwitched = lastPid !== currentPid;
     const isDefaultProject = currentPid === '_default';
@@ -95,7 +95,7 @@ export function invalidateCacheOnProjectSwitch(): void {
     if (shouldUpdate && !isDefaultProject) {
       // Different project — clear old project's cache (it stays for that project)
       // Just update the tracker; each project has its own scoped keys
-      localStorage.setItem(StorageKey.WsLastProject, currentPid);
+      localStorage.setItem(StorageKeyType.WsLastProject, currentPid);
     }
   } catch (_e) { logWarn('invalidateCacheOnProjectSwitch', 'localStorage write failed: ' + (_e instanceof Error ? _e.message : String(_e))); }
 }

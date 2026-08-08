@@ -1,7 +1,7 @@
 /**
  * Leaf module: canonical SQLite project name for the macro-controller.
  *
- * Extracted from `db/macro-db.ts` (Plan-17 step 6) so dependents can reference
+ * Extracted from `db/macro-db.ts` (PlanTierType-17 step 6) so dependents can reference
  * DB_NAME without pulling in `macro-db.ts` and its transitive imports
  * (`ui/prompt-loader`, `logging`, etc.). This breaks the runtime cycles
  *   db/macro-db.ts <-> seed/seed-plan-next.ts

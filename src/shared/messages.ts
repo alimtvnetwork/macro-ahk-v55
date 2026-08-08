@@ -8,7 +8,7 @@
 
 import type { JsonValue } from "../background/handlers/handler-types";
 import type { InjectionLaunchSource } from "./injection-types";
-import { Status3, Status4, ConnectionEnum, LoggingMode, RequestType, DatabaseEnum, MimeKindEnum, StepLinkSlotEnum, Status1, FormatEnum, SurfaceEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { TokenStatusStatus, ConfigStatusStatus, ConnectionStateType, LoggingModeType, RequestType, DatabaseType, MimeKindType, StepLinkSlotType, MessageRequestStatusType, DocFormatType, StorageSurfaceType } from "../../standalone-scripts/macro-controller/src/types/enums";
 import { SourceEnum, BootPersistenceMode, HealthState } from "../types/enums";
 
 export enum MessageType {
@@ -302,12 +302,12 @@ export enum MessageType {
 /* ------------------------------------------------------------------ */
 
 export interface TokenStatus {
-    status: Status3;
+    status: TokenStatusStatus;
     expiresIn: string | null;
 }
 
 export interface ConfigStatus {
-    status: Status4;
+    status: ConfigStatusStatus;
     source: SourceEnum;
 }
 
@@ -344,10 +344,10 @@ export interface WasmProbeResult {
 }
 
 export interface StatusResponse {
-    connection: ConnectionEnum;
+    connection: ConnectionStateType;
     token: TokenStatus;
     config: ConfigStatus;
-    loggingMode: LoggingMode;
+    loggingMode: LoggingModeType;
     version: string;
     bootStep: string;
     persistenceMode: BootPersistenceMode;
@@ -462,14 +462,14 @@ export type MessageRequest =
     | { type: MessageType.GET_ACTIVE_ERRORS }
     | { type: MessageType.CLEAR_ERRORS }
     | { type: MessageType.GET_STORAGE_STATS }
-    | { type: MessageType.QUERY_LOGS; database: DatabaseEnum; offset: number; limit: number }
-    | { type: MessageType.GET_LOG_DETAIL; database: DatabaseEnum; rowId: number }
+    | { type: MessageType.QUERY_LOGS; database: DatabaseType; offset: number; limit: number }
+    | { type: MessageType.GET_LOG_DETAIL; database: DatabaseType; rowId: number }
     | { type: MessageType.TOGGLE_XPATH_RECORDER }
     | { type: MessageType.GET_RECORDED_XPATHS }
     | { type: MessageType.CLEAR_RECORDED_XPATHS }
     | { type: MessageType.TEST_XPATH; xpath: string }
     | { type: MessageType.VALIDATE_ALL_XPATHS; xpaths: Record<string, { xpath: string; selector?: string }> }
-    | { type: MessageType.RECORDER_DATA_SOURCE_ADD; projectSlug: string; filePath: string; mimeKind: MimeKindEnum; rawText: string }
+    | { type: MessageType.RECORDER_DATA_SOURCE_ADD; projectSlug: string; filePath: string; mimeKind: MimeKindType; rawText: string }
     | { type: MessageType.RECORDER_DATA_SOURCE_LIST; projectSlug: string }
     | { type: MessageType.RECORDER_FIELD_BINDING_UPSERT; projectSlug: string; stepId: number; dataSourceId: number; columnName: string }
     | { type: MessageType.RECORDER_FIELD_BINDING_LIST; projectSlug: string }
@@ -484,7 +484,7 @@ export type MessageRequest =
     | { type: MessageType.RECORDER_STEP_SELECTORS_LIST; projectSlug: string; stepId: number }
     | { type: MessageType.RECORDER_STEP_UPDATE_META; projectSlug: string; stepId: number; patch: Record<string, JsonValue> }
     | { type: MessageType.RECORDER_STEP_TAGS_SET; projectSlug: string; stepId: number; tags: ReadonlyArray<string> }
-    | { type: MessageType.RECORDER_STEP_LINK_SET; projectSlug: string; stepId: number; slot: StepLinkSlotEnum; targetProjectSlug: string | null }
+    | { type: MessageType.RECORDER_STEP_LINK_SET; projectSlug: string; stepId: number; slot: StepLinkSlotType; targetProjectSlug: string | null }
     | { type: MessageType.RECORDER_JS_SNIPPET_UPSERT; projectSlug: string; draft: Record<string, JsonValue> }
     | { type: MessageType.RECORDER_JS_SNIPPET_LIST; projectSlug: string }
     | { type: MessageType.RECORDER_JS_SNIPPET_DELETE; projectSlug: string; jsSnippetId: number }
@@ -499,7 +499,7 @@ export type MessageRequest =
     | { type: MessageType.GET_SESSION_REPORT; sessionId?: string }
     | { type: MessageType.BROWSE_OPFS_SESSIONS }
     | { type: MessageType.GET_OPFS_STATUS }
-    | { type: MessageType.RECORD_CYCLE_METRIC; cycleNumber: number; startTime: string; endTime: string; status: Status1; errorMessage?: string }
+    | { type: MessageType.RECORD_CYCLE_METRIC; cycleNumber: number; startTime: string; endTime: string; status: MessageRequestStatusType; errorMessage?: string }
     | { type: MessageType.GET_RUN_STATS }
     | { type: MessageType.CLEAR_RUN_STATS }
     | { type: MessageType.GET_PROMPTS }
@@ -567,7 +567,7 @@ export type MessageRequest =
     | { type: MessageType.HOT_RELOAD_SCRIPT; scriptName: string }
     // ─── Schema Meta Engine (Issue 85) ───
     | { type: MessageType.APPLY_JSON_SCHEMA; project: string; schema: Record<string, JsonValue> }
-    | { type: MessageType.GENERATE_SCHEMA_DOCS; project: string; format?: FormatEnum }
+    | { type: MessageType.GENERATE_SCHEMA_DOCS; project: string; format?: DocFormatType }
     // ─── Automation Chains (Spec 21) ───
     | { type: MessageType.GET_AUTOMATION_CHAINS; project?: string }
     | { type: MessageType.SAVE_AUTOMATION_CHAIN; project?: string; chain: Record<string, JsonValue> }
@@ -578,7 +578,7 @@ export type MessageRequest =
     | { type: MessageType.INVALIDATE_CACHE }
     | { type: MessageType.GET_CACHE_STATS }
     // ─── SDK Self-Test (Popup ✅/❌ panel) ───
-    | { type: MessageType.SDK_SELFTEST_REPORT; surface: SurfaceEnum; pass: boolean; failures: string[]; version: string }
+    | { type: MessageType.SDK_SELFTEST_REPORT; surface: StorageSurfaceType; pass: boolean; failures: string[]; version: string }
     | { type: MessageType.GET_SDK_SELFTEST };
 
 /* ------------------------------------------------------------------ */

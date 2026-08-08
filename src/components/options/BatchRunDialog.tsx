@@ -35,7 +35,7 @@ import {
     runBatch,
     type BatchFailurePolicy,
     type BatchGroupReport,
-    type BatchGroupStatus,
+    type BatchGroupStatusType,
 } from "@/background/recorder/step-library/run-batch";
 import type { StepGroupRow, StepLibraryDb } from "@/background/recorder/step-library/db";
 import type { LeafStepExecutor, RunStepTraceEntry } from "@/background/recorder/step-library/run-group-runner";
@@ -67,7 +67,7 @@ interface BatchRunDialogProps {
     readonly onApplyMergedInput: (groupId: number, bag: GroupInputBag) => void;
 }
 
-const STATUS_STYLE: Record<BatchGroupStatus, string> = {
+const STATUS_STYLE: Record<BatchGroupStatusType, string> = {
     Pending:   "bg-muted text-muted-foreground",
     Running:   "bg-primary/15 text-primary",
     Succeeded: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
@@ -496,7 +496,7 @@ export default function BatchRunDialog(props: BatchRunDialogProps) {
     );
 }
 
-function StatusBadge({ status }: { status: BatchGroupStatus }) {
+function StatusBadge({ status }: { status: BatchGroupStatusType }) {
     return (
         <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${STATUS_STYLE[status]}`}>
             {status}

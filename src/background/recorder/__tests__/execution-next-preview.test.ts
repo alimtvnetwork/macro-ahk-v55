@@ -12,9 +12,9 @@ import {
 } from "../execution-next-preview";
 
 const steps: PreviewStep[] = [
-    { StepId: 1, OrderIndex: 1, VariableName: "openLogin",  Label: "Open login" },
-    { StepId: 2, OrderIndex: 2, VariableName: "fillEmail",  Label: "Type email" },
-    { StepId: 3, OrderIndex: 3, VariableName: "submitForm", Label: "Click submit" },
+    { StepId: 1, OrderIndex: 1, VariableName: "openLogin",  LabelType: "Open login" },
+    { StepId: 2, OrderIndex: 2, VariableName: "fillEmail",  LabelType: "Type email" },
+    { StepId: 3, OrderIndex: 3, VariableName: "submitForm", LabelType: "Click submit" },
 ];
 
 describe("buildExecutionNextPreview", () => {

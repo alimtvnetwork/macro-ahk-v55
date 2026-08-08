@@ -17,7 +17,7 @@ import { loadSession, persistSession } from "./recorder/recorder-session-storage
 import { recorderReducer, IDLE_SESSION } from "./recorder/recorder-store";
 import { isNewTabOrBlankUrl } from "../shared/url-utils";
 import { evaluateUrlMatches } from "./project-matcher";
-import { SourceEnum1, PhaseEnum } from "../types/enums";
+import { ResolvedShortcutScriptsSource, PhaseEnum } from "../types/enums";
 
 const RUN_SCRIPTS_COMMAND = "run-scripts";
 const FORCE_RUN_SCRIPTS_COMMAND = "force-run-scripts";
@@ -147,7 +147,7 @@ async function getActiveTab(): Promise<chrome.tabs.Tab | null> {
 interface ResolvedShortcutScripts {
     scripts: ScriptEntry[];
     /** Where the scripts came from for diagnostics. */
-    source: SourceEnum1;
+    source: ResolvedShortcutScriptsSource;
     /** Human-readable project label, e.g. `"My Project" (id=abc)` or `none`. */
     projectLabel: string;
 }

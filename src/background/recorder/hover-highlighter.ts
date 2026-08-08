@@ -87,7 +87,7 @@ export function nthAncestor(el: Element, depth: number): Element {
 /* ------------------------------------------------------------------ */
 
 interface InternalState {
-    Mode: HighlighterMode;
+    OperationModeType: HighlighterMode;
     HoverTarget: Element | null;
     AncestorOffset: number;
     AltHeld: boolean;
@@ -148,7 +148,7 @@ export function mountHoverHighlighter(
     removeExistingHighlighterHost(doc);
     const nodes = buildHighlighterNodes(doc);
     const state: InternalState = {
-        Mode: "off", HoverTarget: null, AncestorOffset: 0, AltHeld: false, RafToken: null,
+        OperationModeType: "off", HoverTarget: null, AncestorOffset: 0, AltHeld: false, RafToken: null,
     };
     const schedulePaint = createPaintScheduler(nodes, state, doc);
     const handlers = createHighlighterHandlers(nodes.host, state, schedulePaint);
@@ -208,7 +208,7 @@ function createPaintScheduler(
 
 function renderHighlighter(nodes: HighlighterNodes, state: InternalState): void {
     const target = state.HoverTarget;
-    if (target === null || state.Mode === "off") {
+    if (target === null || state.OperationModeType === "off") {
         hideHighlighterNodes(nodes);
         return;
     }
@@ -263,7 +263,7 @@ function createHighlighterHandlers(
 function handleHighlighterMouseMove(
     event: MouseEvent, host: HTMLElement, state: InternalState, schedulePaint: () => void,
 ): void {
-    if (state.Mode === "off") { return; }
+    if (state.OperationModeType === "off") { return; }
     const target = event.target;
     if (!(target instanceof Element)) { return; }
     if (host.contains(target)) { return; }
@@ -293,7 +293,7 @@ function handleHighlighterWheel(
 }
 
 function handleReplayStart(event: Event, state: InternalState, schedulePaint: () => void): void {
-    if (state.Mode !== "replay") { return; }
+    if (state.OperationModeType !== "replay") { return; }
     const detail = (event as CustomEvent<{ Element?: Element }>).detail;
     const target = detail?.Element ?? null;
     if (target === null) { return; }
@@ -303,7 +303,7 @@ function handleReplayStart(event: Event, state: InternalState, schedulePaint: ()
 }
 
 function handleReplayEnd(state: InternalState, schedulePaint: () => void): void {
-    if (state.Mode !== "replay") { return; }
+    if (state.OperationModeType !== "replay") { return; }
     state.HoverTarget = null;
     schedulePaint();
 }
@@ -336,11 +336,11 @@ function buildHighlighterHandle(
     return {
         Host: host,
         SetMode(mode) {
-            state.Mode = mode;
+            state.OperationModeType = mode;
             if (mode === "off") { state.HoverTarget = null; state.AncestorOffset = 0; }
             schedulePaint();
         },
-        GetMode() { return state.Mode; },
+        GetMode() { return state.OperationModeType; },
         Outline(target) { state.HoverTarget = target; state.AncestorOffset = 0; schedulePaint(); },
         Destroy() { detachHighlighterListeners(doc, handlers); host.remove(); },
     };

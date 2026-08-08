@@ -5,7 +5,7 @@
  * in the Lovable chat box: paste → submit → wait for completion → repeat N times.
  * Two mount points (floating macro panel section + inline strip above the chat
  * textarea) share count/wait/run state. The inline strip is hidden by the
- * shared Plan/Next/Repeat +/- group toggle; the panel keeps its local collapse.
+ * shared PlanTierType/Next/Repeat +/- group toggle; the panel keeps its local collapse.
  */
 
 import { log } from '../logger';
@@ -24,11 +24,11 @@ import { ensureInlineStripsFrame } from './inline-strips-frame';
 import { extractEditorPlainText, replaceEditorText } from './editor-text';
 import { captureChatSubmit } from '../capture/chat-submit-capture';
 import { buildNextSelectorControl } from './next-selector-control';
-import { RepeatPhaseEnum, DisplayValueEnum } from "../types/enums";
+import { RepeatPhaseType, CssDisplayType } from "../types/enums";
 
 export const PRESETS = [1, 2, 3, 4, 5, 8, 10, 12, 15, 20, 25, 30, 50, 60, 70, 75, 80, 100, 200] as const;
 /**
- * Issue 06 (2026-07-18) — Plan-23 step 3. The repeat preset chip row rendered
+ * Issue 06 (2026-07-18) — PlanTierType-23 step 3. The repeat preset chip row rendered
  * every value inline, wrapping past the visible bounds of the inline strip
  * once the tail values (60..200) were added. `PRESET_INLINE_MAX` is the
  * inclusive threshold at or below which chips stay inline; values above it
@@ -44,7 +44,7 @@ export const WAIT_MODE_SUBMIT_READY = 'submit-ready' as const;
 export const WAIT_MODE_FIXED_DELAY = 'fixed-delay' as const;
 export type RepeatWaitMode = typeof WAIT_MODE_SUBMIT_READY | typeof WAIT_MODE_FIXED_DELAY;
 
-type RepeatPhase = RepeatPhaseEnum;
+type RepeatPhase = RepeatPhaseType;
 
 interface RepeatState {
   count: number;
@@ -475,7 +475,7 @@ function wireTogglePopover(
   wrap: HTMLElement,
   trigger: HTMLElement,
   pop: HTMLElement,
-  displayValue: DisplayValueEnum = 'flex',
+  displayValue: CssDisplayType = 'flex',
 ): { open: () => void; close: () => void } {
   function open(): void {
     positionTogglePopoverFixed(trigger, pop);
@@ -894,8 +894,6 @@ function installOverflowHooks(row: HTMLElement, presetsWrap: HTMLElement, sentin
       log('Repeat: overflow install failed — ' + (e instanceof Error ? e.message : String(e)), 'warn');
     }
   })();
-
-  return { row, input, action, progress };
 }
 
 function buildRepeatChipForOverflow(n: number, highlighted: boolean): HTMLElement {
@@ -1012,7 +1010,7 @@ function tryMountInline(): boolean {
   const host = (target.closest && target.closest('form')) || target.parentElement;
   if (!host || !host.parentElement) return false;
 
-  // v4.16+: mount into shared frame body so Plan/Next/Repeat share one visual
+  // v4.16+: mount into shared frame body so PlanTierType/Next/Repeat share one visual
   // unit and one minimize control. See inline-strips-frame.ts.
   const framed = ensureInlineStripsFrame(host as HTMLElement);
   if (!framed) return false;

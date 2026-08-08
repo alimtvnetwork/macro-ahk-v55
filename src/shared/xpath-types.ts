@@ -1,4 +1,4 @@
-import { FullStrategyEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { FullStrategyType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /**
  * Marco Extension — XPath Recorder Types
@@ -12,5 +12,5 @@ export interface RecordedXPath {
     tagName: string;
     text: string;
     timestamp: string;
-    strategy: FullStrategyEnum;
+    strategy: FullStrategyType;
 }

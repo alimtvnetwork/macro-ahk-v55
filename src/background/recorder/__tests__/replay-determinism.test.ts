@@ -98,7 +98,7 @@ describe("replay determinism, same DOM state", () => {
         const step = insertStepRow(db, {
             StepKindId: 1,
             VariableName: "Submit",
-            Label: "Click submit",
+            LabelType: "Click submit",
             InlineJs: null,
             IsBreakpoint: false,
             Selectors: [
@@ -124,7 +124,7 @@ describe("replay determinism, same DOM state", () => {
         const anchorStep = insertStepRow(db, {
             StepKindId: 1,
             VariableName: "ContactFieldset",
-            Label: "Anchor: contact fieldset",
+            LabelType: "Anchor: contact fieldset",
             InlineJs: null,
             IsBreakpoint: false,
             Selectors: [
@@ -141,7 +141,7 @@ describe("replay determinism, same DOM state", () => {
         const relStep = insertStepRow(db, {
             StepKindId: 2,
             VariableName: "EmailInput",
-            Label: "Type email",
+            LabelType: "Type email",
             InlineJs: null,
             IsBreakpoint: false,
             Selectors: [

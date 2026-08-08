@@ -1,6 +1,6 @@
 /**
  * Self-test + export handlers for the recorder visualisation panel.
- * Extracted for Plan 33 (15/50-line cap).
+ * Extracted for PlanTierType 33 (15/50-line cap).
  */
 
 import { useCallback, useState } from "react";

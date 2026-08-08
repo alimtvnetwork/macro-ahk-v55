@@ -16,7 +16,7 @@ import {
     type KeywordEventStep,
     type KeywordEventTarget,
 } from "@/hooks/use-keyword-events";
-import { Type3 } from "../types/enums";
+import { DispatchKeyType } from "../types/enums";
 
 export interface PlaybackOptions {
     /**
@@ -109,7 +109,7 @@ function resolveTarget(
     return resolveEventTarget(eventCfg);
 }
 
-function dispatchKey(target: EventTarget, type: Type3, parsed: ParsedCombo): void {
+function dispatchKey(target: EventTarget, type: DispatchKeyType, parsed: ParsedCombo): void {
     const init: KeyboardEventInit = {
         key: parsed.Key,
         code: parsed.Key.length === 1 ? `Key${parsed.Key.toUpperCase()}` : parsed.Key,

@@ -35,7 +35,7 @@ describe('schedulePostParseEnrichment — per-row repaint contract', () => {
         const full = readFileSync(SRC, 'utf8');
         // Static import OR dynamic import('./ws-list-renderer') — both invoke
         // populateLoopWorkspaceDropdown after enrichment; dynamic form is used
-        // to avoid a 2-node madge cycle (Plan-17 step 18).
+        // to avoid a 2-node madge cycle (PlanTierType-17 step 18).
         const staticImport = /import\s*\{\s*populateLoopWorkspaceDropdown\s*\}\s*from\s*['"]\.\/ws-list-renderer['"]/;
         const dynamicImport = /import\(\s*['"]\.\/ws-list-renderer['"]\s*\)[\s\S]*populateLoopWorkspaceDropdown/;
         expect(staticImport.test(full) || dynamicImport.test(full)).toBe(true);

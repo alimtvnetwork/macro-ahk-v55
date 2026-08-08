@@ -1,6 +1,6 @@
 /**
  * EmptyTreeState — empty-state placeholder for the Step Group Library
- * tree pane. Extracted from `StepGroupLibraryPanel.tsx` (Plan 24, Step 3)
+ * tree pane. Extracted from `StepGroupLibraryPanel.tsx` (PlanTierType 24, Step 3)
  * so the panel file no longer has to carry this presentational block.
  */
 

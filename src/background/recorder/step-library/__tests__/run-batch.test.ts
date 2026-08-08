@@ -49,7 +49,7 @@ function makeGroup(db: StepLibraryDb, projectId: number, name: string): number {
     db.appendStep({
         StepGroupId: id,
         StepKindId: StepKindId.Click,
-        Label: `Click in ${name}`,
+        LabelType: `Click in ${name}`,
         PayloadJson: JSON.stringify({ Selector: `#${name}` }),
     });
     return id;

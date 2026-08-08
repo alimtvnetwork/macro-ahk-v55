@@ -11,7 +11,7 @@
  * `LogSink` interface so the state machine code stays storage-agnostic.
  */
 
-export enum LogPhase {
+export enum LogPhaseType {
     Login = "Login",
     Promote = "Promote",
     SignOut = "SignOut",
@@ -19,7 +19,7 @@ export enum LogPhase {
     Task = "Task",
 }
 
-export enum LogSeverity {
+export enum LogSeverityType {
     Info = "Info",
     Warn = "Warn",
     Error = "Error",
@@ -28,8 +28,8 @@ export enum LogSeverity {
 export interface LogEntry {
     TaskId: string;
     RowIndex: number | null;
-    Phase: LogPhase;
-    Severity: LogSeverity;
+    Phase: LogPhaseType;
+    Severity: LogSeverityType;
     Message: string;
     TimestampUtc: string;
 }
@@ -41,8 +41,8 @@ export interface LogSink {
 export const buildEntry = (
     taskId: string,
     rowIndex: number | null,
-    phase: LogPhase,
-    severity: LogSeverity,
+    phase: LogPhaseType,
+    severity: LogSeverityType,
     message: string,
 ): LogEntry => ({
     TaskId: taskId,

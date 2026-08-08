@@ -2,7 +2,7 @@
  * Spec: spec/21-app/01-chrome-extension/home-screen-modification/09-macro-controller-sync.md
  * CurrentWorkspaceName is the ONLY source of truth on dashboard.
  */
-import { AllowedHomeUrl } from "./allowed-home-url.enum";
+import { AllowedHomeUrlType } from "./allowed-home-url.enum";
 import { HomepageDashboardVariables, resolveElement } from "./homepage-dashboard-variables";
 import { logError, logWarn } from "./logger";
 import { findByName } from "./workspace-dictionary";
@@ -21,7 +21,7 @@ export function syncWithMacroController(dict: WorkspaceDictionary): WorkspaceRec
 }
 
 function isOnDashboard(): boolean {
-    return window.location.href === AllowedHomeUrl.DASHBOARD;
+    return window.location.href === AllowedHomeUrlType.DASHBOARD;
 }
 
 function doSync(dict: WorkspaceDictionary): WorkspaceRecord | null {

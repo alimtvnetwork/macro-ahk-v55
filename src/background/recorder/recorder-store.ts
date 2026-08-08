@@ -31,7 +31,7 @@ export type RecorderAction =
 
 export interface NewStepInput {
     readonly Kind: RecordedStep["Kind"];
-    readonly Label: string;
+    readonly LabelType: string;
     readonly VariableName: string;
     readonly Selector: StepSelector;
 }

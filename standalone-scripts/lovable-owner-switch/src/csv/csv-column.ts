@@ -6,7 +6,7 @@
  * OwnerEmail2 optional). Extra columns are ignored with a warning.
  */
 
-export enum OwnerSwitchCsvColumn {
+export enum OwnerSwitchCsvColumnType {
     LoginEmail = "LoginEmail",
     Password = "Password",
     OwnerEmail1 = "OwnerEmail1",
@@ -14,16 +14,16 @@ export enum OwnerSwitchCsvColumn {
     Notes = "Notes",
 }
 
-export const REQUIRED_COLUMNS: ReadonlyArray<OwnerSwitchCsvColumn> = Object.freeze([
-    OwnerSwitchCsvColumn.LoginEmail,
-    OwnerSwitchCsvColumn.OwnerEmail1,
+export const REQUIRED_COLUMNS: ReadonlyArray<OwnerSwitchCsvColumnType> = Object.freeze([
+    OwnerSwitchCsvColumnType.LoginEmail,
+    OwnerSwitchCsvColumnType.OwnerEmail1,
 ]);
 
-export const OPTIONAL_COLUMNS: ReadonlyArray<OwnerSwitchCsvColumn> = Object.freeze([
-    OwnerSwitchCsvColumn.Password,
-    OwnerSwitchCsvColumn.OwnerEmail2,
-    OwnerSwitchCsvColumn.Notes,
+export const OPTIONAL_COLUMNS: ReadonlyArray<OwnerSwitchCsvColumnType> = Object.freeze([
+    OwnerSwitchCsvColumnType.Password,
+    OwnerSwitchCsvColumnType.OwnerEmail2,
+    OwnerSwitchCsvColumnType.Notes,
 ]);
 
-export const ALL_COLUMNS: ReadonlyArray<OwnerSwitchCsvColumn> =
+export const ALL_COLUMNS: ReadonlyArray<OwnerSwitchCsvColumnType> =
     Object.freeze([...REQUIRED_COLUMNS, ...OPTIONAL_COLUMNS]);

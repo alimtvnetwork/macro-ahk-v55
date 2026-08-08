@@ -33,7 +33,7 @@ interface RenameHistoryEntry {
 // ── Constants ──
 
 import { RENAME_DEFAULT_DELAY_MS, RENAME_MIN_DELAY_MS, RENAME_MAX_DELAY_MS, RENAME_OP_WINDOW, RENAME_HISTORY_MAX, RENAME_MAX_CONSECUTIVE_FAILURES } from './constants';
-import { StorageKey } from './types';
+import { StorageKeyType } from './types';
 const DEFAULT_DELAY_MS = RENAME_DEFAULT_DELAY_MS;
 const MIN_DELAY_MS = RENAME_MIN_DELAY_MS;
 const MAX_DELAY_MS = RENAME_MAX_DELAY_MS;
@@ -45,7 +45,7 @@ export class BulkRenameManager {
 
   private delayMs: number = DEFAULT_DELAY_MS;
   private cancelled: boolean = false;
-  // authRecoveryExhausted moved to `rename-auth-recovery-flag.ts` (Plan-17 step 8)
+  // authRecoveryExhausted moved to `rename-auth-recovery-flag.ts` (PlanTierType-17 step 8)
   // to break the rename-api <-> rename-bulk cycle. Behavior is preserved:
   // the flag is still reset in `bulkRename()` via `setAuthRecoveryExhausted(false)`.
   private avgOpMs: number = 0;
@@ -127,7 +127,7 @@ export class BulkRenameManager {
 
   private restoreHistory(): void {
     try {
-      const saved = localStorage.getItem(StorageKey.RenameHistory);
+      const saved = localStorage.getItem(StorageKeyType.RenameHistory);
       const hasSaved = saved !== null;
 
       if (hasSaved) {
@@ -141,7 +141,7 @@ export class BulkRenameManager {
 
   private persistHistory(): void {
     try {
-      localStorage.setItem(StorageKey.RenameHistory, JSON.stringify(this.history));
+      localStorage.setItem(StorageKeyType.RenameHistory, JSON.stringify(this.history));
     } catch (_e: unknown) {
       log('[Rename] Failed to persist undo history: ' + (_e instanceof Error ? _e.message : String(_e)), 'warn');
     }

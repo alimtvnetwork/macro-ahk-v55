@@ -6,12 +6,12 @@
  * empty so the validator can report a typed error.
  */
 
-import { OwnerSwitchCsvColumn } from "./csv-column";
+import { OwnerSwitchCsvColumnType } from "./csv-column";
 
 export const readOptional = (
     row: ReadonlyArray<string>,
-    indices: ReadonlyMap<OwnerSwitchCsvColumn, number>,
-    column: OwnerSwitchCsvColumn,
+    indices: ReadonlyMap<OwnerSwitchCsvColumnType, number>,
+    column: OwnerSwitchCsvColumnType,
 ): string | null => {
     const idx = indices.get(column);
 
@@ -26,8 +26,8 @@ export const readOptional = (
 
 export const readRequired = (
     row: ReadonlyArray<string>,
-    indices: ReadonlyMap<OwnerSwitchCsvColumn, number>,
-    column: OwnerSwitchCsvColumn,
+    indices: ReadonlyMap<OwnerSwitchCsvColumnType, number>,
+    column: OwnerSwitchCsvColumnType,
 ): string => {
     const value = readOptional(row, indices, column);
 

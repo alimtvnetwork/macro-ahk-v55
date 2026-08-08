@@ -1,7 +1,7 @@
 /**
  * Marco Extension — Delivery-log section for WebhookSettingsDialog.
  *
- * Extracted from `WebhookSettingsDialog.tsx` (v4.213.0) as part of Plan-24
+ * Extracted from `WebhookSettingsDialog.tsx` (v4.213.0) as part of PlanTierType-24
  * SS-05 so the parent component drops below the `max-lines-per-function`
  * warning threshold. All state remains owned by the parent dialog; this
  * component is a pure presentation of the "Recent deliveries" section.
@@ -19,7 +19,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 
 import {
     isWebhookFailure,
@@ -94,12 +94,12 @@ export function DeliveryLogSection(props: Props) {
     return (
         <section className="space-y-2 rounded-md border p-3">
             <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">
+                <LabelType className="text-sm font-medium">
                     Recent deliveries
                     <span className="ml-1.5 text-xs font-normal text-muted-foreground">
                         ({log.length}/20)
                     </span>
-                </Label>
+                </LabelType>
                 <div className="flex items-center gap-2">
                     <Button size="sm" variant="ghost" onClick={onRefresh} title="Refresh log">
                         <RefreshCw className="h-3.5 w-3.5" />

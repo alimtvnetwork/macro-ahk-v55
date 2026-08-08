@@ -1,3 +1,4 @@
+import { DbResult } from '../db/db-result';
 /**
  * v4.400.0: Round-trip contract. Exported JSON payload MUST reproduce as
  * a valid PromptsBundleV1 whose entries are all user-added (isDefault=false),
@@ -18,8 +19,8 @@ vi.mock('../toast', () => ({ showToast: vi.fn() }));
 vi.mock('../logger', () => ({ log: vi.fn() }));
 vi.mock('../shared-state', () => ({ VERSION: '0.1.0' }));
 vi.mock('../db/prompt-revision-db', () => ({
-    listPromptRevisions: vi.fn(async () => ({ ok: true, value: [] })),
-    insertImportedRevisions: vi.fn(async () => ({ ok: true })),
+    listPromptRevisions: vi.fn(async () => (new DbResult(true, []))),
+    insertImportedRevisions: vi.fn(async () => (new DbResult(true, undefined))),
 }));
 vi.mock('../ui/prompt-drag-order', () => ({ getEffectivePromptOrder: () => [] }));
 

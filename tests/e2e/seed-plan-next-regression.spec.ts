@@ -2,7 +2,7 @@
  * seed-plan-next-regression.spec.ts
  *
  * Playwright regression harness that replicates the manual Chrome regression
- * flow for the Plan/Next seeder (macro-controller v4.72.0 / v4.73.0):
+ * flow for the PlanTierType/Next seeder (macro-controller v4.72.0 / v4.73.0):
  *
  *   1. Cold boot: seedPlanNextPrompts() inserts 8 rows, promotes both defaults,
  *      persists telemetry to localStorage[marco_last_seed_telemetry].

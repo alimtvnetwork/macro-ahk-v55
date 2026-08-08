@@ -11,7 +11,7 @@ import { BookOpen, Database, RefreshCw, FileCode, Braces } from "lucide-react";
 import { toast } from "sonner";
 import { sendMessage } from "@/lib/message-client";
 import { DevGuideSection } from "../DevGuideSection";
-import { Enum_4fd41a90 } from "../../../types/enums";
+import { SemanticSemantic4fd41a } from "../../../types/enums";
 
 interface DocsTabProps {
   namespace: string;
@@ -23,7 +23,7 @@ interface DocsTabProps {
 export function DocsTab({ namespace, slug, targetUrls }: DocsTabProps) {
   const [generating, setGenerating] = useState(false);
   const [docsOutput, setDocsOutput] = useState<{ markdown?: string; prisma?: string } | null>(null);
-  const [docsFormat, setDocsFormat] = useState<Enum_4fd41a90>("markdown");
+  const [docsFormat, setDocsFormat] = useState<SemanticSemantic4fd41a>("markdown");
 
   const handleGenerateDocs = useCallback(async () => {
     setGenerating(true);

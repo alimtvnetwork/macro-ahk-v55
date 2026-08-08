@@ -1,8 +1,8 @@
 import { ServiceResult } from '../utils/result-wrapper';
 /**
- * Inline chip gear menu (Plan-23, step 3).
+ * Inline chip gear menu (PlanTierType-23, step 3).
  *
- * A small ⚙ button that sits next to the "📋 Plan" / "▶ Next" labels in
+ * A small ⚙ button that sits next to the "📋 PlanTierType" / "▶ Next" labels in
  * the inline strips above the chat box, and opens a floating menu with:
  *   - Edit default prompt
  *   - Add new prompt for this role
@@ -26,10 +26,10 @@ import { pickPromptFromRole } from './chip-gear-picker';
 import { setDefaultPromptForRole, deletePromptById } from '../db/prompt-db';
 import { exportPromptsToJson } from './prompt-io';
 import { dispatchPromptsChanged } from './prompts-changed-event';
-import { RejectionType } from "../types/enums";
+import { RejectionCategoryType } from "../types/enums";
 
 /**
- * Plan 26 step 9: coded diagnostic toast helper for chip-gear actions. Keeps
+ * PlanTierType 26 step 9: coded diagnostic toast helper for chip-gear actions. Keeps
  * the friendly toast sentence, appends `[code=X]` so users can copy it into
  * bug reports, and routes structured context to the SDK logger via
  * `logDiagnosticFromCode` so the diagnostics ZIP indexes it.
@@ -198,7 +198,7 @@ function wirePromptActionsSubmenu(trigger: HTMLButtonElement, submenu: HTMLEleme
 
 export interface BuildChipGearButtonInput {
   role: PromptRole;
-  /** Human-facing role label, e.g. "Plan" or "Next". */
+  /** Human-facing role label, e.g. "PlanTierType" or "Next". */
   roleLabel: string;
   /** Color used for the button glyph — matches the strip's accent. */
   accent: string;
@@ -207,7 +207,7 @@ export interface BuildChipGearButtonInput {
 /**
  * Build the shared prompt-management action rows (Edit default / Add new /
  * Manage) intended to be injected at the TOP of the "More" popover on both
- * the Plan and Next inline strips. Returns a section element that already
+ * the PlanTierType and Next inline strips. Returns a section element that already
  * contains a heading label + rows + a trailing divider — callers just
  * `popover.appendChild(section)` before the numeric chip grid.
  */
@@ -228,7 +228,7 @@ export function buildChipGearActionSection(input: BuildChipGearButtonInput): HTM
 }
 
 function wrapAction(name: string, role: PromptRole, action: () => Promise<void> | void): void {
-  const handleFailure = (rejectionType: RejectionType, err: unknown): void => {
+  const handleFailure = (rejectionType: RejectionCategoryType, err: unknown): void => {
     reportGearFailure(
       'UI_ACTION_E001',
       { actionName: name, role, rejectionType, reason: toErrorMessage(err) },
@@ -287,7 +287,7 @@ async function runReseedAndOpen(role: PromptRole, force: boolean): Promise<void>
   }
   showToast(force ? '⚠️ Forcing default reset…' : '🔄 Re-seeding defaults…', 'info');
   const result = await reseedPromptsOnDemand({ force });
-  if (result.isFail) {
+  if (!result.ok) {
     const reason = result.error ?? 'unknown';
     reportGearFailure(
       'SEED_RESEED_E001',
@@ -348,7 +348,7 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
   if (!picked) return;
   if (picked.IsDefault === 1) { showToast('Already active', 'info'); return; }
   const res = await setDefaultPromptForRole(picked.Id, role);
-  if (res.isFail) {
+  if (!res.ok) {
     const reason = res.error ?? 'unknown';
     reportGearFailure(
       'DB_WRITE_E003',
@@ -357,7 +357,7 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
     );
     return;
   }
-  // v4.401.0: invalidate the in-memory prompt cache so the numbered Next/Plan
+  // v4.401.0: invalidate the in-memory prompt cache so the numbered Next/PlanTierType
   // chips (which read via `getPromptsConfig()`) see the newly-active row on
   // the next click instead of pasting the previous default's body.
   const loader = await import('./prompt-loader');
@@ -380,7 +380,7 @@ async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> 
   });
   if (!ok) return;
   const res = await deletePromptById(picked.Id);
-  if (res.isFail) {
+  if (!res.ok) {
     const reason = res.error ?? 'unknown';
     reportGearFailure(
       'DB_WRITE_E004',

@@ -1,7 +1,7 @@
 /**
  * LocalStorage and cache key constants.
  */
-export enum StorageKey {
+export enum StorageKeyType {
   PanelState = 'ml_panel_state',
   PanelGeometry = 'ml_panel_geometry',
   BackdropOpacity = 'marco_backdrop_opacity',
@@ -23,7 +23,7 @@ export enum StorageKey {
   PromptSeedTrace = 'marco_prompt_seed_trace',
   /** Ring buffer of the last N diagnostic-toast trace events (v4.298.0). */
   DiagnosticToastTrace = 'marco_diagnostic_toast_trace',
-  /** Last Plan/Next seeding boot snapshot for the diagnostics panel (v4.405.0). */
+  /** Last PlanTierType/Next seeding boot snapshot for the diagnostics panel (v4.405.0). */
   SeedStatusSnapshot = 'marco_seed_status_snapshot',
   /** Ring buffer of the last N PROMPT_EDIT_E005 role-diagnostic snapshots. */
   PromptEditE005Store = 'marco_prompt_edit_e005_store',

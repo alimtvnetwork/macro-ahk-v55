@@ -10,9 +10,9 @@
  */
 
 import type { ProjectInstruction } from "../../types/instruction/project-instruction";
-import { InjectionWorld } from "../../types/instruction/enums/injection-world";
-import { InjectionRunAt } from "../../types/instruction/enums/injection-run-at";
-import { MatchType } from "../../types/instruction/enums/match-type";
+import { InjectionWorldType } from "../../types/instruction/enums/injection-world";
+import { InjectionRunAtType } from "../../types/instruction/enums/injection-run-at";
+import { MatchRuleType } from "../../types/instruction/enums/match-type";
 import type { EmptySettings } from "../../types/instruction/seed/empty-settings";
 import { VERSION } from "../../shared-version";
 
@@ -22,7 +22,7 @@ const instruction: ProjectInstruction<EmptySettings> = {
     DisplayName: "Lovable Owner Switch",
     Version: VERSION,
     Description: "Bulk-switch Lovable workspace ownership from a CSV of LoginEmail → OwnerEmail rows.",
-    World: InjectionWorld.Main,
+    World: InjectionWorldType.Main,
     IsGlobal: false,
     Dependencies: ["lovable-common"],
     LoadOrder: 60,
@@ -31,8 +31,8 @@ const instruction: ProjectInstruction<EmptySettings> = {
         SeedOnInstall: true,
         IsRemovable: false,
         AutoInject: true,
-        RunAt: InjectionRunAt.DocumentIdle,
-        TargetUrls: [{ Pattern: "https://lovable.dev/*", MatchType: MatchType.Glob }],
+        RunAt: InjectionRunAtType.DocumentIdle,
+        TargetUrls: [{ Pattern: "https://lovable.dev/*", MatchRuleType: MatchRuleType.Glob }],
         Cookies: [],
         Settings: {},
     },

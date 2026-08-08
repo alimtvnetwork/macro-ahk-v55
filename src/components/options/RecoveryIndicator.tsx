@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { History, CheckCircle2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Enum_33898847 } from "../../types/enums";
+import { SemanticSemantic } from "../../types/enums";
 
 /**
  * Indicates state synchronization and recovery status.
  */
 export function RecoveryIndicator() {
-  const [status, setStatus] = useState<Enum_33898847>("synced");
+  const [status, setStatus] = useState<SemanticSemantic>("synced");
   const timerRef = useRef<number | null>(null);
 
   // Mock sync activity

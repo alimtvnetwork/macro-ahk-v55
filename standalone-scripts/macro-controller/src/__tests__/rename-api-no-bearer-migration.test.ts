@@ -1,5 +1,5 @@
 /**
- * Plan 22 · gap #7 follow-up: `rename-api.rejectNoBearerToken` migration to
+ * PlanTierType 22 · gap #7 follow-up: `rename-api.rejectNoBearerToken` migration to
  * the `showDiagnosticToast` single-sink pipeline.
  *
  * Root cause of the design under test: pre-migration, `rejectNoBearerToken`

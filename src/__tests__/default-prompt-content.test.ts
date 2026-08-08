@@ -35,7 +35,7 @@ describe('default prompt content', () => {
     expect(prompt).toContain('Definition of done');
   });
 
-  it('bundles the numbered Plan prompt source', () => {
+  it('bundles the numbered PlanTierType prompt source', () => {
     const prompt = readPrompt('standalone-scripts/prompts/14-plan-steps/prompt.md');
 
     expect(prompt).toContain('steps plan, maximum enforcement');

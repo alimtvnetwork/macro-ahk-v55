@@ -1,7 +1,7 @@
 /**
  * CSS fragment constants used for inline styling across UI modules.
  */
-export enum CssFragment {
+export enum CssFragmentType {
   SpanStyleColor = '<span style="color:',
   BarSegmentTail = '%;height:100%;background:linear-gradient(90deg,',
   TransitionTail = ');transition:width ',

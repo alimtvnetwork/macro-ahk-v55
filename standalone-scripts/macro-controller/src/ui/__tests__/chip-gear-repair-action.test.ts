@@ -38,6 +38,9 @@ vi.mock('../prompt-editor', () => ({
 vi.mock('../prompt-history-panel', () => ({ openPromptHistoryPanel: vi.fn() }));
 vi.mock('../chip-gear-picker', () => ({ pickPromptFromRole: vi.fn() }));
 vi.mock('../../db/prompt-db', () => ({
+    DbResult,
+    DbResult,
+    DbResult,
     setDefaultPromptForRole: vi.fn(),
     deletePromptById: vi.fn(),
 }));
@@ -97,7 +100,7 @@ describe('chip-gear "Repair prompts" action', () => {
             }));
         }));
 
-        const section = buildChipGearActionSection({ role: 'plan', roleLabel: 'Plan', accent: '#f0f' });
+        const section = buildChipGearActionSection({ role: 'plan', roleLabel: 'PlanTierType', accent: '#f0f' });
         document.body.appendChild(section);
         const row = findRepairRow(section);
 
@@ -162,7 +165,7 @@ describe('chip-gear "Repair prompts" action', () => {
                 isHealthy: true,
             });
 
-        const section = buildChipGearActionSection({ role: 'plan', roleLabel: 'Plan', accent: '#f0f' });
+        const section = buildChipGearActionSection({ role: 'plan', roleLabel: 'PlanTierType', accent: '#f0f' });
         document.body.appendChild(section);
         const row = findRepairRow(section);
 

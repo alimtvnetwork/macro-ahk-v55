@@ -17,13 +17,13 @@
 
 import { DataSourceKindId } from "../recorder-db-schema";
 import { parseCsv, parseJson, type ParsedDataSource } from "./data-source-parsers";
-import { MimeKindEnum } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { MimeKindType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 export const DROPZONE_HOST_ID = "marco-recorder-dropzone-host";
 
 export interface DroppedDataSource {
     readonly FileName: string;
-    readonly MimeKind: MimeKindEnum;
+    readonly MimeKind: MimeKindType;
     readonly RawText: string;
     readonly Parsed: ParsedDataSource;
 }

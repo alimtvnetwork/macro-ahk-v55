@@ -10,8 +10,8 @@ import { log } from '../logger';
 import { logError } from '../error-utils';
 import { showToast } from '../toast';
 import { DB_PROMPTS_CACHE_VERSION as DB_VERSION } from '../constants';
-import { PromptCacheKey } from '../types';
-import { RoleEnum5, Enum_190b59f6 } from "../types/enums";
+import { PromptCacheKeyType } from '../types';
+import { CachedPromptRoleType, UISnapshotFieldType } from "../types/enums";
 
 // ============================================
 // Types
@@ -30,13 +30,13 @@ export interface CachedPromptEntry {
   /** When true, the prompt is omitted from JSON export downloads (v4.11+). */
   excludeFromExport?: boolean;
   /**
-   * Plan-14 step 12/13: when present and equal to 'plan' | 'next' | 'generic',
+   * PlanTierType-14 step 12/13: when present and equal to 'plan' | 'next' | 'generic',
    * this entry lives in the Prompt DB table and round-trips through it on
    * import/export. Absent for legacy JSON-cache-only entries.
    */
-  role?: RoleEnum5;
+  role?: CachedPromptRoleType;
   /**
-   * Plan-15 tasks 13-14: configurable replace token key + N chip values.
+   * PlanTierType-15 tasks 13-14: configurable replace token key + N chip values.
    * Present only for role-scoped rows (plan/next/generic) so import/export
    * preserves user overrides through the DB bridge.
    */
@@ -95,7 +95,7 @@ export function computePromptHash(entries: CachedPromptEntry[]): string {
 function openDb(): Promise<IDBDatabase> {
   return new Promise(function(resolve, reject) {
     try {
-      const request = indexedDB.open(PromptCacheKey.DbName, DB_VERSION);
+      const request = indexedDB.open(PromptCacheKeyType.DbName, DB_VERSION);
       request.onupgradeneeded = function() {
         createStoresIfMissing(request.result);
       };
@@ -111,11 +111,11 @@ function openDb(): Promise<IDBDatabase> {
 
 /** Ensure both object stores exist during upgrade. */
 function createStoresIfMissing(db: IDBDatabase): void {
-  if (!db.objectStoreNames.contains(PromptCacheKey.Store)) {
-    db.createObjectStore(PromptCacheKey.Store, { keyPath: 'id' });
+  if (!db.objectStoreNames.contains(PromptCacheKeyType.Store)) {
+    db.createObjectStore(PromptCacheKeyType.Store, { keyPath: 'id' });
   }
-  if (!db.objectStoreNames.contains(PromptCacheKey.UiStore)) {
-    db.createObjectStore(PromptCacheKey.UiStore, { keyPath: 'id' });
+  if (!db.objectStoreNames.contains(PromptCacheKeyType.UiStore)) {
+    db.createObjectStore(PromptCacheKeyType.UiStore, { keyPath: 'id' });
   }
 }
 
@@ -188,7 +188,7 @@ function logWriteError(storeName: string, e: unknown): void {
 
 /** Read the JSON copy of cached prompts. */
 export function readJsonCopy(): Promise<JsonCopyRecord | null> {
-  return readRecord<JsonCopyRecord>(PromptCacheKey.Store, PromptCacheKey.JsonCopy).then(function(record) {
+  return readRecord<JsonCopyRecord>(PromptCacheKeyType.Store, PromptCacheKeyType.JsonCopy).then(function(record) {
     if (!record || record.schemaVersion !== String(DB_VERSION) || !record.entries || record.entries.length === 0) {
       return null;
     }
@@ -203,8 +203,8 @@ export function writeJsonCopy(entries: CachedPromptEntry[]): Promise<void> {
   const hash = computePromptHash(entries);
   log('[PromptCache] Writing JsonCopy (' + entries.length + ' entries)', 'info');
 
-  return writeRecord(PromptCacheKey.Store, {
-    id: PromptCacheKey.JsonCopy,
+  return writeRecord(PromptCacheKeyType.Store, {
+    id: PromptCacheKeyType.JsonCopy,
     schemaVersion: String(DB_VERSION),
     entries: entries,
     fetchedAt: Date.now(),
@@ -218,7 +218,7 @@ export function writeJsonCopy(entries: CachedPromptEntry[]): Promise<void> {
 
 /** Read the HTML copy of the rendered dropdown. */
 export function readHtmlCopy(): Promise<HtmlCopyRecord | null> {
-  return readRecord<HtmlCopyRecord>(PromptCacheKey.Store, PromptCacheKey.HtmlCopy).then(function(record) {
+  return readRecord<HtmlCopyRecord>(PromptCacheKeyType.Store, PromptCacheKeyType.HtmlCopy).then(function(record) {
     if (!record || !record.html) {
       return null;
     }
@@ -232,8 +232,8 @@ export function readHtmlCopy(): Promise<HtmlCopyRecord | null> {
 export function writeHtmlCopy(options: { html: string; promptCount: number; dataHash: string }): Promise<void> {
   log('[PromptCache] Writing HtmlCopy (' + options.promptCount + ' prompts)', 'info');
 
-  return writeRecord(PromptCacheKey.Store, {
-    id: PromptCacheKey.HtmlCopy,
+  return writeRecord(PromptCacheKeyType.Store, {
+    id: PromptCacheKeyType.HtmlCopy,
     html: options.html,
     promptCount: options.promptCount,
     dataHash: options.dataHash,
@@ -264,8 +264,8 @@ export function clearPromptCache(): Promise<void> {
   log('[PromptCache] Clearing JsonCopy + HtmlCopy', 'info');
 
   return Promise.all([
-    deleteRecord(PromptCacheKey.Store, PromptCacheKey.JsonCopy),
-    deleteRecord(PromptCacheKey.Store, PromptCacheKey.HtmlCopy),
+    deleteRecord(PromptCacheKeyType.Store, PromptCacheKeyType.JsonCopy),
+    deleteRecord(PromptCacheKeyType.Store, PromptCacheKeyType.HtmlCopy),
   ]).then(function() { /* void */ });
 }
 
@@ -281,9 +281,9 @@ export function getCachedHash(): Promise<string | null> {
 // ============================================
 
 /** Save rendered dropdown HTML + state to IndexedDB. */
-export function writeUISnapshot(snapshot: Omit<UISnapshot, Enum_190b59f6>): Promise<void> {
-  return writeRecord(PromptCacheKey.UiStore, {
-    id: PromptCacheKey.UiCache,
+export function writeUISnapshot(snapshot: Omit<UISnapshot, UISnapshotFieldType>): Promise<void> {
+  return writeRecord(PromptCacheKeyType.UiStore, {
+    id: PromptCacheKeyType.UiCache,
     html: snapshot.html,
     categoryFilter: snapshot.categoryFilter,
     scrollTop: snapshot.scrollTop,
@@ -295,7 +295,7 @@ export function writeUISnapshot(snapshot: Omit<UISnapshot, Enum_190b59f6>): Prom
 
 /** Read cached UI snapshot from IndexedDB. */
 export function readUISnapshot(): Promise<UISnapshot | null> {
-  return readRecord<UISnapshot>(PromptCacheKey.UiStore, PromptCacheKey.UiCache).then(function(record) {
+  return readRecord<UISnapshot>(PromptCacheKeyType.UiStore, PromptCacheKeyType.UiCache).then(function(record) {
     if (!record || !record.html) {
       return null;
     }
@@ -306,5 +306,5 @@ export function readUISnapshot(): Promise<UISnapshot | null> {
 
 /** Clear UI snapshot cache. */
 export function clearUISnapshot(): Promise<void> {
-  return deleteRecord(PromptCacheKey.UiStore, PromptCacheKey.UiCache);
+  return deleteRecord(PromptCacheKeyType.UiStore, PromptCacheKeyType.UiCache);
 }

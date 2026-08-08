@@ -1,5 +1,5 @@
 /**
- * Plan-10 follow-up — integration test wiring the REAL freshness probe
+ * PlanTierType-10 follow-up — integration test wiring the REAL freshness probe
  * (`hasFreshCreditBalanceCache`) against the REAL in-memory credit-balance
  * cache. Every prior integration test injected a stub probe, so nothing
  * exercised the actual short-circuit path production runs on.
@@ -28,7 +28,7 @@ import {
   __writeCreditBalanceUpdateMemoryCacheForTests,
   clearCreditBalanceUpdateMemoryCache,
 } from '../../credit-balance-update/credit-balance-cache';
-import { CreditFetchOutcome } from '../../credit-balance-update/credit-fetch-outcome';
+import { CreditFetchOutcomeType } from '../../credit-balance-update/credit-fetch-outcome';
 import type { CreditFetchResult } from '../../credit-balance-update/credit-balance-types';
 import {
   WIRE_PRO_ONE_STALE,
@@ -39,7 +39,7 @@ const mockedFetch = vi.mocked(fetchAndPersist);
 
 function makeResult(workspaceId: string): CreditFetchResult {
   return {
-    outcome: CreditFetchOutcome.ApiHit,
+    outcome: CreditFetchOutcomeType.ApiHit,
     balance: {
       totalRemaining: 100,
       totalGranted: 200,

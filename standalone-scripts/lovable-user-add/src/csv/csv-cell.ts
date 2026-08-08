@@ -5,12 +5,12 @@
  * throws so the parser can record a typed error.
  */
 
-import { UserAddCsvColumn } from "./csv-column";
+import { UserAddCsvColumnType } from "./csv-column";
 
 export const readOptional = (
     row: ReadonlyArray<string>,
-    indices: ReadonlyMap<UserAddCsvColumn, number>,
-    column: UserAddCsvColumn,
+    indices: ReadonlyMap<UserAddCsvColumnType, number>,
+    column: UserAddCsvColumnType,
 ): string | null => {
     const idx = indices.get(column);
 
@@ -25,8 +25,8 @@ export const readOptional = (
 
 export const readRequired = (
     row: ReadonlyArray<string>,
-    indices: ReadonlyMap<UserAddCsvColumn, number>,
-    column: UserAddCsvColumn,
+    indices: ReadonlyMap<UserAddCsvColumnType, number>,
+    column: UserAddCsvColumnType,
 ): string => {
     const value = readOptional(row, indices, column);
 

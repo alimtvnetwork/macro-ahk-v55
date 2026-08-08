@@ -134,18 +134,18 @@ const DropdownMenuRadioItem = React.forwardRef<
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
 
 const DropdownMenuLabel = React.forwardRef<
-  React.ElementRef<typeof DropdownMenuPrimitive.Label>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label> & {
+  React.ElementRef<typeof DropdownMenuPrimitive.LabelType>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.LabelType> & {
     inset?: boolean;
   }
 >(({ className, inset, ...props }, ref) => (
-  <DropdownMenuPrimitive.Label
+  <DropdownMenuPrimitive.LabelType
     ref={ref}
     className={cn("px-2 py-1.5 text-sm font-semibold", inset && "pl-8", className)}
     {...props}
   />
 ));
-DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
+DropdownMenuLabel.displayName = DropdownMenuPrimitive.LabelType.displayName;
 
 const DropdownMenuSeparator = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Separator>,

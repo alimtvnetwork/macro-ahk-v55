@@ -1,11 +1,11 @@
 import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Inline strips above the Lovable chat textarea — order top→bottom:
- *   1) 📋 Plan  → click number → APPEND Plan-${N} prompt to chat (no submit)
+ *   1) 📋 PlanTierType  → click number → APPEND PlanTierType-${N} prompt to chat (no submit)
  *   2) ▶ Next  → click number → APPEND Next-${N}-steps prompt to chat (no submit)
  *   3) 🔁 Repeat (mounted by repeat-loop-ui.ts) — the ONLY executor: submits + loops.
  *
- * Plan and Next are paste-only stagers. They never call submit, never loop,
+ * PlanTierType and Next are paste-only stagers. They never call submit, never loop,
  * never chain into Repeat. The user reviews/edits the staged text and presses
  * Enter (or 🔁 Repeat) themselves.
  *
@@ -32,7 +32,7 @@ import { REPLACE_KEY_DEFAULT } from '../db/prompt-defaults';
 import { buildChipGearActionSection } from './chip-gear-menu';
 import { subscribePromptsChanged } from './prompts-changed-event';
 
-/** Hard guard: Plan/Next strips MUST NOT auto-trigger Repeat or each other. */
+/** Hard guard: PlanTierType/Next strips MUST NOT auto-trigger Repeat or each other. */
 export const INLINE_AUTOCHAIN_DISABLED = true;
 
 const NEXT_PRESETS = [1, 2, 3, 4, 5, 8, 10, 15] as const;
@@ -68,7 +68,7 @@ const SEL_TRAILING_ACTION = '[data-trailing-action="1"]';
 
 /**
  * Attach a smooth hover treatment to a preset chip. Uses the chip's own
- * background/border colors so Plan (amber) and Next (violet) each stay on
+ * background/border colors so PlanTierType (amber) and Next (violet) each stay on
  * brand. Restores the exact original styles on mouseleave — no drift.
  */
 function attachChipHover(button: HTMLButtonElement, hoverBg: string): void {
@@ -160,9 +160,9 @@ async function resolveNextTextDbFirst(deps: TaskNextDeps, n: number): Promise<st
     const bridge = await import('../db/sql-bridge');
     const result = await bridge.runWithBridgeRetry(
       function() { return mod.getDefaultPromptForRole('next'); },
-      function(r) { return r.isSuccess ? undefined : (r.error ?? 'getDefaultPromptForRole !ok'); },
+      function(r) { return r.ok ? undefined : (r.error ?? 'getDefaultPromptForRole !ok'); },
     );
-    if (result.isSuccess && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
+    if (result.ok && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
       const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
       log('NextInline.resolve: using DB next-default (' + result.value.Body.length + ' chars, key=' + key + ') for N=' + n, 'info');
       return substituteToken(result.value.Body, key, n);
@@ -208,7 +208,7 @@ export async function stageNextPrompt(deps: TaskNextDeps, n: number): Promise<vo
   }
 }
 
-// ── Plan strip (paste-only, unchanged behaviour) ─────────────────────
+// ── PlanTierType strip (paste-only, unchanged behaviour) ─────────────────────
 
 function planClickHandler(n: number): void {
   if (taskNextState.running || isSplitterRunning()) {
@@ -216,7 +216,7 @@ function planClickHandler(n: number): void {
     return;
   }
   const clamped = Math.max(PLAN_MIN, Math.min(PLAN_MAX, n));
-  // v4.34.0: clicking a Plan preset also mirrors the number into the
+  // v4.34.0: clicking a PlanTierType preset also mirrors the number into the
   // Repeat count textbox so the user can immediately hit 🔁 Repeat
   // without retyping it. Repeat still requires an explicit Run click.
   try { setRepeatCount(clamped); }
@@ -228,7 +228,7 @@ function makePlanPresetButton(n: number, highlighted: boolean): HTMLButtonElemen
   const b = document.createElement('button');
   b.type = 'button';
   b.textContent = String(n);
-  b.title = 'Append "Plan ' + n + '" to the chat box (no submit)';
+  b.title = 'Append "PlanTierType ' + n + '" to the chat box (no submit)';
   const bg = highlighted ? 'rgba(245,158,11,0.55)' : 'rgba(245,158,11,0.12)';
   const hoverBg = highlighted ? 'rgba(245,158,11,0.75)' : 'rgba(245,158,11,0.28)';
   const border = highlighted ? '1px solid rgba(245,158,11,0.85)' : '1px solid rgba(245,158,11,0.3)';
@@ -803,7 +803,7 @@ function populatePlanDropup(panel: HTMLElement, values: readonly number[]): void
     chipGrid.appendChild(b);
   }
   panel.appendChild(chipGrid);
-  panel.appendChild(buildChipGearActionSection({ role: 'plan', roleLabel: 'Plan', accent: 'rgba(245,158,11,0.85)' }));
+  panel.appendChild(buildChipGearActionSection({ role: 'plan', roleLabel: 'PlanTierType', accent: 'rgba(245,158,11,0.85)' }));
 }
 
 interface PlanDropupHandle {
@@ -816,7 +816,7 @@ function createPlanDropupPanel(): HTMLElement {
   const panel = document.createElement('div');
   panel.id = 'marco-plan-dropup-' + Math.random().toString(36).slice(2, 9);
   panel.setAttribute(ATTR_ROLE, MENU_ROLE);
-  panel.setAttribute(ATTR_ARIA_LABEL, 'Plan menu');
+  panel.setAttribute(ATTR_ARIA_LABEL, 'PlanTierType menu');
   panel.style.cssText = 'position:fixed;display:none;flex-direction:column;gap:4px;padding:7px;background:#1a1a2e;border:1px solid rgba(245,158,11,0.6);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.5);z-index:2147483646;min-width:226px;max-width:300px;';
   panel.dataset['role'] = 'plan-dropup';
   return panel;
@@ -842,7 +842,7 @@ function schedulePlanDropupDbRefresh(rePopulate: (values: readonly number[]) => 
 
 function buildPlanDropup(anchor: HTMLElement, trigger: HTMLButtonElement): PlanDropupHandle {
   const panel = createPlanDropupPanel();
-  const a11y = enhancePopoverA11y(panel, trigger, () => setOpen(false), 'Plan menu');
+  const a11y = enhancePopoverA11y(panel, trigger, () => setOpen(false), 'PlanTierType menu');
   const rePopulate = (values: readonly number[]): void => {
     populatePlanDropup(panel, values);
     if (isPopoverOpen(panel)) positionPopoverFixed(panel, trigger);
@@ -864,7 +864,7 @@ function buildSplitStrip(): HTMLElement {
   root.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 8px;background:rgba(124,58,237,0.10);border:none;border-radius:5px;font-family:system-ui,-apple-system,sans-serif;color:' + cPanelFg + ';font-size:11px;box-sizing:border-box;';
 
   const label = document.createElement('span');
-  label.textContent = '📋 Plan';
+  label.textContent = '📋 PlanTierType';
   label.style.cssText = 'font-weight:600;color:#fbbf24;';
   root.appendChild(label);
   
@@ -939,7 +939,7 @@ function makeNextPresetButton(deps: TaskNextDeps, n: number, highlighted: boolea
 }
 
 /**
- * Build the "More ▾" popover for the Next strip. Unlike Plan, Next shows
+ * Build the "More ▾" popover for the Next strip. Unlike PlanTierType, Next shows
  * all presets inline, so the popover exists purely to host the shared
  * prompt-management actions (Edit default / Add new / Manage).
  */
@@ -1053,13 +1053,13 @@ function tryMountInline(deps: TaskNextDeps): boolean {
   const host = (target.closest && target.closest('form')) || target.parentElement;
   if (!host || !host.parentElement) return false;
 
-  // v4.16+: mount into shared frame so Plan/Next/Repeat share one visual unit
+  // v4.16+: mount into shared frame so PlanTierType/Next/Repeat share one visual unit
   // and one minimize/maximize control. See inline-strips-frame.ts.
   const framed = ensureInlineStripsFrame(host as HTMLElement);
   if (!framed) return false;
   const body = framed.body;
 
-  // Order top→bottom inside the frame: Plan → Next → (Repeat appended after).
+  // Order top→bottom inside the frame: PlanTierType → Next → (Repeat appended after).
   if (!document.getElementById(SPLIT_ID)) {
     const splitStrip = buildSplitStrip();
     splitStrip.id = SPLIT_ID;
@@ -1108,7 +1108,7 @@ function _teardownPointerPopoverClosers(): void {
 /**
  * Register a document-level click closer that hides `panel` whenever the
  * click lands outside `anchor`. Extracted to satisfy sonarjs/no-identical-functions
- * (Plan and Next dropups previously duplicated this block).
+ * (PlanTierType and Next dropups previously duplicated this block).
  */
 function attachDropupOutsideCloser(panel: HTMLElement, anchor: HTMLElement): void {
   const closer = (ev: MouseEvent): void => {
@@ -1153,12 +1153,12 @@ export function __positionPopoverFixedForTests(panel: HTMLElement, button: HTMLE
 
 
 /**
- * v4.11+: Plan and Next inline strips above the chat textarea are HIDDEN by
+ * v4.11+: PlanTierType and Next inline strips above the chat textarea are HIDDEN by
  * default. They have been folded into the prompts dropdown header. Set
  * `window.__MARCO_SHOW_LEGACY_INLINE_STRIPS__ = true` before mount to restore.
  * Tracking: .lovable/question-and-ambiguity/64-compact-plan-next-into-prompts-dropdown.md
  */
-// v4.14.1: restored — user relies on inline Plan/Next strips above the chat.
+// v4.14.1: restored — user relies on inline PlanTierType/Next strips above the chat.
 // The dropdown tabs are an additional surface, not a replacement.
 export const SHOW_LEGACY_INLINE_STRIPS = true;
 

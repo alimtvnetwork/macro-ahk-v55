@@ -12,7 +12,7 @@
 import { describe, expect, it } from "vitest";
 import { buildUserAddRunSummary } from "../run-summary-builder";
 import { UserAddRowOutcomeCode } from "../row-types";
-import { UserAddLogPhase, UserAddLogSeverity } from "../log-sink";
+import { UserAddLogPhaseType, UserAddLogSeverityType } from "../log-sink";
 import { RunSummaryRowStatus, RunSummaryScriptCode } from "../../../../lovable-common/src/report/run-summary-types";
 import type { UserAddRowResult } from "../row-types";
 import type { UserAddLogEntry } from "../log-sink";
@@ -42,8 +42,8 @@ const stepAFailed: UserAddRowResult = {
 };
 
 const warn: UserAddLogEntry = {
-    TaskId: "t1", RowIndex: 3, Phase: UserAddLogPhase.StepB,
-    Severity: UserAddLogSeverity.Warn,
+    TaskId: "t1", RowIndex: 3, Phase: UserAddLogPhaseType.StepB,
+    Severity: UserAddLogSeverityType.Warn,
     Message: "No rollback performed", TimestampUtc: "2026-04-26T00:00:00Z",
 };
 

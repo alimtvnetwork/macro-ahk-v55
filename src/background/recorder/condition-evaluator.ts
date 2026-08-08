@@ -1,4 +1,4 @@
-import { SelectorKindEnum, OpEnum, ReasonEnum, KindEnum2, Mode1 } from "../../types/enums";
+import { SelectorKindEnum, OpEnum, ReasonEnum, PredicateEvaluationKind, MatchAttrMode } from "../../types/enums";
 
 /**
  * Marco Extension — Condition Evaluator (Spec 18)
@@ -56,7 +56,7 @@ export type ConditionWaitOutcome =
 
 export interface PredicateEvaluation {
     readonly Selector: string;
-    readonly Kind: KindEnum2;
+    readonly Kind: PredicateEvaluationKind;
     readonly Matcher: string;
     readonly Result: boolean;
     readonly Detail?: string;
@@ -190,7 +190,7 @@ function evaluatePredicate(predicate: Predicate, options: EvaluateOptions): bool
 function recordTrace(
     options: EvaluateOptions,
     predicate: Predicate,
-    kind: KindEnum2,
+    kind: PredicateEvaluationKind,
     result: boolean,
     detail?: string,
 ): void {
@@ -217,7 +217,7 @@ function matchTextContains(element: Element, matcher: Matcher & { Kind: "TextCon
     return matchText(element.textContent ?? "", matcher.Value, matcher.CaseSensitive, (a, b) => a.includes(b));
 }
 
-function matchAttr(element: Element, name: string, expected: string, mode: Mode1): boolean {
+function matchAttr(element: Element, name: string, expected: string, mode: MatchAttrMode): boolean {
     const value = element.getAttribute(name);
     if (value === null) return false;
     return mode === "eq" ? value === expected : value.includes(expected);
@@ -257,14 +257,14 @@ function compareCount(count: number, op: OpEnum, n: number): boolean {
 /*  Selector locators                                                  */
 /* ------------------------------------------------------------------ */
 
-export function resolveSelectorKind(kind: SelectorKind, expression: string): KindEnum2 {
+export function resolveSelectorKind(kind: SelectorKind, expression: string): PredicateEvaluationKind {
     if (kind === "XPath") return "XPath";
     if (kind === "Css") return "Css";
     const trimmed = expression.trimStart();
     return trimmed.startsWith("/") || trimmed.startsWith("(") ? "XPath" : "Css";
 }
 
-function locateFirst(expression: string, kind: KindEnum2, doc: Document): Element | null {
+function locateFirst(expression: string, kind: PredicateEvaluationKind, doc: Document): Element | null {
     if (kind === "XPath") {
         const r = doc.evaluate(expression, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
         const node = r.singleNodeValue;
@@ -273,7 +273,7 @@ function locateFirst(expression: string, kind: KindEnum2, doc: Document): Elemen
     return doc.querySelector(expression);
 }
 
-function locateAll(expression: string, kind: KindEnum2, doc: Document): Element[] {
+function locateAll(expression: string, kind: PredicateEvaluationKind, doc: Document): Element[] {
     if (kind === "XPath") {
         const r = doc.evaluate(expression, doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
         const out: Element[] = [];

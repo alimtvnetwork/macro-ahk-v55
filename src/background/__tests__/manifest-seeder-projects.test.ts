@@ -46,7 +46,7 @@ function makeProject(overrides: Partial<SeedProjectEntry> = {}): SeedProjectEntr
         Templates: [],
         Prompts: [],
         TargetUrls: [
-            { Pattern: "https://lovable.dev/", MatchType: "exact" },
+            { Pattern: "https://lovable.dev/", MatchRuleType: "exact" },
         ],
         Cookies: [],
         ...overrides,
@@ -156,7 +156,7 @@ describe("isStoredProjectEquivalent (Issue 119 Step 6)", () => {
     it("detects targetUrls.matchType changes", () => {
         const a = buildStoredProjectFromSeed(makeProject());
         const b = buildStoredProjectFromSeed(
-            makeProject({ TargetUrls: [{ Pattern: "https://lovable.dev/", MatchType: "glob" }] }),
+            makeProject({ TargetUrls: [{ Pattern: "https://lovable.dev/", MatchRuleType: "glob" }] }),
         );
         expect(isStoredProjectEquivalent(a, b)).toBe(false);
     });

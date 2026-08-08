@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { WorkspaceCredit } from '../types';
-import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
+import { CreditFetchOutcomeType } from '../credit-balance-update/credit-fetch-outcome';
 import type { CreditFetchResult } from '../credit-balance-update/credit-balance-types';
 
 const { logErrorSpy } = vi.hoisted(() => ({
@@ -34,7 +34,7 @@ function workspace(partial: Partial<WorkspaceCredit>): WorkspaceCredit {
 
 function result(workspaceId: string): CreditFetchResult {
     return {
-        outcome: CreditFetchOutcome.ApiHit,
+        outcome: CreditFetchOutcomeType.ApiHit,
         balance: null,
         fetchedAt: 1,
         sourceUrl: 'https://api.example.test/workspaces/' + workspaceId + '/credit-balance',
@@ -104,9 +104,9 @@ describe('fanOutCreditEnrichment', () => {
             },
         });
 
-        expect(fanOut.resultsByWorkspaceId.ok_1?.outcome).toBe(CreditFetchOutcome.ApiHit);
+        expect(fanOut.resultsByWorkspaceId.ok_1?.outcome).toBe(CreditFetchOutcomeType.ApiHit);
         expect(fanOut.resultsByWorkspaceId.bad_1).toBeNull();
-        expect(fanOut.resultsByWorkspaceId.ok_2?.outcome).toBe(CreditFetchOutcome.ApiHit);
+        expect(fanOut.resultsByWorkspaceId.ok_2?.outcome).toBe(CreditFetchOutcomeType.ApiHit);
         expect(logErrorSpy).toHaveBeenCalledWith(
             'CreditBalanceUpdate.fanOut',
             expect.stringContaining('WorkspaceId=bad_1'),

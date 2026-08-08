@@ -15,14 +15,14 @@
 import type { WorkspaceCredit } from './types';
 import { isCanceledStatus, isPastDueStatus, isExpiredTier, isFreeTier } from './types/subscription-status';
 import type { WorkspaceLifecycleConfig } from './workspace-lifecycle-config';
-import { WorkspaceStatusKind } from "./types/enums";
+import { WorkspaceStatusKindType } from "./types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Status kinds                                                       */
 /* ------------------------------------------------------------------ */
 
 export interface WorkspaceStatus {
-  kind: WorkspaceStatusKind;
+  kind: WorkspaceStatusKindType;
   label: string;
   /** ISO date that drove the decision (status change OR refill date). Empty when none. */
   sinceIso: string;
@@ -35,7 +35,7 @@ export interface WorkspaceStatus {
 }
 
 /** Human labels — kept inside this module so consumers stay in sync. */
-const STATUS_LABELS: Record<WorkspaceStatusKind, string> = {
+const STATUS_LABELS: Record<WorkspaceStatusKindType, string> = {
   'fully-expired':   'Fully Expired',
   'expired-canceled': 'Expired (Canceled)',
   'expired':         'Expired',
@@ -128,7 +128,7 @@ function pickRefillIso(ws: WorkspaceCredit): string {
 }
 
 function buildStatus(
-  kind: WorkspaceStatusKind,
+  kind: WorkspaceStatusKindType,
   opts: { sinceIso?: string | undefined; refillIso?: string | undefined; daysSince?: number | undefined; daysToRefill?: number | undefined },
 ): WorkspaceStatus {
   return {

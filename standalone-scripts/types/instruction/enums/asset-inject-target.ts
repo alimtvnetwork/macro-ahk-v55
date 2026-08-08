@@ -3,6 +3,6 @@
  * Currently only `Head` is supported, but the enum exists so the
  * surface stays explicit if `Body` injection is added later.
  */
-export const enum AssetInjectTarget {
+export const enum AssetInjectTargetType {
     Head = "head",
 }

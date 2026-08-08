@@ -7,12 +7,12 @@
 
 import "./globals.d";
 import { BannerLocator, type LocateResult } from "./banner-locator";
-import { BannerLogFn } from "../../types/runtime/enums/banner";
+import { BannerLogFnType } from "../../types/runtime/enums/banner";
 import { logPaymentBannerHiderError } from "./logger";
 import { renderDebugOverlay, hideDebugOverlay } from "./debug-overlay";
 import {
     type BannerDebugMatch,
-    BannerState,
+    BannerStateType,
     OBSERVER_DEBOUNCE_MS,
     REMOVE_DELAY_MS,
     STATE_ATTR,
@@ -68,7 +68,7 @@ export class PaymentBannerHider implements PaymentBannerHiderApi {
 
             this.hide(hit);
         } catch (caught) {
-            this.logError(BannerLogFn.Check, "Detection pass failed", caught);
+            this.logError(BannerLogFnType.Check, "Detection pass failed", caught);
             throw caught;
         }
     }
@@ -96,14 +96,14 @@ export class PaymentBannerHider implements PaymentBannerHiderApi {
         };
         if (this.overlayActive) renderDebugOverlay(this.lastMatch);
 
-        for (const t of targets) t.setAttribute(STATE_ATTR, BannerState.Fading);
+        for (const t of targets) t.setAttribute(STATE_ATTR, BannerStateType.Fading);
 
         queueMicrotask(() => {
-            for (const t of targets) t.setAttribute(STATE_ATTR, BannerState.Hiding);
+            for (const t of targets) t.setAttribute(STATE_ATTR, BannerStateType.Hiding);
         });
 
         window.setTimeout(() => {
-            for (const t of targets) t.setAttribute(STATE_ATTR, BannerState.Done);
+            for (const t of targets) t.setAttribute(STATE_ATTR, BannerStateType.Done);
             this.stopObserver();
         }, REMOVE_DELAY_MS);
     }

@@ -5,7 +5,7 @@
  * `navigator.storage.getDirectory()`. Covers happy path (save + read +
  * list + delete + deleteProject) and unavailable-OPFS fallback.
  *
- * Plan 13, step 3.
+ * PlanTierType 13, step 3.
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';

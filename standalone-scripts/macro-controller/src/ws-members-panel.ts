@@ -25,7 +25,7 @@ import { createChipInput } from './ws-members-chip-input';
 import { showToast } from './toast';
 import { onCreditPollTick } from './credit-poll-events';
 import { makeDraggable } from './ui/drag-window';
-import { MemberRoleEnum } from "./types/enums";
+import { MemberRoleType } from "./types/enums";
 
 const PANEL_ID = 'marco-ws-members-panel';
 const Z_INDEX = 100002;
@@ -527,7 +527,7 @@ function performRemove(panelEl: HTMLElement, wsId: string, wsName: string, userI
     });
 }
 
-function performPromoteDemote(panelEl: HTMLElement, wsId: string, wsName: string, userId: string, label: string, nextRole: MemberRoleEnum): void {
+function performPromoteDemote(panelEl: HTMLElement, wsId: string, wsName: string, userId: string, label: string, nextRole: MemberRoleType): void {
   const verb = nextRole === 'owner' ? 'Promote to Owner' : 'Demote to Member';
   if (!window.confirm(verb + ': "' + label + '"?')) return;
   updateMemberRole(wsId, userId, nextRole)
@@ -615,7 +615,7 @@ function submitInvite(el: HTMLElement, wsId: string, wsName: string, form: HTMLF
   const roleSelect = form.querySelector('[data-marco-field="invite-role"]') as HTMLSelectElement | null;
   const submitBtn = form.querySelector('[data-marco-field="invite-submit"]') as HTMLButtonElement | null;
   const roleRaw = (roleSelect?.value || 'member').toLowerCase();
-  const role: MemberRoleEnum = roleRaw === 'owner' ? 'owner' : 'member';
+  const role: MemberRoleType = roleRaw === 'owner' ? 'owner' : 'member';
   
   if (validEmails.length === 0) {
     showToast('⚠️ No valid emails to invite', 'info');

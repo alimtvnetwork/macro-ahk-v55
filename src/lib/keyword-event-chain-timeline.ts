@@ -35,7 +35,7 @@ export type TimelineEntry =
         readonly AtMs: number;
         readonly EventId: string;
         readonly StepIndex: number;
-        readonly Label: string;
+        readonly LabelType: string;
     }
     | {
         readonly Kind: "EventEnd";
@@ -127,7 +127,7 @@ export function recordStep(
         AtMs: offsetMs(state, now),
         EventId: event.Id,
         StepIndex: stepIndex,
-        Label: describeStep(step),
+        LabelType: describeStep(step),
     });
 }
 

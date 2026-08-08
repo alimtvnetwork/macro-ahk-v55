@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * Unit tests for `pending-restore-undo` (survive-refresh Undo).
  *
@@ -11,8 +12,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 vi.mock('../../db/prompt-db', () => ({
-    upsertPrompt: vi.fn(async () => ({ ok: true, value: 1 })),
-    deletePromptById: vi.fn(async () => ({ ok: true, value: undefined })),
+    DbResult,
+    DbResult,
+    DbResult,
+    upsertPrompt: vi.fn(async () => (new DbResult(true, 1))),
+    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
 }));
 
 vi.mock('../../toast', () => ({
@@ -49,7 +53,7 @@ function makeUpdateRecord(overrides?: Partial<PendingRestoreUndo>): PendingResto
             restoredBody: 'NEW',
             restoredReplaceKey: 'n',
             slug: 'plan',
-            name: 'Plan',
+            name: 'PlanTierType',
             role: 'plan',
             preBody: 'OLD',
             preReplaceKey: 'n',

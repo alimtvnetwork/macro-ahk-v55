@@ -1,5 +1,5 @@
 /**
- * Plan-10 follow-up — real freshness probe for `batchRefreshFromWire`.
+ * PlanTierType-10 follow-up — real freshness probe for `batchRefreshFromWire`.
  *
  * Replaces the `noFreshCache` stub in `ui/panel-controls.ts` (which
  * always returned `false`) with a probe backed by the in-memory tier of

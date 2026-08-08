@@ -31,7 +31,7 @@ function isCreditBalanceTarget(workspace: WorkspaceCredit): boolean {
 function logFanOutFailure(workspace: WorkspaceCredit, caught: CaughtError): void {
   logError(
     'CreditBalanceUpdate.fanOut',
-    'Path: standalone-scripts/macro-controller/src/credit-balance-update/credit-enrichment-fanout.ts. Missing item: /credit-balance result for workspace ' + workspace.id + '. Reason: requestCredits rejected during capped fan-out (WorkspaceId=' + workspace.id + ', Plan=' + String(workspace.plan) + ').',
+    'Path: standalone-scripts/macro-controller/src/credit-balance-update/credit-enrichment-fanout.ts. Missing item: /credit-balance result for workspace ' + workspace.id + '. Reason: requestCredits rejected during capped fan-out (WorkspaceId=' + workspace.id + ', PlanTierType=' + String(workspace.plan) + ').',
     caught,
   );
 }

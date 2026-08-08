@@ -15,16 +15,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ArrowUpCircle, Pin, RefreshCw, Unlink } from "lucide-react";
-import { LinkState } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { LinkStateType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 interface SyncBadgeProps {
-  state: LinkState;
+  state: LinkStateType;
   pinnedVersion?: string | null;
   updateAvailable?: boolean;
 }
 
 export function SyncBadge({ state, pinnedVersion, updateAvailable }: SyncBadgeProps) {
-  const config: Record<LinkState, { label: string; className: string; icon: typeof RefreshCw }> = {
+  const config: Record<LinkStateType, { label: string; className: string; icon: typeof RefreshCw }> = {
     synced: {
       label: "Synced",
       className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",

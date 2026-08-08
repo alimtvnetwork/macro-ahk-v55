@@ -2,7 +2,7 @@ import type { Identifier } from "../primitives/identifier";
 import type { CookieBinding } from "./cookie-binding";
 import type { CookieSpec } from "./cookie-spec";
 import type { TargetUrl } from "./target-url";
-import type { InjectionRunAt } from "../enums/injection-run-at";
+import type { InjectionRunAtType } from "../enums/injection-run-at";
 
 /**
  * Declarative seed metadata that controls how the runtime registers,
@@ -21,7 +21,7 @@ export type SeedBlock<TSettings extends object> = {
     readonly SeedOnInstall: boolean;
     readonly IsRemovable: boolean;
     readonly AutoInject: boolean;
-    readonly RunAt?: InjectionRunAt;
+    readonly RunAt?: InjectionRunAtType;
     readonly CookieBinding?: CookieBinding;
     readonly TargetUrls: ReadonlyArray<TargetUrl>;
     readonly Cookies: ReadonlyArray<CookieSpec>;

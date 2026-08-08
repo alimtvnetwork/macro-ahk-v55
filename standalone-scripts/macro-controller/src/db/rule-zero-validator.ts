@@ -1,9 +1,9 @@
-import { RuleZeroCodeEnum } from "../types/enums";
+import { RuleZeroCodeCategory } from "../types/enums";
 
 /**
  * Rule-0 validator — "Step count is law".
  *
- * The Plan prompt's Rule 0 states: the number of steps in a written plan MUST
+ * The PlanTierType prompt's Rule 0 states: the number of steps in a written plan MUST
  * equal the injected `{{n}}` value exactly (no `n-1`, no `n+1`, no padding).
  * This module is the runtime guard that blocks saving any plan body that
  * violates that contract before it reaches the DB.
@@ -16,7 +16,7 @@ import { RuleZeroCodeEnum } from "../types/enums";
  *      template stay allowed.
  *
  *   2. Concrete mode (declared count is a literal integer, e.g. from a
- *      `Steps: 5` frontmatter line or a `<n> steps Plan` header): count the
+ *      `Steps: 5` frontmatter line or a `<n> steps PlanTierType` header): count the
  *      top-level numbered items under `## Steps` (falling back to the whole
  *      document, ignoring fenced code blocks) and require the count to equal
  *      the declared integer. Any mismatch is a Rule-0 violation and the
@@ -44,24 +44,10 @@ export interface RuleZeroCheck {
     /** Human-readable reason. Non-empty on both pass and fail for logging. */
     reason: string;
     /**
-     * Stable machine code. Callers switch on this instead of parsing `reason`.
-     * `'template'`, `'match'`, `'no-declaration'`, `'no-steps'`, `'mismatch'`.
-     */
-    code: RuleZeroCode;
-}
-
-export type RuleZeroCode =
-    RuleZeroCodeEnum;
-
-const RE_FENCE = /^\s*```/;
-const RE_STEPS_HEADING = /^#{1,6}\s+steps\s*$/i;
-const RE_NEXT_HEADING = /^#{1,6}\s+\S+/;
-const RE_TOP_LEVEL_NUMBERED = /^(\d+)\.\s+\S/;
-
 /** Frontmatter line: `Steps: 5` or `Steps: {{n}}`. First match wins. */
 const RE_FRONTMATTER_STEPS = /^\s*steps\s*:\s*(\S.*?)\s*$/im;
 
-/** Prose declarations: `EXACTLY 5 steps`, `# 5 steps Plan`. */
+/** Prose declarations: `EXACTLY 5 steps`, `# 5 steps PlanTierType`. */
 const RE_EXACTLY_STEPS = /exactly\s+(\{\{n\}\}|\d+)\s+steps?/i;
 const RE_HEADER_STEPS = /(?:^|\n)#\s*(\{\{n\}\}|\d+)\s+steps?\s+plan\b/i;
 
@@ -76,7 +62,7 @@ const RE_HEADER_STEPS = /(?:^|\n)#\s*(\{\{n\}\}|\d+)\s+steps?\s+plan\b/i;
  * Precedence (first hit wins so the frontmatter always trumps loose prose):
  *   1. Frontmatter `Steps: …` (top of file).
  *   2. `EXACTLY … steps` phrase.
- *   3. `# <N> steps Plan` header.
+ *   3. `# <N> steps PlanTierType` header.
  */
 export function parseDeclaredStepCount(body: string):
     | { kind: 'literal'; value: number }

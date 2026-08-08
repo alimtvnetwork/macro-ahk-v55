@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WorkspaceCredit } from '../types';
-import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
-import { Plan } from '../credit-balance-update/plan';
+import { CreditFetchOutcomeType } from '../credit-balance-update/credit-fetch-outcome';
+import { PlanTierType } from '../credit-balance-update/plan';
 import type { CreditFetchResult } from '../credit-balance-update/credit-balance-types';
 
 const { fetchWorkspaceCreditBalanceSpy, settingsListeners } = vi.hoisted(() => ({
@@ -56,10 +56,10 @@ function ws(partial: Partial<WorkspaceCredit>): WorkspaceCredit {
     };
 }
 
-function apiResult(outcome = CreditFetchOutcome.ApiHit): CreditFetchResult {
+function apiResult(outcome = CreditFetchOutcomeType.ApiHit): CreditFetchResult {
     return {
         outcome,
-        balance: outcome === CreditFetchOutcome.ApiHit ? {
+        balance: outcome === CreditFetchOutcomeType.ApiHit ? {
             totalRemaining: 5,
             totalGranted: 5,
             dailyRemaining: 5,
@@ -87,7 +87,7 @@ describe('credit-fetch-controller', () => {
 
         const result = await requestCredits(workspace);
 
-        expect(result.outcome).toBe(CreditFetchOutcome.InlineHit);
+        expect(result.outcome).toBe(CreditFetchOutcomeType.InlineHit);
         expect(result.balance?.availableBalance).toBe(45);
         expect(result.balance?.cloudRemaining).toBe(0);
         expect(result.balance?.aiRemaining).toBe(0);
@@ -97,7 +97,7 @@ describe('credit-fetch-controller', () => {
     it('skips plans that do not require credit-balance fetch', async () => {
         const result = await requestCredits(ws({ plan: 'business' }));
 
-        expect(result.outcome).toBe(CreditFetchOutcome.Skipped);
+        expect(result.outcome).toBe(CreditFetchOutcomeType.Skipped);
         expect(fetchWorkspaceCreditBalanceSpy).not.toHaveBeenCalled();
     });
 
@@ -107,8 +107,8 @@ describe('credit-fetch-controller', () => {
 
         const result = await requestCredits(workspace);
 
-        expect(result.outcome).toBe(CreditFetchOutcome.ApiHit);
-        expect(fetchWorkspaceCreditBalanceSpy).toHaveBeenCalledWith({ workspaceId: 'ws_1', plan: Plan.Ktlo, timeoutMs: 3000 });
+        expect(result.outcome).toBe(CreditFetchOutcomeType.ApiHit);
+        expect(fetchWorkspaceCreditBalanceSpy).toHaveBeenCalledWith({ workspaceId: 'ws_1', plan: PlanTierType.Ktlo, timeoutMs: 3000 });
         expect(workspace.available).toBe(5);
         expect(workspace.dailyFree).toBe(5);
     });
@@ -141,34 +141,34 @@ describe('credit-fetch-controller', () => {
         await requestCredits(workspace);
         const cached = await requestCredits(workspace);
 
-        expect(cached.outcome).toBe(CreditFetchOutcome.ApiCacheHit);
+        expect(cached.outcome).toBe(CreditFetchOutcomeType.ApiCacheHit);
         expect(fetchWorkspaceCreditBalanceSpy).toHaveBeenCalledTimes(1);
     });
 
     it('caches timeout negative result without hammering the endpoint', async () => {
-        fetchWorkspaceCreditBalanceSpy.mockResolvedValueOnce(apiResult(CreditFetchOutcome.Timeout));
+        fetchWorkspaceCreditBalanceSpy.mockResolvedValueOnce(apiResult(CreditFetchOutcomeType.Timeout));
         const workspace = ws({ plan: 'cancelled' });
 
         const first = await requestCredits(workspace);
         const second = await requestCredits(workspace);
 
-        expect(first.outcome).toBe(CreditFetchOutcome.Timeout);
-        expect(second.outcome).toBe(CreditFetchOutcome.Timeout);
+        expect(first.outcome).toBe(CreditFetchOutcomeType.Timeout);
+        expect(second.outcome).toBe(CreditFetchOutcomeType.Timeout);
         expect(fetchWorkspaceCreditBalanceSpy).toHaveBeenCalledTimes(1);
     });
 
     it('performs one forced-token retry after AuthError', async () => {
         fetchWorkspaceCreditBalanceSpy
-            .mockResolvedValueOnce(apiResult(CreditFetchOutcome.AuthError))
-            .mockResolvedValueOnce(apiResult(CreditFetchOutcome.ApiHit));
+            .mockResolvedValueOnce(apiResult(CreditFetchOutcomeType.AuthError))
+            .mockResolvedValueOnce(apiResult(CreditFetchOutcomeType.ApiHit));
 
         const result = await requestCredits(ws({ plan: 'ktlo' }));
 
-        expect(result.outcome).toBe(CreditFetchOutcome.ApiHit);
+        expect(result.outcome).toBe(CreditFetchOutcomeType.ApiHit);
         expect(fetchWorkspaceCreditBalanceSpy).toHaveBeenCalledTimes(2);
         expect(fetchWorkspaceCreditBalanceSpy.mock.calls[1][0]).toEqual({
             workspaceId: 'ws_1',
-            plan: Plan.Ktlo,
+            plan: PlanTierType.Ktlo,
             timeoutMs: 3000,
             forceTokenRefresh: true,
         });
@@ -184,8 +184,8 @@ describe('credit-fetch-controller', () => {
         resolveFetch(apiResult());
         const results = await Promise.all([first, second]);
 
-        expect(results[0].outcome).toBe(CreditFetchOutcome.ApiHit);
-        expect(results[1].outcome).toBe(CreditFetchOutcome.ApiHit);
+        expect(results[0].outcome).toBe(CreditFetchOutcomeType.ApiHit);
+        expect(results[1].outcome).toBe(CreditFetchOutcomeType.ApiHit);
         expect(fetchWorkspaceCreditBalanceSpy).toHaveBeenCalledTimes(1);
     });
 

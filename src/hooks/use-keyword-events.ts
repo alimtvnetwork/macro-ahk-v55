@@ -11,7 +11,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { logError } from "./hook-logger";
-import { DirectionEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { DirectionType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 const STORAGE_KEY = "marco-keyword-events-v1";
 
@@ -20,14 +20,14 @@ const STORAGE_KEY = "marco-keyword-events-v1";
  * persisted events without these fields keep their current behaviour:
  *   • `Enabled` — `false` skips the step at playback time. Absent / `true`
  *     runs as before. Set in bulk by the step-row right-click context menu.
- *   • `Label`   — free-form display name shown next to the step's
+ *   • `LabelType`   — free-form display name shown next to the step's
  *     Combo/Wait summary. Used by the "Rename in sequence" bulk action so
  *     selected steps can be relabelled to "Login 01", "Login 02", … without
  *     touching the underlying Combo (which carries real keystroke data).
  */
 export interface KeywordEventStepCommon {
     readonly Enabled?: boolean;
-    readonly Label?: string;
+    readonly LabelType?: string;
 }
 export type KeywordEventStep =
     | (KeywordEventStepCommon & { readonly Kind: "Key"; readonly Id: string; readonly Combo: string })
@@ -94,7 +94,7 @@ export interface UseKeywordEventsApi {
     readonly updateEvent: (id: string, patch: Partial<Omit<KeywordEvent, "Id">>) => void;
     readonly addStep: (eventId: string, step: Omit<KeywordEventStep, "Id">) => void;
     readonly removeStep: (eventId: string, stepId: string) => void;
-    readonly moveStep: (eventId: string, stepId: string, direction: DirectionEnum) => void;
+    readonly moveStep: (eventId: string, stepId: string, direction: DirectionType) => void;
     /**
      * Bulk delete a set of steps inside a single event. No-op when the id list
      * is empty or none of the ids resolve. Kept event-scoped so the right-click
@@ -108,7 +108,7 @@ export interface UseKeywordEventsApi {
      */
     readonly setStepsEnabled: (eventId: string, stepIds: readonly string[], enabled: boolean) => void;
     /**
-     * Bulk overwrite each step's `Label` with the provided ordered list. The
+     * Bulk overwrite each step's `LabelType` with the provided ordered list. The
      * caller is responsible for matching `labels[i]` to `stepIds[i]`. Skips
      * any id that does not resolve in the event so a stale selection cannot
      * corrupt the list.
@@ -192,7 +192,7 @@ export function useKeywordEvents(): UseKeywordEventsApi {
         ));
     }, []);
 
-    const moveStep = useCallback((eventId: string, stepId: string, direction: DirectionEnum) => {
+    const moveStep = useCallback((eventId: string, stepId: string, direction: DirectionType) => {
         setEvents(prev => prev.map(e => {
             if (e.Id !== eventId) return e;
             const idx = e.Steps.findIndex(s => s.Id === stepId);
@@ -253,11 +253,11 @@ export function useKeywordEvents(): UseKeywordEventsApi {
                         if (next === undefined) return s;
                         const trimmed = next.trim();
                         if (trimmed.length === 0) {
-                            const { Label: _drop, ...rest } = s as KeywordEventStep & { Label?: string };
+                            const { LabelType: _drop, ...rest } = s as KeywordEventStep & { LabelType?: string };
                             void _drop;
                             return rest as KeywordEventStep;
                         }
-                        return { ...s, Label: trimmed } as KeywordEventStep;
+                        return { ...s, LabelType: trimmed } as KeywordEventStep;
                     }),
                 };
             }));

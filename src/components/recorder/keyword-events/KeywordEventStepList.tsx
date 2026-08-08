@@ -1,6 +1,6 @@
 /**
  * Per-event step list with multi-selection toolbar. Extracted from
- * `KeywordEventsPanel.tsx` in Plan 25 Step 14 — owns the per-card
+ * `KeywordEventsPanel.tsx` in PlanTierType 25 Step 14 — owns the per-card
  * shift-click selection so each event tracks its own anchor.
  */
 
@@ -16,7 +16,7 @@ import {
 import type { KeywordEvent, KeywordEventStep } from "@/hooks/use-keyword-events";
 import { validateEventSteps } from "@/lib/keyword-event-validation";
 import { KeywordEventStepContextMenu } from "../KeywordEventStepContextMenu";
-import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { DirectionType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 const CSS_TEXT_DESTRUCTIVE = "text-destructive";
 
@@ -24,13 +24,13 @@ export interface KeywordEventStepListProps {
     readonly event: KeywordEvent;
     readonly currentStepIndex: number | null;
     readonly onRemoveStep: (stepId: string) => void;
-    readonly onMoveStep: (stepId: string, dir: DirectionEnum) => void;
+    readonly onMoveStep: (stepId: string, dir: DirectionType) => void;
     readonly onRemoveSteps: (eventId: string, stepIds: readonly string[]) => void;
     readonly onSetStepsEnabled: (eventId: string, stepIds: readonly string[], enabled: boolean) => void;
     readonly onRelabelSteps: (eventId: string, stepIds: readonly string[], labels: readonly string[]) => void;
 }
 
-// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf; Plan 25 Step 14
+// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf; PlanTierType 25 Step 14
 export function KeywordEventStepList(props: KeywordEventStepListProps): JSX.Element {
     const {
         event, currentStepIndex, onRemoveStep, onMoveStep,
@@ -121,10 +121,10 @@ interface StepRowProps {
     readonly onRemoveSteps: (eventId: string, stepIds: readonly string[]) => void;
     readonly onRelabelSteps: (eventId: string, stepIds: readonly string[], labels: readonly string[]) => void;
     readonly onRemoveStep: (stepId: string) => void;
-    readonly onMoveStep: (stepId: string, dir: DirectionEnum) => void;
+    readonly onMoveStep: (stepId: string, dir: DirectionType) => void;
 }
 
-// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf; Plan 25 Step 14
+// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf; PlanTierType 25 Step 14
 function StepRow(props: StepRowProps): JSX.Element {
     const {
         step, index, event, issue, isCurrent, selected, selectedStepIds,
@@ -171,13 +171,13 @@ function StepRow(props: StepRowProps): JSX.Element {
                         className="h-3.5 w-3.5"
                     />
                     <Badge variant="outline" className="text-[10px] w-6 justify-center">{index + 1}</Badge>
-                    {step.Label && (
+                    {step.LabelType && (
                         <Badge
                             variant="secondary"
                             className="text-[10px] px-1.5"
                             data-testid={`keyword-event-step-label-${event.Id}-${index}`}
                         >
-                            {step.Label}
+                            {step.LabelType}
                         </Badge>
                     )}
                     <StepKindDetail step={step} hasIssue={issue !== undefined} />

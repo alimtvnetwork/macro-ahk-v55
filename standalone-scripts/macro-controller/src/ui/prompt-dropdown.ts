@@ -48,7 +48,7 @@ import { renderFilterMenu } from './prompt-filter-menu';
 import { buildDropdownHeader } from './prompt-dropdown-header';
 
 import { sortEntriesByOrder, attachDragHandlers, getSlugPositionSource } from './prompt-drag-order';
-import { SlugPositionSourceEnum } from "../types/enums";
+import { SlugPositionSourceType } from "../types/enums";
 
 /**
  * Visual metadata for each prompt-position source. Rendered as a small
@@ -56,7 +56,7 @@ import { SlugPositionSourceEnum } from "../types/enums";
  * came from the canonical default, a migrated saved order, or their own
  * drag-and-drop persistence.
  */
-const POSITION_SOURCE_META: Record<SlugPositionSourceEnum, { glyph: string; bg: string; tooltip: string }> = {
+const POSITION_SOURCE_META: Record<SlugPositionSourceType, { glyph: string; bg: string; tooltip: string }> = {
   default: { glyph: 'D',  bg: 'rgba(107,114,128,0.75)', tooltip: 'Position from DEFAULT_PROMPT_ORDER (no saved order applies).' },
   migrated: { glyph: 'M', bg: 'rgba(59,130,246,0.85)',  tooltip: 'Position from a saved order carried across migrations (not manually dragged).' },
   drag: { glyph: '⇅',      bg: 'rgba(16,185,129,0.85)',  tooltip: 'Position set by your drag-and-drop and persisted to localStorage.' },
@@ -157,7 +157,7 @@ function anchorTaskNextSub(row: HTMLElement, sub: HTMLElement, host: HTMLElement
 /**
  * In-memory mirror of the last persisted UI snapshot. Lets the prompts
  * dropdown paint synchronously on click (zero IDB round-trip, zero flicker)
- * — fixes Issue 129 S-1 where Plan Task / Task Next briefly disappeared
+ * — fixes Issue 129 S-1 where PlanTierType Task / Task Next briefly disappeared
  * because the previous render path gated on `readUISnapshot()`.
  *
  * The IDB copy is still written by `_persistSnapshot` and still read once on
@@ -342,7 +342,7 @@ function _renderFresh(
   _persistSnapshot(promptsDropdown, entries, dataHash, categoryFilter);
 }
 
-/** Append header, Task Next + Plan Task (collapsed by default) + Filter inline menus. */
+/** Append header, Task Next + PlanTierType Task (collapsed by default) + Filter inline menus. */
 function _appendHeaderAndSubmenu(
   container: HTMLElement,
   entries: LoaderPromptEntry[],
@@ -355,14 +355,14 @@ function _appendHeaderAndSubmenu(
   if (!container.style.position) container.style.position = 'relative';
   container.appendChild(buildDropdownHeader(ctx, taskNextDeps, () => renderPromptsDropdown(ctx, taskNextDeps)));
 
-  // v4.x: Plan Task submenu removed from this dropdown — it lives elsewhere
+  // v4.x: PlanTierType Task submenu removed from this dropdown — it lives elsewhere
   // in the extension UI. The 'plan' tab / floating group are no longer built.
 
   const categories = collectUniqueCategories(entries);
   renderFilterMenu(container, categories, ctx, taskNextDeps, renderPromptsDropdown);
 }
 
-// _buildFloatingGroup removed (v4.27+): Plan/Next tabbed floating groups are no longer used.
+// _buildFloatingGroup removed (v4.27+): PlanTierType/Next tabbed floating groups are no longer used.
 
 
 
@@ -486,14 +486,14 @@ function _rebindDropdownListeners(
 }
 
 /**
- * Rebuild every Plan Task submenu in the dropdown after a snapshot restore.
+ * Rebuild every PlanTierType Task submenu in the dropdown after a snapshot restore.
  *
  * Issue 129 Step 3 root cause: snapshot restore writes `innerHTML`, which
  * destroys the per-element `onclick` handlers attached by
  * `renderPlanTaskSubmenu()` in plan-task-ui.ts. The previous rebind list
- * only touched the Task Next submenu, so the Plan Task row (inline + inside
+ * only touched the Task Next submenu, so the PlanTierType Task row (inline + inside
  * the 🎯 Tasks floating panel) silently became dead HTML — clicking the
- * "🧠 Plan Task" header toggled nothing, and the preset "Plan in N steps"
+ * "🧠 PlanTierType Task" header toggled nothing, and the preset "PlanTierType in N steps"
  * rows did not inject the prompt.
  *
  * Fix: locate the inline row (`[data-inline-plan-row]`) and the in-Tasks-group
@@ -501,7 +501,7 @@ function _rebindDropdownListeners(
  * re-render via `renderPlanTaskSubmenu` so all listeners are fresh.
  */
 function _rebindPlanTaskSubmenus(container: HTMLElement, ctx: PromptContext): void {
-  // v4.12.0: Plan now lives in a single floating popover keyed by
+  // v4.12.0: PlanTierType now lives in a single floating popover keyed by
   // [data-plan-group]. Rebuild its contents in-place so listeners are fresh.
   const planGroup = container.querySelector('[data-plan-group]') as HTMLElement | null;
   if (planGroup) {
@@ -689,7 +689,7 @@ function _rebindActionIcons(
 function renderEmptyState(container: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): void {
   const emptyState = document.createElement('div');
   emptyState.style.cssText = 'padding:20px 12px;text-align:center;color:' + cPanelFgDim + ';font-size:13px;';
-  // Plan-17 step 14: static markup replaced with DOM API to purge innerHTML pattern.
+  // PlanTierType-17 step 14: static markup replaced with DOM API to purge innerHTML pattern.
   const icon = document.createElement('div');
   icon.style.cssText = 'font-size:28px;margin-bottom:8px;';
   icon.textContent = '📋';
@@ -1082,7 +1082,7 @@ function renderPromptItem(
 
 /** Open an inline editor for a prompt. */
 function _openInlinePromptEditor(item: HTMLElement, p: LoaderPromptEntry, ctx: PromptContext, taskNextDeps: TaskNextDeps): void {
-  // Plan-17 step 15: replace innerHTML save/restore with a live-DOM clone.
+  // PlanTierType-17 step 15: replace innerHTML save/restore with a live-DOM clone.
   // Root cause: innerHTML serialization drops event handlers, breaks
   // custom-element upgrades, and re-parses untrusted-looking attribute values.
   // A DocumentFragment holds the real child nodes; `replaceChildren(...)`

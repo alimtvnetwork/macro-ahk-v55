@@ -1,4 +1,4 @@
-import { LevelEnum4 } from "./enums";
+import { ToastEntryLevelType } from "./enums";
 
 /**
  * Macro Controller — UI, Prompt & Misc Type Definitions
@@ -26,7 +26,7 @@ export interface ActivityLogEntry {
 export interface ToastEntry {
   id: string;
   message: string;
-  type: LevelEnum4;
+  type: ToastEntryLevelType;
   element: HTMLElement;
   dismissTimer: ReturnType<typeof setTimeout> | null;
 }
@@ -57,7 +57,7 @@ export interface PromptEntry {
   tags?: string[];
   /** v4.12.0 (Issue 64): when true, prompt is skipped by `exportPromptsToJson`. */
   excludeFromExport?: boolean;
-  // Dynamic prompt expansion (e.g. `Next ${N} steps`, `Plan ${N}`).
+  // Dynamic prompt expansion (e.g. `Next ${N} steps`, `PlanTierType ${N}`).
   // When isDynamic is true, normalizePromptEntries() emits one flat
   // PromptEntry per replaceValue with ${replaceKey} substituted into
   // name, text, slug (via slugTemplate), and id.
@@ -70,7 +70,7 @@ export interface PromptEntry {
   parentSlug?: string;
   variantValue?: string;
   /**
-   * Plan-14 role discriminator (`plan` | `next` | `generic`). Introduced in
+   * PlanTierType-14 role discriminator (`plan` | `next` | `generic`). Introduced in
    * v4.71.0 so the export/import bundle envelope and the DB bridge can
    * round-trip role-scoped prompts without losing classification.
    */

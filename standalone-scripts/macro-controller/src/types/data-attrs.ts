@@ -1,7 +1,7 @@
 /**
  * Data attributes used on DOM elements.
  */
-export enum DataAttr {
+export enum DataAttrType {
   Active = 'data-active',
   Skeleton = 'data-skeleton',
   SelectedId = 'data-selected-id',

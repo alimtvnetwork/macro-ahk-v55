@@ -9,11 +9,11 @@ import { ServiceResult } from '../../../utils/result-wrapper';
  */
 
 import { StepKindId } from "@/background/recorder/step-library/schema";
-import { UrlMatchEnum, Mode2, SelectorKindEnum } from "../../../types/enums";
+import { UrlMatchEnum, UrlTabClickFailureMode, SelectorKindEnum } from "../../../types/enums";
 
 export interface SubmitInput {
     StepKindId: StepKindId;
-    Label: string | null;
+    LabelType: string | null;
     PayloadJson: string | null;
     TargetStepGroupId: number | null;
 }
@@ -23,13 +23,13 @@ export type BuildResult =
     | { readonly Ok: false; readonly ErrorMessage: string; readonly ErrorDescription?: string };
 
 export type UrlMatchDialect = UrlMatchEnum;
-export type UrlTabClickMode = Mode2;
+export type UrlTabClickMode = UrlTabClickFailureMode;
 export type SelectorKindOption = SelectorKindEnum;
 
 export interface UrlTabClickFormState {
     UrlPattern: string;
     UrlMatch: UrlMatchDialect;
-    Mode: UrlTabClickMode;
+    OperationModeType: UrlTabClickMode;
     Selector: string;
     SelectorKind: SelectorKindOption;
     TimeoutMs: string;
@@ -40,7 +40,7 @@ export interface UrlTabClickFormState {
 export const URL_TAB_CLICK_DEFAULTS: UrlTabClickFormState = {
     UrlPattern: "",
     UrlMatch: "Glob",
-    Mode: "OpenOrFocus",
+    OperationModeType: "OpenOrFocus",
     Selector: "",
     SelectorKind: "Auto",
     TimeoutMs: "",
@@ -55,7 +55,7 @@ export function hydrateUrlTabClickForm(payloadJson: string | null): UrlTabClickF
         return {
             UrlPattern:   typeof parsed.UrlPattern === "string" ? parsed.UrlPattern : "",
             UrlMatch:     (parsed.UrlMatch === "Exact" || parsed.UrlMatch === "Prefix" || parsed.UrlMatch === "Glob" || parsed.UrlMatch === "Regex") ? parsed.UrlMatch : "Glob",
-            Mode:         (parsed.Mode === "OpenNew" || parsed.Mode === "FocusExisting" || parsed.Mode === "OpenOrFocus") ? parsed.Mode : "OpenOrFocus",
+            OperationModeType:         (parsed.OperationModeType === "OpenNew" || parsed.OperationModeType === "FocusExisting" || parsed.OperationModeType === "OpenOrFocus") ? parsed.OperationModeType : "OpenOrFocus",
             Selector:     typeof parsed.Selector === "string" ? parsed.Selector : "",
             SelectorKind: (parsed.SelectorKind === "XPath" || parsed.SelectorKind === "Css" || parsed.SelectorKind === "Auto") ? parsed.SelectorKind : "Auto",
             TimeoutMs:    typeof parsed.TimeoutMs === "number" ? String(parsed.TimeoutMs) : "",
@@ -99,7 +99,7 @@ export function buildHotkeyPayload(
         Ok: true,
         Input: {
             StepKindId: StepKindId.Hotkey,
-            Label: normaliseLabel(label),
+            LabelType: normaliseLabel(label),
             PayloadJson: JSON.stringify(payload),
             TargetStepGroupId: null,
         },
@@ -110,8 +110,8 @@ function validateUrlTabClickForm(form: UrlTabClickFormState): BuildResult | null
     if (form.UrlPattern.trim() === "") {
         return { Ok: false, ErrorMessage: "URL pattern is required." };
     }
-    if (form.DirectOpen && form.Mode !== "OpenNew") {
-        return { Ok: false, ErrorMessage: "DirectOpen requires Mode = 'OpenNew'." };
+    if (form.DirectOpen && form.OperationModeType !== "OpenNew") {
+        return { Ok: false, ErrorMessage: "DirectOpen requires OperationModeType = 'OpenNew'." };
     }
     if (form.DirectOpen && form.Url.trim() === "") {
         return { Ok: false, ErrorMessage: "DirectOpen requires a literal URL." };
@@ -130,7 +130,7 @@ function buildUrlTabClickPayloadObject(form: UrlTabClickFormState, timeoutMs: nu
     const payload: Record<string, unknown> = {
         UrlPattern: form.UrlPattern.trim(),
         UrlMatch:   form.UrlMatch,
-        Mode:       form.Mode,
+        OperationModeType:       form.OperationModeType,
     };
     if (form.Selector.trim() !== "") { payload.Selector = form.Selector.trim(); }
     if (form.SelectorKind !== "Auto") { payload.SelectorKind = form.SelectorKind; }
@@ -150,7 +150,7 @@ export function buildUrlTabClickPayload(label: string, form: UrlTabClickFormStat
         Ok: true,
         Input: {
             StepKindId: StepKindId.UrlTabClick,
-            Label: normaliseLabel(label),
+            LabelType: normaliseLabel(label),
             PayloadJson: JSON.stringify(payload),
             TargetStepGroupId: null,
         },
@@ -185,7 +185,7 @@ export function buildGenericPayload(
         Ok: true,
         Input: {
             StepKindId: kind,
-            Label: normaliseLabel(label),
+            LabelType: normaliseLabel(label),
             PayloadJson: trimmed === "" ? null : trimmed,
             TargetStepGroupId: kind === StepKindId.RunGroup ? targetGroupId : null,
         },

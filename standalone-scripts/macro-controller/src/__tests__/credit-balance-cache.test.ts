@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import 'fake-indexeddb/auto';
-import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
+import { CreditFetchOutcomeType } from '../credit-balance-update/credit-fetch-outcome';
 import type { CreditFetchResult } from '../credit-balance-update/credit-balance-types';
 import {
     clearCreditBalanceUpdateMemoryCache,
@@ -18,7 +18,7 @@ vi.mock('../error-utils', () => ({
 
 function result(fetchedAt = 1_000): CreditFetchResult {
     return {
-        outcome: CreditFetchOutcome.ApiHit,
+        outcome: CreditFetchOutcomeType.ApiHit,
         balance: {
             totalRemaining: 5,
             totalGranted: 5,
@@ -69,6 +69,6 @@ describe('credit-balance-update cache', () => {
     });
 
     it('marks cached balance result as ApiCacheHit', () => {
-        expect(makeCachedResult(result()).outcome).toBe(CreditFetchOutcome.ApiCacheHit);
+        expect(makeCachedResult(result()).outcome).toBe(CreditFetchOutcomeType.ApiCacheHit);
     });
 });

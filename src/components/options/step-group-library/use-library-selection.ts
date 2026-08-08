@@ -3,7 +3,7 @@
  *
  * Small hook that packages the selection add/remove pattern used by the
  * tree checkboxes (single id + subtree) plus the "toggle folder
- * expanded" and "clear all" primitives. Extracted per Plan 24 SS-06
+ * expanded" and "clear all" primitives. Extracted per PlanTierType 24 SS-06
  * Phase 2 so the panel body stays under the ESLint
  * `max-lines-per-function` ceiling.
  */

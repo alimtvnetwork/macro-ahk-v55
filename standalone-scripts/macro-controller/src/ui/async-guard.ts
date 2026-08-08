@@ -1,7 +1,7 @@
 /**
  * async-guard: absorb rapid re-entrant clicks on async chip / button handlers.
  *
- * The Next chip, Plan chip, and prompt-editor Save all fire DB-fallback flows
+ * The Next chip, PlanTierType chip, and prompt-editor Save all fire DB-fallback flows
  * via `runWithBridgeRetry`. If the user double-clicks while a retry is in
  * flight, the second call can hit a stale cached method and surface
  * PROMPT_LOAD_E001 / PROMPT_EDIT_E005 to the user even though the first call

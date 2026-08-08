@@ -6,19 +6,19 @@
  * (Q4 default: extra OwnerEmail3+ ignored with a warning, not error).
  */
 
-import { OwnerSwitchCsvColumn, REQUIRED_COLUMNS, ALL_COLUMNS } from "./csv-column";
+import { OwnerSwitchCsvColumnType, REQUIRED_COLUMNS, ALL_COLUMNS } from "./csv-column";
 import type { CsvParseError, CsvParseWarning } from "./csv-types";
 
 export interface HeaderResolution {
-    Indices: ReadonlyMap<OwnerSwitchCsvColumn, number>;
+    Indices: ReadonlyMap<OwnerSwitchCsvColumnType, number>;
     Errors: ReadonlyArray<CsvParseError>;
     Warnings: ReadonlyArray<CsvParseWarning>;
 }
 
 const HEADER_ROW_INDEX = 0;
 
-const buildIndexMap = (header: ReadonlyArray<string>): Map<OwnerSwitchCsvColumn, number> => {
-    const out = new Map<OwnerSwitchCsvColumn, number>();
+const buildIndexMap = (header: ReadonlyArray<string>): Map<OwnerSwitchCsvColumnType, number> => {
+    const out = new Map<OwnerSwitchCsvColumnType, number>();
 
     for (const column of ALL_COLUMNS) {
         const idx = header.findIndex((h) => h.trim() === column);
@@ -32,7 +32,7 @@ const buildIndexMap = (header: ReadonlyArray<string>): Map<OwnerSwitchCsvColumn,
 };
 
 const collectMissingErrors = (
-    indices: ReadonlyMap<OwnerSwitchCsvColumn, number>,
+    indices: ReadonlyMap<OwnerSwitchCsvColumnType, number>,
 ): CsvParseError[] => {
     const errors: CsvParseError[] = [];
 

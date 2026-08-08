@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * Delete → DOM removal + subsequent Save drift-guard integration.
  *
@@ -29,9 +30,9 @@ interface Row {
 // Mutable store so renderAllRoles reflects post-delete state.
 const store: Record<string, Row[]> = {
     plan: [
-        { Id: 1, Slug: 'plan-default', Name: 'Plan (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
-        { Id: 2, Slug: 'plan-concise', Name: 'Plan (concise)', Body: 'A {{n}} B', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
-        { Id: 3, Slug: 'plan-verbose', Name: 'Plan (verbose)', Body: 'V {{n}} W', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 1, Slug: 'plan-default', Name: 'PlanTierType (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 2, Slug: 'plan-concise', Name: 'PlanTierType (concise)', Body: 'A {{n}} B', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 3, Slug: 'plan-verbose', Name: 'PlanTierType (verbose)', Body: 'V {{n}} W', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
     ],
     next: [],
     generic: [],
@@ -39,9 +40,9 @@ const store: Record<string, Row[]> = {
 
 const mocks = vi.hoisted(() => ({
     listPromptsByRole: vi.fn(),
-    setDefaultPromptForRole: vi.fn(async () => ({ ok: true })),
-    deletePromptById: vi.fn(async () => ({ ok: true })),
-    upsertPrompt: vi.fn(async () => ({ ok: true, value: 99 })),
+    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+    upsertPrompt: vi.fn(async () => (new DbResult(true, 99))),
 }));
 vi.mock('../../db/prompt-db', () => mocks);
 
@@ -65,19 +66,19 @@ beforeEach(() => {
     document.body.innerHTML = '';
     // Reset store to a known baseline for each test.
     store.plan = [
-        { Id: 1, Slug: 'plan-default', Name: 'Plan (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
-        { Id: 2, Slug: 'plan-concise', Name: 'Plan (concise)', Body: 'A {{n}} B', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
-        { Id: 3, Slug: 'plan-verbose', Name: 'Plan (verbose)', Body: 'V {{n}} W', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 1, Slug: 'plan-default', Name: 'PlanTierType (default)', Body: 'X {{n}} Y', Role: 'plan', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 2, Slug: 'plan-concise', Name: 'PlanTierType (concise)', Body: 'A {{n}} B', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
+        { Id: 3, Slug: 'plan-verbose', Name: 'PlanTierType (verbose)', Body: 'V {{n}} W', Role: 'plan', IsDefault: 0, CreatedAt: 0, UpdatedAt: 0 },
     ];
     mocks.listPromptsByRole.mockReset();
-    mocks.listPromptsByRole.mockImplementation(async (role: string) => ({ ok: true, value: store[role] ?? [] }));
+    mocks.listPromptsByRole.mockImplementation(async (role: string) => (new DbResult(true, store[role] ?? [])));
     mocks.deletePromptById.mockReset();
     mocks.deletePromptById.mockImplementation(async (id: number) => {
         store.plan = store.plan.filter((r) => r.Id !== id);
-        return { ok: true };
+        return new DbResult(true, undefined);
     });
     mocks.upsertPrompt.mockReset();
-    mocks.upsertPrompt.mockImplementation(async () => ({ ok: true, value: 99 }));
+    mocks.upsertPrompt.mockImplementation(async () => (new DbResult(true, 99)));
 });
 afterEach(() => { document.body.innerHTML = ''; vi.restoreAllMocks(); });
 
@@ -107,7 +108,7 @@ describe('prompt-library-modal — delete removes row + drift guard persists on 
     it('after successful delete, editing a survivor to drop {{n}} is rejected and the modal stays open with unchanged body', async () => {
         vi.spyOn(window, 'confirm').mockReturnValue(true);
         // Arm token-drift rejection for the subsequent upsertPrompt call.
-        mocks.upsertPrompt.mockImplementation(async () => ({ ok: false, error: 'token drift: {{n}} missing' }));
+        mocks.upsertPrompt.mockImplementation(async () => (new DbResult(false, undefined, 'token drift: {{n}} missing')));
 
         await openPromptLibraryModal();
 

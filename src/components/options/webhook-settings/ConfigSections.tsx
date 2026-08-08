@@ -1,7 +1,7 @@
 /**
  * Marco Extension — Sub-sections of `WebhookSettingsDialog`.
  *
- * v4.213.0 (Plan-24 SS-05 Phase 2): the URL/timeout, Headers, and Events
+ * v4.213.0 (PlanTierType-24 SS-05 Phase 2): the URL/timeout, Headers, and Events
  * sections were previously inlined inside the dialog's render function.
  * Extracting them here keeps the parent component under
  * `max-lines-per-function` while preserving 1:1 markup.
@@ -13,7 +13,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
 import {
@@ -39,9 +39,9 @@ export function EnableUrlTimeoutSection({ draft, setDraft }: EnableUrlTimeoutPro
     return (
         <section className="space-y-3 rounded-md border p-3">
             <div className="flex items-center justify-between">
-                <Label htmlFor="hook-enabled" className="text-sm font-medium">
+                <LabelType htmlFor="hook-enabled" className="text-sm font-medium">
                     Send results to webhook
-                </Label>
+                </LabelType>
                 <Switch
                     id="hook-enabled"
                     checked={draft.Enabled}
@@ -49,9 +49,9 @@ export function EnableUrlTimeoutSection({ draft, setDraft }: EnableUrlTimeoutPro
                 />
             </div>
             <div className="space-y-1.5">
-                <Label htmlFor="hook-url" className="text-xs text-muted-foreground">
+                <LabelType htmlFor="hook-url" className="text-xs text-muted-foreground">
                     Endpoint URL, supports {"{{GroupId}}"}, {"{{GroupName}}"}, {"{{Event}}"} tokens
-                </Label>
+                </LabelType>
                 <Input
                     id="hook-url"
                     type="url"
@@ -61,9 +61,9 @@ export function EnableUrlTimeoutSection({ draft, setDraft }: EnableUrlTimeoutPro
                 />
             </div>
             <div className="space-y-1.5">
-                <Label htmlFor="hook-timeout" className="text-xs text-muted-foreground">
+                <LabelType htmlFor="hook-timeout" className="text-xs text-muted-foreground">
                     Timeout (ms, 1 000 to 60 000)
-                </Label>
+                </LabelType>
                 <Input
                     id="hook-timeout"
                     type="number"
@@ -89,7 +89,7 @@ export function HeadersSection({ headers, onAdd, onUpdate, onRemove }: HeadersSe
     return (
         <section className="space-y-2 rounded-md border p-3">
             <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">Custom headers</Label>
+                <LabelType className="text-sm font-medium">Custom headers</LabelType>
                 <Button size="sm" variant="ghost" onClick={onAdd}>
                     <Plus className="mr-1 h-3.5 w-3.5" />
                     Add header
@@ -140,7 +140,7 @@ interface EventsSectionProps {
 export function EventsSection({ events, eventSet, onToggle }: EventsSectionProps) {
     return (
         <section className="space-y-2 rounded-md border p-3">
-            <Label className="text-sm font-medium">Send on these events</Label>
+            <LabelType className="text-sm font-medium">Send on these events</LabelType>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {ALL_WEBHOOK_EVENTS.map((kind) => (
                     <label

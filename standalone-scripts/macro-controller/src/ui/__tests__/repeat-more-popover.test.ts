@@ -1,5 +1,5 @@
 /**
- * Plan-23 step 3 regression: repeat preset "More ▾" overflow popover.
+ * PlanTierType-23 step 3 regression: repeat preset "More ▾" overflow popover.
  *
  * Freezes the split threshold (PRESET_INLINE_MAX = 50) and the popover
  * behaviour that closes issue 06:

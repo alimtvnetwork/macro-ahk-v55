@@ -25,7 +25,7 @@ import { logError } from './error-utils';
 import { getCastleRequestToken } from './castle-token';
 import { extractUserIdFromBearer } from './ws-move-user-id';
 
-import { Label } from './types';
+import { LabelType } from './types';
 
 function mc() { return MacroController.getInstance(); }
 
@@ -98,13 +98,13 @@ export function updateLoopMoveStatus(statusState: string, message: string): void
 async function probeSessionWithToken(context: string, token: string): Promise<void> {
   const authLabel = 'Bearer ' + token.substring(0, 12) + '...REDACTED';
 
-  log(Label.LogSessionCheck + context + '] Probing workspace session (auth: ' + authLabel + ')', 'info');
+  log(LabelType.LogSessionCheck + context + '] Probing workspace session (auth: ' + authLabel + ')', 'info');
 
   try {
     const resp = await window.marco!.api!.workspace.probe({ baseUrl: CREDIT_API_BASE });
 
-    if (resp.isFail) {
-      logError('unknown', Label.LogSessionCheck + context + '] ❌ Session probe failed: HTTP ' + resp.status + ' (auth: ' + authLabel + ')');
+    if (!resp.ok) {
+      logError('unknown', LabelType.LogSessionCheck + context + '] ❌ Session probe failed: HTTP ' + resp.status + ' (auth: ' + authLabel + ')');
       showToast(context + ' failed — session also broken (HTTP ' + resp.status + '). Re-auth needed.', 'error');
 
       return;
@@ -117,10 +117,10 @@ async function probeSessionWithToken(context: string, token: string): Promise<vo
         ? ((data as Record<string, unknown[]>).workspaces).length
         : '?');
 
-    log(Label.LogSessionCheck + context + '] ✅ Session valid — ' + wsCount + ' workspaces loaded (auth: ' + authLabel + ')', 'success');
+    log(LabelType.LogSessionCheck + context + '] ✅ Session valid — ' + wsCount + ' workspaces loaded (auth: ' + authLabel + ')', 'success');
     showToast(context + ' failed but session is valid (' + wsCount + ' workspaces)', 'info');
   } catch (err) {
-    logError('unknown', Label.LogSessionCheck + context + '] ❌ Network error: ' + (err as Error).message);
+    logError('unknown', LabelType.LogSessionCheck + context + '] ❌ Network error: ' + (err as Error).message);
     showToast(context + ' failed — network error on session check', 'error');
   }
 }
@@ -138,14 +138,14 @@ export async function verifyWorkspaceSessionAfterFailure(context: string): Promi
     return;
   }
 
-  log(Label.LogSessionCheck + context + '] No bearer token — recovering before probe', 'warn');
+  log(LabelType.LogSessionCheck + context + '] No bearer token — recovering before probe', 'warn');
 
   try {
     const recoveredToken = await recoverAuthOnce();
     const fallbackToken = recoveredToken || resolveToken();
 
     if (!fallbackToken) {
-      logError('unknown', Label.LogSessionCheck + context + '] Recovery failed — skipping unauthenticated session probe');
+      logError('unknown', LabelType.LogSessionCheck + context + '] Recovery failed — skipping unauthenticated session probe');
       showToast(context + ' failed — no bearer token available for session check', 'error', { noStop: true });
 
       return;
@@ -153,7 +153,7 @@ export async function verifyWorkspaceSessionAfterFailure(context: string): Promi
 
     await probeSessionWithToken(context, fallbackToken);
   } catch {
-    logError('unknown', Label.LogSessionCheck + context + '] Recovery error — skipping unauthenticated session probe');
+    logError('unknown', LabelType.LogSessionCheck + context + '] Recovery error — skipping unauthenticated session probe');
     showToast(context + ' failed — no bearer token available for session check', 'error', { noStop: true });
   }
 }
@@ -331,7 +331,7 @@ async function handleMoveResponse(
     await handleMoveAuthFailure(projectId, targetWorkspaceId, targetWorkspaceName, token, resp.status);
     return;
   }
-  if (resp.isSuccess) {
+  if (resp.ok) {
     log('Move response: ' + resp.status + label, 'success');
     handleMoveSuccess(targetWorkspaceName, label);
     return;
@@ -467,7 +467,7 @@ async function executeSwitchContext(
       return;
     }
 
-    if (resp.isSuccess) {
+    if (resp.ok) {
       log('Switch context response: ' + resp.status + label, 'success');
     } else {
       const bodyPreview = JSON.stringify(resp.data).substring(0, 500);

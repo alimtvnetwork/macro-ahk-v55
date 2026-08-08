@@ -7,9 +7,9 @@
 
 import { describe, it, expect } from 'vitest';
 import {
-  SubscriptionStatus,
-  WsTierValue,
-  PlanName,
+  SubscriptionStatusType,
+  WsTierValueType,
+  PlanNameType,
   normalizeSubscriptionStatus,
   isCanceledStatus,
   isPastDueStatus,
@@ -20,27 +20,27 @@ import {
 
 describe('subscription-status enums', () => {
   it('exposes canonical Stripe status values', () => {
-    expect(SubscriptionStatus.ACTIVE).toBe('active');
-    expect(SubscriptionStatus.TRIALING).toBe('trialing');
-    expect(SubscriptionStatus.PAST_DUE).toBe('past_due');
-    expect(SubscriptionStatus.UNPAID).toBe('unpaid');
-    expect(SubscriptionStatus.CANCELED).toBe('canceled');
-    expect(SubscriptionStatus.CANCELLED).toBe('cancelled');
-    expect(SubscriptionStatus.EXPIRED).toBe('expired');
+    expect(SubscriptionStatusType.ACTIVE).toBe('active');
+    expect(SubscriptionStatusType.TRIALING).toBe('trialing');
+    expect(SubscriptionStatusType.PAST_DUE).toBe('past_due');
+    expect(SubscriptionStatusType.UNPAID).toBe('unpaid');
+    expect(SubscriptionStatusType.CANCELED).toBe('canceled');
+    expect(SubscriptionStatusType.CANCELLED).toBe('cancelled');
+    expect(SubscriptionStatusType.EXPIRED).toBe('expired');
   });
 
   it('exposes canonical workspace tier values', () => {
-    expect(WsTierValue.FREE).toBe('FREE');
-    expect(WsTierValue.LITE).toBe('LITE');
-    expect(WsTierValue.PRO).toBe('PRO');
-    expect(WsTierValue.EXPIRED).toBe('EXPIRED');
+    expect(WsTierValueType.FREE).toBe('FREE');
+    expect(WsTierValueType.LITE).toBe('LITE');
+    expect(WsTierValueType.PRO).toBe('PRO');
+    expect(WsTierValueType.EXPIRED).toBe('EXPIRED');
   });
 
   it('exposes canonical plan-name values', () => {
-    expect(PlanName.FREE).toBe('free');
-    expect(PlanName.PRO_0).toBe('pro_0');
-    expect(PlanName.KTLO).toBe('ktlo');
-    expect(PlanName.LITE).toBe('lite');
+    expect(PlanNameType.FREE).toBe('free');
+    expect(PlanNameType.PRO_0).toBe('pro_0');
+    expect(PlanNameType.KTLO).toBe('ktlo');
+    expect(PlanNameType.LITE).toBe('lite');
   });
 });
 
@@ -131,18 +131,18 @@ describe('no-magic-strings guard (regression)', () => {
   // comparisons will still match — the enum is the only place the string
   // value is defined.
   it('canceled enum survives round-trip through isCanceledStatus', () => {
-    expect(isCanceledStatus(SubscriptionStatus.CANCELED)).toBe(true);
-    expect(isCanceledStatus(SubscriptionStatus.CANCELLED)).toBe(true);
+    expect(isCanceledStatus(SubscriptionStatusType.CANCELED)).toBe(true);
+    expect(isCanceledStatus(SubscriptionStatusType.CANCELLED)).toBe(true);
   });
   it('past_due enum survives round-trip through isPastDueStatus', () => {
-    expect(isPastDueStatus(SubscriptionStatus.PAST_DUE)).toBe(true);
-    expect(isPastDueStatus(SubscriptionStatus.UNPAID)).toBe(true);
+    expect(isPastDueStatus(SubscriptionStatusType.PAST_DUE)).toBe(true);
+    expect(isPastDueStatus(SubscriptionStatusType.UNPAID)).toBe(true);
   });
   it('active enum survives round-trip through isHealthyStatus', () => {
-    expect(isHealthyStatus(SubscriptionStatus.ACTIVE)).toBe(true);
-    expect(isHealthyStatus(SubscriptionStatus.TRIALING)).toBe(true);
+    expect(isHealthyStatus(SubscriptionStatusType.ACTIVE)).toBe(true);
+    expect(isHealthyStatus(SubscriptionStatusType.TRIALING)).toBe(true);
   });
   it('EXPIRED tier round-trip', () => {
-    expect(isExpiredTier(WsTierValue.EXPIRED)).toBe(true);
+    expect(isExpiredTier(WsTierValueType.EXPIRED)).toBe(true);
   });
 });

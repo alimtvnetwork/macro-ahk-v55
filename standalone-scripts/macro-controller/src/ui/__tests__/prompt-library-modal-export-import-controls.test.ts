@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * v4.191.0: modal wiring test for the new header controls.
  * - Export "History" checkbox flows through to `exportPromptsToJson({ includeRevisions })`.
@@ -11,10 +12,10 @@ vi.mock('../../logging', () => ({ log: vi.fn() }));
 vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 
 const dbMocks = vi.hoisted(() => ({
-    listPromptsByRole: vi.fn(async () => ({ ok: true, value: [] })),
-    setDefaultPromptForRole: vi.fn(async () => ({ ok: true })),
-    deletePromptById: vi.fn(async () => ({ ok: true })),
-    upsertPrompt: vi.fn(async () => ({ ok: true, value: 1 })),
+    listPromptsByRole: vi.fn(async () => (new DbResult(true, []))),
+    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+    upsertPrompt: vi.fn(async () => (new DbResult(true, 1))),
 }));
 vi.mock('../../db/prompt-db', () => dbMocks);
 

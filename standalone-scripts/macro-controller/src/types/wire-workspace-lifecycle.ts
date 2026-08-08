@@ -1,5 +1,5 @@
 /**
- * Plan-10 (follow-up) — sibling wide surface for the lifecycle / meta
+ * PlanTierType-10 (follow-up) — sibling wide surface for the lifecycle / meta
  * strings + shallow nested objects consumed by
  * `credit-parser.parseWorkspaceItem` and `extractLifecycleMeta`.
  *

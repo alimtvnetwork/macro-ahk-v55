@@ -1,4 +1,4 @@
-import { Type4, ResourceType, Status10 } from "../../../types/enums";
+import { InstructionStepType, ResourceType, UpdaterEntryStatus } from "../../../types/enums";
 
 export interface UpdaterEndpoint {
   id: number;
@@ -13,7 +13,7 @@ export interface UpdaterStep {
   id: number;
   stepId: string;
   sortOrder: number;
-  type: Type4;
+  type: InstructionStepType;
   condition?: string;
   resourceType?: ResourceType;
   sourceUrl?: string;
@@ -54,7 +54,7 @@ export interface UpdaterEntry {
   categories: string[];
   endpoints: UpdaterEndpoint[];
   steps: UpdaterStep[];
-  status?: Status10;
+  status?: UpdaterEntryStatus;
 }
 
 export const INTERVAL_OPTIONS = [

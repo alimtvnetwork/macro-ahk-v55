@@ -1,9 +1,9 @@
 /**
- * Plan-10 log-signal regression — proves `batchRefreshFromWire` emits
+ * PlanTierType-10 log-signal regression — proves `batchRefreshFromWire` emits
  * the observable funnel line `CreditBalance.batchFromWire: raw=N, typed=N, enrichable=N`
  * so operators can trace wire→typed→enrichable attrition without a debugger.
  *
- * Silent-failure guard: if this log ever disappears, the whole Plan-10
+ * Silent-failure guard: if this log ever disappears, the whole PlanTierType-10
  * observability contract is dead.
  */
 
@@ -26,7 +26,7 @@ vi.mock('../../logging', () => ({
 import { batchRefreshFromWire } from '../batch-refresh-from-wire';
 import { WIRE_CANONICAL_SET } from '../__fixtures__/wire-workspaces';
 
-describe('batchRefreshFromWire log signal (Plan-10)', () => {
+describe('batchRefreshFromWire log signal (PlanTierType-10)', () => {
   beforeEach(() => { logSpy.mockClear(); });
 
   it('emits CreditBalance.batchFromWire funnel line with raw/typed/enrichable counts', async () => {

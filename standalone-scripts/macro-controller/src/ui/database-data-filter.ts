@@ -9,11 +9,11 @@
  */
 
 import type { FilterState } from './database-modal-data';
-// Plan-17 step 16: escapeHtml pulled from leaf (no cycle edge to data-table);
+// PlanTierType-17 step 16: escapeHtml pulled from leaf (no cycle edge to data-table);
 // loadTableData/getActiveFilters are lazy-loaded at handler time to eliminate
 // the modal-data ↔ filter runtime cycle (madge circulars #11 and #12).
 import { escapeHtml } from './database-html-escape';
-import { Enum_7dc824d7 } from "../types/enums";
+import { FilterStateModeType } from "../types/enums";
 
 // ── Filter Bar ──
 
@@ -86,7 +86,7 @@ function buildColumnSelect(
   return select;
 }
 
-// ── Mode Select ──
+// ── OperationModeType Select ──
 
 function buildModeSelect(filter: FilterState | null | undefined): HTMLSelectElement {
   const select = document.createElement('select');
@@ -157,7 +157,7 @@ function buildSearchButton(
   button.onclick = async () => {
     const selectedColumn = columnSelect.value;
     const filterValue = valueInput.value.trim();
-    const selectedMode = modeSelect.value as Enum_7dc824d7;
+    const selectedMode = modeSelect.value as FilterStateModeType;
     const caseSensitiveCheckbox = caseSensitiveLabel.querySelector('input') as HTMLInputElement;
     const isCaseSensitive = caseSensitiveCheckbox.checked;
     const hasValidFilter = selectedColumn !== '' && filterValue !== '';

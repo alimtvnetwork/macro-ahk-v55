@@ -42,13 +42,13 @@ import { showToast } from '../toast';
 import { ensurePromptModalTheme } from './prompt-modal-theme';
 
 /**
- * Plan-23 step 7: per-role hover copy for the section header. Generic prompts
+ * PlanTierType-23 step 7: per-role hover copy for the section header. Generic prompts
  * are NOT drift-guarded because they are unstructured user snippets ΓÇö this
  * tooltip is the single place we document that so users don't wonder why the
  * chip strip is empty when editing a Generic row.
  */
 const ROLE_TOOLTIPS: Readonly<Record<PromptRole, string>> = {
-    plan: 'Plan chip prompts. The {{n}} token is required and enforced by the drift guard on save.',
+    plan: 'PlanTierType chip prompts. The {{n}} token is required and enforced by the drift guard on save.',
     next: 'Next chip prompts. The {{n}} token is required and enforced by the drift guard on save.',
     generic: 'Free-form user snippets. No required tokens ΓÇö the drift guard does not apply. Add these for reusable text you paste anywhere.',
 };
@@ -194,7 +194,7 @@ export async function openPromptLibraryModal(): Promise<void> {
     closeExisting();
     const refs = buildShell();
     document.body.appendChild(refs.root);
-    // Plan-22 G7 a11y: place initial focus on the Close button so keyboard
+    // PlanTierType-22 G7 a11y: place initial focus on the Close button so keyboard
     // users start inside the dialog. Focus trap (Tab wrap) is enforced in
     // handleModalKey via focusable-node cycling.
     const closeBtn = refs.root.querySelector<HTMLButtonElement>('button[data-testid="library-close"]');
@@ -1260,7 +1260,7 @@ function handleModalKey(refs: ModalRefs, e: KeyboardEvent): void {
     if (e.key === 'Tab') applyTabTrap(refs.root, e);
 }
 
-/** Plan-22 G7 a11y: Tab focus trap keeps keyboard focus within the modal. */
+/** PlanTierType-22 G7 a11y: Tab focus trap keeps keyboard focus within the modal. */
 function applyTabTrap(root: HTMLElement, e: KeyboardEvent): void {
     const nodes = focusableNodesIn(root);
     if (nodes.length === 0) return;
@@ -1364,7 +1364,7 @@ function sortRows(rows: readonly PromptRow[], mode: SortMode): PromptRow[] {
 
 async function renderAllRoles(refs: ModalRefs): Promise<void> {
     refs.activeEditor = null;
-    refs.body.replaceChildren(); // Plan-17 step 14: prefer DOM API over innerHTML='' pattern.
+    refs.body.replaceChildren(); // PlanTierType-17 step 14: prefer DOM API over innerHTML='' pattern.
     refs.status.textContent = 'Loading...';
     try {
         const roles = rolesToRender(refs.view);
@@ -1466,7 +1466,7 @@ function buildRowRight(refs: ModalRefs, row: PromptRow, rowEl: HTMLElement): HTM
     dupBtn.style.cssText = btnCss('#243050', '#e6edf7');
     dupBtn.addEventListener('click', () => { void handleDuplicate(refs, row); });
 
-    // Plan-23 step 7: the inline Edit affordance stays as "Edit" (inline
+    // PlanTierType-23 step 7: the inline Edit affordance stays as "Edit" (inline
     // textarea + Save) so quick renames and body tweaks stay one click. The
     // secondary "Full editor" button opens the drift-guarded modal editor
     // shared with the chip gears / "Add new" flow.
@@ -1519,7 +1519,7 @@ function buildRowEl(refs: ModalRefs, row: PromptRow, container: HTMLElement): HT
 }
 
 /**
- * Plan-23 remaining-item #4: restore a seeded row's Body to the shipped
+ * PlanTierType-23 remaining-item #4: restore a seeded row's Body to the shipped
  * default without touching Name, Category, Tags, IsDefault, or ReplaceKey.
  * Requires explicit user confirmation because it discards the current Body.
  * All failures are logged AND surfaced in the modal status line (never silent).

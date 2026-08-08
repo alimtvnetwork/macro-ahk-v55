@@ -21,7 +21,7 @@ import { state } from './shared-state';
 import { extractProjectIdFromUrl } from './workspace-detection';
 import { getCachedWorkspaceName, getCachedWorkspaceId } from './workspace-cache';
 import { logError } from './error-utils';
-import { SourceEnum4 } from "./types/enums";
+import { WorkspaceSnapshotSourceType } from "./types/enums";
 
 const REQUEST_SOURCE = 'marco-extension-request';
 const RESPONSE_SOURCE = 'marco-controller-response';
@@ -31,7 +31,7 @@ export interface DetectedWorkspaceSnapshot {
     readonly workspaceName: string;
     readonly workspaceId: string;
     readonly projectId: string | null;
-    readonly source: SourceEnum4;
+    readonly source: WorkspaceSnapshotSourceType;
     readonly capturedAt: string;
 }
 

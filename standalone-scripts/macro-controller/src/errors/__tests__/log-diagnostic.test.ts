@@ -1,5 +1,5 @@
 /**
- * Plan 26 / step 6 — verifies that `logDiagnostic` and
+ * PlanTierType 26 / step 6 — verifies that `logDiagnostic` and
  * `logDiagnosticFromCode` route DiagnosticError instances through the SDK
  * logger as BOTH a human error line and a structured `console` record whose
  * first argument is `'diagnostic-report'` and whose payload contains the
@@ -85,7 +85,7 @@ function assertStructuredPayload(
   }
 }
 
-describe('logDiagnostic (Plan 26 step 6)', () => {
+describe('logDiagnostic (PlanTierType 26 step 6)', () => {
   beforeEach(() => uninstallLogger());
   afterEach(() => uninstallLogger());
 

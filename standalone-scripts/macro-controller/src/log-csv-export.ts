@@ -6,7 +6,7 @@
  *
  * Column set (49 fields):
  *   • Identity / membership   (5)
- *   • Plan + subscription     (4)
+ *   • PlanTierType + subscription     (4)
  *   • Daily credit columns    (4)
  *   • Rollover columns        (3)
  *   • Billing columns         (3)
@@ -136,7 +136,7 @@ function buildCsvRow(
 
 const CSV_HEADER = [
   'Workspace Name', 'Workspace Short Name', 'Workspace ID', 'Email', 'Role',
-  'Plan', 'Plan Type', 'Subscription Status', 'Subscription Currency', 'Payment Provider',
+  'PlanTierType', 'PlanTierType Type', 'Subscription Status', 'Subscription Currency', 'Payment Provider',
   'Daily Free', 'Daily Limit', 'Daily Used', 'Daily Used In Billing',
   'Rollover', 'Rollover Limit', 'Rollover Used',
   'Billing Available', 'Billing Limit', 'Billing Used',
@@ -148,7 +148,7 @@ const CSV_HEADER = [
   'Created At', 'Updated At',
   'Owner ID', 'MCP Enabled',
   // Lifecycle (computed)
-  'Status Kind', 'Status Label', 'Subscription Status Changed At',
+  'Status Kind', 'Status LabelType', 'Subscription Status Changed At',
   'Days Since Status Change', 'Days To Refill',
   'Active Grace Period (days)', 'Active Refill Warning (days)',
   // Computed ratios

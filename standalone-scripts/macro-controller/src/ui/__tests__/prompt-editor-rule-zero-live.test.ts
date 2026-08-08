@@ -1,7 +1,7 @@
 /**
  * v4.176.0 — Rule-0 live pre-save indicator regression.
  *
- * The Plan editor MUST surface `validateRuleZero(body)` state live so users
+ * The PlanTierType editor MUST surface `validateRuleZero(body)` state live so users
  * see declared vs counted step counts and Save is disabled while a literal
  * mismatch is present. Template bodies (containing `{{n}}`) must stay
  * neutral and never block Save.
@@ -22,7 +22,7 @@ function openPlanEditorWith(bodyText: string): {
   const editPrompt = { id: 'db-row-1', slug: seedRow.slug, name: seedRow.name, text: bodyText };
   openPromptCreationModal({} as never, {} as never, editPrompt as never, undefined, {
     requiredTokens: ['n'],
-    roleLabel: 'Plan',
+    roleLabel: 'PlanTierType',
     role: 'plan',
   });
   const overlay = document.getElementById('marco-prompt-modal')!;
@@ -35,7 +35,7 @@ function openPlanEditorWith(bodyText: string): {
 }
 
 describe('Rule-0 live pre-save indicator (v4.176.0, extended to next in v4.189.0)', () => {
-  it('mounts the indicator for the Next role (v4.189.0 parity with Plan)', () => {
+  it('mounts the indicator for the Next role (v4.189.0 parity with PlanTierType)', () => {
     const seedRow = PLAN_NEXT_SEED_ROWS.find((r) => r.slug === 'next-default')!;
     openPromptCreationModal(
       {} as never, {} as never,

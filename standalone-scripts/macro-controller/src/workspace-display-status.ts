@@ -1,7 +1,7 @@
 /**
  * Workspace Display Status — Step 1 of Issue 115
  *
- * Pure module. Collapses the granular lifecycle `WorkspaceStatusKind` from
+ * Pure module. Collapses the granular lifecycle `WorkspaceStatusKindType` from
  * `workspace-status.ts` into a *display kind* used by the badge renderer.
  *
  * Display rules (per Issue 115 spec):
@@ -23,11 +23,11 @@ import type { WorkspaceCredit } from './types';
 import type { WorkspaceLifecycleConfig } from './workspace-lifecycle-config';
 import { daysToRefillForWs } from './workspace-refill-priority';
 import { daysBetween, getEffectiveStatus, type WorkspaceStatus } from './workspace-status';
-import { WorkspaceDisplayKindEnum, WorkspaceDisplayToneEnum } from "./types/enums";
+import { WorkspaceDisplayKindType, WorkspaceDisplayToneType } from "./types/enums";
 
 /** Display-side badge categories. Decoupled from internal lifecycle enum. */
 export type WorkspaceDisplayKind =
-  WorkspaceDisplayKindEnum;
+  WorkspaceDisplayKindType;
 
 /**
  * Issue 119: grace period in days after a workspace enters `past-due-expiring`
@@ -38,7 +38,7 @@ export const PAST_DUE_GRACE_DAYS = 10;
 
 /** Abstract tone names. Renderer maps these to CSS. */
 export type WorkspaceDisplayTone =
-  WorkspaceDisplayToneEnum;      // normal — no badge
+  WorkspaceDisplayToneType;      // normal — no badge
 
 export interface WorkspaceDisplayStatus {
   kind: WorkspaceDisplayKind;
@@ -84,7 +84,7 @@ export const WORKSPACE_BADGE_DISPLAY: Record<WorkspaceDisplayKind, { tone: Works
 };
 
 /* ------------------------------------------------------------------ */
-/*  Label formatters                                                   */
+/*  LabelType formatters                                                   */
 /* ------------------------------------------------------------------ */
 
 const MAX_DAY_BADGE = 99;

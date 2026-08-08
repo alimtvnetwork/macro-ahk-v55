@@ -1,7 +1,7 @@
 /**
  * Prompt Dropdown Render helpers
  *
- * Plan-17 Step 25: extracted from ui/prompt-dropdown.ts to shrink that file
+ * PlanTierType-17 Step 25: extracted from ui/prompt-dropdown.ts to shrink that file
  * below the 500 LOC guideline cap. Hosts pure DOM-render helpers that group
  * entries into collapsible folder trees.
  *
@@ -58,7 +58,7 @@ function buildFolderNode(
 
   const folderHeader = document.createElement('div');
   folderHeader.style.cssText = 'padding:6px 10px;font-size:10px;font-weight:700;color:' + cPrimaryLight + ';cursor:pointer;display:flex;align-items:center;gap:6px;background:rgba(124,58,237,0.03);';
-  // Plan-17 step 14: XSS-safe DOM build (folderName originates from user data).
+  // PlanTierType-17 step 14: XSS-safe DOM build (folderName originates from user data).
   const folderIcon = document.createElement('span');
   folderIcon.textContent = '📁';
   const folderLabel = document.createElement('span');

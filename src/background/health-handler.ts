@@ -16,7 +16,7 @@ import { countTable, getLogsDb, getErrorsDb, getCurrentSessionId } from "./handl
 import { logBgWarnError, logCaughtError, BgLogTag} from "./bg-logger";
 
 import { getChromeRef } from "./chrome-ref";
-import { Enum_24dffcd9, Enum_2183c564 } from "../types/enums";
+import { ApplyQuotaResultResult, ApplyErrorRateResultResult } from "../types/enums";
 
 const _chr = getChromeRef();
 
@@ -104,7 +104,7 @@ async function checkStorageAvailability(): Promise<boolean> {
 }
 
 /** Checks total row count against storage thresholds. */
-function checkStorageQuota(): Enum_24dffcd9 {
+function checkStorageQuota(): ApplyQuotaResultResult {
     try {
         const logCount = countTable(getLogsDb(), "Logs");
         const errorCount = countTable(getErrorsDb(), "Errors");
@@ -122,7 +122,7 @@ function checkStorageQuota(): Enum_24dffcd9 {
 }
 
 /** Checks recent error rate for the CURRENT session only. */
-function checkErrorRate(): Enum_2183c564 {
+function checkErrorRate(): ApplyErrorRateResultResult {
     try {
         const currentSessionId = getCurrentSessionId();
         if (currentSessionId === null) {
@@ -166,7 +166,7 @@ function applyStorageResult(isAvailable: boolean, details: string[]): void {
 
 /** Applies quota check result to details. */
 function applyQuotaResult(
-    result: Enum_24dffcd9,
+    result: ApplyQuotaResultResult,
     details: string[],
 ): void {
     const isWarning = result === "warning";
@@ -181,7 +181,7 @@ function applyQuotaResult(
 
 /** Applies error rate result to details. */
 function applyErrorRateResult(
-    result: Enum_2183c564,
+    result: ApplyErrorRateResultResult,
     details: string[],
 ): void {
     const isDegraded = result === "degraded";

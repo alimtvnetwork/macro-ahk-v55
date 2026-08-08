@@ -27,7 +27,7 @@ function ws(partial: Partial<WorkspaceCredit>): WorkspaceCredit {
 describe('generateCsv', () => {
   it('returns header only for empty workspace list', () => {
     const csv = generateCsv([]);
-    expect(csv).toBe('Workspace,Plan,Projects,Used,Remaining,Total,Daily,DailyLimit,Source');
+    expect(csv).toBe('Workspace,PlanTierType,Projects,Used,Remaining,Total,Daily,DailyLimit,Source');
   });
 
   it('emits one data row per workspace in order', () => {
@@ -37,7 +37,7 @@ describe('generateCsv', () => {
     ]);
     const lines = csv.split('\r\n');
     expect(lines).toHaveLength(3);
-    expect(lines[0]).toBe('Workspace,Plan,Projects,Used,Remaining,Total,Daily,DailyLimit,Source');
+    expect(lines[0]).toBe('Workspace,PlanTierType,Projects,Used,Remaining,Total,Daily,DailyLimit,Source');
     expect(lines[1]).toMatch(/^"Alpha","Pro 3",7,320,80,400,0,5,(Inline|Cache|Missing)$/);
     expect(lines[2]).toMatch(/^"Beta","Pro 0",0,45,15,60,0,5,(Inline|Cache|Missing)$/);
   });
@@ -62,7 +62,7 @@ describe('generateCsv', () => {
     ]);
     // numProjects=1 falls back because default is 1 in ws(), but we override to 1 in generateCsv logic too
     // Let's just check the header is present and row has values
-    expect(csv).toMatch(/^Workspace,Plan,Projects,Used,Remaining,Total,Daily,DailyLimit,Source/);
+    expect(csv).toMatch(/^Workspace,PlanTierType,Projects,Used,Remaining,Total,Daily,DailyLimit,Source/);
   });
 });
 

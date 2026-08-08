@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getPlatform } from "../../platform";
 import { Toast } from "../shared/Toast";
-import { VariantEnum2 } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { AlertVariantType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 interface StoredScript {
     id: string;
@@ -21,7 +21,7 @@ export function ScriptsLibrary() {
     const platform = getPlatform();
     const [scripts, setScripts] = useState<StoredScript[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [toast, setToast] = useState<{ message: string; variant: VariantEnum2 } | null>(null);
+    const [toast, setToast] = useState<{ message: string; variant: AlertVariantType } | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
 
     const loadScripts = useCallback(async () => {

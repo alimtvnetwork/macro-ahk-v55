@@ -1,5 +1,5 @@
 /**
- * Plan-23 remaining-item #4: AI guideline export includes the shipped seed
+ * PlanTierType-23 remaining-item #4: AI guideline export includes the shipped seed
  * body as a "Canonical default" appendix so an external AI editor can diff
  * against the byte-exact original before proposing edits.
  *
@@ -17,7 +17,7 @@ import { PLAN_DEFAULT_BODY } from '../../seed/plan-next-prompts';
 describe('buildAiGuidelineMarkdown — Canonical default appendix', () => {
     it('appends the seed body inside a ```text fence when seedBody is provided', () => {
         const md = buildAiGuidelineMarkdown({
-            roleLabel: 'Plan',
+            roleLabel: 'PlanTierType',
             requiredTokens: ['n'],
             seedBody: PLAN_DEFAULT_BODY,
         });
@@ -36,7 +36,7 @@ describe('buildAiGuidelineMarkdown — Canonical default appendix', () => {
 
     it('omits the appendix when seedBody is an empty string (defensive)', () => {
         const md = buildAiGuidelineMarkdown({
-            roleLabel: 'Plan',
+            roleLabel: 'PlanTierType',
             requiredTokens: ['n'],
             seedBody: '',
         });

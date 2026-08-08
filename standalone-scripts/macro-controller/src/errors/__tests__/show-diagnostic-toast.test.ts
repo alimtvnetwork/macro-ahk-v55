@@ -1,5 +1,5 @@
 /**
- * Plan 22 · gap #7 — end-to-end coverage of the structured-failure toast
+ * PlanTierType 22 · gap #7 — end-to-end coverage of the structured-failure toast
  * rendering pipeline: DiagnosticError -> reportDiagnostic -> showToast.
  *
  * Locks: severity mapping (T1..T4), multi-line body preservation with
@@ -27,7 +27,7 @@ import {
   clearDiagnosticToastTrace,
 } from '../../telemetry/diagnostic-toast-telemetry';
 
-describe('showDiagnosticToast pipeline (Plan 22 gap #7)', () => {
+describe('showDiagnosticToast pipeline (PlanTierType 22 gap #7)', () => {
   let errSpy: ReturnType<typeof vi.spyOn>;
   let logSpy: ReturnType<typeof vi.spyOn>;
 

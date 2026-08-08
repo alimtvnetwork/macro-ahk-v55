@@ -20,8 +20,8 @@ import type { WorkspaceCredit } from '../types';
 import { resolveCreditSummary } from '../credit-balance-update/credit-summary-resolver';
 import { formatPlanDisplayLabel } from '../credit-balance-update/plan-mapper';
 import { makeDraggable } from './drag-window';
-import { CreditToneEnum, SortKeyEnum, SortDirEnum } from "../types/enums";
-import { SideEnum1 } from "../../../../src/types/enums";
+import { CreditToneType, WorkspaceSortKeyType, SortDirectionType } from "../types/enums";
+import { SemanticSemanticSideEnum } from "../../../../src/types/enums";
 
 const DIALOG_ID = 'marco-credit-totals-modal';
 const ATTR_ARIA_LABEL = 'aria-label';
@@ -46,7 +46,7 @@ export function formatLocalReset(iso: string): string {
 /** Generate a RFC-4180-ish CSV string from workspace credits. */
 export function generateCsv(workspaces: ReadonlyArray<WorkspaceCredit>): string {
   const rows: string[] = [];
-  rows.push('Workspace,Plan,Projects,Used,Remaining,Total,Daily,DailyLimit,Source');
+  rows.push('Workspace,PlanTierType,Projects,Used,Remaining,Total,Daily,DailyLimit,Source');
   for (const ws of workspaces) {
     const summary = resolveCreditSummary(ws);
     const name = (ws.fullName || ws.name || ws.id).replace(/"/g, '""');
@@ -77,7 +77,7 @@ export function downloadCsv(filename: string, csvText: string): void {
 }
 
 /** Tone palette for credit numbers — colourful, dark-theme safe (Step 7). */
-export type CreditTone = CreditToneEnum;
+export type CreditTone = CreditToneType;
 const TONE_COLOR: Record<CreditTone, string> = {
   ok: '#86efac',      // green — remaining / healthy
   warn: '#fbbf24',    // amber — alerts
@@ -136,8 +136,8 @@ function ensureRowStyles(): void {
 }
 
 /** Sort key + direction for the breakdown table (Step 9). */
-export type SortKey = SortKeyEnum;
-export type SortDir = SortDirEnum;
+export type SortKey = WorkspaceSortKeyType;
+export type SortDir = SortDirectionType;
 export interface SortState { key: SortKey; dir: SortDir; }
 
 const NUMERIC_KEYS: ReadonlySet<SortKey> = new Set(['projects', 'used', 'rem', 'total']);
@@ -182,9 +182,9 @@ export function nextSortDir(key: SortKey, current: SortState): SortState {
   return { key, dir: 'none' };
 }
 
-const COLUMNS: ReadonlyArray<{ key: SortKey; label: string; align: SideEnum1 }> = [
+const COLUMNS: ReadonlyArray<{ key: SortKey; label: string; align: SemanticSemanticSideEnum }> = [
   { key: 'name', label: 'Workspace', align: 'left' },
-  { key: 'plan', label: 'Plan', align: 'left' },
+  { key: 'plan', label: 'PlanTierType', align: 'left' },
   { key: 'projects', label: 'Prj', align: 'right' },
   { key: 'used', label: 'Used', align: 'right' },
   { key: 'rem', label: 'Rem', align: 'right' },

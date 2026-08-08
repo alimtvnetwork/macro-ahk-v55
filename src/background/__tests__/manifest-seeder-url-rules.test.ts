@@ -1,8 +1,8 @@
 /**
- * Issue 119 — manifest-seeder preserves MatchType.
+ * Issue 119 — manifest-seeder preserves MatchRuleType.
  *
  * Background: `lovable-dashboard`'s seed declares
- * `{ Pattern: "https://lovable.dev/dashboard", MatchType: "exact" }`.
+ * `{ Pattern: "https://lovable.dev/dashboard", MatchRuleType: "exact" }`.
  * The pre-fix `extractUrlMatches` flattened to `string[]` and the
  * downstream matcher globbed every entry — exact-match intent was lost.
  *
@@ -14,7 +14,7 @@
 
 import { describe, it, expect } from "vitest";
 import type { SeedProjectEntry } from "../../shared/seed-manifest-types";
-import { MatchType1 } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { UrlRuleMatchType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 // Re-export the internal helpers by re-implementing them with the same
 // signature here — the production code lives in `manifest-seeder.ts` as
@@ -27,11 +27,11 @@ function extractUrlMatches(project: SeedProjectEntry): string[] {
 function extractUrlMatchRules(project: SeedProjectEntry) {
     return (project.TargetUrls ?? []).map((t) => ({
         pattern: t.Pattern,
-        matchType: t.MatchType,
+        matchType: t.MatchRuleType,
     }));
 }
 
-function makeProject(targets: Array<{ Pattern: string; MatchType: MatchType1 }>): SeedProjectEntry {
+function makeProject(targets: Array<{ Pattern: string; MatchRuleType: UrlRuleMatchType }>): SeedProjectEntry {
     return {
         Name: "test", DisplayName: "Test", Version: "1.0.0", Description: "",
         SeedId: "test-seed", SeedOnInstall: true, World: "MAIN",
@@ -44,8 +44,8 @@ function makeProject(targets: Array<{ Pattern: string; MatchType: MatchType1 }>)
 describe("manifest-seeder URL extraction", () => {
     it("extractUrlMatches returns flat string[] (legacy)", () => {
         const p = makeProject([
-            { Pattern: "https://lovable.dev/dashboard", MatchType: "exact" },
-            { Pattern: "https://lovable.dev/projects/*", MatchType: "glob" },
+            { Pattern: "https://lovable.dev/dashboard", MatchRuleType: "exact" },
+            { Pattern: "https://lovable.dev/projects/*", MatchRuleType: "glob" },
         ]);
         expect(extractUrlMatches(p)).toEqual([
             "https://lovable.dev/dashboard",
@@ -53,11 +53,11 @@ describe("manifest-seeder URL extraction", () => {
         ]);
     });
 
-    it("extractUrlMatchRules preserves MatchType per entry", () => {
+    it("extractUrlMatchRules preserves MatchRuleType per entry", () => {
         const p = makeProject([
-            { Pattern: "https://lovable.dev/dashboard", MatchType: "exact" },
-            { Pattern: "https://lovable.dev/projects/*", MatchType: "glob" },
-            { Pattern: "^https://lovable\\.dev/p/[a-z0-9]+$", MatchType: "regex" },
+            { Pattern: "https://lovable.dev/dashboard", MatchRuleType: "exact" },
+            { Pattern: "https://lovable.dev/projects/*", MatchRuleType: "glob" },
+            { Pattern: "^https://lovable\\.dev/p/[a-z0-9]+$", MatchRuleType: "regex" },
         ]);
         expect(extractUrlMatchRules(p)).toEqual([
             { pattern: "https://lovable.dev/dashboard", matchType: "exact" },
@@ -73,9 +73,9 @@ describe("manifest-seeder URL extraction", () => {
     });
 
     it("urlMatches and urlMatchRules have matching length + order", () => {
-        const targets: Array<{ Pattern: string; MatchType: MatchType1 }> = [
-            { Pattern: "a", MatchType: "exact" },
-            { Pattern: "b", MatchType: "glob" },
+        const targets: Array<{ Pattern: string; MatchRuleType: UrlRuleMatchType }> = [
+            { Pattern: "a", MatchRuleType: "exact" },
+            { Pattern: "b", MatchRuleType: "glob" },
         ];
         const p = makeProject(targets);
         const flat = extractUrlMatches(p);

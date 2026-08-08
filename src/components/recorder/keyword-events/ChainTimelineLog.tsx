@@ -2,7 +2,7 @@
  * Marco Extension: Chain timeline log
  *
  * Live-updating scroll log rendered under {@link ChainSettingsRow} during a
- * keyword-event chain run. Extracted from `KeywordEventsPanel.tsx` in Plan 25
+ * keyword-event chain run. Extracted from `KeywordEventsPanel.tsx` in PlanTierType 25
  * Step 16 so the panel host drops below 300 lines and the log's autoscroll
  * effect can be unit-tested in isolation.
  */

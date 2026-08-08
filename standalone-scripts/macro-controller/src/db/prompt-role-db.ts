@@ -19,10 +19,9 @@ import { DB_NAME } from './db-name';
 import { runSql as runSqlBridge } from './sql-bridge';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
 
-export interface EnforceResult {
-    ok: boolean;
-    error?: string;
-}
+import { ServiceResult } from '../utils/result-wrapper';
+
+export type EnforceResult = ServiceResult<void, string>;
 
 /** Escape a SQL string literal (single-quote doubling). Exported for CRUD reuse. */
 export function sqlLit(s: string): string {
@@ -38,32 +37,31 @@ export async function enforceSingleDefaultPerRole(role: PromptRole, keepId: numb
     if (!isPromptRole(role)) {
         const err = 'enforceSingleDefaultPerRole: invalid role ' + String(role);
         logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role: String(role), keepId, stage: 'validate-role', reason: 'invalid role' });
-        return { ok: false, error: err };
+        return new ServiceResult(false, undefined, err);
     }
     if (!Number.isInteger(keepId) || keepId <= 0) {
         const err = 'enforceSingleDefaultPerRole: keepId must be a positive integer, got ' + String(keepId);
         logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role, keepId: String(keepId), stage: 'validate-keepId', reason: 'keepId must be a positive integer' });
-        return { ok: false, error: err };
+        return new ServiceResult(false, undefined, err);
     }
 
     const sql = [
         'BEGIN TRANSACTION;',
-        'UPDATE Prompt SET IsDefault = 0 WHERE Role = ' + sqlLit(role) + ' AND Id <> ' + keepId + ';',
-        'UPDATE Prompt SET IsDefault = 1 WHERE Id = ' + keepId + ' AND Role = ' + sqlLit(role) + ';',
+        'UPDATE Prompt SET IsDefault = 0 WHERE Role = ' + sqlLit(role) + ' AND Id <> ' + String(keepId) + ';',
+        'UPDATE Prompt SET IsDefault = 1 WHERE Id = ' + String(keepId) + ' AND Role = ' + sqlLit(role) + ';',
         'COMMIT;',
     ].join('\n');
 
     try {
         void DB_NAME;
         const resp = await runSqlBridge('SCHEMA', sql);
-        if (resp && resp.isOk) return { ok: true };
+        if (resp && resp.isOk) return new ServiceResult(true);
         const reason = resp?.errorMessage || 'unknown error';
         const message = 'enforceSingleDefaultPerRole failed: ' + reason;
         logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role, keepId, stage: 'rawSql', reason });
-        return { ok: false, error: message };
+        return new ServiceResult(false, undefined, message);
     } catch (err) {
         const reason = err instanceof Error ? err.message : String(err);
         logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role, keepId, stage: 'threw', reason }, err);
-        return { ok: false, error: reason };
     }
 }

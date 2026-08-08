@@ -8,7 +8,7 @@
  *     playback skips steps with `Enabled === false`).
  *   • Remove selected steps (single bulk-delete, no per-step confirms).
  *   • Rename in sequence — relabels selected steps "Login 01", "Login 02"
- *     (or any `Base + {n}` template), writing to the optional `Label` field
+ *     (or any `Base + {n}` template), writing to the optional `LabelType` field
  *     so the underlying Combo / Wait values are never destroyed.
  *
  * If the right-clicked step is NOT part of the current selection, the menu
@@ -42,7 +42,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import {
     DEFAULT_SEQUENCE_RENAME,
     renderSequenceName,
@@ -258,7 +258,7 @@ function StepSequenceRenameDialog(props: StepSequenceRenameDialogProps): JSX.Ele
                 <DialogHeader>
                     <DialogTitle>Rename steps in sequence</DialogTitle>
                     <DialogDescription>
-                        Writes a Label like “Step 01”, “Step 02” to each selected
+                        Writes a LabelType like “Step 01”, “Step 02” to each selected
                         step. Use <code className="font-mono">{"{n}"}</code> to
                         insert the number anywhere; otherwise the Separator is
                         placed between Base and the number.
@@ -271,7 +271,7 @@ function StepSequenceRenameDialog(props: StepSequenceRenameDialogProps): JSX.Ele
                 >
                     <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1">
-                            <Label htmlFor="step-rename-base" className="text-xs">Base</Label>
+                            <LabelType htmlFor="step-rename-base" className="text-xs">Base</LabelType>
                             <Input
                                 id="step-rename-base"
                                 autoFocus
@@ -282,7 +282,7 @@ function StepSequenceRenameDialog(props: StepSequenceRenameDialogProps): JSX.Ele
                             />
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="step-rename-start" className="text-xs">Start at</Label>
+                            <LabelType htmlFor="step-rename-start" className="text-xs">Start at</LabelType>
                             <Input
                                 id="step-rename-start"
                                 tabIndex={2}
@@ -296,7 +296,7 @@ function StepSequenceRenameDialog(props: StepSequenceRenameDialogProps): JSX.Ele
                             />
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="step-rename-padding" className="text-xs">Padding</Label>
+                            <LabelType htmlFor="step-rename-padding" className="text-xs">Padding</LabelType>
                             <Input
                                 id="step-rename-padding"
                                 tabIndex={3}
@@ -311,7 +311,7 @@ function StepSequenceRenameDialog(props: StepSequenceRenameDialogProps): JSX.Ele
                             />
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="step-rename-sep" className="text-xs">Separator</Label>
+                            <LabelType htmlFor="step-rename-sep" className="text-xs">Separator</LabelType>
                             <Input
                                 id="step-rename-sep"
                                 tabIndex={4}

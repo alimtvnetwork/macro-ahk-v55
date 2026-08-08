@@ -12,7 +12,7 @@ import { openPromptHistoryPanel } from '../prompt-history-panel';
 import type { PromptRevisionRow } from '../../db/prompt-revision-db';
 
 const rev = (over: Partial<PromptRevisionRow> = {}): PromptRevisionRow => ({
-    Id: 1, PromptId: 1, Slug: 'plan-default', Name: 'Plan',
+    Id: 1, PromptId: 1, Slug: 'plan-default', Name: 'PlanTierType',
     Body: 'body {{n}}', Role: 'plan', ReplaceKey: 'n',
     ReplaceValues: '[]', CreatedAt: 1000, Reason: 'upsert',
     ...over,

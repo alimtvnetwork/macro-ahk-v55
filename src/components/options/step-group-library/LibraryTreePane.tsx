@@ -22,7 +22,7 @@ import type { StepGroupRow } from "@/background/recorder/step-library/db";
 import { EmptyTreeState } from "./EmptyTreeState";
 import { TreeNodeRow } from "./TreeNodeRow";
 import type { TreeNode } from "./tree";
-import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { DirectionType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 interface LibraryTreePaneProps {
     readonly tree: ReadonlyArray<TreeNode>;
@@ -43,7 +43,7 @@ interface LibraryTreePaneProps {
     readonly onRename: (group: StepGroupRow) => void;
     readonly onDelete: (group: StepGroupRow) => void;
     readonly onExportOne: (id: number) => void;
-    readonly onMove: (id: number, direction: DirectionEnum) => void;
+    readonly onMove: (id: number, direction: DirectionType) => void;
     readonly onArchiveToggle: (group: StepGroupRow) => void;
     readonly onApplyInputs: (group: StepGroupRow) => void;
     readonly onImportCsvInputs: (group: StepGroupRow) => void;

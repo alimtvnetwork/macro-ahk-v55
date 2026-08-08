@@ -19,7 +19,7 @@ import type {
     RunSummary, RunSummaryAction, RunSummaryCounts, RunSummaryRow,
 } from "../../../lovable-common/src/report/run-summary-types";
 import { UserAddRowOutcomeCode } from "./row-types";
-import { UserAddLogSeverity } from "./log-sink";
+import { UserAddLogSeverityType } from "./log-sink";
 import type { UserAddRowResult } from "./row-types";
 import type { UserAddLogEntry } from "./log-sink";
 
@@ -112,7 +112,7 @@ const countRows = (rows: ReadonlyArray<RunSummaryRow>): RunSummaryCounts => ({
 
 const noticesFrom = (entries: ReadonlyArray<UserAddLogEntry>): ReadonlyArray<string> => {
     return entries
-        .filter((e) => e.Severity === UserAddLogSeverity.Warn || e.Severity === UserAddLogSeverity.Error)
+        .filter((e) => e.Severity === UserAddLogSeverityType.Warn || e.Severity === UserAddLogSeverityType.Error)
         .map((e) => `[${e.Severity}] [Row=${e.RowIndex ?? "-"}] [${e.Phase}] ${e.Message}`);
 };
 

@@ -32,7 +32,7 @@ async function assertDiagnosticCardsRender(): Promise<void> {
         render(<DiagnosticsPanel />);
         await waitFor(() => {
             expect(screen.getByText("Boot Phase")).toBeInTheDocument();
-            expect(screen.getByText("DB Mode")).toBeInTheDocument();
+            expect(screen.getByText("DB OperationModeType")).toBeInTheDocument();
             expect(screen.getByText("Total Boot Time")).toBeInTheDocument();
             expect(screen.getByText("Version")).toBeInTheDocument();
         });

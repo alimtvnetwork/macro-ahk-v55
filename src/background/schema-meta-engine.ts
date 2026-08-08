@@ -11,7 +11,7 @@
  */
 
 import type { Database as SqlJsDatabase } from "sql.js";
-import { Type1, Type, OnDeleteEnum } from "../types/enums";
+import { ColumnValidationType, Type, OnDeleteEnum } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Meta table schemas                                                  */
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS MetaRelations (
 /* ------------------------------------------------------------------ */
 
 export interface ColumnValidation {
-    type: Type1;
+    type: ColumnValidationType;
     minLength?: number;
     maxLength?: number;
     min?: number;

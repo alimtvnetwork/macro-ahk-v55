@@ -45,14 +45,14 @@ import {
     type Condition,
     type ConditionWaitOutcome,
 } from "./condition-evaluator";
-import { KindEnum3, OnTimeoutEnum, KindEnum2, ReasonEnum3 } from "../../types/enums";
+import { ReplayStepInputKind, OnTimeoutEnum, PredicateEvaluationKind, WaitForOutcomeReason } from "../../types/enums";
 
 const SOURCE_FILE = "src/background/recorder/live-dom-replay.ts";
 
 export interface ReplayStepInput {
     readonly StepId: number;
     readonly Index: number;
-    readonly Kind: KindEnum3;
+    readonly Kind: ReplayStepInputKind;
     readonly Selectors: ReadonlyArray<PersistedSelector>;
     /** For Type/Select — the literal value or a `{{Column}}` template. */
     readonly Value?: string;
@@ -352,7 +352,7 @@ async function checkPostWait(
     return buildWaitFailure(step, options, startedAt, now(), resolved, state, effectiveWait, waitOutcome);
 }
 
-function detectWaitKind(spec: WaitForSpec): KindEnum2 {
+function detectWaitKind(spec: WaitForSpec): PredicateEvaluationKind {
     const declared = spec.Kind ?? "Auto";
     if (declared === "XPath") { return "XPath"; }
     if (declared === "Css")   { return "Css"; }
@@ -367,7 +367,7 @@ function buildWaitFailure(
     resolved: ResolvedSelector,
     state: ActionState,
     effectiveWait: WaitForSpec,
-    waitOutcome: { Ok: false; Reason: ReasonEnum3; DurationMs: number; Detail?: string },
+    waitOutcome: { Ok: false; Reason: WaitForOutcomeReason; DurationMs: number; Detail?: string },
 ): ReplayStepResult {
     const resolvedKind = detectWaitKind(effectiveWait);
     const reasonCode: FailureReasonCode = waitOutcome.Reason === "InvalidSelector"

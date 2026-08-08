@@ -14,8 +14,8 @@ import type { XPathEntry } from "./xpath-entry";
  *     name: "payment-banner",
  *     wrappingXPath: "//div[@data-role='payment-banner']",
  *     entries: [
- *       { kind: XPathKind.Direct, name: "title", value: ".//h2" },
- *       { kind: XPathKind.Direct, name: "close", value: ".//button" },
+ *       { kind: XPathKindType.Direct, name: "title", value: ".//h2" },
+ *       { kind: XPathKindType.Direct, name: "close", value: ".//button" },
  *     ],
  *   }
  */

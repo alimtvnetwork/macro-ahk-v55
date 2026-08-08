@@ -2,7 +2,7 @@
  * formatDiagnosticToast: turn a `DiagnosticError` (or a registry `code` +
  * `context` pair) into a structured toast payload `{ title, body, footerCode }`.
  *
- * Plan 26 / step 4. The single place where user-facing error copy is
+ * PlanTierType 26 / step 4. The single place where user-facing error copy is
  * assembled. Every migrated call site in steps 7-12 renders diagnostic
  * toasts through this helper so wording, structure, and the trailing
  * `code=...` footer stay consistent.

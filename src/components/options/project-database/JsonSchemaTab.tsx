@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { MonacoCodeEditor } from "@/components/options/LazyMonacoCodeEditor";
 import { DiffEditor } from "@monaco-editor/react";
 import {
@@ -26,7 +26,7 @@ import { sendMessage } from "@/lib/message-client";
 import { ErrorModal } from "./ErrorModal";
 import { createErrorModel, type ErrorModel } from "@/types/error-model";
 import { logError } from "../options-logger";
-import { FormatEnum1 } from "../../../types/enums";
+import { JsonSchemaTabFormat } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Example template                                                    */
@@ -414,7 +414,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
   };
 
   /* ---- Generate Docs ---- */
-  const handleGenerateDocs = async (format: FormatEnum1) => {
+  const handleGenerateDocs = async (format: JsonSchemaTabFormat) => {
     setGeneratingDocs(true);
     try {
       const result = await sendMessage<{ isOk: boolean; markdown?: string; prisma?: string; errorMessage?: string }>({
@@ -619,7 +619,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
               onCheckedChange={setAutoGenDocs}
               className="h-4 w-7"
             />
-            <Label className="text-[10px] text-muted-foreground whitespace-nowrap">Auto-gen docs</Label>
+            <LabelType className="text-[10px] text-muted-foreground whitespace-nowrap">Auto-gen docs</LabelType>
           </div>
           <Button
             size="sm"

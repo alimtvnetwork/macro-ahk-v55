@@ -30,7 +30,7 @@ import {
     StepStatusId,
     type StepKindId,
 } from "../recorder-db-schema";
-import { Enum_50213bfa } from "../../types/enums";
+import { SemanticSemantic50213bfa } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -42,7 +42,7 @@ export interface PersistedStep {
     readonly StepStatusId: number;
     readonly OrderIndex: number;
     readonly VariableName: string;
-    readonly Label: string;
+    readonly LabelType: string;
     readonly Description: string | null;
     readonly InlineJs: string | null;
     readonly ParamsJson: string | null;
@@ -75,7 +75,7 @@ export interface SelectorDraft {
 export interface StepDraft {
     readonly StepKindId: (typeof StepKindId)[keyof typeof StepKindId];
     readonly VariableName: string;
-    readonly Label: string;
+    readonly LabelType: string;
     readonly InlineJs: string | null;
     /** JSON-serialised step-kind-specific params (e.g. UrlTabClickParams). */
     readonly ParamsJson?: string | null;
@@ -96,11 +96,11 @@ export function nextOrderIndex(db: SqlJsDatabase): number {
 function execStepInsert(db: SqlJsDatabase, draft: StepDraft, orderIndex: number): void {
     db.run(
         `INSERT INTO Step
-            (StepKindId, StepStatusId, OrderIndex, VariableName, Label, InlineJs, ParamsJson, IsBreakpoint)
+            (StepKindId, StepStatusId, OrderIndex, VariableName, LabelType, InlineJs, ParamsJson, IsBreakpoint)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
             draft.StepKindId, StepStatusId.Active, orderIndex,
-            draft.VariableName, draft.Label, draft.InlineJs,
+            draft.VariableName, draft.LabelType, draft.InlineJs,
             draft.ParamsJson ?? null, draft.IsBreakpoint ? 1 : 0,
         ],
     );
@@ -158,7 +158,7 @@ export function insertSelectorsForStep(
 
 const STEP_SELECT_COLUMNS =
     `StepId, StepKindId, StepStatusId, OrderIndex, VariableName,
-     Label, Description, InlineJs, ParamsJson, IsBreakpoint,
+     LabelType, Description, InlineJs, ParamsJson, IsBreakpoint,
      IsDisabled, RetryCount, TimeoutMs, OnSuccessProjectId, OnFailureProjectId,
      CapturedAt, UpdatedAt`;
 
@@ -281,7 +281,7 @@ export async function updateStepVariableName(
 
 function validateStepDraft(draft: StepDraft): void {
     if (!draft.VariableName) throw new Error("Step.VariableName is required");
-    if (!draft.Label) throw new Error("Step.Label is required");
+    if (!draft.LabelType) throw new Error("Step.LabelType is required");
     if (draft.Selectors.length === 0) {
         throw new Error("Step requires at least one selector draft");
     }
@@ -322,10 +322,10 @@ function readSelector(db: SqlJsDatabase, selectorId: number): PersistedSelector 
     return rowToSelector(row);
 }
 
-function rowToStepIdentity(row: ReadonlyArray<unknown>): Pick<PersistedStep, Enum_50213bfa> {
+function rowToStepIdentity(row: ReadonlyArray<unknown>): Pick<PersistedStep, SemanticSemantic50213bfa> {
     return {
         StepId: row[0] as number, StepKindId: row[1] as number, StepStatusId: row[2] as number,
-        OrderIndex: row[3] as number, VariableName: row[4] as string, Label: row[5] as string,
+        OrderIndex: row[3] as number, VariableName: row[4] as string, LabelType: row[5] as string,
         Description: (row[6] as string | null) ?? null,
         InlineJs: (row[7] as string | null) ?? null,
         ParamsJson: (row[8] as string | null) ?? null,

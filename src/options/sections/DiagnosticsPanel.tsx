@@ -173,7 +173,7 @@ export function DiagnosticsPanel() {
                     </div>
                 </div>
                 <div className={`diag-card${highlightClass("persistenceMode")}`}>
-                    <div className="diag-card-label">DB Mode</div>
+                    <div className="diag-card-label">DB OperationModeType</div>
                     <div className="diag-card-value">
                         <span className="diag-status-dot">{dbIcon}</span>
                         {dbLabels[data.persistenceMode] ?? data.persistenceMode}
@@ -247,7 +247,7 @@ export function DiagnosticsPanel() {
                 <table className="diag-meta-table">
                     <tbody>
                         <tr className={highlightClass("connection")}><td>Connection</td><td>{data.connection}</td></tr>
-                        <tr className={highlightClass("loggingMode")}><td>Logging Mode</td><td>{data.loggingMode}</td></tr>
+                        <tr className={highlightClass("loggingMode")}><td>Logging OperationModeType</td><td>{data.loggingMode}</td></tr>
                         <tr className={highlightClass("configStatus")}><td>Config Status</td><td>{data.config.status} ({data.config.source})</td></tr>
                         <tr className={highlightClass("tokenStatus")}><td>Token Status</td><td>{data.token.status}</td></tr>
                     </tbody>
@@ -305,7 +305,7 @@ function buildReport(data: StatusData, messages: TrackedMessage[]): string {
         "",
         "── Boot ──",
         `Phase:       ${data.bootStep}`,
-        `DB Mode:     ${data.persistenceMode}`,
+        `DB OperationModeType:     ${data.persistenceMode}`,
         `Total Boot:  ${data.totalBootMs} ms`,
         "",
         "── Boot Step Timings ──",

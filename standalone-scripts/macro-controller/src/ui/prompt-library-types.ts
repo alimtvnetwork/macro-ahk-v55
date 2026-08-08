@@ -25,7 +25,7 @@ export const TOAST_ERROR = 'error' as const;
 export const PREVIEW_FAILED_PREFIX = 'Preview failed: ';
 
 export const ROLE_TOOLTIPS: Readonly<Record<PromptRole, string>> = {
-  plan: 'Plan chip prompts. The {{n}} token is required and enforced by the drift guard on save.',
+  plan: 'PlanTierType chip prompts. The {{n}} token is required and enforced by the drift guard on save.',
   next: 'Next chip prompts. The {{n}} token is required and enforced by the drift guard on save.',
   generic: 'Free-form user snippets. No required tokens — the drift guard does not apply. Add these for reusable text you paste anywhere.',
 };

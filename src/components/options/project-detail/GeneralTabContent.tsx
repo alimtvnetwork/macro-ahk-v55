@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -35,7 +35,7 @@ import { generateLlmGuide } from "@/lib/generate-llm-guide";
 import { generateDts } from "@/lib/generate-dts";
 import { exportKnowledgeBase } from "@/lib/developer-guide-bundle";
 import { toast } from "sonner";
-import { LogLevelEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { LogLevelType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -133,7 +133,7 @@ export function GeneralTabContent({ project, allProjects, onSave }: GeneralTabCo
         </h3>
         <div className="grid grid-cols-2 gap-3 text-xs">
           <div className="space-y-1">
-            <Label className="text-muted-foreground font-medium text-xs">Name</Label>
+            <LabelType className="text-muted-foreground font-medium text-xs">Name</LabelType>
             <Input
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
@@ -141,7 +141,7 @@ export function GeneralTabContent({ project, allProjects, onSave }: GeneralTabCo
             />
           </div>
           <div className="space-y-1">
-            <Label className="text-muted-foreground font-medium text-xs">Version</Label>
+            <LabelType className="text-muted-foreground font-medium text-xs">Version</LabelType>
             <Input
               value={editVersion}
               onChange={(e) => setEditVersion(e.target.value)}
@@ -161,7 +161,7 @@ export function GeneralTabContent({ project, allProjects, onSave }: GeneralTabCo
             <code className="text-foreground font-mono bg-muted/30 px-2 py-0.5 rounded select-all block w-fit">{codeName}</code>
           </div>
           <div className="col-span-2 space-y-1">
-            <Label className="text-muted-foreground font-medium text-xs">Description</Label>
+            <LabelType className="text-muted-foreground font-medium text-xs">Description</LabelType>
             <Textarea
               value={editDescription}
               onChange={(e) => setEditDescription(e.target.value)}
@@ -190,35 +190,35 @@ export function GeneralTabContent({ project, allProjects, onSave }: GeneralTabCo
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Globe className="h-3.5 w-3.5 text-muted-foreground" />
-              <Label className="text-xs font-medium">Global Project</Label>
+              <LabelType className="text-xs font-medium">Global Project</LabelType>
             </div>
             <Switch checked={isGlobal} onCheckedChange={(v) => void toggleFlag("isGlobal", v)} />
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
-              <Label className="text-xs font-medium">Removable</Label>
+              <LabelType className="text-xs font-medium">Removable</LabelType>
             </div>
             <Switch checked={isRemovable !== false} onCheckedChange={(v) => void toggleFlag("isRemovable", v)} />
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Link className="h-3.5 w-3.5 text-muted-foreground" />
-              <Label className="text-xs font-medium">Only Run as Dependency</Label>
+              <LabelType className="text-xs font-medium">Only Run as Dependency</LabelType>
             </div>
             <Switch checked={Boolean(settings?.onlyRunAsDependency)} onCheckedChange={(v) => void toggleFlag("onlyRunAsDependency", v)} />
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Shield className="h-3.5 w-3.5 text-muted-foreground" />
-              <Label className="text-xs font-medium">Isolate Scripts</Label>
+              <LabelType className="text-xs font-medium">Isolate Scripts</LabelType>
             </div>
             <Switch checked={settings?.isolateScripts ?? false} onCheckedChange={(v) => void toggleFlag("isolateScripts", v)} />
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" />
-              <Label className="text-xs font-medium">Retry on Navigate</Label>
+              <LabelType className="text-xs font-medium">Retry on Navigate</LabelType>
             </div>
             <Switch checked={settings?.retryOnNavigate ?? false} onCheckedChange={(v) => void toggleFlag("retryOnNavigate", v)} />
           </div>
@@ -226,7 +226,7 @@ export function GeneralTabContent({ project, allProjects, onSave }: GeneralTabCo
             <div className="flex items-center gap-2">
               <Zap className="h-3.5 w-3.5 text-muted-foreground" />
               <div>
-                <Label className="text-xs font-medium">Allow Dynamic Requests</Label>
+                <LabelType className="text-xs font-medium">Allow Dynamic Requests</LabelType>
                 <p className="text-[10px] text-muted-foreground">Scripts can call RiseupAsiaMacroExt.require()</p>
               </div>
             </div>
@@ -363,11 +363,11 @@ export function GeneralTabContent({ project, allProjects, onSave }: GeneralTabCo
         </h3>
         <div className="grid grid-cols-2 gap-3 text-xs">
           <div className="space-y-1">
-            <Label className="text-muted-foreground font-medium text-xs">Log Level</Label>
+            <LabelType className="text-muted-foreground font-medium text-xs">Log Level</LabelType>
             <select
               value={settings?.logLevel ?? "info"}
               onChange={(e) => {
-                const logLevel = e.target.value as LogLevelEnum;
+                const logLevel = e.target.value as LogLevelType;
                 void onSave({ id: project.id, settings: { ...(settings ?? {}), logLevel } as StoredProject["settings"] });
                 toast.success(`Log level set to ${logLevel}`);
               }}

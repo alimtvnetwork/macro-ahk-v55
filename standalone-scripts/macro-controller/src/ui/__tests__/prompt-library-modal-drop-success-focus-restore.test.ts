@@ -1,3 +1,4 @@
+import { DbResult } from '../../db/db-result';
 /**
  * prompt-library-modal - After a successful drag-and-drop import, keyboard
  * focus must return to the Import button. A drop event does not originate
@@ -26,10 +27,13 @@ vi.mock('../prompt-io-db-bridge', () => ({
 }));
 vi.mock('../prompt-loader', () => buildPromptLoaderMock({ invalidatePromptCache: vi.fn() }));
 vi.mock('../../db/prompt-db', () => ({
-    listPromptsByRole: vi.fn(async () => ({ ok: true, value: [] })),
-    setDefaultPromptForRole: vi.fn(async () => ({ ok: true })),
-    deletePromptById: vi.fn(async () => ({ ok: true })),
-    upsertPrompt: vi.fn(async () => ({ ok: true, value: 1 })),
+    DbResult,
+    DbResult,
+    DbResult,
+    listPromptsByRole: vi.fn(async () => (new DbResult(true, []))),
+    setDefaultPromptForRole: vi.fn(async () => (new DbResult(true, undefined))),
+    deletePromptById: vi.fn(async () => (new DbResult(true, undefined))),
+    upsertPrompt: vi.fn(async () => (new DbResult(true, 1))),
 }));
 
 const io = vi.hoisted(() => ({

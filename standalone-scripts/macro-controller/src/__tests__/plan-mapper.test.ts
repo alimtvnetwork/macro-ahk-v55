@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { Plan } from '../credit-balance-update/plan';
+import { PlanTierType } from '../credit-balance-update/plan';
 
 const { logErrorSpy } = vi.hoisted(() => ({
     logErrorSpy: vi.fn(),
@@ -17,42 +17,42 @@ beforeEach(() => {
 
 describe('credit-balance-update plan mapper', () => {
     it.each([
-        ['pro_0', Plan.Pro0],
-        ['pro_1', Plan.Pro1],
-        ['pro_3', Plan.Pro3],
-        ['ktlo', Plan.Ktlo],
-        ['lite', Plan.Ktlo],
-        ['ktlo_2', Plan.Ktlo],
-        ['ktlo_3', Plan.Ktlo],
-        ['KTLO_2', Plan.Ktlo],
-        ['free', Plan.Free],
-        ['cancelled', Plan.Cancelled],
-        ['canceled', Plan.Cancelled],
-        ['business', Plan.Business],
-        ['enterprise', Plan.Enterprise],
-        ['', Plan.Unknown],
-        [null, Plan.Unknown],
+        ['pro_0', PlanTierType.Pro0],
+        ['pro_1', PlanTierType.Pro1],
+        ['pro_3', PlanTierType.Pro3],
+        ['ktlo', PlanTierType.Ktlo],
+        ['lite', PlanTierType.Ktlo],
+        ['ktlo_2', PlanTierType.Ktlo],
+        ['ktlo_3', PlanTierType.Ktlo],
+        ['KTLO_2', PlanTierType.Ktlo],
+        ['free', PlanTierType.Free],
+        ['cancelled', PlanTierType.Cancelled],
+        ['canceled', PlanTierType.Cancelled],
+        ['business', PlanTierType.Business],
+        ['enterprise', PlanTierType.Enterprise],
+        ['', PlanTierType.Unknown],
+        [null, PlanTierType.Unknown],
     ])('maps %s to %s', (wire, expected) => {
         expect(mapPlanFromWire(wire)).toBe(expected);
     });
 
     it('logs CODE RED for unknown non-empty plans', () => {
-        expect(mapPlanFromWire('future_plan')).toBe(Plan.Unknown);
+        expect(mapPlanFromWire('future_plan')).toBe(PlanTierType.Unknown);
         expect(logErrorSpy).toHaveBeenCalledTimes(1);
         expect(String(logErrorSpy.mock.calls[0][1])).toContain('[CODE RED]');
         expect(String(logErrorSpy.mock.calls[0][1])).toContain('future_plan');
     });
 
     it.each([
-        [Plan.Ktlo, true],
-        [Plan.Free, true],
-        [Plan.Cancelled, true],
-        [Plan.Pro0, true],
-        [Plan.Pro1, false],
-        [Plan.Pro3, false],
-        [Plan.Business, false],
-        [Plan.Enterprise, false],
-        [Plan.Unknown, false],
+        [PlanTierType.Ktlo, true],
+        [PlanTierType.Free, true],
+        [PlanTierType.Cancelled, true],
+        [PlanTierType.Pro0, true],
+        [PlanTierType.Pro1, false],
+        [PlanTierType.Pro3, false],
+        [PlanTierType.Business, false],
+        [PlanTierType.Enterprise, false],
+        [PlanTierType.Unknown, false],
     ])('shouldFetchCreditBalanceForPlan(%s) returns %s', (plan, expected) => {
         expect(shouldFetchCreditBalanceForPlan(plan)).toBe(expected);
     });

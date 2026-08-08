@@ -72,7 +72,7 @@ describe("isAncestor + buildRelativeXPath", () => {
 });
 
 /* ------------------------------------------------------------------ */
-/*  Label suggester                                                    */
+/*  LabelType suggester                                                    */
 /* ------------------------------------------------------------------ */
 
 describe("toPascalCase", () => {

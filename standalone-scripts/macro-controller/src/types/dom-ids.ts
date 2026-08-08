@@ -1,7 +1,7 @@
 /**
  * DOM Element IDs used across the macro controller UI.
  */
-export enum DomId {
+export enum DomIdType {
   PanelBackdrop = 'marco-panel-backdrop',
   LoopWsList = 'loop-ws-list',
   LoopWsSelected = 'loop-ws-selected',

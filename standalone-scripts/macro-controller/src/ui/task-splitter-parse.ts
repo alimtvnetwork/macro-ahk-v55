@@ -1,4 +1,4 @@
-import { SplitterParseReasonEnum } from "../types/enums";
+import { SplitterParseReasonType } from "../types/enums";
 
 /**
  * Task Splitter reply parser.
@@ -8,7 +8,7 @@ import { SplitterParseReasonEnum } from "../types/enums";
  */
 
 export type SplitterParseReason =
-    SplitterParseReasonEnum;
+    SplitterParseReasonType;
 
 export interface SplitterParseFailure {
     readonly Reason: SplitterParseReason;

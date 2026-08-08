@@ -43,7 +43,7 @@ function freshDb(): SqlJsDatabase {
 const baseDraft = (variableName: string, label: string): StepDraft => ({
     StepKindId: StepKindId.Click,
     VariableName: variableName,
-    Label: label,
+    LabelType: label,
     InlineJs: null,
     IsBreakpoint: false,
     Selectors: [

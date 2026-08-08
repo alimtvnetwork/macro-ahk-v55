@@ -1,5 +1,5 @@
 /**
- * Plan 12 step 18 (SS-06): atomic prompt-import commit with rollback.
+ * PlanTierType 12 step 18 (SS-06): atomic prompt-import commit with rollback.
  *
  * ROOT ROBUSTNESS PROBLEM this file solves (one sentence):
  * `performPromptImport()` writes the merged prompt list to IndexedDB and

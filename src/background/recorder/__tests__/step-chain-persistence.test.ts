@@ -45,7 +45,7 @@ function freshDb(): SqlJsDatabase {
 const draft = (name: string): StepDraft => ({
     StepKindId: StepKindId.Click,
     VariableName: name,
-    Label: name,
+    LabelType: name,
     InlineJs: null,
     IsBreakpoint: false,
     Selectors: [{
@@ -175,12 +175,12 @@ describe("step-chain-persistence, Phase 14 spec validation", () => {
             .toThrow(/TimeoutMs exceeds/);
     });
 
-    it("rejects empty / oversize Label and oversize Description", () => {
+    it("rejects empty / oversize LabelType and oversize Description", () => {
         const db = freshDb();
         const step = insertStepRow(db, draft("A"));
-        expect(() => updateStepMetaRow(db, step.StepId, { Label: "   " })).toThrow(/Label cannot be empty/);
-        expect(() => updateStepMetaRow(db, step.StepId, { Label: "x".repeat(MAX_LABEL_LENGTH + 1) }))
-            .toThrow(/Label exceeds/);
+        expect(() => updateStepMetaRow(db, step.StepId, { LabelType: "   " })).toThrow(/LabelType cannot be empty/);
+        expect(() => updateStepMetaRow(db, step.StepId, { LabelType: "x".repeat(MAX_LABEL_LENGTH + 1) }))
+            .toThrow(/LabelType exceeds/);
         expect(() => updateStepMetaRow(db, step.StepId, { Description: "x".repeat(MAX_DESCRIPTION_LENGTH + 1) }))
             .toThrow(/Description exceeds/);
     });

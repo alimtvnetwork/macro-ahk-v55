@@ -33,7 +33,7 @@ import { BgLogTag, logBgError } from "../bg-logger";
 export type ProbeFailureReason =
     ProbeFailureReasonEnum;
 
-export type DetectedWorkspaceSource = SourceEnum4;
+export type DetectedWorkspaceSource = WorkspaceSnapshotSourceType;
 
 export interface MatchedRuleInfo {
     /** The rule's pattern (e.g. "https://*.lovable.app/*"). */
@@ -41,7 +41,7 @@ export interface MatchedRuleInfo {
     /** The rule's match strategy. */
     matchType: UrlRule["matchType"];
     /** How this rule was identified: replayed from the live injection record, or freshly evaluated against the URL. */
-    origin: OriginEnum1;
+    origin: MatchedRuleInfoOrigin;
 }
 
 export interface OpenLovableTabInfo {
@@ -82,8 +82,8 @@ export interface OpenLovableTabsResponse {
 
 /** URL match patterns for chrome.tabs.query — single source of truth. */
 import { LOVABLE_TAB_PATTERNS } from "../../shared/lovable-tab-patterns";
-import { ProbeFailureReasonEnum, OriginEnum1, BindingSourceEnum } from "../../types/enums";
-import { SourceEnum4 } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { ProbeFailureReasonEnum, MatchedRuleInfoOrigin, BindingSourceEnum } from "../../types/enums";
+import { WorkspaceSnapshotSourceType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 interface ProbePayload {
     workspaceName?: string;

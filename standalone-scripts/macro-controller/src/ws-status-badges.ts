@@ -1,5 +1,5 @@
 import type { WorkspaceCredit } from './types';
-import { WsTierValue, isExpiredTier } from './types/subscription-status';
+import { WsTierValueType, isExpiredTier } from './types/subscription-status';
 import { WS_TIER_LABELS, getEffectiveStatus, getWorkspaceLifecycleConfig, expiredDays, formatExpiryStartDate, formatExpiredDuration, formatDateDDMMMYY, formatDayCount, type WorkspaceStatus } from './credit-fetch';
 import { REFILL_PRIORITY_WINDOW_DAYS } from './constants';
 import { daysToRefillForWs } from './workspace-refill-priority';
@@ -64,7 +64,7 @@ export function resolveStatusPill(
   ws: WorkspaceCredit, config: ReturnType<typeof getWorkspaceLifecycleConfig>,
 ): { pillHtml: string; suppressTier: boolean } {
   if (!config.enableWorkspaceStatusLabels) return { pillHtml: '', suppressTier: false };
-  const wsTier = ws.tier || WsTierValue.FREE;
+  const wsTier = ws.tier || WsTierValueType.FREE;
   const status = getEffectiveStatus(ws, config);
   const pillHtml = buildStatusPillHtml(status, ws);
   let suppressTier = false;
@@ -93,8 +93,8 @@ export function resolveTierBadgeLabel(ws: WorkspaceCredit, fallback: string): st
 }
 
 export function buildTierBadgeHtml(ws: WorkspaceCredit): string {
-  const wsTier = ws.tier || WsTierValue.FREE;
-  const tierMeta = WS_TIER_LABELS[wsTier] || WS_TIER_LABELS[WsTierValue.FREE];
+  const wsTier = ws.tier || WsTierValueType.FREE;
+  const tierMeta = WS_TIER_LABELS[wsTier] || WS_TIER_LABELS[WsTierValueType.FREE];
   const config = getWorkspaceLifecycleConfig();
   const { pillHtml: statusPillHtml, suppressTier: suppressTierBadge } = resolveStatusPill(ws, config);
   const tierLabel = resolveTierBadgeLabel(ws, tierMeta.label);

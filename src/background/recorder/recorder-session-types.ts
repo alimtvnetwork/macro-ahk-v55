@@ -30,7 +30,7 @@ export interface RecordedStep {
     readonly StepId: string;
     readonly Index: number;
     readonly Kind: RecordedStepKind;
-    readonly Label: string;
+    readonly LabelType: string;
     readonly VariableName: string;
     readonly Selector: StepSelector;
     readonly CapturedAt: string;

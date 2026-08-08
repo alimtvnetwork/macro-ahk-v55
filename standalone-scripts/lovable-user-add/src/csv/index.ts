@@ -11,7 +11,7 @@ export { validateRow } from "./csv-validator";
 export { isValidEmail } from "./email-validator";
 export { normalizeRole } from "./role-normalizer";
 export type { RoleNormalizeResult } from "./role-normalizer";
-export { UserAddCsvColumn, ALL_COLUMNS, REQUIRED_COLUMNS } from "./csv-column";
+export { UserAddCsvColumnType, ALL_COLUMNS, REQUIRED_COLUMNS } from "./csv-column";
 export type {
     UserAddCsvRow,
     UserAddCsvParseResult,

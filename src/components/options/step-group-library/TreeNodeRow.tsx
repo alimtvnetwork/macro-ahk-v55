@@ -1,7 +1,7 @@
 /**
  * TreeNodeRow — a single row in the tree pane of the Step Group Library.
  *
- * Extracted from `StepGroupLibraryPanel.tsx` (Plan 24, Step 3) and split
+ * Extracted from `StepGroupLibraryPanel.tsx` (PlanTierType 24, Step 3) and split
  * into small helpers (drag-handlers hook, move arrows, actions menu,
  * label body) so each function fits inside the 50-line ceiling enforced
  * by `max-lines-per-function`. Behaviour is unchanged.
@@ -40,7 +40,7 @@ import type { StepGroupRow } from "@/background/recorder/step-library/db";
 
 import { logError } from "../options-logger";
 import { DRAG_MIME } from "./constants";
-import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { DirectionType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 export interface TreeNode {
     readonly Group: StepGroupRow;
@@ -65,7 +65,7 @@ export interface TreeNodeRowProps {
     readonly onRename: (group: StepGroupRow) => void;
     readonly onDelete: (group: StepGroupRow) => void;
     readonly onExportThis: (id: number) => void;
-    readonly onMove: (id: number, direction: DirectionEnum) => void;
+    readonly onMove: (id: number, direction: DirectionType) => void;
     readonly onArchiveToggle: (group: StepGroupRow) => void;
     readonly onApplyInputs: (group: StepGroupRow) => void;
     readonly onImportCsvInputs: (group: StepGroupRow) => void;

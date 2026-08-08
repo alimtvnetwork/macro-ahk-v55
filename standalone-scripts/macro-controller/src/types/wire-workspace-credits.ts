@@ -1,5 +1,5 @@
 /**
- * Plan-10 (follow-up) — sibling wide type covering the numeric credit
+ * PlanTierType-10 (follow-up) — sibling wide type covering the numeric credit
  * fields that `pro-zero/pro-zero-workspace-adapter.ts` narrows from the
  * `/user/workspaces` row separately from `WireWorkspace` (which only
  * covers identity + plan/tier strings).

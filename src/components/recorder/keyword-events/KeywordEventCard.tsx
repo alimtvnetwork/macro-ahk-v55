@@ -1,7 +1,7 @@
 /**
  * Refactored keyword event card. Composes {@link KeywordEventCardHeader},
  * {@link KeywordEventStepList}, and {@link KeywordEventAddStepControls}
- * (Plan 25 Step 14). Owns per-event validation summary + card styling.
+ * (PlanTierType 25 Step 14). Owns per-event validation summary + card styling.
  */
 
 import { cn } from "@/lib/utils";
@@ -16,7 +16,7 @@ import { KeywordEventAddStepControls } from "./KeywordEventAddStepControls";
 import { LiveDispatchPreview } from "./LiveDispatchPreview";
 import { TargetPickerRow } from "./TargetPickerRow";
 import { PauseAfterRow } from "./PauseAfterRow";
-import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { DirectionType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 export interface KeywordEventCardProps {
     readonly event: KeywordEvent;
@@ -28,7 +28,7 @@ export interface KeywordEventCardProps {
     readonly onUpdate: (patch: Partial<Omit<KeywordEvent, "Id">>) => void;
     readonly onAddStep: (step: Omit<KeywordEventStep, "Id">) => void;
     readonly onRemoveStep: (stepId: string) => void;
-    readonly onMoveStep: (stepId: string, dir: DirectionEnum) => void;
+    readonly onMoveStep: (stepId: string, dir: DirectionType) => void;
     readonly onRemoveSteps: (eventId: string, stepIds: readonly string[]) => void;
     readonly onSetStepsEnabled: (eventId: string, stepIds: readonly string[], enabled: boolean) => void;
     readonly onRelabelSteps: (eventId: string, stepIds: readonly string[], labels: readonly string[]) => void;
@@ -38,7 +38,7 @@ export interface KeywordEventCardProps {
     readonly onToggleSelect?: (checked: boolean, mouseEvent?: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-// eslint-disable-next-line max-lines-per-function -- composition wrapper; Plan 25 Step 14
+// eslint-disable-next-line max-lines-per-function -- composition wrapper; PlanTierType 25 Step 14
 export function KeywordEventCard(props: KeywordEventCardProps): JSX.Element {
     const {
         event, isRunning, currentStepIndex,

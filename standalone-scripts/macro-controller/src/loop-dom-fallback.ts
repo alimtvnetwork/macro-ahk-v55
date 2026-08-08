@@ -6,7 +6,7 @@
  */
 
 import { log, logSub } from './logger';
-import { LoopDirection } from './types';
+import { LoopDirectionType } from './types';
 import { MacroController } from './core/MacroController';
 import { checkSystemBusy, closeProjectDialog, ensureProjectDialogOpen, isUserTypingInPrompt, pollForDialogReady } from './dom-helpers';
 import { TIMING, state } from './shared-state';
@@ -33,7 +33,7 @@ export function dispatchDelegateSignal(direction: string): void {
 // ============================================
 // performDirectMove — Direct API move
 // ============================================
-export function performDirectMove(direction: LoopDirection): void {
+export function performDirectMove(direction: LoopDirectionType): void {
   log('=== DIRECT API MOVE ' + direction.toUpperCase() + ' ===', 'delegate');
   logSub('v7.9.6: Using moveToAdjacentWorkspace() — no AHK delegation', 1);
   state.isDelegating = true;
@@ -98,14 +98,14 @@ export function runCycleDomFallback(): void {
 // ============================================
 // forceSwitch — Immediate move without waiting
 // ============================================
-export function forceSwitch(direction: LoopDirection | string): void {
+export function forceSwitch(direction: LoopDirectionType | string): void {
   if (state.isDelegating) {
     log('BLOCKED: Already moving, ignoring force ' + direction.toUpperCase(), 'warn');
     return;
   }
   log('=== FORCE ' + direction.toUpperCase() + ' ===', 'delegate');
   logSub('v7.9.6: Direct API move — no AHK delegation', 1);
-  performDirectMove(direction as LoopDirection);
+  performDirectMove(direction as LoopDirectionType);
 }
 
 // ============================================

@@ -17,7 +17,7 @@
 /* ------------------------------------------------------------------ */
 
 export type LogLevel =
-  LogLevelEnum1;
+  ExtLogLevelType;
 
 export interface LogManagerConfig {
   [key: string]: boolean | Record<string, boolean>;
@@ -33,10 +33,10 @@ export interface LogManagerConfig {
   levels: Record<string, boolean>;
 }
 
-import { StorageKey } from './types';
-import { LogLevelEnum1 } from "./types/enums";
+import { StorageKeyType } from './types';
+import { ExtLogLevelType } from "./types/enums";
 
-const STORAGE_KEY = StorageKey.LogManagerConfig;
+const STORAGE_KEY = StorageKeyType.LogManagerConfig;
 
 const DEFAULT_CONFIG: LogManagerConfig = {
   enabled: true,

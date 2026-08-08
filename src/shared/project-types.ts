@@ -1,4 +1,4 @@
-import { MatchType, RunAtEnum1, RoleEnum1, LogLevelEnum } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { MatchRuleType, ScriptRunAtType, CookieBindingRoleType, LogLevelType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /**
  * Marco Extension — Project Data Types
@@ -10,7 +10,7 @@ import { MatchType, RunAtEnum1, RoleEnum1, LogLevelEnum } from "../../standalone
 /** URL matching rule for project activation. */
 export interface UrlRule {
     pattern: string;
-    matchType: MatchType;
+    matchType: MatchRuleType;
     excludePattern?: string;
 }
 
@@ -18,7 +18,7 @@ export interface UrlRule {
 export interface ScriptEntry {
     path: string;
     order: number;
-    runAt?: RunAtEnum1;
+    runAt?: ScriptRunAtType;
     configBinding?: string;
     description?: string;
     /** Inline code — persisted when script is edited or not matched from library */
@@ -35,14 +35,14 @@ export interface ConfigEntry {
 export interface CookieBinding {
     cookieName: string;
     url: string;
-    role: RoleEnum1;
+    role: CookieBindingRoleType;
     description?: string;
 }
 
 /** Project-level injection settings. */
 export interface ProjectSettings {
     isolateScripts?: boolean;
-    logLevel?: LogLevelEnum;
+    logLevel?: LogLevelType;
     retryOnNavigate?: boolean;
     /** Project-specific XPath for the chat input element (overrides global default). */
     chatBoxXPath?: string;

@@ -5,7 +5,7 @@ import { ServiceResult } from '../utils/result-wrapper';
  * Phase 5D split from ui/prompt-manager.ts.
  * See: spec/04-macro-controller/ts-migration-v2/05-module-splitting.md
  */
-import { CssFragment } from '../types';
+import { CssFragmentType } from '../types';
 import { log } from '../logger';
 import { logDiagnosticFromCode } from '../error-utils';
 import { cPanelBg, cPanelBgAlt, cPanelFg, cPanelFgDim, cPrimary, cPrimaryLight, cPrimaryBorderA } from '../shared-state';
@@ -22,7 +22,7 @@ import { downloadAiGuideline } from './prompt-ai-guideline';
 import { ensurePromptModalTheme } from './prompt-modal-theme';
 import { getSeedBodyForSlug } from '../seed/plan-next-prompts';
 import { renderDiffPane } from './prompt-diff';
-import { RuleEnum } from "../types/enums";
+import { ValidatedRuleType } from "../types/enums";
 
 const CSS_BTN_HOVER_BG = '#2d3348';
 const CSS_BTN_REST_BG = '#252a36';
@@ -64,7 +64,7 @@ function handleFile(file: File, refs: FileHandlerRefs): void {
     }
     refs.dropZone.style.borderColor = '#16a34a';
     refs.dropZone.innerHTML = '✅ Loaded: <b>' + file.name + '</b> (' + content.length + ' chars)';
-    setTimeout(function() { refs.dropZone.style.borderColor = CssFragment.BorderPrimary; }, 2000);
+    setTimeout(function() { refs.dropZone.style.borderColor = CssFragmentType.BorderPrimary; }, 2000);
     log('File loaded into prompt editor: ' + file.name, 'success');
   };
   reader.readAsText(file);
@@ -82,7 +82,7 @@ function onEscHandler(overlay: HTMLElement): (e: KeyboardEvent) => void {
 }
 
 /**
- * Options for `openPromptCreationModal`. Plan-23 step 5 adds
+ * Options for `openPromptCreationModal`. PlanTierType-23 step 5 adds
  * `requiredTokens` so the editor renders a visible chip strip of the
  * tokens that MUST remain in the body and disables Save while any of
  * them are missing (prevents runtime drift caught by `assertParamTokensUnchanged`).
@@ -124,7 +124,7 @@ interface PromptSaveFailure {
    * fix next) instead of a generic "Save failed" message.
    */
   failure?: {
-    rule: RuleEnum;
+    rule: ValidatedRuleType;
     code?: string;
     expectedN?: number | null;
     actualN?: number | null;
@@ -152,7 +152,7 @@ function formatSaveErrorMessage(
   },
 ): string {
   const buttonLabel = input.isEdit ? '💾 Update' : '💾 Save';
-  const roleLabel = input.role === 'plan' ? 'Plan'
+  const roleLabel = input.role === 'plan' ? 'PlanTierType'
     : input.role === 'next' ? 'Next'
     : input.role === 'generic' ? 'Generic' : 'prompt';
   const f = input.failure;
@@ -185,7 +185,7 @@ function formatSaveErrorMessage(
  * Open the prompt creation/edit modal.
  * @param editPrompt — existing prompt object for editing (has .id)
  * @param prefillData — pre-fill data for new prompt (no .id, not edit mode)
- * @param options — required tokens + role label for the drift-guarded editor (Plan-23 step 5)
+ * @param options — required tokens + role label for the drift-guarded editor (PlanTierType-23 step 5)
  */
 export function openPromptCreationModal(
   _ctx: PromptContext,
@@ -200,7 +200,7 @@ export function openPromptCreationModal(
 
   const isEdit = !!(editPrompt && editPrompt.id);
   const baseInitial = isEdit ? editPrompt : (prefillData || {});
-  // Role governance (issue: category empty when editing Plan/Next chips).
+  // Role governance (issue: category empty when editing PlanTierType/Next chips).
   // For role-scoped prompts the role IS the category, so force the combo
   // to the role name and mark it as locked. The `_buildCategorySelect`
   // helper reads `__lockedCategory` to disable the picker and add the
@@ -216,7 +216,7 @@ export function openPromptCreationModal(
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:1000010;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;';
 
   const modal = document.createElement('div');
-  modal.style.cssText = 'background:' + cPanelBg + CssFragment.BorderSolid + cPrimary + ';border-radius:12px;width:520px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.8);';
+  modal.style.cssText = 'background:' + cPanelBg + CssFragmentType.BorderSolid + cPrimary + ';border-radius:12px;width:520px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.8);';
 
   // Header
   const headerEl = document.createElement('div');
@@ -355,27 +355,27 @@ function _buildExcludeFromExportToggle(initialData: Record<string, unknown>): { 
 function _buildTitleAndContent(body: HTMLElement, initialData: Record<string, unknown>): { titleInput: HTMLInputElement; contentArea: HTMLTextAreaElement; charCount: HTMLElement } {
   const titleLabel = document.createElement('label');
   titleLabel.textContent = 'Prompt Title';
-  titleLabel.style.cssText = CssFragment.LabelBlock + cPrimaryLight + CssFragment.LabelSuffix;
+  titleLabel.style.cssText = CssFragmentType.LabelBlock + cPrimaryLight + CssFragmentType.LabelSuffix;
   body.appendChild(titleLabel);
   const titleInput = document.createElement('input');
   titleInput.type = 'text';
   titleInput.placeholder = 'e.g. Code Review Prompt';
   titleInput.value = (initialData.name as string) || '';
-  titleInput.style.cssText = 'width:100%;padding:8px 12px;background:' + cPanelBg + CssFragment.BorderSolid + cPrimaryBorderA + CssFragment.BorderRadiusColor + cPanelFg + ';font-size:13px;margin-bottom:12px;outline:none;box-sizing:border-box;';
+  titleInput.style.cssText = 'width:100%;padding:8px 12px;background:' + cPanelBg + CssFragmentType.BorderSolid + cPrimaryBorderA + CssFragmentType.BorderRadiusColor + cPanelFg + ';font-size:13px;margin-bottom:12px;outline:none;box-sizing:border-box;';
   titleInput.onfocus = function() { (this as HTMLElement).style.borderColor = cPrimary; };
-  titleInput.onblur = function() { (this as HTMLElement).style.borderColor = CssFragment.BorderPrimaryStrong; };
+  titleInput.onblur = function() { (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; };
   body.appendChild(titleInput);
 
   const contentLabel = document.createElement('label');
   contentLabel.textContent = 'Prompt Content (Markdown supported)';
-  contentLabel.style.cssText = CssFragment.LabelBlock + cPrimaryLight + CssFragment.LabelSuffix;
+  contentLabel.style.cssText = CssFragmentType.LabelBlock + cPrimaryLight + CssFragmentType.LabelSuffix;
   body.appendChild(contentLabel);
   const contentArea = document.createElement('textarea');
   contentArea.placeholder = 'Enter your prompt text here…\n\nSupports {{date}}, {{time}} variables.';
   contentArea.value = (initialData.text as string) || '';
-  contentArea.style.cssText = 'width:100%;height:200px;padding:10px 12px;background:' + cPanelBg + CssFragment.BorderSolid + cPrimaryBorderA + CssFragment.BorderRadiusColor + cPanelFg + ';font-size:12px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;resize:vertical;outline:none;box-sizing:border-box;line-height:1.5;';
+  contentArea.style.cssText = 'width:100%;height:200px;padding:10px 12px;background:' + cPanelBg + CssFragmentType.BorderSolid + cPrimaryBorderA + CssFragmentType.BorderRadiusColor + cPanelFg + ';font-size:12px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;resize:vertical;outline:none;box-sizing:border-box;line-height:1.5;';
   contentArea.onfocus = function() { (this as HTMLElement).style.borderColor = cPrimary; };
-  contentArea.onblur = function() { (this as HTMLElement).style.borderColor = CssFragment.BorderPrimaryStrong; };
+  contentArea.onblur = function() { (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; };
   body.appendChild(contentArea);
 
   const charCount = document.createElement('div');
@@ -398,10 +398,10 @@ function _buildFileDropZone(body: HTMLElement, contentArea: HTMLTextAreaElement,
   const fileRefs: FileHandlerRefs = { contentArea, charCount, titleInput, dropZone };
   fileInput.onchange = function() { handleFile(fileInput.files![0], fileRefs); };
   dropZone.addEventListener('dragover', function(e: Event) { e.preventDefault(); e.stopPropagation(); (this as HTMLElement).style.borderColor = cPrimary; (this as HTMLElement).style.background = 'rgba(124,58,237,0.1)'; });
-  dropZone.addEventListener('dragleave', function(e: Event) { e.preventDefault(); (this as HTMLElement).style.borderColor = CssFragment.BorderPrimary; (this as HTMLElement).style.background = 'transparent'; });
+  dropZone.addEventListener('dragleave', function(e: Event) { e.preventDefault(); (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimary; (this as HTMLElement).style.background = 'transparent'; });
   dropZone.addEventListener('drop', function(e: DragEvent) {
     e.preventDefault(); e.stopPropagation();
-    (this as HTMLElement).style.borderColor = CssFragment.BorderPrimary; (this as HTMLElement).style.background = 'transparent';
+    (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimary; (this as HTMLElement).style.background = 'transparent';
     if (e.dataTransfer && e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0], fileRefs);
   });
   body.appendChild(dropZone);
@@ -428,7 +428,7 @@ function _buildVariableReference(body: HTMLElement): void {
 function _buildTagsInput(initialData: Record<string, unknown>): { tagsWrap: HTMLElement; tagsInput: HTMLInputElement } {
   const tagsLabel = document.createElement('label');
   tagsLabel.textContent = 'Tags (comma separated)';
-  tagsLabel.style.cssText = CssFragment.LabelBlock + cPrimaryLight + CssFragment.LabelSuffix;
+  tagsLabel.style.cssText = CssFragmentType.LabelBlock + cPrimaryLight + CssFragmentType.LabelSuffix;
 
   const tagsWrap = document.createElement('div');
   tagsWrap.style.cssText = 'margin-bottom:12px;';
@@ -438,9 +438,9 @@ function _buildTagsInput(initialData: Record<string, unknown>): { tagsWrap: HTML
   tagsInput.type = 'text';
   tagsInput.placeholder = 'e.g. ui, backend, logic';
   tagsInput.value = Array.isArray(initialData.tags) ? initialData.tags.join(', ') : '';
-  tagsInput.style.cssText = 'width:100%;padding:8px 12px;background:' + cPanelBg + CssFragment.BorderSolid + cPrimaryBorderA + CssFragment.BorderRadiusColor + cPanelFg + ';font-size:13px;outline:none;box-sizing:border-box;';
+  tagsInput.style.cssText = 'width:100%;padding:8px 12px;background:' + cPanelBg + CssFragmentType.BorderSolid + cPrimaryBorderA + CssFragmentType.BorderRadiusColor + cPanelFg + ';font-size:13px;outline:none;box-sizing:border-box;';
   tagsInput.onfocus = function() { (this as HTMLElement).style.borderColor = cPrimary; };
-  tagsInput.onblur = function() { (this as HTMLElement).style.borderColor = CssFragment.BorderPrimaryStrong; };
+  tagsInput.onblur = function() { (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; };
   
   tagsWrap.appendChild(tagsInput);
   return { tagsWrap, tagsInput };
@@ -463,7 +463,7 @@ function collectExistingCategories(): string[] {
 function _buildCategorySelect(initialData: Record<string, unknown>): { catWrap: HTMLElement; catSelect: HTMLSelectElement; catCustomInput: HTMLInputElement } {
   const catLabel = document.createElement('label');
   catLabel.textContent = 'Category (optional)';
-  catLabel.style.cssText = CssFragment.LabelBlock + cPrimaryLight + CssFragment.LabelSuffix;
+  catLabel.style.cssText = CssFragmentType.LabelBlock + cPrimaryLight + CssFragmentType.LabelSuffix;
 
   const existingCats = collectExistingCategories();
 
@@ -472,9 +472,9 @@ function _buildCategorySelect(initialData: Record<string, unknown>): { catWrap: 
   catWrap.appendChild(catLabel);
 
   const catSelect = document.createElement('select');
-  catSelect.style.cssText = 'width:100%;padding:8px 12px;background:' + cPanelBg + CssFragment.BorderSolid + cPrimaryBorderA + CssFragment.BorderRadiusColor + cPanelFg + ';font-size:13px;outline:none;box-sizing:border-box;appearance:auto;cursor:pointer;';
+  catSelect.style.cssText = 'width:100%;padding:8px 12px;background:' + cPanelBg + CssFragmentType.BorderSolid + cPrimaryBorderA + CssFragmentType.BorderRadiusColor + cPanelFg + ';font-size:13px;outline:none;box-sizing:border-box;appearance:auto;cursor:pointer;';
   catSelect.onfocus = function() { (this as HTMLElement).style.borderColor = cPrimary; };
-  catSelect.onblur = function() { (this as HTMLElement).style.borderColor = CssFragment.BorderPrimaryStrong; };
+  catSelect.onblur = function() { (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; };
 
   const noneOpt = document.createElement('option');
   noneOpt.value = ''; noneOpt.textContent = '— No category —';
@@ -491,9 +491,9 @@ function _buildCategorySelect(initialData: Record<string, unknown>): { catWrap: 
   const catCustomInput = document.createElement('input');
   catCustomInput.type = 'text';
   catCustomInput.placeholder = 'Type custom category name…';
-  catCustomInput.style.cssText = 'display:none;width:100%;padding:8px 12px;background:' + cPanelBg + CssFragment.BorderSolid + cPrimaryBorderA + CssFragment.BorderRadiusColor + cPanelFg + ';font-size:13px;outline:none;box-sizing:border-box;margin-top:6px;';
+  catCustomInput.style.cssText = 'display:none;width:100%;padding:8px 12px;background:' + cPanelBg + CssFragmentType.BorderSolid + cPrimaryBorderA + CssFragmentType.BorderRadiusColor + cPanelFg + ';font-size:13px;outline:none;box-sizing:border-box;margin-top:6px;';
   catCustomInput.onfocus = function() { (this as HTMLElement).style.borderColor = cPrimary; };
-  catCustomInput.onblur = function() { (this as HTMLElement).style.borderColor = CssFragment.BorderPrimaryStrong; };
+  catCustomInput.onblur = function() { (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; };
 
   catSelect.onchange = function() {
     catCustomInput.style.display = catSelect.value === '__custom__' ? 'block' : 'none';
@@ -511,7 +511,7 @@ function _buildCategorySelect(initialData: Record<string, unknown>): { catWrap: 
       // prompts) is a real option even when no other prompt has surfaced it
       // yet. Without this the select would silently fall back to '— No
       // category —' and the user would see an empty combo when editing the
-      // Plan/Next chip prompts.
+      // PlanTierType/Next chip prompts.
       const injected = document.createElement('option');
       injected.value = initialCat; injected.textContent = initialCat;
       catSelect.insertBefore(injected, catSelect.lastChild);
@@ -565,7 +565,7 @@ function saveGenericPrompt(input: PromptSaveInput): Promise<PromptSaveResult> {
 }
 
 export function saveRoleScopedPrompt(input: PromptSaveInput, role: PromptRole): Promise<PromptSaveResult> {
-  // Rule-0 gate: for BOTH Plan and Next roles, block any save whose declared
+  // Rule-0 gate: for BOTH PlanTierType and Next roles, block any save whose declared
   // step count (a literal integer in `Steps:`/`EXACTLY N steps`/`# N steps`)
   // does not match the number of top-level numbered steps in the body.
   // Template bodies still carrying `{{n}}` are exempt (deferred to inject-time).
@@ -573,7 +573,7 @@ export function saveRoleScopedPrompt(input: PromptSaveInput, role: PromptRole): 
   // Extended to `next` in v4.183.0 to close the asymmetric-validator gap.
   if (role === 'plan' || role === 'next') {
     const check = validateRuleZero(input.text);
-    if (check.isFail) {
+    if (!check.ok) {
       const slug = buildSlug(role, input.name, input.editPrompt);
       logDiagnosticFromCode(
         'PROMPT_VALIDATE_E001',
@@ -611,7 +611,7 @@ export function saveRoleScopedPrompt(input: PromptSaveInput, role: PromptRole): 
     replaceKey: input.editPrompt?.replaceKey,
     replaceValues: input.editPrompt?.replaceValues,
   }).then(function(result) {
-    if (result.isSuccess) return { isOk: true };
+    if (result.ok) return { isOk: true };
     return {
       isOk: false,
       errorMessage: result.error ?? 'Role-scoped prompt save failed',
@@ -656,17 +656,17 @@ function _buildPromptModalFooter(
   const footer = document.createElement('div');
   footer.style.cssText = 'display:flex;flex-direction:column;gap:8px;padding:12px 20px;border-top:1px solid rgba(124,58,237,0.3);';
 
-  // Plan-23 step 5: required-tokens chip strip + live drift indicator.
+  // PlanTierType-23 step 5: required-tokens chip strip + live drift indicator.
   const requiredTokens = (options?.requiredTokens ?? []).filter((t): t is string => typeof t === 'string' && t.length > 0);
   const tokenStrip = _buildRequiredTokenStrip(requiredTokens);
   if (tokenStrip) footer.appendChild(tokenStrip.root);
 
   // v4.176.0 — Rule-0 live pre-save indicator. v4.189.0: extended to the Next
-  // role. `prompt-injection.ts` already gates BOTH Plan AND Next saves via
+  // role. `prompt-injection.ts` already gates BOTH PlanTierType AND Next saves via
   // `validateRuleZero` (see the `role === 'plan' || role === 'next'` branch
-  // earlier in this file), but the pre-save UX was Plan-only. Users editing
+  // earlier in this file), but the pre-save UX was PlanTierType-only. Users editing
   // Next-role bodies hit the same rejection at Save-time with no live warning,
-  // creating the exact click-Save-then-rejected loop the Plan indicator was
+  // creating the exact click-Save-then-rejected loop the PlanTierType indicator was
   // designed to prevent. Mounting the indicator for both roles closes that gap.
   const showRuleZero = options?.role === 'plan' || options?.role === 'next';
   const ruleZeroIndicator = showRuleZero ? _buildRuleZeroIndicator() : null;
@@ -676,13 +676,13 @@ function _buildPromptModalFooter(
   const buttonRow = document.createElement('div');
   buttonRow.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;';
 
-  // Plan-23 step 6: Download AI guideline. Emits a role-scoped Markdown file
+  // PlanTierType-23 step 6: Download AI guideline. Emits a role-scoped Markdown file
   // that lists the required tokens so an external AI editor can preserve the
   // drift-guard contract. Silent-fail impossible: helper toasts on error.
   const guidelineBtn = document.createElement('button');
   guidelineBtn.textContent = '📥 AI guideline';
   guidelineBtn.title = 'Download a Markdown guideline listing tokens the AI must preserve when editing this prompt.';
-  guidelineBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragment.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;margin-right:auto;';
+  guidelineBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;margin-right:auto;';
   guidelineBtn.onmouseover = function() { (this as HTMLElement).style.background = CSS_BTN_HOVER_BG; };
   guidelineBtn.onmouseout = function() { (this as HTMLElement).style.background = CSS_BTN_REST_BG; };
   guidelineBtn.onclick = function() {
@@ -697,7 +697,7 @@ function _buildPromptModalFooter(
   };
   buttonRow.appendChild(guidelineBtn);
 
-  // Plan-23 step 4: Reset to default. Only visible in edit mode for a slug
+  // PlanTierType-23 step 4: Reset to default. Only visible in edit mode for a slug
   // shipped by the seeder. Restores the textarea body from the canonical
   // `PLAN_NEXT_SEED_ROWS` entry, refreshes the drift-guard chip strip, and
   // toasts the user. The row is not persisted until the user hits Save, so
@@ -709,7 +709,7 @@ function _buildPromptModalFooter(
     resetBtn.textContent = '↺ Reset to default';
     resetBtn.title = 'Restore this prompt body to the shipped default. Not saved until you click Save.';
     resetBtn.dataset.testid = 'prompt-editor-reset-default';
-    resetBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragment.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;';
+    resetBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;';
     resetBtn.onmouseover = function() { (this as HTMLElement).style.background = CSS_BTN_HOVER_BG; };
     resetBtn.onmouseout = function() { (this as HTMLElement).style.background = CSS_BTN_REST_BG; };
     resetBtn.onclick = function() {
@@ -730,7 +730,7 @@ function _buildPromptModalFooter(
   // Paste Test button
   const testBtn = document.createElement('button');
   testBtn.textContent = '📋 Paste Test';
-  testBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragment.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;';
+  testBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;';
   testBtn.onmouseover = function() { (this as HTMLElement).style.background = CSS_BTN_HOVER_BG; };
   testBtn.onmouseout = function() { (this as HTMLElement).style.background = CSS_BTN_REST_BG; };
   testBtn.onclick = function() {
@@ -776,7 +776,7 @@ function _buildPromptModalFooter(
     diffBtn.textContent = '🔍 Diff vs saved';
     diffBtn.title = 'Toggle a live unified diff comparing this editor with the currently-saved prompt body. Shortcut: Ctrl+D (Cmd+D on macOS).';
     diffBtn.dataset.testid = 'prompt-editor-diff-toggle';
-    diffBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragment.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;';
+    diffBtn.style.cssText = CSS_MODAL_SECONDARY_BTN_BASE + cPanelBgAlt + CssFragmentType.BorderSolid + cPrimaryBorderA + ';border-radius:6px;color:#c4b5fd;font-size:12px;cursor:pointer;';
     const applyDiffOpenState = function (): void {
       diffHost.style.display = isDiffOpen ? 'block' : 'none';
       diffBtn.textContent = isDiffOpen ? '🔍 Hide diff' : '🔍 Diff vs saved';
@@ -829,7 +829,7 @@ function _buildPromptModalFooter(
   const refreshDriftState = function (): void {
     const missing = tokenStrip ? tokenStrip.recomputeMissing(contentArea.value) : [];
     const ruleZero = ruleZeroIndicator ? ruleZeroIndicator.recompute(contentArea.value) : null;
-    const ruleZeroBlocks = ruleZero !== null && ruleZero.isFail;
+    const ruleZeroBlocks = ruleZero !== null && !ruleZero.ok;
     const blocked = missing.length > 0 || ruleZeroBlocks;
     (saveBtn as HTMLButtonElement).disabled = blocked;
     saveBtn.style.opacity = blocked ? '0.5' : '1';
@@ -897,7 +897,7 @@ function _buildPromptModalFooter(
         };
         if (previousId !== undefined) undoPayload.id = previousId;
         return upsertPrompt(undoPayload).then(function(r) {
-          if (r.isFail) {
+          if (!r.ok) {
             showPasteToast('❌ Undo failed: ' + (r.error ?? 'upsert failed'), true);
             logDiagnosticFromCode(
               'PROMPT_UNDO_E001',
@@ -975,7 +975,7 @@ function _buildPromptModalFooter(
 }
 
 /**
- * Plan-23 step 5: build the required-tokens chip strip and expose a
+ * PlanTierType-23 step 5: build the required-tokens chip strip and expose a
  * `recomputeMissing(body)` callback the footer uses to toggle Save.
  * Returns `null` when the caller passed no required tokens (Generic role,
  * Save-from-chatbox flow) so the editor keeps its original single-row footer.

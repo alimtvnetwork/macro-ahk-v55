@@ -6,7 +6,7 @@
  * with a styled, semantic, multi-section panel:
  *
  *   ┌─ Workspace name + lifecycle pill
- *   │  Plan · Role · Projects · Git Sync
+ *   │  PlanTierType · Role · Projects · Git Sync
  *   ├─ Credits (Free / Daily / Rollover / Billing)
  *   ├─ Refill (when applicable)
  *   ├─ Expiry (when applicable)
@@ -21,7 +21,7 @@
  */
 
 import type { WorkspaceCredit } from './types/credit-types';
-import { isHealthyStatus, isPastDueStatus, isCanceledStatus, SubscriptionStatus } from './types/subscription-status';
+import { isHealthyStatus, isPastDueStatus, isCanceledStatus, SubscriptionStatusType } from './types/subscription-status';
 import type { WorkspaceStatus } from './workspace-status';
 import {
   getEffectiveStatus,
@@ -161,7 +161,7 @@ function buildSubscriptionSection(ws: WorkspaceCredit): string {
     let color = '#e2e8f0';
     if (isHealthyStatus(norm)) color = '#34d399';
     else if (isPastDueStatus(norm)) color = '#fde68a';
-    else if (isCanceledStatus(norm) || norm === SubscriptionStatus.EXPIRED) color = '#fca5a5';
+    else if (isCanceledStatus(norm) || norm === SubscriptionStatusType.EXPIRED) color = '#fca5a5';
     out.push(rowHtml(LABEL_STATUS, escHtml(subStatus), color));
   }
   if (changedIso) {

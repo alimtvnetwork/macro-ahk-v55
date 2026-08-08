@@ -32,7 +32,7 @@ import { statusRenderStats } from '../ui/ui-status-renderer';
 import { logError } from '../error-utils';
 
 // ============================================
-// Sub-manager interfaces (moved to controller-state.ts per Plan-17 step 4)
+// Sub-manager interfaces (moved to controller-state.ts per PlanTierType-17 step 4)
 // Re-exported here for backward compatibility — existing consumers importing
 // `AuthManagerInterface` etc. from `core/MacroController` keep working while
 // new code should import directly from `core/controller-state`.

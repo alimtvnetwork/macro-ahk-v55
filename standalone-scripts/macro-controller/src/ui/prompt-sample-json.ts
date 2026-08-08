@@ -18,7 +18,7 @@ import type { PromptEntry } from '../types/ui-types';
 
 const SAMPLE_ENTRIES: readonly PromptEntry[] = [
     {
-        name: 'Sample Plan prompt',
+        name: 'Sample PlanTierType prompt',
         text: 'Rewrite the plan into {{n}} concise bullet points that preserve intent.',
         category: 'plan',
         slug: 'sample-plan',

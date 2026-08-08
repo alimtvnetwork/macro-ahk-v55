@@ -2,7 +2,7 @@
  * Marco Extension: Chain settings row
  *
  * The compound settings block sitting above the keyword-event list.
- * Extracted from `KeywordEventsPanel.tsx` in Plan 25 Step 16.
+ * Extracted from `KeywordEventsPanel.tsx` in PlanTierType 25 Step 16.
  *
  * The row is composed of four leaves:
  *   1. `ChainToggleHeader`: enable switch + status badges + run/stop button.
@@ -18,7 +18,7 @@ import { Link2, Play, Square } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -97,9 +97,9 @@ function ChainToggleHeader(props: ChainToggleHeaderProps): JSX.Element {
         <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-2">
                 <Link2 className="h-4 w-4 text-primary" />
-                <Label htmlFor="kev-chain-toggle" className="text-sm font-medium cursor-pointer">
+                <LabelType htmlFor="kev-chain-toggle" className="text-sm font-medium cursor-pointer">
                     Auto-chain into recorder playback
-                </Label>
+                </LabelType>
             </div>
             <Switch
                 id="kev-chain-toggle"
@@ -149,7 +149,7 @@ interface ChainRunControlsProps {
     readonly onCancel: () => void;
 }
 
-// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf; Plan 25 Step 16
+// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf; PlanTierType 25 Step 16
 function ChainRunControls(props: ChainRunControlsProps): JSX.Element {
     const { running, progress, enabledCount, runShortcutLabel, stopShortcutLabel, onRun, onCancel } = props;
     if (running) {
@@ -219,9 +219,9 @@ function ChainPauseRow(props: ChainPauseRowProps): JSX.Element {
     const pauseDraft = String(settings.PauseMs);
     return (
         <div className="flex items-center gap-3">
-            <Label htmlFor="kev-chain-pause" className="text-xs text-muted-foreground shrink-0">
+            <LabelType htmlFor="kev-chain-pause" className="text-xs text-muted-foreground shrink-0">
                 Pause between events
-            </Label>
+            </LabelType>
             <Input
                 id="kev-chain-pause"
                 type="number"
@@ -264,12 +264,12 @@ function ChainAfterRecordingRow(props: ChainAfterRecordingRowProps): JSX.Element
         <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
                 <Square className="h-3.5 w-3.5 text-primary" />
-                <Label
+                <LabelType
                     htmlFor="kev-chain-after-recording"
                     className="text-xs font-medium cursor-pointer"
                 >
                     Run chain after recording stops
-                </Label>
+                </LabelType>
             </div>
             <Switch
                 id="kev-chain-after-recording"

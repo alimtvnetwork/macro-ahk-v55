@@ -14,7 +14,7 @@
  * in unit tests without a live browser.
  */
 
-import { UserAddLogPhase, UserAddLogSeverity, buildUserAddEntry } from "./log-sink";
+import { UserAddLogPhaseType, UserAddLogSeverityType, buildUserAddEntry } from "./log-sink";
 import type { UserAddLogSink } from "./log-sink";
 
 export interface TaskSignOutResult {
@@ -30,7 +30,7 @@ export const runTaskSignOut = async (
 ): Promise<TaskSignOutResult> => {
     const startedAt = Date.now();
     sink.write(buildUserAddEntry(
-        taskId, null, UserAddLogPhase.SignOut, UserAddLogSeverity.Warn, STUB_PENDING_MESSAGE,
+        taskId, null, UserAddLogPhaseType.SignOut, UserAddLogSeverityType.Warn, STUB_PENDING_MESSAGE,
     ));
 
     return Promise.resolve({

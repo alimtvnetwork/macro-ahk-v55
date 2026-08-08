@@ -199,7 +199,7 @@ async function _handleFile(file: File, overwrite: boolean): Promise<void> {
     const results = await performPromptImport(valid, importOpts);
     const errCount = results.errors ? results.errors.length : 0;
     if (errCount > 0) {
-      // Plan-14 step 12 follow-up: surface per-entry DB rejections (token drift, etc.)
+      // PlanTierType-14 step 12 follow-up: surface per-entry DB rejections (token drift, etc.)
       // instead of silently swallowing them behind the success total.
       log('[PromptIO] Import errors (' + errCount + '): ' + results.errors.join(' | '), 'warn');
       const preview = results.errors.slice(0, 2).join(' | ');

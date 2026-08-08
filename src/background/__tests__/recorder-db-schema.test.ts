@@ -98,14 +98,14 @@ describe("RECORDER_DB_SCHEMA", () => {
         const db = freshDb();
         expect(() =>
             db.run(
-                `INSERT INTO Step (StepKindId, OrderIndex, VariableName, Label, InlineJs)
+                `INSERT INTO Step (StepKindId, OrderIndex, VariableName, LabelType, InlineJs)
                  VALUES (?, 1, 'X', 'L', 'doStuff()')`,
                 [StepKindId.Click],
             ),
         ).toThrow();
         expect(() =>
             db.run(
-                `INSERT INTO Step (StepKindId, OrderIndex, VariableName, Label, InlineJs)
+                `INSERT INTO Step (StepKindId, OrderIndex, VariableName, LabelType, InlineJs)
                  VALUES (?, 1, 'X', 'L', 'doStuff()')`,
                 [StepKindId.JsInline],
             ),
@@ -115,13 +115,13 @@ describe("RECORDER_DB_SCHEMA", () => {
     it("enforces unique VariableName per project DB", () => {
         const db = freshDb();
         db.run(
-            `INSERT INTO Step (StepKindId, OrderIndex, VariableName, Label)
+            `INSERT INTO Step (StepKindId, OrderIndex, VariableName, LabelType)
              VALUES (?, 1, 'EmailField', 'Email')`,
             [StepKindId.Type],
         );
         expect(() =>
             db.run(
-                `INSERT INTO Step (StepKindId, OrderIndex, VariableName, Label)
+                `INSERT INTO Step (StepKindId, OrderIndex, VariableName, LabelType)
                  VALUES (?, 2, 'EmailField', 'Email 2')`,
                 [StepKindId.Type],
             ),
@@ -131,7 +131,7 @@ describe("RECORDER_DB_SCHEMA", () => {
     it("cascades Selector deletion when its Step is deleted", () => {
         const db = freshDb();
         db.run(
-            `INSERT INTO Step (StepKindId, OrderIndex, VariableName, Label)
+            `INSERT INTO Step (StepKindId, OrderIndex, VariableName, LabelType)
              VALUES (?, 1, 'Btn', 'Submit')`,
             [StepKindId.Click],
         );
@@ -148,7 +148,7 @@ describe("RECORDER_DB_SCHEMA", () => {
     it("defaults a new Step to StepStatus = Draft", () => {
         const db = freshDb();
         db.run(
-            `INSERT INTO Step (StepKindId, OrderIndex, VariableName, Label)
+            `INSERT INTO Step (StepKindId, OrderIndex, VariableName, LabelType)
              VALUES (?, 1, 'X', 'L')`,
             [StepKindId.Click],
         );

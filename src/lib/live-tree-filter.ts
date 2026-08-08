@@ -7,7 +7,7 @@
  * unit-tested in isolation from React.
  *
  * Match contract:
- *   - **Case-insensitive** substring match on `Group.Name`, `Step.Label`,
+ *   - **Case-insensitive** substring match on `Group.Name`, `Step.LabelType`,
  *     and the step kind label (e.g. "Click", "Type") so users can search
  *     `"submit"` and locate every Submit step.
  *   - When a group's own name matches, the entire subtree is included so
@@ -44,7 +44,7 @@ function normalize(query: string): string {
 }
 
 function stepMatches(step: StepRow, q: string): boolean {
-    const label = (step.Label ?? "").toLowerCase();
+    const label = (step.LabelType ?? "").toLowerCase();
     if (label.includes(q)) { return true; }
     return stepKindLabel(step.StepKindId).toLowerCase().includes(q);
 }

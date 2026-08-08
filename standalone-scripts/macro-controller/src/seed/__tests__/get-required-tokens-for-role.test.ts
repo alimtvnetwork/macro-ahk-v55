@@ -1,5 +1,5 @@
 /**
- * Plan-23 remaining-item #3: regression coverage for `getRequiredTokensForRole`,
+ * PlanTierType-23 remaining-item #3: regression coverage for `getRequiredTokensForRole`,
  * the single source of truth for the drift-guard contract used by the editor
  * chip strip, the AI guideline export, and the DB parity check.
  *

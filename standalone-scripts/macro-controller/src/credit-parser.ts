@@ -2,15 +2,15 @@
  * Credit Parser — API response parsing and tier resolution
  *
  * Extracted from credit-fetch.ts (module splitting).
- * Contains: parseLoopApiResponse, syncCreditStateFromApi, resolveWsTier, WsTier, WS_TIER_LABELS.
+ * Contains: parseLoopApiResponse, syncCreditStateFromApi, resolveWsTier, WsTierType, WS_TIER_LABELS.
  */
 
 import { log, logSub } from './logger';
-import { CreditSource } from './types';
+import { CreditSourceType } from './types';
 import {
-  SubscriptionStatus,
-  WsTierValue,
-  PlanName,
+  SubscriptionStatusType,
+  WsTierValueType,
+  PlanNameType,
   isCanceledStatus,
   isExpiredSubscriptionStatus,
   normalizeSubscriptionStatus,
@@ -31,7 +31,7 @@ import { toWireWorkspaceLifecycle, type WireWorkspaceLifecycle } from './types/w
 // ============================================
 // Workspace Tier Enum
 // ============================================
-export const enum WsTier {
+export const enum WsTierType {
   FREE     = 'FREE',
   LITE     = 'LITE',
   PRO      = 'PRO',
@@ -58,19 +58,19 @@ export function resolveWsTier(plan: string, subStatus: string, billingLimit: num
   const s = normalizeSubscriptionStatus(subStatus);
 
   // Lite / ktlo plan (incl. tiered variants like `ktlo_2`, `ktlo_3`)
-  if (p === PlanName.KTLO || p === PlanName.LITE || p.startsWith('ktlo_')) return WsTierValue.LITE;
+  if (p === PlanNameType.KTLO || p === PlanNameType.LITE || p.startsWith('ktlo_')) return WsTierValueType.LITE;
 
   // Has billing = was/is pro
-  if (billingLimit > 0 || (p && p !== PlanName.FREE)) {
-    if (s === SubscriptionStatus.ACTIVE) return WsTierValue.PRO;
-    if (isCanceledStatus(s) || s === SubscriptionStatus.PAST_DUE) return WsTierValue.EXPIRED;
-    return WsTierValue.PRO; // default if billing exists
+  if (billingLimit > 0 || (p && p !== PlanNameType.FREE)) {
+    if (s === SubscriptionStatusType.ACTIVE) return WsTierValueType.PRO;
+    if (isCanceledStatus(s) || s === SubscriptionStatusType.PAST_DUE) return WsTierValueType.EXPIRED;
+    return WsTierValueType.PRO; // default if billing exists
   }
 
   // Free plan + canceled sub = expired trial/pro
-  if (isCanceledStatus(s)) return WsTierValue.EXPIRED;
+  if (isCanceledStatus(s)) return WsTierValueType.EXPIRED;
 
-  return WsTierValue.FREE;
+  return WsTierValueType.FREE;
 }
 
 // ============================================
@@ -197,7 +197,7 @@ function calcProOne(
 function parseWorkspaceItem(rawItem: Record<string, unknown>, wsIdx: number): import('./types').WorkspaceCredit {
   const rawWs = rawItem;
   const ws = resolveWireSection(rawWs);
-  // Plan-10: narrow the wire row at the parse boundary through the three
+  // PlanTierType-10: narrow the wire row at the parse boundary through the three
   // sanctioned wide surfaces. Zero inline `as` casts on `ws` fields — any
   // new field consumer must extend one of these surfaces.
   const wire = toWireWorkspace(ws);
@@ -360,7 +360,7 @@ export function parseLoopApiResponse(data: Record<string, unknown>): boolean {
   matchCurrentWorkspace(perWs);
   buildWsByIdIndex(perWs);
 
-  loopCreditState.source = CreditSource.Api;
+  loopCreditState.source = CreditSourceType.Api;
   log('Credit API: parsed ' + perWs.length + ' workspaces — dailyFree=' + loopCreditState.totalDailyFree + ' rollover=' + loopCreditState.totalRollover + ' available=' + loopCreditState.totalAvailable + ' | wsById keys=' + Object.keys(loopCreditState.wsById).length, 'success');
   return true;
 }

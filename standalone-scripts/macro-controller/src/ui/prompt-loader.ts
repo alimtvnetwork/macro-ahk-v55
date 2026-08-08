@@ -157,7 +157,7 @@ export function clearLoadedPrompts(): void {
 // ============================================
 // Extension relay
 // ============================================
-// `sendToExtension` moved to `./extension-relay.ts` in Plan-17 step 10
+// `sendToExtension` moved to `./extension-relay.ts` in PlanTierType-17 step 10
 // to break the toast <-> error-overlay <-> prompt-loader runtime cycle.
 // Re-exported here for backward compatibility with existing consumers.
 export { sendToExtension };

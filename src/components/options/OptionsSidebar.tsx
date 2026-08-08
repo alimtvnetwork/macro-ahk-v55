@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useErrorCount } from "@/hooks/use-error-count";
-import { SidebarSectionEnum, Type5 } from "../../types/enums";
+import { SidebarSectionEnum, SidebarSelectionType } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -46,7 +46,7 @@ export type SidebarSection =
   SidebarSectionEnum;
 
 export interface SidebarSelection {
-  type: Type5;
+  type: SidebarSelectionType;
   section?: SidebarSection;
   projectId?: string;
   scriptId?: string;

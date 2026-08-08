@@ -1,3 +1,4 @@
+import { DbResult } from '../db/db-result';
 /**
  * Unit test — ws-move post-move credit-balance refresh (Issue 122a)
  *
@@ -85,7 +86,7 @@ beforeEach(() => {
     (window as unknown as { marco: { api: { workspace: { move: (p: string, w: string) => Promise<{ ok: boolean; status: number; data: unknown }> } } } }).marco = {
         api: {
             workspace: {
-                move: vi.fn(async () => ({ ok: true, status: 200, data: { ok: true } })),
+                move: vi.fn(async () => ({ ok: true, status: 200, data: new DbResult(true, undefined) })),
             } as unknown as { move: (p: string, w: string) => Promise<{ ok: boolean; status: number; data: unknown }> },
         },
     };

@@ -13,7 +13,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { BannerLocator, type LocateResult } from "./banner-locator";
 import { PaymentBannerHider } from "./index";
 import {
-    BannerState,
+    BannerStateType,
     OBSERVER_DEBOUNCE_MS,
     REMOVE_DELAY_MS,
     STATE_ATTR,
@@ -48,9 +48,9 @@ describe("PaymentBannerHider — selector-based regressions", () => {
 
         new PaymentBannerHider(new IdLocator(element)).check();
 
-        expect(element.getAttribute(STATE_ATTR)).toBe(BannerState.Fading);
+        expect(element.getAttribute(STATE_ATTR)).toBe(BannerStateType.Fading);
         await vi.advanceTimersByTimeAsync(REMOVE_DELAY_MS + 10);
-        expect(element.getAttribute(STATE_ATTR)).toBe(BannerState.Done);
+        expect(element.getAttribute(STATE_ATTR)).toBe(BannerStateType.Done);
     });
 
     it("collapses a banner located by [role='alert']", async () => {
@@ -58,7 +58,7 @@ describe("PaymentBannerHider — selector-based regressions", () => {
         const element = document.querySelector<HTMLElement>("[role='alert']")!;
 
         new PaymentBannerHider(new IdLocator(element)).check();
-        expect(element.getAttribute(STATE_ATTR)).toBe(BannerState.Fading);
+        expect(element.getAttribute(STATE_ATTR)).toBe(BannerStateType.Fading);
     });
 
     it("collapses a banner located by [data-testid]", async () => {
@@ -66,9 +66,9 @@ describe("PaymentBannerHider — selector-based regressions", () => {
         const element = document.querySelector<HTMLElement>("[data-testid='billing-banner']")!;
 
         new PaymentBannerHider(new IdLocator(element)).check();
-        expect(element.getAttribute(STATE_ATTR)).toBe(BannerState.Fading);
+        expect(element.getAttribute(STATE_ATTR)).toBe(BannerStateType.Fading);
         await vi.advanceTimersByTimeAsync(REMOVE_DELAY_MS + 10);
-        expect(element.getAttribute(STATE_ATTR)).toBe(BannerState.Done);
+        expect(element.getAttribute(STATE_ATTR)).toBe(BannerStateType.Done);
     });
 
     it("collapses a banner located by class selector", async () => {
@@ -76,7 +76,7 @@ describe("PaymentBannerHider — selector-based regressions", () => {
         const element = document.querySelector<HTMLElement>(".billing-warning")!;
 
         new PaymentBannerHider(new IdLocator(element)).check();
-        expect(element.getAttribute(STATE_ATTR)).toBe(BannerState.Fading);
+        expect(element.getAttribute(STATE_ATTR)).toBe(BannerStateType.Fading);
     });
 
     it("walks single-child wrappers up to 3 levels (id-located)", async () => {
@@ -92,7 +92,7 @@ describe("PaymentBannerHider — selector-based regressions", () => {
         new PaymentBannerHider(new IdLocator(banner)).check();
 
         for (const element of [banner, L1, L2, L3]) {
-            expect(element.getAttribute(STATE_ATTR)).toBe(BannerState.Fading);
+            expect(element.getAttribute(STATE_ATTR)).toBe(BannerStateType.Fading);
         }
     });
 
@@ -109,7 +109,7 @@ describe("PaymentBannerHider — selector-based regressions", () => {
 
         new PaymentBannerHider(new IdLocator(banner)).check();
 
-        expect(banner.getAttribute(STATE_ATTR)).toBe(BannerState.Fading);
+        expect(banner.getAttribute(STATE_ATTR)).toBe(BannerStateType.Fading);
         expect(parent.getAttribute(STATE_ATTR)).toBeNull();
         expect(other.getAttribute(STATE_ATTR)).toBeNull();
     });
@@ -120,7 +120,7 @@ describe("PaymentBannerHider — selector-based regressions", () => {
 
         new PaymentBannerHider(new IdLocator(banner)).check();
 
-        expect(banner.getAttribute(STATE_ATTR)).toBe(BannerState.Fading);
+        expect(banner.getAttribute(STATE_ATTR)).toBe(BannerStateType.Fading);
         expect(document.querySelector("main")!.getAttribute(STATE_ATTR)).toBeNull();
         expect(document.body.getAttribute(STATE_ATTR)).toBeNull();
     });
@@ -130,13 +130,13 @@ describe("PaymentBannerHider — selector-based regressions", () => {
         const element = document.querySelector<HTMLElement>("#b")!;
 
         new PaymentBannerHider(new IdLocator(element)).check();
-        expect(element.getAttribute(STATE_ATTR)).toBe(BannerState.Fading);
+        expect(element.getAttribute(STATE_ATTR)).toBe(BannerStateType.Fading);
 
         await Promise.resolve();
-        expect(element.getAttribute(STATE_ATTR)).toBe(BannerState.Hiding);
+        expect(element.getAttribute(STATE_ATTR)).toBe(BannerStateType.Hiding);
 
         await vi.advanceTimersByTimeAsync(REMOVE_DELAY_MS + 5);
-        expect(element.getAttribute(STATE_ATTR)).toBe(BannerState.Done);
+        expect(element.getAttribute(STATE_ATTR)).toBe(BannerStateType.Done);
     });
 
     it("is idempotent: a second check() on the same element does nothing", async () => {

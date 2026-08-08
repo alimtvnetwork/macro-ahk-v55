@@ -1,7 +1,7 @@
 /**
  * Token Seeder diagnostics polling + derivation hook.
  *
- * Extracted from `TokenSeederStatusIndicator.tsx` (Plan 25 · Step 9): owns
+ * Extracted from `TokenSeederStatusIndicator.tsx` (PlanTierType 25 · Step 9): owns
  * the diagnostics cache/poll loop, the 500ms tick, and the memoised
  * retry+category summaries. The indicator component becomes a pure
  * renderer over the returned bag.

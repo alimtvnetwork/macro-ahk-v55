@@ -31,7 +31,7 @@ function captured(s: RecordingSession, stepId: string, varName: string, anchorSt
         CapturedAt: FIXED_NOW,
         Step: {
             Kind: "Click",
-            Label: `Label-${stepId}`,
+            LabelType: `LabelType-${stepId}`,
             VariableName: varName,
             Selector: { XPathFull: `//*[@id="${stepId}"]`, XPathRelative: null, AnchorStepId: anchorStepId, Strategy: "Id" },
         },

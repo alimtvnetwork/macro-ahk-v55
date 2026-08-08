@@ -1,6 +1,6 @@
 import type { WorkspaceCredit } from '../types';
 import { logError } from '../error-utils';
-import { CreditFetchOutcome } from './credit-fetch-outcome';
+import { CreditFetchOutcomeType } from './credit-fetch-outcome';
 import { requestCredits } from './credit-fetch-controller';
 
 function snapshot(ws: WorkspaceCredit): string {
@@ -18,7 +18,7 @@ async function enrichOne(ws: WorkspaceCredit): Promise<boolean> {
     const before = snapshot(ws);
     try {
         const result = await requestCredits(ws);
-        if (result.outcome === CreditFetchOutcome.Skipped || result.outcome === CreditFetchOutcome.InlineHit) {
+        if (result.outcome === CreditFetchOutcomeType.Skipped || result.outcome === CreditFetchOutcomeType.InlineHit) {
             return false;
         }
         return before !== snapshot(ws);

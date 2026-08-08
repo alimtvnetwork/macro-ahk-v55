@@ -1,5 +1,5 @@
 /**
- * Plan-10 — WireWorkspace to enrichment-candidate mapper.
+ * PlanTierType-10 — WireWorkspace to enrichment-candidate mapper.
  *
  * Consumes the parsed `/user/workspaces` rows (as `WireWorkspace[]`,
  * see `types/wire-workspace.ts`) and produces the flat decision list
@@ -7,7 +7,7 @@
  * `needsBalanceEnrichment` (plan-10 predicate) so the batch call site
  * stays a dumb consumer with no policy branching of its own.
  *
- * The mapper is the second Plan-10 mapping layer + guard: it protects
+ * The mapper is the second PlanTierType-10 mapping layer + guard: it protects
  * downstream code from ever seeing a shapeless `Record<string, unknown>`
  * and it re-uses the tested predicate rather than duplicating tier/plan
  * rules.

@@ -5,13 +5,13 @@
  * Spec: spec/22-app-issues/114-pro-zero-credit-balance-calculation.md §4
  */
 
-import type { MacroCreditSource } from './macro-credit-source';
+import type { MacroCreditSourceType } from './macro-credit-source';
 
 export interface MacroCreditSummary {
     Total: number;
     AvailableCredits: number;
     TotalUsed: number;
-    Source: MacroCreditSource;
+    Source: MacroCreditSourceType;
     DailyRemaining: number;
     DailyLimit: number;
     BillingRemaining: number;

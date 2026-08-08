@@ -14,7 +14,7 @@
  */
 
 /** Canonical Stripe subscription_status values returned by Lovable's billing API. */
-export const enum SubscriptionStatus {
+export const enum SubscriptionStatusType {
   ACTIVE     = 'active',
   TRIALING   = 'trialing',
   PAST_DUE   = 'past_due',
@@ -27,15 +27,15 @@ export const enum SubscriptionStatus {
 }
 
 /** Derived workspace tier (computed by resolveWsTier). */
-export const enum WsTierValue {
+export const enum WsTierValueType {
   FREE    = 'FREE',
   LITE    = 'LITE',
   PRO     = 'PRO',
   EXPIRED = 'EXPIRED',
 }
 
-/** Plan-name strings (lowercase) emitted by the workspace API. */
-export const enum PlanName {
+/** PlanTierType-name strings (lowercase) emitted by the workspace API. */
+export const enum PlanNameType {
   FREE  = 'free',
   PRO_0 = 'pro_0',
   KTLO  = 'ktlo',
@@ -54,24 +54,24 @@ export function normalizeSubscriptionStatus(s: string | null | undefined): strin
 /** True for canceled / cancelled (US + UK spelling). */
 export function isCanceledStatus(s: string | null | undefined): boolean {
   const n = normalizeSubscriptionStatus(s);
-  return n === SubscriptionStatus.CANCELED || n === SubscriptionStatus.CANCELLED;
+  return n === SubscriptionStatusType.CANCELED || n === SubscriptionStatusType.CANCELLED;
 }
 
 /** True for past_due / unpaid — Stripe's "needs payment, grants still live" states. */
 export function isPastDueStatus(s: string | null | undefined): boolean {
   const n = normalizeSubscriptionStatus(s);
-  return n === SubscriptionStatus.PAST_DUE || n === SubscriptionStatus.UNPAID;
+  return n === SubscriptionStatusType.PAST_DUE || n === SubscriptionStatusType.UNPAID;
 }
 
 /** True for active / trialing — healthy subscriptions. */
 export function isHealthyStatus(s: string | null | undefined): boolean {
   const n = normalizeSubscriptionStatus(s);
-  return n === SubscriptionStatus.ACTIVE || n === SubscriptionStatus.TRIALING;
+  return n === SubscriptionStatusType.ACTIVE || n === SubscriptionStatusType.TRIALING;
 }
 
 /** True when the workspace tier string represents the EXPIRED tier. */
 export function isExpiredTier(tier: string | null | undefined): boolean {
-  return (tier || '').toUpperCase().trim() === WsTierValue.EXPIRED;
+  return (tier || '').toUpperCase().trim() === WsTierValueType.EXPIRED;
 }
 
 /**
@@ -81,7 +81,7 @@ export function isExpiredTier(tier: string | null | undefined): boolean {
  * UI (Issue: free-plan expiry suppression).
  */
 export function isFreeTier(tier: string | null | undefined): boolean {
-  return (tier || '').toUpperCase().trim() === WsTierValue.FREE;
+  return (tier || '').toUpperCase().trim() === WsTierValueType.FREE;
 }
 
 /**

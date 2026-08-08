@@ -1,5 +1,5 @@
 /**
- * Plan-14 close-out step 2: Export-format parity for role-scoped DB rows.
+ * PlanTierType-14 close-out step 2: Export-format parity for role-scoped DB rows.
  *
  * Root cause guarded: JSON, ZIP, and SQLite exports all funnel through
  * `buildPromptsBundle` and (for the DB-truth merge) through
@@ -34,8 +34,8 @@ async function blobToBytes(blob: Blob): Promise<Uint8Array> {
 }
 
 const ROLE_ENTRIES: PromptEntry[] = [
-  { name: 'Plan Default', slug: 'plan-default', text: 'plan body with {{n}}', role: 'plan', isDefault: true },
-  { name: 'Plan Variant A', slug: 'plan-variant-a', text: 'variant A ${N}', role: 'plan' },
+  { name: 'PlanTierType Default', slug: 'plan-default', text: 'plan body with {{n}}', role: 'plan', isDefault: true },
+  { name: 'PlanTierType Variant A', slug: 'plan-variant-a', text: 'variant A ${N}', role: 'plan' },
   { name: 'Next Default', slug: 'next-default', text: 'next body {{n}}', role: 'next', isDefault: true },
   { name: 'Next Variant B', slug: 'next-variant-b', text: 'variant B', role: 'next' },
   { name: 'Generic One', slug: 'generic-one', text: 'generic body', role: 'generic' },
@@ -48,7 +48,7 @@ function toTuples(entries: readonly PromptEntry[]): Tuple[] {
   return entries.map((e) => ({ slug: e.slug, name: e.name, role: e.role, text: e.text }));
 }
 
-describe('Plan-14 close-out: export-format parity for role-scoped rows', () => {
+describe('PlanTierType-14 close-out: export-format parity for role-scoped rows', () => {
   it('JSON envelope preserves the role field on every entry', () => {
     const bundle = buildPromptsBundle(ROLE_ENTRIES, '4.71.0', { format: 'json' });
     expect(bundle.entryCount).toBe(ROLE_ENTRIES.length);

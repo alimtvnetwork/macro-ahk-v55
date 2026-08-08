@@ -1,9 +1,9 @@
 import { ServiceResult } from '../utils/result-wrapper';
 /**
- * Plan Task UI — Inline accordion mirror of Task Next, but injects a
+ * PlanTierType Task UI — Inline accordion mirror of Task Next, but injects a
  * "plan this task in N steps" prompt instead of running a multi-task loop.
  *
- * Single source of truth for the Plan Task prompt template.
+ * Single source of truth for the PlanTierType Task prompt template.
  */
 
 import { cPanelFg, cPrimary, cPrimaryLight, cBtnMenuHover, lDropdownRadius } from '../shared-state';
@@ -16,7 +16,7 @@ import { substituteToken } from '../utils/token-substitute';
 import { REPLACE_KEY_DEFAULT } from '../db/prompt-defaults';
 import { PLAN_DEFAULT_BODY } from '../seed/plan-next-prompts';
 
-// Plan sequence (v3.63.0): increasing-gap progression requested by user 2026-06-19.
+// PlanTierType sequence (v3.63.0): increasing-gap progression requested by user 2026-06-19.
 // 2,3,5,8,10,12,14,15,18,20,22,25,28,30,32,35,38,40,42,45,48,50,52,55,58,60,70,80,100,150,200
 const PLAN_TASK_STEP_COUNTS = [
   2, 3, 5, 8, 10, 12, 14, 15, 18, 20,
@@ -25,7 +25,7 @@ const PLAN_TASK_STEP_COUNTS = [
 ];
 
 /**
- * Build the canonical Plan Task prompt for N steps by substituting `{{n}}`
+ * Build the canonical PlanTierType Task prompt for N steps by substituting `{{n}}`
  * in the shared `PLAN_DEFAULT_BODY` (single source of truth in
  * `seed/plan-next-prompts.ts`, mirrored from
  * `standalone-scripts/prompts/14-plan-steps/prompt.md`).
@@ -40,7 +40,7 @@ function adapterGetByXPath(xpath: string): Element | null {
 }
 
 /**
- * Resolve the Plan prompt body. Step 15 of plan-14: prefer the user-editable
+ * Resolve the PlanTierType prompt body. Step 15 of plan-14: prefer the user-editable
  * `plan-default` row from the Prompt table (with `{{n}}` substituted), and
  * fall back to `buildPlanTaskPrompt(n)` on any DB failure so the chip never
  * dies silently when the DB layer is unavailable (e.g. first-boot race).
@@ -49,7 +49,7 @@ async function resolvePlanBody(n: number): Promise<string> {
   try {
     const mod = await import('../db/prompt-db');
     const result = await mod.getDefaultPromptForRole('plan');
-    if (result.isSuccess && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
+    if (result.ok && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
       const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
       return substituteToken(result.value.Body, key, n);
     }
@@ -68,11 +68,11 @@ function injectPlanPrompt(n: number): void {
     console.log('[PlanTask] Injection outcome: ' + outcome);
     // Success ('injected') and clipboard-fallback ('clipboard') already toast from prompt-utils.
     // Only show a caller-side toast on hard failure.
-    if (String(outcome) === 'failed') showPasteToast('❌ Plan prompt: injection failed', true);
+    if (String(outcome) === 'failed') showPasteToast('❌ PlanTierType prompt: injection failed', true);
   })();
 }
 
-/** Render the Plan Task inline accordion into the container. */
+/** Render the PlanTierType Task inline accordion into the container. */
 export function renderPlanTaskSubmenu(container: HTMLElement, ctx: PromptContext): void {
   const { item, sub } = buildShell(ctx);
   appendGearRow(sub, ctx.promptsDropdown);
@@ -82,15 +82,15 @@ export function renderPlanTaskSubmenu(container: HTMLElement, ctx: PromptContext
 }
 
 /**
- * Plan-23 step 2: per-chip prompt editor entry point. Placed at the top of
- * the Plan submenu so users no longer have to hunt through the Library modal
- * to edit / add a Plan prompt (see issue 04).
+ * PlanTierType-23 step 2: per-chip prompt editor entry point. Placed at the top of
+ * the PlanTierType submenu so users no longer have to hunt through the Library modal
+ * to edit / add a PlanTierType prompt (see issue 04).
  */
 function appendGearRow(sub: HTMLElement, dropdown: HTMLElement): void {
   const row = document.createElement('div');
   row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:6px;padding:5px 12px;border-bottom:1px solid rgba(124,58,237,0.2);font-size:10px;color:' + cPrimaryLight + ';';
   const label = document.createElement('span');
-  label.textContent = '⚙ Plan prompt';
+  label.textContent = '⚙ PlanTierType prompt';
   row.appendChild(label);
 
   const actions = document.createElement('span');
@@ -134,7 +134,7 @@ function buildShell(ctx: PromptContext): { item: HTMLElement; sub: HTMLElement }
   item.style.cssText = 'border-bottom:1px solid rgba(124,58,237,0.3);';
   const row = document.createElement('div');
   row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 8px;cursor:pointer;font-size:11px;color:' + cPrimaryLight + ';font-weight:600;';
-  row.textContent = '🧠 Plan Task';
+  row.textContent = '🧠 PlanTierType Task';
   const arrow = document.createElement('span');
   arrow.textContent = '▸';
   arrow.style.cssText = 'font-size:10px;margin-left:4px;';
@@ -183,7 +183,7 @@ function renderPresetStepsInto(sub: HTMLElement, dropdown: HTMLElement, values: 
     const it = document.createElement('div');
     it.setAttribute('data-plan-preset', '1');
     it.style.cssText = 'padding:5px 12px;cursor:pointer;font-size:10px;color:' + cPanelFg + ';';
-    it.textContent = 'Plan ' + n;
+    it.textContent = 'PlanTierType ' + n;
     it.onmouseover = function() { (this as HTMLElement).style.background = cBtnMenuHover; };
     it.onmouseout = function() { (this as HTMLElement).style.background = 'transparent'; };
     it.onclick = function(e: Event) {
@@ -199,7 +199,7 @@ function appendPresetSteps(sub: HTMLElement, dropdown: HTMLElement): void {
   // Render hardcoded defaults first so the submenu is populated even before
   // the DB read resolves — matches plan-14 cold-boot behavior.
   renderPresetStepsInto(sub, dropdown, PLAN_TASK_STEP_COUNTS);
-  // Plan-15 Task 9: replace with DB-driven ReplaceValues when they diverge
+  // PlanTierType-15 Task 9: replace with DB-driven ReplaceValues when they diverge
   // from the plan-14 seed defaults. Silent fallback on any failure.
   void (async () => {
     try {
@@ -233,7 +233,7 @@ function appendCustomStepRow(sub: HTMLElement, dropdown: HTMLElement): void {
   inp.onclick = function(e: Event) { e.stopPropagation(); };
   row.appendChild(inp);
   const go = document.createElement('span');
-  go.textContent = '▶'; go.title = 'Plan';
+  go.textContent = '▶'; go.title = 'PlanTierType';
   go.style.cssText = 'cursor:pointer;font-size:11px;color:' + cPrimary + ';';
   go.onclick = function(e: Event) {
     e.stopPropagation();

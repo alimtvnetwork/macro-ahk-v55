@@ -9,12 +9,12 @@ import { TaskQueueManager } from '../task-manager';
 import { cPanelBg, cPanelFg, cPrimary, cPrimaryLight, cSuccess, cError, cWarning, cPanelBgAlt, cPanelBorder } from '../shared-state';
 const TASK_QUEUE_SCOPE = '[TaskQueue]';
 import { log } from '../logger';
-import { ActiveQueueTabEnum } from "../types/enums";
+import { ActiveQueueTabType } from "../types/enums";
 
 // import { showToast } from '../toast';
-// import { CssFragment } from '../types';
+// import { CssFragmentType } from '../types';
 
-let _activeQueueTab: ActiveQueueTabEnum = 'active';
+let _activeQueueTab: ActiveQueueTabType = 'active';
 const _selectedTaskIds: Set<string> = new Set();
 let _selectionMode = false;
 

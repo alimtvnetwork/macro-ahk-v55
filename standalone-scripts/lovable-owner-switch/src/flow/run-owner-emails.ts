@@ -13,7 +13,7 @@
  */
 
 import { runPromote } from "./run-promote";
-import { LogPhase, LogSeverity, buildEntry } from "./log-sink";
+import { LogPhaseType, LogSeverityType, buildEntry } from "./log-sink";
 import type { LogSink } from "./log-sink";
 import type { RowExecutionContext } from "./row-types";
 import type { PromotedOwnerRecord } from "./row-types";
@@ -44,8 +44,8 @@ const logPromote = (
     ctx: RowExecutionContext, sink: LogSink, ownerEmail: string, error: string | null,
 ): void => {
     sink.write(buildEntry(
-        ctx.Task.TaskId, ctx.Row.RowIndex, LogPhase.Promote,
-        error === null ? LogSeverity.Info : LogSeverity.Error,
+        ctx.Task.TaskId, ctx.Row.RowIndex, LogPhaseType.Promote,
+        error === null ? LogSeverityType.Info : LogSeverityType.Error,
         `Promote ${ownerEmail}: ${error ?? "ok"}`,
     ));
 };
@@ -58,7 +58,7 @@ const logNoRollback = (
     }
 
     sink.write(buildEntry(
-        ctx.Task.TaskId, ctx.Row.RowIndex, LogPhase.Promote, LogSeverity.Warn,
+        ctx.Task.TaskId, ctx.Row.RowIndex, LogPhaseType.Promote, LogSeverityType.Warn,
         `No rollback performed (per policy). Already promoted in this row: ${alreadyDone.join(", ")}. ` +
         `Re-run will skip these and only retry the failed owner(s).`,
     ));

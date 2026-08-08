@@ -1,5 +1,5 @@
 /**
- * Plan 09 invariant: only the Repeat strip is allowed to start an automated
+ * PlanTierType 09 invariant: only the Repeat strip is allowed to start an automated
  * submit loop. Pin the diagnostic log line emitted by startRepeatLoop so that
  * any future refactor preserves the `RepeatLoop.start: source=repeat-strip`
  * marker — it's how we attribute auto-submits in the console when triaging

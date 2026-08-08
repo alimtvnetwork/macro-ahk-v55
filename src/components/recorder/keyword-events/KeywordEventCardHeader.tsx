@@ -2,7 +2,7 @@
  * Header row for a single {@link KeywordEventCard}: drag handle, selection
  * checkbox, keyword input, enable switch, run/stop button, remove button.
  *
- * Extracted from `KeywordEventsPanel.tsx` in Plan 25 Step 14 to drop the
+ * Extracted from `KeywordEventsPanel.tsx` in PlanTierType 25 Step 14 to drop the
  * card body under the `max-lines-per-function` / cognitive-complexity
  * ceilings. Pure presentational; all state lives in the parent card.
  */
@@ -11,7 +11,7 @@ import { Play, Square, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LabelType } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import type { KeywordEvent } from "@/hooks/use-keyword-events";
 
@@ -29,7 +29,7 @@ export interface KeywordEventCardHeaderProps {
     readonly onRemove: () => void;
 }
 
-// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf; Plan 25 Step 14
+// eslint-disable-next-line max-lines-per-function -- JSX-heavy leaf; PlanTierType 25 Step 14
 export function KeywordEventCardHeader(props: KeywordEventCardHeaderProps): JSX.Element {
     const {
         event, isRunning, runnable, runDisabledReason,
@@ -62,7 +62,7 @@ export function KeywordEventCardHeader(props: KeywordEventCardHeaderProps): JSX.
                     onCheckedChange={(value) => onUpdate({ Enabled: value })}
                     aria-label="Enabled"
                 />
-                <Label className="text-xs text-muted-foreground">{event.Enabled ? "On" : "Off"}</Label>
+                <LabelType className="text-xs text-muted-foreground">{event.Enabled ? "On" : "Off"}</LabelType>
             </div>
             {isRunning ? (
                 <Button

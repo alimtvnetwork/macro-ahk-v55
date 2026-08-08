@@ -2,7 +2,7 @@
  * StepRowItem — a single draggable step row inside the right pane
  * of the Step Group Library.
  *
- * Extracted from `StepGroupLibraryPanel.tsx` (Plan 24, Step 3) and
+ * Extracted from `StepGroupLibraryPanel.tsx` (PlanTierType 24, Step 3) and
  * split into small helpers (drag handlers hook, label block, action
  * button strip) so each function stays inside the 50-line ceiling
  * enforced by `max-lines-per-function`.
@@ -31,7 +31,7 @@ import { stepKindLabel } from "@/hooks/use-step-library";
 
 import { logError } from "../options-logger";
 import { STEP_DRAG_MIME } from "./constants";
-import { DirectionEnum } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { DirectionType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 export interface StepRowItemProps {
     readonly step: StepRow;
@@ -40,7 +40,7 @@ export interface StepRowItemProps {
     readonly stepGroupId: number;
     readonly waitLabel: string | null;
     readonly waitTitle: string | null;
-    readonly onMove: (stepId: number, direction: DirectionEnum) => void;
+    readonly onMove: (stepId: number, direction: DirectionType) => void;
     readonly onDropReorder: (stepGroupId: number, sourceStepId: number, targetStepId: number) => void;
     readonly onToggleDisabled: (step: StepRow, nextDisabled: boolean) => void;
     readonly onEdit: (step: StepRow) => void;
@@ -120,7 +120,7 @@ function StepRowLabel(props: {
                     {stepKindLabel(step.StepKindId)}
                 </span>
                 <span className={`truncate text-sm font-medium ${isDisabled ? "line-through" : ""}`}>
-                    {step.Label ?? "(no label)"}
+                    {step.LabelType ?? "(no label)"}
                 </span>
                 {isDisabled && (
                     <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">

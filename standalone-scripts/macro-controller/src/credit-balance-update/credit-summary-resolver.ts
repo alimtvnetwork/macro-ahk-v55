@@ -1,13 +1,13 @@
 import type { WorkspaceCredit } from '../types';
 import { calcTotalCredits } from '../credit-api';
-import { CreditFetchOutcome } from './credit-fetch-outcome';
+import { CreditFetchOutcomeType } from './credit-fetch-outcome';
 import { readCreditBalanceUpdateCacheSync } from './credit-balance-cache';
 import { hasInlineCredits, isUnifiedBillingWorkspace } from './credit-fetch-controller';
 import { mapPlanFromWire, shouldFetchCreditBalanceForPlan } from './plan-mapper';
 import { resolveDisplayAvailable, resolveDisplayTotal } from './credit-balance-display';
-import { CreditSummarySourceEnum } from "../types/enums";
+import { CreditSummarySourceType } from "../types/enums";
 
-export type CreditSummarySource = CreditSummarySourceEnum;
+export type CreditSummarySource = CreditSummarySourceType;
 
 export interface CreditSummary {
     readonly available: number;
@@ -81,7 +81,7 @@ function zeroSummary(source: CreditSummary['source'], renderDash: boolean): Cred
 export function resolveCreditSummary(ws: WorkspaceCredit): CreditSummary {
     const cached = ws.id ? readCreditBalanceUpdateCacheSync(ws.id) : null;
     if (cached?.balance) { return buildCachedSummary(ws, cached.balance); }
-    if (cached?.outcome === CreditFetchOutcome.Timeout) { return zeroSummary('Timeout', true); }
+    if (cached?.outcome === CreditFetchOutcomeType.Timeout) { return zeroSummary('Timeout', true); }
 
     const plan = mapPlanFromWire(ws.plan);
     const total = inlineTotal(ws);

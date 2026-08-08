@@ -14,8 +14,8 @@ import {
 } from '../workspace-display-status';
 import { buildWorkspaceHoverHtml } from '../ws-hover-card';
 import {
-  SubscriptionStatus,
-  WsTierValue,
+  SubscriptionStatusType,
+  WsTierValueType,
   isPastDueStatus,
   isCanceledStatus,
 } from '../types/subscription-status';
@@ -40,9 +40,9 @@ function makeWs(overrides: Partial<WorkspaceCredit> = {}): WorkspaceCredit {
     used: 0, limit: 0, topupLimit: 0,
     totalCredits: 100, available: 50, rollover: 20, billingAvailable: 30,
     hasFree: false, totalCreditsUsed: 0,
-    subscriptionStatus: SubscriptionStatus.ACTIVE,
+    subscriptionStatus: SubscriptionStatusType.ACTIVE,
     subscriptionStatusChangedAt: '',
-    plan: 'pro_1', role: 'owner', tier: WsTierValue.PRO,
+    plan: 'pro_1', role: 'owner', tier: WsTierValueType.PRO,
     raw: {}, rawApi: {},
     numProjects: 0, gitSyncEnabled: false, nextRefillAt: '',
     billingPeriodEndAt: '', createdAt: '', membershipRole: '', planType: 'monthly',
@@ -52,7 +52,7 @@ function makeWs(overrides: Partial<WorkspaceCredit> = {}): WorkspaceCredit {
 
 function pastDueWs(daysSince: number, extra: Partial<WorkspaceCredit> = {}): WorkspaceCredit {
   return makeWs({
-    subscriptionStatus: SubscriptionStatus.PAST_DUE,
+    subscriptionStatus: SubscriptionStatusType.PAST_DUE,
     subscriptionStatusChangedAt: new Date(NOW - daysSince * 86_400_000).toISOString(),
     ...extra,
   });
@@ -91,7 +91,7 @@ describe('Issue 118 integration — past_due priority', () => {
 
   it('unpaid resolves like past_due', () => {
     const ws = makeWs({
-      subscriptionStatus: SubscriptionStatus.UNPAID,
+      subscriptionStatus: SubscriptionStatusType.UNPAID,
       subscriptionStatusChangedAt: new Date(NOW - 7 * 86_400_000).toISOString(),
     });
     expect(getEffectiveStatus(ws, CFG, NOW).kind).toBe('past-due-expiring');
@@ -99,9 +99,9 @@ describe('Issue 118 integration — past_due priority', () => {
 
   it('canceled status still wins over past_due-shaped data (canceled is terminal)', () => {
     const ws = makeWs({
-      subscriptionStatus: SubscriptionStatus.CANCELED,
+      subscriptionStatus: SubscriptionStatusType.CANCELED,
       subscriptionStatusChangedAt: new Date(NOW - 60 * 86_400_000).toISOString(),
-      tier: WsTierValue.EXPIRED,
+      tier: WsTierValueType.EXPIRED,
     });
     const status = getEffectiveStatus(ws, CFG, NOW);
     expect(status.kind).not.toBe('past-due-expiring');
@@ -119,7 +119,7 @@ describe('Issue 118 integration — hover card past-due section', () => {
   });
 
   it('hover card omits past-due section when workspace is healthy', () => {
-    const ws = makeWs({ subscriptionStatus: SubscriptionStatus.ACTIVE });
+    const ws = makeWs({ subscriptionStatus: SubscriptionStatusType.ACTIVE });
     const status = getEffectiveStatus(ws, CFG, NOW);
     const html = buildWorkspaceHoverHtml(ws, status, CFG);
     expect(html).not.toContain('Grants remain active');
@@ -175,15 +175,15 @@ describe('Issue 118 integration — sort key (daysSince desc, available tiebreak
 
 describe('Issue 118 integration — enum guard regressions', () => {
   it('isPastDueStatus matches both spellings and rejects unrelated', () => {
-    expect(isPastDueStatus(SubscriptionStatus.PAST_DUE)).toBe(true);
-    expect(isPastDueStatus(SubscriptionStatus.UNPAID)).toBe(true);
-    expect(isPastDueStatus(SubscriptionStatus.ACTIVE)).toBe(false);
-    expect(isPastDueStatus(SubscriptionStatus.CANCELED)).toBe(false);
+    expect(isPastDueStatus(SubscriptionStatusType.PAST_DUE)).toBe(true);
+    expect(isPastDueStatus(SubscriptionStatusType.UNPAID)).toBe(true);
+    expect(isPastDueStatus(SubscriptionStatusType.ACTIVE)).toBe(false);
+    expect(isPastDueStatus(SubscriptionStatusType.CANCELED)).toBe(false);
   });
 
   it('isCanceledStatus accepts both canceled and cancelled', () => {
-    expect(isCanceledStatus(SubscriptionStatus.CANCELED)).toBe(true);
-    expect(isCanceledStatus(SubscriptionStatus.CANCELLED)).toBe(true);
-    expect(isCanceledStatus(SubscriptionStatus.PAST_DUE)).toBe(false);
+    expect(isCanceledStatus(SubscriptionStatusType.CANCELED)).toBe(true);
+    expect(isCanceledStatus(SubscriptionStatusType.CANCELLED)).toBe(true);
+    expect(isCanceledStatus(SubscriptionStatusType.PAST_DUE)).toBe(false);
   });
 });

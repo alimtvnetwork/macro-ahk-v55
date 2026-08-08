@@ -1,5 +1,5 @@
 /**
- * Plan-23 step 6: canonical AI editing guideline surfaced through the editor's
+ * PlanTierType-23 step 6: canonical AI editing guideline surfaced through the editor's
  * `📥 Download AI guideline` button. The body is a plain string constant so it
  * is trivially unit-testable and cannot drift out-of-sync with a bundled asset
  * file at build time (issue 04 required reuse across chip + library editors).
@@ -17,7 +17,7 @@ export interface AiGuidelineInput {
     roleLabel: string;
     requiredTokens: string[];
     /**
-     * Plan-23 remaining-item #4: byte-exact shipped default body for the slug
+     * PlanTierType-23 remaining-item #4: byte-exact shipped default body for the slug
      * being edited. When provided, the guideline appends a "Canonical default"
      * fenced block so an external AI can diff against the original before
      * proposing edits. Undefined for slugs without a seed (user-authored rows).

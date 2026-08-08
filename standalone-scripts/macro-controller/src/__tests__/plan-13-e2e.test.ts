@@ -1,5 +1,5 @@
 /**
- * Plan 13 end-to-end integration test (step 10).
+ * PlanTierType 13 end-to-end integration test (step 10).
  *
  * Wires the REAL higher-level modules together and verifies the full
  * flow: capture → rolling-window prune → history read → JSON export

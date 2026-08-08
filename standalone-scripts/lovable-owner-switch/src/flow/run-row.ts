@@ -17,7 +17,7 @@ import { runSignOut } from "./run-sign-out";
 import { runOwnerEmails } from "./run-owner-emails";
 import { finalizeRow } from "./row-finalize";
 import { RowOutcomeCode } from "./row-types";
-import { LogPhase, LogSeverity, buildEntry } from "./log-sink";
+import { LogPhaseType, LogSeverityType, buildEntry } from "./log-sink";
 import type { LogSink } from "./log-sink";
 import type { PromotedOwnerRecord, RowExecutionContext, RowExecutionResult } from "./row-types";
 import type { RowStateStore } from "./row-state-store";
@@ -46,8 +46,8 @@ const succeedResult = (
 
 const noteSignOut = (ctx: RowExecutionContext, sink: LogSink, error: string | null): void => {
     sink.write(buildEntry(
-        ctx.Task.TaskId, ctx.Row.RowIndex, LogPhase.SignOut,
-        LogSeverity.Warn, `Sign-out best-effort failed: ${error ?? "unknown"}`,
+        ctx.Task.TaskId, ctx.Row.RowIndex, LogPhaseType.SignOut,
+        LogSeverityType.Warn, `Sign-out best-effort failed: ${error ?? "unknown"}`,
     ));
 };
 

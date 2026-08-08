@@ -78,8 +78,8 @@ describe("timeline reducer", () => {
         expect(s2.Entries.length).toBe(2);
         const a = s2.Entries[0];
         const b = s2.Entries[1];
-        if (a.Kind === "Step") { expect(a.Label).toBe("Key Ctrl+Enter"); }
-        if (b.Kind === "Step") { expect(b.Label).toBe("Wait 250ms"); expect(b.StepIndex).toBe(1); }
+        if (a.Kind === "Step") { expect(a.LabelType).toBe("Key Ctrl+Enter"); }
+        if (b.Kind === "Step") { expect(b.LabelType).toBe("Wait 250ms"); expect(b.StepIndex).toBe(1); }
     });
 
     it("records event end and chain end", () => {

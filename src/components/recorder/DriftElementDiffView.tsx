@@ -27,7 +27,7 @@ import {
     formatDuration,
     type DriftTimeline,
 } from "@/background/recorder/drift-timeline";
-import { ToneEnum3, SideEnum } from "../../types/enums";
+import { SemanticSemanticToneEnum1, SideEnum } from "../../types/enums";
 
 interface DriftElementDiffViewProps {
     /** Recorded / expected element snapshot (or null when never captured). */
@@ -45,7 +45,7 @@ interface DriftElementDiffViewProps {
     readonly now?: Date;
 }
 
-const VERDICT_META: Readonly<Record<DriftVerdict, { label: string; tone: ToneEnum3 }>> = {
+const VERDICT_META: Readonly<Record<DriftVerdict, { label: string; tone: SemanticSemanticToneEnum1 }>> = {
     Identical: { label: "Identical", tone: "ok" },
     AttributeDrift: { label: "Attribute drift", tone: "warn" },
     RenamedIdentity: { label: "Renamed identity", tone: "warn" },

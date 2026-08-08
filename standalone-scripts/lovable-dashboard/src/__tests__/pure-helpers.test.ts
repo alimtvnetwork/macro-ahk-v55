@@ -8,8 +8,8 @@ import { onSearchInput } from "../search-bar";
 import { resolveFullXPath, HomepageDashboardVariables } from "../homepage-dashboard-variables";
 import { toCreditPair } from "../credit-source";
 import { isHomeUrlAllowed } from "../url-guard";
-import { AllowedHomeUrl } from "../allowed-home-url.enum";
-import { NavDirection, type WorkspaceDictionary, type WorkspaceRecord } from "../types";
+import { AllowedHomeUrlType } from "../allowed-home-url.enum";
+import { NavDirectionType, type WorkspaceDictionary, type WorkspaceRecord } from "../types";
 
 function rec(index: number, name: string, isSelected = false): WorkspaceRecord {
     return {
@@ -30,16 +30,16 @@ function dictOf(records: WorkspaceRecord[]): WorkspaceDictionary {
 
 describe("computeTargetIndex", () => {
     it("steps down within range", () => {
-        expect(computeTargetIndex(2, 5, NavDirection.DOWN, 1)).toBe(3);
+        expect(computeTargetIndex(2, 5, NavDirectionType.DOWN, 1)).toBe(3);
     });
     it("steps up within range", () => {
-        expect(computeTargetIndex(3, 5, NavDirection.UP, 2)).toBe(1);
+        expect(computeTargetIndex(3, 5, NavDirectionType.UP, 2)).toBe(1);
     });
     it("clamps to 1 when going below", () => {
-        expect(computeTargetIndex(2, 5, NavDirection.UP, 10)).toBe(1);
+        expect(computeTargetIndex(2, 5, NavDirectionType.UP, 10)).toBe(1);
     });
     it("clamps to total when going above", () => {
-        expect(computeTargetIndex(4, 5, NavDirection.DOWN, 10)).toBe(5);
+        expect(computeTargetIndex(4, 5, NavDirectionType.DOWN, 10)).toBe(5);
     });
 });
 
@@ -80,14 +80,14 @@ describe("toCreditPair", () => {
 });
 
 describe("isHomeUrlAllowed", () => {
-    it("accepts every AllowedHomeUrl value exactly", () => {
-        for (const url of Object.values(AllowedHomeUrl)) {
+    it("accepts every AllowedHomeUrlType value exactly", () => {
+        for (const url of Object.values(AllowedHomeUrlType)) {
             expect(isHomeUrlAllowed(url)).toBe(true);
         }
     });
     it("accepts ONLY the exact /dashboard URL (v3.21.0 contract)", () => {
         // The enum must contain exactly one value — DASHBOARD.
-        const values = Object.values(AllowedHomeUrl);
+        const values = Object.values(AllowedHomeUrlType);
         expect(values).toHaveLength(1);
         expect(values[0]).toBe("https://lovable.dev/dashboard");
         expect(isHomeUrlAllowed("https://lovable.dev/dashboard")).toBe(true);

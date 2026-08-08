@@ -9,7 +9,7 @@
  */
 
 import { CreditGrantType } from './credit-grant-type';
-import { MacroCreditSource } from './macro-credit-source';
+import { MacroCreditSourceType } from './macro-credit-source';
 import type { CreditBalanceResponseTyped } from './credit-balance-response-typed';
 import type { ExpiringGrant } from './expiring-grant';
 import type { MacroCreditSummary } from './macro-credit-summary';
@@ -57,7 +57,7 @@ export function calculateProZeroCreditSummary(
         Total: balance.total_granted,
         AvailableCredits: balance.total_remaining,
         TotalUsed: balance.total_billing_period_used,
-        Source: MacroCreditSource.CREDIT_BALANCE,
+        Source: MacroCreditSourceType.CREDIT_BALANCE,
         DailyRemaining: balance.daily_remaining,
         DailyLimit: balance.daily_limit,
         // Wire API renamed monthly/billing-period grants from `billing` → `granted`

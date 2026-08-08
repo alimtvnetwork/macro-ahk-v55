@@ -6,7 +6,7 @@
  */
 
 /** Source of credit data. */
-export enum CreditSource {
+export enum CreditSourceType {
   Api = 'api',
   Cache = 'cache',
 }
@@ -83,7 +83,7 @@ export interface LoopCreditState {
   totalRollover: number;
   totalAvailable: number;
   totalBillingAvail: number;
-  source: CreditSource | null;
+  source: CreditSourceType | null;
   wsById: Record<string, WorkspaceCredit>;
 }
 

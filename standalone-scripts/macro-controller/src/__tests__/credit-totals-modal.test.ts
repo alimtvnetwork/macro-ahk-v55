@@ -20,7 +20,7 @@ import {
 import { aggregateCreditTotals } from '../credit-totals';
 import { loopCreditState } from '../shared-state';
 import type { WorkspaceCredit } from '../types';
-import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
+import { CreditFetchOutcomeType } from '../credit-balance-update/credit-fetch-outcome';
 import { __writeCreditBalanceUpdateMemoryCacheForTests, clearCreditBalanceUpdateMemoryCache } from '../credit-balance-update/credit-balance-cache';
 
 function ws(partial: Partial<WorkspaceCredit>): WorkspaceCredit {
@@ -55,7 +55,7 @@ afterEach(() => {
 
 function seedCachedBalance(workspaceId: string, remaining: number, total: number): void {
   __writeCreditBalanceUpdateMemoryCacheForTests(workspaceId, {
-    outcome: CreditFetchOutcome.ApiHit,
+    outcome: CreditFetchOutcomeType.ApiHit,
     fetchedAt: Date.now(),
     sourceUrl: 'test',
     errorDetail: null,
