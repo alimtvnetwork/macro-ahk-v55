@@ -1,3 +1,4 @@
+import { HttpCodes } from "./constants/http";
 import { ServiceResult } from './utils/result-wrapper';
 /**
  * Workspace Adjacent Navigation — Move to adjacent workspace with fresh fetch and skip logic.
@@ -29,7 +30,7 @@ function mc() { return MacroController.getInstance(); }
 // ============================================
 
 function isAuthFailure(status: number): boolean {
-  return status === 401 || status === 403;
+  return status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN;
 }
 
 // ============================================

@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /* eslint-disable sonarjs/no-duplicate-string */
 /**
  * MacroLoop Controller — Task Queue UI (Modal & Section)
@@ -199,7 +200,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
 
   listContainer.addEventListener('refresh-queue', refreshHandler);
   
-  setInterval(refreshHandler, 1000);
+  setInterval(refreshHandler, Timings.TIMEOUT_SHORT);
   
   // Update pause button state based on manager
   setInterval(() => {
@@ -212,7 +213,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
        pauseBtn.style.background = isPaused || isStopped ? 'rgba(34,197,94,0.15)' : cPanelBgAlt;
        pauseBtn.style.color = isPaused || isStopped ? '#4ade80' : '#9ca3af';
     }
-  }, 1000);
+  }, Timings.TIMEOUT_SHORT);
 
   refreshHandler();
 

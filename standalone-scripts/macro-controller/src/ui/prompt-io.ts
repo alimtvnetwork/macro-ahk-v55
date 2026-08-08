@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Prompt IO, Core Logic & Types (Issue 131).
@@ -97,7 +98,7 @@ export async function exportPromptsToJson(options: ExportPromptsOptions = {}): P
     setTimeout(() => {
       if (a.parentNode) a.parentNode.removeChild(a);
       URL.revokeObjectURL(url);
-    }, 100);
+    }, Timings.POLL_INTERVAL_FAST);
 
     const suffix = skipped > 0 ? ` (${skipped} excluded)` : '';
     const defSuffix = defaultsSkipped > 0 ? `, ${defaultsSkipped} defaults skipped` : '';

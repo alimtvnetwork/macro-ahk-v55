@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Script Re-Inject Section (Issue 77, Task 8.5)
  *
@@ -297,7 +298,7 @@ export function buildHotReloadSection(onVersionMismatch?: (available: string) =>
   checkBtn.onclick = function() { checkVersion(); };
   reinjectBtn.onclick = function() { _handleReinject(reinjectBtn, statusRow); };
 
-  setTimeout(checkVersion, 500);
+  setTimeout(checkVersion, Timings.POLL_INTERVAL_NORMAL);
 
   return { section: col.section, checkNow: checkVersion };
 }

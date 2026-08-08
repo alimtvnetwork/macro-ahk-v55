@@ -1,3 +1,4 @@
+import { Timings } from "./constants/timing";
 import { DomainConstants } from "./constants/domain";
 /**
  * DOM Helper Functions — Extracted from macro-looping.ts (Step 2)
@@ -178,7 +179,7 @@ export function pollForDialogReady(): Promise<void> {
           setTimeout(function () {
             log('Dialog settle delay complete — proceeding', 'check');
             resolve();
-          }, 500);
+          }, Timings.POLL_INTERVAL_NORMAL);
         },
         onTimeout: function () {
           log('Main progress bar NOT found after ' + maxWait + 'ms — proceeding anyway (timeout)', 'warn');

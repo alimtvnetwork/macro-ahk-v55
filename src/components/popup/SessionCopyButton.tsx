@@ -1,3 +1,4 @@
+import { Timings } from "../../constants/timing";
 import { useState, useCallback, useEffect } from "react";
 import { logError } from "@/hooks/popup-logger";
 import { Button } from "@/components/ui/button";
@@ -194,7 +195,7 @@ export function SessionCopyButton() {
       const label = isCurrentSession ? "current session" : `session #${selectedSession}`;
       toast.success(`Report for ${label} copied to clipboard`);
 
-      setTimeout(() => setState("idle"), 2000);
+      setTimeout(() => setState("idle"), Timings.TIMEOUT_NORMAL);
     } catch (copyError) {
       setState("idle");
       const msg = copyError instanceof Error ? copyError.message : "Copy failed";

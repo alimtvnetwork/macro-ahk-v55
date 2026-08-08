@@ -1,3 +1,4 @@
+import { Timings } from "./constants/timing";
 import { ServiceResult } from './utils/result-wrapper';
 /**
  * MacroLoop Controller — Single Workspace Rename API
@@ -209,7 +210,7 @@ function handleRenameError(
     },
   });
 
-  const isForbiddenAfterFallback = resp.status === 403 && attempt.didLimitFallback;
+  const isForbiddenAfterFallback = resp.status === HttpCodes.FORBIDDEN && attempt.didLimitFallback;
 
   if (isForbiddenAfterFallback) {
     addForbidden(wsId, bodyPreview);
@@ -251,13 +252,13 @@ async function executeRename(
 
   if (isRateLimited) {
     log('[Rename] Rate limited (429) — retrying in 2s', 'warn');
-    await delay(2000);
+    await delay(Timings.TIMEOUT_NORMAL);
 
     return executeRename(wsId, newName, token, { ...attempt, didRateLimitRetry: true }, forceRetry);
   }
 
   // 403 with credit-limit field → retry without it
-  const isCreditLimitForbidden = resp.status === 403 && attempt.includeCreditLimit && !attempt.didLimitFallback;
+  const isCreditLimitForbidden = resp.status === HttpCodes.FORBIDDEN && attempt.includeCreditLimit && !attempt.didLimitFallback;
 
   if (isCreditLimitForbidden) {
     handleCreditLimitFallback(resp, wsId);
@@ -266,7 +267,7 @@ async function executeRename(
   }
 
   // 401 → auth recovery
-  const isUnauthorized = resp.status === 401 && !attempt.didAuthRecovery;
+  const isUnauthorized = resp.status === HttpCodes.UNAUTHORIZED && !attempt.didAuthRecovery;
 
   if (isUnauthorized) {
     const newToken = await handleRenameAuthRecovery(token, wsId);

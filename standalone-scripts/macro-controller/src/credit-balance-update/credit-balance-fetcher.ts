@@ -1,3 +1,4 @@
+import { HttpCodes } from "../constants/http";
 import { getBearerToken, markBearerTokenExpired } from '../auth';
 import { CREDIT_API_BASE } from '../shared-state';
 import { CreditFetchOutcomeType } from './credit-fetch-outcome';
@@ -100,8 +101,8 @@ function buildResult(
 }
 
 function classifyHttpReason(status: number): CreditFetchOutcomeType {
-    if (status === 401 || status === 403) return CreditFetchOutcomeType.AuthError;
-    if (status >= 500) return CreditFetchOutcomeType.HttpError;
+    if (status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN) return CreditFetchOutcomeType.AuthError;
+    if (status >= HttpCodes.INTERNAL_SERVER_ERROR) return CreditFetchOutcomeType.HttpError;
     return CreditFetchOutcomeType.HttpError;
 }
 
@@ -115,7 +116,7 @@ async function handleNonOkResponse(
     const bodyPreview = await readBodyPreview(response);
     const status = response.status;
     const detail = 'HTTP ' + status + ' from /workspaces/{id}/credit-balance';
-    const reasonStr = status === 401 || status === 403 ? 'AuthError' : status >= 500 ? 'Http5xx' : 'HttpError';
+    const reasonStr = status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN ? 'AuthError' : status >= HttpCodes.INTERNAL_SERVER_ERROR ? 'Http5xx' : 'HttpError';
     if (reasonStr === 'AuthError') {
         markBearerTokenExpired('credit-balance-update');
     }

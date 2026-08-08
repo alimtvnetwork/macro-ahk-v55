@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Task Next Submenu
  *
@@ -69,7 +70,7 @@ export function buildTaskNextSubmenu(
         self.style.background = 'transparent';
         submenu.style.display = 'none';
       }
-    }, 100);
+    }, Timings.POLL_INTERVAL_FAST);
   };
 
   buildPresetCountItems(submenu, dropdown, taskNextDeps);

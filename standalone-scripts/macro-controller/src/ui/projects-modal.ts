@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 import { ServiceResult } from '../utils/result-wrapper';
 /**
  * MacroLoop Controller — Projects Modal
@@ -1120,7 +1121,7 @@ function downloadCsv(filename: string, csv: string): void {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        setTimeout(function () { URL.revokeObjectURL(url); }, Timings.TIMEOUT_SHORT);
     } catch (err) {
         logError('Projects', 'CSV download failed: ' + String(err));
     }

@@ -1,3 +1,4 @@
+import { Timings } from "../../../constants/timing";
 /**
  * Marco Extension — Error Modal
  *
@@ -43,7 +44,7 @@ export function ErrorModal({ error, open, onOpenChange }: ErrorModalProps) {
       await navigator.clipboard.writeText(formatErrorForClipboard(error));
       setCopied(true);
       toast.success("Error details copied to clipboard");
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), Timings.TIMEOUT_NORMAL);
     } catch {
       toast.error("Failed to copy to clipboard");
     }

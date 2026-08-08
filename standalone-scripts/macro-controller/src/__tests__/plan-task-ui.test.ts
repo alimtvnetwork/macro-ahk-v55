@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 import { DbResult } from '../db/db-result';
 /**
  * Step 3 (PlanTierType Task RCA) — Tests for plan-task-ui.ts.
@@ -149,7 +150,7 @@ describe('renderPlanTaskSubmenu — RC-3 no auto-collapse', () => {
     sub.style.display = 'block';
 
     item.dispatchEvent(new Event('mouseleave'));
-    await new Promise((r) => setTimeout(r, 500)); // far longer than the legacy 120ms timer
+    await new Promise((r) => setTimeout(r, Timings.POLL_INTERVAL_NORMAL)); // far longer than the legacy 120ms timer
 
     expect(sub.style.display).toBe('block'); // STILL open — auto-collapse removed
   });

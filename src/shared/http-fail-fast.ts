@@ -1,3 +1,4 @@
+import { HttpCodes } from "../constants/http";
 /**
  * HTTP Fail-Fast helper (HEFF).
  *
@@ -71,16 +72,16 @@ export interface HttpFailureReport {
 const isOk = (status: number): boolean => status >= HTTP_OK_MIN && status < HTTP_OK_MAX;
 
 const reasonForStatus = (status: number): string => {
-    if (status === 401) return "Unauthorized — token missing/expired (do NOT retry; do NOT refresh in a loop).";
-    if (status === 403) return "Forbidden — caller lacks permission for this resource.";
-    if (status === 404) return "Not Found — endpoint or resource does not exist at this URL.";
+    if (status === HttpCodes.UNAUTHORIZED) return "Unauthorized — token missing/expired (do NOT retry; do NOT refresh in a loop).";
+    if (status === HttpCodes.FORBIDDEN) return "Forbidden — caller lacks permission for this resource.";
+    if (status === HttpCodes.NOT_FOUND) return "Not Found — endpoint or resource does not exist at this URL.";
     if (status === 405) return "Method Not Allowed — server rejected this HTTP method; do NOT swap methods and retry.";
     if (status === 408) return "Request Timeout — server-side timeout.";
-    if (status === 409) return "Conflict — server state disagrees with request.";
+    if (status === HttpCodes.CONFLICT) return "Conflict — server state disagrees with request.";
     if (status === 410) return "Gone — resource permanently removed.";
     if (status === 429) return "Rate Limited — STOP all calls to this host immediately.";
-    if (status >= 500 && status < 600) return `Server Error ${status} — do NOT retry; surface to user.`;
-    if (status >= 400 && status < 500) return `Client Error ${status} — bad request shape or auth; do NOT retry.`;
+    if (status >= HttpCodes.INTERNAL_SERVER_ERROR && status < 600) return `Server Error ${status} — do NOT retry; surface to user.`;
+    if (status >= HttpCodes.BAD_REQUEST && status < HttpCodes.INTERNAL_SERVER_ERROR) return `Client Error ${status} — bad request shape or auth; do NOT retry.`;
     return `Unexpected HTTP status ${status}.`;
 };
 

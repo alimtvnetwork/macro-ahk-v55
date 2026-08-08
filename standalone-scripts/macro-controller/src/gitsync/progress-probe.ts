@@ -1,3 +1,4 @@
+import { HttpCodes } from "../constants/http";
 import { ServiceResult } from '../utils/result-wrapper';
 /**
  * MacroLoop Controller — GitSync progress probe (v3.40.2)
@@ -133,12 +134,12 @@ export async function probeProgress(
         baseUrl: CREDIT_API_BASE,
     });
 
-    if (resp.status === 404) {
+    if (resp.status === HttpCodes.NOT_FOUND) {
         log('[GitsyncProbe] 404 — no job yet for ws=' + wsId + ' pid=' + projectId
             + ' job=' + jobId, 'info');
         return null;
     }
-    if (resp.status === 401 || resp.status === 403) {
+    if (resp.status === HttpCodes.UNAUTHORIZED || resp.status === HttpCodes.FORBIDDEN) {
         // Caller lacks access → treat as no visible job.
         log('[GitsyncProbe] HTTP ' + resp.status + ' for ws=' + wsId
             + ' pid=' + projectId + ' → null', 'info');

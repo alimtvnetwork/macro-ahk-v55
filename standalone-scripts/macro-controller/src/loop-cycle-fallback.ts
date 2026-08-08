@@ -1,3 +1,4 @@
+import { Timings } from "./constants/timing";
 import { ServiceResult } from './utils/result-wrapper';
 /**
  * Loop cycle - fallback fetch flow.
@@ -51,7 +52,7 @@ export function setRunCycleRef(runCycle: () => void): void {
 }
 
 function isAuthFailure(status: number): boolean {
-  return status === 401 || status === 403;
+  return status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN;
 }
 
 function isLoopStale(): boolean {
@@ -71,7 +72,7 @@ function releaseCycleLock(): void {
 // ============================================
 
 async function doubleConfirmAndMove(threshold: number): Promise<void> {
-  await delay(2000);
+  await delay(Timings.TIMEOUT_NORMAL);
 
   if (isLoopStale()) {
     log('SKIP: State changed during double-confirm wait', 'skip');

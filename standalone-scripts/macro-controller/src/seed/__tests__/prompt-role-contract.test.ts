@@ -87,7 +87,6 @@ describe('Prompt role contract matrix (v4.179.0)', () => {
         });
 
         it('getSeedBodyForSlug is consistent with PLAN_NEXT_SEED_ROWS', () => {
-        it('getSeedBodyForSlug is consistent with PLAN_NEXT_SEED_ROWS', () => {
             for (const row of PLAN_NEXT_SEED_ROWS) {
                 expect(getSeedBodyForSlug(row.slug)).toBe(row.body);
             }

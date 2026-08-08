@@ -1,3 +1,4 @@
+import { HttpCodes } from "../constants/http";
 /**
  * Marco Extension — Database Manager
  *
@@ -143,7 +144,7 @@ async function runWasmHeadAttempt(
  * `[WASM_FILE_MISSING_404]` error for 404, non-2xx, or empty file.
  */
 function validateWasmHeadResponse(wasmUrl: string, response: Response, probe: WasmProbeResult): void {
-    if (response.status === 404) {
+    if (response.status === HttpCodes.NOT_FOUND) {
         setWasmProbeResult(probe);
         throw new Error(
             `[WASM_FILE_MISSING_404] HEFF: HTTP 404 on HEAD ${wasmUrl}. ` +

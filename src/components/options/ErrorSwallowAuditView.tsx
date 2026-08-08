@@ -1,3 +1,4 @@
+import { HttpCodes } from "../../constants/http";
 /**
  * Marco Extension — Error-Swallowing Audit View
  *
@@ -160,7 +161,7 @@ export default function ErrorSwallowAuditView() {
         setState({ kind: "loading" });
         try {
             const res = ServiceResult.wrapFetch(await fetch(DEFAULT_AUDIT_URL, { cache: "no-store" }));
-            if (res.status === 404) {
+            if (res.status === HttpCodes.NOT_FOUND) {
                 setState({ kind: "missing" });
                 return;
             }

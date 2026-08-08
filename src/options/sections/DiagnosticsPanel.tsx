@@ -1,3 +1,4 @@
+import { Timings } from "../../constants/timing";
 import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Marco Extension — React Options: Diagnostics Panel
@@ -99,7 +100,7 @@ export function DiagnosticsPanel() {
         // EXT-02: fully pause/resume polling based on page visibility
         const startPolling = () => {
             if (timerRef.current) return;
-            timerRef.current = setInterval(() => void fetchData(), 10_000);
+            timerRef.current = setInterval(() => void fetchData(), Timings.TIMEOUT_VERY_LONG);
         };
         const stopPolling = () => {
             if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
@@ -119,7 +120,7 @@ export function DiagnosticsPanel() {
         const report = buildReport(data, messages);
         await navigator.clipboard.writeText(report);
         setCopyLabel("✅ Copied!");
-        setTimeout(() => setCopyLabel("📋 Copy Diagnostics Report"), 2000);
+        setTimeout(() => setCopyLabel("📋 Copy Diagnostics Report"), Timings.TIMEOUT_NORMAL);
     }, [data, messages]);
 
     const highlightClass = (key: string): string =>

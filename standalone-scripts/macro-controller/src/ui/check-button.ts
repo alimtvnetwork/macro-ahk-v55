@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Check Button Builder
  * Step 2g: Extracted from macro-looping.ts
@@ -102,7 +103,7 @@ function _handleCheckClick(ctx: CheckButtonCtx): void {
   if (state.isDelegating) {
     log('Check blocked: move/delegation in progress', 'warn');
     checkBtn.style.opacity = '0.5';
-    setTimeout(function() { checkBtn.style.opacity = '1'; }, 500);
+    setTimeout(function() { checkBtn.style.opacity = '1'; }, Timings.POLL_INTERVAL_NORMAL);
     return;
   }
 

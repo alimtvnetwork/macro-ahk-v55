@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /* eslint-disable sonarjs/no-duplicate-string */
 /**
  * MacroLoop Controller — Settings Tab Panel Builders
@@ -288,7 +289,7 @@ export function buildTaskNextPanel(makeField: MakeFieldFn): TaskNextPanelResult 
 
 // ── Logging Panel ──
 
- 
+
 export function buildLoggingPanel(deps: SettingsDeps): LoggingPanelResult {
   const { btnStyle, showToast } = deps;
   const panel = document.createElement('div');
@@ -532,7 +533,7 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
   panel.appendChild(listContainer);
 
   // Initial load
-  setTimeout(() => refreshHistory(), 100);
+  setTimeout(() => refreshHistory(), Timings.POLL_INTERVAL_FAST);
 
   _mountSubmitHistoryPanel(panel);
 

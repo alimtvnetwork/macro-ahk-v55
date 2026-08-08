@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Workspace Dropdown Builder
  * Step 2g: Extracted from macro-looping.ts
@@ -203,7 +204,7 @@ function _appendActionButtons(header: HTMLElement, deps: WsDropdownDeps): void {
   header.appendChild(wsRenameBtn);
 
   header.appendChild(_buildUndoBtn(getRenameHistory, undoLastRename, populateLoopWorkspaceDropdown));
-  setTimeout(function() { updateUndoBtnVisibility(); }, 100);
+  setTimeout(function() { updateUndoBtnVisibility(); }, Timings.POLL_INTERVAL_FAST);
 
   const wsFocusBtn = document.createElement('button');
   wsFocusBtn.textContent = '📍 Focus Current';

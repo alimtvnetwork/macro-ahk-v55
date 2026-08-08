@@ -1,3 +1,4 @@
+import { Timings } from "../../constants/timing";
 import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -302,7 +303,7 @@ export function InjectionCopyButton() {
       setErrorCount(errors.length);
       setState("copied");
       toast.success(`Copied ${errors.length} errors + ${logs.length} diagnostic logs`);
-      setTimeout(() => setState("idle"), 2000);
+      setTimeout(() => setState("idle"), Timings.TIMEOUT_NORMAL);
     } catch (err) {
       setState("idle");
       toast.error(err instanceof Error ? err.message : "Copy failed");

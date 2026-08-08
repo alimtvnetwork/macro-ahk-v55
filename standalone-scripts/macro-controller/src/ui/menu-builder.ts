@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Menu Builder
  * Step 2g: Extracted from macro-looping.ts
@@ -178,7 +179,7 @@ function downloadTextFile(fileName: string, content: string, mimeType: string): 
   document.body.appendChild(anchor);
   anchor.click();
   document.body.removeChild(anchor);
-  setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+  setTimeout(function() { URL.revokeObjectURL(url); }, Timings.TIMEOUT_SHORT);
 }
 
 async function fetchBundledMacroControllerSource(): Promise<ExtensionResponse> {

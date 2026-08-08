@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * Project History Panel — plan 13 step 9 (DOM shell).
  *
@@ -86,7 +87,7 @@ function defaultDownload(filename: string, payload: string): void {
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  setTimeout(() => URL.revokeObjectURL(url), Timings.TIMEOUT_SHORT);
 }
 
 function resolveDeps(deps?: ProjectHistoryPanelDeps): Required<ProjectHistoryPanelDeps> {

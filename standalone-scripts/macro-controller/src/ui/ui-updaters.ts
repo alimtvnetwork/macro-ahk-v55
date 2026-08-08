@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — UI Update Functions
  * Step 2b: Extracted from macro-looping.ts
@@ -129,7 +130,7 @@ export function animateBtn(btn: HTMLElement): void {
       btn.style.filter = '';
       btn.style.background = origBg;
     }, 180);
-  }, 100);
+  }, Timings.POLL_INTERVAL_FAST);
 }
 
 /**

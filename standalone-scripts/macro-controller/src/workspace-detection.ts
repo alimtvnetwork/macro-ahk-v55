@@ -1,5 +1,6 @@
+import { HttpCodes } from "./constants/http";
 import { ServiceResult } from './utils/result-wrapper';
- 
+
 /**
  * MacroLoop Controller — Workspace Detection Module (barrel)
  *
@@ -27,7 +28,7 @@ import { logError } from './error-utils';
 // ============================================
 
 function isAuthFailure(status: number): boolean {
-  return status === 401 || status === 403;
+  return status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN;
 }
 
 // ============================================

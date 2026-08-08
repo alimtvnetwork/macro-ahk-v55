@@ -1,3 +1,4 @@
+import { Timings } from "../../constants/timing";
 /**
  * Token Seeder Diagnostics Panel
  *
@@ -126,7 +127,7 @@ export function TokenSeederDiagnosticsPanel() {
 
     useEffect(() => {
         if (tickRef.current) clearInterval(tickRef.current);
-        tickRef.current = setInterval(() => setNow(Date.now()), 500);
+        tickRef.current = setInterval(() => setNow(Date.now()), Timings.POLL_INTERVAL_NORMAL);
         return () => {
             if (tickRef.current) clearInterval(tickRef.current);
         };

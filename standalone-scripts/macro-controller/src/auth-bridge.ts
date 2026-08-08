@@ -1,3 +1,4 @@
+import { Timings } from "./constants/timing";
 /**
  * MacroLoop Controller — Extension Bridge Communication
  * Phase 5B: Extracted from auth.ts
@@ -376,7 +377,7 @@ export function isRelayActive(): Promise<boolean> {
           window.removeEventListener('message', ctx._onPong!);
           resolve(false);
         }
-      }, 500),
+      }, Timings.POLL_INTERVAL_NORMAL),
       pingId,
       resolve,
     };

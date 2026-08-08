@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * Panel Header — Title bar construction extracted from panel-builder.ts (Phase 5F)
  *
@@ -145,7 +146,7 @@ function _assembleTitleRow(titleRow: HTMLElement, els: Record<string, HTMLElemen
 // Displays project name from API or DOM — click to re-detect workspace
 // ============================================
 
- 
+
 function buildWorkspaceNameBadge(deps: PanelBuilderDeps): HTMLElement {
   const wsNameEl = document.createElement('div');
   wsNameEl.id = 'loop-title-ws-name';
@@ -199,7 +200,7 @@ function buildWorkspaceNameBadge(deps: PanelBuilderDeps): HTMLElement {
         wsNameEl.style.fontWeight = fallbackTitleBarState.fontWeight;
         wsNameEl.textContent = fallbackTitleBarState.text;
         wsNameEl.title = fallbackTitleBarState.title;
-      }, 2000);
+      }, Timings.TIMEOUT_NORMAL);
     });
   };
 

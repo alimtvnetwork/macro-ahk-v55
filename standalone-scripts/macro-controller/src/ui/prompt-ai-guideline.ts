@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * PlanTierType-23 step 6: canonical AI editing guideline surfaced through the editor's
  * `📥 Download AI guideline` button. The body is a plain string constant so it
@@ -100,7 +101,7 @@ export function downloadAiGuideline(input: AiGuidelineInput): void {
         setTimeout(() => {
             if (a.parentNode) a.parentNode.removeChild(a);
             URL.revokeObjectURL(url);
-        }, 100);
+        }, Timings.POLL_INTERVAL_FAST);
         showToast('📥 Guideline downloaded for ' + input.roleLabel, 'success');
     } catch (err) {
         logError('PromptEditor', 'downloadAiGuideline failed for role=' + input.roleLabel, err);

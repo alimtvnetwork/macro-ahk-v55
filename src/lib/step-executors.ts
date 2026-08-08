@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * Step Executors — Spec 21
  *
@@ -31,7 +32,7 @@ export async function executeInjectPrompt(step: StepInjectPrompt): Promise<void>
     setTimeout(() => {
       window.removeEventListener("message", handler);
       reject(new Error(`Timeout injecting prompt "${step.slug}"`));
-    }, 10000);
+    }, Timings.TIMEOUT_VERY_LONG);
   });
 }
 
@@ -78,7 +79,7 @@ export async function executeWaitForElement(step: StepWaitForElement, signal?: A
         reject(new Error(`Timeout waiting for element ${appear ? "to appear" : "to disappear"}: ${step.selector}`));
         return;
       }
-      setTimeout(check, 500);
+      setTimeout(check, Timings.POLL_INTERVAL_NORMAL);
     };
     check();
   });
@@ -100,7 +101,7 @@ export async function executeWaitForText(step: StepWaitForText, signal?: AbortSi
         reject(new Error(`Timeout waiting for text: "${step.text}"`));
         return;
       }
-      setTimeout(check, 1000);
+      setTimeout(check, Timings.TIMEOUT_SHORT);
     };
     check();
   });

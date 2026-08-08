@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * Panel Controls — Button row construction extracted from panel-builder.ts (Phase 5F)
  *
@@ -92,7 +93,7 @@ function focusCurrentWorkspaceInList(): void {
   if (currentItem) {
     currentItem.scrollIntoView({ block: 'center', behavior: 'smooth' });
     (currentItem as HTMLElement).style.outline = '2px solid #F59E0B';
-    setTimeout(function() { (currentItem as HTMLElement).style.outline = ''; }, 2000);
+    setTimeout(function() { (currentItem as HTMLElement).style.outline = ''; }, Timings.TIMEOUT_NORMAL);
     log('Credits: ✅ Focused current workspace: ' + currentName, 'success');
   } else {
     log('Credits: current workspace item not found in list for "' + currentName + '"', 'warn');
@@ -353,7 +354,7 @@ interface PromptsDropdownResult {
   taskNextDeps: TaskNextDeps;
 }
 
- 
+
 function buildPromptsDropdown(_deps: PanelBuilderDeps, btnStyle: string): PromptsDropdownResult {
   const promptsContainer = document.createElement('div');
   promptsContainer.style.cssText = 'position:relative;display:inline-block;min-width:0;';

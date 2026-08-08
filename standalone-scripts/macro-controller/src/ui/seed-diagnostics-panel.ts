@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * seed-diagnostics-panel.ts (v4.405.0)
  *
@@ -166,7 +167,7 @@ function downloadE005DiagnosticsZip(): void {
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  setTimeout(() => URL.revokeObjectURL(url), Timings.TIMEOUT_SHORT);
 }
 
 function buildContractMarkdown(bridge: ReturnType<typeof getSqlBridgeState>): string {

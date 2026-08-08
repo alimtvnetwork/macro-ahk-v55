@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * LLM Authoring Guide - downloadable asset.
  *
@@ -171,5 +172,5 @@ export function downloadLlmGuide(): void {
   document.body.appendChild(a);
   a.click();
   a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  setTimeout(() => URL.revokeObjectURL(url), Timings.TIMEOUT_SHORT);
 }

@@ -1,3 +1,4 @@
+import { Timings } from "./constants/timing";
 /**
  * Workspace Members Panel — v2.216.0
  *
@@ -116,7 +117,7 @@ function exportMembersCsv(wsName: string, members: WorkspaceMember[]): void {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    setTimeout(function () { URL.revokeObjectURL(url); }, Timings.TIMEOUT_SHORT);
     showToast('📄 Exported ' + members.length + ' members → ' + filename, 'success');
   } catch (err: unknown) {
     logError("AutoCatch", "Unhandled exception", err);

@@ -1,3 +1,4 @@
+import { HttpCodes } from "./constants/http";
 import { ServiceResult } from './utils/result-wrapper';
 /**
  * MacroLoop Controller — Credit Fetch
@@ -98,7 +99,7 @@ async function apiFetchWorkspaces(): Promise<SdkApiResponse> {
 }
 
 function isAuthFailure(status: number): boolean {
-  return status === 401 || status === 403;
+  return status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN;
 }
 
 // ============================================

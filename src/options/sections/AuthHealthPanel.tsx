@@ -1,3 +1,4 @@
+import { Timings } from "../../constants/timing";
 /**
  * Auth Health Panel — Displays auth strategy waterfall results
  *
@@ -61,7 +62,7 @@ export function AuthHealthPanel() {
         ];
         await navigator.clipboard.writeText(lines.join("\n"));
         setCopyLabel("✅ Copied!");
-        setTimeout(() => setCopyLabel("📋 Copy"), 2000);
+        setTimeout(() => setCopyLabel("📋 Copy"), Timings.TIMEOUT_NORMAL);
     }, [data]);
 
     return (

@@ -1,3 +1,4 @@
+import { HttpCodes } from "../constants/http";
 import { ServiceResult } from '../utils/result-wrapper';
 /**
  * MacroLoop Controller — Gitsync Disconnect (Issue 129 / Step 9)
@@ -84,7 +85,7 @@ export async function disconnectGithubRepo(
     return { status: 'error', message: 'network_error' };
   }
 
-  if (resp.status === 404) {
+  if (resp.status === HttpCodes.NOT_FOUND) {
     invalidateGitsyncCache(wsId, pid);
     log('[GitsyncDisconnect] HTTP 404 ws=' + wsId + ' pid=' + pid + ' → already not_linked', 'info');
     return { status: 'not_linked' };

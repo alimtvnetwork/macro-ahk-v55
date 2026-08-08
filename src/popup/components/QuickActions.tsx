@@ -1,3 +1,4 @@
+import { Timings } from "../../constants/timing";
 /* eslint-disable sonarjs/no-duplicate-string -- action labels repeated across handlers */
 /**
  * Marco Extension — React Popup: Quick Actions
@@ -39,7 +40,7 @@ function useButtonFlash(resetLabel: string) {
             setTimeout(() => {
                 setLabel(resetLabel);
                 setIsSuccess(false);
-            }, 2000);
+            }, Timings.TIMEOUT_NORMAL);
         },
         [resetLabel],
     );

@@ -1,3 +1,4 @@
+import { HttpCodes } from "./constants/http";
 import { ServiceResult } from './utils/result-wrapper';
 /**
  * Credit Balance API — Free Credit Detection via /workspaces/{id}/credit-balance
@@ -75,7 +76,7 @@ export function clearResolvedWorkspace(): void {
 // ============================================
 
 function isAuthFailure(status: number): boolean {
-  return status === 401 || status === 403;
+  return status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN;
 }
 
 // ============================================
@@ -176,7 +177,7 @@ export async function resolveWorkspaceId(): Promise<string | null> {
 // fetchCreditBalance — GET /workspaces/{id}/credit-balance
 // Uses marco.api.credits.fetchBalance()
 // ============================================
- 
+
 // eslint-disable-next-line max-lines-per-function -- linear API call with multiple diagnostic branches; splitting hurts readability
 export async function fetchCreditBalance(
   workspaceId?: string,

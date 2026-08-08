@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * Prompt Dropdown — Dropdown rendering with categories, Task Next, prompt items
  *
@@ -840,7 +841,7 @@ function _buildTaskNextMenuShell(promptsDropdown: HTMLElement, taskNextDeps: Tas
   taskNextItem.onmouseout = function() {
     setTimeout(function() {
       if (!taskNextItem.matches(':hover')) hideSub();
-    }, 100);
+    }, Timings.POLL_INTERVAL_FAST);
   };
 
   return { taskNextItem, taskNextSub };

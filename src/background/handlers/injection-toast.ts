@@ -1,3 +1,4 @@
+import { Timings } from "../../constants/timing";
 /**
  * Marco Extension — Injection Toast UI
  *
@@ -48,7 +49,7 @@ export async function showInjectionToastInTab(
                 if (loader) {
                     loader.style.opacity = "0";
                     loader.style.transform = exitTransform;
-                    loaderTimer = setTimeout(() => { loaderTimer = null; loader.remove(); }, 300);
+                    loaderTimer = setTimeout(() => { loaderTimer = null; loader.remove(); }, Timings.ANIMATION_DURATION);
                 }
 
                 const m = (window as unknown as Record<string, Record<string, ((...args: unknown[]) => void)>>).marco;
@@ -166,7 +167,7 @@ export async function showInjectionFailureToastInTab(
                 if (loader) {
                     loader.style.opacity = "0";
                     loader.style.transform = exitTransform;
-                    loaderTimer = setTimeout(() => { loaderTimer = null; loader.remove(); }, 300);
+                    loaderTimer = setTimeout(() => { loaderTimer = null; loader.remove(); }, Timings.ANIMATION_DURATION);
                 }
 
                 const m = (window as unknown as Record<string, Record<string, ((...args: unknown[]) => void)>>).marco;
@@ -352,7 +353,7 @@ export async function showInjectionLoadingToast(tabId: number, scriptCount: numb
                         toast.style.transform = exitTransform;
                         removeTimer = setTimeout(cleanup, 350);
                     }
-                }, 10000);
+                }, Timings.TIMEOUT_VERY_LONG);
             },
             args: [scriptCount, EXTENSION_VERSION, TOAST_EXIT_TRANSFORM],
         });

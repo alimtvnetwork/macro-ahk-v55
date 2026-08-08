@@ -1,3 +1,4 @@
+import { Timings } from "../../constants/timing";
 /**
  * DependencyChainPanel — Shows the dependency chain from the last injection run.
  *
@@ -132,7 +133,7 @@ export function DependencyChainPanel() {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), Timings.TIMEOUT_NORMAL);
       toast.success("Chain diagnostics copied to clipboard");
     } catch {
       toast.error("Failed to copy to clipboard");

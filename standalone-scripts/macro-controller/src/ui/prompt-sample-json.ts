@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * Downloadable sample JSON for the Prompt Library import feature.
  *
@@ -65,7 +66,7 @@ export function downloadSamplePromptsJson(): void {
         setTimeout(() => {
             if (a.parentNode) a.parentNode.removeChild(a);
             URL.revokeObjectURL(url);
-        }, 100);
+        }, Timings.POLL_INTERVAL_FAST);
         showToast('Downloaded prompts-sample.json', 'success');
     } catch (err) {
         log('[PromptLibrary] Sample JSON download failed: ' + String(err), 'error');

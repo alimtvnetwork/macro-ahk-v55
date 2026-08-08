@@ -1,3 +1,4 @@
+import { Timings } from "../../constants/timing";
 /* eslint-disable sonarjs/no-duplicate-string -- UI label & log category strings */
 /**
  * Marco Extension — React Popup: SQLite Bundle Actions
@@ -43,11 +44,11 @@ export function SqliteBundleActions({
     const fileRef = useRef<HTMLInputElement>(null);
 
     const resetExport = useCallback(() => {
-        setTimeout(() => setExportLabel("🗄️ Export DB"), 2000);
+        setTimeout(() => setExportLabel("🗄️ Export DB"), Timings.TIMEOUT_NORMAL);
     }, []);
 
     const resetImport = useCallback(() => {
-        setTimeout(() => setImportLabel("📥 Import"), 2000);
+        setTimeout(() => setImportLabel("📥 Import"), Timings.TIMEOUT_NORMAL);
     }, []);
 
     const handleExport = useCallback(async () => {

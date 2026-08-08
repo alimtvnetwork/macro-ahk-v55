@@ -1,3 +1,4 @@
+import { Timings } from "../../../constants/timing";
 /**
  * Marco Extension — Recorder Export helpers
  *
@@ -136,5 +137,5 @@ export function downloadRecorderExport(opts: ExportOptions, format: ExportFormat
     a.click();
     a.remove();
     /* Revoke after a tick so the browser has time to start the download. */
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setTimeout(() => URL.revokeObjectURL(url), Timings.TIMEOUT_SHORT);
 }

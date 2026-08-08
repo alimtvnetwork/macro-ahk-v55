@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Tools & Collapsible Sections Builder
  * Step 2g: Extracted from macro-looping.ts
@@ -209,7 +210,7 @@ function _buildJsLogsSection(): HTMLElement {
     if (countEl) countEl.textContent = 'Copied! (' + getAllLogs().length + ' entries)';
     setTimeout(function() {
       if (countEl) countEl.textContent = 'JS Logs (' + getAllLogs().length + ' entries)';
-    }, 2000);
+    }, Timings.TIMEOUT_NORMAL);
   };
 
   const downloadLogBtn = document.createElement('button');
@@ -259,7 +260,7 @@ function _buildRecentErrorsSection(): HTMLElement {
     const text = _formatAllRecentErrors();
     navigator.clipboard.writeText(text).then(function() {
       copyAllErrBtn.textContent = '✓';
-      setTimeout(function() { copyAllErrBtn.textContent = '📋'; }, 2000);
+      setTimeout(function() { copyAllErrBtn.textContent = '📋'; }, Timings.TIMEOUT_NORMAL);
     }).catch(function(e: unknown) { log('Clipboard write failed for error copy: ' + (e instanceof Error ? e.message : String(e)), 'warn'); });
   };
 

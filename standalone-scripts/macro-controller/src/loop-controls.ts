@@ -1,3 +1,4 @@
+import { Timings } from "./constants/timing";
 /**
  * Loop Controls — Start/stop, interval timers, status refresh
  *
@@ -363,7 +364,7 @@ export function startStatusRefresh(): void {
 
   state.statusRefreshId = trackedSetInterval('LoopControls.statusRefresh', refreshStatus, intervalMs);
   state.statusRefreshPeriodMs = intervalMs;
-  setTimeout(refreshStatus, 1000);
+  setTimeout(refreshStatus, Timings.TIMEOUT_SHORT);
 }
 
 export function stopStatusRefresh(): void {

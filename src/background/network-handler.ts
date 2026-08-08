@@ -1,3 +1,4 @@
+import { HttpCodes } from "../constants/http";
 /**
  * Marco Extension — Network Status & Request Handler
  *
@@ -141,10 +142,10 @@ export function getNetworkStats(): {
 
 /** Categorizes an HTTP status code into a bucket. */
 function categorizeStatus(status: number): string {
-    const isSuccess = status >= 200 && status < 300;
-    const isRedirect = status >= 300 && status < 400;
-    const isClientError = status >= 400 && status < 500;
-    const isServerError = status >= 500;
+    const isSuccess = status >= HttpCodes.OK && status < 300;
+    const isRedirect = status >= 300 && status < HttpCodes.BAD_REQUEST;
+    const isClientError = status >= HttpCodes.BAD_REQUEST && status < HttpCodes.INTERNAL_SERVER_ERROR;
+    const isServerError = status >= HttpCodes.INTERNAL_SERVER_ERROR;
     const isNetworkError = status === 0;
 
     if (isSuccess) return "2xx";

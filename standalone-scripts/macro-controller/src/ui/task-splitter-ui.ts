@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Task Splitter UI — paste one long instruction, break it into N steps,
@@ -590,7 +591,7 @@ function buildControl(): HTMLElement {
       return;
     }
     if (state.running) render();
-  }, 1000);
+  }, Timings.TIMEOUT_SHORT);
 
   return root;
 }

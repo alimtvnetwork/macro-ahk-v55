@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Auth Diagnostics Row Builders
  *
@@ -334,7 +335,7 @@ function buildReadCookieButton(deps: AuthDiagDeps, onUpdate: () => void): HTMLBu
       onUpdate();
       button.disabled = false;
       button.textContent = hasToken ? '✅ Read Cookie' : '❌ Read Cookie';
-      setTimeout(function () { button.textContent = '🍪 Read Cookie'; }, 2000);
+      setTimeout(function () { button.textContent = '🍪 Read Cookie'; }, Timings.TIMEOUT_NORMAL);
     });
   };
 

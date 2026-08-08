@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * Prompt Dropdown IO helpers (PlanTierType-17 steps 23 & 24)
  *
@@ -65,7 +66,7 @@ function triggerDownload(blob: Blob, filename: string): void {
   anchor.download = filename;
   document.body.appendChild(anchor);
   anchor.click();
-  setTimeout(function() { anchor.remove(); URL.revokeObjectURL(url); }, 100);
+  setTimeout(function() { anchor.remove(); URL.revokeObjectURL(url); }, Timings.POLL_INTERVAL_FAST);
 }
 
 function todayIso(): string {

@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /*
  * ui/extension-relay.ts
  *
@@ -83,7 +84,7 @@ export function sendToExtension(type: string, payload: Record<string, unknown>):
       timeout: setTimeout(function() {
         log('Extension relay timed out for ' + type, 'warn');
         finishRelay(relay, { isOk: false, errorMessage: 'Extension relay timeout' });
-      }, 5000),
+      }, Timings.TIMEOUT_LONG),
       resolve,
     };
 

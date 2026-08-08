@@ -1,3 +1,4 @@
+import { Timings } from "./constants/timing";
 import { ServiceResult } from './utils/result-wrapper';
 /**
  * MacroLoop Controller, Startup & Initialization
@@ -363,7 +364,7 @@ function _checkPendingTasksOnStartup(): void {
     } catch (err: unknown) {
       logError('Startup', 'Pending tasks check failed', err);
     }
-  }, 2000);
+  }, Timings.TIMEOUT_NORMAL);
 }
 
 /** Prominent dialog to resume pending tasks on startup. */
@@ -754,7 +755,7 @@ function resolveTier1Workspace(tier1Data: MarkViewedResponse): boolean {
 
 // Retry policy: first retry forces cookie refresh, second retry is the final pass.
 
- 
+
 // eslint-disable-next-line max-lines-per-function
 function scheduleWorkspaceRetry(attempt: number): void {
   const isExhausted = attempt > STARTUP_WS_MAX_RETRIES;

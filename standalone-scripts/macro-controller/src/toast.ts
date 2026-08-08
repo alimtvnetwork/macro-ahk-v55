@@ -1,3 +1,4 @@
+import { Timings } from "./constants/timing";
 /**
  * MacroLoop Controller — Toast Notification System
  * Phase 6: Refactored to class-based encapsulation (CQ11–CQ18)
@@ -452,7 +453,7 @@ export function dismissToast(toast: HTMLElement & { _dismissed?: boolean; _dismi
     if (hasParent) {
       toast.parentNode!.removeChild(toast);
     }
-  }, 300);
+  }, Timings.ANIMATION_DURATION);
 }
 
 export function dismissAllToasts(): void {

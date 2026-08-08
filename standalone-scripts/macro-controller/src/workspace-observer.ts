@@ -1,4 +1,5 @@
  
+import { Timings } from "./constants/timing";
 /**
  * MacroLoop Controller — Workspace Observer Module
  * Step 2a: Extracted from macro-looping.ts
@@ -415,7 +416,7 @@ function handleObserverMutation(navEl: Node | Element): void {
     state.workspaceChangedTimer = setTimeout(function () {
       state.workspaceJustChanged = false;
       mc().updateUI();
-    }, 10000);
+    }, Timings.TIMEOUT_VERY_LONG);
 
     mc().updateUI();
     triggerCreditCheckOnWorkspaceChange();

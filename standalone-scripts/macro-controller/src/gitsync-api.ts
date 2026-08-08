@@ -1,3 +1,4 @@
+import { HttpCodes } from "./constants/http";
 import { ServiceResult } from './utils/result-wrapper';
 /**
  * MacroLoop Controller — Gitsync API client (v3.19.0)
@@ -100,7 +101,7 @@ export async function fetchGitsyncConfig(
     return { status: 'error', message: 'network_error' };
   }
 
-  if (resp.status === 404 || resp.status === 401 || resp.status === 403) {
+  if (resp.status === HttpCodes.NOT_FOUND || resp.status === HttpCodes.UNAUTHORIZED || resp.status === HttpCodes.FORBIDDEN) {
     // 404 = no gitsync row; 401/403 = caller lacks access. From the user's
     // perspective all three are "no repo we can open" → cache as not_linked.
     log('[GitsyncApi] HTTP ' + resp.status + ' ws=' + wsId + ' pid=' + pid + ' → not_linked', 'info');

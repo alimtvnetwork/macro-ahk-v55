@@ -1,3 +1,4 @@
+import { Timings } from "../../constants/timing";
 import { ServiceResult } from '../../utils/result-wrapper';
 import { useState } from "react";
 import { logError } from "@/hooks/popup-logger";
@@ -126,7 +127,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
     try {
       await navigator.clipboard.writeText(buildCurrentReport());
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), Timings.TIMEOUT_NORMAL);
     } catch {
         // TODO: Auto-injected by CatchAudit
         logError('AutoCatch', 'Unhandled exception', err);
@@ -139,7 +140,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
     try {
       await navigator.clipboard.writeText(ctx.sql);
       setSqlCopied(true);
-      setTimeout(() => setSqlCopied(false), 2000);
+      setTimeout(() => setSqlCopied(false), Timings.TIMEOUT_NORMAL);
     } catch {
         // TODO: Auto-injected by CatchAudit
         logError('AutoCatch', 'Unhandled exception', err);
@@ -168,9 +169,9 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       a.click();
       document.body.removeChild(a);
       // Defer revoke so Chrome can finish the download.
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setTimeout(() => URL.revokeObjectURL(url), Timings.TIMEOUT_SHORT);
       setDownloaded(true);
-      setTimeout(() => setDownloaded(false), 2000);
+      setTimeout(() => setDownloaded(false), Timings.TIMEOUT_NORMAL);
     } catch {
         // TODO: Auto-injected by CatchAudit
         logError('AutoCatch', 'Unhandled exception', err);

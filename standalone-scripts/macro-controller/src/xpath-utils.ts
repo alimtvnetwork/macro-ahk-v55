@@ -1,4 +1,5 @@
  
+import { Timings } from "./constants/timing";
 import { toErrorMessage , logError } from './error-utils';
 /**
  * MacroLoop Controller — XPath Utilities Module
@@ -53,7 +54,7 @@ export function initXPathUtils(): void {
         );
         log('XPathUtils detected on deferred retry (500ms)', 'success');
       }
-    }, 500);
+    }, Timings.POLL_INTERVAL_NORMAL);
   }
 }
 

@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Prompt Injection — Prompt creation/edit modal, paste-into-editor logic
@@ -65,7 +66,7 @@ function handleFile(file: File, refs: FileHandlerRefs): void {
     }
     refs.dropZone.style.borderColor = '#16a34a';
     refs.dropZone.innerHTML = '✅ Loaded: <b>' + file.name + '</b> (' + content.length + ' chars)';
-    setTimeout(function() { refs.dropZone.style.borderColor = CssFragmentType.BorderPrimary; }, 2000);
+    setTimeout(function() { refs.dropZone.style.borderColor = CssFragmentType.BorderPrimary; }, Timings.TIMEOUT_NORMAL);
     log('File loaded into prompt editor: ' + file.name, 'success');
   };
   reader.readAsText(file);
@@ -448,7 +449,7 @@ function _buildTagsInput(initialData: Record<string, unknown>): { tagsWrap: HTML
 }
 
 // ── Category Select ──
- 
+
 function collectExistingCategories(): string[] {
   const promptsCfg = getPromptsConfig();
   const existingEntries = promptsCfg.entries || [];
@@ -645,7 +646,7 @@ function refreshAfterPromptSave(): void {
 }
 
 // ── Prompt Modal Footer ──
- 
+
 // eslint-disable-next-line max-lines-per-function
 function _buildPromptModalFooter(
   isEdit: boolean,

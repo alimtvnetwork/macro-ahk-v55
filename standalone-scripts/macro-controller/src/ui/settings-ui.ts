@@ -1,4 +1,5 @@
  
+import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Settings Dialog
  *
@@ -262,7 +263,7 @@ function _exportOverridesJson(showToast: (m: string, l?: string) => void): void 
   document.body.appendChild(a);
   a.click();
   a.remove();
-  setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+  setTimeout(function() { URL.revokeObjectURL(url); }, Timings.TIMEOUT_SHORT);
   showToast('✅ Overrides exported', 'info');
 }
 

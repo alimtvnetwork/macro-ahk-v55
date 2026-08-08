@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Marco Extension — Session Log File Writer
@@ -175,7 +176,7 @@ async function appendToFile(filename: string, text: string): Promise<void> {
         flushTimerId = setTimeout(() => {
             flushTimerId = null;
             void flushPending();
-        }, 100);
+        }, Timings.POLL_INTERVAL_FAST);
     }
 }
 

@@ -1,3 +1,4 @@
+import { Timings } from "./constants/timing";
 /**
  * Loop Check — Manual workspace + credit detection (runCheck)
  *
@@ -192,7 +193,7 @@ export function runCheck(): Promise<void> | undefined {
         setTimeout(function() {
           processProgressBar(dialogBtn);
           resolve();
-        }, 100);
+        }, Timings.POLL_INTERVAL_FAST);
       });
     })
     .catch(function(finalErr: Error) {

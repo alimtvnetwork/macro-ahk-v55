@@ -1,3 +1,4 @@
+import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Bulk Rename Dialog
  * Phase 5A: Extracted from ws-selection-ui.ts
@@ -682,7 +683,7 @@ function handleRenameDone(
     applyBtn.style.background = '#059669';
     cancelBtn.style.display = 'inline-block';
     populateLoopWorkspaceDropdown();
-  }, 2000);
+  }, Timings.TIMEOUT_NORMAL);
 }
 
 function handleRenameProgress(
