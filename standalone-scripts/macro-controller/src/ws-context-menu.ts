@@ -105,11 +105,14 @@ async function buildCopyJsonPayload(ws: import('./types').WorkspaceCredit): Prom
     // PRO_ZERO: append the verbatim /credit-balance JSON captured during enrichment.
     const balanceRaw = ws[PRO_ZERO_BALANCE_JSON_FIELD];
     const source = ws[PRO_ZERO_SOURCE_FIELD];
-    if (source === MacroCreditSource.CREDIT_BALANCE && typeof balanceRaw === 'string' && balanceRaw.length > 0) {
+    const isBalanceSource = source === MacroCreditSource.CREDIT_BALANCE;
+    const hasBalanceRaw = typeof balanceRaw === 'string';
+    const isBalanceNonEmpty = hasBalanceRaw && balanceRaw.length > 0;
+    if (isBalanceSource && isBalanceNonEmpty) {
         return JSON.stringify({
             Source: MacroCreditSource.CREDIT_BALANCE,
             Workspace: JSON.parse(workspaceJson) as unknown,
-            CreditBalance: JSON.parse(balanceRaw) as unknown,
+            CreditBalance: JSON.parse(balanceRaw as string) as unknown,
         }, null, 2);
     }
 
@@ -249,8 +252,11 @@ function buildDynamicGithubItem(wsId: string, projectId: string): HTMLElement {
   void (async function () {
     try {
       const cached = await getGitsyncCache(wsId, projectId);
-      if (cached && cached.Status === 'found' && cached.RepoUrl) {
-        applyConnected(item, wsId, projectId, cached.RepoUrl);
+      const hasCachedResult = cached !== null && cached !== undefined;
+      const isCachedFound = hasCachedResult && cached!.Status === 'found';
+      const hasCachedRepoUrl = isCachedFound && !!cached!.RepoUrl;
+      if (hasCachedRepoUrl) {
+        applyConnected(item, wsId, projectId, cached!.RepoUrl!);
         return;
       }
       const state = await resolveConnection(wsId, '', projectId);
@@ -377,11 +383,15 @@ async function openGithubRepoFlow(
   if (forceRefresh) invalidateGitsyncCache(wsId, pid);
 
   const cached = forceRefresh ? null : await getGitsyncCache(wsId, pid);
-  if (cached && cached.Status === 'found' && cached.RepoUrl) {
-    window.open(cached.RepoUrl, '_blank', 'noopener,noreferrer');
+  const hasCachedEntry = cached !== null && cached !== undefined;
+  const isCachedFound = hasCachedEntry && cached!.Status === 'found';
+  const hasCachedRepoUrl = isCachedFound && !!cached!.RepoUrl;
+  if (hasCachedRepoUrl) {
+    window.open(cached!.RepoUrl!, '_blank', 'noopener,noreferrer');
     return;
   }
-  if (cached && cached.Status === 'not_linked') {
+  const isCachedNotLinked = hasCachedEntry && cached!.Status === 'not_linked';
+  if (isCachedNotLinked) {
     showToast('🐙 No GitHub repo linked (cached). Use Refresh gitsync to re-check.', 'warn');
     return;
   }

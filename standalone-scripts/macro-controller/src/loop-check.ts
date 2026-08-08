@@ -54,7 +54,13 @@ function restoreOnFailure(
     return;
   }
 
-  if (state.workspaceName && previousWsName && wsList && wsList.length > 0 && !findExactWorkspaceMatch(state.workspaceName, wsList)) {
+  const hasWorkspaceName = !!state.workspaceName;
+  const hasPreviousName = !!previousWsName;
+  const hasWorkspaceList = Array.isArray(wsList) && wsList.length > 0;
+  const isNameNotInList = hasWorkspaceName && hasWorkspaceList ? !findExactWorkspaceMatch(state.workspaceName, wsList) : false;
+  const shouldRestoreWorkspace = hasWorkspaceName && hasPreviousName && hasWorkspaceList && isNameNotInList;
+
+  if (shouldRestoreWorkspace) {
     state.workspaceName = previousWsName;
     loopCreditState.currentWs = previousCurrentWs;
     log('Restored previous workspace (detected name was not an exact known workspace): ' + previousWsName, 'warn');
@@ -62,7 +68,10 @@ function restoreOnFailure(
 }
 
 function syncCurrentWsFromName(wsList: WorkspaceCredit[]): void {
-  if (!state.workspaceName || !wsList || wsList.length === 0) return;
+  const isMissingWorkspaceName = !state.workspaceName;
+  const isMissingWorkspaceList = !wsList || wsList.length === 0;
+  if (isMissingWorkspaceName) return;
+  if (isMissingWorkspaceList) return;
   const matched = findExactWorkspaceMatch(state.workspaceName, wsList);
   if (matched) { loopCreditState.currentWs = matched; }
 }

@@ -25,6 +25,7 @@ import {
 import { suggestVariableName } from "./xpath-label-suggester";
 import { enqueueCapture, flushNow } from "./xpath-capture-coalescer";
 import { mountRecorderToolbar, type RecorderToolbarHandle, type RecorderToolbarOptions } from "../background/recorder/recorder-toolbar";
+import { mountDropZoneOverlay, type DropZoneHandle } from "../background/recorder/dropzone-overlay";
 import type { RecordingPhase, RecordingSession } from "../background/recorder/recorder-session-types";
 
 /* ------------------------------------------------------------------ */
@@ -33,6 +34,7 @@ import type { RecordingPhase, RecordingSession } from "../background/recorder/re
 
 let isActive = true;
 let toolbarHandle: RecorderToolbarHandle | null = null;
+let dropzoneHandle: DropZoneHandle | null = null;
 
 /* ------------------------------------------------------------------ */
 /*  XPath Generation — Priority Strategy                               */
@@ -279,6 +281,18 @@ function startRecorder(): void {
                     toolbarHandle.Pause();
                 }
             }
+
+            dropzoneHandle = mountDropZoneOverlay({
+                OnFileDropped: (file) => {
+                    chrome.runtime.sendMessage({
+                        type: "RECORDER_DATA_SOURCE_ADD",
+                        projectSlug: session?.ProjectSlug || "default",
+                        filePath: file.FileName,
+                        mimeKind: file.MimeKind,
+                        rawText: file.RawText
+                    });
+                }
+            });
         });
     }
 }
@@ -298,6 +312,10 @@ function stopRecorder(): void {
     if (toolbarHandle) {
         toolbarHandle.Destroy();
         toolbarHandle = null;
+    }
+    if (dropzoneHandle) {
+        dropzoneHandle.Destroy();
+        dropzoneHandle = null;
     }
     
     console.log("[Marco] XPath recorder stopped");

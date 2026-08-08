@@ -12,7 +12,7 @@ import { CONFIG, TIMING, loopCreditState, state } from './shared-state';
 import { trackedSetInterval, trackedClearInterval } from './interval-registry';
 import { log, logSub, getDisplayProjectName } from './logger';
 import { reactClick, getByXPath, getAllByXPath, findElement, ML_ELEMENTS } from './xpath-utils';
-import { collectWorkspaceNameCandidatesFromNode, matchWorkspaceByName, normalizeWorkspaceName, isInvalidWorkspaceCandidateName } from './ws-name-matching';
+import { collectWorkspaceNameCandidatesFromNode, matchWorkspaceByName, normalizeWorkspaceName, isValidWorkspaceCandidateName } from './ws-name-matching';
 import type { WorkspaceCredit, WorkspaceMatchCandidate } from './types';
 
 import { Label } from './types';
@@ -188,17 +188,24 @@ function applyChosenWorkspace(
   }
   const firstRaw = (allNodes[0].textContent || '').trim();
   const projectName = getDisplayProjectName();
-  const isInvalidRawWorkspace = isInvalidWorkspaceCandidateName(firstRaw, projectName);
+  const isValidRawWorkspace = isValidWorkspaceCandidateName(firstRaw, projectName);
 
-  if (perWs.length === 0 && firstRaw && !isInvalidRawWorkspace) {
-    state.workspaceName = firstRaw;
-    log(fn + ': ✅ No workspace list — using raw XPath text as workspace name: "' + firstRaw + '"', 'success');
-  } else if (perWs.length === 0 && firstRaw && isInvalidRawWorkspace) {
-    log(fn + ': ⚠️ Ignoring raw XPath workspace candidate "' + firstRaw + '" because it is a generic/project label; preserving existing workspace', 'warn');
-  } else {
+  const isEmptyWorkspaceList = perWs.length === 0;
+  const hasFirstRaw = firstRaw.length > 0;
+
+  if (!isEmptyWorkspaceList || !hasFirstRaw) {
     log(fn + ': XPath returned ' + allNodes.length + ' nodes but no unambiguous exact match. First node: "' + firstRaw + '" (checked ' + perWs.length + ' workspaces)', 'warn');
     log(fn + Label.KeepingExistingWs + (state.workspaceName || '(none)'), 'warn');
+    return;
   }
+
+  if (isValidRawWorkspace) {
+    state.workspaceName = firstRaw;
+    log(fn + ': ✅ No workspace list — using raw XPath text as workspace name: "' + firstRaw + '"', 'success');
+    return;
+  }
+
+  log(fn + ': ⚠️ Ignoring raw XPath workspace candidate "' + firstRaw + '" because it is a generic/project label; preserving existing workspace', 'warn');
 }
 
 /** Handle the timeout fallback (CSS selectors, then give up). */

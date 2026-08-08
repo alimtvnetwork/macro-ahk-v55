@@ -52,9 +52,9 @@ export function isOnProjectPage(): boolean {
  */
 export function isUserTypingInPrompt(): boolean {
   const promptXpath = CONFIG.PROMPT_ACTIVE_XPATH;
-  const isDisabled = !promptXpath || promptXpath.indexOf('__') === 0;
+  const isEnabled = promptXpath && promptXpath.indexOf('__') !== 0;
 
-  if (isDisabled) {
+  if (!isEnabled) {
     return false;
   }
 

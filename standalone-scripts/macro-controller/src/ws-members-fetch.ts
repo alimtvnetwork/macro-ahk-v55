@@ -44,8 +44,11 @@ function getMemberships(op: string) {
 export async function fetchWorkspaceMembers(wsId: string, limit = DEFAULT_MEMBERS_PAGE_LIMIT): Promise<{ members: WorkspaceMember[]; total: number }> {
   const now = Date.now();
   const cached = membersCache.get(wsId);
-  if (cached && cached.expires > now && cached.members.length >= limit) {
-    return { members: cached.members.slice(0, limit), total: cached.total };
+  const hasCachedEntry = cached !== null && cached !== undefined;
+  const isCacheNotExpired = hasCachedEntry && cached!.expires > now;
+  const isCacheSufficient = isCacheNotExpired && cached!.members.length >= limit;
+  if (isCacheSufficient) {
+    return { members: cached!.members.slice(0, limit), total: cached!.total };
   }
 
   log('[Members] GET list wsId=' + wsId + ' limit=' + limit, 'delegate');

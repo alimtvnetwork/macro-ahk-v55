@@ -980,7 +980,7 @@ function exportCsv(statusEl: HTMLElement): void {
         return isCsvProjectNameFallback(task.project, tabIndex);
     }).length;
     const normalizedLastCommunicationCount = tasks.filter(function (task) {
-        return hasMissingCsvLastCommunication(task.project.lastMessageAt);
+        return !hasCsvLastCommunication(task.project.lastMessageAt);
     }).length;
     const rows: ExportRow[] = tasks.map(function (task) {
         return {
@@ -1045,16 +1045,16 @@ export function resolveCsvProjectName(project: ProjectEntry, tabIndex: OpenTabIn
     return openTabProjectName || project.name || project.id;
 }
 
-export function hasMissingCsvLastCommunication(lastMessageAt: string): boolean {
+export function hasCsvLastCommunication(lastMessageAt: string): boolean {
     const normalized = lastMessageAt.trim().toLowerCase();
 
-    return normalized === '' || normalized === CSV_UPSTREAM_EMPTY_PLACEHOLDER;
+    return normalized !== '' && normalized !== CSV_UPSTREAM_EMPTY_PLACEHOLDER;
 }
 
 export function normalizeCsvLastCommunication(lastMessageAt: string): string {
-    const isMissing = hasMissingCsvLastCommunication(lastMessageAt);
+    const hasData = hasCsvLastCommunication(lastMessageAt);
 
-    return isMissing ? CSV_MISSING_LAST_COMMUNICATION_LABEL : lastMessageAt;
+    return hasData ? lastMessageAt : CSV_MISSING_LAST_COMMUNICATION_LABEL;
 }
 
 export function getCsvLastCommunicationNormalizedLogMessage(normalizedCount: number): string | null {

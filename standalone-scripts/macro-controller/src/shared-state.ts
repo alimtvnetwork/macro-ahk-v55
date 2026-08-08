@@ -92,7 +92,10 @@ export { VERSION };
 // Expose version via RiseupAsiaMacroExt namespace (Issue 78 — no bare window globals)
 try {
   const root = (typeof window !== 'undefined' ? window.RiseupAsiaMacroExt : undefined);
-  if (root && root.Projects && root.Projects.MacroController) {
+  const hasRoot = root !== null && root !== undefined;
+  const hasProjects = hasRoot && root!.Projects !== null && root!.Projects !== undefined;
+  const hasMacroController = hasProjects && !!root!.Projects.MacroController;
+  if (hasMacroController) {
     if (!root.Projects.MacroController.meta) root.Projects.MacroController.meta = {};
     root.Projects.MacroController.meta.version = VERSION;
   }

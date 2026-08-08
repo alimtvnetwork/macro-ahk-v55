@@ -1,5 +1,5 @@
 {
-  "GeneratedAt": "2026-08-07T18:26:29.987Z",
+  "GeneratedAt": "2026-08-08T06:06:02.447Z",
   "Items": [
     {
       "Id": "9ce78a370955",
@@ -33,15 +33,6 @@
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/selected-workspaces-store.ts",
       "Line": 18,
-      "Rule": "no-empty-catch",
-      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
-      "Snippet": "catch (_e: unknown) {"
-    },
-    {
-      "Id": "e99d5cd30406",
-      "Severity": "P1",
-      "File": "standalone-scripts/macro-controller/src/startup.ts",
-      "Line": 377,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch (_e: unknown) {"
@@ -146,10 +137,10 @@
       "Snippet": "catch(function() {"
     },
     {
-      "Id": "3ca4559d3f88",
+      "Id": "43c90c2fa4b6",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/ui/prompt-dropdown.ts",
-      "Line": 177,
+      "Line": 189,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch(function() {"
@@ -173,82 +164,73 @@
       "Snippet": "catch {"
     },
     {
-      "Id": "25c02d15abcf",
+      "Id": "83a12c82ce3b",
       "Severity": "P1",
-      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-modal.ts",
-      "Line": 579,
+      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-actions.ts",
+      "Line": 47,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"
     },
     {
-      "Id": "da8846043d4f",
+      "Id": "f69f7aac74c4",
       "Severity": "P1",
-      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-modal.ts",
-      "Line": 601,
+      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-actions.ts",
+      "Line": 48,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"
     },
     {
-      "Id": "094b276ebab5",
+      "Id": "863b5510c231",
       "Severity": "P1",
-      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-modal.ts",
-      "Line": 605,
+      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-actions.ts",
+      "Line": 52,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"
     },
     {
-      "Id": "ce32f5996608",
+      "Id": "e73d275c58ff",
       "Severity": "P1",
-      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-modal.ts",
-      "Line": 978,
+      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-error.ts",
+      "Line": 95,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"
     },
     {
-      "Id": "17cb05a80351",
+      "Id": "491d7f8af3c6",
       "Severity": "P1",
-      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-modal.ts",
-      "Line": 1238,
+      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-import-pipeline.ts",
+      "Line": 125,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"
     },
     {
-      "Id": "0e267b97333b",
+      "Id": "368c058dd4b8",
       "Severity": "P1",
-      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-modal.ts",
-      "Line": 1790,
+      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-preview.ts",
+      "Line": 116,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"
     },
     {
-      "Id": "ac7bc7ba2b7a",
+      "Id": "6900db743ee3",
       "Severity": "P1",
-      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-modal.ts",
-      "Line": 1791,
+      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-preview.ts",
+      "Line": 138,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"
     },
     {
-      "Id": "29135c1d72e4",
+      "Id": "2394761a1ef1",
       "Severity": "P1",
-      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-modal.ts",
-      "Line": 1796,
-      "Rule": "no-empty-catch",
-      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
-      "Snippet": "catch {"
-    },
-    {
-      "Id": "0bad6d287600",
-      "Severity": "P1",
-      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-modal.ts",
-      "Line": 1812,
+      "File": "standalone-scripts/macro-controller/src/ui/prompt-library-preview.ts",
+      "Line": 142,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"

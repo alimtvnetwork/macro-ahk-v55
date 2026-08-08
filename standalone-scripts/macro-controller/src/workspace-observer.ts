@@ -131,7 +131,11 @@ function collectFromNavButtons(): NavCandidate[] {
     if (/^(Projects?|Settings|Home|Menu|Sign|Log|Help|Docs|\+|×|☰|⋮)$/i.test(text)) continue;
     if (text.length <= 2 && /[^a-zA-Z0-9]/.test(text)) continue;
     const rect = el.getBoundingClientRect();
-    if (rect.width > 0 && rect.height > 0 && rect.top < 80) {
+    const hasWidth = rect.width > 0;
+    const hasHeight = rect.height > 0;
+    const isVisible = hasWidth && hasHeight;
+    const isInNavBar = rect.top < 80;
+    if (isVisible && isInNavBar) {
       results.push({ el, text, y: rect.top, x: rect.left });
     }
   }
@@ -146,7 +150,16 @@ function collectFromTopNav(): NavCandidate[] {
     const text2 = (el2.textContent || '').trim();
     if (!text2 || text2.length < 3 || text2.length > 60) continue;
     const rect2 = el2.getBoundingClientRect();
-    if (rect2.width > 0 && rect2.height > 0 && rect2.top < 80 && rect2.left < 400 && el2.children.length <= 1) {
+    const hasWidth2 = rect2.width > 0;
+    const hasHeight2 = rect2.height > 0;
+    const isVisible2 = hasWidth2 && hasHeight2;
+    const isInTopNav = rect2.top < 80;
+    const isInLeftNav = rect2.left < 400;
+    const hasNoChildren = el2.children.length <= 1;
+    const isTopNavMatch = isVisible2 && isInTopNav;
+    const isLeftNavMatch = isInLeftNav && hasNoChildren;
+    const isNavCandidate = isTopNavMatch && isLeftNavMatch;
+    if (isNavCandidate) {
       results.push({ el: el2, text: text2, y: rect2.top, x: rect2.left });
     }
   }

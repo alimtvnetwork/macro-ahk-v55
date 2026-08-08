@@ -31,23 +31,23 @@ export function normalizeWorkspaceName(name: string): string {
   return (name || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
 }
 
-export function isInvalidWorkspaceCandidateName(name: string, projectName?: string): boolean {
+export function isValidWorkspaceCandidateName(name: string, projectName?: string): boolean {
   const normalizedName = normalizeWorkspaceName(name);
   const normalizedProjectName = normalizeWorkspaceName(projectName || '');
 
   if (!normalizedName) {
-    return true;
+    return false;
   }
 
   if (INVALID_WORKSPACE_NAME_CANDIDATES.has(normalizedName)) {
-    return true;
+    return false;
   }
 
   if (normalizedProjectName && normalizedName === normalizedProjectName) {
-    return true;
+    return false;
   }
 
-  return false;
+  return true;
 }
 
 export function matchWorkspaceByName(rawName: string, perWs: WorkspaceCredit[]): WorkspaceCredit | null {

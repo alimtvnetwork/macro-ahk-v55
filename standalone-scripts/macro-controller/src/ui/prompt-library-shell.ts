@@ -87,33 +87,7 @@ export interface ShellEls {
   dropZone: HTMLDivElement;
 }
 
-export function buildShell(): ShellEls {
-  const root = document.createElement('div');
-  root.style.cssText = [
-    'position:fixed', 'inset:0', 'z-index:2147483000',
-    'background:rgba(0,0,0,0.55)',
-    'display:flex', 'align-items:center', 'justify-content:center',
-    'font-family:system-ui,-apple-system,sans-serif',
-  ].join(';');
-
-  const panel = document.createElement('div');
-  panel.style.cssText = [
-    'width:min(720px,92vw)', 'max-height:85vh', 'overflow:auto',
-    'background:#121826', 'color:#e6edf7',
-    CSS_BORDER_DEFAULT, 'border-radius:10px',
-    'box-shadow:0 20px 60px rgba(0,0,0,0.6)',
-    'padding:16px 18px',
-  ].join(';');
-
-  const header = document.createElement('div');
-  header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;';
-  const title = document.createElement('div');
-  title.textContent = '≡ƒùé Prompt Library';
-  title.style.cssText = 'font-size:15px;font-weight:600;color:#c9b7ff;';
-
-  const actionWrap = document.createElement('div');
-  actionWrap.style.cssText = 'display:flex;align-items:center;gap:12px;';
-
+function buildHeaderPreviewGroup() {
   const previewGroup = document.createElement('div');
   previewGroup.style.cssText = 'display:flex;align-items:center;border-right:1px solid #2b3648;padding-right:12px;';
   const previewBtn = document.createElement('button');
@@ -128,7 +102,10 @@ export function buildShell(): ShellEls {
   previewFileInput.hidden = true;
   previewGroup.appendChild(previewBtn);
   previewGroup.appendChild(previewFileInput);
+  return { previewGroup, previewBtn, previewFileInput };
+}
 
+function buildHeaderImportGroup() {
   const importGroup = document.createElement('div');
   importGroup.style.cssText = 'display:flex;align-items:center;gap:6px;';
   const importRoleSelect = document.createElement('select');
@@ -154,7 +131,10 @@ export function buildShell(): ShellEls {
   importGroup.appendChild(importRoleSelect);
   importGroup.appendChild(importBtn);
   importGroup.appendChild(fileInput);
+  return { importGroup, importRoleSelect, importBtn, fileInput };
+}
 
+function buildHeaderExportGroup() {
   const exportGroup = document.createElement('div');
   exportGroup.style.cssText = 'display:flex;align-items:center;gap:6px;';
   const includeRevisionsLabel = document.createElement('label');
@@ -173,62 +153,30 @@ export function buildShell(): ShellEls {
   exportBtn.style.cssText = 'background:#243050;color:#e6edf7;border:1px solid #3a465c;border-radius:6px;padding:4px 12px;font-size:11.5px;cursor:pointer;';
   exportGroup.appendChild(includeRevisionsLabel);
   exportGroup.appendChild(exportBtn);
+  return { exportGroup, includeRevisionsCb, exportBtn };
+}
 
+function buildHeaderMiscButtons() {
   const closeBtn = document.createElement('button');
   closeBtn.type = 'button';
-  closeBtn.textContent = '×';
+  closeBtn.textContent = 'x';
   closeBtn.dataset.testid = 'library-close';
   closeBtn.setAttribute('aria-label', 'Close dialog');
   closeBtn.style.cssText = 'background:transparent;border:none;color:#9aa7bd;font-size:24px;cursor:pointer;padding:0 4px;margin-left:8px;line-height:1;';
-  // Note: modal close handled outside
 
   const sampleBtn = document.createElement('button');
   sampleBtn.type = 'button';
-  sampleBtn.textContent = '≡ƒôä Sample JSON';
+  sampleBtn.textContent = '📄 Sample JSON';
   sampleBtn.dataset.testid = 'library-sample-json';
   sampleBtn.title = 'Download a reference prompts-sample.json you can edit and re-import';
   sampleBtn.style.cssText = 'background:#243050;color:#e6edf7;border:1px solid #3a465c;border-radius:6px;padding:4px 12px;font-size:11.5px;cursor:pointer;';
   sampleBtn.addEventListener('click', () => {
       void import('./prompt-sample-json').then((m) => m.downloadSamplePromptsJson());
   });
+  return { closeBtn, sampleBtn };
+}
 
-  actionWrap.appendChild(previewGroup);
-  actionWrap.appendChild(importGroup);
-  actionWrap.appendChild(exportGroup);
-  actionWrap.appendChild(sampleBtn);
-  actionWrap.appendChild(closeBtn);
-  actionWrap.appendChild(previewFileInput);
-  actionWrap.appendChild(fileInput);
-  header.appendChild(title);
-  header.appendChild(actionWrap);
-
-  const scrollWrap = document.createElement('div');
-  scrollWrap.style.cssText = 'flex:1;overflow-y:auto;padding:16px 20px;';
-  const errorBanner = document.createElement('div');
-  errorBanner.dataset.testid = 'library-import-error';
-  errorBanner.tabIndex = -1;
-  errorBanner.setAttribute('role', 'alert');
-  errorBanner.setAttribute('aria-live', 'assertive');
-  errorBanner.setAttribute('aria-atomic', 'true');
-  errorBanner.hidden = true;
-  errorBanner.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, 'background:#3a2530', 'border:1px solid #6b2b3a', CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, 'color:#f2c9c9', 'outline:none'].join(';');
-
-  const fileInfo = document.createElement('div');
-  fileInfo.dataset.testid = 'library-file-info';
-  fileInfo.hidden = true;
-  fileInfo.setAttribute('aria-live', 'polite');
-  fileInfo.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, CSS_BG_MUTED_1, CSS_BORDER_DEFAULT, CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, 'color:#a3b4cc', 'font-family:ui-monospace,monospace'].join(';');
-
-  const previewPanel = document.createElement('div');
-  previewPanel.dataset.testid = 'library-import-preview-panel';
-  previewPanel.hidden = true;
-  previewPanel.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, 'background:#1c2336', CSS_BORDER_DEFAULT, CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, 'color:#d1dbe8'].join(';');
-
-  const partialErrorsPanel = document.createElement('div');
-  partialErrorsPanel.dataset.testid = 'library-import-partial-errors';
-  partialErrorsPanel.hidden = true;
-  partialErrorsPanel.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, 'background:#2d1b22', 'border:1px solid #5a2431', CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, 'color:#e8b5b5'].join(';');
-
+function buildDropZone(importBtn: HTMLButtonElement, fileInput: HTMLInputElement) {
   const dropZone = document.createElement('div');
   dropZone.dataset.testid = 'library-drop-zone';
   dropZone.setAttribute('role', 'button');
@@ -271,6 +219,79 @@ export function buildShell(): ShellEls {
   };
   dropZone.addEventListener('focus', applyFocusRing);
   dropZone.addEventListener('blur', clearFocusRing);
+  return dropZone;
+}
+
+export function buildShell(): ShellEls {
+  const root = document.createElement('div');
+  root.style.cssText = [
+    'position:fixed', 'inset:0', 'z-index:2147483000',
+    'background:rgba(0,0,0,0.55)',
+    'display:flex', 'align-items:center', 'justify-content:center',
+    'font-family:system-ui,-apple-system,sans-serif',
+  ].join(';');
+
+  const panel = document.createElement('div');
+  panel.style.cssText = [
+    'width:min(720px,92vw)', 'max-height:85vh', 'overflow:auto',
+    'background:#121826', 'color:#e6edf7',
+    CSS_BORDER_DEFAULT, 'border-radius:10px',
+    'box-shadow:0 20px 60px rgba(0,0,0,0.6)',
+    'padding:16px 18px',
+  ].join(';');
+
+  const header = document.createElement('div');
+  header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;';
+  const title = document.createElement('div');
+  title.textContent = '≡ƒùé Prompt Library';
+  title.style.cssText = 'font-size:15px;font-weight:600;color:#c9b7ff;';
+
+  const actionWrap = document.createElement('div');
+  actionWrap.style.cssText = 'display:flex;align-items:center;gap:12px;';
+
+  const { previewGroup, previewBtn, previewFileInput } = buildHeaderPreviewGroup();
+  const { importGroup, importRoleSelect, importBtn, fileInput } = buildHeaderImportGroup();
+  const { exportGroup, includeRevisionsCb, exportBtn } = buildHeaderExportGroup();
+  const { closeBtn, sampleBtn } = buildHeaderMiscButtons();
+
+  actionWrap.appendChild(previewGroup);
+  actionWrap.appendChild(importGroup);
+  actionWrap.appendChild(exportGroup);
+  actionWrap.appendChild(sampleBtn);
+  actionWrap.appendChild(closeBtn);
+  actionWrap.appendChild(previewFileInput);
+  actionWrap.appendChild(fileInput);
+  header.appendChild(title);
+  header.appendChild(actionWrap);
+
+  const scrollWrap = document.createElement('div');
+  scrollWrap.style.cssText = 'flex:1;overflow-y:auto;padding:16px 20px;';
+  const errorBanner = document.createElement('div');
+  errorBanner.dataset.testid = 'library-import-error';
+  errorBanner.tabIndex = -1;
+  errorBanner.setAttribute('role', 'alert');
+  errorBanner.setAttribute('aria-live', 'assertive');
+  errorBanner.setAttribute('aria-atomic', 'true');
+  errorBanner.hidden = true;
+  errorBanner.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, 'background:#3a2530', 'border:1px solid #6b2b3a', CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, 'color:#f2c9c9', 'outline:none'].join(';');
+
+  const fileInfo = document.createElement('div');
+  fileInfo.dataset.testid = 'library-file-info';
+  fileInfo.hidden = true;
+  fileInfo.setAttribute('aria-live', 'polite');
+  fileInfo.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, CSS_BG_MUTED_1, CSS_BORDER_DEFAULT, CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, 'color:#a3b4cc', 'font-family:ui-monospace,monospace'].join(';');
+
+  const previewPanel = document.createElement('div');
+  previewPanel.dataset.testid = 'library-import-preview-panel';
+  previewPanel.hidden = true;
+  previewPanel.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, 'background:#1c2336', CSS_BORDER_DEFAULT, CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, 'color:#d1dbe8'].join(';');
+
+  const partialErrorsPanel = document.createElement('div');
+  partialErrorsPanel.dataset.testid = 'library-import-partial-errors';
+  partialErrorsPanel.hidden = true;
+  partialErrorsPanel.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, 'background:#2d1b22', 'border:1px solid #5a2431', CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, 'color:#e8b5b5'].join(';');
+
+  const dropZone = buildDropZone(importBtn, fileInput);
 
   const body = document.createElement('div');
   body.dataset.testid = 'library-body';

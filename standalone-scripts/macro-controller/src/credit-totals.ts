@@ -107,24 +107,24 @@ function readCreditTriple(ws: WorkspaceCredit): CreditTriple {
   };
 }
 
-/** True when none of the three primary credit fields are usable numbers. */
-function isMissingCreditData(ws: WorkspaceCredit): boolean {
+/** True when the primary credit fields are usable numbers. */
+function hasCreditData(ws: WorkspaceCredit): boolean {
   // RCA 2026-06-06: a Pending/Timeout resolver row means /credit-balance has
   // not landed for this workspace yet — exclude it from totals instead of
   // contributing a phantom 0 that drags the aggregate down.
   if (resolveCreditSummary(ws).renderDash) {
-    return true;
+    return false;
   }
   if (isProZeroPlan(ws)) {
     const hasUsed = typeof ws.totalCreditsUsed === 'number' && Number.isFinite(ws.totalCreditsUsed);
     const hasAvail = typeof ws.available === 'number' && Number.isFinite(ws.available);
     const hasGranted = typeof ws.totalCredits === 'number' && Number.isFinite(ws.totalCredits);
-    return !hasUsed && !hasAvail && !hasGranted;
+    return hasUsed || hasAvail || hasGranted;
   }
   const hasUsed = typeof ws.used === 'number' && Number.isFinite(ws.used);
   const hasAvail = typeof ws.billingAvailable === 'number' && Number.isFinite(ws.billingAvailable);
   const hasLimit = typeof ws.limit === 'number' && Number.isFinite(ws.limit);
-  return !hasUsed && !hasAvail && !hasLimit;
+  return hasUsed || hasAvail || hasLimit;
 }
 
 /**
@@ -160,7 +160,7 @@ export function aggregateCreditTotals(
     if (isFreeTierWorkspace(ws)) continue;
     consideredCount += 1;
 
-    if (isMissingCreditData(ws)) {
+    if (!hasCreditData(ws)) {
       missingCount += 1;
       continue;
     }

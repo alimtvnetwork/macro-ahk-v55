@@ -12,7 +12,7 @@ import { MacroController } from '../core/MacroController';
 import { nsWrite, nsCallTyped } from '../api-namespace';
 import { clearSkeletons } from './skeleton';
 import { cacheWorkspaceName } from '../workspace-cache';
-import { isInvalidWorkspaceCandidateName } from '../ws-name-matching';
+import { isValidWorkspaceCandidateName } from '../ws-name-matching';
 import { getTitleBarDisplayState } from './title-bar-display';
 
 function mc() { return MacroController.getInstance(); }
@@ -38,7 +38,12 @@ export function updateUI(): void {
   updateTitleBarWorkspaceName();
 
   // Persist workspace name to localStorage for instant UI on next load
-  if (state.workspaceName && !state.workspaceFromCache && !isInvalidWorkspaceCandidateName(state.workspaceName)) {
+  const hasWorkspaceName = !!state.workspaceName;
+  const isFromCache = !!state.workspaceFromCache;
+  const isValidName = isValidWorkspaceCandidateName(state.workspaceName);
+  const isReadyToUpdate = hasWorkspaceName && !isFromCache;
+  const shouldUpdate = isReadyToUpdate && isValidName;
+  if (shouldUpdate) {
     cacheWorkspaceName(
       state.workspaceName,
       loopCreditState.currentWs ? loopCreditState.currentWs.id : undefined,

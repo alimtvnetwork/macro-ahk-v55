@@ -237,6 +237,18 @@ async function toggleRecordingFromShortcut(): Promise<void> {
         const next = recorderReducer(current, action);
         await persistSession(next);
         console.log("[Marco] Recorder phase: %s → %s (session=%s)", current.Phase, next.Phase, next.SessionId || "(cleared)");
+
+        // Phase 1: Inject the recorder script into the active tab when starting
+        if (next.Phase === "Recording" && current.Phase === "Idle") {
+            const target = await getActiveTab();
+            if (target && target.id) {
+                await chrome.scripting.executeScript({
+                    target: { tabId: target.id },
+                    files: ["content-scripts/xpath-recorder.js"]
+                });
+                console.log("[Marco] Injected xpath-recorder.js into tab %d", target.id);
+            }
+        }
     } catch (err) {
         logCaughtError(BgLogTag.SHORTCUT, "Toggle-recording shortcut failed", err);
     }

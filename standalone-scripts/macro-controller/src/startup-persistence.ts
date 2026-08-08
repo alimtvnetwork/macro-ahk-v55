@@ -59,8 +59,8 @@ function describeObserveTarget(target: Element): string {
 function attachVisibilityHandler(createUI: () => void): () => void {
   function onVisibilityChange(): void {
     if (document.visibilityState !== 'visible') return;
-    const isMissing = !document.getElementById(IDS.SCRIPT_MARKER) || !document.getElementById(IDS.CONTAINER);
-    if (isMissing) {
+    const isPresent = !!document.getElementById(IDS.SCRIPT_MARKER) && !!document.getElementById(IDS.CONTAINER);
+    if (!isPresent) {
       log('visibilitychange: UI missing — re-injecting', 'check');
       tryReinjectUI(createUI);
     }

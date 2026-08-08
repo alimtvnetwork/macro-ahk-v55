@@ -88,7 +88,11 @@ export function invalidateCacheOnProjectSwitch(): void {
   try {
     const currentPid = resolveProjectId();
     const lastPid = localStorage.getItem(StorageKey.WsLastProject) || '';
-    if (lastPid && lastPid !== currentPid && currentPid !== '_default') {
+    const hasPreviousProject = lastPid.length > 0;
+    const isProjectSwitched = lastPid !== currentPid;
+    const isDefaultProject = currentPid === '_default';
+    const shouldUpdate = hasPreviousProject && isProjectSwitched;
+    if (shouldUpdate && !isDefaultProject) {
       // Different project — clear old project's cache (it stays for that project)
       // Just update the tracker; each project has its own scoped keys
       localStorage.setItem(StorageKey.WsLastProject, currentPid);

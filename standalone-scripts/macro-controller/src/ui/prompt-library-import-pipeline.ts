@@ -28,7 +28,7 @@ export function showImportSpinner(importBtn: HTMLButtonElement): void {
     'vertical-align:-1px', 'animation:mc-spin 0.7s linear infinite',
   ].join(';');
   importBtn.appendChild(spinner);
-  importBtn.appendChild(importBtn.ownerDocument.createTextNode('Importing…'));
+  importBtn.appendChild(importBtn.ownerDocument.createTextNode('Importing...'));
 }
 
 export function hideImportSpinner(importBtn: HTMLButtonElement, originalLabel: string): void {
@@ -55,6 +55,53 @@ export async function handleExport(refs: ModalRefs): Promise<void> {
   }
 }
 
+async function executeImportParse(
+  refs: ModalRefs,
+  text: string,
+  file: File
+) {
+  const parsed = parsePromptsText(text);
+  if (parsed.errors.length > 0 && parsed.valid.length === 0) {
+    const friendly = buildFriendlyImportError(parsed.errors, file.name);
+    refs.status.textContent = 'Import parse failed: ' + friendly.headline;
+    renderImportErrorBanner(refs, friendly.headline, friendly.hint);
+    logLibraryImportFailure('parse', 'errors=' + String(parsed.errors.length) + ' name=' + file.name, parsed.errors);
+    showToast(IMPORT_FAILED_PREFIX + friendly.headline, TOAST_ERROR);
+    refs.lastImportFailed = true;
+    return null;
+  }
+  return parsed;
+}
+
+async function executeImportDb(
+  refs: ModalRefs,
+  parsed: ReturnType<typeof parsePromptsText>,
+  renderAllRoles: (r: ModalRefs) => Promise<void>
+) {
+  const roleSel = refs.importRoleSelect?.value;
+  const roleFilter = (roleSel === 'plan' || roleSel === 'next' || roleSel === 'generic') ? roleSel : undefined;
+  const importOpts: Parameters<typeof performPromptImport>[1] = { overwrite: true };
+  if (roleFilter) importOpts.roleFilter = roleFilter;
+  if (parsed.revisions && parsed.revisions.length > 0) importOpts.revisions = parsed.revisions;
+  if (parsed.promptOrder && parsed.promptOrder.length > 0) importOpts.promptOrder = parsed.promptOrder;
+  
+  showImportProgress(refs);
+  importOpts.onProgress = (p) => updateImportProgress(refs, p);
+  
+  const results = await performPromptImport(parsed.valid, importOpts);
+  const skipped = parsed.errors.length;
+  const revBit = (results.revisionsImported ?? 0) > 0 ? ', +' + String(results.revisionsImported) + ' revisions' : '';
+  const summary = 'Import: +' + results.added + ' added, ' + results.updated
+    + ' updated' + revBit + (skipped > 0 ? ', ' + skipped + ' skipped' : '')
+    + (results.errors.length > 0 ? ', ' + results.errors.length + ' errors' : '');
+    
+  log('PromptLibraryModal: ' + summary, 'info');
+  showToast(summary, results.errors.length > 0 ? 'warn' : 'success');
+  await renderAllRoles(refs);
+  
+  return { summary, results };
+}
+
 export async function handleImportFile(
   refs: ModalRefs,
   file: File,
@@ -67,6 +114,7 @@ export async function handleImportFile(
   const retrying = refs.lastImportFailed === true;
   const attemptPrefix = retrying ? 'Retrying import: ' : 'Importing ';
   const retry = (): void => { void handleImportFile(refs, file, fileInput, importBtn, renderAllRoles, 'click'); };
+  
   const invalid = validateImportFile(file);
   if (invalid) {
     refs.status.textContent = (retrying ? 'Retry rejected: ' : 'Import rejected: ') + invalid.headline;
@@ -78,6 +126,7 @@ export async function handleImportFile(
     focusErrorBanner(refs);
     return;
   }
+  
   importBtn.disabled = true;
   importBtn.setAttribute('aria-busy', 'true');
   fileInput.disabled = true;
@@ -88,36 +137,17 @@ export async function handleImportFile(
 
   refs.status.textContent = attemptPrefix + file.name + ' ...';
   let focusAfter: 'import' | 'banner' | null = null;
+  
   try {
     const text = await file.text();
-    const parsed = parsePromptsText(text);
-    if (parsed.errors.length > 0 && parsed.valid.length === 0) {
-      const friendly = buildFriendlyImportError(parsed.errors, file.name);
-      refs.status.textContent = 'Import parse failed: ' + friendly.headline;
-      renderImportErrorBanner(refs, friendly.headline, friendly.hint);
-      logLibraryImportFailure('parse', 'errors=' + String(parsed.errors.length) + ' name=' + file.name, parsed.errors);
-      showToast(IMPORT_FAILED_PREFIX + friendly.headline, TOAST_ERROR);
-      refs.lastImportFailed = true;
+    const parsed = await executeImportParse(refs, text, file);
+    if (!parsed) {
       focusAfter = 'banner';
       return;
     }
-    const roleSel = refs.importRoleSelect?.value;
-    const roleFilter = (roleSel === 'plan' || roleSel === 'next' || roleSel === 'generic') ? roleSel : undefined;
-    const importOpts: Parameters<typeof performPromptImport>[1] = { overwrite: true };
-    if (roleFilter) importOpts.roleFilter = roleFilter;
-    if (parsed.revisions && parsed.revisions.length > 0) importOpts.revisions = parsed.revisions;
-    if (parsed.promptOrder && parsed.promptOrder.length > 0) importOpts.promptOrder = parsed.promptOrder;
-    showImportProgress(refs);
-    importOpts.onProgress = (p) => updateImportProgress(refs, p);
-    const results = await performPromptImport(parsed.valid, importOpts);
-    const skipped = parsed.errors.length;
-    const revBit = (results.revisionsImported ?? 0) > 0 ? ', +' + String(results.revisionsImported) + ' revisions' : '';
-    const summary = 'Import: +' + results.added + ' added, ' + results.updated
-      + ' updated' + revBit + (skipped > 0 ? ', ' + skipped + ' skipped' : '')
-      + (results.errors.length > 0 ? ', ' + results.errors.length + ' errors' : '');
-    log('PromptLibraryModal: ' + summary, 'info');
-    showToast(summary, results.errors.length > 0 ? 'warn' : 'success');
-    await renderAllRoles(refs);
+    
+    const { summary, results } = await executeImportDb(refs, parsed, renderAllRoles);
+    
     refs.status.textContent = (retrying ? 'Retry succeeded. ' : '') + summary;
     refs.lastImportFailed = false;
     clearImportErrorBanner(refs);

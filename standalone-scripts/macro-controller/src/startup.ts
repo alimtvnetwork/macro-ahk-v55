@@ -110,7 +110,7 @@ export function bootstrap(deps: {
     // Re-render the UI when the user saves new overrides so the workspace
     // status pills pick up the new thresholds without a page reload.
     onSettingsChange(function () {
-      try { updateUI(); } catch (_e: unknown) { /* UI may not be mounted yet */ } // allow-swallow: UI may not be mounted at settings-change time; non-critical cosmetic update.
+      try { updateUI(); } catch (err: unknown) { logError('Startup', 'UI update failed on settings change', err); }
     });
   });
 
@@ -290,7 +290,10 @@ function _preWarmPrompts(attempt: number): void {
 
   const sdk = (window as unknown as Record<string, unknown>).marco as { prompts?: { preWarm(): Promise<unknown[]> } } | undefined;
 
-  if (sdk && sdk.prompts && typeof sdk.prompts.preWarm === 'function') {
+  const hasSdk = sdk !== null && sdk !== undefined;
+  const hasPrompts = hasSdk && sdk!.prompts !== null && sdk!.prompts !== undefined;
+  const hasPreWarm = hasPrompts && typeof sdk!.prompts.preWarm === 'function';
+  if (hasPreWarm) {
     sdk.prompts.preWarm().then(function(prompts: unknown[]) {
       if (prompts && prompts.length > 0) {
         log('Startup: 📋 Pre-warmed ' + prompts.length + ' prompts via SDK (attempt ' + (attempt + 1) + ')', 'success');
@@ -374,8 +377,8 @@ function _checkPendingTasksOnStartup(): void {
         showToast(`📋 ${pending.length} task${pending.length > 1 ? 's' : ''} in queue (paused). Open Task Queue to resume.`, 'info', { noStop: true });
       }
 
-    } catch (_e: unknown) {
-      /* Non-critical startup check, silently ignore */
+    } catch (err: unknown) {
+      logError('Startup', 'Pending tasks check failed', err);
     }
   }, 2000);
 }
@@ -462,7 +465,7 @@ function ensureUiManagerRegistered(mc: MacroController): boolean {
       log('Startup: self-healed UIManager from persisted factory', 'success');
       return true;
     } catch (err) {
-      log('Startup: persisted UIManager factory failed, ' + toErrorMessage(err), 'warn');
+      logError('Startup', 'persisted UIManager factory failed', err);
     }
   }
 
@@ -685,7 +688,7 @@ function fetchTier1Prefetch(projectId: string, _token: string): Promise<MarkView
       .then(handleTier1Response)
       .catch(handleTier1Error);
   } catch (err: unknown) {
-    log('Startup: Tier 1 prefetch error: ' + toErrorMessage(err), 'warn');
+    logError('Startup', 'Tier 1 prefetch error', err);
     timingEnd(Label.WsPrefetch, 'warn', toErrorMessage(err));
     return Promise.resolve(null);
   }

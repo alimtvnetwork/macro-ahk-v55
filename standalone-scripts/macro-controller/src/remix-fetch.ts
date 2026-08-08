@@ -53,8 +53,11 @@ export async function fetchWorkspaceProjectNames(wsId: string, force = false): P
   const op = 'fetchWorkspaceProjectNames';
   if (!wsId) throwDiagnostic('REMIX_FETCH_E002', { argument: 'wsId', op });
   const existing = cache[wsId];
-  if (!force && existing && Date.now() - existing.fetchedAt < PROJECTS_TTL_MS) {
-    return existing.names;
+  const isForceFetch = force;
+  const hasCachedEntry = existing !== undefined && existing !== null;
+  const isCacheValid = hasCachedEntry && (Date.now() - existing!.fetchedAt < PROJECTS_TTL_MS);
+  if (!isForceFetch && isCacheValid) {
+    return existing!.names;
   }
 
   const api = getSdk(op);
@@ -74,7 +77,10 @@ export async function fetchWorkspaceProjectNames(wsId: string, force = false): P
   const list = Array.isArray(data.projects) ? data.projects : [];
   const names = new Set<string>();
   for (const p of list) {
-    if (p && typeof p.name === 'string' && p.name.trim()) {
+    const hasProject = p !== null && p !== undefined;
+    const hasName = hasProject && typeof p.name === 'string';
+    const hasNonEmptyName = hasName && p.name.trim().length > 0;
+    if (hasNonEmptyName) {
       names.add(p.name.trim().toLowerCase());
     }
   }

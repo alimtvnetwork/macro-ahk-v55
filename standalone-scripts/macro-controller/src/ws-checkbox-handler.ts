@@ -203,7 +203,11 @@ export function triggerLoopMoveFromSelection(): void {
 
   const currentWorkspaceName = (state.workspaceName || '').trim().toLowerCase();
   const targetWorkspaceName = (wsName || '').trim().toLowerCase();
-  if (currentWorkspaceName && targetWorkspaceName && currentWorkspaceName === targetWorkspaceName) {
+  const hasCurrentName = !!currentWorkspaceName;
+  const hasTargetName = !!targetWorkspaceName;
+  const isSameName = currentWorkspaceName === targetWorkspaceName;
+  const isMatchingSelf = hasCurrentName && hasTargetName;
+  if (isMatchingSelf && isSameName) {
     log('Move blocked: target workspace is already current -> ' + wsName, 'warn');
     updateLoopMoveStatus('error', 'Already on this workspace');
     showToast('You are already in this workspace — select a different one', 'info', { noStop: true });

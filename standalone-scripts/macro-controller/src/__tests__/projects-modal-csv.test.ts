@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   filterWorkspaceBlocksByVisibility,
   getCsvLastCommunicationNormalizedLogMessage,
-  hasMissingCsvLastCommunication,
+  hasCsvLastCommunication,
   isWorkspaceFilterVisible,
   isWorkspaceWithinCreditsRange,
   isCsvProjectNameFallback,
@@ -118,14 +118,14 @@ describe('Projects modal CSV last communication cleanup', () => {
   });
 
   it('replaces upstream placeholder lastCommunication values with an em dash', () => {
-    expect(hasMissingCsvLastCommunication('(no data returned by API)')).toBe(true);
+    expect(hasCsvLastCommunication('(no data returned by API)')).toBe(false);
     expect(normalizeCsvLastCommunication('(no data returned by API)')).toBe('—');
   });
 
   it('keeps real lastCommunication values untouched', () => {
     const value = '2026-06-21T08:30:00.000Z';
 
-    expect(hasMissingCsvLastCommunication(value)).toBe(false);
+    expect(hasCsvLastCommunication(value)).toBe(true);
     expect(normalizeCsvLastCommunication(value)).toBe(value);
   });
 

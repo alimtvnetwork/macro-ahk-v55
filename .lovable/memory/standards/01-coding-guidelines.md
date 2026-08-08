@@ -34,15 +34,24 @@ Before generating any code, the AI MUST read the following spec folders in order
 - **Zero nested `if`** - always invert the condition, exit early, and continue on the happy path.
 - Use guard clauses to keep the main flow flat.
 
-### 3. Keep ifs simple - no negatives
-- **No `!` on function calls** - use `isInvalid()`, `isMissing()`, `isDisabled()` instead.
-- **Max 2 conditions** per `if`.
-- **Never mix `&&` and `||`** - extract into named booleans.
-- **Never mix positive + negative** (`isX && !isY` → extract a named boolean).
+### 3. Keep ifs simple — no `!` at the call site
+- **NEVER use `!` in an `if` condition.** Every condition must read naturally without a `!`.
+- **To check for absence/failure:** name the boolean to describe the absent state positively.
+  - ✅ `const isMissing = value === null; if (isMissing)`
+  - ✅ `const isDisabled = script.isEnabled === false; if (isDisabled)`
+  - ❌ `const hasValue = value !== null; if (!hasValue)` — introduces `!` at call site
+  - ❌ `if (!isValid)` — use `isInvalid` instead
+- **NEVER use more than one `&&`** in a single condition. `if (A && B && C)` is banned. Extract into sequential guard clauses or a named boolean.
+- **NEVER mix `&&` and `||`** in the same condition. Extract into distinctly named booleans.
+- **Never mix positive + negative inline** (`isX && !isY` → extract into a named boolean).
 
 ### 4. Follow the Boolean guidelines
 - All booleans (variables **and** functions) must start with `is` or `has`. `should` only for recommendations/preferences.
-- **Never** use `not`/`no` in boolean names - use the inverse: `isInactive`, `isMissing`, `isDisabled`.
+- Booleans must be named to describe what IS TRUE when the flag is set — regardless of whether the state is "good" or "bad".
+  - `isMissing` = true when the thing IS missing ✅
+  - `isDisabled` = true when the thing IS disabled ✅
+  - `isInvalid` = true when the thing IS invalid ✅
+  - `isNotReady` = ❌ use `isPending` or `isInitializing` instead
 - Extract multi-part conditions into named variables.
 
 ### 5. Use proper types - never use `any`, `unknown`, `interface{}`, or any wide-range type except for Generic
