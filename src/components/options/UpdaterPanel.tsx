@@ -24,6 +24,7 @@ import {
   INTERVAL_OPTIONS,
 } from "./updater/updater-types";
 import { UpdaterEntryCard } from "./updater/UpdaterEntryCard";
+import { AddUpdaterForm, AddUpdaterData } from "./updater/AddUpdaterForm";
 
 interface Props {
   projectId: string;
@@ -52,65 +53,27 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
 
   useEffect(() => { void loadUpdaters(); }, [loadUpdaters]);
 
-  const [newName, setNewName] = useState("");
-  const [newDescription, setNewDescription] = useState("");
-  const [newScriptUrl, setNewScriptUrl] = useState("");
-  const [newVersionUrl, setNewVersionUrl] = useState("");
-  const [newInstructionUrl, setNewInstructionUrl] = useState("");
-  const [newChangelogUrl, setNewChangelogUrl] = useState("");
-  const [newIsGit, setNewIsGit] = useState(false);
-  const [newIsRedirectable, setNewIsRedirectable] = useState(true);
-  const [newMaxRedirectDepth, setNewMaxRedirectDepth] = useState(2);
-  const [newAutoCheck, setNewAutoCheck] = useState(1440);
-  const [newCacheExpiry, setNewCacheExpiry] = useState(10080);
-  const [newCategories, setNewCategories] = useState<string[]>([]);
-  const [newHasConfirm, setNewHasConfirm] = useState(false);
-  const [newHasChangelogFromVersionInfo, setNewHasChangelogFromVersionInfo] = useState(true);
-
-  const resetAddForm = () => {
-    setNewName("");
-    setNewDescription("");
-    setNewScriptUrl("");
-    setNewVersionUrl("");
-    setNewInstructionUrl("");
-    setNewChangelogUrl("");
-    setNewIsGit(false);
-    setNewIsRedirectable(true);
-    setNewMaxRedirectDepth(2);
-    setNewAutoCheck(1440);
-    setNewCacheExpiry(10080);
-    setNewCategories([]);
-    setNewHasConfirm(false);
-    setNewHasChangelogFromVersionInfo(true);
-  };
-
-  const handleAdd = async () => {
-    if (!newName.trim() || !newScriptUrl.trim()) {
-      toast.error("Name and Script URL are required");
-
-      return;
-    }
+  const handleAdd = async (data: AddUpdaterData) => {
     try {
       await sendMessage({
         type: "CREATE_UPDATER",
         data: {
-          name: newName.trim(),
-          scriptUrl: newScriptUrl.trim(),
-          versionInfoUrl: newVersionUrl.trim() || undefined,
-          instructionUrl: newInstructionUrl.trim() || undefined,
-          changelogUrl: newChangelogUrl.trim() || undefined,
-          isGit: newIsGit,
-          isRedirectable: newIsRedirectable,
-          maxRedirectDepth: newMaxRedirectDepth,
-          hasChangelogFromVersionInfo: newHasChangelogFromVersionInfo,
-          hasUserConfirmBeforeUpdate: newHasConfirm,
-          autoCheckIntervalMinutes: newAutoCheck,
-          cacheExpiryMinutes: newCacheExpiry,
+          name: data.name,
+          scriptUrl: data.scriptUrl,
+          versionInfoUrl: data.versionInfoUrl || undefined,
+          instructionUrl: data.instructionUrl || undefined,
+          changelogUrl: data.changelogUrl || undefined,
+          isGit: data.isGit,
+          isRedirectable: data.isRedirectable,
+          maxRedirectDepth: data.maxRedirectDepth,
+          hasChangelogFromVersionInfo: data.hasChangelogFromVersionInfo,
+          hasUserConfirmBeforeUpdate: data.hasUserConfirmBeforeUpdate,
+          autoCheckIntervalMinutes: data.autoCheckIntervalMinutes,
+          cacheExpiryMinutes: data.cacheExpiryMinutes,
         },
       });
-      resetAddForm();
       setIsAdding(false);
-      toast.success(`Added updater "${newName.trim()}"`);
+      toast.success(`Added updater "${data.name}"`);
       await loadUpdaters();
     } catch (err) {
       toast.error("Failed to create updater");
@@ -302,125 +265,8 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
 
       {/* Add form */}
       {isAdding && (
-        <div className="rounded-lg border border-border p-4 space-y-4 bg-muted/10 anim-fade-in-up">
-          <h4 className="text-xs font-semibold text-foreground">New Update Source</h4>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <LabelType className="text-xs">Name *</LabelType>
-              <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="e.g. Riseup Macro SDK" className="h-8 text-xs" />
-            </div>
-            <div className="space-y-1">
-              <LabelType className="text-xs">Description</LabelType>
-              <Input value={newDescription} onChange={(e) => setNewDescription(e.target.value)} placeholder="Purpose of this source" className="h-8 text-xs" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">URLs</p>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <LabelType className="text-xs">Script URL *</LabelType>
-                <Input value={newScriptUrl} onChange={(e) => setNewScriptUrl(e.target.value)} placeholder="https://..." className="h-8 text-xs font-mono" />
-              </div>
-              <div className="space-y-1">
-                <LabelType className="text-xs">Version Info URL</LabelType>
-                <Input value={newVersionUrl} onChange={(e) => setNewVersionUrl(e.target.value)} placeholder="https://..." className="h-8 text-xs font-mono" />
-              </div>
-              <div className="space-y-1">
-                <LabelType className="text-xs">Instruction URL</LabelType>
-                <Input value={newInstructionUrl} onChange={(e) => setNewInstructionUrl(e.target.value)} placeholder="https://..." className="h-8 text-xs font-mono" />
-              </div>
-              <div className="space-y-1">
-                <LabelType className="text-xs">Changelog URL</LabelType>
-                <Input value={newChangelogUrl} onChange={(e) => setNewChangelogUrl(e.target.value)} placeholder="https://..." className="h-8 text-xs font-mono" />
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Settings</p>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-1">
-                <LabelType className="text-xs">Auto-Check Interval</LabelType>
-                <Select value={String(newAutoCheck)} onValueChange={(v) => setNewAutoCheck(Number(v))}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {INTERVAL_OPTIONS.map((o) => (
-                      <SelectItem key={o.value} value={String(o.value)} className="text-xs">{o.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1">
-                <LabelType className="text-xs">Cache Expiry</LabelType>
-                <Select value={String(newCacheExpiry)} onValueChange={(v) => setNewCacheExpiry(Number(v))}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {INTERVAL_OPTIONS.map((o) => (
-                      <SelectItem key={o.value} value={String(o.value)} className="text-xs">{o.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1">
-                <LabelType className="text-xs">Max Redirect Depth</LabelType>
-                <Input type="number" min={0} max={10} value={newMaxRedirectDepth} onChange={(e) => setNewMaxRedirectDepth(Number(e.target.value))} className="h-8 text-xs" />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-4">
-            <label className="flex items-center gap-2 text-xs">
-              <Switch checked={newIsGit} onCheckedChange={setNewIsGit} className="scale-75" />
-              <GitBranch className="h-3 w-3 text-muted-foreground" />
-              Git source
-            </label>
-            <label className="flex items-center gap-2 text-xs">
-              <Switch checked={newIsRedirectable} onCheckedChange={setNewIsRedirectable} className="scale-75" />
-              <Globe className="h-3 w-3 text-muted-foreground" />
-              Allow redirects
-            </label>
-            <label className="flex items-center gap-2 text-xs">
-              <Switch checked={newHasConfirm} onCheckedChange={setNewHasConfirm} className="scale-75" />
-              <Shield className="h-3 w-3 text-muted-foreground" />
-              Confirm before update
-            </label>
-            <label className="flex items-center gap-2 text-xs">
-              <Switch checked={newHasChangelogFromVersionInfo} onCheckedChange={setNewHasChangelogFromVersionInfo} className="scale-75" />
-              Changelog from VersionInfo
-            </label>
-          </div>
-
-          <div className="space-y-1.5">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Categories</p>
-            <div className="flex flex-wrap gap-1.5">
-              {AVAILABLE_CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setNewCategories((c) => toggleCategory(c, cat))}
-                  className={`text-[10px] px-2 py-0.5 rounded-full border transition-all duration-200 ${
-                    newCategories.includes(cat)
-                      ? "bg-primary/15 text-primary border-primary/30 font-medium"
-                      : "bg-muted/20 text-muted-foreground border-border hover:border-primary/30"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-1">
-            <Button size="sm" variant="ghost" onClick={() => { resetAddForm(); setIsAdding(false); }} className="text-xs">
-              Cancel
-            </Button>
-            <Button size="sm" onClick={handleAdd} className="text-xs gap-1.5">
-              <Plus className="h-3 w-3" />
-              Add Source
-            </Button>
-          </div>
+        <div className="anim-fade-in-up">
+          <AddUpdaterForm onAdd={handleAdd} onCancel={() => setIsAdding(false)} />
         </div>
       )}
 
