@@ -68,12 +68,14 @@ export function ConfigsList({ configs, loading, onSave, onDelete }: Props) {
     const isNameEmpty = form.name.trim() === "";
     if (isNameEmpty) {
       toast.error("Config name is required");
+
       return;
     }
 
     const isJsonInvalid = !validateJson(form.json);
     if (isJsonInvalid) {
       toast.error("Invalid JSON");
+
       return;
     }
 
@@ -226,6 +228,7 @@ export function ConfigsList({ configs, loading, onSave, onDelete }: Props) {
 function validateJson(json: string): boolean {
   try {
     JSON.parse(json);
+
     return true;
   } catch {
     return false;

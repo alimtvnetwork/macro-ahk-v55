@@ -90,6 +90,7 @@ function loadPersistedSequence(): SequenceRenameInput {
             : null;
         if (!raw) return { ...DEFAULT_SEQUENCE_RENAME, Base: "Step {n}" };
         const parsed = JSON.parse(raw) as Partial<SequenceRenameInput>;
+
         return {
             Base: typeof parsed.Base === "string" ? parsed.Base : "Step {n}",
             Start: typeof parsed.Start === "number" && Number.isFinite(parsed.Start)
@@ -140,12 +141,14 @@ export function KeywordEventStepContextMenu(
                 .filter(s => selectedStepIds.has(s.Id))
                 .map(s => s.Id);
         }
+
         return [step.Id];
     }, [step.Id, selectedStepIds, event.Steps]);
 
     const operandCount = operandIds.length;
     const allDisabled = useMemo(() => {
         const set = new Set(operandIds);
+
         return event.Steps.filter(s => set.has(s.Id)).every(s => s.Enabled === false);
     }, [operandIds, event.Steps]);
 

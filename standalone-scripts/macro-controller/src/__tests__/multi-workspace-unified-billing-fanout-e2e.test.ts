@@ -84,6 +84,7 @@ describe('multi-workspace unified-billing fan-out E2E', () => {
                 const isMissingBalance = !balance;
                 if (isMissingBalance) throw new Error('no fixture for ' + target.id);
                 overlayCreditBalanceOnWorkspace(target, balance);
+
                 return {
                     outcome: CreditFetchOutcomeType.ApiHit,
                     balance,

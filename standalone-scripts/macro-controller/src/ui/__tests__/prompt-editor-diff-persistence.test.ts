@@ -21,7 +21,6 @@ beforeEach(() => {
   clearDiffPrefs();
 });
 
-
 function openEditModal(role: PromptRowRoleType): {
   overlay: HTMLElement;
   diffBtn: HTMLButtonElement;
@@ -36,6 +35,7 @@ function openEditModal(role: PromptRowRoleType): {
   const overlay = document.getElementById('marco-prompt-modal')!;
   const diffBtn = overlay.querySelector<HTMLButtonElement>('[data-testid="prompt-editor-diff-toggle"]')!;
   const diffHost = overlay.querySelector<HTMLElement>('[data-testid="prompt-editor-diff-host"]')!;
+
   return { overlay, diffBtn, diffHost };
 }
 

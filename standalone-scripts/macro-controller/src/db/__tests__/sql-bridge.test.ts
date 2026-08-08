@@ -32,6 +32,7 @@ describe('sql-bridge probe', () => {
             if (payload.method === 'SELECT') {
                 return Promise.resolve({ isOk: true, rows: [{ Id: 1 }] });
             }
+
             return Promise.resolve({ isOk: false, errorMessage: 'unexpected: ' + String(payload.method) });
         });
 
@@ -50,6 +51,7 @@ describe('sql-bridge probe', () => {
                 });
             }
             if (payload.method === 'EXEC') return Promise.resolve({ isOk: true, lastInsertId: 42 });
+
             return Promise.resolve({ isOk: false, errorMessage: 'unexpected' });
         });
 
@@ -80,6 +82,7 @@ describe('sql-bridge probe', () => {
             if (payload.method === 'QUERY') {
                 return Promise.resolve({ isOk: false, errorMessage: 'Unsupported method: QUERY' });
             }
+
             return Promise.resolve({ isOk: true, rows: [] });
         });
         await runSql('QUERY', 'SELECT 1');

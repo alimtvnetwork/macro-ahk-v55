@@ -47,6 +47,7 @@ function stepOptionLabel(o: StepOption): string {
     const label = o.StepId === null ? "(no Step ID)" : `Step #${o.StepId}`;
     const kind = o.StepKind ? ` · ${o.StepKind}` : "";
     const count = o.Count > 1 ? ` ×${o.Count}` : "";
+
     return `${label}${kind}${count}`;
 }
 

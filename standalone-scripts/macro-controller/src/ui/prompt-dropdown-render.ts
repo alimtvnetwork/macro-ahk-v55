@@ -42,6 +42,7 @@ function groupEntriesByFolder(entries: LoaderPromptEntry[]): FolderGroups {
       rootItems.push(p);
     }
   });
+
   return { folders, rootItems };
 }
 
@@ -89,6 +90,7 @@ function buildFolderNode(
 
   folderWrap.appendChild(folderHeader);
   folderWrap.appendChild(folderBody);
+
   return folderWrap;
 }
 

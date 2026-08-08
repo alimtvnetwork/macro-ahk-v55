@@ -219,6 +219,7 @@ export function StorageBrowserView() {
 
   if (selectedTable && activeSurface === "database") {
     const tableInfo = tables.find(t => t.name === selectedTable);
+
     return (
       <TableDataView
         tableName={selectedTable}
@@ -706,6 +707,7 @@ function TableDataView({
 
     if (Object.keys(updates).length === 0) {
       setEditRow(null);
+
       return;
     }
 
@@ -799,6 +801,7 @@ function TableDataView({
                 const pkVal = primaryKeys.length > 0
                   ? primaryKeys.map(k => String(row[k] ?? i)).join("-")
                   : String(i);
+
                 return (
                   <tr
                     key={pkVal}
@@ -878,6 +881,7 @@ function TableDataView({
                 const isPk = primaryKeys.includes(col);
                 const isReadOnly = READ_ONLY_COLUMNS.has(col);
                 const isDisabled = isPk || isReadOnly;
+
                 return (
                   <div key={col}>
                     <label className="text-[10px] font-mono text-muted-foreground flex items-center gap-1.5 mb-1">
@@ -936,6 +940,7 @@ function CellValue({ value }: { value: SqlValue }) {
   if (raw.length > 80) {
     return <span title={raw}>{raw.slice(0, 80)}…</span>;
   }
+
   return <span>{raw}</span>;
 }
 
@@ -948,6 +953,7 @@ function formatBytes(bytes: number): string {
   const units = ["B", "KB", "MB", "GB"];
   const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
   const value = bytes / Math.pow(1024, i);
+
   return `${value.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
 }
 

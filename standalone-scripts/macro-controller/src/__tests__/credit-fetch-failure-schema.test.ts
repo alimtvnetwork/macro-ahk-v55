@@ -25,6 +25,7 @@ const REQUIRED_KEYS = ['Reason', 'ReasonDetail', 'WorkspaceId', 'BearerPrefix', 
 function parseLoggedPayload(callIndex: number): Record<string, unknown> {
     const args = logErrorSpy.mock.calls[callIndex];
     expect(args[0]).toBe('CreditBalanceUpdate.fetch');
+
     return JSON.parse(args[1] as string) as Record<string, unknown>;
 }
 

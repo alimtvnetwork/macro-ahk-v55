@@ -131,6 +131,7 @@ const DEFAULT_THEME: MacroThemeRoot = {
 export function validateConfig(raw: unknown): MacroControllerConfig {
   if (!isPlainObject(raw)) {
     warn('Config: received non-object — using all defaults');
+
     return { ...DEFAULT_CONFIG };
   }
 
@@ -156,6 +157,7 @@ export function validateConfig(raw: unknown): MacroControllerConfig {
 export function validateTheme(raw: unknown): MacroThemeRoot {
   if (!isPlainObject(raw)) {
     warn('Theme: received non-object — using all defaults');
+
     return { ...DEFAULT_THEME };
   }
 
@@ -188,6 +190,7 @@ export function validateTheme(raw: unknown): MacroThemeRoot {
 function validateSchemaVersion(label: string, version: unknown, supported: number): void {
   if (typeof version !== 'number') {
     warn(label + ': schemaVersion is not a number (got ' + typeof version + ')');
+
     return;
   }
   if (version > supported) {

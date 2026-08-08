@@ -12,6 +12,7 @@ const logErrorSpy = vi.fn();
 
 vi.mock('../../error-utils', async () => {
   const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+
   return { ...actual, logError: logErrorSpy };
 });
 

@@ -33,6 +33,7 @@ export async function handleProjectConfigRead(payload: MessageRequest): Promise<
 
     const mgr = await initProjectDb(m.project, CONFIG_TABLES_SCHEMA);
     const rows = readConfigFromDb(mgr);
+
     return { isOk: true, rows };
 }
 
@@ -43,6 +44,7 @@ export async function handleProjectConfigUpdate(payload: MessageRequest): Promis
 
     const mgr = await initProjectDb(m.project, CONFIG_TABLES_SCHEMA);
     const ok = updateConfigValue(mgr, m.section, m.key, m.value ?? "", m.valueType);
+
     return { isOk: ok };
 }
 
@@ -53,5 +55,6 @@ export async function handleProjectConfigReconstruct(payload: MessageRequest): P
 
     const mgr = await initProjectDb(m.project, CONFIG_TABLES_SCHEMA);
     const config = reconstructConfigFromDb(mgr);
+
     return { isOk: true, config };
 }

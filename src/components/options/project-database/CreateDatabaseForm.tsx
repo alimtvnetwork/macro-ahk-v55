@@ -27,7 +27,6 @@ import {
   type NamespaceDatabaseRequest,
 } from "@/types/default-databases";
 
-
 interface CreateDatabaseFormProps {
   projectSlug: string;
   /** Current count of user-created databases (excludes defaults) */

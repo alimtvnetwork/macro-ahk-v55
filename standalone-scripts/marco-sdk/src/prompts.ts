@@ -88,6 +88,7 @@ function computeHash(entries: PromptEntry[]): string {
         parts.push(`${e.name || ""}:${(e.text || "").length}`);
     }
     parts.sort();
+
     return parts.join("|");
 }
 
@@ -122,6 +123,7 @@ function readCache(): Promise<CacheRecord | null> {
                         const record = req.result as CacheRecord | undefined;
                         if (record?.schemaVersion !== CACHE_SCHEMA_VERSION) {
                             resolve(null);
+
                             return;
                         }
                         resolve(record.entries?.length ? record : null);
@@ -133,11 +135,14 @@ function readCache(): Promise<CacheRecord | null> {
                 }
             });
         })
-        .catch((e) => { NamespaceLogger.error('fetchPromptList', 'Failed to fetch prompt list', e); return null; });
+        .catch((e) => { NamespaceLogger.error('fetchPromptList', 'Failed to fetch prompt list', e);
+
+ return null; });
 }
 
 function writeCache(entries: PromptEntry[]): Promise<void> {
     const hash = computeHash(entries);
+
     return openIdb()
         .then((db) => {
             return new Promise<void>((resolve) => {
@@ -198,6 +203,7 @@ function normalize(raw: Array<Partial<PromptEntry>>): PromptEntry[] {
             });
         }
     }
+
     return out;
 }
 
@@ -223,6 +229,7 @@ async function fetchFromBridge(): Promise<PromptEntry[]> {
             NamespaceLogger.error("fetchFromBridge", `GET_PROMPTS attempt ${i + 1}/${RETRY_DELAYS.length} failed — will retry per RETRY_DELAYS schedule`, caught);
         }
     }
+
     return [];
 }
 
@@ -271,6 +278,7 @@ function findPasteTarget(xpath?: string, selector?: string): HTMLElement | null 
         const found = document.querySelector<HTMLElement>(sel);
         if (found) return found;
     }
+
     return null;
 }
 
@@ -291,6 +299,7 @@ function injectText(text: string, target: HTMLElement): boolean {
         }
         target.dispatchEvent(new Event("input", { bubbles: true }));
         target.dispatchEvent(new Event("change", { bubbles: true }));
+
         return true;
     }
 
@@ -323,6 +332,7 @@ function injectText(text: string, target: HTMLElement): boolean {
     }
 
     target.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: fullText }));
+
     return true;
 }
 
@@ -349,6 +359,7 @@ async function getAllCached(): Promise<PromptEntry[]> {
                 memoryCache = cached.entries;
                 // Background revalidation (fire-and-forget)
                 backgroundRevalidate(cached.hash);
+
                 return cached.entries;
             }
 
@@ -357,6 +368,7 @@ async function getAllCached(): Promise<PromptEntry[]> {
             if (bridgePrompts.length > 0) {
                 memoryCache = bridgePrompts;
                 await writeCache(bridgePrompts);
+
                 return bridgePrompts;
             }
 
@@ -400,6 +412,7 @@ export function createPromptsApi(): PromptsApi {
             // Invalidate caches after mutation
             memoryCache = null;
             await clearCache();
+
             return resp.prompt;
         },
 
@@ -423,18 +436,21 @@ export function createPromptsApi(): PromptsApi {
             if (!target) {
                 // Fallback: copy to clipboard
                 navigator.clipboard.writeText(text).catch((e) => { NamespaceLogger.error('copyToClipboard', 'Clipboard write failed', e); });
+
                 return false;
             }
             try {
                 return injectText(text, target);
             } catch {
                 navigator.clipboard.writeText(text).catch((e) => { NamespaceLogger.error('copyToClipboard', 'Clipboard write failed', e); });
+
                 return false;
             }
         },
 
         async getConfig(): Promise<ResolvedPromptsConfig> {
             const entries = await getAllCached();
+
             return {
                 entries,
                 pasteTargetXPath: DEFAULT_PASTE_XPATH,

@@ -32,5 +32,6 @@ export function collectTypedRows(
         rows.push(stmt.getAsObject());
     }
     stmt.free();
+
     return rows;
 }

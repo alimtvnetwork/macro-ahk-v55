@@ -241,7 +241,6 @@ CREATE TABLE IF NOT EXISTS GroupedKv (
 CREATE INDEX IF NOT EXISTS IdxGroupedKvGroup ON GroupedKv(GroupName);
 `;
 
-
 /* ------------------------------------------------------------------ */
 /*  Scripts (logs.db)                                                  */
 /* ------------------------------------------------------------------ */

@@ -62,6 +62,7 @@ export function daysBetween(isoOrMs: string | number, nowMs?: number): number {
   const now = typeof nowMs === 'number' ? nowMs : Date.now();
   const diffMs = now - t;
   if (diffMs <= 0) return 0;
+
   return Math.floor(diffMs / MS_PER_DAY);
 }
 
@@ -74,6 +75,7 @@ export function daysUntil(iso: string, nowMs?: number): number {
   const now = typeof nowMs === 'number' ? nowMs : Date.now();
   const diffMs = t - now;
   if (diffMs < 0) return -1;
+
   return Math.ceil(diffMs / MS_PER_DAY);
 }
 
@@ -90,6 +92,7 @@ export function formatDateDDMMMYY(iso: string): string {
   const day = String(d.getDate()).padStart(2, '0');
   const mon = MONTH_NAMES[d.getMonth()];
   const yr = String(d.getFullYear() % 100).padStart(2, '0');
+
   return day + ' ' + mon + ' ' + yr;
 }
 
@@ -100,10 +103,12 @@ export function formatDayCount(days: number): string {
   if (days < 365) {
     const months = Math.floor(days / 30);
     const remDays = days % 30;
+
     return remDays > 0 ? months + 'mo ' + remDays + 'd' : months + 'mo';
   }
   const years = Math.floor(days / 365);
   const remMonths = Math.floor((days % 365) / 30);
+
   return remMonths > 0 ? years + 'y ' + remMonths + 'mo' : years + 'y';
 }
 
@@ -126,6 +131,7 @@ function normalizeStatus(s: string): string {
 function pickRefillIso(ws: WorkspaceCredit): string {
   if (ws.nextRefillAt) return ws.nextRefillAt;
   if (ws.billingPeriodEndAt) return ws.billingPeriodEndAt;
+
   return '';
 }
 
@@ -161,6 +167,7 @@ function resolveCanceledStatus(
   if (changedIso && daysSinceChange >= grace) {
     return buildStatus('fully-expired', { sinceIso: changedIso, daysSince: daysSinceChange });
   }
+
   return buildStatus('expired-canceled', { sinceIso: changedIso, daysSince: daysSinceChange });
 }
 
@@ -170,6 +177,7 @@ function resolveTierExpiredStatus(
   if (changedIso && daysSinceChange >= grace) {
     return buildStatus('fully-expired', { sinceIso: changedIso, daysSince: daysSinceChange });
   }
+
   return buildStatus('expired', { sinceIso: changedIso, daysSince: daysSinceChange });
 }
 
@@ -191,6 +199,7 @@ function resolveRefillStatus(
   if (dToRefill >= 0 && dToRefill <= config.refillWarningThresholdDays) {
     return buildStatus('about-to-refill', { refillIso, daysToRefill: dToRefill });
   }
+
   return null;
 }
 
@@ -257,6 +266,7 @@ export function hasLiveGrants(ws: WorkspaceCredit): boolean {
   const avail = Number(ws.available) || 0;
   const roll = Number(ws.rollover) || 0;
   const bill = Number(ws.billingAvailable) || 0;
+
   return avail > 0 || roll > 0 || bill > 0;
 }
 

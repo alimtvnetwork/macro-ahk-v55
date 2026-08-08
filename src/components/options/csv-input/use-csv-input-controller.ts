@@ -55,11 +55,13 @@ export interface UseCsvInputControllerOptions {
 
 function buildInitialMappings(headers: ReadonlyArray<string>): ColumnMapping[] {
     const seen = new Set<string>();
+
     return headers.map((header) => {
         let candidate = suggestVariableName(header);
         let index = 2;
         while (seen.has(candidate)) candidate = `${suggestVariableName(header)}_${index++}`;
         seen.add(candidate);
+
         return { Column: header, Variable: candidate, Coerce: "auto" as CoercionKind };
     });
 }
@@ -89,7 +91,9 @@ function useCsvParseState(open: boolean): ParseState {
     const acceptText = useCallback((text: string, fileName: string | null): void => {
         const result = parseCsv(text);
         if (!result.Ok) {
-            setParsed(null); setMappings([]); setParseError(result.Reason); return;
+            setParsed(null); setMappings([]); setParseError(result.Reason);
+
+ return;
         }
         setParseError(null);
         setParsed({ Csv: result, FileName: fileName });
@@ -116,9 +120,11 @@ function useCsvFileReader(
     setPasted: (value: string) => void,
 ): (file: File) => Promise<void> {
     const { toast } = useToast();
+
     return useCallback(async (file: File): Promise<void> => {
         if (file.size > MAX_BYTES) {
             toast({ variant: "destructive", title: "File too large", description: "CSV files must be 5 MB or smaller." });
+
             return;
         }
         try {
@@ -153,6 +159,7 @@ function useCsvFileHandlers(
         const file = event.dataTransfer.files[0] ?? null;
         if (file !== null) void handleFile(file);
     }, [handleFile, setDragOver]);
+
     return { handleFilePick, handleDrop };
 }
 
@@ -179,6 +186,7 @@ function useCsvApplyHandler(options: UseApplyOptions): ApplyHandler {
         if (parsed === null) return null;
         const row = parsed.Csv.Rows[rowIndex] ?? null;
         if (row === null) return null;
+
         return buildBagFromRow({ Headers: parsed.Csv.Headers, Row: row, Mappings: mappings });
     }, [parsed, mappings, rowIndex]);
 

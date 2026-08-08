@@ -25,6 +25,7 @@ function getManifestVersion(): string | null {
   } catch (caught) {
     logError("PopupHeader.getManifestVersion", "chrome.runtime.getManifest() threw — not running inside an extension context, returning null version", caught);
   }
+
   return null;
 }
 
@@ -69,6 +70,7 @@ export function PopupHeader({ version, onRefresh }: Props) {
 
                 if (canOpenOptionsPage) {
                   runtime.openOptionsPage();
+
                   return;
                 }
 

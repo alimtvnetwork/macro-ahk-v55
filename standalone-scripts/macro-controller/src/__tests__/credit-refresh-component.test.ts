@@ -29,6 +29,7 @@ vi.mock('../api-namespace', () => ({ nsWrite: vi.fn() }));
 vi.mock('../async-utils', () => ({
     pollUntil: vi.fn((condition: () => true | null) => {
         condition();
+
         return Promise.resolve(true);
     }),
 }));
@@ -45,6 +46,7 @@ vi.mock('../ui/check-button', () => ({
     createCheckButton: () => {
         const checkBtn = document.createElement('button');
         checkBtn.textContent = '✓';
+
         return { checkBtn };
     },
 }));
@@ -66,6 +68,7 @@ vi.mock('../ui/menu-builder', () => ({
         const menuBtn = document.createElement('button');
         menuBtn.textContent = '☰';
         menuContainer.appendChild(menuBtn);
+
         return { menuContainer, menuBtn };
     },
 }));

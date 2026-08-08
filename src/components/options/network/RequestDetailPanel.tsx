@@ -173,6 +173,7 @@ function hasNonEmptyHeaders(headers?: Record<string, string>): boolean {
   if (isMissing) return false;
 
   const keyCount = Object.keys(headers).length;
+
   return keyCount > 0;
 }
 

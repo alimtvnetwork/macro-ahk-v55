@@ -98,6 +98,7 @@ function handleRecorderMock(message: MockRecorderMessage): object | null {
 
     if (message.type === "RECORDER_STEP_LIST") {
         const steps = mockRecorderSteps.get(slug) ?? [];
+
         return { steps, dataSources: [], fieldBindings: [] };
     }
     if (message.type === "RECORDER_STEP_INSERT" && message.draft !== undefined) {
@@ -115,13 +116,16 @@ function handleRecorderMock(message: MockRecorderMessage): object | null {
             CreatedAt: new Date().toISOString(),
         };
         mockRecorderSteps.set(slug, [...list, step]);
+
         return { isOk: true, step };
     }
     if (message.type === "RECORDER_STEP_DELETE" && typeof message.stepId === "number") {
         const list = mockRecorderSteps.get(slug) ?? [];
         mockRecorderSteps.set(slug, list.filter((s) => s.StepId !== message.stepId));
+
         return { isOk: true };
     }
+
     return null;
 }
 
@@ -132,6 +136,7 @@ function getMockResponse(message: MessagePayload): string | number | boolean | n
     if (message.type === "CLEAR_ERRORS") {
         mockErrorsCleared = true;
         mockLogsCleared = true;
+
         return { isOk: true };
     }
 

@@ -21,12 +21,19 @@ export function flattenConditionSelectors(c: Condition): FlattenedSelectors {
     const all: string[] = [];
     const xpath: string[] = [];
     walk(c);
+
     return { Selectors: all, XPath: xpath };
 
     function walk(node: Condition): void {
-        if ("All" in node) { for (const child of node.All) walk(child); return; }
-        if ("Any" in node) { for (const child of node.Any) walk(child); return; }
-        if ("Not" in node) { walk(node.Not); return; }
+        if ("All" in node) { for (const child of node.All) walk(child);
+
+ return; }
+        if ("Any" in node) { for (const child of node.Any) walk(child);
+
+ return; }
+        if ("Not" in node) { walk(node.Not);
+
+ return; }
         collectLeaf(node);
     }
 

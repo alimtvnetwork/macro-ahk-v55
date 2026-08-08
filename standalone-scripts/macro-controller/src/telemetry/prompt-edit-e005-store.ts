@@ -39,9 +39,11 @@ function safeRead(): Envelope {
     if (isMissingRaw) return { entries: [] };
     const parsed = JSON.parse(raw) as Envelope;
     if (!parsed || !Array.isArray(parsed.entries)) return { entries: [] };
+
     return parsed;
   } catch (err) {
     logError('PromptEditE005Store', 'read failed', err);
+
     return { entries: [] };
   }
 }
@@ -84,6 +86,7 @@ export function readLatestPromptEditE005ByRole(): Record<string, PromptEditE005E
   for (const entry of safeRead().entries) {
     byRole[entry.role] = entry;
   }
+
   return byRole;
 }
 
@@ -124,5 +127,6 @@ export function summarizeLatestByRole(): PromptEditE005Summary[] {
       at: entry.at,
     });
   }
+
   return out;
 }

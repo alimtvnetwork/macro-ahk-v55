@@ -23,6 +23,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../logging', () => ({ log: () => {} }));
 vi.mock('../prompt-utils', async (importOriginal) => {
     const actual = await importOriginal<typeof import('../prompt-utils')>();
+
     return {
         ...actual,
         showPasteToast: () => {},
@@ -72,6 +73,7 @@ function nonHeartbeatIntervals(): number {
     if (snap.byLabel[INTERVAL_HEARTBEAT_LABEL]) {
         total -= snap.byLabel[INTERVAL_HEARTBEAT_LABEL];
     }
+
     return total;
 }
 

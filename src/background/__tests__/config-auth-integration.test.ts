@@ -49,6 +49,7 @@ function buildChromeMock(options: {
                         if (cookie) return cookie;
                     }
                 }
+
                 return null;
             }),
             getAll: vi.fn(async ({ url }: { url: string }) => {
@@ -58,6 +59,7 @@ function buildChromeMock(options: {
                         results.push(...cookieMap.values());
                     }
                 }
+
                 return results;
             }),
         },
@@ -68,6 +70,7 @@ function buildChromeMock(options: {
         scripting: {
             executeScript: vi.fn(async ({ target }: { target: { tabId: number } }) => {
                 const result = scriptResults.get(target.tabId);
+
                 return [{ result: typeof result === "function" ? await result() : result }];
             }),
         },
@@ -77,6 +80,7 @@ function buildChromeMock(options: {
                     if (typeof keys === "string") return { [keys]: storageData[keys] };
                     const result: Record<string, unknown> = {};
                     for (const key of keys) result[key] = storageData[key];
+
                     return result;
                 }),
                 set: vi.fn(async () => {}),
@@ -142,6 +146,7 @@ async function setupTest(options: {
     // Dynamic import to get fresh module state
     const mod = await import("@/background/handlers/config-auth-handler");
     mod._resetAuthCacheForTest();
+
     return { mod, chromeMock };
 }
 
@@ -155,6 +160,7 @@ function makeCookieStore(entries: Array<{ url: string; name: string; value: stri
             domain: entry.domain ?? new URL(entry.url).hostname,
         });
     }
+
     return store;
 }
 

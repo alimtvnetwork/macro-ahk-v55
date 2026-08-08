@@ -62,6 +62,7 @@ export function useListPanelMutations(input: UseListPanelMutationsInput): UseLis
     const submitRename = makeSubmitRename(deps, renameDialog, renameError, setRenameDialog);
     const submitDelete = makeSubmitDelete(deps, deleteDialog, setDeleteDialog);
     const batchActions = useStepGroupBatchActions(lib);
+
     return {
         createDialog, setCreateDialog, renameDialog, setRenameDialog, deleteDialog, setDeleteDialog,
         createError, renameError,

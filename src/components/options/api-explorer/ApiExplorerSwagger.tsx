@@ -57,6 +57,7 @@ export function ApiExplorerSwagger() {
 
   const categories = useMemo(() => {
     const cats = new Set(endpoints.map((e) => e.Category));
+
     return ["all", ...Array.from(cats).sort()];
   }, [endpoints]);
 
@@ -74,6 +75,7 @@ export function ApiExplorerSwagger() {
           e.Description.toLowerCase().includes(q),
       );
     }
+
     return list;
   }, [endpoints, categoryFilter, search]);
 
@@ -85,6 +87,7 @@ export function ApiExplorerSwagger() {
       if (!map.has(cat)) map.set(cat, []);
       map.get(cat)!.push(ep);
     }
+
     return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
   }, [filtered]);
 

@@ -24,6 +24,7 @@ function openDb(): Promise<IDBDatabase> {
     return new Promise(function (resolve, reject): void {
         if (!hasIndexedDb()) {
             reject(new Error('IndexedDB unavailable'));
+
             return;
         }
         const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -90,6 +91,7 @@ export function writeCreditBalanceUpdateCache(
     }
     const entry = buildEntry(workspaceId, result, ttlMs, nowMs);
     memoryCache.set(workspaceId, entry);
+
     return openDb()
         .then(function (db): Promise<void> { return writeStoreEntry(db, entry).finally(function (): void { db.close(); }); })
         .catch(function (caught: CaughtError): void {
@@ -109,6 +111,7 @@ export function readCreditBalanceUpdateCacheSync(
     if (!entry || !isFresh(entry, nowMs)) {
         return null;
     }
+
     return entry.result;
 }
 
@@ -128,6 +131,7 @@ export async function readCreditBalanceUpdateCache(
             return null;
         }
         memoryCache.set(workspaceId, entry);
+
         return entry.result;
     } catch (caught: CaughtError) {
         logError(
@@ -135,6 +139,7 @@ export async function readCreditBalanceUpdateCache(
             'Path: standalone-scripts/macro-controller/src/credit-balance-update/credit-balance-cache.ts. Missing item: IndexedDB store ' + STORE_NAME + '. Reason: failed to read credit-balance cache for workspace ' + workspaceId + '.',
             caught,
         );
+
         return null;
     }
 }
@@ -176,6 +181,7 @@ export function makeCachedResult(result: CreditFetchResult): CreditFetchResult {
     if (isMissingBalance) {
         return result;
     }
+
     return {
         outcome: CreditFetchOutcomeType.ApiCacheHit,
         balance: result.balance,

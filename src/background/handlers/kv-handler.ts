@@ -33,6 +33,7 @@ export function bindKvDbManager(manager: DbManager): void {
 function getDb(): SqlJsDatabase {
     const isMissingDbManager = !dbManager;
     if (isMissingDbManager) throw new Error("[kv] DbManager not bound");
+
     return dbManager.getLogsDb();
 }
 
@@ -59,6 +60,7 @@ export async function handleKvGet(
     const value = result.length > 0 && result[0].values.length > 0
         ? String(result[0].values[0][0])
         : null;
+
     return { value };
 }
 
@@ -82,6 +84,7 @@ export async function handleKvSet(
         [projectId, key, stringified],
     );
     markDirty();
+
     return { isOk: true };
 }
 
@@ -99,6 +102,7 @@ export async function handleKvDelete(
     const db = getDb();
     db.run("DELETE FROM ProjectKv WHERE ProjectId = ? AND Key = ?", [projectId, key]);
     markDirty();
+
     return { isOk: true };
 }
 
@@ -121,6 +125,7 @@ export async function handleKvList(
         entries.push({ key: String(row.Key), value: String(row.Value) });
     }
     stmt.free();
+
     return { entries };
 }
 

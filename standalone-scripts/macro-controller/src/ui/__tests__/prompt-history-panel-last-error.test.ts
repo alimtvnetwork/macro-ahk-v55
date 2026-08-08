@@ -50,6 +50,7 @@ async function openEmptyPanel(): Promise<void> {
 
 function makeFile(size: number, name = 'huge.json', type = 'application/json'): File {
   const bytes = new Uint8Array(size);
+
   return new File([bytes], name, { type });
 }
 

@@ -120,6 +120,7 @@ function shouldSkipProbe(
     if (probeInFlight.has(tabId)) return true;
 
     lastProbedFingerprint.set(tabId, fp);
+
     return false;
 }
 
@@ -137,6 +138,7 @@ async function handleHistoryStateUpdated(
         // from lovable.dev home to /projects/xxx). webNavigation.onCompleted
         // does NOT fire on pushState, so delegate to the auto-injection pipeline.
         await delegateToAutoInjector(tabId, details.url);
+
         return;
     }
 
@@ -149,7 +151,6 @@ async function handleHistoryStateUpdated(
         probeInFlight.delete(tabId);
     }
 }
-
 
 /* ------------------------------------------------------------------ */
 /*  Marker Probe                                                       */
@@ -176,6 +177,7 @@ async function probeAndReinject(tabId: number): Promise<void> {
 
     if (markersExist) {
         logMarkersIntact(tabId);
+
         return;
     }
 

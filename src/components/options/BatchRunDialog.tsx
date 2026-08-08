@@ -79,11 +79,13 @@ function move<T>(values: ReadonlyArray<T>, from: number, to: number): T[] {
     if (to < 0 || to >= values.length) return values.slice();
     const next = values.slice();
     [next[from], next[to]] = [next[to], next[from]];
+
     return next;
 }
 
 function formatDuration(ms: number): string {
     if (ms < 1000) return `${ms} ms`;
+
     return `${(ms / 1000).toFixed(2)} s`;
 }
 
@@ -107,9 +109,11 @@ async function applyInputSnapshot(args: MergeSnapshotArgs): Promise<boolean> {
     if (!snapshot.Result.Ok) {
         if (!snapshot.Result.Continue) {
             toast.error(`Input source failed: ${snapshot.Result.Error}. Run aborted.`);
+
             return false;
         }
         toast.warning(`Input source failed: ${snapshot.Result.Error}. Continuing with local inputs.`);
+
         return true;
     }
     if (snapshot.Result.Skipped || snapshot.Bag === null) return true;
@@ -120,6 +124,7 @@ async function applyInputSnapshot(args: MergeSnapshotArgs): Promise<boolean> {
     }
     const keyCount = Object.keys(incoming).length;
     toast.success(`Input source: merged ${keyCount} key(s) into ${args.order.length} group(s)`);
+
     return true;
 }
 
@@ -189,6 +194,7 @@ function BatchToolbar({
     running: boolean;
 }) {
     const completed = summary.Succeeded + summary.Failed + summary.Skipped;
+
     return (
         <div className="flex items-center justify-between gap-4 rounded-md border bg-muted/30 px-3 py-2 text-sm">
             <div className="flex items-center gap-3 text-muted-foreground">
@@ -367,6 +373,7 @@ function useBatchRunState(open: boolean, initialOrder: ReadonlyArray<number>): B
             setLiveMode(false);
         }
     }, [open, initialOrder]);
+
     return {
         order, setOrder, reports, setReports, running, setRunning,
         continueOnFailure, setContinueOnFailure, liveMode, setLiveMode,
@@ -396,11 +403,15 @@ function reportBatchOutcome(result: {
 
 async function executeBatch(args: HandleRunArgs): Promise<void> {
     const { db, projectId, state: s, policy, groupsById, groupInputs, onApplyMergedInput } = args;
-    if (db === null || projectId === null) { toast.error("Library not ready"); return; }
+    if (db === null || projectId === null) { toast.error("Library not ready");
+
+ return; }
     if (s.order.length === 0) return;
     s.setRunning(true);
     const proceed = await applyInputSnapshot({ order: s.order, groupInputs, onApplyMergedInput });
-    if (!proceed) { s.setRunning(false); return; }
+    if (!proceed) { s.setRunning(false);
+
+ return; }
     s.setReports(s.order.map((id) => emptyReport(id)));
     const live: BatchGroupReport[] = s.order.map((id) => emptyReport(id));
     const executor: LeafStepExecutor = s.liveMode
@@ -430,6 +441,7 @@ function BatchRunBody({ s, groupsById, summary, flatTrace, handleRun, onClose }:
     onClose: () => void;
 }) {
     const showSummary = s.lastRunDurationMs !== null && !s.running;
+
     return (
         <>
             <DialogHeader>
@@ -475,6 +487,7 @@ export default function BatchRunDialog(props: BatchRunDialogProps) {
     const summary = useMemo(() => {
         const counts = { Succeeded: 0, Failed: 0, Skipped: 0, Running: 0, Pending: 0 };
         for (const r of s.reports) counts[r.Status]++;
+
         return counts;
     }, [s.reports]);
     const flatTrace = useMemo<ReadonlyArray<RunStepTraceEntry>>(() => {
@@ -483,8 +496,10 @@ export default function BatchRunDialog(props: BatchRunDialogProps) {
             const trace = r.Result?.Trace;
             if (trace !== undefined) out.push(...trace);
         }
+
         return out;
     }, [s.reports]);
+
     return (
         <Dialog open={open} onOpenChange={(o) => { if (!s.running) onOpenChange(o); }}>
             <DialogContent className="max-w-2xl">

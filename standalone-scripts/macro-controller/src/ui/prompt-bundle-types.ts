@@ -110,7 +110,6 @@ function assignStringFields(entry: PromptEntry, raw: Record<string, unknown>): v
   for (const key of keys) {
     if (typeof raw[key as string] === 'string') {
       (entry as unknown as Record<string, unknown>)[key as string] = raw[key as string];
-
     }
   }
 }
@@ -141,10 +140,9 @@ function coercePromptEntry(raw: Record<string, unknown>): PromptEntry | null {
   }
   const rawRole = raw['role'];
   if (isPromptRole(rawRole)) entry.role = rawRole;
+
   return entry;
 }
-
-
 
 /** Validate the top-level envelope fields (id, versions, timestamps). */
 function validateEnvelopeFields(value: Record<string, unknown>): string[] {
@@ -156,6 +154,7 @@ function validateEnvelopeFields(value: Record<string, unknown>): string[] {
   if (typeof exporterVersion !== 'string' || !SEMVER_RE.test(exporterVersion)) {
     errors.push('exporterVersion must be semver (e.g. 4.34.0 or 0.0.0-dev)');
   }
+
   return errors;
 }
 
@@ -166,16 +165,19 @@ function validateEntries(rawEntries: unknown[]): { entries: PromptEntry[]; error
   rawEntries.forEach((raw, index) => {
     if (!isPlainObject(raw)) {
       errors.push(`entries[${index}] is not an object`);
+
       return;
     }
     const entry = coercePromptEntry(raw);
     const isMissingEntry = !entry;
     if (isMissingEntry) {
       errors.push(`entries[${index}] missing required name/text`);
+
       return;
     }
     entries.push(entry);
   });
+
   return { entries, errors };
 }
 
@@ -188,6 +190,7 @@ export function validatePromptsBundle(value: unknown): BundleValidationResult {
   const rawEntries = value['entries'];
   if (!Array.isArray(rawEntries)) {
     errors.push('entries must be an array');
+
     return { isValid: false, bundle: null, errors };
   }
   const { entries, errors: entryErrors } = validateEntries(rawEntries);
@@ -219,9 +222,9 @@ export function validatePromptsBundle(value: unknown): BundleValidationResult {
     const orderStrings = rawOrder.filter((v): v is string => typeof v === 'string' && v.length > 0);
     if (orderStrings.length > 0) bundle.promptOrder = orderStrings;
   }
+
   return { isValid: true, bundle, errors: [] };
 }
-
 
 /** Coerce an unknown `revisions` array into typed `BundleRevisionRow[]`.
  * Silently drops malformed rows: revisions are optional metadata, so a
@@ -239,6 +242,7 @@ function coerceBundleRevisionRow(item: Record<string, unknown>): BundleRevisionR
   const reason = typeof item['Reason'] === 'string' ? item['Reason'] : 'import';
   if (!slug || !name || !isPromptRole(role)) return null;
   if (!Number.isFinite(createdAt)) return null;
+
   return { Slug: slug, Name: name, Body: body, Role: role, ReplaceKey: rk, ReplaceValues: rv, CreatedAt: createdAt, Reason: reason };
 }
 
@@ -249,9 +253,9 @@ function coerceBundleRevisions(raw: unknown[]): BundleRevisionRow[] {
     const row = coerceBundleRevisionRow(item);
     if (row) out.push(row);
   }
+
   return out;
 }
-
 
 /** Generate a UUIDv4. Prefers `crypto.randomUUID`, falls back to a hand-rolled v4. */
 function newBundleId(): string {
@@ -262,6 +266,7 @@ function newBundleId(): string {
   bytes[6] = (bytes[6] & 0x0f) | 0x40;
   bytes[8] = (bytes[8] & 0x3f) | 0x80;
   const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
@@ -301,5 +306,6 @@ export function buildPromptsBundle(
   if (options.promptOrder && options.promptOrder.length > 0) {
     bundle.promptOrder = options.promptOrder.slice();
   }
+
   return bundle;
 }

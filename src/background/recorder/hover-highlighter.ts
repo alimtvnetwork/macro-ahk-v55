@@ -52,6 +52,7 @@ function closestByClassToken(el: Element, tokens: ReadonlyArray<string>): Elemen
         }
         current = current.parentElement;
     }
+
     return null;
 }
 
@@ -65,6 +66,7 @@ function closestFlexOrGrid(el: Element): Element | null {
         if (isFlexOrGrid && hasMultipleChildren) return current;
         current = current.parentElement;
     }
+
     return null;
 }
 
@@ -79,6 +81,7 @@ export function nthAncestor(el: Element, depth: number): Element {
         current = current.parentElement;
         remaining--;
     }
+
     return current;
 }
 
@@ -153,6 +156,7 @@ export function mountHoverHighlighter(
     const schedulePaint = createPaintScheduler(nodes, state, doc);
     const handlers = createHighlighterHandlers(nodes.host, state, schedulePaint);
     attachHighlighterListeners(doc, handlers);
+
     return buildHighlighterHandle(nodes.host, state, schedulePaint, doc, handlers);
 }
 
@@ -170,6 +174,7 @@ function buildHighlighterNodes(doc: Document): HighlighterNodes {
     appendHighlighterStyle(doc, root);
     const { primaryEl, groupEl, chipEl } = createHighlighterOverlays(doc);
     root.append(groupEl, primaryEl, chipEl);
+
     return { host, primaryEl, groupEl, chipEl };
 }
 
@@ -188,6 +193,7 @@ function createHighlighterOverlays(doc: Document): {
     primaryEl.className = "outline-primary hidden";
     const chipEl = doc.createElement("div");
     chipEl.className = "chip hidden";
+
     return { primaryEl, groupEl, chipEl };
 }
 
@@ -198,6 +204,7 @@ function createPaintScheduler(
         state.RafToken = null;
         renderHighlighter(nodes, state);
     };
+
     return () => {
         if (state.RafToken !== null) { return; }
         const win = doc.defaultView;
@@ -210,6 +217,7 @@ function renderHighlighter(nodes: HighlighterNodes, state: InternalState): void 
     const target = state.HoverTarget;
     if (target === null || state.OperationModeType === "off") {
         hideHighlighterNodes(nodes);
+
         return;
     }
     const resolved = nthAncestor(target, state.AncestorOffset);
@@ -365,5 +373,6 @@ export function describeElement(el: Element, depthOffset: number): string {
         ? "." + el.className.trim().split(/\s+/).slice(0, 3).join(".")
         : "";
     const depth = depthOffset > 0 ? `  · depth +${depthOffset}` : "";
+
     return `${tag}${id}${cls}${depth}`;
 }

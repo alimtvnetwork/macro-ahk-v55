@@ -91,6 +91,7 @@ function CreateGroupDialog(props: {
 }): JSX.Element {
     const { state, setState, onSubmit } = props;
     const title = state.parent === null ? "Create top-level group" : "Create child group";
+
     return (
         <Dialog open={state.open} onOpenChange={(open) => setState((p) => ({ ...p, open }))}>
             <DialogContent>
@@ -134,6 +135,7 @@ function RenameGroupDialog(props: {
     readonly onSubmit: () => void;
 }): JSX.Element {
     const { state, setState, onSubmit } = props;
+
     return (
         <Dialog open={state.open} onOpenChange={(open) => setState((p) => ({ ...p, open }))}>
             <DialogContent>
@@ -174,6 +176,7 @@ function DeleteGroupDialog(props: {
     readonly onConfirm: () => void;
 }): JSX.Element {
     const { state, setState, onConfirm } = props;
+
     return (
         <AlertDialog open={state.open} onOpenChange={(open) => setState((p) => ({ ...p, open }))}>
             <AlertDialogContent>
@@ -203,6 +206,7 @@ function DeleteGroupDialog(props: {
 function renderDeleteStepBody(state: DeleteStepDialogState): string {
     if (state.step === null) return "No step selected.";
     const label = state.step.LabelType ?? `Step #${state.step.StepId}`;
+
     return `"${label}" will be removed from this group. This cannot be undone.`;
 }
 
@@ -213,6 +217,7 @@ function DeleteStepConfirmDialog(props: {
 }): JSX.Element {
     const { state, setState, onConfirm } = props;
     const bodyText = renderDeleteStepBody(state);
+
     return (
         <AlertDialog open={state.open} onOpenChange={(open) => setState((p) => ({ ...p, open }))}>
             <AlertDialogContent>
@@ -238,6 +243,7 @@ function DeleteStepConfirmDialog(props: {
 
 function CrudDialogGroup(props: LibraryDialogsProps): JSX.Element {
     const { state, viewModel, mutations, lib } = props;
+
     return (
         <>
             <CreateGroupDialog
@@ -274,6 +280,7 @@ function CrudDialogGroup(props: LibraryDialogsProps): JSX.Element {
 
 function RunAndSettingsDialogGroup(props: LibraryDialogsProps): JSX.Element {
     const { state, viewModel, lib } = props;
+
     return (
         <>
             <BatchRunDialog
@@ -309,6 +316,7 @@ function RunAndSettingsDialogGroup(props: LibraryDialogsProps): JSX.Element {
 
 function BundleDialogGroup(props: LibraryDialogsProps): JSX.Element {
     const { importApi, exportImport } = props;
+
     return (
         <>
             <ImportErrorDialog
@@ -349,6 +357,7 @@ function BundleDialogGroup(props: LibraryDialogsProps): JSX.Element {
 
 function StepDialogGroup(props: LibraryDialogsProps): JSX.Element {
     const { state, lib, mutations } = props;
+
     return (
         <>
             <GroupInputsDialog

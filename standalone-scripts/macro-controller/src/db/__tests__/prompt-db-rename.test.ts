@@ -20,6 +20,7 @@ vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({ sendToExtension:
 vi.mock('../extension-bridge', () => ({ sendToExtension: sendMock }));
 vi.mock('../prompt-role-db', async () => {
     const actual = await vi.importActual<Record<string, unknown>>('../prompt-role-db');
+
     return { ...actual };
 });
 

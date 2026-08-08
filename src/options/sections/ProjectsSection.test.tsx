@@ -9,7 +9,6 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { ProjectsSection } from "@/options/sections/ProjectsSection";
 import { flushEffects } from "@/test/support";
 
-
 describe("ProjectsSection", () => {
     it("renders without crashing", async () => {
         const { container } = render(<ProjectsSection />);

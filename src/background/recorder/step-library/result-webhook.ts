@@ -131,6 +131,7 @@ export function isWebhookFailure(r: WebhookDeliveryResult): r is WebhookDelivery
 function safeLocalStorage(): Storage | null {
     try {
         if (typeof localStorage === "undefined") return null;
+
         return localStorage;
     } catch {
         return null;
@@ -158,6 +159,7 @@ function asEvent(v: unknown): WebhookEventKind {
     if (typeof v === "string" && (ALL_WEBHOOK_EVENTS as ReadonlyArray<string>).includes(v)) {
         return v as WebhookEventKind;
     }
+
     return "GroupRunSucceeded";
 }
 
@@ -188,6 +190,7 @@ export function loadWebhookConfig(): WebhookConfig {
                   .filter((e): e is string => typeof e === "string")
                   .filter((e): e is WebhookEventKind => (ALL_WEBHOOK_EVENTS as ReadonlyArray<string>).includes(e))
             : [...ALL_WEBHOOK_EVENTS];
+
         return {
             Enabled: asBool(parsed.Enabled, false),
             Url: asString(parsed.Url, ""),
@@ -216,6 +219,7 @@ export function saveWebhookConfig(config: WebhookConfig): WebhookConfig {
             logError("AutoCatch", "Unhandled exception", err);
         } // allow-swallow: localStorage quota / unavailable — config in-memory is authoritative this session
     }
+
     return normalized;
 }
 
@@ -285,6 +289,7 @@ function migrateSuccess(input: Record<string, unknown>, c: CommonMigratedFields)
 
 function migrateSkipped(input: Record<string, unknown>, c: CommonMigratedFields): WebhookDeliveryResult {
     const url = typeof input.Url === "string" ? input.Url : null;
+
     return {
         SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
         Kind: "skipped", Ok: true, Skipped: true,
@@ -296,6 +301,7 @@ function migrateSkipped(input: Record<string, unknown>, c: CommonMigratedFields)
 
 function migrateFailure(input: Record<string, unknown>, c: CommonMigratedFields): WebhookDeliveryResult {
     const status = typeof input.Status === "number" ? input.Status : null;
+
     return {
         SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
         Kind: "failure", Ok: false, Skipped: false,
@@ -306,7 +312,6 @@ function migrateFailure(input: Record<string, unknown>, c: CommonMigratedFields)
         DurationMs: c.DurationMs, EmittedAt: c.EmittedAt, Payload: c.Payload,
     };
 }
-
 
 /* ------------------------------------------------------------------ */
 /*  Delivery log                                                       */
@@ -321,6 +326,7 @@ function readLogRaw(): unknown[] {
         const isMissingRaw = !raw;
         if (isMissingRaw) return [];
         const parsed: unknown = JSON.parse(raw);
+
         return Array.isArray(parsed) ? parsed : [];
     } catch {
         return [];
@@ -372,6 +378,7 @@ export function repairDeliveryLog(): RepairReport {
         }
     }
     writeLog(kept);
+
     return { Removed: removed, Kept: kept.length, Errors: errors };
 }
 
@@ -409,6 +416,7 @@ export function buildGroupRunPayload(input: GroupRunPayloadInput): WebhookPayloa
     if (input.FailureReason !== undefined) out.FailureReason = input.FailureReason;
     if (input.FailedStepId !== undefined) out.FailedStepId = input.FailedStepId;
     if (input.IsTest) out.IsTest = true;
+
     return out;
 }
 
@@ -446,9 +454,11 @@ function substitute(template: string, payload: WebhookPayload, event: WebhookEve
         Event: event,
         Outcome: payload.Outcome ?? event,
     };
+
     return template.replace(/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g, (_m, key: string) => {
         const v = lookup[key];
         if (v === undefined || v === null) return "";
+
         return typeof v === "string" ? v : String(v);
     });
 }
@@ -481,11 +491,13 @@ export async function dispatchWebhook(
     const finalUrl = substitute(config.Url, payload, event);
     const headers = buildHeaders(config, payload, event);
     const body = JSON.stringify({ Event: event, Payload: payload, EmittedAt: emittedAt });
+
     return recordEntry(await performFetch(event, finalUrl, headers, body, config, emittedAt, payload));
 }
 
 function recordEntry<T extends WebhookDeliveryResult>(entry: T): T {
     appendLog(entry);
+
     return entry;
 }
 
@@ -496,6 +508,7 @@ function checkSkipReason(config: WebhookConfig, event: WebhookEventKind): string
     if (config.Events.length > 0 && !config.Events.includes(event)) {
         return `Event ${event} not subscribed`;
     }
+
     return null;
 }
 
@@ -527,6 +540,7 @@ function buildHeaders(
     if (config.SecretToken && config.SecretToken.trim().length > 0) {
         headers["X-Marco-Token"] = config.SecretToken;
     }
+
     return headers;
 }
 
@@ -547,12 +561,14 @@ async function performFetch(
         const res = ServiceResult.wrapFetch(await fetch(finalUrl, { method: "POST", headers, body, signal: controller.signal }));
         clearTimeout(timer);
         const durationMs = Date.now() - startedAt;
+
         return res.isSuccess
             ? buildSuccess(event, finalUrl, res.status, durationMs, emittedAt, payload)
             : buildHttpFailure(event, finalUrl, res.status, res.statusText, durationMs, emittedAt, payload);
     } catch (err) {
         clearTimeout(timer);
         const durationMs = Date.now() - startedAt;
+
         return buildErrorFailure(event, finalUrl, err, timeoutMs, durationMs, emittedAt, payload);
     }
 }
@@ -591,6 +607,7 @@ function buildErrorFailure(
     const message = aborted
         ? `Timeout after ${timeoutMs}ms`
         : err instanceof Error ? err.message : String(err);
+
     return {
         SchemaVersion: WEBHOOK_RESULT_SCHEMA_VERSION,
         Kind: "failure", Ok: false, Skipped: false,

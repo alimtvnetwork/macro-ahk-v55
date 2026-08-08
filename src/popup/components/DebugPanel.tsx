@@ -47,6 +47,7 @@ export function DebugPanel({ entries, isVisible, onClear }: DebugPanelProps) {
             const entry = entries.get(a);
             if (!entry) return `${a}: —`;
             if (entry.error === null) return `${a}: OK (${formatTime(entry.timestamp)})`;
+
             return `${a}: ERROR "${entry.error}" (${formatTime(entry.timestamp)})`;
         });
         const text = `Marco Debug Panel — ${new Date().toISOString()}\n${lines.join("\n")}`;

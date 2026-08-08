@@ -15,7 +15,6 @@ import { makeDraggable } from './ui/drag-window';
 import { loopCreditState } from './shared-state';
 import { inviteMemberMany, promoteMemberMany, demoteMemberMany, removeMemberMany, type MemberRole } from './ws-members-mutations';
 
-
 const PANEL_ID = 'marco-ws-bulk-members-panel';
 const Z_INDEX = 100003;
 
@@ -99,11 +98,13 @@ function renderBody(): void {
 
   if (activeState.loading) {
     body.innerHTML = '<div style="padding: 20px; text-align: center; color: #94a3b8;">⏳ Aggregating...</div>';
+
     return;
   }
 
   if (activeState.error) {
     body.innerHTML = `<div style="padding: 20px; color: #fca5a5; font-size: 12px;">❌ Error: ${activeState.error}</div>`;
+
     return;
   }
 
@@ -171,6 +172,7 @@ function showMemberRowContextMenu(member: AggregatedMember, x: number, y: number
             menu.remove();
             onClick();
         };
+
         return item;
     };
 
@@ -196,7 +198,6 @@ function showMemberRowContextMenu(member: AggregatedMember, x: number, y: number
     }, 10);
 }
 
-
 function renderMemberRow(m: AggregatedMember, totalWs: number): string {
   const isAll = m.presenceCount === totalWs;
   const badgeColor = isAll ? '#10b981' : '#f59e0b';
@@ -215,7 +216,6 @@ function renderMemberRow(m: AggregatedMember, totalWs: number): string {
     </div>
   `;
 }
-
 
 function renderFooter(): void {
   const footer = document.getElementById('bulk-members-footer');

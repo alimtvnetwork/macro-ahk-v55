@@ -36,6 +36,7 @@ function normalizePromptEntries(entries: Partial<PromptEntry & { order?: number 
       out.push(entry);
     }
   }
+
   return out;
 }
 
@@ -71,6 +72,7 @@ function findNextTasksPrompt(entries: PromptEntry[], targetSlug = 'next-tasks'):
     const name = (entry.name || '').toLowerCase();
     if (name.indexOf('next') !== -1 && name.indexOf('task') !== -1) return entry;
   }
+
   // NO FALLBACK to entries[0], return null
   return null;
 }

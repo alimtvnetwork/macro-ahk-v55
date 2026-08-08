@@ -88,7 +88,6 @@ export function setLoopWsLastCheckedIdx(v: number): void { wsSelectionState.last
 // ============================================
 export { SESSION_BRIDGE_KEYS } from './constants';
 
-
 class SessionBridgeState {
   private _source = '';
 

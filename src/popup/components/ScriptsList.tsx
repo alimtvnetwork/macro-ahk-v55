@@ -25,12 +25,14 @@ const HIDDEN_SCRIPT_PATHS = new Set(["combo-switch.js", "macro-controller.js"]);
 function normalizeScriptPath(path: string): string {
     const normalized = path.trim().toLowerCase().replace(/\\/g, "/");
     const fileName = normalized.split("/").pop() ?? normalized;
+
     return fileName.split(/[?#]/)[0] ?? fileName;
 }
 
 function isToggleableScript(script: ScriptEntry): boolean {
     const normalizedPath = normalizeScriptPath(script.path);
     const normalizedId = (script.id ?? "").trim().toLowerCase();
+
     return TOGGLEABLE_SCRIPT_PATHS.has(normalizedPath)
         || TOGGLEABLE_SCRIPT_IDS.has(normalizedId);
 }
@@ -42,12 +44,14 @@ function isHiddenScript(script: ScriptEntry): boolean {
 function resolveStatusIcon(status: string): string {
     if (status === "injected") return "✅";
     if (status === "failed") return "❌";
+
     return "⬚";
 }
 
 function resolveStatusClass(status: string): string {
     if (status === "injected") return "injected";
     if (status === "failed") return "failed";
+
     return "inactive";
 }
 

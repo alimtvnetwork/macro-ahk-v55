@@ -41,6 +41,7 @@ function buildTooltip(bag: TokenSeederDiagnosticsBag): string {
     const retryLine = nextRetryMs <= 0
         ? "Retrying on next poll."
         : `Next retry at ${formatRetryTimestamp(nextRetryAt)} (in ${formatRemaining(nextRetryMs)}).`;
+
     return (
         `${targets.length} tab(s) blocked Chrome scripting access.\n` +
         `Categories, ${summary || "Unknown"}.\n` +
@@ -56,6 +57,7 @@ function TokenSeederTriggerButton(props: {
     const { bag, open } = props;
     const { targets, nextRetryMs } = bag;
     const isReady = nextRetryMs <= 0;
+
     return (
         <button
             type="button"

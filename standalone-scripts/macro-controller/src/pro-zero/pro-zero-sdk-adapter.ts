@@ -25,6 +25,7 @@ function getSdk(stage: string): SdkBridge {
     if (!sdk || !sdk.api || !sdk.api.credits) {
         throwDiagnostic('PROZERO_ADAPTER_E001', { stage });
     }
+
     return sdk;
 }
 

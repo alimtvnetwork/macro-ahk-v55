@@ -30,6 +30,7 @@ function resolveProjectId(): string {
     logError("AutoCatch", "Unhandled exception", _e);
     logDebug('resolveProjectId', 'URL parse failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
+
   return '_default';
 }
 
@@ -41,9 +42,11 @@ function cacheKey(projectId: string, suffix: string): string {
 export function getCachedWorkspaceName(): string {
   try {
     const pid = resolveProjectId();
+
     return localStorage.getItem(cacheKey(pid, 'name')) || '';
   } catch (e) {
     logError('getCachedWsName', 'Failed to read cached workspace name', e);
+
     return '';
   }
 }
@@ -52,9 +55,11 @@ export function getCachedWorkspaceName(): string {
 export function getCachedWorkspaceId(): string {
   try {
     const pid = resolveProjectId();
+
     return localStorage.getItem(cacheKey(pid, 'id')) || '';
   } catch (e) {
     logError('getCachedWsId', 'Failed to read cached workspace ID', e);
+
     return '';
   }
 }

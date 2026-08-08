@@ -73,12 +73,14 @@ export function compareSelectorAttempts(
 ): SelectorComparison {
     const attempts = selectors.map((sel) => evaluateOne(sel, selectors, doc));
     sortAttempts(attempts);
+
     return summariseComparison(attempts);
 }
 
 function sortAttempts(attempts: SelectorAttemptComparison[]): void {
     attempts.sort((a, b) => {
         if (a.IsPrimary !== b.IsPrimary) { return a.IsPrimary ? -1 : 1; }
+
         return a.SelectorId - b.SelectorId;
     });
 }
@@ -89,6 +91,7 @@ function summariseComparison(
     const primary = attempts.find((a) => a.IsPrimary) ?? null;
     const primaryMatched = primary?.Matched ?? false;
     const anyFallbackMatched = attempts.some((a) => !a.IsPrimary && a.Matched);
+
     return {
         Attempts: attempts,
         PrimaryMatched: primaryMatched,
@@ -112,11 +115,13 @@ function evaluateOne(
     if (resolveOutcome.error !== null) {
         return failedAttempt(base, selector.Expression, resolveOutcome.error);
     }
+
     return tryLookupAttempt(base, selector.SelectorKindId, resolveOutcome.expression, doc);
 }
 
 function buildAttemptBase(selector: PersistedSelector): AttemptBase {
     const kind = SELECTOR_KIND_NAMES[selector.SelectorKindId] ?? `Kind${selector.SelectorKindId}`;
+
     return {
         SelectorId: selector.SelectorId,
         Kind: kind,
@@ -133,6 +138,7 @@ function resolveExpression(
     }
     try {
         const synthetic = withSyntheticPrimary(all, selector.SelectorId);
+
         return { expression: resolveStepSelector(synthetic).Expression, error: null };
     } catch (err) {
         return { expression: selector.Expression, error: errorMessage(err) };
@@ -150,6 +156,7 @@ function tryLookupAttempt(
 ): SelectorAttemptComparison {
     try {
         const { element, count } = lookup(kindId, resolved, doc);
+
         return successfulAttempt(base, resolved, element, count);
     } catch (err) {
         return failedAttempt(base, resolved, errorMessage(err));
@@ -195,6 +202,7 @@ function lookup(
         return xpathLookup(expression, doc);
     }
     const list = doc.querySelectorAll(expression);
+
     return { element: list.length > 0 ? list[0] : null, count: list.length };
 }
 
@@ -206,6 +214,7 @@ function xpathLookup(
     );
     const count = snapshot.snapshotLength;
     const first = count > 0 ? snapshot.snapshotItem(0) : null;
+
     return { element: first instanceof Element ? first : null, count };
 }
 
@@ -224,5 +233,6 @@ function readDomContext(element: Element): DomContext {
 
 function nonEmptyAttr(element: Element, name: string): string | null {
     const value = element.getAttribute(name);
+
     return value !== null && value.length > 0 ? value : null;
 }

@@ -38,6 +38,7 @@ vi.mock('../../db/project-chat-submit-db', () => ({
       Source: input.source, FileId: input.fileId, CharCount: input.charCount,
       CreatedAt: input.createdAt, MetaJson: input.metaJson,
     });
+
     return true;
   }),
   countChatSubmits: vi.fn(async (projectId: string) =>
@@ -52,6 +53,7 @@ vi.mock('../../db/project-chat-submit-db', () => ({
     const idx = rows.findIndex((r) => r.Id === id);
     if (idx < 0) return false;
     rows.splice(idx, 1);
+
     return true;
   }),
   renameProjectChatSubmits: vi.fn(async (projectId: string, newName: string) => {
@@ -59,13 +61,16 @@ vi.mock('../../db/project-chat-submit-db', () => ({
     for (const row of rows) {
       if (row.ProjectId === projectId) { row.ProjectName = newName; updated++; }
     }
+
     return updated > 0;
   }),
 }));
 
 vi.mock('../../storage/chat-submit-opfs-store', () => ({
   writeEntry: vi.fn(async (projectId: string, fileId: string, body: string) => {
-    blobs.set(`${projectId}/${fileId}`, body); return true;
+    blobs.set(`${projectId}/${fileId}`, body);
+
+ return true;
   }),
   readEntry: vi.fn(async (projectId: string, fileId: string) =>
     blobs.get(`${projectId}/${fileId}`) ?? null),

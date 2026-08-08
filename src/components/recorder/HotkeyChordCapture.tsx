@@ -47,6 +47,7 @@ function eventToChord(e: KeyboardEvent): string | null {
     if (key === " ") { key = "Space"; }
     if (key.length === 1) { key = key.toUpperCase(); }
     parts.push(key);
+
     return parts.join("+");
 }
 
@@ -68,6 +69,7 @@ export function HotkeyChordCapture(props: HotkeyChordCaptureProps): JSX.Element 
             e.preventDefault();
             setActive(false);
             boxRef.current?.blur();
+
             return;
         }
         if (e.key === "Backspace" && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey && value.length > 0) {
@@ -75,6 +77,7 @@ export function HotkeyChordCapture(props: HotkeyChordCaptureProps): JSX.Element 
             // otherwise allow "Ctrl+Backspace" etc. to be captured.
             e.preventDefault();
             onChange(value.slice(0, -1));
+
             return;
         }
         const chord = eventToChord(e);
@@ -90,6 +93,7 @@ export function HotkeyChordCapture(props: HotkeyChordCaptureProps): JSX.Element 
         const box = boxRef.current;
         if (box === null) { return; }
         box.addEventListener("keydown", onKeyDown);
+
         return () => box.removeEventListener("keydown", onKeyDown);
     }, [active, onKeyDown]);
 
@@ -109,6 +113,7 @@ export function HotkeyChordCapture(props: HotkeyChordCaptureProps): JSX.Element 
             boxRef.current?.blur();
         };
         document.addEventListener("pointerdown", onPointerDown, true);
+
         return () => document.removeEventListener("pointerdown", onPointerDown, true);
     }, [active]);
 

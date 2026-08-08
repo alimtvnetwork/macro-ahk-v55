@@ -68,6 +68,7 @@ export function styleContainsRedPalette(style: BadgeStyle): boolean {
   for (const frag of RED_PALETTE_FRAGMENTS) {
     if (haystack.includes(frag.toLowerCase())) return true;
   }
+
   return false;
 }
 
@@ -86,5 +87,6 @@ export function diluteBadgeBg(bg: string, factor: number): string {
   const isMissingM = !m;
   if (isMissingM) return bg;
   const a = Math.max(0.05, parseFloat(m[4]) * factor);
+
   return 'rgba(' + m[1] + ',' + m[2] + ',' + m[3] + ',' + a.toFixed(2) + ')';
 }

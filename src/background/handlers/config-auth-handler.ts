@@ -108,6 +108,7 @@ async function resolveSessionCookieNamesFromProjects(_projectId?: string | null)
             "Project cookie bindings unavailable — falling back to default candidate name lists",
             bindingsErr instanceof Error ? bindingsErr : String(bindingsErr),
         );
+
         return {
             sessionNames: SESSION_COOKIE_NAME_CANDIDATES,
             refreshNames: REFRESH_COOKIE_NAME_CANDIDATES,
@@ -199,7 +200,7 @@ export function getConfigFetchStatus() {
  * Network auth-token exchange is intentionally disabled to avoid noisy 401s.
  * See root-cause: spec/22-app-issues/80-auth-token-bridge-null-on-preview.md
  */
-// eslint-disable-next-line max-lines-per-function
+ 
 export async function handleGetToken(
     _projectId?: string,
     tabUrlHint?: string,
@@ -235,10 +236,12 @@ export async function handleGetToken(
 
     if (sessionLookup.value !== null) {
         logBgWarnError(BgLogTag.CONFIG_AUTH, "GET_TOKEN: session cookie exists but no JWT could be derived");
+
         return { token: null, refreshed: false, errorMessage: "Session cookie exists, but JWT cookie/localStorage lookup failed." };
     }
 
     const cookieDiscovery = await discoverAuthCookieNames(primaryUrl);
+
     return { token: null, refreshed: false, errorMessage: buildMissingCookieMessage(cookieDiscovery, resolvedCookieNames.sessionNames, resolvedCookieNames.refreshNames) };
 }
 
@@ -248,8 +251,10 @@ async function tryStrategy1DirectCookie(names: string[], url: string): Promise<{
         console.log("[config-auth] GET_TOKEN: found JWT directly in session cookie");
         cachedSessionId = lookup.value;
         cachedAt = Date.now();
+
         return { token: lookup.value, refreshed: true, cookieName: lookup.cookieName ?? COOKIE_SESSION_ID };
     }
+
     return null;
 }
 
@@ -259,8 +264,10 @@ async function tryStrategy2LocalStorage(hint?: string): Promise<{ token: string;
         console.log("[config-auth] GET_TOKEN: found JWT in platform tab localStorage");
         cachedSessionId = jwt;
         cachedAt = Date.now();
+
         return { token: jwt, refreshed: true, cookieName: "localStorage[sb-*-auth-token]" };
     }
+
     return null;
 }
 
@@ -270,8 +277,10 @@ async function tryStrategy3SignedUrl(hint?: string, url?: string): Promise<{ tok
         console.log("[config-auth] GET_TOKEN: using signed URL token fallback");
         cachedSessionId = token;
         cachedAt = Date.now();
+
         return { token, refreshed: true, cookieName: "signedUrl[__lovable_token]" };
     }
+
     return null;
 }
 
@@ -281,8 +290,10 @@ async function tryStrategy4Exchange(projectId: string, sessionLookup: any, refre
         console.log("[config-auth] GET_TOKEN: exchanged opaque session cookie for JWT");
         cachedSessionId = exchangeToken;
         cachedAt = Date.now();
+
         return { token: exchangeToken, refreshed: true, cookieName: "auth-token-exchange" };
     }
+
     return null;
 }
 
@@ -381,6 +392,7 @@ export async function handleRefreshToken(
     }
 
     const cookieDiscovery = await discoverAuthCookieNames(primaryUrl);
+
     return {
         sessionId,
         refreshToken,
@@ -415,13 +427,16 @@ async function attemptAutoRefresh(
             cachedSessionId = authToken;
             cachedAt = Date.now();
             console.log("[config-auth] Auto-refresh successful (cookie/localStorage)");
+
             return authToken;
         }
 
         logBgWarnError(BgLogTag.CONFIG_AUTH, "Auto-refresh returned no token");
+
         return null;
     } catch (refreshError) {
         logRefreshError(refreshError);
+
         return null;
     } finally {
         isRefreshing = false;
@@ -513,6 +528,7 @@ async function getActiveTabUrl(): Promise<string | null> {
             "chrome.tabs.query(active,currentWindow) failed — returning null URL",
             queryErr instanceof Error ? queryErr : String(queryErr),
         );
+
         return null;
     }
 }
@@ -605,6 +621,7 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
                     } catch (lsErr) {
                         logSampledDebug(BgLogTag.CONFIG_AUTH, "localStorage scan unavailable", "localStorage scan unavailable", lsErr instanceof Error ? lsErr : String(lsErr));
                     }
+
                     return null;
                 },
             });
@@ -651,6 +668,7 @@ async function resolvePrimaryUrl(tabUrlHint?: string): Promise<string> {
     }
 
     const activeTabUrl = await getActiveTabUrl();
+
     return activeTabUrl ?? COOKIE_URL;
 }
 
@@ -673,6 +691,7 @@ function extractSignedUrlTokenFromUrl(url: string | null | undefined): string | 
             "URL parse failed for signed-URL token extraction — input was not a valid URL",
             urlErr instanceof Error ? urlErr : String(urlErr),
         );
+
         return null;
     }
 }
@@ -692,6 +711,7 @@ async function resolveSignedUrlTokenCandidate(
     }
 
     const activeTabUrl = await getActiveTabUrl();
+
     return extractSignedUrlTokenFromUrl(activeTabUrl);
 }
 
@@ -715,13 +735,16 @@ async function fetchAuthTokenFromSessionExchange(
                 `HEFF: HTTP ${response.status} on GET ${url} — auth-token exchange failed; ` +
                 `do NOT retry. Loop halted. Awaiting user instruction.`,
             );
+
             return null;
         }
 
         const payload = await response.json() as unknown;
+
         return extractJwtFromAuthTokenPayload(payload);
     } catch (exchangeError) {
         logBgWarnError(BgLogTag.CONFIG_AUTH, "Auth-token exchange failed", exchangeError instanceof Error ? exchangeError : undefined);
+
         return null;
     }
 }

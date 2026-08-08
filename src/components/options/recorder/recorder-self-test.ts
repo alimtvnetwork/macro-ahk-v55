@@ -84,6 +84,7 @@ export async function runRecorderSelfTest(projectSlug: string): Promise<SelfTest
         // Best-effort cleanup; do not mask the original error.
         await deleteStep(projectSlug, insertedStepId).catch((cleanupErr: unknown) => {
             logError("recorderSelfTest.cleanup", `deleteStep failed for insertedStepId=${insertedStepId} during error-recovery cleanup — original error will still be rethrown`, cleanupErr);
+
             return undefined;
         });
         throw err;
@@ -114,6 +115,7 @@ async function insertDummyStep(projectSlug: string, variableName: string): Promi
         if (typeof response?.step?.StepId !== "number") {
             throw new Error("RECORDER_STEP_INSERT returned no StepId");
         }
+
         return response.step.StepId;
     } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
@@ -128,6 +130,7 @@ async function listSteps(projectSlug: string, phase: SelfTestPhase): Promise<Lis
             type: "RECORDER_STEP_LIST" as any,
             projectSlug,
         });
+
         return response?.steps ?? [];
     } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);

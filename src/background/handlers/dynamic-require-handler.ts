@@ -54,6 +54,7 @@ export async function handleDynamicRequire(
 
     if (!target || !requesterProjectId || !tabId) {
         logDynamicLoad(requesterProjectId ?? "unknown", target ?? "unknown", "error", "Missing required fields");
+
         return { isOk: false, errorMessage: "DYNAMIC_REQUIRE: missing target, requesterProjectId, or tabId" };
     }
 
@@ -64,12 +65,14 @@ export async function handleDynamicRequire(
     const isMissingRequester = !requester;
     if (isMissingRequester) {
         logDynamicLoad(requesterProjectId, target, "denied", "Requester project not found");
+
         return { isOk: false, errorMessage: `Requester project "${requesterProjectId}" not found` };
     }
 
     // --- Check allowDynamicRequests flag ---
     if (!requester.settings?.allowDynamicRequests) {
         logDynamicLoad(requesterProjectId, target, "denied", "allowDynamicRequests is disabled");
+
         return {
             isOk: false,
             errorMessage: `Project "${requester.name}" does not have allowDynamicRequests enabled`,
@@ -81,6 +84,7 @@ export async function handleDynamicRequire(
     const isMissingResolved = !resolved;
     if (isMissingResolved) {
         logDynamicLoad(requesterProjectId, target, "not_found", "Target project or script not found");
+
         return { isOk: false, errorMessage: `Cannot resolve target "${target}"` };
     }
 
@@ -89,6 +93,7 @@ export async function handleDynamicRequire(
     // --- Check isGlobal flag on target ---
     if (!targetProject.isGlobal && targetProject.id !== requesterProjectId) {
         logDynamicLoad(requesterProjectId, target, "denied", `Target project "${targetProject.name}" is not global`);
+
         return {
             isOk: false,
             errorMessage: `Project "${targetProject.name}" is not marked as global — cannot be dynamically loaded`,
@@ -101,6 +106,7 @@ export async function handleDynamicRequire(
         const isMissingCode = !code;
         if (isMissingCode) {
             logDynamicLoad(requesterProjectId, target, "error", "Script code is empty or not found");
+
             return { isOk: false, errorMessage: `Script code for "${target}" is empty or not found` };
         }
 
@@ -112,11 +118,13 @@ export async function handleDynamicRequire(
         logDynamicLoad(requesterProjectId, target, "loaded", `Injected into tab ${tabId}`);
 
         console.log("[dynamic-require] ✅ %s → %s injected successfully", requester.name, target);
+
         return { isOk: true, namespace };
     } catch (err) {
         const errMsg = err instanceof Error ? err.message : String(err);
         logDynamicLoad(requesterProjectId, target, "error", errMsg);
         logCaughtError(BgLogTag.DYNAMIC_REQUIRE, `${requester.name} → ${target} failed`, err);
+
         return { isOk: false, errorMessage: errMsg };
     }
 }
@@ -162,6 +170,7 @@ function resolveTarget(
 /** Finds a project by codeName, name, or slug (case-insensitive). */
 function findProject(name: string, projects: StoredProject[]): StoredProject | undefined {
     const lower = name.toLowerCase();
+
     return projects.find(
         (p) =>
             p.codeName?.toLowerCase() === lower ||
@@ -183,6 +192,7 @@ async function loadScriptCode(projectId: string, script: ScriptEntry): Promise<s
     try {
         const files = await getFilesByProject(projectId);
         const file = files.find((f: { path: string; content: string }) => f.path === script.path);
+
         return file?.content ?? null;
     } catch {
         return null;
@@ -209,7 +219,6 @@ function logDynamicLoad(
         } catch (err) {
             logError("AutoCatch", "Unhandled exception", err);
         }
-
 
         db.run(
             `INSERT INTO DynamicLoadLog (Timestamp, Requester, Target, Status, Detail, ExtVersion)

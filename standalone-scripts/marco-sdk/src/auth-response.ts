@@ -139,6 +139,7 @@ function decodeBase64Url(value: string): string | null {
     try {
         const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
         const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+
         return atob(padded);
     } catch {
         return null;
@@ -162,6 +163,7 @@ export function decodeJwtPayload(token: string | null): Record<string, unknown> 
 
     try {
         const parsed = JSON.parse(decoded) as unknown;
+
         return isRecord(parsed) ? parsed : null;
     } catch {
         return null;

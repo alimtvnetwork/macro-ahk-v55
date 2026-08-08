@@ -34,6 +34,7 @@ async function handleRename(projectId: string, oldName: string | null, newName: 
     // to persist). Log for visibility and skip — never overwrite a
     // known name with null.
     logError(SCOPE, `skip: newName is null (projectId=${projectId}, oldName=${oldName ?? 'null'})`);
+
     return;
   }
   const isRenamed = await renameProjectChatSubmits(projectId, newName);

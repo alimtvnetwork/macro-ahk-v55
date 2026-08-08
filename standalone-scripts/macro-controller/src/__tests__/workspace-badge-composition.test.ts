@@ -44,6 +44,7 @@ function buildBadgeFragment(status: WorkspaceStatus, ws: WorkspaceCredit): strin
   const display = classifyFromStatus(status, ws);
   if (display.kind === 'normal' || !display.label) return '';
   const style = resolveBadgeStyle(display.tone);
+
   return '[' + display.kind + '|' + display.label + '|' + style.fg + '|' + style.bg + ']';
 }
 

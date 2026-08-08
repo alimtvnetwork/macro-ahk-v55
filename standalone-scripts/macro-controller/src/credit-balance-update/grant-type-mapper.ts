@@ -35,6 +35,7 @@ export function mapGrantTypeFromWire(wireGrantType: string | null | undefined): 
                 LOG_SCOPE,
                 '[CODE RED] Unknown credit grant type. Path: standalone-scripts/macro-controller/src/credit-balance-update/grant-type-mapper.ts. Missing item: GrantType enum mapping for wire grant_type "' + normalized + '". Reason: preserving row as GrantType.Unknown so totals continue without unsafe assumptions.',
             );
+
             return GrantType.Unknown;
     }
 }

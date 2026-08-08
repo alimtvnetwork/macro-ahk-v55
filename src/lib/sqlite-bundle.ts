@@ -20,6 +20,7 @@ import type JSZipType from "jszip";
 /** Lazy JSZip loader — keeps ~95 kB out of the options/popup chunk until import/export runs. */
 async function loadJSZip(): Promise<typeof JSZipType> {
   const mod = await import("jszip");
+
   return mod.default;
 }
 import { sendMessage } from "@/lib/message-client";
@@ -190,18 +191,19 @@ const CREATE_PROMPTS_TO_CATEGORY_TABLE = `
   );
 `;
 
-
 /* ------------------------------------------------------------------ */
 /*  Init sql.js                                                        */
 /* ------------------------------------------------------------------ */
 
 async function initDb(): Promise<Database> {
   const SQL = await initSqlJs({ locateFile: () => WASM_URL });
+
   return new SQL.Database();
 }
 
 async function openDb(data: Uint8Array): Promise<Database> {
   const SQL = await initSqlJs({ locateFile: () => WASM_URL });
+
   return new SQL.Database(data);
 }
 
@@ -414,6 +416,7 @@ function parsePromptCategories(raw: Record<string, unknown>): string[] {
     seen.add(trimmed);
     out.push(trimmed);
   }
+
   return out;
 }
 
@@ -470,7 +473,6 @@ function insertPromptCategories(
   linkStmt.free();
 }
 
-
 // eslint-disable-next-line max-lines-per-function
 export async function exportAllAsSqliteZip(): Promise<void> {
   const [projRes, scriptsRes, configsRes, promptsRes] = await Promise.all([
@@ -489,6 +491,7 @@ export async function exportAllAsSqliteZip(): Promise<void> {
         const r = raw as unknown as Record<string, unknown>;
         const uid = String(r.id ?? "");
         rawPromptsByUid.set(uid, r);
+
         return {
           id: uid,
           slug: typeof r.slug === "string" ? r.slug : undefined,
@@ -716,6 +719,7 @@ function col(
   strict = false,
 ): SqlValue {
   if (strict) return rowObject[pascalName];
+
   return rowObject[pascalName] ?? rowObject[snakeName];
 }
 
@@ -726,6 +730,7 @@ function resolveUid(rowObject: Record<string, unknown>, strict = false): string 
   if (uid != null && String(uid) !== "") return String(uid);
   // Fallback for v3 bundles where Id was TEXT PK containing the runtime UUID
   const id = strict ? rowObject["Id"] : (rowObject["Id"] ?? rowObject["id"]);
+
   return String(id ?? "");
 }
 
@@ -749,6 +754,7 @@ function readDependenciesTable(db: Database): Map<string, Array<{ projectId: str
     list.push({ projectId: dependsOn, version });
     out.set(projectUid, list);
   }
+
   return out;
 }
 
@@ -779,6 +785,7 @@ function readVariablesTable(db: Database): Map<string, Record<string, unknown>> 
     map[name] = parsed;
     out.set(projectUid, map);
   }
+
   return out;
 }
 
@@ -797,6 +804,7 @@ function readProjects(db: Database, strict = false): StoredProject[] {
   const varsByProject = readVariablesTable(db);
 
   const cols = rows[0].columns;
+
   return rows[0].values.map((row: SqlValue[]) => {
     const rowObject = Object.fromEntries(cols.map((c: SqlValue, i: number) => [c, row[i]]));
     const projectUid = resolveUid(rowObject, strict);
@@ -813,6 +821,7 @@ function readProjects(db: Database, strict = false): StoredProject[] {
     const settings = varRows && schemaVersion >= 2
       ? { ...settingsFromBlob, variables: varRows }
       : settingsFromBlob;
+
     return {
       id: projectUid,
       schemaVersion,
@@ -845,8 +854,10 @@ function readScripts(db: Database, strict = false): StoredScript[] {
   if (!hasRows) return [];
 
   const cols = rows[0].columns;
+
   return rows[0].values.map((row: SqlValue[]) => {
     const rowObject = Object.fromEntries(cols.map((c: SqlValue, i: number) => [c, row[i]]));
+
     return {
       id: resolveUid(rowObject, strict),
       name: (col(rowObject, "Name", "name", strict) as string),
@@ -877,8 +888,10 @@ function readConfigs(db: Database, strict = false): StoredConfig[] {
   if (!hasRows) return [];
 
   const cols = rows[0].columns;
+
   return rows[0].values.map((row: SqlValue[]) => {
     const rowObject = Object.fromEntries(cols.map((c: SqlValue, i: number) => [c, row[i]]));
+
     return {
       id: resolveUid(rowObject, strict),
       name: (col(rowObject, "Name", "name", strict) as string),
@@ -907,6 +920,7 @@ function readPromptCategoriesTable(db: Database): Map<string, string[]> {
     list.push(name);
     out.set(uid, list);
   }
+
   return out;
 }
 
@@ -924,6 +938,7 @@ function readPrompts(db: Database, strict = false): PromptEntry[] {
     const catsByPromptUid = readPromptCategoriesTable(db);
 
     const cols = rows[0].columns;
+
     return rows[0].values.map((row: SqlValue[]) => {
       const rowObject = Object.fromEntries(cols.map((c: SqlValue, i: number) => [c, row[i]]));
       const uid = resolveUid(rowObject, strict);
@@ -934,6 +949,7 @@ function readPrompts(db: Database, strict = false): PromptEntry[] {
       const category = junctionCats && junctionCats.length > 0
         ? junctionCats.join(", ")
         : singularCategory;
+
       return {
         id: uid,
         // v5 — Slug column is now actually written. v4 bundles return
@@ -1081,6 +1097,7 @@ export async function importFromSqliteZip(
 ): Promise<ImportResult> {
   const { projects, scripts, configs, prompts } = await extractBundle(file, options);
   await replaceAll(projects, scripts, configs, prompts);
+
   return {
     projectCount: projects.length,
     scriptCount: scripts.length,
@@ -1096,6 +1113,7 @@ export async function mergeFromSqliteZip(
 ): Promise<ImportResult> {
   const { projects, scripts, configs, prompts } = await extractBundle(file, options);
   await mergeAll(projects, scripts, configs, prompts);
+
   return {
     projectCount: projects.length,
     scriptCount: scripts.length,
@@ -1129,6 +1147,7 @@ async function extractBundle(file: File, options?: ImportOptions) {
   // returns [] when absent, so older v4 bundles without Prompts still work.
   const prompts = readPrompts(db, strict);
   db.close();
+
   return { projects, scripts, configs, prompts };
 }
 
@@ -1235,6 +1254,7 @@ export async function exportPromptsAsSqliteZip(): Promise<void> {
         const r = raw as unknown as Record<string, unknown>;
         const uid = String(r.id ?? "");
         rawPromptsByUid.set(uid, r);
+
         return {
           id: uid,
           slug: typeof r.slug === "string" ? r.slug : undefined,
@@ -1288,6 +1308,7 @@ async function extractPromptsBundle(
   const prompts = readPrompts(db, strict);
   db.close();
   if (prompts.length === 0) throw new Error("No prompts found in bundle");
+
   return prompts;
 }
 
@@ -1324,6 +1345,7 @@ export async function mergePromptsFromSqliteZip(
   for (const p of prompts) {
     await sendMessage({ type: "SAVE_PROMPT", prompt: p });
   }
+
   return { promptCount: prompts.length };
 }
 

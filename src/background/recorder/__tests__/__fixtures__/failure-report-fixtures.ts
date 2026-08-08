@@ -116,6 +116,7 @@ function makeTargetElement(): Element {
     if (btn === null) {
         throw new Error("Fixture setup failed: <button> not found in jsdom.");
     }
+
     return btn;
 }
 
@@ -151,6 +152,7 @@ export function fixtureReplayZeroMatches(): FixtureBundle {
         Now: FIXTURE_NOW,
         FormSnapshot: null,
     };
+
     return {
         NonVerbose: buildFailureReport({ ...base, Verbose: false }),
         Verbose: buildFailureReport({ ...base, Verbose: true }),
@@ -174,6 +176,7 @@ export function fixtureReplayPrimaryDrift(): FixtureBundle {
         Now: FIXTURE_NOW,
         FormSnapshot: null,
     };
+
     return {
         NonVerbose: buildFailureReport({ ...base, Verbose: false }),
         Verbose: buildFailureReport({ ...base, Verbose: true }),
@@ -197,6 +200,7 @@ export function fixtureReplayVariableMissing(): FixtureBundle {
         Now: FIXTURE_NOW,
         FormSnapshot: null,
     };
+
     return {
         NonVerbose: buildFailureReport({ ...base, Verbose: false }),
         Verbose: buildFailureReport({ ...base, Verbose: true }),
@@ -222,6 +226,7 @@ export function fixtureRecordNoTarget(): FixtureBundle {
         Now: FIXTURE_NOW,
         FormSnapshot: null,
     };
+
     return {
         NonVerbose: buildFailureReport({ ...base, Verbose: false }),
         Verbose: buildFailureReport({ ...base, Verbose: true }),
@@ -253,6 +258,7 @@ export function fixtureReplayJsInlineThrew(): FixtureBundle {
         Now: FIXTURE_NOW,
         DataRow: { Email: "alice@example.com" },
     };
+
     return {
         NonVerbose: buildJsStepFailureReport({ ...base, Verbose: false }),
         Verbose: buildJsStepFailureReport({ ...base, Verbose: true }),

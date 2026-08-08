@@ -163,6 +163,7 @@ export function validateDatabaseName(name: string): NamespaceValidationResult {
   if (!/^[A-Z][a-zA-Z0-9]*$/.test(trimmed)) {
     return { valid: false, error: "Database name must be PascalCase (e.g. MyStore)" };
   }
+
   return { valid: true };
 }
 

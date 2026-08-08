@@ -57,6 +57,7 @@ const OSANO_PATTERNS = [
 function isOsanoRelatedError(error: InjectionError): boolean {
   const msg = (error.message ?? "").toLowerCase();
   const stack = (error.stack_trace ?? "").toLowerCase();
+
   return OSANO_PATTERNS.some((p) => msg.includes(p) || stack.includes(p));
 }
 
@@ -406,6 +407,7 @@ function formatErrorForCopy(error: InjectionError): string {
 function formatTime(timestamp: string): string {
   try {
     const d = new Date(timestamp);
+
     return d.toLocaleTimeString(undefined, {
       hour: "2-digit",
       minute: "2-digit",

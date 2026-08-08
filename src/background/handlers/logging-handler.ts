@@ -81,6 +81,7 @@ export function getLogsDb() {
     if (isMissingDb) {
         throw new Error("[logging] DbManager not bound. Call bindDbManager() first.");
     }
+
     return dbManager!.getLogsDb();
 }
 
@@ -91,6 +92,7 @@ export function getErrorsDb() {
     if (isMissingDb) {
         throw new Error("[logging] DbManager not bound. Call bindDbManager() first.");
     }
+
     return dbManager!.getErrorsDb();
 }
 
@@ -101,6 +103,7 @@ async function ensureSessionId(): Promise<number> {
     if (isMissingSession) {
         await startSession("0.0.0");
     }
+
     return currentSessionId!;
 }
 
@@ -130,6 +133,7 @@ export async function handleLogEntry(message: MessageRequest): Promise<OkRespons
     insertLogRow(payload, sessionId);
     void writeLogEntry(payload);
     dbManager!.markDirty();
+
     return { isOk: true };
 }
 
@@ -194,6 +198,7 @@ export async function handleLogError(message: MessageRequest): Promise<OkRespons
     const sessionId = await ensureSessionId();
     insertErrorRow(payload, sessionId);
     writeErrorEntry(payload);
+
     return { isOk: true };
 }
 
@@ -251,6 +256,7 @@ export function normalizeRow(row: SqlRow): Record<string, SqlValue> {
         // Also keep original key so nothing breaks if already camelCase
         if (camel !== key) out[key] = value;
     }
+
     return out;
 }
 
@@ -281,6 +287,7 @@ function queryRecentLogs(source?: string, limit?: number): SqlRow[] {
     if (hasSourceFilter) {
         return queryWithSource(db, source!, maxRows);
     }
+
     return queryAll(db, maxRows);
 }
 
@@ -343,6 +350,7 @@ function querySessionLogs(sessionId: string): SqlRow[] {
         "SELECT * FROM Logs WHERE SessionId = ? ORDER BY Timestamp ASC",
     );
     stmt.bind([sessionId]);
+
     return collectRows(stmt);
 }
 
@@ -353,6 +361,7 @@ function querySessionErrors(sessionId: string): SqlRow[] {
         "SELECT * FROM Errors WHERE SessionId = ? ORDER BY Timestamp ASC",
     );
     stmt.bind([sessionId]);
+
     return collectRows(stmt);
 }
 
@@ -363,6 +372,7 @@ function queryRecentLogsAll(limit: number): SqlRow[] {
         "SELECT * FROM Logs ORDER BY Timestamp DESC LIMIT ?",
     );
     stmt.bind([limit]);
+
     return collectRows(stmt);
 }
 
@@ -373,6 +383,7 @@ function queryRecentErrorsAll(limit: number): SqlRow[] {
         "SELECT * FROM Errors ORDER BY Timestamp DESC LIMIT ?",
     );
     stmt.bind([limit]);
+
     return collectRows(stmt);
 }
 

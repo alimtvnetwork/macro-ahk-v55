@@ -67,6 +67,7 @@ export function buildRepairReport(result: AutoRepairResult): RepairReportSummary
     checkedAt: result.finalReport.checkedAt,
   };
   if (result.reseedError) summary.reseedError = result.reseedError;
+
   return summary;
 }
 
@@ -76,7 +77,6 @@ function formatIssueLine(issue: PromptHealthIssue): string {
 
 // eslint-disable-next-line sonarjs/cognitive-complexity -- linear report formatter, complexity is from branch labels not logic
 export function formatRepairReportText(report: RepairReportSummary): string {
-
   const lines: string[] = [];
   const headline = report.isHealthy
     ? '✅ Prompts healthy after repair'
@@ -101,6 +101,7 @@ export function formatRepairReportText(report: RepairReportSummary): string {
     lines.push('➕ Newly flagged after repair (' + report.newlyFlagged.length + '):');
     for (const issue of report.newlyFlagged) lines.push(formatIssueLine(issue));
   }
+
   return lines.join('\n');
 }
 
@@ -136,7 +137,6 @@ export function stashRepairReport(report: RepairReportSummary): void {
  */
 // eslint-disable-next-line max-lines-per-function -- self-contained modal builder; splitting fragments DOM lifecycle
 export function showRepairReportModal(report: RepairReportSummary): HTMLElement | null {
-
   if (typeof document === 'undefined' || !document.body) return null;
 
   const backdrop = document.createElement('div');
@@ -212,6 +212,7 @@ export function showRepairReportModal(report: RepairReportSummary): HTMLElement 
   doneBtn.addEventListener('click', dismiss);
   backdrop.addEventListener('click', (event) => { if (event.target === backdrop) dismiss(); });
   document.addEventListener('keydown', onKey);
+
   return backdrop;
 }
 
@@ -227,6 +228,7 @@ function renderIssueList(heading: string, issues: PromptHealthIssue[], accent: s
     none.textContent = '(none)';
     none.style.cssText = 'font-size:12px;opacity:0.6;padding-left:12px;';
     wrap.appendChild(none);
+
     return wrap;
   }
   const list = document.createElement('ul');
@@ -241,5 +243,6 @@ function renderIssueList(heading: string, issues: PromptHealthIssue[], accent: s
     list.appendChild(li);
   }
   wrap.appendChild(list);
+
   return wrap;
 }

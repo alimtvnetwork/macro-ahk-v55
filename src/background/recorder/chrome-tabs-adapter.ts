@@ -3,6 +3,7 @@ import type { TabsAdapter, TabRef } from "./url-tab-click";
 export class ChromeTabsAdapter implements TabsAdapter {
     async listTabs(): Promise<ReadonlyArray<TabRef>> {
         const tabs = await (chrome.tabs as any).query({});
+
         return tabs.map((t: any) => ({
             Id: t.id!,
             Url: t.url || t.pendingUrl || "",
@@ -19,6 +20,7 @@ export class ChromeTabsAdapter implements TabsAdapter {
 
     async createTab(url: string): Promise<TabRef> {
         const tab = await (chrome.tabs as any).create({ url, active: true });
+
         return { Id: tab.id!, Url: tab.url || tab.pendingUrl || "" };
     }
 
@@ -36,6 +38,7 @@ export class ChromeTabsAdapter implements TabsAdapter {
             }
             await new Promise(resolve => setTimeout(resolve, 200));
         }
+
         return null;
     }
 }

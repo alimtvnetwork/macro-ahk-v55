@@ -29,6 +29,7 @@ export function ConfigSectionList({ sections, edits, saving, editKey, onEditChan
     setOpenSections((prev) => {
       const next = new Set(prev);
       if (next.has(s)) next.delete(s); else next.add(s);
+
       return next;
     });
   };

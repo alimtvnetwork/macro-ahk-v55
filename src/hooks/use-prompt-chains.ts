@@ -179,6 +179,7 @@ export function usePromptChains() {
 
                 state.isRunning = false;
                 setExecution({ ...state });
+
                 return;
             }
         }

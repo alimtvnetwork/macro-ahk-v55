@@ -46,6 +46,7 @@ const asMock = <T>(v: T) => v as unknown as Mock;
 
 function makeUpdateRecord(overrides?: Partial<PendingRestoreUndo>): PendingRestoreUndo {
     const now = Date.now();
+
     return {
         payload: {
             kind: 'update', restoredId: 7, restoredBody: 'NEW', restoredReplaceKey: 'n',

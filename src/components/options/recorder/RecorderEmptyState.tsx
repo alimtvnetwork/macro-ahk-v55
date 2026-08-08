@@ -105,5 +105,6 @@ function CauseIcon({ status }: { status: CauseStatus }): JSX.Element {
     if (status === "error") {
         return <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />;
     }
+
     return <Circle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />;
 }

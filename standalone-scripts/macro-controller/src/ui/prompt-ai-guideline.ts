@@ -79,6 +79,7 @@ export function buildAiGuidelineMarkdown(input: AiGuidelineInput): string {
             '',
         );
     }
+
     return lines.join('\n');
 }
 

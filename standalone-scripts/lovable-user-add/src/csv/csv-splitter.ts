@@ -32,6 +32,7 @@ interface SplitState {
 const handleQuote = (state: SplitState, next: string): void => {
     if (state.inQuotes && next === CHAR_QUOTE) {
         state.cell += CHAR_QUOTE;
+
         return;
     }
 
@@ -41,12 +42,14 @@ const handleQuote = (state: SplitState, next: string): void => {
 const handleChar = (state: SplitState, ch: string, next: string): void => {
     if (ch === CHAR_QUOTE) {
         handleQuote(state, next);
+
         return;
     }
 
     if (!state.inQuotes && ch === CHAR_COMMA) {
         state.row.push(state.cell);
         state.cell = "";
+
         return;
     }
 
@@ -54,6 +57,7 @@ const handleChar = (state: SplitState, ch: string, next: string): void => {
         state.row.push(state.cell);
         state.cell = "";
         state.row = finalizeRow(state.rows, state.row);
+
         return;
     }
 

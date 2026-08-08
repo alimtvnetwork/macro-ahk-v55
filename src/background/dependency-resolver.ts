@@ -45,6 +45,7 @@ function parseSemver(version: string): SemverParts | null {
     const match = version.match(/^(\d+)\.(\d+)\.(\d+)/);
     const isMissingMatch = !match;
     if (isMissingMatch) return null;
+
     return {
         major: parseInt(match[1], 10),
         minor: parseInt(match[2], 10),
@@ -154,6 +155,7 @@ export function resolveInjectionOrder(projects: ProjectNode[]): ResolutionResult
     queue.sort((a, b) => {
         const aGlobal = projectMap.get(a)?.isGlobal ? 0 : 1;
         const bGlobal = projectMap.get(b)?.isGlobal ? 0 : 1;
+
         return aGlobal - bGlobal;
     });
 
@@ -179,6 +181,7 @@ export function resolveInjectionOrder(projects: ProjectNode[]): ResolutionResult
         const missing = projects
             .filter((p) => !order.includes(p.id))
             .map((p) => p.id);
+
         return {
             order: [],
             isSuccess: false,

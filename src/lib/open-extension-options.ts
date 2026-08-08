@@ -33,6 +33,7 @@ function getChrome(): ChromeApiLike | null {
     const api = (globalThis as { chrome?: ChromeApiLike }).chrome;
     if (api === undefined) { return null; }
     if (api.runtime?.id === undefined) { return null; }
+
     return api;
 }
 
@@ -45,6 +46,7 @@ export function openExtensionOptions(): boolean {
     if (api?.runtime?.openOptionsPage !== undefined) {
         try {
             api.runtime.openOptionsPage();
+
             return true;
         } catch (err) {
             console.warn("[openExtensionOptions] openOptionsPage failed, falling back", err);
@@ -55,6 +57,7 @@ export function openExtensionOptions(): boolean {
         try {
             const url = api.runtime.getURL(EXTENSION_OPTIONS_PATH);
             void api.tabs.create({ url });
+
             return true;
         } catch (err) {
             console.warn("[openExtensionOptions] tabs.create failed, falling back", err);
@@ -63,6 +66,7 @@ export function openExtensionOptions(): boolean {
 
     if (typeof window !== "undefined") {
         const opened = window.open(PREVIEW_OPTIONS_PATH, "_blank", "noopener,noreferrer");
+
         return opened !== null;
     }
 

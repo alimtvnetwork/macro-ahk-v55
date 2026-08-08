@@ -71,6 +71,7 @@ const SPAN_COLOR_OPEN = '<span style="color:';
 
 function rowHtml(label: string, value: string, valueColor?: string): string {
   const color = valueColor || '#e2e8f0';
+
   return '<div style="display:flex;justify-content:space-between;gap:10px;padding:2px 0;font-size:11px;">'
     + SPAN_COLOR_OPEN + '#94a3b8;">' + escHtml(label) + '</span>'
     + SPAN_COLOR_OPEN + color + ';font-weight:600;">' + value + '</span>'
@@ -86,6 +87,7 @@ function pillHtml(status: WorkspaceStatus, ws?: WorkspaceCredit): string {
   const display = classifyFromStatus(status, ws || ({} as WorkspaceCredit));
   if (display.kind === 'normal' || !display.label) return '';
   const s = resolveBadgeStyle(display.tone);
+
   return '<span style="font-size:9px;color:' + s.fg
     + ';background:' + s.bg
     + ';border:1px solid ' + s.border
@@ -110,6 +112,7 @@ export function buildSubHeader(ws: WorkspaceCredit): string {
     parts.push(ws.numProjects + ' project' + (ws.numProjects === 1 ? '' : 's'));
   }
   if (ws.gitSyncEnabled) parts.push('Git Sync ✓');
+
   return '<div style="font-size:10px;color:#94a3b8;margin-bottom:4px;">' + parts.join(' · ') + '</div>';
 }
 
@@ -142,6 +145,7 @@ function buildCreditsSection(ws: WorkspaceCredit): string {
   if (summary.source !== 'Inline') {
     out.push(rowHtml('Source', summary.source));
   }
+
   return out.join('');
 }
 
@@ -170,6 +174,7 @@ function buildSubscriptionSection(ws: WorkspaceCredit): string {
     const suffix = days > 0 ? ' (' + formatDayCount(days) + ')' : '';
     out.push(rowHtml('Changed', date + suffix));
   }
+
   return out.join('');
 }
 
@@ -185,6 +190,7 @@ function pickRefillEstimateIso(ws: WorkspaceCredit): string {
 /** Build the highlighted "Next refill (in Nd)" row when in the warning window. */
 function activeRefillRow(status: WorkspaceStatus): string {
   if (status.kind !== KIND_ABOUT_TO_REFILL || !status.refillIso) return '';
+
   return rowHtml('Next refill',
     formatDateDDMMMYY(status.refillIso) + ' (in ' + formatDayCount(status.daysToRefill) + ')',
     '#bae6fd');
@@ -198,6 +204,7 @@ function estimatedRefillRow(ws: WorkspaceCredit, status: WorkspaceStatus, estima
   const days = daysUntil(estimateIso);
   const inSuffix = days > 0 ? ' (in ' + formatDayCount(days) + ')' : '';
   const sourceTag = ws.nextRefillAt ? '' : ' [from billing_period_end]';
+
   return rowHtml('Estimated next refill',
     formatDateDDMMMYY(estimateIso) + inSuffix + sourceTag);
 }
@@ -218,6 +225,7 @@ function warningStartRow(estimateIso: string, refillWarningDays: number): string
   } else if (refillMs > now) {
     suffix = ' (active now)';
   }
+
   return rowHtml('Warning starts on',
     warnDate + ' · −' + formatDayCount(refillWarningDays) + suffix);
 }
@@ -235,9 +243,9 @@ function buildRefillSection(
     warningStartRow(estimateIso, config.refillWarningThresholdDays),
   ].filter((s) => s.length > 0);
   if (rows.length === 0) return '';
+
   return sectionHeaderHtml('Refill') + rows.join('');
 }
-
 
 function expiryLabelFor(kind: WorkspaceStatus['kind']): string {
   if (kind === 'expired-canceled') return 'Canceled on';
@@ -245,6 +253,7 @@ function expiryLabelFor(kind: WorkspaceStatus['kind']): string {
   if (kind === 'about-to-expire') return LABEL_PAST_DUE_SINCE;
   if (kind === KIND_PAST_DUE_EXPIRING) return LABEL_PAST_DUE_SINCE;
   if (kind === 'expired') return 'Expired since';
+
   return 'Since';
 }
 
@@ -263,6 +272,7 @@ function buildExpirySection(ws: WorkspaceCredit, status: WorkspaceStatus): strin
   if (ws.billingPeriodEndAt) {
     out.push(rowHtml('Billing period ends', formatDateDDMMMYY(ws.billingPeriodEndAt)));
   }
+
   return out.join('');
 }
 
@@ -279,6 +289,7 @@ function buildPastDueSection(ws: WorkspaceCredit, status: WorkspaceStatus): stri
     out.push(rowHtml('Grants live until', formatDateDDMMMYY(ws.billingPeriodEndAt)));
   }
   out.push(rowHtml('Warning', 'Credits will be lost if unpaid', '#fca5a5'));
+
   return out.join('');
 }
 
@@ -287,6 +298,7 @@ function buildMetaSection(ws: WorkspaceCredit): string {
   const out: string[] = [sectionHeaderHtml('Meta')];
   if (ws.createdAt) out.push(rowHtml('Created', formatDateDDMMMYY(ws.createdAt)));
   if (ws.id) out.push(rowHtml('ID', escHtml(String(ws.id))));
+
   return out.join('');
 }
 
@@ -300,6 +312,7 @@ function buildThresholdsSection(config: WorkspaceLifecycleConfig): string {
   const out: string[] = [sectionHeaderHtml('Thresholds (active)')];
   out.push(rowHtml('Expiry grace', formatDayCount(config.expiryGracePeriodDays)));
   out.push(rowHtml('Refill warning', formatDayCount(config.refillWarningThresholdDays)));
+
   return out.join('');
 }
 
@@ -319,6 +332,7 @@ function traceLineHtml(matched: boolean, rule: string, descOrReason: string): st
   const iconColor = matched ? '#34d399' : '#64748b';
   const ruleColor = matched ? '#bbf7d0' : '#94a3b8';
   const textColor = matched ? '#e2e8f0' : '#94a3b8';
+
   return '<div style="display:flex;gap:6px;padding:1px 0;font-size:10px;line-height:1.4;">'
     + SPAN_COLOR_OPEN + iconColor + ';font-weight:700;flex-shrink:0;">' + icon + '</span>'
     + '<div style="flex:1;min-width:0;">'
@@ -391,12 +405,14 @@ function availableColor(available: number, daily: number): string {
   const ratio = available / denom;
   if (ratio < 0.1) return C_DESTRUCTIVE;
   if (ratio < 0.5) return C_WARNING;
+
   return C_SUCCESS;
 }
 
 function dateColor(daysUntilEvent: number, expired = false): string {
   if (expired || daysUntilEvent < 0) return C_DESTRUCTIVE;
   if (daysUntilEvent <= 1) return C_WARNING;
+
   return C_ACCENT;
 }
 
@@ -404,6 +420,7 @@ function planChipHtml(ws: WorkspaceCredit): string {
   // Prefer the canonical plan label (`Light 2`, `Pro 3`, …) and fall back to
   // the tier bucket only when no wire plan is present.
   const plan = formatPlanDisplayLabel(ws.plan) || String(ws.tier || 'FREE');
+
   return '<span style="font-size:9px;color:' + C_ACCENT
     + ';background:rgba(103,232,249,0.12);border:1px solid rgba(103,232,249,0.35)'
     + ';padding:1px 5px;border-radius:3px;font-weight:700;letter-spacing:0.3px;'
@@ -425,6 +442,7 @@ function creditsCompactRow(ws: WorkspaceCredit): string {
     const dashHtml = SPAN_COLOR_OPEN + C_MUTED + ';font-weight:600;">—</span>'
       + SPAN_COLOR_OPEN + C_MUTED + ';font-weight:400;"> '
       + (summary.source === 'Pending' ? 'fetching…' : 'unavailable') + '</span>';
+
     return compactRow('Credits', dashHtml);
   }
   const avail = summary.available;
@@ -437,6 +455,7 @@ function creditsCompactRow(ws: WorkspaceCredit): string {
     + SPAN_COLOR_OPEN + C_MUTED + ';font-weight:400;"> daily · </span>'
     + SPAN_COLOR_OPEN + '#e2e8f0;">' + used + '</span>'
     + SPAN_COLOR_OPEN + C_MUTED + ';font-weight:400;"> used</span>';
+
   return compactRow('Credits', html);
 }
 
@@ -452,6 +471,7 @@ function refillCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string 
   const color = dateColor(days);
   const html = SPAN_COLOR_OPEN + color + ';font-weight:700;">' + rel + '</span>'
     + SPAN_COLOR_OPEN + C_MUTED + ';font-weight:400;"> (' + escHtml(date) + ')</span>';
+
   return compactRow('Refill', html);
 }
 
@@ -463,6 +483,7 @@ function expiresCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string
     const days = daysBetween(status.sinceIso);
     const html = SPAN_COLOR_OPEN + C_DESTRUCTIVE + ';font-weight:700;">expired ' + formatDayCount(days) + ' ago</span>'
       + SPAN_COLOR_OPEN + C_MUTED + ';font-weight:400;"> (' + escHtml(formatDateDDMMMYY(status.sinceIso)) + ')</span>';
+
     return compactRow('Expires', html);
   }
   const isMissingIso = !iso;
@@ -473,6 +494,7 @@ function expiresCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string
   const color = dateColor(days, expired);
   const html = SPAN_COLOR_OPEN + color + ';font-weight:700;">' + rel + '</span>'
     + SPAN_COLOR_OPEN + C_MUTED + ';font-weight:400;"> (' + escHtml(date) + ')</span>';
+
   return compactRow('Expires', html);
 }
 
@@ -482,6 +504,7 @@ function pastDueCompactRow(status: WorkspaceStatus): string {
   const days = status.daysSince || 0;
   const html = SPAN_COLOR_OPEN + C_DESTRUCTIVE + ';font-weight:700;">past due ' + formatDayCount(days) + '</span>'
     + SPAN_COLOR_OPEN + C_MUTED + ';font-weight:400;"> — pay to keep credits</span>';
+
   return compactRow(LABEL_STATUS, html);
 }
 
@@ -499,6 +522,7 @@ function buildPriorityDetailsHtml(
     + buildMetaSection(ws)
     + buildThresholdsSection(config)
     + buildStatusTraceSection(explanation);
+
   return '<details data-marco-tip-details style="margin-top:8px;border-top:1px solid rgba(148,163,184,0.18);padding-top:6px;">'
     + '<summary style="cursor:pointer;font-size:10px;font-weight:700;color:' + C_ACCENT
     + ';letter-spacing:0.4px;text-transform:uppercase;list-style:none;user-select:none;">▸ Priority rules &amp; details</summary>'
@@ -524,9 +548,9 @@ export function buildWorkspaceHoverHtml(
     + refillCompactRow(ws, status)
     + expiresCompactRow(ws, status)
     + pastDueCompactRow(status);
+
   return header + priority + buildPriorityDetailsHtml(ws, status, config, explanation);
 }
-
 
 /* ------------------------------------------------------------------ */
 /* DOM mount + positioning                                             */
@@ -564,6 +588,7 @@ function ensureCardElement(): HTMLDivElement {
   el.addEventListener('mouseenter', cancelHideTimer);
   el.addEventListener('mouseleave', scheduleHide);
   document.body.appendChild(el);
+
   return el;
 }
 
@@ -660,6 +685,7 @@ export function attachWorkspaceHoverCard(listEl: HTMLElement, lookup: WsLookup):
     // click <details> or copy IDs. The card's own mouseenter cancels the timer.
     if (related && related.closest('#' + HOVERCARD_ID)) {
       cancelHideTimer();
+
       return;
     }
     scheduleHide();
@@ -716,5 +742,4 @@ export function showWorkspaceHoverCardPinned(wsId: string): void {
     document.addEventListener('keydown', dismiss, true);
   }, 10);
 }
-
 

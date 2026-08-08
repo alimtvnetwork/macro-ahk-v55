@@ -46,6 +46,7 @@ function StepPaneTitle({ activeGroup, activeStepsCount, groupInputs }: {
     const inputsCount = activeGroup !== null
         ? Object.keys(groupInputs.get(activeGroup.StepGroupId) ?? {}).length
         : 0;
+
     return (
         <div className="flex min-w-0 items-center gap-2">
             <div className="truncate text-sm font-medium text-muted-foreground">
@@ -67,6 +68,7 @@ function StepPaneTitle({ activeGroup, activeStepsCount, groupInputs }: {
 
 function StepPaneActions(props: LibraryStepPaneProps) {
     const grp = props.activeGroup;
+
     return (
         <div className="flex items-center gap-2">
             {grp?.Description != null && grp.Description !== "" && (
@@ -119,6 +121,7 @@ function StepList(props: LibraryStepPaneProps) {
             </div>
         );
     }
+
     return (
         <ol className="divide-y">
             {activeSteps.map((step, idx) => {
@@ -127,6 +130,7 @@ function StepList(props: LibraryStepPaneProps) {
                 const waitTitle = wait === undefined
                     ? null
                     : `Wait for ${wait.Kind} "${wait.Selector}" to ${wait.Condition} (${wait.TimeoutMs} ms)`;
+
                 return (
                     <StepRowItem
                         key={step.StepId}

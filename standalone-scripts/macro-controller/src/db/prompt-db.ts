@@ -46,8 +46,6 @@ export interface PromptRow {
     UpdatedAt: number;
 }
 
-
-
 export interface UpsertInput {
     id?: number | undefined;
     slug: string;
@@ -72,11 +70,13 @@ async function runSql(method: MethodEnum1, sql: string): Promise<RawSqlOk> {
     // 'QUERY' | 'SCHEMA' signature is preserved for call-site compatibility;
     // the bridge maps it onto whichever method name the backend accepts.
     void DB_NAME; // DB_NAME is applied inside the bridge; kept imported for clarity.
+
     return runSqlBridge(method, sql);
 }
 
 function fail<T>(where: string, message: string, context?: unknown): DbResult<T> {
     logDiagnosticFromCode('DB_PROMPT_E001', { where, reason: message }, context);
+
     return new DbResult(false, undefined, message);
 }
 
@@ -84,6 +84,7 @@ function rowToPrompt(r: unknown): PromptRow {
     const o = r as Record<string, unknown>;
     const rawKey = typeof o.ReplaceKey === 'string' && o.ReplaceKey.length > 0
         ? o.ReplaceKey : REPLACE_KEY_DEFAULT;
+
     return {
         Id: Number(o.Id), Slug: String(o.Slug), Name: String(o.Name),
         Body: String(o.Body), Role: String(o.Role) as PromptRole,
@@ -107,6 +108,7 @@ function resolveReplaceFields(input: UpsertInput): { key: string; valuesJson: st
         ? [...REPLACE_VALUES_DEFAULT]
         : normalizeReplaceValues(input.replaceValues);
     if (values === null) return { error: 'replaceValues must contain at least one non-empty entry' };
+
     return { key, valuesJson: encodeReplaceValues(values) };
 }
 
@@ -118,6 +120,7 @@ export async function listPromptsByRole(role: PromptRole): Promise<DbResult<Prom
     const resp = await runLoggedQuery('QUERY', sql, 'prompt-db');
     if (!resp.ok) return fail('listPromptsByRole', resp.error?.message || 'query failed');
     const rows = Array.isArray(resp.data?.rows) ? resp.data?.rows.map(rowToPrompt) : [];
+
     return new DbResult(true, rows);
 }
 
@@ -130,6 +133,7 @@ export async function getDefaultPromptForRole(role: PromptRole): Promise<DbResul
     if (!resp.ok) return fail('getDefaultPromptForRole', resp.error?.message || 'query failed');
     const rows = Array.isArray(resp.data?.rows) ? resp.data?.rows : [];
     if (rows.length === 0) return new DbResult(true, undefined);
+
     return new DbResult(true, rowToPrompt(rows[0]));
 }
 
@@ -164,6 +168,7 @@ function buildInsertSql(input: UpsertInput, resolved: ResolvedReplace, now: numb
         sqlLit(resolved.key), sqlLit(resolved.valuesJson),
         String(now), String(now),
     ].join(', ');
+
     return 'INSERT INTO Prompt (' + cols + ') VALUES (' + vals + ')';
 }
 
@@ -188,6 +193,7 @@ async function resolveInsertedPromptId(input: UpsertInput): Promise<number | nul
     const rows = Array.isArray(resp.data?.rows) ? resp.data?.rows : [];
     const firstRow = rows.length > 0 ? rows[0] as Record<string, object | string | number | null> : null;
     const insertedId = Number(firstRow?.Id ?? 0);
+
     return Number.isInteger(insertedId) && insertedId > 0 ? insertedId : null;
 }
 
@@ -196,6 +202,7 @@ function validateUpsert(input: UpsertInput): string | null {
     if (input.slug.trim() === '') return 'slug must not be empty';
     if (input.name.trim() === '') return 'name must not be empty';
     if (input.body.trim() === '') return 'body must not be empty';
+
     return null;
 }
 
@@ -208,6 +215,7 @@ function checkTokenGuard(input: UpsertInput): string | null {
         const oldKey = typeof input.previousReplaceKey === 'string' ? input.previousReplaceKey : undefined;
         const newKey = typeof input.replaceKey === 'string' ? input.replaceKey : undefined;
         assertParamTokensUnchanged(input.previousBody as string, input.body, { oldKey, newKey });
+
         return null;
     } catch (e) {
         return e instanceof Error ? e.message : String(e);
@@ -251,6 +259,7 @@ export async function upsertPrompt(input: UpsertInput): Promise<DbResult<number>
             logDiagnosticFromCode('DB_PROMPT_REVISION_SNAPSHOT_E001', { slug: preImage.Slug, reason: revResult.error ?? 'unknown error' });
         }
     }
+
     return new DbResult(true, id);
 }
 
@@ -260,6 +269,7 @@ async function countRowsForRole(role: PromptRole): Promise<number> {
     if (!resp.ok) return -1;
     const row = Array.isArray(resp.data?.rows) && resp.data?.rows.length > 0
         ? (resp.data?.rows[0] as Record<string, unknown>) : null;
+
     return row ? Number(row.c ?? 0) : 0;
 }
 
@@ -267,6 +277,7 @@ async function readPromptRow(id: number): Promise<PromptRow | null> {
     const resp = await runSql('QUERY', 'SELECT * FROM Prompt WHERE Id = ' + String(id) + ' LIMIT 1');
     if (!resp.isOk) return null;
     const rows = Array.isArray(resp.rows) ? resp.rows : [];
+
     return rows.length > 0 ? rowToPrompt(rows[0]) : null;
 }
 
@@ -282,5 +293,6 @@ export async function deletePromptById(id: number): Promise<DbResult<void>> {
     if (count <= 1) return fail('deletePromptById', 'refuse to delete last row for role ' + row.Role);
     const resp = await runLoggedQuery('SCHEMA', 'DELETE FROM Prompt WHERE Id = ' + String(id), 'prompt-db');
     if (!resp.ok) return fail('deletePromptById', resp.error?.message || 'delete failed');
+
     return new DbResult(true, undefined);
 }

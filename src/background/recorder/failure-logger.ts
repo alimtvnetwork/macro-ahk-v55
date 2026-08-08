@@ -230,6 +230,7 @@ function buildContextCore(
     const attempts = resolveAttempts(input);
     const variables: ReadonlyArray<VariableContext> = input.Variables ?? [];
     const { Reason, ReasonDetail } = classifyReason(input, attempts, variables, message);
+
     return {
         Message: message, Stack: extractStack(input.Error), Attempts: attempts,
         Reason, ReasonDetail, Verbose: input.Verbose === true,
@@ -240,6 +241,7 @@ function resolveFailureReportContext(input: BuildFailureReportInput): FailureRep
     const now = input.Now ?? defaultNow;
     const core = buildContextCore(input, now);
     const domContext = input.Target ? readDomContext(input.Target, core.Verbose) : null;
+
     return {
         ...core, DomContext: domContext,
         CapturedHtml: core.Verbose && domContext !== null ? (domContext.OuterHtml ?? null) : null,
@@ -267,6 +269,7 @@ function resolveAttempts(input: BuildFailureReportInput): ReadonlyArray<Selector
     if (input.EvaluatedAttempts !== undefined) {
         return input.EvaluatedAttempts.map(toAttemptFromEvaluated);
     }
+
     return (input.Selectors ?? []).map(toAttemptFromPersisted);
 }
 
@@ -285,9 +288,9 @@ function resolveFormSnapshot(
     if (input.Target) {
         return captureFormSnapshot(input.Target, { Verbose: verbose, Now: now });
     }
+
     return null;
 }
-
 
 /**
  * Auto-classify the failure when the caller did not supply a Reason.
@@ -326,6 +329,7 @@ function classifyReason(
     if (primaryFallbackClass !== null) { return primaryFallbackClass; }
     const zeroClass = classifyZeroMatches(attempts);
     if (zeroClass !== null) { return zeroClass; }
+
     return { Reason: "Unknown", ReasonDetail: message };
 }
 
@@ -338,6 +342,7 @@ function classifyVariableFailure(
     if (failedVar === undefined) { return null; }
     const code = variableReasonToCode(failedVar.FailureReason);
     const detail = failedVar.FailureDetail ?? `Variable {{${failedVar.Name}}} failed.`;
+
     return { Reason: code, ReasonDetail: detail };
 }
 
@@ -357,6 +362,7 @@ function classifySelectorSyntaxFailure(
     if (reasons.has("EmptyExpression")) {
         return { Reason: "EmptyExpression", ReasonDetail: firstDetail(attempts, "EmptyExpression") };
     }
+
     return null;
 }
 
@@ -366,6 +372,7 @@ function classifyPrimaryFallback(
     const primary = attempts.find((a) => a.IsPrimary) ?? null;
     const anyFallbackMatched = attempts.some((a) => !a.IsPrimary && a.Matched);
     if (primary === null || primary.Matched || !anyFallbackMatched) { return null; }
+
     return {
         Reason: "PrimaryMissedFallbackOk",
         ReasonDetail:
@@ -384,6 +391,7 @@ function classifyZeroMatches(
     const isMissingAnyEvaluated = !anyEvaluated;
     if (isMissingAnyEvaluated) { return null; }
     if (!attempts.every((a) => !a.Matched && a.MatchCount === 0)) { return null; }
+
     return {
         Reason: "ZeroMatches",
         ReasonDetail:
@@ -392,9 +400,9 @@ function classifyZeroMatches(
     };
 }
 
-
 function firstDetail(attempts: ReadonlyArray<SelectorAttempt>, code: AttemptFailureReason | "NotEvaluated"): string {
     const hit = attempts.find((a) => a.FailureReason === code);
+
     return hit?.FailureDetail ?? `Attempt failed with ${code}.`;
 }
 
@@ -404,6 +412,7 @@ function variableReasonToCode(reason: VariableContext["FailureReason"]): Failure
     if (reason === "UndefinedValue")  { return "VariableUndefined"; }
     if (reason === "EmptyString")     { return "VariableEmpty"; }
     if (reason === "TypeMismatch")    { return "VariableTypeMismatch"; }
+
     return "Unknown";
 }
 
@@ -444,6 +453,7 @@ export function formatFailureReport(report: FailureReport): string {
     appendVariablesSection(lines, report.Variables);
     appendOptionalSections(lines, report);
     appendStackSection(lines, report.StackTrace);
+
     return lines.join("\n");
 }
 
@@ -452,6 +462,7 @@ function formatWhere(report: FailureReport): string {
     if (report.StepId !== null) where.push(`StepId=${report.StepId}`);
     if (report.Index !== null) where.push(`Index=${report.Index}`);
     if (report.StepKind !== null) where.push(`Kind=${report.StepKind}`);
+
     return where.join(" ");
 }
 
@@ -471,6 +482,7 @@ function formatSelectorLine(s: SelectorAttempt): string {
     const tail = s.Matched
         ? `→ ${s.MatchCount} match${s.MatchCount === 1 ? "" : "es"}`
         : `→ ${s.MatchCount} matches (${s.FailureReason}${detailSuffix})`;
+
     return `${matchMark} ${primaryMark} ${s.Strategy.padEnd(13)} ${expr} ${tail}`;
 }
 
@@ -490,6 +502,7 @@ function formatVariableLine(v: VariableContext): string {
     const tail = ok
         ? `${valueLabel} [${v.ValueType}] from ${v.Source}`
         : `${valueLabel} [${v.ValueType}] from ${v.Source}, ${v.FailureReason}${detailSuffix}`;
+
     return `${mark} {{${v.Name}}} = ${tail}`;
 }
 
@@ -517,7 +530,6 @@ function appendStackSection(lines: string[], stack: string | null): void {
     }
 }
 
-
 /**
  * Single entry point used by both pipelines. Writes the structured report
  * to `console.error` with the phase prefix and returns the report so the
@@ -527,6 +539,7 @@ function appendStackSection(lines: string[], stack: string | null): void {
 export function logFailure(input: BuildFailureReportInput): FailureReport {
     const report = buildFailureReport(input);
     console.error(formatFailureReport(report));
+
     return report;
 }
 
@@ -542,6 +555,7 @@ function extractMessage(err: unknown): string {
 
 function extractStack(err: unknown): string | null {
     if (err instanceof Error && typeof err.stack === "string") return err.stack;
+
     return null;
 }
 
@@ -578,6 +592,7 @@ function toAttemptFromEvaluated(a: EvaluatedAttempt): SelectorAttempt {
 
 function nonEmptyAttr(el: Element, attr: string): string | null {
     const v = el.getAttribute(attr);
+
     return v !== null && v.length > 0 ? v : null;
 }
 
@@ -599,6 +614,7 @@ function readDomContext(el: Element, verbose: boolean): DomContext {
     const fullText = (el.textContent ?? "").trim();
     const fullOuter = el.outerHTML ?? "";
     const base = readBaseDomContext(el, fullText, fullOuter);
+
     return verbose ? { ...base, OuterHtml: fullOuter, Text: fullText } : base;
 }
 

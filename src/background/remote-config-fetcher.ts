@@ -77,6 +77,7 @@ export async function resolveConfigCascade(
 
     if (hasLocal) {
         const merged = { ...bundledDefaults, ...localOverrides };
+
         return buildResult(merged, "local");
     }
 

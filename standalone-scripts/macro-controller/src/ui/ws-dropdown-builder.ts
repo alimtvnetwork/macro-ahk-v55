@@ -86,6 +86,7 @@ function handleFocusCurrent(
   if ((loopCreditState.perWorkspace || []).length === 0) {
     log('Focus Current: no workspaces loaded, fetching...', 'check');
     fetchLoopCreditsWithDetect(false);
+
     return;
   }
 
@@ -98,6 +99,7 @@ function handleFocusCurrent(
 
     if (isMissingCurrentName) {
       logError('Focus Current', '❌ workspace still unknown after API detection');
+
       return;
     }
 
@@ -230,7 +232,9 @@ function _buildUndoBtn(
   wsUndoBtn.style.cssText = 'display:none;padding:1px 6px;background:rgba(239,68,68,0.2);color:#f87171;border:1px solid rgba(239,68,68,0.4);border-radius:3px;font-size:8px;cursor:pointer;font-weight:700;';
   wsUndoBtn.onclick = function(e: Event) {
     e.preventDefault(); e.stopPropagation();
-    if (getRenameHistory().length === 0) { log('[Rename] Nothing to undo', 'warn'); return; }
+    if (getRenameHistory().length === 0) { log('[Rename] Nothing to undo', 'warn');
+
+ return; }
     const last = getRenameHistory()[getRenameHistory().length - 1];
     const count = last.entries.length;
     wsUndoBtn.disabled = true;
@@ -248,6 +252,7 @@ function _buildUndoBtn(
       }
     });
   };
+
   return wsUndoBtn;
 }
 
@@ -285,6 +290,7 @@ function _buildWsSearchInput(
       triggerLoopMoveFromSelection();
     }
   };
+
   return wsSearchInput;
 }
 
@@ -307,5 +313,6 @@ function _buildMoveRow(triggerLoopMoveFromSelection: () => void): HTMLElement {
 
   wsMoveRow.appendChild(moveBtn);
   wsMoveRow.appendChild(moveStatus);
+
   return wsMoveRow;
 }

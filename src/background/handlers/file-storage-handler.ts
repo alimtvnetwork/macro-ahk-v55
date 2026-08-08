@@ -43,6 +43,7 @@ export function bindFileStorageDbManager(manager: DbManager): void {
 function getDb(): SqlJsDatabase {
     const isMissingDbManager = !dbManager;
     if (isMissingDbManager) throw new Error("[file-storage] DbManager not bound");
+
     return dbManager.getLogsDb();
 }
 
@@ -89,6 +90,7 @@ export async function handleFileSave(
     const id = String(result[0].values[0][0]);
     markDirty();
     onFilesChanged?.(projectId);
+
     return { isOk: true, id };
 }
 
@@ -111,6 +113,7 @@ export async function handleFileGet(
     }
 
     const row = result[0].values[0];
+
     return {
         file: {
             id: String(row[0]),
@@ -150,6 +153,7 @@ export async function handleFileList(
         });
     }
     stmt.free();
+
     return { files };
 }
 
@@ -164,6 +168,7 @@ export async function handleFileDelete(
     const db = getDb();
     db.run("DELETE FROM ProjectFiles WHERE Id = ?", [fileId]);
     markDirty();
+
     return { isOk: true };
 }
 
@@ -193,5 +198,6 @@ export function getFilesByProject(
         });
     }
     stmt.free();
+
     return files;
 }

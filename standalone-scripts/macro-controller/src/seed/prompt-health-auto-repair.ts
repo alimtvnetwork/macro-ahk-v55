@@ -120,5 +120,6 @@ export async function runPromptHealthCheckWithAutoRepair(): Promise<AutoRepairRe
     isHealthy,
   };
   if (reseed.error) result.reseedError = reseed.error;
+
   return result;
 }

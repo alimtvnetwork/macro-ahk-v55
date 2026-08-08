@@ -147,15 +147,21 @@ function useRequestExport(
 ) {
     return useCallback(
         (ids: ReadonlyArray<number>, includeDescendants: boolean = true) => {
-            if (!isLibraryReady(lib)) { toast.error("Library not ready"); return; }
-            if (ids.length === 0) { toast.error("Select at least one group to export"); return; }
+            if (!isLibraryReady(lib)) { toast.error("Library not ready");
+
+ return; }
+            if (ids.length === 0) { toast.error("Select at least one group to export");
+
+ return; }
             const preview = previewStepGroupExport({
                 Source: lib.Lib!,
                 ProjectId: lib.Project!.ProjectId,
                 SelectedStepGroupIds: ids,
                 IncludeDescendants: includeDescendants,
             });
-            if (preview.Reason !== "Ok") { showError(explainExportFailure(preview)); return; }
+            if (preview.Reason !== "Ok") { showError(explainExportFailure(preview));
+
+ return; }
             setPreviewState({
                 Open: true,
                 Preview: preview,
@@ -177,7 +183,9 @@ function useConfirmExport(
         const pending = previewState.Pending;
         setPreviewState(INITIAL_PREVIEW);
         if (pending === null) return;
-        if (!isLibraryReady(lib)) { toast.error("Library not ready"); return; }
+        if (!isLibraryReady(lib)) { toast.error("Library not ready");
+
+ return; }
         const result = await runStepGroupExport({
             Source: lib.Lib!,
             ProjectId: lib.Project!.ProjectId,
@@ -187,7 +195,9 @@ function useConfirmExport(
             SqlJs: lib.SqlJs!,
             JsZip: JSZip,
         });
-        if (result.Reason !== "Ok") { showError(explainExportFailure(result)); return; }
+        if (result.Reason !== "Ok") { showError(explainExportFailure(result));
+
+ return; }
         triggerZipDownload(result.ZipBytes, result.ZipFileName);
         setLastExport({
             FileName: result.ZipFileName,
@@ -208,6 +218,7 @@ export function useStepGroupExport(lib: StepLibrarySliceForExport): UseStepGroup
     const [lastExport, setLastExport] = useState<LastExportSummary | null>(null);
     const requestExport = useRequestExport(lib, setPreviewState, showError);
     const confirmExport = useConfirmExport(lib, previewState, setPreviewState, setLastExport, showError);
+
     return {
         requestExport, confirmExport, lastExport,
         previewState, setPreviewOpen, errorState, setErrorOpen,

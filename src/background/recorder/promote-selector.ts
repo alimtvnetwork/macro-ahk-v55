@@ -63,6 +63,7 @@ function validatePromotion(
     if (target.IsPrimary === 1) {
         return fail("AlreadyPrimary", `Selector ${targetSelectorId} is already the primary selector.`);
     }
+
     return target;
 }
 
@@ -73,12 +74,15 @@ function applyPromotion(
     const updated: PersistedSelector[] = selectors.map((s) => {
         if (s.SelectorId === targetSelectorId) return { ...s, IsPrimary: 1 };
         if (s.IsPrimary === 1) return { ...s, IsPrimary: 0 };
+
         return s;
     });
     updated.sort((a, b) => {
         if (a.IsPrimary !== b.IsPrimary) return a.IsPrimary === 1 ? -1 : 1;
+
         return a.SelectorId - b.SelectorId;
     });
+
     return updated;
 }
 
@@ -89,6 +93,7 @@ export function promoteSelectorToPrimary(
     const validated = validatePromotion(selectors, targetSelectorId);
     if ("Error" in validated) return validated;
     const previousPrimary = selectors.find((s) => s.IsPrimary === 1) ?? null;
+
     return {
         Selectors: applyPromotion(selectors, targetSelectorId),
         DemotedSelectorId: previousPrimary?.SelectorId ?? null,

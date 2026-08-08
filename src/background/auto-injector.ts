@@ -188,6 +188,7 @@ export async function handleTabActivated(tabId: number): Promise<void> {
         console.log(
             `[auto-injector] AUTOATTACH_SKIPPED_USER_DISMISSED tab=${tabId} url=${url} trigger=activate`,
         );
+
         return;
     }
 
@@ -216,6 +217,7 @@ export async function handleNavigationCompleted(
         console.log(
             `[new-tab-guard] skipped url="${details.url ?? ""}" tabId=${details.tabId}`,
         );
+
         return;
     }
 
@@ -226,6 +228,7 @@ export async function handleNavigationCompleted(
 
     if (isMissingIsEligible) {
         logUrlGuardSkip(details.tabId, details.url);
+
         return;
     }
 
@@ -236,9 +239,9 @@ export async function handleNavigationCompleted(
         console.log(
             `[auto-injector] AUTOATTACH_SKIPPED_USER_DISMISSED tab=${details.tabId} url=${details.url} trigger=load`,
         );
+
         return;
     }
-
 
     // TTL-based dedup: absorb listener double-fires (audit U-1 recommendation).
     // Reloads >5s apart still re-inject; bursts within 5s are squashed.
@@ -282,6 +285,7 @@ async function processPageNavigation(
 
     if (isConditionFailed) {
         logConditionSkip(tabId, url);
+
         return;
     }
 
@@ -312,6 +316,7 @@ async function processPageNavigation(
         console.log(
             `[auto-injector] No auto-injectable scripts for tab ${tabId}: ${url}`,
         );
+
         return;
     }
 

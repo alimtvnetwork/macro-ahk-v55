@@ -109,6 +109,7 @@ chrome.runtime.onMessage.addListener(
                 : undefined;
         if (messageType === "__PING__") {
             sendResponse({ type: "__PONG__" });
+
             return false;
         }
 

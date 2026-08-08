@@ -36,6 +36,7 @@ async function openDatabaseFrom(bytes: Uint8Array): Promise<SqlDatabaseRO> {
   const initFn: SqlJsModule['default'] = sqlJs.default;
   const SQL = await initFn({ locateFile: () => SQL_WASM_URL });
   const DatabaseCtor = SQL.Database;
+
   return new DatabaseCtor(bytes) as unknown as SqlDatabaseRO;
 }
 
@@ -52,6 +53,7 @@ function readMeta(db: SqlDatabaseRO): Map<string, string> {
   } finally {
     stmt.free();
   }
+
   return meta;
 }
 
@@ -59,6 +61,7 @@ function requireMeta(meta: Map<string, string>, key: string): string {
   const value = meta.get(key);
   const isMissingValue = !value;
   if (isMissingValue) throwDiagnostic('PROMPT_IO_SQLITE_E001', { missingKey: key });
+
   return value as string;
 }
 
@@ -66,6 +69,7 @@ function parseTags(raw: unknown): string[] | undefined {
   if (typeof raw !== 'string' || raw.length === 0) return undefined;
   const parsed = JSON.parse(raw) as unknown;
   if (!Array.isArray(parsed)) return undefined;
+
   return parsed.filter((t): t is string => typeof t === 'string');
 }
 
@@ -82,6 +86,7 @@ function rowToEntry(row: Record<string, unknown>): PromptEntry {
   if (typeof row.ReplaceKey === 'string' && row.ReplaceKey.length > 0) entry.replaceKey = row.ReplaceKey;
   const excludeRaw = row.ExcludeFromExport;
   if (typeof excludeRaw === 'number') entry.excludeFromExport = excludeRaw !== 0;
+
   return entry;
 }
 
@@ -95,6 +100,7 @@ function readPrompts(db: SqlDatabaseRO): PromptEntry[] {
   } finally {
     stmt.free();
   }
+
   return entries;
 }
 
@@ -133,6 +139,7 @@ export async function parsePromptsBundleSqlite(bytes: Uint8Array): Promise<Sqlit
       format: 'sqlite',
       entries,
     };
+
     return { bundle };
   } finally {
     db.close();

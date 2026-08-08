@@ -32,6 +32,7 @@ export function sessionsHasTextPk(db: SqlJsDatabase): boolean {
                 return true;
             }
         }
+
         return false;
     } catch {
         return false;

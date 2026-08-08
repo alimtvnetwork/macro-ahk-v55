@@ -60,6 +60,7 @@ function readSnippetByName(
     if (isMissingValues) {
         throw new Error(`JsSnippet "${name}" not found after upsert`);
     }
+
     return rowToSnippet(values);
 }
 
@@ -81,6 +82,7 @@ export function upsertJsSnippetRow(
              UpdatedAt   = datetime('now')`,
         [draft.Name, draft.Description, draft.Body],
     );
+
     return readSnippetByName(db, draft.Name);
 }
 
@@ -91,6 +93,7 @@ export function listJsSnippetRows(
         `SELECT JsSnippetId, Name, Description, Body, CreatedAt, UpdatedAt
          FROM JsSnippet ORDER BY Name ASC`,
     );
+
     return (result[0]?.values ?? []).map(rowToSnippet);
 }
 
@@ -112,6 +115,7 @@ export async function upsertJsSnippet(
     const mgr = await initProjectDb(projectSlug);
     const row = upsertJsSnippetRow(mgr.getDb(), draft);
     mgr.markDirty();
+
     return row;
 }
 
@@ -119,6 +123,7 @@ export async function listJsSnippets(
     projectSlug: string,
 ): Promise<ReadonlyArray<JsSnippetRow>> {
     const mgr = await initProjectDb(projectSlug);
+
     return listJsSnippetRows(mgr.getDb());
 }
 

@@ -27,6 +27,7 @@ const store = new Map<string, boolean>();
  */
 export function resolveVerboseLogging(projectId: string | null | undefined): boolean {
     const key = normalizeId(projectId);
+
     return store.get(key) === true;
 }
 
@@ -51,6 +52,7 @@ export function snapshotVerboseLoggingStore(): ReadonlyArray<{ ProjectId: string
     for (const [k, v] of store.entries()) {
         out.push({ ProjectId: k, Verbose: v });
     }
+
     return out;
 }
 
@@ -58,5 +60,6 @@ function normalizeId(projectId: string | null | undefined): string {
     if (projectId === null || projectId === undefined || projectId.length === 0) {
         return FALLBACK_PROJECT_ID;
     }
+
     return projectId;
 }

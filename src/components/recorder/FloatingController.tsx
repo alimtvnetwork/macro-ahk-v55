@@ -81,6 +81,7 @@ function loadMode(): ControllerMode {
     } catch (caught) {
         logError("FloatingController.loadMode", `localStorage read failed for key="${MODE_STORAGE_KEY}" — defaulting to "compact"`, caught);
     }
+
     return "compact";
 }
 
@@ -105,6 +106,7 @@ function formatElapsed(startedAt: string, nowMs: number): string {
     const s = (total % 60).toString().padStart(2, "0");
     if (total < 3600) { return `${m}:${s}`; }
     const h = Math.floor(total / 3600).toString().padStart(2, "0");
+
     return `${h}:${m}:${s}`;
 }
 
@@ -113,8 +115,10 @@ function useElapsedTicker(startedAt: string, isRunning: boolean): string {
     useEffect(() => {
         if (!isRunning) { return; }
         const id = window.setInterval(() => setNow(Date.now()), 1000);
+
         return () => window.clearInterval(id);
     }, [isRunning]);
+
     return useMemo(() => formatElapsed(startedAt, now), [startedAt, now]);
 }
 
@@ -186,6 +190,7 @@ export function FloatingController(props: FloatingControllerProps): JSX.Element 
         if (prev === "Idle" && session.Phase === "Recording" && mode === "mini") {
             prePromoteModeRef.current = "mini";
             setMode("compact");
+
             return;
         }
         if (prev !== "Idle" && session.Phase === "Idle" && prePromoteModeRef.current !== null) {
@@ -200,6 +205,7 @@ export function FloatingController(props: FloatingControllerProps): JSX.Element 
             setStopArmed(true);
             if (stopTimer.current !== null) { window.clearTimeout(stopTimer.current); }
             stopTimer.current = window.setTimeout(() => setStopArmed(false), STOP_CONFIRM_TIMEOUT_MS);
+
             return;
         }
         if (stopTimer.current !== null) { window.clearTimeout(stopTimer.current); }
@@ -211,6 +217,7 @@ export function FloatingController(props: FloatingControllerProps): JSX.Element 
     const cyclePrimary = () => {
         if (!isIdle) {
             void (isRecording ? onPause() : onResume());
+
             return;
         }
         if (onStart !== undefined) {
@@ -356,6 +363,7 @@ function HotkeyQuickAdd(props: { onClose: () => void }): JSX.Element {
         if (selection.StepGroupId !== null) {
             return lib.Groups.find((g) => g.StepGroupId === selection.StepGroupId) ?? null;
         }
+
         return lib.Groups[0] ?? null;
     }, [selection.StepGroupId, lib.Groups]);
 
@@ -363,15 +371,18 @@ function HotkeyQuickAdd(props: { onClose: () => void }): JSX.Element {
         setError(null);
         if (targetGroup === null) {
             setError("No StepGroup available — create one in the Options page first.");
+
             return;
         }
         if (chords.length === 0) {
             setError("Capture at least one key combination.");
+
             return;
         }
         const wait = waitMs.trim() === "" ? undefined : Number(waitMs.trim());
         if (wait !== undefined && (!Number.isFinite(wait) || wait < 0)) {
             setError("Wait (ms) must be a non-negative number.");
+
             return;
         }
         const payload = wait === undefined
@@ -481,6 +492,7 @@ function FloatingShell(props: {
     const { mode, onModeChange, children, testid } = props;
     const { position, isDragging, containerRef, handleProps } = useDraggable();
     const positioned = position !== null;
+
     return (
         <div
             ref={containerRef}
@@ -538,6 +550,7 @@ function ModeSwitcher(props: { mode: ControllerMode; onModeChange: (m: Controlle
         expanded: "mini",
     };
     const Icon = mode === "expanded" ? Minimize2 : Maximize2;
+
     return (
         <button
             type="button"
@@ -553,6 +566,7 @@ function ModeSwitcher(props: { mode: ControllerMode; onModeChange: (m: Controlle
 
 function RecordingDot(props: { isRecording: boolean }): JSX.Element {
     const { isRecording } = props;
+
     return (
         <span
             className={cn(
@@ -569,6 +583,7 @@ function RecordingDot(props: { isRecording: boolean }): JSX.Element {
 
 function StopButton(props: { armed: boolean; onClick: () => void; compact?: boolean; disabled?: boolean; title?: string }): JSX.Element {
     const { armed, onClick, compact, disabled, title } = props;
+
     return (
         <Button
             size="sm"

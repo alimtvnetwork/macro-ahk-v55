@@ -52,6 +52,7 @@ function captureStack(error?: CaughtError): string {
     const trace = new Error().stack || "";
     // Strip the first 3 frames: Error, captureStack, and the Logger method
     const lines = trace.split("\n");
+
     return lines.slice(3).join("\n");
 }
 

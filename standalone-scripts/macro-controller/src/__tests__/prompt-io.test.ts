@@ -7,7 +7,6 @@ import { validatePromptEntry, mergePrompts, parsePromptsText } from '../ui/promp
 import type { CachedPromptEntry } from '../ui/prompt-cache';
 
 describe('Prompt IO Logic', () => {
-  
   describe('validatePromptEntry', () => {
     it('should validate a correct entry', () => {
       const entry = { name: 'Test', text: 'Prompt content' };

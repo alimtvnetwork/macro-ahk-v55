@@ -72,11 +72,16 @@ export async function executeWaitForElement(step: StepWaitForElement, signal?: A
 
   return new Promise((resolve, reject) => {
     const check = () => {
-      if (signal?.aborted) { reject(new Error("Cancelled")); return; }
+      if (signal?.aborted) { reject(new Error("Cancelled"));
+
+ return; }
       const exists = !!document.querySelector(step.selector);
-      if ((appear && exists) || (!appear && !exists)) { resolve(); return; }
+      if ((appear && exists) || (!appear && !exists)) { resolve();
+
+ return; }
       if (Date.now() - start > timeout) {
         reject(new Error(`Timeout waiting for element ${appear ? "to appear" : "to disappear"}: ${step.selector}`));
+
         return;
       }
       setTimeout(check, Timings.POLL_INTERVAL_NORMAL);
@@ -95,10 +100,15 @@ export async function executeWaitForText(step: StepWaitForText, signal?: AbortSi
 
   return new Promise((resolve, reject) => {
     const check = () => {
-      if (signal?.aborted) { reject(new Error("Cancelled")); return; }
-      if (document.body.innerText.includes(step.text)) { resolve(); return; }
+      if (signal?.aborted) { reject(new Error("Cancelled"));
+
+ return; }
+      if (document.body.innerText.includes(step.text)) { resolve();
+
+ return; }
       if (Date.now() - start > timeout) {
         reject(new Error(`Timeout waiting for text: "${step.text}"`));
+
         return;
       }
       setTimeout(check, Timings.TIMEOUT_SHORT);

@@ -74,6 +74,7 @@ export async function mountTaskQueueReinjectionToast(): Promise<void> {
     const pendingCount = await queue.count(projectId);
     if (pendingCount <= 0) {
       log('TaskQueueReinjection: no queued tasks for project ' + projectId, 'info');
+
       return;
     }
     renderTaskQueueReinjectionToast({ projectId, pendingCount, queue });

@@ -22,15 +22,18 @@ class WsListViewState {
     if (isMissingInstance) {
       WsListViewState.instance = new WsListViewState();
     }
+
     return WsListViewState.instance;
   }
 
   private loadBool(key: string, fallback: boolean): boolean {
     try {
       const stored: string | null = localStorage.getItem(key);
+
       return stored === null ? fallback : stored === 'true';
     } catch (e: unknown) {
       logError('viewState.load', 'Failed to read "' + key + '" from localStorage', e);
+
       return fallback;
     }
   }
@@ -44,6 +47,7 @@ class WsListViewState {
     } catch (e: unknown) {
       logError('viewState.loadCreditSortMode', 'Failed to read credit sort mode from localStorage', e);
     }
+
     return 'none';
   }
 

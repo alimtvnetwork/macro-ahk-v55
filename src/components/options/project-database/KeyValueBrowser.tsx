@@ -24,7 +24,6 @@ import {
 import { toast } from "sonner";
 import { sendMessage } from "@/lib/message-client";
 
-
 interface KeyValueBrowserProps {
   projectSlug: string;
 }
@@ -92,6 +91,7 @@ export function KeyValueBrowser({ projectSlug }: KeyValueBrowserProps) {
       !searchTerm ||
       e.Key.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (e.Value ?? "").toLowerCase().includes(searchTerm.toLowerCase());
+
     return matchNs && matchSearch;
   });
 
@@ -116,6 +116,7 @@ export function KeyValueBrowser({ projectSlug }: KeyValueBrowserProps) {
   const handleSave = async () => {
     if (!formKey.trim()) {
       toast.error("Key is required");
+
       return;
     }
 
@@ -183,6 +184,7 @@ export function KeyValueBrowser({ projectSlug }: KeyValueBrowserProps) {
 
   const truncateValue = (displayValue: string | null, max = 60): string => {
     if (!displayValue) return "—";
+
     return displayValue.length > max ? displayValue.slice(0, max) + "…" : displayValue;
   };
 

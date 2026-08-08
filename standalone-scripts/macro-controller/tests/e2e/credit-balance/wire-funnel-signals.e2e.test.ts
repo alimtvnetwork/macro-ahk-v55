@@ -54,6 +54,7 @@ function findLog(prefix: string): string {
     typeof message === 'string' && message.startsWith(prefix),
   );
   expect(hit, 'expected log line starting with ' + prefix).toBeDefined();
+
   return hit![0] as string;
 }
 

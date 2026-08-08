@@ -70,6 +70,7 @@ export async function handleRecorderCapturePersist(
 
     const projectSlug = await resolveProjectSlug(req.projectSlug);
     const result = await persistOneCapture(projectSlug, req.payload);
+
     return { isOk: true, step: result.step, selectors: result.selectors };
 }
 
@@ -106,6 +107,7 @@ export async function handleRecorderCapturePersistBatch(
         const result = await persistOneCapture(projectSlug, payload);
         results.push(result);
     }
+
     return { isOk: true, results };
 }
 
@@ -153,6 +155,7 @@ async function persistOneCapture(
 
     const draft = buildStepDraftFromCapture(finalPayload, anchorSelectorId);
     const { step, selectors } = await insertStep(projectSlug, draft);
+
     return { step, selectors };
 }
 
@@ -174,5 +177,6 @@ async function resolveProjectSlug(override?: string): Promise<string> {
             "RECORDER_CAPTURE_PERSIST: active session has empty ProjectSlug",
         );
     }
+
     return session.ProjectSlug;
 }

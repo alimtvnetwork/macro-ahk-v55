@@ -36,6 +36,7 @@ function matchesToken(event: KeywordEvent, token: string): boolean {
     if ((event.Description ?? "").toLowerCase().includes(token)) return true;
     if ((event.Category ?? "").toLowerCase().includes(token)) return true;
     const tags = event.Tags ?? [];
+
     return tags.some(t => t.toLowerCase().includes(token));
 }
 
@@ -50,5 +51,6 @@ export function filterKeywordEvents(
 ): readonly KeywordEvent[] {
     const tokens = tokenizeSearch(search);
     if (tokens.length === 0) return events;
+
     return events.filter(ev => tokens.every(t => matchesToken(ev, t)));
 }

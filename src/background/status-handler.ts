@@ -43,9 +43,11 @@ export async function buildStatusResponse(): Promise<StatusResponse> {
 async function resolveTokenStatus(): Promise<StatusResponse["token"]> {
     try {
         const cookie = await readAuthCookie();
+
         return evaluateCookieStatus(cookie);
     } catch (cookieError) {
         logCookieWarning(cookieError);
+
         return buildMissingToken();
     }
 }
@@ -148,6 +150,7 @@ async function resolveConfigStatus(): Promise<StatusResponse["config"]> {
         if (hasFetched) {
             return { status: "loaded", source: "remote" };
         }
+
         return { status: "defaults", source: "hardcoded" };
     } catch {
         return { status: "defaults", source: "hardcoded" };
@@ -162,6 +165,7 @@ function resolveConnectionState(): StatusResponse["connection"] {
 
     if (isError) return "offline";
     if (isDegraded) return "degraded";
+
     return "online";
 }
 

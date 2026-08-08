@@ -47,12 +47,16 @@ describe("executeHotkeyStep", () => {
         const events: string[] = [];
         const fakeDoc = {
             querySelector: () => null,
-            dispatchEvent: (e: Event) => { events.push(e.type); return true; },
+            dispatchEvent: (e: Event) => { events.push(e.type);
+
+ return true; },
         };
         const setTimeoutCalls: number[] = [];
         const env = {
             document: fakeDoc as unknown as Document,
-            setTimeout: ((cb: () => void, ms: number) => { setTimeoutCalls.push(ms); cb(); return 0; }) as typeof setTimeout,
+            setTimeout: ((cb: () => void, ms: number) => { setTimeoutCalls.push(ms); cb();
+
+ return 0; }) as typeof setTimeout,
         };
         await executeHotkeyStep({ Keys: ["Ctrl+S", "Enter"], WaitMs: 500 }, env);
         expect(events).toEqual(["keydown", "keyup", "keydown", "keyup"]);
@@ -67,7 +71,9 @@ describe("executeHotkeyStep", () => {
         };
         await expect(executeHotkeyStep(
             { Keys: ["Enter"], Selector: "#nope" },
-            { document: fakeDoc as unknown as Document, setTimeout: ((cb: () => void) => { cb(); return 0; }) as typeof setTimeout },
+            { document: fakeDoc as unknown as Document, setTimeout: ((cb: () => void) => { cb();
+
+ return 0; }) as typeof setTimeout },
         )).rejects.toThrow(/did not match/);
     });
 });

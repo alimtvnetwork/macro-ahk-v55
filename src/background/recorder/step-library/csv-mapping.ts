@@ -61,6 +61,7 @@ export function suggestVariableName(header: string): string {
     if (cleaned === "") cleaned = "Var";
     // Ensure leading char is a letter or underscore.
     if (!/^[A-Za-z_]/.test(cleaned)) cleaned = `_${cleaned}`;
+
     return cleaned.slice(0, 64);
 }
 
@@ -70,6 +71,7 @@ export function validateVariableName(name: string): string | null {
     if (!VARIABLE_NAME_RE.test(name)) {
         return `Variable name "${name}" is invalid — use 1–64 chars, letters/digits/underscore, must not start with a digit.`;
     }
+
     return null;
 }
 
@@ -108,6 +110,7 @@ export function buildBagFromRow(opts: BuildBagOptions): BuildBagResult {
             Column: null,
         };
     }
+
     return { Ok: true, Bag: bag, UsedColumns: used };
 }
 
@@ -151,9 +154,9 @@ function applyMapping(
             Column: m.Column,
         };
     }
+
     return { Ok: true, Variable: m.Variable, Value: coerced.Value };
 }
-
 
 type CoerceResult =
     | { readonly Ok: true; readonly Value: JsonValue }
@@ -174,6 +177,7 @@ function coerceNumber(raw: string): CoerceResult {
     if (raw.trim() === "") return { Ok: false, Reason: 'Expected a number, got "" (empty cell).' };
     const n = Number(raw);
     if (!Number.isFinite(n)) return { Ok: false, Reason: `Expected a number, got "${raw}".` };
+
     return { Ok: true, Value: n };
 }
 
@@ -181,6 +185,7 @@ function coerceBoolean(raw: string): CoerceResult {
     const t = raw.trim().toLowerCase();
     if (t === "true" || t === "1" || t === "yes" || t === "y") return { Ok: true, Value: true };
     if (t === "false" || t === "0" || t === "no" || t === "n" || t === "") return { Ok: true, Value: false };
+
     return { Ok: false, Reason: `Expected a boolean (true/false/yes/no/0/1), got "${raw}".` };
 }
 
@@ -190,6 +195,7 @@ function coerceJson(raw: string): CoerceResult {
         return { Ok: true, Value: JSON.parse(raw) as JsonValue };
     } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
+
         return { Ok: false, Reason: `JSON parse error: ${msg}` };
     }
 }
@@ -206,6 +212,7 @@ function coerceAuto(raw: string): CoerceResult {
         const n = Number(trimmed);
         if (Number.isFinite(n) && String(n) === trimmed) return { Ok: true, Value: n };
     }
+
     return { Ok: true, Value: raw };
 }
 

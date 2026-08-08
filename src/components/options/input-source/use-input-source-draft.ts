@@ -68,6 +68,7 @@ function useHeaderMutators(setDraft: React.Dispatch<React.SetStateAction<InputSo
     const removeHeader = useCallback((idx: number) => {
         setDraft((prev) => ({ ...prev, Headers: prev.Headers.filter((_, i) => i !== idx) }));
     }, [setDraft]);
+
     return { addHeader, updateHeader, removeHeader };
 }
 
@@ -92,6 +93,7 @@ function useTestHandler(
     return useCallback(async () => {
         if (draft.Url.trim().length === 0) {
             toast.error("Add a URL before sending a test fetch");
+
             return;
         }
         setBusy(true);
@@ -106,10 +108,12 @@ function reportTestOutcome(result: FetchInputResult): void {
     if (result.Ok && !result.Skipped) {
         const keys = Object.keys(result.Bag);
         toast.success(`Fetched ${keys.length} key(s) (HTTP ${result.Status})`);
+
         return;
     }
     if (result.Ok && result.Skipped) {
         toast.warning(`Skipped: ${result.SkipReason}`);
+
         return;
     }
     toast.error(`Fetch failed: ${result.Error}`);

@@ -83,9 +83,11 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
   const [reportMode, setReportMode] = useState<BootFailureBannerMode>(() => {
     try {
       const saved = localStorage.getItem("marco_support_report_mode");
+
       return saved === "short" ? "short" : "full";
     } catch (caught) { // allow-swallow: localStorage may be denied; safe default is "full"
       logError("BootFailureBanner.loadReportMode", "localStorage read failed for key=marco_support_report_mode — defaulting to \"full\" report mode", caught);
+
       return "full";
     }
   });
@@ -640,6 +642,7 @@ function buildReport(input: ReportInput): string {
     // Short mode stops here — full report adds fix steps, stack, click trail.
     lines.push("(Short report — toggle to Full to include suggested fix, stack trace, and recent UI actions.)");
     lines.push("");
+
     return lines.join("\n");
   }
 
@@ -661,6 +664,7 @@ function buildReport(input: ReportInput): string {
     });
   }
   lines.push("");
+
   return lines.join("\n");
 }
 
@@ -668,6 +672,7 @@ function buildReport(input: ReportInput): string {
 function formatTime(iso: string): string {
   try {
     const date = new Date(iso);
+
     return date.toLocaleTimeString("en-GB", { hour12: false });
   } catch {
     return iso;

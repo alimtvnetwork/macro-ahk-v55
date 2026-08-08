@@ -186,6 +186,7 @@ function resolveProjectBinding(
         projectId = probePayload.projectId;
         bindingSource = "probe";
     }
+
     return { projectId, bindingSource };
 }
 
@@ -212,6 +213,7 @@ function resolveMatchedRule(args: {
     if (injectionMatchedRuleId !== null && injectionMatchedRuleId.startsWith(projectId + ":")) {
         const pattern = injectionMatchedRuleId.slice(projectId.length + 1);
         const rule = project.targetUrls.find((r) => r.pattern === pattern);
+
         return {
             pattern,
             matchType: rule?.matchType ?? "glob",
@@ -237,6 +239,7 @@ function resolveMatchedRule(args: {
 async function safeGetFocusedWindowId(): Promise<number | null> {
     try {
         const w = await chrome.windows.getLastFocused();
+
         return typeof w.id === "number" ? w.id : null;
     } catch {
         return null;
@@ -261,6 +264,7 @@ async function probeTabWorkspace(tabId: number | null): Promise<ProbeResult> {
         if (r.isOk === false) {
             return emitProbeFailure(tabId, "ProbeFailed", r.errorMessage ?? "probe failed (no errorMessage from controller)");
         }
+
         return { payload: r.payload ?? null, error: null, reason: null, reasonDetail: null };
     } catch (e) {
         const payload = e instanceof Error ? e.message : String(e);
@@ -269,6 +273,7 @@ async function probeTabWorkspace(tabId: number | null): Promise<ProbeResult> {
         // so it isn't conflated with genuine SDK exceptions.
         const isNoReceiver = /receiving end does not exist|could not establish connection/i.test(payload);
         const reason: ProbeFailureReason = isNoReceiver ? "NoReceiver" : "Exception";
+
         return emitProbeFailure(tabId, reason, payload);
     }
 }
@@ -293,5 +298,6 @@ function emitProbeFailure(
             contextDetail: reasonDetail,
         });
     }
+
     return { payload: null, error: reasonDetail, reason, reasonDetail };
 }

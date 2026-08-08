@@ -137,6 +137,7 @@ function AssetTypeIcon({ type }: { type: AssetType }) {
     preset: Settings2,
   };
   const Icon = icons[type];
+
   return <Icon className="h-4 w-4 text-muted-foreground" />;
 }
 
@@ -274,6 +275,7 @@ export function PromoteDialog({ open, onOpenChange, onPromoted }: PromoteDialogP
   const handlePromote = useCallback(async () => {
     if (!name.trim() || !slug.trim() || !content.trim()) {
       toast.error("Name, slug, and content are required");
+
       return;
     }
 
@@ -539,6 +541,7 @@ function AssetDetailPanel({ asset, links, onBack, onSync, onDelete, onLinkStateC
               <div className="space-y-2">
                 {links.map(link => {
                   const options = LINK_STATE_OPTIONS[link.LinkStateType];
+
                   return (
                     <div key={link.Id} className="flex items-center justify-between text-xs gap-2">
                       <span className="text-muted-foreground shrink-0">Project #{link.ProjectId}</span>
@@ -557,6 +560,7 @@ function AssetDetailPanel({ asset, links, onBack, onSync, onDelete, onLinkStateC
                           <DropdownMenuContent align="end" className="w-40">
                             {options.map(targetState => {
                               const Icon = LINK_STATE_ICONS[targetState];
+
                               return (
                                 <DropdownMenuItem
                                   key={targetState}
@@ -696,6 +700,7 @@ export function LibraryView() {
       if (msg?.type === "LIBRARY_CHANGED") {
         if (timer) clearTimeout(timer);
         timer = setTimeout(() => { void loadData(); }, 150);
+
         return;
       }
       if (msg?.type === "LIBRARY_SYNC_BROADCAST") {
@@ -705,6 +710,7 @@ export function LibraryView() {
       }
     };
     runtime.onMessage.addListener(listener);
+
     return () => {
       if (timer) clearTimeout(timer);
       runtime.onMessage!.removeListener(listener);
@@ -788,6 +794,7 @@ export function LibraryView() {
   const filtered = assets.filter(a => {
     if (filterType !== "all" && a.Type !== filterType) return false;
     if (search && !a.Name.toLowerCase().includes(search.toLowerCase()) && !a.Slug.toLowerCase().includes(search.toLowerCase())) return false;
+
     return true;
   });
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -804,11 +811,13 @@ export function LibraryView() {
         e.preventDefault();
         const searchInput = document.querySelector<HTMLInputElement>('[placeholder="Search assets…"]');
         searchInput?.focus();
+
         return;
       }
 
       if (e.key === "Escape" && isInput) {
         (target as HTMLInputElement).blur();
+
         return;
       }
 
@@ -825,6 +834,7 @@ export function LibraryView() {
       }
     };
     window.addEventListener("keydown", handler);
+
     return () => window.removeEventListener("keydown", handler);
   }, [activeTab, safePage, totalPages]);
 

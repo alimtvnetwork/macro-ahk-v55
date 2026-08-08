@@ -23,6 +23,7 @@ export interface CsvMappingTableProps {
 
 export function CsvMappingTable(props: CsvMappingTableProps): JSX.Element {
     const { csv, mappings, rowIndex, coercionOptions, onUpdateMapping } = props;
+
     return (
         <ScrollArea className="h-72 rounded border">
             <table className="w-full text-xs">
@@ -39,6 +40,7 @@ export function CsvMappingTable(props: CsvMappingTableProps): JSX.Element {
                         const mapping = mappings.find((entry) => entry.Column === header);
                         if (mapping === undefined) return null;
                         const cell = csv.Rows[rowIndex]?.[csv.Headers.indexOf(header)] ?? "";
+
                         return (
                             <CsvMappingRow
                                 key={header}

@@ -125,6 +125,7 @@ export function normalizeInjectScriptsResponse(
             inlineSyntaxFlagSource: "wire",
         };
     }
+
     return {
         results,
         inlineSyntaxErrorDetected: false,

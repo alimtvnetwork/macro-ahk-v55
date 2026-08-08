@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, lazy, Suspense } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -114,6 +113,7 @@ function OverflowTabMenu({ activeTab, setActiveTab }: TabListProps) {
   const triggerClass = `inline-flex items-center justify-center gap-1.5 text-xs rounded-md px-2.5 py-1.5 transition-all duration-200 hover:bg-primary/15 hover:text-primary ${
     isOverflowTab ? "bg-primary text-primary-foreground" : "text-muted-foreground"
   }`;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -177,6 +177,7 @@ function LazyTabContent({ value, activeTab, children }: { value: ProjectTab; act
 
 function PrimaryTabPanels({ activeTab, project, allProjects, availableScripts, availableConfigs, onSave, sdkNamespace, projectSlug }: TabsBodyProps) {
   const targetUrls = project.targetUrls ?? [];
+
   return (
     <>
       <TabsContent value="general" className="mt-4" forceMount={activeTab === "general" ? true : undefined}>
@@ -230,6 +231,7 @@ function PrimaryTabPanels({ activeTab, project, allProjects, availableScripts, a
 
 function OverflowTabPanels({ activeTab, project, sdkNamespace, projectSlug }: TabsBodyProps) {
   const targetUrls = project.targetUrls ?? [];
+
   return (
     <>
       <LazyTabContent value="files" activeTab={activeTab}>
@@ -267,6 +269,7 @@ export function ProjectDetailView({ project, allProjects, availableScripts, avai
   const [activeTab, setActiveTab] = useState<ProjectTab>("general");
   const projectSlug = project.slug || slugify(project.name);
   const sdkNamespace = useMemo(() => toSdkNamespace(projectSlug), [projectSlug]);
+
   return (
     <div className="space-y-4">
       <ProjectHeader

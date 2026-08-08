@@ -34,12 +34,14 @@ export function extractParamTokens(body: string): string[] {
     for (const m of body.matchAll(TOKEN_RE)) {
         out.push(m[1] ?? m[2]);
     }
+
     return out;
 }
 
 function toMultiset(tokens: string[]): Map<string, number> {
     const m = new Map<string, number>();
     for (const t of tokens) m.set(t, (m.get(t) ?? 0) + 1);
+
     return m;
 }
 
@@ -49,6 +51,7 @@ function diffAdded(newSet: Map<string, number>, oldSet: Map<string, number>): st
         const gap = v - (oldSet.get(k) ?? 0);
         for (let i = 0; i < gap; i++) added.push(k);
     }
+
     return added;
 }
 
@@ -58,6 +61,7 @@ function diffRemoved(newSet: Map<string, number>, oldSet: Map<string, number>): 
         const gap = v - (newSet.get(k) ?? 0);
         for (let i = 0; i < gap; i++) removed.push(k);
     }
+
     return removed;
 }
 
@@ -77,6 +81,7 @@ export interface AssertOptions {
 
 function renameToken(tokens: string[], oldKey: string, newKey: string): string[] {
     if (!oldKey || !newKey || oldKey === newKey) return tokens;
+
     return tokens.map((t) => (t === oldKey ? newKey : t));
 }
 

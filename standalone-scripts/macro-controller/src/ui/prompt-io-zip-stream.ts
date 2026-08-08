@@ -43,6 +43,7 @@ function buildCrcTable(): Uint32Array {
     for (let k = 0; k < 8; k++) c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
     table[i] = c >>> 0;
   }
+
   return table;
 }
 
@@ -51,6 +52,7 @@ function crc32(bytes: Uint8Array): number {
   if (isMissingCRC_TABLE) CRC_TABLE = buildCrcTable();
   let c = 0xffffffff;
   for (let i = 0; i < bytes.length; i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+
   return (c ^ 0xffffffff) >>> 0;
 }
 
@@ -93,6 +95,7 @@ function buildLocalHeader(path: string, crc: number, size: number): Uint8Array {
   writeUint16LE(view, 26, nameBytes.length);
   writeUint16LE(view, 28, 0);
   header.set(nameBytes, 30);
+
   return header;
 }
 
@@ -118,6 +121,7 @@ function buildCentralEntry(record: CentralRecord): Uint8Array {
   writeUint32LE(view, 38, 0);
   writeUint32LE(view, 42, record.offset);
   entry.set(nameBytes, 46);
+
   return entry;
 }
 
@@ -132,6 +136,7 @@ function buildEocd(centralOffset: number, centralSize: number, count: number): U
   writeUint32LE(view, 12, centralSize);
   writeUint32LE(view, 16, centralOffset);
   writeUint16LE(view, 20, 0);
+
   return eocd;
 }
 
@@ -147,6 +152,7 @@ export interface StreamingZipInfo {
 function stripBody(entry: PromptEntry): Record<string, unknown> {
   const clone: Record<string, unknown> = { ...entry };
   delete clone.text;
+
   return clone;
 }
 
@@ -176,6 +182,7 @@ export function buildPromptsZipStream(
   const preparedEntries = bundle.entries.map((entry, index) => {
     const slugSource = entry.slug ?? entry.name;
     const slug = sanitizeSlug(slugSource, index + 1);
+
     return {
       bodyPath: `entries/${slug}.md`,
       body: encodeUtf8(entry.text),

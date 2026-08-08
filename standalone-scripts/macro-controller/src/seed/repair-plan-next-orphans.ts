@@ -48,6 +48,7 @@ export async function repairPlanNextOrphans(): Promise<OrphanRepairReport> {
     if (entry.outcome === 'adopted') adopted += 1;
     else if (entry.outcome === 'failed-upsert' || entry.outcome === 'skipped-lookup-failed') failures += 1;
   }
+
   return { inspected: defaults.length, adopted, failures, entries };
 }
 
@@ -59,6 +60,7 @@ async function repairSingleOrphan(seedRow: typeof PLAN_NEXT_SEED_ROWS[number]): 
       slug: seedRow.slug, fromRole: 'unknown', toRole: seedRow.role,
       stage: 'lookup', reason: lookup.error ?? 'getPromptBySlug returned !ok',
     });
+
     return { slug: seedRow.slug, fromRole: 'unknown', toRole: seedRow.role, outcome: 'skipped-lookup-failed', reason: lookup.error ?? 'lookup failed' };
   }
   const existing = lookup.value;
@@ -77,7 +79,9 @@ async function repairSingleOrphan(seedRow: typeof PLAN_NEXT_SEED_ROWS[number]): 
       slug: seedRow.slug, fromRole: existing.Role, toRole: seedRow.role,
       stage: 'upsert', reason: saved.error ?? 'upsertPrompt returned !ok',
     });
+
     return { slug: seedRow.slug, fromRole: existing.Role, toRole: seedRow.role, outcome: 'failed-upsert', reason: saved.error ?? 'upsert failed' };
   }
+
   return { slug: seedRow.slug, fromRole: existing.Role, toRole: seedRow.role, outcome: 'adopted' };
 }

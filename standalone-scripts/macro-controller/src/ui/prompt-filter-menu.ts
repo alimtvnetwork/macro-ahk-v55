@@ -52,6 +52,7 @@ function buildShell(ctx: PromptContext, categories: string[]): { item: HTMLEleme
   item.appendChild(row);
   item.appendChild(sub);
   wireToggle(row, arrow, sub, ctx.promptsDropdown, categories.length);
+
   return { item, sub };
 }
 
@@ -114,6 +115,7 @@ function buildCategoryRow(cat: string, ctx: PromptContext, deps: TaskNextDeps, r
     togglePromptCategoryFilter(cat.toLowerCase());
     rerender(ctx, deps);
   };
+
   return it;
 }
 

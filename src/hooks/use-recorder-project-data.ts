@@ -119,6 +119,7 @@ async function fetchProjectData(projectSlug: string): Promise<RecorderProjectDat
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sendMessage<{ bindings: ReadonlyArray<FieldBindingRow> }>({ type: "RECORDER_FIELD_BINDING_LIST" as any, projectSlug }),
     ]);
+
     return {
         steps: stepsRes.steps ?? [],
         dataSources: dsRes.dataSources ?? [],
@@ -133,6 +134,7 @@ async function fetchSelectors(projectSlug: string, stepId: number): Promise<Read
         projectSlug,
         stepId,
     }).catch(() => ({ selectors: [] as ReadonlyArray<SelectorRow> }));
+
     return list.selectors;
 }
 
@@ -142,6 +144,7 @@ async function sendUpdateStepMeta(projectSlug: string, stepId: number, patch: St
         type: "RECORDER_STEP_UPDATE_META" as any,
         projectSlug, stepId, patch,
     });
+
     return res.step;
 }
 
@@ -151,6 +154,7 @@ async function sendSetStepTags(projectSlug: string, stepId: number, tags: Readon
         type: "RECORDER_STEP_TAGS_SET" as any,
         projectSlug, stepId, tags,
     });
+
     return res.tags;
 }
 
@@ -160,6 +164,7 @@ async function sendSetStepLink(projectSlug: string, stepId: number, slot: StepLi
         type: "RECORDER_STEP_LINK_SET" as any,
         projectSlug, stepId, slot, targetProjectSlug,
     });
+
     return res.step;
 }
 
@@ -200,7 +205,9 @@ export function useRecorderProjectData(projectSlug: string): HookResult {
 
     const setStepTags = useCallback(async (stepId: number, tags: ReadonlyArray<string>) => {
         const next = await sendSetStepTags(projectSlug, stepId, tags);
-        setTagsByStep((prev) => { const m = new Map(prev); m.set(stepId, next); return m; });
+        setTagsByStep((prev) => { const m = new Map(prev); m.set(stepId, next);
+
+ return m; });
     }, [projectSlug]);
 
     const setStepLink = useCallback(async (stepId: number, slot: StepLinkSlot, targetProjectSlug: string | null) => {
@@ -211,5 +218,4 @@ export function useRecorderProjectData(projectSlug: string): HookResult {
 
     return { data, loading, error, reload, loadSelectors, tagsByStep, updateStepMeta, setStepTags, setStepLink };
 }
-
 

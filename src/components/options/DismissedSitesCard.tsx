@@ -79,6 +79,7 @@ function RefreshButton({ loading, onRefresh }: { loading: boolean; onRefresh: ()
 function DismissedSitesBody(props: { loading: boolean; hasOrigins: boolean; origins: string[]; pending: string | null; onForget: (origin: string) => Promise<void> }): JSX.Element {
     if (props.loading && props.origins.length === 0) return <LoadingSites />;
     if (!props.hasOrigins) return <NoDismissedSites />;
+
     return <DismissedSitesList origins={props.origins} pending={props.pending} onForget={props.onForget} />;
 }
 

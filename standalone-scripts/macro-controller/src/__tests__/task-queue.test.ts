@@ -8,11 +8,13 @@ import {
 
 const makeMemoryStorage = (): QueueStorage => {
     const store = new Map<string, TaskQueueRecord>();
+
     return {
         read: async (projectId) => {
             const rec = store.get(projectId);
             const isMissingRec = !rec;
             if (isMissingRec) return null;
+
             // deep clone to mimic IndexedDB serialisation
             return JSON.parse(JSON.stringify(rec)) as TaskQueueRecord;
         },

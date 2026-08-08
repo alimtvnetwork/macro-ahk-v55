@@ -31,6 +31,7 @@ function makeHandlers(): { handlers: ProjectNameDropdownHandlers; calls: Record<
         onRename: 0, onConnect: 0, onOpen: 0, onDisconnect: 0, onStatus: 0, onRemix: 0,
     };
     const bump = (k: string) => () => { calls[k]++; };
+
     return {
         calls,
         handlers: {

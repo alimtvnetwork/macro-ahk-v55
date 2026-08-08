@@ -26,8 +26,10 @@ function bumpPatch(v: string): string {
   const parts = v.split(".");
   if (parts.length === 3) {
     parts[2] = String(Number(parts[2] || 0) + 1);
+
     return parts.join(".");
   }
+
   return v;
 }
 
@@ -105,7 +107,9 @@ export function ProjectHeader({ project, onSave, onDelete, onBack, onSwitchTab }
   const markDirty = () => setDirty(true);
 
   const handleSaveIdentity = async () => {
-    if (!editName.trim()) { toast.error("Project name is required"); return; }
+    if (!editName.trim()) { toast.error("Project name is required");
+
+ return; }
     setIsSaving(true);
     await onSave({
       id: project.id,

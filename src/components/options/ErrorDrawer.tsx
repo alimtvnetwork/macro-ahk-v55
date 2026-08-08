@@ -169,6 +169,7 @@ export function ErrorDrawer({ open, onOpenChange }: ErrorDrawerProps) {
   const handleCopyAll = useCallback(() => {
     if (errorEntries.length === 0) {
       toast.info("No errors to copy");
+
       return;
     }
 

@@ -19,6 +19,7 @@ const sendCalls: Array<{ type: string; payload: unknown }> = [];
 vi.mock('../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: async (type: string, payload: unknown) => {
         sendCalls.push({ type, payload });
+
         return { isOk: true };
     },
 }));
@@ -41,6 +42,7 @@ function installDom(opts: { withSentinel: boolean; withRelayFlag: boolean }): {
     const win: Record<string, unknown> = {};
     if (opts.withRelayFlag) win.__marcoRelayActive = true;
     (globalThis as unknown as { window: unknown }).window = win;
+
     return { sentinelEl };
 }
 

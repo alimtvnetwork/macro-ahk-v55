@@ -97,6 +97,7 @@ function buildSegment(element: Element): string {
 
         if (hasSiblings) {
             const index = siblings.indexOf(element) + 1;
+
             return `${tagName}[${index}]`;
         }
     }

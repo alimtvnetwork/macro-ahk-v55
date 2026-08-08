@@ -26,8 +26,6 @@ import { toWireWorkspace, resolveWireSection } from './types/wire-workspace';
 import { toWireWorkspaceCredits } from './types/wire-workspace-credits';
 import { toWireWorkspaceLifecycle, type WireWorkspaceLifecycle } from './types/wire-workspace-lifecycle';
 
-
-
 // ============================================
 // Workspace Tier Enum
 // ============================================
@@ -64,6 +62,7 @@ export function resolveWsTier(plan: string, subStatus: string, billingLimit: num
   if (billingLimit > 0 || (p && p !== PlanNameType.FREE)) {
     if (s === SubscriptionStatusType.ACTIVE) return WsTierValueType.PRO;
     if (isCanceledStatus(s) || s === SubscriptionStatusType.PAST_DUE) return WsTierValueType.EXPIRED;
+
     return WsTierValueType.PRO; // default if billing exists
   }
 
@@ -99,6 +98,7 @@ export function expiredDays(ws: import('./types').WorkspaceCredit): number | nul
   if (!Number.isFinite(t)) return null;
   const ms = Date.now() - t;
   if (ms < 0) return 0;
+
   return Math.floor(ms / 86400000);
 }
 
@@ -118,6 +118,7 @@ export function formatExpiryStartDate(ws: import('./types').WorkspaceCredit): st
   const dayPart = String(d.getDate()).padStart(2, '0');
   const monPart = months[d.getMonth()];
   const yearPart = String(d.getFullYear() % 100).padStart(2, '0');
+
   return dayPart + '/' + monPart + '/' + yearPart;
 }
 
@@ -133,10 +134,12 @@ export function formatExpiredDuration(ws: import('./types').WorkspaceCredit): st
   if (days < 365) {
     const months = Math.floor(days / 30);
     const remDays = days % 30;
+
     return remDays > 0 ? months + 'mo ' + remDays + 'd' : months + 'mo';
   }
   const years = Math.floor(days / 365);
   const remMonths = Math.floor((days % 365) / 30);
+
   return remMonths > 0 ? years + 'y ' + remMonths + 'mo' : years + 'y';
 }
 
@@ -167,7 +170,6 @@ function extractLifecycleMeta(lifecycle: WireWorkspaceLifecycle): LifecycleMeta 
   };
 }
 
-
 // ============================================
 // parseWorkspaceItem — extract a single workspace from API response
 // ============================================
@@ -193,6 +195,7 @@ function calcProOne(
 ): ProOneCalc {
   const totalCredits = Math.round(totalCreditsUsedInBillingPeriod + dLimit + bLimit);
   const available = Math.max(0, Math.round(totalCredits - totalCreditsUsedInBillingPeriod - dUsed));
+
   return { totalCredits, available, totalCreditsUsed: Math.round(totalCreditsUsedInBillingPeriod) };
 }
 
@@ -258,8 +261,6 @@ function parseWorkspaceItem(rawItem: Record<string, unknown>, wsIdx: number): im
   };
 }
 
-
-
 // ============================================
 // applyLifecycleOverrides — single chokepoint
 // (Phase 5 — workspace-status-tooltip v2.213.0)
@@ -278,6 +279,7 @@ function applyLifecycleOverrides(perWs: import('./types').WorkspaceCredit[]): vo
   const isMissingEnabled = !enabled;
   if (isMissingEnabled) {
     log('Lifecycle overrides disabled via enableCanceledCreditOverride=false', 'info');
+
     return;
   }
   let overridden = 0;
@@ -328,6 +330,7 @@ function matchCurrentWorkspace(perWs: import('./types').WorkspaceCredit[]): void
   for (const ws of perWs) {
     if (ws.fullName === state.workspaceName || ws.name === state.workspaceName) {
       loopCreditState.currentWs = ws;
+
       return;
     }
   }
@@ -350,6 +353,7 @@ export function parseLoopApiResponse(data: Record<string, unknown>): boolean {
   const workspaces = (data.workspaces || data || []) as Array<Record<string, unknown>>;
   if (!Array.isArray(workspaces)) {
     log('parseLoopApiResponse: unexpected response shape', 'warn');
+
     return false;
   }
 
@@ -365,6 +369,7 @@ export function parseLoopApiResponse(data: Record<string, unknown>): boolean {
 
   loopCreditState.source = CreditSourceType.Api;
   log('Credit API: parsed ' + perWs.length + ' workspaces — dailyFree=' + loopCreditState.totalDailyFree + ' rollover=' + loopCreditState.totalRollover + ' available=' + loopCreditState.totalAvailable + ' | wsById keys=' + Object.keys(loopCreditState.wsById).length, 'success');
+
   return true;
 }
 
@@ -390,6 +395,7 @@ export async function applyProZeroEnrichment(): Promise<number> {
   matchCurrentWorkspace(perWs);
   buildWsByIdIndex(perWs);
   log('[ProZero] Enriched ' + mutated + ' workspace(s) — re-aggregated totals', 'success');
+
   return mutated;
 }
 
@@ -411,9 +417,9 @@ export async function applyProOneEnrichment(): Promise<number> {
   matchCurrentWorkspace(perWs);
   buildWsByIdIndex(perWs);
   log('[ProOne] Enriched ' + mutated + ' workspace(s) — re-aggregated totals', 'success');
+
   return mutated;
 }
-
 
 // ============================================
 // syncCreditStateFromApi — sync loop state from API data
@@ -423,6 +429,7 @@ export function syncCreditStateFromApi(): void {
   const isMissingCws = !cws;
   if (isMissingCws) {
     logSub('syncCreditState: no currentWs — cannot determine credit', 1);
+
     return;
   }
   const dailyFree = cws.dailyFree || 0;

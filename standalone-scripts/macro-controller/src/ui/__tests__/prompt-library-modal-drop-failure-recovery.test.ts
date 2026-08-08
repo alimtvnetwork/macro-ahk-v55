@@ -72,6 +72,7 @@ function fireDragOver(root: HTMLElement): string {
     const ev = new Event('dragover', { bubbles: true, cancelable: true });
     Object.defineProperty(ev, 'dataTransfer', { value: dt, configurable: true });
     root.dispatchEvent(ev);
+
     return dt.dropEffect;
 }
 

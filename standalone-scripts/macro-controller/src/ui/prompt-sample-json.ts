@@ -16,7 +16,6 @@ import { VERSION } from '../shared-state';
 import { buildPromptsBundle } from './prompt-bundle-types';
 import type { PromptEntry } from '../types/ui-types';
 
-
 const SAMPLE_ENTRIES: readonly PromptEntry[] = [
     {
         name: 'Sample PlanTierType prompt',
@@ -49,9 +48,9 @@ const SAMPLE_ENTRIES: readonly PromptEntry[] = [
 
 export function buildSamplePromptsJson(_nowIso?: string): string {
     const bundle = buildPromptsBundle([...SAMPLE_ENTRIES], VERSION, { format: 'json' });
+
     return JSON.stringify(bundle, null, 2);
 }
-
 
 export function downloadSamplePromptsJson(): void {
     try {

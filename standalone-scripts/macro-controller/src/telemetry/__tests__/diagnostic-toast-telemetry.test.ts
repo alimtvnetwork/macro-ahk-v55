@@ -19,7 +19,6 @@ import {
   DIAGNOSTIC_TOAST_TRACE_MAX,
 } from '../diagnostic-toast-telemetry';
 
-
 describe('diagnostic-toast-telemetry', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -165,5 +164,4 @@ describe('diagnostic-toast-telemetry', () => {
     for (let i = 0; i < 50; i++) ids.add(generateCorrelationId());
     expect(ids.size).toBe(50);
   });
-
 });

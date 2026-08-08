@@ -32,12 +32,14 @@ const CSS_MODAL_SECONDARY_BTN_BASE = 'padding:8px 14px;background:';
 /** Adapter: getByXPath returns Node|null, pasteIntoEditor needs Element|null */
 function getByXPathAsElement(xpath: string): Element | null {
   const node = getByXPath(xpath);
+
   return node instanceof Element ? node : null;
 }
 
 // CQ16: Extracted from openPromptCreationModal closure
 function getSelectedCategory(catSelect: HTMLSelectElement, catCustomInput: HTMLInputElement): string {
   if (catSelect.value === '__custom__') return catCustomInput.value.trim();
+
   return catSelect.value;
 }
 
@@ -54,8 +56,12 @@ function handleFile(file: File, refs: FileHandlerRefs): void {
   const isMissingFile = !file;
   if (isMissingFile) return;
   const ext = (file.name || '').split('.').pop()?.toLowerCase() || '';
-  if (!['md', 'txt', 'prompt'].includes(ext)) { showPasteToast('❌ Unsupported file type: .' + ext, true); return; }
-  if (file.size > 50 * 1024) { showPasteToast('❌ File too large (max 50KB)', true); return; }
+  if (!['md', 'txt', 'prompt'].includes(ext)) { showPasteToast('❌ Unsupported file type: .' + ext, true);
+
+ return; }
+  if (file.size > 50 * 1024) { showPasteToast('❌ File too large (max 50KB)', true);
+
+ return; }
   const reader = new FileReader();
   reader.onload = function(e: ProgressEvent<FileReader>) {
     const content = e.target?.result as string;
@@ -80,6 +86,7 @@ function onEscHandler(overlay: HTMLElement): (e: KeyboardEvent) => void {
       document.removeEventListener('keydown', handler);
     }
   };
+
   return handler;
 }
 
@@ -167,6 +174,7 @@ function formatSaveErrorMessage(
     const fix = f.fix ?? (expected !== null
       ? 'Write EXACTLY ' + expected + ' top-level numbered steps under a "Steps:" heading, then click ' + buttonLabel + ' again.'
       : 'Adjust the declared step count or the numbered steps so they match, then click ' + buttonLabel + ' again.');
+
     return '❌ Save blocked: Rule 0 (step count is law)\n'
       + 'Button: ' + buttonLabel + '   Role: ' + roleLabel + '\n'
       + 'Detail: ' + detail + '\n'
@@ -175,11 +183,13 @@ function formatSaveErrorMessage(
   if (f && f.rule === 'token-drift') {
     const tokens = (f.missingTokens ?? []).map(function(t) { return '{{' + t + '}}'; }).join(', ');
     const fix = f.fix ?? ('Paste ' + (tokens || 'the required token(s)') + ' back into the body, then click ' + buttonLabel + '.');
+
     return '❌ Save blocked: required token(s) missing\n'
       + 'Button: ' + buttonLabel + '   Role: ' + roleLabel + '\n'
       + 'Detail: ' + (tokens || 'missing tokens') + '\n'
       + 'Fix: ' + fix;
   }
+
   return '❌ ' + buttonLabel + ' failed (' + roleLabel + '): ' + input.fallbackMessage;
 }
 
@@ -351,6 +361,7 @@ function _buildExcludeFromExportToggle(initialData: Record<string, unknown>): { 
   text.title = 'When enabled, this prompt is skipped by the 📥 IO → Export Prompts download.';
   wrap.appendChild(input);
   wrap.appendChild(text);
+
   return { wrap, input };
 }
 
@@ -445,6 +456,7 @@ function _buildTagsInput(initialData: Record<string, unknown>): { tagsWrap: HTML
   tagsInput.onblur = function() { (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; };
   
   tagsWrap.appendChild(tagsInput);
+
   return { tagsWrap, tagsInput };
 }
 
@@ -459,6 +471,7 @@ function collectExistingCategories(): string[] {
     const ec = (entry.category || '').trim();
     if (ec && !catSeen[ec.toLowerCase()]) { existingCats.push(ec); catSeen[ec.toLowerCase()] = true; }
   }
+
   return existingCats;
 }
 
@@ -533,6 +546,7 @@ function _buildCategorySelect(initialData: Record<string, unknown>): { catWrap: 
 
   catWrap.appendChild(catSelect);
   catWrap.appendChild(catCustomInput);
+
   return { catWrap, catSelect, catCustomInput };
 }
 
@@ -541,12 +555,14 @@ function buildSlug(role: PromptRole, name: string, editPrompt: EditablePrompt | 
     return editPrompt.slug.trim();
   }
   const base = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
   return role + '-' + (base || 'prompt') + '-' + Date.now();
 }
 
 function parseDbPromptId(editPrompt: EditablePrompt | null): number | undefined {
   if (!editPrompt || typeof editPrompt.id !== 'string') return undefined;
   const id = Number(editPrompt.id);
+
   return Number.isInteger(id) && id > 0 ? id : undefined;
 }
 
@@ -556,12 +572,14 @@ function buildLegacyPromptPayload(input: PromptSaveInput): Record<string, unknow
   if (input.tags.length > 0) promptPayload.tags = input.tags;
   if (input.isEdit && input.editPrompt && input.editPrompt.id) promptPayload.id = input.editPrompt.id;
   promptPayload.excludeFromExport = input.excludeFromExport;
+
   return promptPayload;
 }
 
 function saveGenericPrompt(input: PromptSaveInput): Promise<PromptSaveResult> {
   return sendToExtension('SAVE_PROMPT', { prompt: buildLegacyPromptPayload(input) }).then(function(resp: Record<string, unknown>) {
     if (resp && resp.isOk) return { isOk: true };
+
     return { isOk: false, errorMessage: (resp && resp.errorMessage as string) || 'Save failed, extension may not be connected' };
   });
 }
@@ -589,6 +607,7 @@ export function saveRoleScopedPrompt(input: PromptSaveInput, role: PromptRole): 
         },
         new Error('rule-zero:' + check.code),
       );
+
       return Promise.resolve({
         isOk: false,
         errorMessage: check.reason,
@@ -603,6 +622,7 @@ export function saveRoleScopedPrompt(input: PromptSaveInput, role: PromptRole): 
   }
 
   const promptId = parseDbPromptId(input.editPrompt);
+
   return upsertPrompt({
     id: promptId,
     slug: buildSlug(role, input.name, input.editPrompt),
@@ -615,6 +635,7 @@ export function saveRoleScopedPrompt(input: PromptSaveInput, role: PromptRole): 
     replaceValues: input.editPrompt?.replaceValues,
   }).then(function(result) {
     if (result.ok) return { isOk: true };
+
     return {
       isOk: false,
       errorMessage: result.error ?? 'Role-scoped prompt save failed',
@@ -628,6 +649,7 @@ function savePromptFromEditor(input: PromptSaveInput): Promise<PromptSaveResult>
   if (role === 'plan' || role === 'next') {
     return saveRoleScopedPrompt(input, role);
   }
+
   return saveGenericPrompt(input);
 }
 
@@ -674,7 +696,6 @@ function _buildPromptModalFooter(
   const showRuleZero = options?.role === 'plan' || options?.role === 'next';
   const ruleZeroIndicator = showRuleZero ? _buildRuleZeroIndicator() : null;
   if (ruleZeroIndicator) footer.appendChild(ruleZeroIndicator.root);
-
 
   const buttonRow = document.createElement('div');
   buttonRow.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;';
@@ -729,8 +750,6 @@ function _buildPromptModalFooter(
     buttonRow.appendChild(resetBtn);
   }
 
-
-
   // Paste Test button
   const testBtn = document.createElement('button');
   testBtn.textContent = '📋 Paste Test';
@@ -740,7 +759,9 @@ function _buildPromptModalFooter(
   testBtn.onclick = function() {
     let text = contentArea.value.trim();
     const isMissingText = !text;
-    if (isMissingText) { showPasteToast('❌ No content to paste', true); return; }
+    if (isMissingText) { showPasteToast('❌ No content to paste', true);
+
+ return; }
     const now = new Date();
     text = text.replace(/\{\{date\}\}/gi, now.toLocaleDateString());
     text = text.replace(/\{\{time\}\}/gi, now.toLocaleTimeString());
@@ -811,6 +832,7 @@ function _buildPromptModalFooter(
     const diffKeyHandler = function (e: KeyboardEvent): void {
       if (!document.body.contains(overlay)) {
         document.removeEventListener('keydown', diffKeyHandler);
+
         return;
       }
       const isDiffShortcut = (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey
@@ -823,8 +845,6 @@ function _buildPromptModalFooter(
     };
     document.addEventListener('keydown', diffKeyHandler);
   }
-
-
 
   // Save button — drift-guarded via required-tokens chip strip.
   const saveBtn = document.createElement('button');
@@ -864,7 +884,6 @@ function _buildPromptModalFooter(
   };
   refreshDriftState();
 
-
   // eslint-disable-next-line max-lines-per-function -- linear save-response ceremony; split would obscure flow
   function handleSaveResponse(resp: PromptSaveResult, name: string, text: string): void {
     (saveBtn as HTMLButtonElement).disabled = false;
@@ -888,6 +907,7 @@ function _buildPromptModalFooter(
         },
         new Error(fallback),
       );
+
       return;
     }
     const role = options?.role;
@@ -910,6 +930,7 @@ function _buildPromptModalFooter(
           role: role, previousBody: text,
         };
         if (previousId !== undefined) undoPayload.id = previousId;
+
         return upsertPrompt(undoPayload).then(function(r) {
           const isMissingOk = !r.ok;
           if (isMissingOk) {
@@ -919,6 +940,7 @@ function _buildPromptModalFooter(
               { slug: previousSlug, reason: r.error ?? 'upsert failed' },
               new Error(r.error ?? 'upsert failed'),
             );
+
             return;
           }
           showPasteToast('↺ Reverted to previous version', false);
@@ -938,10 +960,16 @@ function _buildPromptModalFooter(
     const name = titleInput.value.trim();
     const text = contentArea.value.trim();
     const isMissingName = !name;
-    if (isMissingName) { showPasteToast('❌ Title is required', true); titleInput.focus(); return; }
+    if (isMissingName) { showPasteToast('❌ Title is required', true); titleInput.focus();
+
+ return; }
     const isMissingText = !text;
-    if (isMissingText) { showPasteToast('❌ Content is required', true); contentArea.focus(); return; }
-    if (text.length > 50 * 1024) { showPasteToast('❌ Content exceeds 50KB limit', true); return; }
+    if (isMissingText) { showPasteToast('❌ Content is required', true); contentArea.focus();
+
+ return; }
+    if (text.length > 50 * 1024) { showPasteToast('❌ Content exceeds 50KB limit', true);
+
+ return; }
 
     if (tokenStrip) {
       const missing = tokenStrip.recomputeMissing(text);
@@ -965,6 +993,7 @@ function _buildPromptModalFooter(
           new Error('token drift: ' + missing.join(',')),
         );
         contentArea.focus();
+
         return;
       }
     }
@@ -1035,6 +1064,7 @@ function _buildRequiredTokenStrip(requiredTokens: string[]): {
       const isMissingOk = !ok;
       if (isMissingOk) missing.push(token);
     }
+
     return missing;
   };
 
@@ -1113,10 +1143,10 @@ function _buildRuleZeroIndicator(): {
   const recompute = function (body: string): import('../db/rule-zero-validator').RuleZeroCheck {
     const check = validateRuleZero(body || '');
     _ruleZeroApplyStyle(badge, _ruleZeroPaintText(check));
+
     return check;
   };
 
   return { root, recompute };
 }
-
 

@@ -43,6 +43,7 @@ export interface RunStatsResponse {
 async function loadMetrics(): Promise<CycleMetric[]> {
     try {
         const result = await chrome.storage.local.get(STORAGE_KEY);
+
         return (result[STORAGE_KEY] as CycleMetric[]) ?? [];
     } catch {
         return [];
@@ -127,5 +128,6 @@ export async function handleGetRunStats(): Promise<RunStatsResponse> {
 /** Clears all stored run statistics. */
 export async function handleClearRunStats(): Promise<{ isOk: true }> {
     await chrome.storage.local.remove(STORAGE_KEY);
+
     return { isOk: true };
 }

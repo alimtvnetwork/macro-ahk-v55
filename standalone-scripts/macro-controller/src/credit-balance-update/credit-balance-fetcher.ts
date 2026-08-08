@@ -37,6 +37,7 @@ function toCaughtMessage(caught: CaughtError): string {
     if (typeof caught === 'string') {
         return caught;
     }
+
     return String(caught);
 }
 
@@ -67,6 +68,7 @@ function buildFailurePayload(
 async function readBodyPreview(response: Response): Promise<string | null> {
     try {
         const text = await response.text();
+
         return text ? text.substring(0, 500) : null;
     } catch (caught: CaughtError) {
         return 'Unable to read error body: ' + toCaughtMessage(caught);
@@ -103,6 +105,7 @@ function buildResult(
 function classifyHttpReason(status: number): CreditFetchOutcomeType {
     if (status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN) return CreditFetchOutcomeType.AuthError;
     if (status >= HttpCodes.INTERNAL_SERVER_ERROR) return CreditFetchOutcomeType.HttpError;
+
     return CreditFetchOutcomeType.HttpError;
 }
 
@@ -122,6 +125,7 @@ async function handleNonOkResponse(
     }
     logCreditFetchFailure(buildFailurePayload(reasonStr, detail, options, url, token, status, bodyPreview, startMs));
     const outcome = reasonStr === 'AuthError' ? CreditFetchOutcomeType.AuthError : CreditFetchOutcomeType.HttpError;
+
     return buildResult(outcome, null, url, detail);
 }
 
@@ -138,6 +142,7 @@ async function parseOkResponse(
     } catch (caught: CaughtError) {
         const detail = 'ParseError: ' + toCaughtMessage(caught);
         logCreditParseFailure(buildFailurePayload('ParseError', detail, options, url, token, response.status, null, startMs), caught);
+
         return buildResult(CreditFetchOutcomeType.ParseError, null, url, detail);
     }
 }
@@ -153,10 +158,12 @@ function handleCaughtError(
     if (isAbortError(caught)) {
         const detail = 'Exceeded ' + timeoutMs + ' ms budget for workspace ' + options.workspaceId;
         logCreditFetchFailure(buildFailurePayload('Timeout', detail, options, url, token, null, null, startMs), caught);
+
         return buildResult(CreditFetchOutcomeType.Timeout, null, url, detail);
     }
     const detail = 'Network error: ' + toCaughtMessage(caught);
     logCreditFetchFailure(buildFailurePayload('NetworkError', detail, options, url, token, null, null, startMs), caught);
+
     return buildResult(CreditFetchOutcomeType.HttpError, null, url, detail);
 }
 
@@ -173,6 +180,7 @@ export async function fetchWorkspaceCreditBalance(
     if (isMissingToken) {
         const detail = 'No bearer token returned by unified getBearerToken() contract';
         logCreditFetchFailure(buildFailurePayload('MissingToken', detail, options, url, null, null, null, startMs));
+
         return buildResult(CreditFetchOutcomeType.MissingToken, null, url, detail);
     }
 
@@ -191,6 +199,7 @@ export async function fetchWorkspaceCreditBalance(
         if (response.isFail) {
             return await handleNonOkResponse(response, options, url, token, startMs);
         }
+
         return await parseOkResponse(response, options, url, token, startMs);
     } catch (caught: CaughtError) {
         return handleCaughtError(caught, options, url, token, startMs, timeoutMs);

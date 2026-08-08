@@ -72,6 +72,7 @@ describe('buildBreakdownTable — projects column + double-click', () => {
     const rows = table.querySelectorAll('[data-credit-totals-row]');
     const texts = Array.from(rows).map((r) => {
       const spans = r.querySelectorAll('span');
+
       // projects is the 3rd cell (index 2) after name and plan
       return spans[2]?.textContent ?? '';
     });

@@ -76,6 +76,7 @@ export async function seedFromManifest(): Promise<SeedResult> {
     if (isMissingManifest) {
         logBgWarnError(BgLogTag.MANIFEST_SEEDER, "seed-manifest.json not found or invalid — skipping. " +
             "Ensure the build pipeline runs compile-instruction + generate-seed-manifest.");
+
         return { scripts: 0, configs: 0, projects: 0, errors: ["seed-manifest.json not found or invalid"] };
     }
 
@@ -83,10 +84,12 @@ export async function seedFromManifest(): Promise<SeedResult> {
     const sv = manifest.SchemaVersion;
     if (typeof sv !== "number" || !Number.isFinite(sv)) {
         logBgWarnError(BgLogTag.MANIFEST_SEEDER, `Invalid schemaVersion: ${sv} — aborting seed`);
+
         return { scripts: 0, configs: 0, projects: 0, errors: [`Invalid schemaVersion: ${sv}`] };
     }
     if (sv > SUPPORTED_SCHEMA_VERSIONS.max) {
         logBgWarnError(BgLogTag.MANIFEST_SEEDER, `schemaVersion ${sv} is newer than supported max (${SUPPORTED_SCHEMA_VERSIONS.max}) — aborting. Update the extension.`);
+
         return { scripts: 0, configs: 0, projects: 0, errors: [`Unsupported schemaVersion ${sv} (max supported: ${SUPPORTED_SCHEMA_VERSIONS.max})`] };
     }
     if (sv < SUPPORTED_SCHEMA_VERSIONS.min) {
@@ -98,6 +101,7 @@ export async function seedFromManifest(): Promise<SeedResult> {
             `schemaVersion ${sv} is older than min (${SUPPORTED_SCHEMA_VERSIONS.min}) — aborting. ` +
             `Rebuild seed-manifest.json with the current generator.`,
         );
+
         return {
             scripts: 0,
             configs: 0,
@@ -171,6 +175,7 @@ async function fetchManifest(): Promise<SeedManifest | null> {
         url = chrome.runtime.getURL(MANIFEST_PATH);
     } catch (err) {
         logCaughtError(BgLogTag.MANIFEST_SEEDER, `chrome.runtime.getURL() failed for '${MANIFEST_PATH}'`, err);
+
         return null;
     }
     console.log("[manifest-seeder] Fetching seed-manifest.json — relative: '%s', absolute: %s", MANIFEST_PATH, url);
@@ -178,6 +183,7 @@ async function fetchManifest(): Promise<SeedManifest | null> {
         const resp = ServiceResult.wrapFetch(await fetch(url));
         if (resp.isFail) {
             logBgWarnError(BgLogTag.MANIFEST_SEEDER, `Fetch failed: HTTP ${resp.status} for ${url} — file does not exist in extension dist`);
+
             return null;
         }
         const raw = await resp.text();
@@ -185,9 +191,11 @@ async function fetchManifest(): Promise<SeedManifest | null> {
         const manifest = JSON.parse(raw) as SeedManifest;
         console.log("[manifest-seeder] ✅ Parsed manifest: %d projects, schema v%d, from %s",
             manifest.Projects?.length ?? 0, manifest.SchemaVersion, url);
+
         return manifest;
     } catch (err) {
         logCaughtError(BgLogTag.MANIFEST_SEEDER, `Fetch/parse error for ${url}`, err);
+
         return null;
     }
 }
@@ -286,6 +294,7 @@ function extractUrlMatchRules(project: SeedProjectEntry): UrlRule[] {
 
 function buildStoredScript(def: SeedScriptEntry, project: SeedProjectEntry, manifest: SeedManifest): StoredScript {
     const now = new Date().toISOString();
+
     return {
         id: def.SeedId,
         name: def.File,
@@ -362,7 +371,6 @@ function isScriptStale(
     );
 }
 
-
 /* ------------------------------------------------------------------ */
 /*  Config Seeding                                                     */
 /* ------------------------------------------------------------------ */
@@ -429,6 +437,7 @@ async function seedConfigsFromManifest(
 
 function buildStoredConfig(def: SeedConfigEntry, json: string): StoredConfig {
     const now = new Date().toISOString();
+
     return {
         id: def.SeedId,
         name: def.File,
@@ -451,6 +460,7 @@ async function fetchConfigJson(filePath: string): Promise<string> {
         throw new Error(`HTTP ${resp.status} on GET ${url} — config asset missing from dist/. Loop halted.`);
     }
     const data = await resp.json();
+
     return JSON.stringify(data, null, 2);
 }
 
@@ -468,6 +478,7 @@ function resolveConfigSeedId(
     const isMissingKey = !key;
     if (isMissingKey) return undefined;
     const config = project.Configs.find((c) => c.Key === key);
+
     return config?.SeedId;
 }
 
@@ -574,6 +585,7 @@ function upsertManifestProject(project: SeedProjectEntry, stored: StoredProject[
     if (idx === -1) {
         console.log("[manifest-seeder:projects] + INSERT %s (id=%s)", project.Name, canonical.id);
         stored.push(canonical);
+
         return true;
     }
 
@@ -587,6 +599,7 @@ function upsertManifestProject(project: SeedProjectEntry, stored: StoredProject[
         createdAt: stored[idx].createdAt,
         settings: { ...canonical.settings, ...stored[idx].settings },
     };
+
     return true;
 }
 
@@ -652,7 +665,6 @@ export function migrateLegacyProjectRecords(
 
     return { projects: out, migrated };
 }
-
 
 /** Builds a canonical `StoredProject` from a manifest project entry. */
 export function buildStoredProjectFromSeed(project: SeedProjectEntry): StoredProject {

@@ -168,6 +168,7 @@ export function setLoopInterval(newIntervalMs: number): boolean {
   }
 
   updateUI();
+
   return true;
 }
 

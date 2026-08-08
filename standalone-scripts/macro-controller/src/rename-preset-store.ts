@@ -54,6 +54,7 @@ export interface RenamePresetStore {
 // `P0001 D01v001`. User can clone this preset and tweak from there.
 export function createDefaultPreset(): RenamePreset {
   const now = Date.now();
+
   return {
     name: DEFAULT_PRESET_NAME,
     template: 'D**v###',
@@ -76,6 +77,7 @@ export function createDefaultPreset(): RenamePreset {
 
 function resolveProjectKey(): string {
   const projectId = getProjectIdFromUrl();
+
   return projectId || getDisplayProjectName();
 }
 
@@ -110,11 +112,14 @@ export function getRenamePresetStore(): RenamePresetStore {
         if (names.length === 0) {
           // Seed default
           await kv.set(SECTION, DEFAULT_PRESET_NAME, createDefaultPreset());
+
           return [DEFAULT_PRESET_NAME];
         }
+
         return names;
       } catch (err) {
         logError(FN, 'listPresets failed for project "' + projectName + '"', err);
+
         return [DEFAULT_PRESET_NAME];
       }
     },
@@ -122,9 +127,11 @@ export function getRenamePresetStore(): RenamePresetStore {
     async getActivePresetName(): Promise<string> {
       try {
         const name = await kv.get<string>(SECTION, ACTIVE_KEY);
+
         return name || DEFAULT_PRESET_NAME;
       } catch (err) {
         logDebug(FN, 'getActivePresetName fallback to Default: ' + String(err));
+
         return DEFAULT_PRESET_NAME;
       }
     },
@@ -141,11 +148,14 @@ export function getRenamePresetStore(): RenamePresetStore {
         // Validate shape
         if (typeof preset.template !== 'string') {
           logDebug(FN, 'Corrupted preset "' + name + '" — returning default');
+
           return createDefaultPreset();
         }
+
         return preset;
       } catch (err) {
         logError(FN, 'loadPreset "' + name + '" failed for project "' + projectName + '"', err);
+
         return null;
       }
     },
@@ -182,5 +192,6 @@ export function getRenamePresetStore(): RenamePresetStore {
 
   cachedProjectKey = rawKey;
   cachedStore = store;
+
   return store;
 }

@@ -51,17 +51,20 @@ async function populate(refs: RenderRefs): Promise<void> {
     if (isMissingOk) {
       logError('NextSelector', 'listPromptsByRole failed', new Error(listed.error ?? 'list failed'));
       refs.hint.textContent = '(unavailable)';
+
       return;
     }
     rows = listed.value ?? [];
   } catch (err) {
     logError('NextSelector', 'listPromptsByRole threw', err);
     refs.hint.textContent = '(unavailable)';
+
     return;
   }
 
   if (rows.length === 0) {
     refs.hint.textContent = '(no prompts)';
+
     return;
   }
 
@@ -87,6 +90,7 @@ async function onSelectionChanged(refs: RenderRefs): Promise<void> {
     if (isMissingOk) {
       logError('NextSelector', 'setDefaultPromptForRole failed', new Error(result.error ?? 'set default failed'));
       showPasteToast('❌ Could not switch Next prompt', true);
+
       return;
     }
     log('NextSelector: default next prompt set to Id=' + id, 'info');
@@ -158,6 +162,7 @@ export function buildNextSelectorControl(): HTMLElement {
   });
 
   void populate(refs);
+
   return wrap;
 }
 

@@ -7,6 +7,7 @@ import { buildRowContainer } from './prompt-library-row';
 
 export function rolesToRender(view: ModalRefs['view']): PromptRole[] {
   if (view.filterRole === 'all') return ROLES;
+
   return [view.filterRole];
 }
 
@@ -14,6 +15,7 @@ export function sortRows(rows: readonly PromptRow[], mode: SortMode): PromptRow[
   const copy = rows.slice();
   if (mode === 'name') return copy.sort((a, b) => a.Name.localeCompare(b.Name));
   if (mode === 'length') return copy.sort((a, b) => b.Body.length - a.Body.length);
+
   return copy.sort((a, b) => (b.IsDefault - a.IsDefault) || a.Name.localeCompare(b.Name));
 }
 
@@ -50,6 +52,7 @@ export async function buildRoleSection(refs: ModalRefs, role: PromptRole, refres
     err.textContent = 'Load error: ' + (result.error ?? 'unknown');
     err.style.cssText = 'color:#f5a3a3;font-size:11px;';
     wrap.appendChild(err);
+
     return wrap;
   }
   const rows = result.value;
@@ -58,9 +61,11 @@ export async function buildRoleSection(refs: ModalRefs, role: PromptRole, refres
     empty.textContent = '(no rows)';
     empty.style.cssText = 'color:#7a8699;font-size:11px;font-style:italic;';
     wrap.appendChild(empty);
+
     return wrap;
   }
   const sortedRows = sortRows(rows, refs.view.sortMode);
   for (const row of sortedRows) wrap.appendChild(buildRowContainer(refs, row, refreshAllRoles));
+
   return wrap;
 }

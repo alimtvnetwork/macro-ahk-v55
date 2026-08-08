@@ -22,6 +22,7 @@ const listeners = new Set<CreditPollListener>();
 /** Subscribe to credit-poll ticks. Returns an unsubscribe fn. */
 export function onCreditPollTick(fn: CreditPollListener): () => void {
   listeners.add(fn);
+
   return function () { listeners.delete(fn); };
 }
 

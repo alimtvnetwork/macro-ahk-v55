@@ -15,10 +15,12 @@ function installSdk(responder: (path: string, params: Record<string, string>) =>
         api: {
             call: async (path: string, opts: { params: Record<string, string>; baseUrl: string }) => {
                 calls.push({ path, params: opts.params });
+
                 return responder(path, opts.params);
             },
         },
     };
+
     return calls;
 }
 
@@ -90,6 +92,7 @@ describe('resolveConnection', () => {
         installSdk(() => {
             n += 1;
             if (n < 3) return { ok: true, status: 200, data: { status: 'running', step: 'pushing_code' } };
+
             return { ok: true, status: 200, data: { status: 'completed', result: { repo_url: 'https://github.com/a/b' } } };
         });
         const r = await resolveConnection('ws1', 'conn1', 'p1', PROBE_POLL_INTERVAL_MS * 5);

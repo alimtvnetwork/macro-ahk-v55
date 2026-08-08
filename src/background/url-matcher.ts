@@ -17,6 +17,7 @@ import { logBgWarnError, BgLogTag} from "./bg-logger";
 export function isUrlMatch(url: string, rule: UrlRule): boolean {
     const isIncluded = evaluateMatchType(url, rule);
     const isExcluded = isIncluded && checkExcludePattern(url, rule.excludePattern);
+
     return isIncluded && isExcluded === false;
 }
 
@@ -63,6 +64,7 @@ function isGlobMatch(url: string, pattern: string): boolean {
 
     try {
         const regex = new RegExp(regexPattern);
+
         return regex.test(url);
     } catch {
         return false;
@@ -73,6 +75,7 @@ function isGlobMatch(url: string, pattern: string): boolean {
 function isRegexMatch(url: string, pattern: string): boolean {
     try {
         const regex = new RegExp(pattern);
+
         return regex.test(url);
     } catch {
         return false;
@@ -139,6 +142,7 @@ function checkExcludePattern(
         return regex.test(pathname);
     } catch {
         logBgWarnError(BgLogTag.URL_MATCHER, `Invalid excludePattern: ${excludePattern}`);
+
         return false;
     }
 }

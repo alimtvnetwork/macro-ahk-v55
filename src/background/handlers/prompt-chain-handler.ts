@@ -54,6 +54,7 @@ interface ExecuteChainStepMessage extends MessageRequest {
 async function loadChains(): Promise<PromptChain[]> {
     try {
         const result = await chrome.storage.sync.get(STORAGE_KEY);
+
         return (result[STORAGE_KEY] as PromptChain[] | undefined) ?? [];
     } catch {
         return [];
@@ -82,6 +83,7 @@ export async function handleSavePromptChain(payload: MessageRequest): Promise<{ 
         chains.push(chain);
     }
     await saveChains(chains);
+
     return { isOk: true, chain };
 }
 
@@ -89,6 +91,7 @@ export async function handleDeletePromptChain(payload: MessageRequest): Promise<
     const { chainId } = payload as DeleteChainMessage;
     const chains = await loadChains();
     await saveChains(chains.filter((c) => c.id !== chainId));
+
     return { isOk: true };
 }
 
@@ -131,6 +134,7 @@ function generateCorrelationId(): string {
     if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
         return crypto.randomUUID();
     }
+
     return `marco-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
@@ -160,6 +164,7 @@ async function clearPendingArg(correlationId: string): Promise<void> {
 function isPromptResultMessage(value: unknown, correlationId: string): value is PromptInjectResultMessage {
     if (!value || typeof value !== "object") return false;
     const messageRecord = value as Record<string, unknown>;
+
     return messageRecord.type === PROMPT_INJECT_RESULT && messageRecord.correlationId === correlationId;
 }
 

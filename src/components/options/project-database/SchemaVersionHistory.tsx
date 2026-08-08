@@ -81,6 +81,7 @@ export function SchemaVersionHistory({
   const saveVersion = async () => {
     if (!Array.isArray(currentTables) || currentTables.length === 0) {
       toast.error("No tables to save");
+
       return;
     }
 

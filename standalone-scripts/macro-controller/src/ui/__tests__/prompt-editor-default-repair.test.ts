@@ -43,6 +43,7 @@ vi.mock('../../db/prompt-db', () => ({
 
 vi.mock('../../error-utils', async () => {
   const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+
   return { ...actual, logError: vi.fn() };
 });
 
@@ -52,6 +53,7 @@ vi.mock('../../telemetry/prompt-seed-telemetry', () => ({ emitPromptSeedEvent: v
 
 vi.mock('../../seed/seed-plan-next', async () => {
   const actual = await vi.importActual<typeof import('../../seed/seed-plan-next')>('../../seed/seed-plan-next');
+
   return { ...actual, seedPlanNextPrompts: vi.fn(async () => (new DbResult(true, undefined))) };
 });
 

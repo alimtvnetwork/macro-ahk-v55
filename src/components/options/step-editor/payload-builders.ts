@@ -52,6 +52,7 @@ export function hydrateUrlTabClickForm(payloadJson: string | null): UrlTabClickF
     if (payloadJson === null || payloadJson === "") return { ...URL_TAB_CLICK_DEFAULTS };
     try {
         const parsed = JSON.parse(payloadJson) as Partial<Record<keyof UrlTabClickFormState, unknown>>;
+
         return {
             UrlPattern:   typeof parsed.UrlPattern === "string" ? parsed.UrlPattern : "",
             UrlMatch:     (parsed.UrlMatch === "Exact" || parsed.UrlMatch === "Prefix" || parsed.UrlMatch === "Glob" || parsed.UrlMatch === "Regex") ? parsed.UrlMatch : "Glob",
@@ -69,6 +70,7 @@ export function hydrateUrlTabClickForm(payloadJson: string | null): UrlTabClickF
 
 function normaliseLabel(label: string): string | null {
     const trimmed = label.trim();
+
     return trimmed === "" ? null : trimmed;
 }
 
@@ -79,6 +81,7 @@ function parseNonNegativeMs(raw: string, fieldLabel: string): { ok: true; value:
     if (!Number.isFinite(value) || value < 0) {
         return { ok: false, message: `${fieldLabel} must be a non-negative number.` };
     }
+
     return { ok: true, value };
 }
 
@@ -95,6 +98,7 @@ export function buildHotkeyPayload(
     const payload = parsedWait.value === undefined
         ? { Keys: [...chords] }
         : { Keys: [...chords], WaitMs: parsedWait.value };
+
     return {
         Ok: true,
         Input: {
@@ -120,9 +124,11 @@ function validateUrlTabClickForm(form: UrlTabClickFormState): BuildResult | null
         try { new RegExp(form.UrlPattern); }
         catch (err) {
             const description = err instanceof Error ? err.message : String(err);
+
             return { Ok: false, ErrorMessage: "Invalid regex pattern", ErrorDescription: description };
         }
     }
+
     return null;
 }
 
@@ -137,6 +143,7 @@ function buildUrlTabClickPayloadObject(form: UrlTabClickFormState, timeoutMs: nu
     if (timeoutMs !== undefined) { payload.TimeoutMs = timeoutMs; }
     if (form.DirectOpen) { payload.DirectOpen = true; }
     if (form.Url.trim() !== "") { payload.Url = form.Url.trim(); }
+
     return payload;
 }
 
@@ -146,6 +153,7 @@ export function buildUrlTabClickPayload(label: string, form: UrlTabClickFormStat
     const parsedTimeout = parseNonNegativeMs(form.TimeoutMs, "Timeout (ms)");
     if (parsedTimeout.isFail) { return { Ok: false, ErrorMessage: parsedTimeout.message }; }
     const payload = buildUrlTabClickPayloadObject(form, parsedTimeout.value);
+
     return {
         Ok: true,
         Input: {
@@ -163,12 +171,14 @@ function validateGenericPayload(kind: StepKindId, payloadJson: string, targetGro
         try { JSON.parse(trimmed); }
         catch (err) {
             const description = err instanceof Error ? err.message : String(err);
+
             return { Ok: false, ErrorMessage: "Payload is not valid JSON", ErrorDescription: description };
         }
     }
     if (kind === StepKindId.RunGroup && targetGroupId === null) {
         return { Ok: false, ErrorMessage: "Select a target group for the RunGroup step." };
     }
+
     return null;
 }
 
@@ -181,6 +191,7 @@ export function buildGenericPayload(
     const invalid = validateGenericPayload(kind, payloadJson, targetGroupId);
     if (invalid !== null) { return invalid; }
     const trimmed = payloadJson.trim();
+
     return {
         Ok: true,
         Input: {

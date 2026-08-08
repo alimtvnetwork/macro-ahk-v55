@@ -43,6 +43,7 @@ vi.mock('../../db/prompt-db', () => ({
 
 const io = vi.hoisted(() => {
     let releaseFn: (() => void) | null = null;
+
     return {
         exportPromptsToJson: vi.fn(async () => undefined),
         parsePromptsText: vi.fn(() => ({
@@ -82,6 +83,7 @@ function fireDragOver(root: HTMLElement): { dropEffect: string } {
     const ev = new Event('dragover', { bubbles: true, cancelable: true });
     Object.defineProperty(ev, 'dataTransfer', { value: dt, configurable: true });
     root.dispatchEvent(ev);
+
     return dt;
 }
 

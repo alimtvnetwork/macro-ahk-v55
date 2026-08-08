@@ -51,6 +51,7 @@ export function filterUserAddedEntries(
     if (isUserAddedEntry(e)) kept.push(e);
     else defaultsSkipped++;
   }
+
   return { kept, defaultsSkipped };
 }
 
@@ -63,11 +64,13 @@ export async function exportPromptsToJson(options: ExportPromptsOptions = {}): P
     const rawEntries = await collectAllExportEntries();
     if (rawEntries.length === 0) {
       showToast('No prompts found to export', 'warn');
+
       return;
     }
     const { kept: entries, defaultsSkipped } = filterUserAddedEntries(rawEntries);
     if (entries.length === 0) {
       showToast('Only default prompts exist, nothing to export', 'warn');
+
       return;
     }
 
@@ -82,6 +85,7 @@ export async function exportPromptsToJson(options: ExportPromptsOptions = {}): P
     const skipped = entries.length - bundle.entryCount;
     if (bundle.entryCount === 0) {
       showToast('All prompts are flagged excludeFromExport, nothing to export', 'warn');
+
       return;
     }
 
@@ -142,9 +146,9 @@ async function collectRevisionsForEntries(entries: CachedPromptEntry[]): Promise
       });
     }
   }
+
   return out;
 }
-
 
 export interface PromptImportResults {
   added: number;
@@ -165,7 +169,6 @@ export interface PromptImportResults {
    */
   defaultsProtected?: number;
 }
-
 
 /**
  * Untyped raw shape used while validating unknown JSON input. Declaring
@@ -258,9 +261,9 @@ export function validatePromptEntryDetailed(
   if (typeof e.excludeFromExport === 'boolean') out.excludeFromExport = e.excludeFromExport;
   if (isPromptRole(e.role)) out.role = e.role;
   preserveDynamicFields(e, out);
+
   return { entry: out, field: null, reason: null };
 }
-
 
 /**
  * PlanTierType-14 step 13: merge JSON-cache entries with DB rows so exports carry
@@ -272,6 +275,7 @@ export async function collectAllExportEntries(): Promise<CachedPromptEntry[]> {
   const cacheEntries = record && record.entries ? record.entries : [];
   const bridge = await import('./prompt-io-db-bridge');
   const dbEntries = await bridge.collectDbEntriesForExport();
+
   return bridge.mergeDbIntoExport(cacheEntries, dbEntries);
 }
 
@@ -284,7 +288,6 @@ export function mergePrompts(
   imported: CachedPromptEntry[],
   overwrite: boolean = true
 ): { merged: CachedPromptEntry[]; results: PromptImportResults } {
-
   const results: PromptImportResults = { added: 0, updated: 0, total: imported.length, errors: [], defaultsProtected: 0 };
   const mergedMap = new Map<string, CachedPromptEntry>();
 
@@ -302,6 +305,7 @@ export function mergePrompts(
       // this is a belt-and-suspenders guard for legacy or crafted bundles.
       if (target.isDefault === true) {
         results.defaultsProtected = (results.defaultsProtected ?? 0) + 1;
+
         return;
       }
       if (overwrite) {
@@ -312,7 +316,6 @@ export function mergePrompts(
       results.added++;
       mergedMap.set(key, imp);
     }
-
   });
 
   return { merged: Array.from(mergedMap.values()), results };
@@ -358,6 +361,7 @@ function parseBundleEnvelope(raw: unknown, valid: CachedPromptEntry[], errors: s
       });
     }
     if (errors.length === 0) errors.push(...result.errors);
+
     return { valid, errors };
   }
   result.bundle.entries.forEach((entry, index) => {
@@ -376,6 +380,7 @@ function parseBundleEnvelope(raw: unknown, valid: CachedPromptEntry[], errors: s
   if (result.bundle.promptOrder && result.bundle.promptOrder.length > 0) {
     out.promptOrder = result.bundle.promptOrder;
   }
+
   return out;
 }
 
@@ -388,6 +393,7 @@ export function parsePromptsText(jsonText: string): ParsedPromptsResult {
     raw = JSON.parse(jsonText);
   } catch (err) {
     errors.push('Failed to parse JSON: ' + (err instanceof Error ? err.message : String(err)));
+
     return { valid, errors };
   }
 
@@ -395,7 +401,6 @@ export function parsePromptsText(jsonText: string): ParsedPromptsResult {
       && 'schemaVersion' in raw && 'entries' in raw) {
     return parseBundleEnvelope(raw, valid, errors);
   }
-
 
   // Shape 2 / 3: bare array or single object (legacy).
   const array = Array.isArray(raw) ? raw : [raw];
@@ -408,7 +413,6 @@ export function parsePromptsText(jsonText: string): ParsedPromptsResult {
       errors.push(`Row ${index + 1} (${ptr}): ${detail.reason ?? 'invalid'} (requires name and text)`);
     }
   });
-
 
   return { valid, errors };
 }
@@ -482,6 +486,7 @@ export function applyRoleFilter(
     if (isPromptRole(e.role) && e.role === roleFilter) kept.push(e);
     else droppedCount++;
   }
+
   return { kept, droppedCount };
 }
 
@@ -588,6 +593,7 @@ export async function performPromptImport(
     groupsDone: 0,
     totalGroups: 0,
   });
+
   return results;
 }
 
@@ -617,6 +623,7 @@ async function collectExistingRoleSlugs(dbEntries: readonly CachedPromptEntry[])
       for (const r of res.value) if (r.Slug) existing.add(role + ':' + r.Slug);
     }
   }
+
   return existing;
 }
 
@@ -635,6 +642,7 @@ function tallyPreviewEntries(
       added++;
     }
   }
+
   return { added, updated, committedSlugs };
 }
 
@@ -649,6 +657,7 @@ function tallyPreviewRevisions(
       if (committedSlugs.has(r.Slug)) revs++; else orphan++;
     }
   }
+
   return { revisions: revs, orphan };
 }
 
@@ -662,6 +671,7 @@ export async function previewPromptImport(
   const existing = await collectExistingRoleSlugs(dbEntries);
   const { added, updated, committedSlugs } = tallyPreviewEntries(dbEntries, existing);
   const { revisions, orphan } = tallyPreviewRevisions(options.revisions, committedSlugs);
+
   return {
     totalInput: importedPrompts.length,
     droppedByRole: droppedCount,
@@ -676,7 +686,6 @@ export async function previewPromptImport(
 /** Structural helper: re-export the bundle shape so callers can type-check
  * a parsed envelope without pulling `prompt-bundle-types` directly. */
 export type { PromptsBundleV1 };
-
 
 /**
  * Destructive: Clear all prompts from the cache.

@@ -25,6 +25,7 @@ function getSchedulePostParseEnrichmentSource(): string {
     expect(start, 'schedulePostParseEnrichment must exist').toBeGreaterThan(-1);
     const rest = full.slice(start);
     const endRel = rest.indexOf('\n}\n');
+
     return endRel === -1 ? rest : rest.slice(0, endRel + 2);
 }
 

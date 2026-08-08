@@ -43,6 +43,7 @@ export interface WireBatchRefreshOptions extends BatchRefreshOptions {
 function isDispatchablePlan(plan: string, allowPlan0: boolean): boolean {
   if (plan === PRO_ONE_PLAN_LITERAL) return true;
   if (allowPlan0 && plan === PRO_ZERO_PLAN_LITERAL) return true;
+
   return false;
 }
 
@@ -86,5 +87,6 @@ export async function batchRefreshFromWire(
     ...(options?.force !== undefined ? { force: options.force } : {}),
     ...(options?.source !== undefined ? { source: options.source } : {}),
   };
+
   return batchRefreshProOneCreditBalances(batchInput, dispatcherOptions);
 }

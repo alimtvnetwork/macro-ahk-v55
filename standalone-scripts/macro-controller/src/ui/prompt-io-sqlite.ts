@@ -37,8 +37,6 @@ const DDL_PROMPTS = `CREATE TABLE Prompts (
   UpdatedAt TEXT NOT NULL
 );`;
 
-
-
 interface SqlDatabase {
   run(sql: string, params?: unknown[]): void;
   export(): Uint8Array;
@@ -54,6 +52,7 @@ async function openDatabase(): Promise<SqlDatabase> {
   const initFn = sqlJs.default;
   const SQL = await initFn({ locateFile: () => SQL_WASM_URL });
   const DatabaseCtor = SQL.Database;
+
   return new DatabaseCtor() as unknown as SqlDatabase;
 }
 
@@ -72,6 +71,7 @@ function insertMeta(db: SqlDatabase, bundle: PromptsBundleV1): void {
 
 function serializeTags(entry: PromptEntry): string | null {
   const hasTags = Array.isArray(entry.tags) && entry.tags.length > 0;
+
   return hasTags ? JSON.stringify(entry.tags) : null;
 }
 
@@ -123,6 +123,7 @@ export async function buildPromptsSqlite(
     db.run(DDL_PROMPTS);
     insertMeta(db, bundle);
     insertPrompts(db, bundle.entries);
+
     return { bytes: db.export(), bundle };
   } finally {
     db.close();

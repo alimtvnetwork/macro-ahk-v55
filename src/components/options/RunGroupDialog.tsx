@@ -42,6 +42,7 @@ export default function RunGroupDialog(props: RunGroupDialogProps): JSX.Element 
     const controller = useRunGroupController({ open, db, projectId, group });
     const { running, result, durationMs, liveMode, setLiveMode, handleRun, summaryReports } = controller;
     const canRun = group !== null && db !== null && projectId !== null;
+
     return (
         <Dialog open={open} onOpenChange={(next) => { if (!running) onOpenChange(next); }}>
             <DialogContent className="max-w-2xl">

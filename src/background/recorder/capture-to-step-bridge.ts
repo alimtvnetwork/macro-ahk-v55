@@ -66,6 +66,7 @@ export function inferStepKind(
     const lower = tagName.toLowerCase();
     if (SELECT_TAGS.has(lower)) return StepKindId.Select;
     if (TYPE_TAGS.has(lower)) return StepKindId.Type;
+
     return StepKindId.Click;
 }
 
@@ -96,6 +97,7 @@ export function findAnchorSelectorId(
     );
     const row = result[0]?.values[0];
     if (row === undefined) return null;
+
     return row[0] as number;
 }
 
@@ -109,6 +111,7 @@ export function buildLabel(payload: XPathCapturePayload): string {
     const tag = payload.TagName.toLowerCase();
     if (trimmed.length === 0) return `<${tag}>`;
     const head = trimmed.length > 60 ? `${trimmed.slice(0, 57)}…` : trimmed;
+
     return `<${tag}> ${head}`;
 }
 
@@ -153,6 +156,7 @@ function buildCaptureSelectors(
             IsPrimary: false,
         });
     }
+
     return selectors;
 }
 
@@ -164,7 +168,7 @@ export function buildStepDraftFromCapture(
     const selectors = buildCaptureSelectors(payload, anchorSelectorId);
     const urlTabParams = deriveUrlTabClickParams(payload);
     
-    let stepKind = urlTabParams === null ? inferStepKind(payload.TagName) : StepKindId.UrlTabClick;
+    const stepKind = urlTabParams === null ? inferStepKind(payload.TagName) : StepKindId.UrlTabClick;
     let paramsJson = urlTabParams === null ? null : JSON.stringify(urlTabParams);
 
     if (urlTabParams === null && (stepKind === StepKindId.Type || stepKind === StepKindId.Select) && payload.Value !== undefined) {

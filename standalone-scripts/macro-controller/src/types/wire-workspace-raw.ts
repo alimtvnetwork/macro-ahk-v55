@@ -36,5 +36,6 @@ export function isWireWorkspaceRaw(candidate: unknown): candidate is WireWorkspa
  */
 export function toWireWorkspaceRaw(raw: unknown): WireWorkspaceRaw | null {
   if (!isWireWorkspaceRaw(raw)) { return null; }
+
   return raw;
 }

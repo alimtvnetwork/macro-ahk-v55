@@ -66,6 +66,7 @@ export function decodeJwtPayload(token: string): JwtInfo {
 
     if (isNotJwt) {
       failResult.error = 'Not a JWT (expected 3 parts, got ' + parts.length + ')';
+
       return failResult;
     }
 
@@ -86,6 +87,7 @@ export function decodeJwtPayload(token: string): JwtInfo {
     };
   } catch (e: unknown) {
     failResult.error = 'Decode failed: ' + toErrorMessage(e);
+
     return failResult;
   }
 }
@@ -103,6 +105,7 @@ function formatTimestamp(epochSeconds: number): string {
     && d.getDate() === now.getDate();
   if (isSameDay) return timeStr;
   const monthDay = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
   return monthDay + ' ' + timeStr;
 }
 

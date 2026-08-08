@@ -38,6 +38,7 @@ export async function warmScriptCache(): Promise<{ warmed: number; failed: numbe
 
         if (fileBackedScripts.length === 0) {
             console.log("[cache-warmer] No filePath-backed scripts to warm");
+
             return { warmed: 0, failed: 0 };
         }
 
@@ -76,20 +77,24 @@ async function warmOneScript(script: StoredScript): Promise<boolean> {
 
         if (response.isFail) {
             logCaughtError(BgLogTag.CACHE_WARMER, `Fetch failed for script file\n  Path: ${url}\n  Missing: Script code for "${filePath}" (HTTP ${response.status})\n  Reason: Server returned non-OK status ${response.status} — file may not exist in web_accessible_resources or dist/`, new Error(`HTTP ${response.status}`));
+
             return false;
         }
 
         const code = await response.text();
         if (!code || code.length < 10) {
             logCaughtError(BgLogTag.CACHE_WARMER, `Empty/tiny response for script file\n  Path: ${url}\n  Missing: Valid script code (got ${code?.length ?? 0} chars, minimum 10 required)\n  Reason: Server returned an empty or near-empty response — file may be a placeholder or build artifact is corrupt`, new Error("Empty response"));
+
             return false;
         }
 
         await cacheScriptCode(filePath, code);
         console.log("[cache-warmer] Cached %s (%d chars)", filePath, code.length);
+
         return true;
     } catch (err) {
         logCaughtError(BgLogTag.CACHE_WARMER, `Error warming script\n  Path: ${url}\n  Missing: Cached script code for "${filePath}"\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
+
         return false;
     }
 }

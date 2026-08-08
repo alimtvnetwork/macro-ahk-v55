@@ -39,6 +39,7 @@ export function buildStatusPillHtml(status: WorkspaceStatus, ws: WorkspaceCredit
       + ';padding:2px 6px;border-radius:4px;font-weight:600;margin-left:3px;vertical-align:middle;letter-spacing:0.3px;text-transform:none;"'
       + ' data-marco-tip="' + tip + '">' + display.sublabel + '</span>';
   }
+
   return html;
 }
 
@@ -54,6 +55,7 @@ export function buildRefillBadgeHtml(ws: WorkspaceCredit): string {
   } else if (days <= 3) {
     fg = '#fde68a'; bg = 'rgba(180,83,9,0.45)'; border = '#f59e0b';
   }
+
   return '<span class="loop-ws-refill-badge" style="font-size:9px;color:' + fg
     + CSS_BG + bg + ';border:1px solid ' + border
     + ';padding:1px 5px;border-radius:3px;font-weight:700;margin-left:5px;vertical-align:middle;letter-spacing:0.3px;">R '
@@ -73,6 +75,7 @@ export function resolveStatusPill(
     const display = classifyFromStatus(status, ws);
     if (display.kind !== 'normal') suppressTier = true;
   }
+
   return { pillHtml, suppressTier };
 }
 
@@ -85,11 +88,13 @@ export function buildLegacyExpiredBadge(ws: WorkspaceCredit): string {
   if (startDate) tipParts.push('since ' + startDate);
   if (duration) tipParts.push('(' + duration + ')');
   const tip = tipParts.join(' ').replace(/"/g, '&quot;');
+
   return '<span style="font-size:10px;color:#fca5a5;background:rgba(127,29,29,0.55);padding:2px 5px;border-radius:3px;font-weight:600;margin-left:3px;vertical-align:middle;" data-marco-tip="' + tip + '">·' + days + 'd</span>';
 }
 
 export function resolveTierBadgeLabel(ws: WorkspaceCredit, fallback: string): string {
   const label = formatPlanDisplayLabel(ws.plan);
+
   return label || fallback;
 }
 
@@ -113,5 +118,6 @@ export function buildTierBadgeHtml(ws: WorkspaceCredit): string {
   if (isMissingEnableWorkspaceStatusLabels) {
     tierBadge += buildRefillBadgeHtml(ws);
   }
+
   return tierBadge;
 }

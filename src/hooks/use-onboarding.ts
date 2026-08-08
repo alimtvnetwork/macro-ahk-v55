@@ -155,15 +155,18 @@ export function usePermissions() {
           setGranted((prev) => [...prev, origin]);
         }
         setLoading(false);
+
         return isGranted;
       } catch {
         setLoading(false);
+
         return false;
       }
     }
 
     // Dev fallback
     setGranted((prev) => [...prev, origin]);
+
     return true;
   }, []);
 

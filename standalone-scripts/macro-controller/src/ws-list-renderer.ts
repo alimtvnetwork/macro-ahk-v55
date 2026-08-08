@@ -64,6 +64,7 @@ function computeMaxTotalCredits(workspaces: WorkspaceCredit[]): number {
     const mtc = Math.round(resolveCreditSummary(ws).total);
     if (mtc > maxTotalCredits) maxTotalCredits = mtc;
   }
+
   return maxTotalCredits;
 }
 
@@ -91,6 +92,7 @@ export function filterAndSortWorkspaces(
       const daysA = statusA.daysSince || 0;
       const daysB = statusB.daysSince || 0;
       if (daysB !== daysA) return daysB - daysA;
+
       return resolveCreditSummary(b.ws).available - resolveCreditSummary(a.ws).available;
     });
   } else if (viewState().getRefillPriority() || fs.refillSoon) {
@@ -104,6 +106,7 @@ export function filterAndSortWorkspaces(
     survivors.sort(function (a, b) {
       const av = resolveCreditSummary(a.ws).available;
       const bv = resolveCreditSummary(b.ws).available;
+
       return desc ? bv - av : av - bv;
     });
   }
@@ -184,6 +187,7 @@ function attachHoverCardForList(listEl: HTMLElement): void {
       const wid = String(w.id || (w.raw && w.raw.id) || '');
       if (wid === id) return w;
     }
+
     return null;
   });
   hideWorkspaceHoverCard();
@@ -252,6 +256,7 @@ function _createClickHandler(): (e: MouseEvent) => void {
         parseInt(item.getAttribute('data-ws-idx') || '0', 10),
         e.shiftKey,
       );
+
       return;
     }
     setLoopWsNavIndex(parseInt(item.getAttribute('data-ws-idx') || '0', 10));
@@ -268,6 +273,7 @@ function _createDblClickHandler(): (e: MouseEvent) => void {
     e.stopPropagation();
     if (item.getAttribute(DataAttrType.WsCurrent) === 'true') {
       log('Double-click on current workspace "' + item.getAttribute(DataAttrType.WsName) + '" — no move needed', 'warn');
+
       return;
     }
     log('Double-click move -> ' + item.getAttribute(DataAttrType.WsName) + ' (id=' + item.getAttribute(DataAttrType.WsId) + ')', 'delegate');
@@ -329,6 +335,7 @@ class WsDropdownState {
     if (isDropdownStateUninitialized) {
       WsDropdownState.instance = new WsDropdownState();
     }
+
     return WsDropdownState.instance;
   }
 
@@ -349,10 +356,13 @@ export function populateLoopWorkspaceDropdown(): void {
   if (isMissingListEl) return;
   const workspaces = loopCreditState.perWorkspace || [];
   if (workspaces.length === 0) {
-    if (dropdownState().getHash() === '_empty') { dropdownState().recordSkip(); return; }
+    if (dropdownState().getHash() === '_empty') { dropdownState().recordSkip();
+
+ return; }
     dropdownState().setHash('_empty');
     dropdownState().recordExecution();
     listEl.innerHTML = '<div style="padding:6px;color:' + cPrimaryLight + ';font-size:10px;">📭 No workspaces loaded — click 💰 Credits to retry</div>';
+
     return;
   }
   const currentName = state.workspaceName || '';
@@ -382,7 +392,9 @@ export function populateLoopWorkspaceDropdown(): void {
     checkedCount,
   ].join('|');
 
-  if (hash === dropdownState().getHash()) { dropdownState().recordSkip(); return; }
+  if (hash === dropdownState().getHash()) { dropdownState().recordSkip();
+
+ return; }
   dropdownState().setHash(hash);
   dropdownState().recordExecution();
   renderLoopWorkspaceList(workspaces, currentName, filter);
@@ -408,6 +420,7 @@ class CreditResolvedRepaintScheduler {
     if (isRepaintSchedulerUninitialized) {
       CreditResolvedRepaintScheduler.instance = new CreditResolvedRepaintScheduler();
     }
+
     return CreditResolvedRepaintScheduler.instance;
   }
 

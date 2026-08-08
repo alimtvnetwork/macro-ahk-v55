@@ -33,6 +33,7 @@ function findButton(xpath: string, ariaLabel: string): HTMLButtonElement | null 
     try {
         const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
         const node = result.singleNodeValue;
+
         return node instanceof HTMLButtonElement ? node : null;
     } catch {
         return null;
@@ -87,11 +88,12 @@ export function autoResumeQueueIfNeeded(deps: AutoResumeDeps): AutoResumeResult 
 
         // All systems go — click it
         resumeBtn.click();
-        return { acted: true, reason: 'ok', count };
 
+        return { acted: true, reason: 'ok', count };
     } catch (caught) {
         // eslint-disable-next-line no-restricted-syntax -- caught error surfaced before Logger available in this scope
         console.error('[AutoResume] Unexpected failure', caught);
+
         return { acted: false, reason: 'threw' };
     }
 }

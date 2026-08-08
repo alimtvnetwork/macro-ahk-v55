@@ -75,6 +75,7 @@ export async function prependDependencyScripts(callerScripts: ScriptEntry[], all
 
     if (isMissingIsSuccess) {
         logBgWarnError(BgLogTag.INJECTION_DEPS, `Dependency resolution failed: ${resolution.errorMessage}`);
+
         return [...collectGlobalScripts(globalProjects), ...callerScripts];
     }
 
@@ -158,6 +159,7 @@ export function collectGlobalScripts(globalProjects: StoredProject[]): ScriptEnt
             scripts.push({ ...script, order: baseOrder + script.order });
         }
     }
+
     return scripts;
 }
 
@@ -182,5 +184,6 @@ export function getScriptIdentity(value: unknown): string | null {
 export function normalizeScriptIdentity(value: string): string {
     const normalized = value.trim().toLowerCase().replace(/\\/g, "/");
     const fileName = normalized.split("/").pop() ?? normalized;
+
     return fileName.split(/[?#]/)[0] ?? fileName;
 }

@@ -38,6 +38,7 @@ function findButton(xpath: string, ariaLabel: string): HTMLElement | null {
         logError("AutoCatch", "Unhandled exception", err);
     }
     const all = document.querySelectorAll<HTMLElement>('button[aria-label="' + ariaLabel + '"]');
+
     return all.length > 0 ? all[0] : null;
 }
 
@@ -55,6 +56,7 @@ export function pauseQueue(): QueueClickResult {
         return { clicked: false, reason: 'pause-missing' };
     }
     btn.click();
+
     return { clicked: true, reason: 'ok' };
 }
 
@@ -64,6 +66,7 @@ export function resumeQueue(): QueueClickResult {
         return { clicked: false, reason: 'resume-missing' };
     }
     btn.click();
+
     return { clicked: true, reason: 'ok' };
 }
 
@@ -72,5 +75,4 @@ export type { QueueCountReadResult } from './queue-count';
 export { autoResumeQueueIfNeeded } from './auto-resume';
 export type { AutoResumeResult, AutoResumeDeps } from './auto-resume';
 export { checkAutoResume } from './auto-resume';
-
 

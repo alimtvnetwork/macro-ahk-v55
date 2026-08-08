@@ -71,6 +71,7 @@ function readCentralEntry(view: DataView, bytes: Uint8Array, offset: number): { 
   const nameBytes = bytes.subarray(offset + 46, offset + 46 + nameLen);
   const name = new TextDecoder('utf-8').decode(nameBytes);
   const next = offset + 46 + nameLen + extraLen + commentLen;
+
   return { entry: { name, method, compressedSize, uncompressedSize, localOffset }, next };
 }
 
@@ -83,6 +84,7 @@ function extractStoredPayload(view: DataView, bytes: Uint8Array, entry: CentralE
   const nameLen = readUint16LE(view, entry.localOffset + 26);
   const extraLen = readUint16LE(view, entry.localOffset + 28);
   const dataStart = entry.localOffset + 30 + nameLen + extraLen;
+
   return bytes.subarray(dataStart, dataStart + entry.compressedSize);
 }
 
@@ -98,6 +100,7 @@ function readZipFileMap(bytes: Uint8Array): ZipFileMap {
     files.set(entry.name, extractStoredPayload(view, bytes, entry));
     cursor = next;
   }
+
   return { files };
 }
 
@@ -125,6 +128,7 @@ function parseManifest(map: ZipFileMap): PromptsBundleV1 {
   if (!result.isValid || !result.bundle) {
     throwDiagnostic('PROMPT_IO_ZIP_E006', { errorList: result.errors.join('; ') });
   }
+
   return result.bundle;
 }
 
@@ -135,6 +139,7 @@ function rehydrateBody(entry: PromptEntry, index: number, map: ZipFileMap): Prom
   const hasBody = bodyBytes !== undefined;
   const isMissingHasBody = !hasBody;
   if (isMissingHasBody) throwDiagnostic('PROMPT_IO_ZIP_E007', { slug, promptName: entry.name });
+
   return { ...entry, text: decodeUtf8(bodyBytes as Uint8Array) };
 }
 
@@ -156,5 +161,6 @@ export function parsePromptsBundleZip(bytes: Uint8Array): ZipImportResult {
   const shell = parseManifest(map);
   const entries = shell.entries.map((entry, i) => rehydrateBody(entry, i, map));
   const bundle: PromptsBundleV1 = { ...shell, entries, entryCount: entries.length };
+
   return { bundle, fileCount: map.files.size };
 }

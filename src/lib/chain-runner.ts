@@ -121,6 +121,7 @@ export class ChainRunner {
 
   private async waitIfPaused(): Promise<void> {
     if (!this.paused) return;
+
     return new Promise<void>((resolve) => { this.pauseResolve = resolve; });
   }
 
@@ -195,6 +196,7 @@ export class ChainRunner {
     if (isTrue) {
       await this.executeBranchSteps(step.then, subIdx);
       this.skipBranchSteps(step.else.length, elseStartIdx);
+
       return;
     }
     

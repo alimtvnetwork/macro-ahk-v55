@@ -72,6 +72,7 @@ export async function readCookieValueFromCandidates(
     primaryUrl?: string | null,
 ): Promise<string | null> {
     const cookie = await readCookieFromCandidates(cookieName, primaryUrl);
+
     return cookie?.value ?? null;
 }
 

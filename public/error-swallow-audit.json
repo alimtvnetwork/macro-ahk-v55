@@ -1,29 +1,29 @@
 {
-  "GeneratedAt": "2026-08-08T13:06:01.751Z",
+  "GeneratedAt": "2026-08-08T13:10:37.840Z",
   "Items": [
     {
-      "Id": "8ac52867f5c7",
+      "Id": "ee51b7fa58e4",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/ui/prompt-dropdown-header.ts",
-      "Line": 121,
+      "Line": 119,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch(function() {"
     },
     {
-      "Id": "783e19127898",
+      "Id": "4a6eb5f6072b",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/ui/prompt-dropdown.ts",
-      "Line": 191,
+      "Line": 193,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch(function() {"
     },
     {
-      "Id": "38e93116785f",
+      "Id": "1d10c68d7760",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/ui/prompt-injection.ts",
-      "Line": 644,
+      "Line": 666,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch(function() {"

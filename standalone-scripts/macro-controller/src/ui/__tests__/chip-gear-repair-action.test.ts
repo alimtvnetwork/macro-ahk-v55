@@ -48,6 +48,7 @@ vi.mock('../prompt-io', () => ({ exportPromptsToJson: vi.fn() }));
 vi.mock('../../toast', () => ({ showToast: mocks.showToast }));
 vi.mock('../../error-utils', async () => {
     const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+
     return { ...actual, logDiagnosticFromCode: mocks.logDiagnosticFromCode };
 });
 
@@ -66,6 +67,7 @@ function findRepairRow(section: HTMLElement): HTMLElement {
     const row = rows.find(r => r.textContent?.includes('Repair prompts'));
     const isMissingRow = !row;
     if (isMissingRow) throw new Error('Repair row not found in gear section');
+
     return row;
 }
 

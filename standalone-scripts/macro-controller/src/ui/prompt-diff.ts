@@ -31,6 +31,7 @@ export function diffLines(before: string, after: string): DiffLine[] {
   const beforeLines = before.split('\n');
   const afterLines = after.split('\n');
   const table = buildLcsTable(beforeLines, afterLines);
+
   return walkLcsTable(table, beforeLines, afterLines);
 }
 
@@ -47,6 +48,7 @@ function buildLcsTable(a: readonly string[], b: readonly string[]): number[][] {
         : Math.max(prevRow[j] as number, row[j - 1] as number);
     }
   }
+
   return table;
 }
 
@@ -63,6 +65,7 @@ function walkLcsTable(table: number[][], a: readonly string[], b: readonly strin
   }
   while (i > 0) { out.push({ op: DIFF_OP_REMOVE, text: a[i - 1] as string }); i -= 1; }
   while (j > 0) { out.push({ op: DIFF_OP_ADD, text: b[j - 1] as string }); j -= 1; }
+
   return out.reverse();
 }
 
@@ -81,6 +84,7 @@ export function summarizeDiff(lines: readonly DiffLine[]): DiffStats {
     else if (line.op === DIFF_OP_REMOVE) removed += 1;
     else unchanged += 1;
   }
+
   return { added, removed, unchanged };
 }
 
@@ -99,9 +103,11 @@ export function renderDiffPane(before: string, after: string): HTMLElement {
   pane.appendChild(buildDiffHeader(stats));
   if (stats.added === 0 && stats.removed === 0) {
     pane.appendChild(buildEmptyRow());
+
     return pane;
   }
   for (const line of diff) pane.appendChild(buildDiffRow(line));
+
   return pane;
 }
 
@@ -110,6 +116,7 @@ function buildDiffHeader(stats: DiffStats): HTMLElement {
   header.dataset.testid = 'prompt-editor-diff-stats';
   header.style.cssText = 'font-size:10px;color:' + cPanelFgDim + ';margin-bottom:6px;';
   header.textContent = '+' + stats.added + ' / -' + stats.removed + ' (unchanged ' + stats.unchanged + ')';
+
   return header;
 }
 
@@ -118,6 +125,7 @@ function buildEmptyRow(): HTMLElement {
   row.dataset.testid = 'prompt-editor-diff-empty';
   row.style.cssText = 'color:' + cPanelFgDim + ';font-style:italic;';
   row.textContent = 'No differences vs saved body.';
+
   return row;
 }
 
@@ -126,17 +134,20 @@ function buildDiffRow(line: DiffLine): HTMLElement {
   row.dataset.diffOp = line.op;
   row.style.cssText = rowCssFor(line.op);
   row.textContent = prefixFor(line.op) + line.text;
+
   return row;
 }
 
 function prefixFor(op: DiffOp): string {
   if (op === DIFF_OP_ADD) return '+ ';
   if (op === DIFF_OP_REMOVE) return '- ';
+
   return '  ';
 }
 
 function rowCssFor(op: DiffOp): string {
   if (op === DIFF_OP_ADD) return 'white-space:pre-wrap;background:' + COLOR_ADD_BG + ';color:' + COLOR_ADD_FG + ';padding:0 4px;';
   if (op === DIFF_OP_REMOVE) return 'white-space:pre-wrap;background:' + COLOR_REMOVE_BG + ';color:' + COLOR_REMOVE_FG + ';padding:0 4px;';
+
   return 'white-space:pre-wrap;color:' + cPanelFgDim + ';padding:0 4px;';
 }

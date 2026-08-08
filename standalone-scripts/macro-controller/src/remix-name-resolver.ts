@@ -45,6 +45,7 @@ export function parseName(name: string): ParsedName {
   }
   const [, base, separator, vLetter, numStr] = match;
   const count = Number(numStr);
+
   return {
     base,
     separator,
@@ -63,6 +64,7 @@ export function buildName(
   const sep = parsed.vLetter ? parsed.separator : fallbackSeparator;
   const inputV = parsed.vLetter || 'V';
   const v = vCasing === 'upper' ? 'V' : vCasing === 'lower' ? 'v' : inputV;
+
   return parsed.base + sep + v + String(n);
 }
 

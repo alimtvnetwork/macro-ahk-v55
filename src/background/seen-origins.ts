@@ -58,6 +58,7 @@ export async function preloadSeenOrigins(): Promise<void> {
 export function isOriginSeen(url: string): boolean {
     const origin = safeOrigin(url);
     if (origin === "") return true; // unparseable → never show toast
+
     return seen.has(origin);
 }
 
@@ -79,6 +80,7 @@ export async function markOriginSeen(url: string): Promise<boolean> {
             err as Error,
         );
     }
+
     return true;
 }
 

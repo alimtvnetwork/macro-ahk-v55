@@ -45,11 +45,13 @@ export function normalizeRedirectUrl(
     try {
         const url = new URL(trimmed, origin);
         if (ALLOWED_PROTOCOLS.indexOf(url.protocol) === -1) return null;
+
         return url.toString();
     } catch (err: unknown) {
         logError('RemixNav',
             'normalizeRedirectUrl: invalid URL "' + trimmed + '" (origin=' + origin + ')',
             err);
+
         return null;
     }
 }
@@ -72,6 +74,7 @@ export function navigateActiveTabToRemixedProject(
     const w = (typeof window !== 'undefined' ? window : null);
     if (!w || !w.location) {
         logError('RemixNav', 'navigate refused: window.location unavailable');
+
         return false;
     }
     const origin = w.location.origin || DomainConstants.PRIMARY_URL;
@@ -80,14 +83,17 @@ export function navigateActiveTabToRemixedProject(
     if (isMissingAbsolute) {
         logError('RemixNav',
             'navigate refused: rejected URL "' + redirectUrl + '" (origin=' + origin + ')');
+
         return false;
     }
     log('[RemixNav] navigating active tab → ' + absolute, 'info');
     try {
         w.location.assign(absolute);
+
         return true;
     } catch (err: unknown) {
         logError('RemixNav', 'location.assign threw for ' + absolute, err);
+
         return false;
     }
 }
@@ -99,7 +105,9 @@ export function navigateActiveTabToRemixedProject(
 export function navigateFromCachedRemix(row: RemixNewProjectRow | null): boolean {
     if (!row || !row.RedirectUrl) {
         logError('RemixNav', 'navigateFromCachedRemix: missing row or RedirectUrl');
+
         return false;
     }
+
     return navigateActiveTabToRemixedProject(row.RedirectUrl);
 }

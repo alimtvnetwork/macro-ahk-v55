@@ -30,6 +30,7 @@ export function useRecorderSelfTestExport(
     const [selfTestRunning, setSelfTestRunning] = useState(false);
     const handleSelfTest = useSelfTestHandler(projectSlug, reload, setSelfTestRunning);
     const handleExport = useExportHandler(projectSlug, data, tagsByStep);
+
     return { selfTestRunning, handleSelfTest, handleExport };
 }
 
@@ -64,6 +65,7 @@ function useExportHandler(projectSlug: string, data: ProjectData, tagsByStep: Ta
         if (data === null) return;
         if (data.steps.length === 0) {
             toast.error("Nothing to export: no steps recorded yet.");
+
             return;
         }
         try {

@@ -29,6 +29,7 @@ export function readFilterState(filter: string, dataAttrActive: string): WsFilte
   const rolloverEl = document.getElementById('loop-ws-rollover-filter');
   const billingEl = document.getElementById('loop-ws-billing-filter');
   const minEl = document.getElementById('loop-ws-min-credits');
+
   return {
     filter,
     freeOnly: viewState().getFreeOnly(),
@@ -47,6 +48,7 @@ export function isCurrentWorkspace(ws: WorkspaceCredit, currentName: string): bo
   if (isMissingCurrentName) return false;
   if (ws.fullName === currentName || ws.name === currentName) return true;
   const lcn = currentName.toLowerCase();
+
   return (ws.fullName || '').toLowerCase().indexOf(lcn) !== -1 ||
          lcn.indexOf((ws.fullName || '').toLowerCase()) !== -1;
 }
@@ -54,6 +56,7 @@ export function isCurrentWorkspace(ws: WorkspaceCredit, currentName: string): bo
 export function matchesTextFilter(ws: WorkspaceCredit, filter: string): boolean {
   const isMissingFilter = !filter;
   if (isMissingFilter) return true;
+
   return ws.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ||
     ws.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
 }
@@ -65,6 +68,7 @@ export function matchesExpiredWithCreditsFilter(ws: WorkspaceCredit): boolean {
   if (sub === 'canceled' || sub === 'cancelled') return false;
   if (!isExpiredWs(ws)) return false;
   if (resolveCreditSummary(ws).available <= EXPIRED_WITH_CREDITS_MIN) return false;
+
   return true;
 }
 
@@ -78,6 +82,7 @@ export function passesCreditFilters(ws: WorkspaceCredit, fs: WsFilterState): boo
   if (fs.expiring && !isExpiringWs(ws)) return false;
   if (fs.refillSoon && !isRefillSoonWs(ws)) return false;
   if (isProOnlySortMode(fs.creditSortMode) && !isProExpiringWs(ws)) return false;
+
   return true;
 }
 
@@ -86,11 +91,13 @@ export function passesFilters(ws: WorkspaceCredit, fs: WsFilterState): boolean {
   if (fs.freeOnly && (ws.dailyFree || 0) <= 0) return false;
   if (fs.rolloverOnly && (ws.rollover || 0) <= 0) return false;
   if (fs.billingOnly && resolveCreditSummary(ws).billingAvailable <= 0) return false;
+
   return passesCreditFilters(ws, fs);
 }
 
 export function expiredRecoveryScore(ws: WorkspaceCredit): number {
   const credits = Math.max(resolveCreditSummary(ws).available, 0);
   const days = Math.max(expiredDays(ws) || 0, 0);
+
   return credits * days + credits;
 }

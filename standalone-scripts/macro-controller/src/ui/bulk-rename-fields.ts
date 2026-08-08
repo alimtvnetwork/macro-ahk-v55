@@ -133,6 +133,7 @@ export function formatEta(ms: number): string {
   if (secs < 60) return secs + 's';
   const mins = Math.floor(secs / 60);
   const remSecs = secs % 60;
+
   return mins + 'm ' + (remSecs > 0 ? remSecs + 's' : '');
 }
 
@@ -164,6 +165,7 @@ export function buildInputRow(
   input.placeholder = placeholder;
   input.style.cssText = 'flex:1;padding:3px 5px;border:1px solid ' + cInputBorder + CssFragmentType.BorderRadius3pxBackground + cInputBg + ';color:' + cInputFg + ';font-size:10px;outline:none;font-family:monospace;';
   row.appendChild(input);
+
   return { row, input, checkbox };
 }
 
@@ -182,6 +184,7 @@ export function buildTemplateRow(): { row: HTMLElement; input: HTMLInputElement 
   input.style.cssText = 'flex:1;padding:3px 5px;border:1px solid ' + cInputBorder + CssFragmentType.BorderRadius3pxBackground + cInputBg + ';color:' + cInputFg + ';font-size:10px;outline:none;font-family:monospace;';
   row.appendChild(lbl);
   row.appendChild(input);
+
   return { row, input };
 }
 
@@ -231,5 +234,6 @@ export function buildTokenRow(): HTMLElement {
   };
   tokenRow.appendChild(tokenLabel);
   tokenRow.appendChild(tokenRefreshBtn);
+
   return tokenRow;
 }

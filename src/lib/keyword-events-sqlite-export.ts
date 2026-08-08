@@ -86,12 +86,14 @@ const CREATE_META_TABLE = `
 
 async function initDb(): Promise<Database> {
     const SQL = await initSqlJs({ locateFile: () => WASM_URL });
+
     return new SQL.Database();
 }
 
 /** Lazy JSZip loader — keeps the ~95 kB out of the recorder chunk. */
 async function loadJSZip(): Promise<typeof JSZipType> {
     const mod = await import("jszip");
+
     return mod.default;
 }
 
@@ -212,6 +214,7 @@ export async function buildKeywordEventsSqliteDb(
         db.run(CREATE_META_TABLE);
         insertKeywordEvents(db, events, now);
         insertMeta(db, events.length, now);
+
         return db.export();
     } finally {
         db.close();
@@ -256,6 +259,7 @@ export async function buildKeywordEventsZip(
         type: "blob",
         compression: "DEFLATE",
     });
+
     return { blob, filename: buildExportFilename() };
 }
 
@@ -274,6 +278,7 @@ export async function downloadKeywordEventsZip(
     emitProgress(onProgress, "download", events.length);
     await triggerDownload(result.blob, result.filename);
     emitProgress(onProgress, "done", events.length);
+
     return result;
 }
 

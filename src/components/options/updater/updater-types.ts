@@ -94,6 +94,7 @@ export function mapBackendEntry(u: Record<string, unknown>): UpdaterEntry {
     if (!u.LastCheckedAt) return "unchecked";
     if (u.CurrentVersion && u.LatestVersion && u.CurrentVersion !== u.LatestVersion) return STATUS_UPDATE_AVAILABLE;
     if (u.LatestVersion) return STATUS_UP_TO_DATE;
+
     return "unchecked";
   };
 

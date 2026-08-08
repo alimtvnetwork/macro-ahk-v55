@@ -57,6 +57,7 @@ function buildForest(groups: ReadonlyArray<StepGroupRow>): TreeNode[] {
             .slice()
             .sort(sortFn)
             .map((g) => ({ Group: g, Children: build(g.StepGroupId) }));
+
     return build(null);
 }
 
@@ -70,6 +71,7 @@ function defaultExpanded(forest: TreeNode[]): Set<number> {
             set.add(child.Group.StepGroupId);
         }
     }
+
     return set;
 }
 
@@ -107,6 +109,7 @@ export function RecorderLiveTreePanel(): JSX.Element {
         setExpanded((prev) => {
             const next = new Set(prev);
             for (const id of filtered.ExpandIds) { next.add(id); }
+
             return next;
         });
     }, [isFiltering, filtered.ExpandIds]);
@@ -123,6 +126,7 @@ export function RecorderLiveTreePanel(): JSX.Element {
                 const row = byId.get(cursor);
                 cursor = row?.ParentStepGroupId ?? null;
             }
+
             return next;
         });
     }, [selection.StepGroupId, lib.Groups]);
@@ -131,6 +135,7 @@ export function RecorderLiveTreePanel(): JSX.Element {
         setExpanded((prev) => {
             const next = new Set(prev);
             if (next.has(id)) { next.delete(id); } else { next.add(id); }
+
             return next;
         });
     };
@@ -264,6 +269,7 @@ function GroupNode(props: GroupNodeProps): JSX.Element {
     const isActive = selectedGroupId === node.Group.StepGroupId && selectedStepId === null;
     const steps = stepsByGroup.get(node.Group.StepGroupId) ?? [];
     const hasChildren = node.Children.length > 0 || steps.length > 0;
+
     return (
         <div>
             <div
@@ -335,6 +341,7 @@ function StepRowNode(props: {
     readonly onClick: () => void;
 }): JSX.Element {
     const { step, depth, isActive, onClick } = props;
+
     return (
         <button
             type="button"

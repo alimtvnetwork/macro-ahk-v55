@@ -34,6 +34,7 @@ export function detectSelectorKind(expression: string): PredicateEvaluationKind 
     if (trimmed.startsWith("/") || trimmed.startsWith("(") || trimmed.startsWith("./")) {
         return "XPath";
     }
+
     return "Css";
 }
 
@@ -68,6 +69,7 @@ function runSelectorLookup(
     trimmed: string, doc: Document, useKind: PredicateEvaluationKind,
 ): SelectorTestResult {
     if (useKind === "XPath") { return runXPathLookup(trimmed, doc); }
+
     return runCssLookup(trimmed, doc);
 }
 
@@ -77,6 +79,7 @@ function runXPathLookup(trimmed: string, doc: Document): SelectorTestResult {
     );
     const count = snapshot.snapshotLength;
     const first = count > 0 ? snapshot.snapshotItem(0) : null;
+
     return {
         Expression: trimmed,
         Kind: "XPath",
@@ -88,6 +91,7 @@ function runXPathLookup(trimmed: string, doc: Document): SelectorTestResult {
 
 function runCssLookup(trimmed: string, doc: Document): SelectorTestResult {
     const list = doc.querySelectorAll(trimmed);
+
     return {
         Expression: trimmed,
         Kind: "Css",
@@ -111,6 +115,7 @@ function selectorErrorResult(
 
 function readDomContext(element: Element): DomContext {
     const attrs = readContextAttributes(element);
+
     return {
         TagName: element.tagName.toLowerCase(),
         Id: attrs.id,
@@ -140,5 +145,6 @@ function readContextAttributes(element: Element): ContextAttrs {
 
 function nonEmptyAttr(element: Element, name: string): string | null {
     const value = element.getAttribute(name);
+
     return value !== null && value.length > 0 ? value : null;
 }

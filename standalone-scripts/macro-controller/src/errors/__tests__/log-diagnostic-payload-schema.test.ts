@@ -76,6 +76,7 @@ function extractPayload(consoleMock: Mock): Payload {
   expect(call.length).toBe(3);
   expect(typeof call[0]).toBe('string'); // scope
   expect(call[1]).toBe('diagnostic-report');
+
   return call[2] as Payload;
 }
 
@@ -116,6 +117,7 @@ function assertPayloadSchema(payload: Payload): void {
 function normalize(payload: Payload): Record<string, unknown> {
   const { timestamp, ...rest } = payload;
   expect(ISO_8601.test(timestamp)).toBe(true);
+
   return { ...rest, timestamp: '<ISO-8601>' };
 }
 
@@ -135,6 +137,7 @@ const LOGGER_VARIANTS: ReadonlyArray<{
         console: consoleMock,
         stackTrace: vi.fn(),
       };
+
       return { logger, consoleMock };
     },
   },
@@ -143,6 +146,7 @@ const LOGGER_VARIANTS: ReadonlyArray<{
     build: () => {
       const consoleMock = vi.fn();
       const logger = { error: vi.fn(), console: consoleMock };
+
       return { logger, consoleMock };
     },
   },
@@ -155,6 +159,7 @@ const LOGGER_VARIANTS: ReadonlyArray<{
         console: consoleMock,
         stackTrace: vi.fn().mockReturnValue(undefined),
       };
+
       return { logger, consoleMock };
     },
   },
@@ -168,6 +173,7 @@ const LOGGER_VARIANTS: ReadonlyArray<{
         warn: vi.fn(),
         debug: vi.fn(),
       };
+
       return { logger, consoleMock };
     },
   },
@@ -181,6 +187,7 @@ const LOGGER_VARIANTS: ReadonlyArray<{
         metric: vi.fn(),
         trace: vi.fn(),
       };
+
       return { logger, consoleMock };
     },
   },

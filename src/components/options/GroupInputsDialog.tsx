@@ -35,6 +35,7 @@ export interface GroupInputsDialogProps {
 export function GroupInputsDialog(props: GroupInputsDialogProps): JSX.Element {
     const { open, groupName, groupId, currentBag, onOpenChange } = props;
     const controller = useGroupInputsController(props);
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-2xl">
@@ -74,5 +75,6 @@ type GroupInputsController = ReturnType<typeof useGroupInputsController>;
 
 function GroupInputsFooter(props: { groupId: number | null; currentBag: GroupInputBag | null; controller: GroupInputsController; onOpenChange: (open: boolean) => void }): JSX.Element {
     const { groupId, currentBag, controller, onOpenChange } = props;
+
     return <DialogFooter className="gap-2 sm:gap-2"><Button variant="ghost" onClick={controller.handleClear} disabled={groupId === null || currentBag === null} className="mr-auto text-destructive hover:text-destructive"><Trash2 className="mr-1 h-4 w-4" />Clear bag</Button><Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button><Button onClick={controller.handleApply} disabled={groupId === null || !controller.parseResult.Ok}>Apply</Button></DialogFooter>;
 }

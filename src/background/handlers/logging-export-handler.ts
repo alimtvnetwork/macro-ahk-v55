@@ -33,6 +33,7 @@ export async function handlePurgeLogs(
     const purged = purgeOldLogs(days);
 
     markLoggingDirty();
+
     return { purged };
 }
 
@@ -49,6 +50,7 @@ function purgeOldLogs(days: number): number {
     }
 
     const after = countTable(db, "Logs");
+
     return before - after;
 }
 
@@ -274,6 +276,7 @@ function buildRowObject(
     for (let i = 0; i < columns.length; i++) {
         record[columns[i]] = values[i];
     }
+
     return record;
 }
 

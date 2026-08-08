@@ -84,6 +84,7 @@ function makeBtn(label: string, variant: ButtonVariantType): HTMLButtonElement {
   const primary = 'background:rgba(124,58,237,0.85);color:#fff;';
   const ghost = 'background:rgba(255,255,255,0.06);color:#ddd;';
   applyStyle(btn, base + (variant === 'primary' ? primary : ghost));
+
   return btn;
 }
 
@@ -114,6 +115,7 @@ function buildPreviewTable(rows: PreviewRow[], onChange: () => void): HTMLElemen
   rows.forEach((r, i) => tbody.appendChild(buildPreviewRow(r, i, onChange)));
   table.appendChild(tbody);
   wrap.appendChild(table);
+
   return wrap;
 }
 
@@ -125,6 +127,7 @@ function conflictBadge(state: PreviewRow['conflict']): string {
     duplicate: '#ef4444',
   };
   const color = colors[state];
+
   return '<span style="display:inline-block;padding:2px 6px;border-radius:3px;background:' + color
     + ';color:#000;font-weight:700;font-size:10px;">' + state + '</span>';
 }
@@ -133,12 +136,14 @@ export function defaultActionFor(conflict: PreviewRow['conflict']): RowAction {
   if (conflict === 'new') return 'add';
   if (conflict === 'update') return 'overwrite';
   if (conflict === 'identical') return 'skip';
+
   return 'skip';
 }
 
 export function allowedActionsFor(conflict: PreviewRow['conflict']): RowAction[] {
   // A brand-new slug can only be added (nothing to overwrite) or skipped.
   if (conflict === 'new') return ['add', 'skip'];
+
   // Everything else has an existing counterpart; user picks the resolution.
   return ['overwrite', 'skip', 'rename'];
 }
@@ -147,6 +152,7 @@ function actionLabel(action: RowAction): string {
   if (action === 'add') return 'Add';
   if (action === 'overwrite') return 'Overwrite';
   if (action === 'skip') return 'Skip';
+
   return 'Rename';
 }
 
@@ -185,6 +191,7 @@ function buildPreviewRow(row: PreviewRow, index: number, onChange: () => void): 
   tr.appendChild(nameCell);
   tr.appendChild(conflictCell);
   tr.appendChild(actionCell);
+
   return tr;
 }
 
@@ -199,12 +206,11 @@ function escapeHtml(text: string): string {
 /*  Step 21: slugKey / makeUniqueSlug moved to prompt-slug-utils.ts.   */
 /* ------------------------------------------------------------------ */
 
-
-
 function isDeepEqual(a: PromptEntry, b: PromptEntry): boolean {
   const aKeys = Object.keys(a).sort();
   const bKeys = Object.keys(b).sort();
   if (aKeys.length !== bKeys.length) return false;
+
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
@@ -214,6 +220,7 @@ async function diffAgainstCache(entries: PromptEntry[]): Promise<PreviewRow[]> {
   const existingList: CachedPromptEntry[] = record && record.entries ? record.entries : [];
   const byKey = new Map<string, CachedPromptEntry>();
   existingList.forEach((e) => byKey.set(slugKey(e), e));
+
   return entries.map((incoming) => classifyRow(incoming, byKey.get(slugKey(incoming))));
 }
 
@@ -223,6 +230,7 @@ export function classifyRow(incoming: PromptEntry, existing: CachedPromptEntry |
   const conflict: PreviewRow['conflict'] = !existing
     ? 'new'
     : isDeepEqual(incoming, existing as unknown as PromptEntry) ? 'identical' : 'update';
+
   return { slug, name, conflict, action: defaultActionFor(conflict), incoming };
 }
 
@@ -289,6 +297,7 @@ function renderPreview(body: HTMLElement, state: ModalState, rerender: () => voi
 function countByAction(rows: PreviewRow[]): { add: number; overwrite: number; skip: number; rename: number } {
   const c = { add: 0, overwrite: 0, skip: 0, rename: 0 };
   rows.forEach((r) => { c[r.action] += 1; });
+
   return c;
 }
 
@@ -312,12 +321,14 @@ function buildBulkActionsBar(rows: PreviewRow[], onChange: () => void): HTMLElem
       });
       onChange();
     };
+
     return b;
   };
 
   bar.appendChild(mkBtn('Overwrite all', 'overwrite'));
   bar.appendChild(mkBtn('Skip all', 'skip'));
   bar.appendChild(mkBtn('Rename all', 'rename'));
+
   return bar;
 }
 
@@ -442,6 +453,7 @@ function buildShell(onClose: () => void): { root: HTMLElement; body: HTMLElement
   panel.appendChild(body);
   panel.appendChild(footer);
   overlay.appendChild(panel);
+
   return { root: overlay, body, footer };
 }
 
@@ -473,6 +485,7 @@ function bucketPreviewRows(
     if (row.action === 'skip') {
       skippedCount += 1;
       auditActions.push({ slug: row.slug, action: 'skip' });
+
       return;
     }
     const validated = validate(row.incoming);
@@ -480,6 +493,7 @@ function bucketPreviewRows(
     if (isMissingValidated) {
       skippedCount += 1;
       auditActions.push({ slug: row.slug, action: 'skip' });
+
       return;
     }
     if (row.action === 'rename') {
@@ -489,11 +503,13 @@ function bucketPreviewRows(
       toImport.push({ ...validated, slug: uniqueSlug });
       renamedCount += 1;
       auditActions.push({ slug: row.slug, action: 'rename', renamedTo: uniqueSlug });
+
       return;
     }
     toImport.push(validated);
     auditActions.push({ slug: row.slug, action: row.action });
   });
+
   return { toImport, auditActions, renamedCount, skippedCount };
 }
 
@@ -504,6 +520,7 @@ async function handleCommitError(err: unknown, state: ModalState): Promise<void>
     ? { code: asCommit.code, message: asCommit.message, hint: asCommit.hint }
     : (() => {
         const c = errors.classifyImportError(err, 'commit');
+
         return { code: c.code, message: c.message, hint: c.hint };
       })();
   state.errorMessage = 'Commit failed (changes rolled back)';
@@ -586,7 +603,6 @@ export function openPromptImportModal(deps: ImportModalDeps): void {
   rerender();
 }
 
-
 function renderStage(state: ModalState, refs: ModalRefs, deps: ImportModalDeps, transition: (next: Stage) => void): void {
   const { body, primaryBtn, cancelBtn } = refs;
   primaryBtn.style.display = '';
@@ -597,11 +613,13 @@ function renderStage(state: ModalState, refs: ModalRefs, deps: ImportModalDeps, 
   if (state.stage === 'idle') {
     primaryBtn.style.display = 'none';
     renderIdle(body, (file) => void startParse(file, state, refs, deps, transition));
+
     return;
   }
   if (state.stage === 'parsing') {
     primaryBtn.disabled = true;
     renderParsing(body, state.filename);
+
     return;
   }
   if (state.stage === 'preview') {
@@ -610,12 +628,14 @@ function renderStage(state: ModalState, refs: ModalRefs, deps: ImportModalDeps, 
     primaryBtn.disabled = importCount === 0;
     primaryBtn.onclick = () => void refs.onCommit();
     renderPreview(body, state, () => renderStage(state, refs, deps, transition));
+
     return;
   }
   if (state.stage === 'committing') {
     primaryBtn.disabled = true;
     cancelBtn.disabled = true;
     renderCommitting(body, state.rows.length);
+
     return;
   }
   if (state.stage === 'error') {
@@ -647,6 +667,7 @@ function renderStage(state: ModalState, refs: ModalRefs, deps: ImportModalDeps, 
         });
       },
     });
+
     return;
   }
 }
@@ -689,10 +710,12 @@ async function startParse(
 async function parseByFormat(bytes: Uint8Array, format: PromptsBundleFormat): Promise<PromptsBundleV1> {
   if (format === 'zip') {
     const reader = await import('./prompt-io-zip-reader');
+
     return reader.parsePromptsBundleZip(bytes).bundle;
   }
   if (format === 'sqlite') {
     const reader = await import('./prompt-io-sqlite-reader');
+
     return (await reader.parsePromptsBundleSqlite(bytes)).bundle;
   }
   const bundleTypes = await import('./prompt-bundle-types');
@@ -703,6 +726,7 @@ async function parseByFormat(bytes: Uint8Array, format: PromptsBundleFormat): Pr
   if (isEnvelope) {
     const result = bundleTypes.validatePromptsBundle(raw);
     if (!result.isValid || !result.bundle) throwDiagnostic('PROMPT_IO_ENVELOPE_E001', { errorList: result.errors.join('; ') });
+
     return result.bundle;
   }
   // Legacy bare-array JSON — synthesize an envelope.
@@ -711,5 +735,6 @@ async function parseByFormat(bytes: Uint8Array, format: PromptsBundleFormat): Pr
   const entries = items
     .map((item) => io.validatePromptEntry(item))
     .filter((e): e is CachedPromptEntry => e !== null) as unknown as PromptEntry[];
+
   return bundleTypes.buildPromptsBundle(entries, '0.0.0', { format: 'json', includeExcluded: true });
 }

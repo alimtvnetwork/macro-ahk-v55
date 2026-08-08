@@ -119,6 +119,7 @@ async function checkElementCondition(
         });
 
         const hasResult = results.length > 0;
+
         return hasResult ? (results[0].result as boolean) : false;
     } catch {
         return false;
@@ -128,6 +129,7 @@ async function checkElementCondition(
 /** Injected function to check for a DOM element. */
 function checkDomElement(selector: string): boolean {
     const element = document.querySelector(selector);
+
     return element !== null;
 }
 
@@ -140,6 +142,7 @@ async function checkOnlineCondition(): Promise<boolean> {
     try {
         const result = await chrome.storage.session.get("marco_network_status");
         const status = result["marco_network_status"];
+
         return status === "offline";
     } catch {
         return false;

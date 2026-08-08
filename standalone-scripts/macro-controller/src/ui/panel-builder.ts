@@ -171,8 +171,6 @@ function assemblePanelChildren(ui: HTMLElement, c: PanelChildren): void {
   ui.appendChild(c.taskSplitterSection);
   ui.appendChild(c.toolsSection);
 }
-
-
  
 export function createUI(deps: PanelBuilderDeps): void {
   let container = getByXPath(CONFIG.CONTROLS_XPATH);
@@ -185,6 +183,7 @@ export function createUI(deps: PanelBuilderDeps): void {
 
   if (document.getElementById(IDS.CONTAINER)) {
     log('UI already exists in DOM');
+
     return;
   }
 
@@ -231,8 +230,6 @@ export function createUI(deps: PanelBuilderDeps): void {
   plCtx.bodyElements = [status, infoRow, summaryBar.root, btnRow, wsDropSection, taskQueueSection, repeatPanelSection, taskSplitterSection, toolsSection];
 
   assemblePanelChildren(ui, { titleRow, summaryBar, status, infoRow, btnRow, wsDropSection, taskQueueSection, repeatPanelSection, taskSplitterSection, toolsSection });
-
-
 
   mountUiContainer(container, ui);
 

@@ -42,6 +42,7 @@ function isRateLimited(): boolean {
     }
 
     rateCount++;
+
     return rateCount > MAX_MESSAGES_PER_SECOND;
 }
 
@@ -91,6 +92,7 @@ export async function handleUserScriptLog(
     }
 
     markLoggingDirty();
+
     return { isOk: true };
 }
 
@@ -170,6 +172,7 @@ async function resolveCurrentSessionId(version: string): Promise<number> {
     }
 
     const newSessionId = await startSession(version);
+
     return Number(newSessionId);
 }
 

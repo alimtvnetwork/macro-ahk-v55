@@ -301,5 +301,6 @@ export function readUserVersion(db: Database): number {
     const res = db.exec("PRAGMA user_version;");
     if (res.length === 0 || res[0].values.length === 0) return 0;
     const v = res[0].values[0][0];
+
     return typeof v === "number" ? v : 0;
 }

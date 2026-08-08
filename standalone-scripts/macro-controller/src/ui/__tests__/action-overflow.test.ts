@@ -42,6 +42,7 @@ function stubSizing(body: HTMLElement, clientWidth: () => number): void {
         }
         if (childHtmlElement.dataset.trailingAction === '1' && childHtmlElement.style.display !== 'none') w += ACTION_W;
       }
+
       return w;
     },
   });
@@ -54,6 +55,7 @@ function makeAction(label: string): HTMLElement {
   btn.type = 'button';
   btn.textContent = label;
   wrap.appendChild(btn);
+
   return wrap;
 }
 

@@ -106,6 +106,7 @@ describe('prompt-editor DiagnosticError migration (PlanTierType 26 · step 8)', 
     expect(toastMsg).toContain('[code=PROMPT_EDIT_E006]');
     const diagCall = logSpy.mock.calls.find((c) => {
       const p = c[1] as { code?: string } | undefined;
+
       return p?.code === 'PROMPT_EDIT_E006';
     });
     expect(diagCall).toBeDefined();

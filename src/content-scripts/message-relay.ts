@@ -167,6 +167,7 @@ function handlePageMessage(event: MessageEvent): void {
             isOk: false,
             errorMessage: `Blocked disallowed message type: ${messageType}`,
         }, isFromSdk);
+
         return;
     }
 
@@ -178,6 +179,7 @@ function handlePageMessage(event: MessageEvent): void {
             isOk: false,
             errorMessage: "Relay rate limit exceeded",
         }, isFromSdk);
+
         return;
     }
 
@@ -197,6 +199,7 @@ let _inFlightRelayRequests = 0;
 
 function makeReleaseGuard(): () => void {
     let settled = false;
+
     return () => {
         if (settled) return;
         settled = true;
@@ -218,6 +221,7 @@ function handleRelayCallback(
             errorMessage:
                 chrome.runtime.lastError?.message ?? "Extension context invalidated",
         }, isSdkSource);
+
         return;
     }
     release();
@@ -251,6 +255,7 @@ function forwardToBackground(
             isOk: false,
             errorMessage: "Relay overloaded - too many in-flight requests",
         }, isSdkSource);
+
         return;
     }
 
@@ -324,6 +329,7 @@ function handleBackgroundMessage(
     // responder via window.postMessage and wait for a matching reply.
     if (messageType === "PROBE_DETECTED_WORKSPACE") {
         probeDetectedWorkspaceFromPage(sendResponse);
+
         return true; // async response
     }
 
@@ -417,6 +423,7 @@ function initMessageRelay(): void {
     // Sentinel for programmatic re-injection detection
     if ((window as unknown as Record<string, unknown>).__marcoRelayActive) {
         console.log("[Marco] Message relay already active — skipping duplicate init");
+
         return;
     }
     (window as unknown as Record<string, unknown>).__marcoRelayActive = true;

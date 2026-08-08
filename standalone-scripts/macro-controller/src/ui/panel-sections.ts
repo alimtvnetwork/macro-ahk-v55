@@ -83,8 +83,6 @@ export interface ToolsMasterResult {
   settingsDeps: SettingsDeps;
 }
 
-
-
 // ============================================
 // buildStatusBar — status + info row
 // ============================================
@@ -137,7 +135,6 @@ export function buildToolsMasterSection(
   return { toolsSection: toolsCol.section, taskQueueSection, wsDropSection, authDiagRow: authDiagResult.row, jsBody: toolsSections.jsBody, settingsDeps };
 }
 
-
 function _buildAuthDiagnostics(): { row: HTMLElement; updateAuthDiagRow: () => void } {
   const authDiagResult = createAuthDiagRow({
     getLastTokenSource: function() { return getLastTokenSource(); },
@@ -150,6 +147,7 @@ function _buildAuthDiagnostics(): { row: HTMLElement; updateAuthDiagRow: () => v
   });
   nsWrite('_internal.updateAuthDiag', authDiagResult.updateAuthDiagRow);
   setRecordRefreshOutcome(recordRefreshOutcome);
+
   return { row: authDiagResult.row, updateAuthDiagRow: authDiagResult.updateAuthDiagRow };
 }
 
@@ -180,7 +178,6 @@ function _buildWsDropdown(deps: PanelBuilderDeps): { wsDropSection: HTMLElement 
     triggerLoopMoveFromSelection: deps.triggerLoopMoveFromSelection,
   });
 }
-
  
 function _buildToolsCollapsible(
   _deps: PanelBuilderDeps, btnStyle: string, taskNextDeps: TaskNextDeps,
@@ -288,6 +285,7 @@ export function createRecordIndicator(): HTMLElement {
   record.className = 'loop-pulse';
   record.style.cssText = 'display:none;position:fixed;top:15px;right:15px;padding:8px 12px;background:#dc2626;border-radius:20px;color:#fff;font-size:12px;font-weight:bold;z-index:99999;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(220,38,38,.4);';
   record.innerHTML = '<span style="width:10px;height:10px;background:#fff;border-radius:50%;display:inline-block;"></span> LOOP';
+
   return record;
 }
 

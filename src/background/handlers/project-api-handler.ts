@@ -89,6 +89,7 @@ export async function handleProjectApi(payload: ProjectApiMessage): Promise<Reco
 
     try {
         const result = await dispatchMethod(db, slug, method, endpoint, params);
+
         return { isOk: true, ...result };
     } catch (err) {
         return {
@@ -146,11 +147,13 @@ function handleGet(
 
     if (hasId) {
         const row = queryFindUnique(db, table, { where: params.where as FindUniqueArgs["where"] });
+
         return { row };
     }
 
     if (params.count) {
         const count = queryCount(db, table, { where: params.where as CountArgs["where"] });
+
         return { count };
     }
 
@@ -160,6 +163,7 @@ function handleGet(
         take: params.take as number,
         skip: params.skip as number,
     });
+
     return { rows };
 }
 
@@ -171,6 +175,7 @@ function handlePost(
 ): Record<string, unknown> {
     const row = queryCreate(db, table, { data: params.data as CreateArgs["data"] });
     void markAndFlush(slug);
+
     return { row };
 }
 
@@ -185,6 +190,7 @@ function handlePut(
         data: params.data as UpdateArgs["data"],
     });
     void markAndFlush(slug);
+
     return { updated: result.count };
 }
 
@@ -198,14 +204,14 @@ function handleDelete(
         where: params.where as DeleteArgs["where"],
     });
     void markAndFlush(slug);
+
     return { deleted: result.count };
 }
 
 /* ------------------------------------------------------------------ */
 /*  Schema commands                                                    */
 /* ------------------------------------------------------------------ */
-
-// eslint-disable-next-line max-lines-per-function -- command dispatcher: one arm per schema verb; splitting would scatter the contract
+ 
 function handleSchemaCommand(
     db: ProjectDb,
     slug: string,
@@ -223,6 +229,7 @@ function handleSchemaCommand(
             }
             createUserTable(db, tableName, columns);
             void markAndFlush(slug);
+
             return { table: tableName };
         }
         case "dropTable": {
@@ -231,10 +238,12 @@ function handleSchemaCommand(
             if (isMissingTableName) throw new Error("dropTable: missing or invalid 'tableName'");
             dropUserTable(db, tableName);
             void markAndFlush(slug);
+
             return { dropped: tableName };
         }
         case "listTables": {
             const tables = listUserTables(db);
+
             return { tables };
         }
         default:
@@ -277,6 +286,7 @@ function handleRawSqlRead(
         throw new Error(`rawSql: method ${method} cannot execute ${describeStatement(unsafe)}`);
     }
     const rows = rowsFromExecResults(db.exec(sql));
+
     return { rows };
 }
 
@@ -296,6 +306,7 @@ function handleRawSqlWrite(
     const changes = getRowsModified(db);
     const lastInsertId = readLastInsertId(db);
     void markAndFlush(slug);
+
     return {
         executed: true,
         ...(lastInsertId !== undefined ? { lastInsertId } : {}),
@@ -317,6 +328,7 @@ function classifyRawSql(sql: string): RawSqlStatement[] {
     if (chunks.length === 0) {
         throw new Error("rawSql: empty SQL statement");
     }
+
     return chunks.map((chunk) => ({ sql: chunk, kind: classifyStatement(chunk) }));
 }
 
@@ -373,12 +385,14 @@ function splitSqlStatements(sql: string): string[] {
         current += ch;
     }
     pushSqlStatement(statements, current);
+
     return statements;
 }
 
 function skipLineComment(sql: string, start: number): number {
     let i = start;
     while (i < sql.length && sql[i] !== "\n") i++;
+
     return i;
 }
 
@@ -388,6 +402,7 @@ function skipBlockComment(sql: string, start: number): number {
         if (sql[i] === "*" && sql[i + 1] === "/") return i + 1;
         i++;
     }
+
     return sql.length - 1;
 }
 
@@ -407,6 +422,7 @@ function rowsFromExecResults(results: ReturnType<ProjectDb["exec"]>): Array<Reco
             rows.push(row);
         }
     }
+
     return rows;
 }
 
@@ -415,6 +431,7 @@ function readLastInsertId(db: ProjectDb): number | undefined {
         const rows = rowsFromExecResults(db.exec("SELECT last_insert_rowid() AS lastInsertId"));
         const value = rows[0]?.lastInsertId;
         const n = typeof value === "number" ? value : Number(value);
+
         return Number.isFinite(n) ? n : undefined;
     } catch {
         return undefined;
@@ -426,6 +443,7 @@ function getRowsModified(db: ProjectDb): number | undefined {
         const reader = db.getRowsModified;
         if (typeof reader !== "function") return undefined;
         const n = reader.call(db);
+
         return Number.isFinite(n) ? n : undefined;
     } catch {
         return undefined;

@@ -101,6 +101,7 @@ function ColumnValidationSection({
       <LabelType className="text-xs font-medium text-muted-foreground">Column Validation</LabelType>
       {namedCols.map((col, colIdx) => {
         const realIdx = table.columns.indexOf(col);
+
         return (
           <div key={colIdx} className="space-y-1">
             <span className="text-[10px] font-mono text-muted-foreground">{col.name}</span>

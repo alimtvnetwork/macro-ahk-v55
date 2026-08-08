@@ -25,6 +25,7 @@ let mockOutcome: PasteOutcome = 'injected';
 
 vi.mock('../ui/prompt-utils', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../ui/prompt-utils')>();
+
   return {
     ...actual,
     showPasteToast: (...args: unknown[]) => showPasteToastSpy(...args),
@@ -57,6 +58,7 @@ function makeCtx(): PromptContextLike {
   const dd = document.createElement('div');
   dd.style.display = 'block';
   document.body.appendChild(dd);
+
   return { promptsDropdown: dd };
 }
 

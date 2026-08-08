@@ -23,13 +23,16 @@ function getSnapshot(): EditorThemeName {
   } catch (caught) {
     logError("useEditorTheme.getSnapshot", "localStorage read failed — falling back to default theme (SSR/sandbox?)", caught);
   }
+
   return DEFAULT_THEME;
 }
 
 /** React hook — returns current theme + setter. */
 export function useEditorTheme() {
   const theme = useSyncExternalStore(
-    (callback) => { listeners.push(callback); return () => { listeners = listeners.filter((l) => l !== callback); }; },
+    (callback) => { listeners.push(callback);
+
+ return () => { listeners = listeners.filter((l) => l !== callback); }; },
     getSnapshot,
     () => DEFAULT_THEME,
   );

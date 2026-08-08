@@ -58,6 +58,7 @@ function fixture(): { forest: LiveTreeNode[]; stepsByGroup: Map<number, StepRow[
         [2, [makeStep(10, 2, "Submit button", StepKindId.Click), makeStep(11, 2, "Email field", StepKindId.Type)]],
         [3, [makeStep(20, 3, "Pay", StepKindId.Click)]],
     ]);
+
     return { forest, stepsByGroup };
 }
 

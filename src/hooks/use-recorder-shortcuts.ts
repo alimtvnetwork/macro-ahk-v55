@@ -37,6 +37,7 @@ function isEditableTarget(t: EventTarget | null): boolean {
     if (!(t instanceof HTMLElement)) { return false; }
     if (t.isContentEditable) { return true; }
     const tag = t.tagName;
+
     return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
 }
 
@@ -62,6 +63,7 @@ export function useRecorderShortcuts(args: UseRecorderShortcutsArgs): void {
                     e.preventDefault();
                     void onResume();
                 }
+
                 return;
             }
 
@@ -71,6 +73,7 @@ export function useRecorderShortcuts(args: UseRecorderShortcutsArgs): void {
                     e.preventDefault();
                     void onPause();
                 }
+
                 return;
             }
 
@@ -82,6 +85,7 @@ export function useRecorderShortcuts(args: UseRecorderShortcutsArgs): void {
         };
 
         window.addEventListener("keydown", onKey);
+
         return () => window.removeEventListener("keydown", onKey);
     }, [phase, onResume, onPause, onStop]);
 }

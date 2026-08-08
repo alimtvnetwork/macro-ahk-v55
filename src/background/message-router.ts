@@ -69,6 +69,7 @@ function extractMessageType(message: MessageRequest): string {
         return "(unknown)";
     }
     const t = (message as { type?: string }).type;
+
     return typeof t === "string" ? t : "(unknown)";
 }
 
@@ -103,6 +104,7 @@ async function routeMessage(
 
     if (isBroadcast) {
         trackMessage(String(messageType), 0, true);
+
         return { isOk: true };
     }
 
@@ -114,6 +116,7 @@ async function routeMessage(
         try {
             const result = await handler(message, sender);
             trackMessage(String(messageType), Math.round(performance.now() - start), true);
+
             return result as MessageResponse;
         } catch (err) {
             trackMessage(String(messageType), Math.round(performance.now() - start), false);

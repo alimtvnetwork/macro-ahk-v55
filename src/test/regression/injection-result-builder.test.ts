@@ -36,6 +36,7 @@ import { BgLogTag } from "../../background/bg-logger";
 
 vi.mock("../../background/bg-logger", async (importOriginal) => {
     const actual = await importOriginal<typeof import("../../background/bg-logger")>();
+
     return {
         ...actual,
         logBgWarnError: vi.fn(),

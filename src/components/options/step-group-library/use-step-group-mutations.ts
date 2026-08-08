@@ -95,5 +95,6 @@ function bindHandlers(deps: MutationDeps) {
 
 export function useStepGroupMutations(params: UseStepGroupMutationsParams) {
     const batchActions = useStepGroupBatchActions(params.lib);
+
     return bindHandlers({ ...params, batchActions });
 }

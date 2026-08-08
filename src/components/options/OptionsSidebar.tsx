@@ -160,6 +160,7 @@ export function OptionsSidebar({ selection, onSelect, onErrorDrawerOpen }: Props
                     <DropdownMenuContent side="right" align="start" className="min-w-[160px]">
                       {overflowItems.map((item) => {
                         const isActive = selection.type === "section" && selection.section === item.id;
+
                         return (
                           <DropdownMenuItem
                             key={item.id}

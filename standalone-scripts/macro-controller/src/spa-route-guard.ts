@@ -100,6 +100,7 @@ function makePatched(original: HistoryFn): HistoryFn {
     } catch (caught: unknown) {
       logError('SpaRouteGuard.patched', String(caught));
     }
+
     return result;
   } as HistoryFn;
 }

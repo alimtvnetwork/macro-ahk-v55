@@ -79,6 +79,7 @@ describe("runKeywordEventChain", () => {
         const order: string[] = [];
         const runner = vi.fn(async (ev: KeywordEvent): Promise<PlaybackResult> => {
             order.push(ev.Id);
+
             return mkResult();
         });
         const r = await runKeywordEventChain(
@@ -94,7 +95,9 @@ describe("runKeywordEventChain", () => {
     it("skips disabled events without counting them", async () => {
         const order: string[] = [];
         const runner = vi.fn(async (ev: KeywordEvent): Promise<PlaybackResult> => {
-            order.push(ev.Id); return mkResult();
+            order.push(ev.Id);
+
+ return mkResult();
         });
         const r = await runKeywordEventChain(
             [mkEvent("a"), mkEvent("b", false), mkEvent("c")],

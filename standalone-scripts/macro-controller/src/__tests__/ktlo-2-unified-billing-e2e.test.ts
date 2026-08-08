@@ -19,6 +19,7 @@ import {
 
 function seedWorkspaceFromWire(): WorkspaceCredit {
     const wire = KTLO_2_UNIFIED_WORKSPACE_WIRE;
+
     return {
         id: wire.id, name: wire.name, fullName: wire.name,
         dailyFree: 0, dailyUsed: wire.daily_credits_used, dailyLimit: wire.daily_credits_limit,

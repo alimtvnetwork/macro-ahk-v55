@@ -488,6 +488,7 @@ function inferCategory(type: MessageType): string {
     if (type.includes("STORAGE")) return "Storage Browser";
     if (type.includes("XPATH")) return "XPath";
     if (type.includes("NETWORK")) return "Network";
+
     return "General";
 }
 
@@ -500,6 +501,7 @@ function inferDescription(type: MessageType): string {
     if (type.startsWith("SAVE_")) return `Creates or updates data using ${type}.`;
     if (type.startsWith("DELETE_")) return `Deletes data using ${type}.`;
     if (type.startsWith("CLEAR_")) return `Clears state/data using ${type}.`;
+
     return `Handles ${type} request.`;
 }
 
@@ -569,6 +571,7 @@ export function buildApiEndpointsResponse(): {
         .sort((a, b) => a.localeCompare(b))
         .map((type) => {
             const override = ENDPOINT_OVERRIDES[type];
+
             return {
                 type,
                 displayName: toDisplayName(type),

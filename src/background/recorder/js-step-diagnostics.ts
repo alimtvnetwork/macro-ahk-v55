@@ -92,6 +92,7 @@ function classifyValue(v: string): { Type: VariableValueType; Display: string } 
     if (v === "") {
         return { Type: "string", Display: "" };
     }
+
     return { Type: "string", Display: v };
 }
 
@@ -113,6 +114,7 @@ function buildVarEntry(
 ): VariableContext {
     const sensitive = isSensitiveDiagnosticName(key);
     const display = sensitive ? maskDiagnosticValue(raw) : classifyValue(raw).Display;
+
     return {
         Name: key,
         Source: source,
@@ -137,6 +139,7 @@ export function buildJsStepVariableContext(
             out.push(buildVarEntry(key, ctx.Row[key], "Row", key));
         }
     }
+
     return out;
 }
 
@@ -186,6 +189,7 @@ function jsStepReasonDetail(err: unknown, body: string): string {
         // JsExecError prefixes "InlineJs execution failed: " — strip it for
         // the human-readable detail; the original is still on StackTrace.
         const msg = err.message.replace(/^InlineJs execution failed:\s*/, "");
+
         return `Runtime: ${msg}${bodyHint(body)}`;
     }
     if (err instanceof Error) {
@@ -205,6 +209,7 @@ function bodyHint(body: string): string {
         return "";
     }
     const trimmed = first.length > 80 ? `${first.slice(0, 77)}…` : first;
+
     return ` (in: ${trimmed})`;
 }
 
@@ -223,8 +228,10 @@ function logLinesAsVariables(
         return [];
     }
     const limit = verbose ? Number.POSITIVE_INFINITY : 240;
+
     return lines.map((line, i) => {
         const value = line.length > limit ? `${line.slice(0, limit - 1)}…` : line;
+
         return {
             Name: `Log[${i}]`,
             Source: "JsLog",
@@ -264,6 +271,7 @@ export function buildJsStepFailureReport(
     input: BuildJsStepFailureReportInput,
 ): FailureReport {
     const verbose = input.Verbose === true;
+
     return buildFailureReport({
         Phase: JS_STEP_PHASE,
         Error: input.Error,
@@ -328,6 +336,7 @@ export async function runJsStepWithDiagnostics(
 ): Promise<JsStepRunOutcome> {
     try {
         const result = await options.Run(body, ctx);
+
         return { IsOk: true, Result: result };
     } catch (err) {
         const report = buildJsStepFailureReport({
@@ -342,6 +351,7 @@ export async function runJsStepWithDiagnostics(
             Now: options.Now,
             DataRow: options.DataRow,
         });
+
         return { IsOk: false, FailureReport: report };
     }
 }

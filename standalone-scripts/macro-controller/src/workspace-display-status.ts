@@ -92,24 +92,28 @@ const MAX_DAY_BADGE = 99;
 function clampDays(n: number): number {
   if (!Number.isFinite(n) || n < 0) return 0;
   if (n > MAX_DAY_BADGE) return MAX_DAY_BADGE;
+
   return Math.floor(n);
 }
 
 export function formatRefillLabel(daysToRefill: number): string {
   const d = clampDays(daysToRefill);
   if (d === 0) return 'Refill today';
+
   return 'Refill ' + d + 'd';
 }
 
 export function formatExpireSoonLabel(daysUntilExpiry: number): string {
   const d = clampDays(daysUntilExpiry);
   if (d === 0) return 'Expire today';
+
   return 'Expire ' + d + 'd';
 }
 
 export function formatExpiredLabel(daysSinceExpiry: number): string {
   const d = clampDays(daysSinceExpiry);
   if (d === 0) return 'Expired';
+
   return 'Expired ' + d + 'd';
 }
 
@@ -117,6 +121,7 @@ export function formatExpiredLabel(daysSinceExpiry: number): string {
 export function formatPassedLabel(daysPassed: number): string {
   const d = clampDays(daysPassed);
   if (d === 0) return 'Today';
+
   return 'Passed ' + d + 'd';
 }
 
@@ -135,13 +140,13 @@ export function pickPastDueTone(daysPassed: number): WorkspaceDisplayTone {
   if (!Number.isFinite(daysPassed) || daysPassed < 0) return 'muted';
   if (daysPassed >= 10) return 'danger';
   if (daysPassed >= 3) return 'warning';
+
   return 'muted';
 }
 
 /* ------------------------------------------------------------------ */
 /*  Classifier                                                         */
 /* ------------------------------------------------------------------ */
-
 
 /**
  * Issue 118 + 119: past-due-expiring.
@@ -159,6 +164,7 @@ function classifyPastDueExpiring(source: PastDueExpiringStatus): WorkspaceDispla
       source,
     };
   }
+
   return {
     kind: 'past-due-expiring',
     label: 'Expire',
@@ -200,11 +206,11 @@ export function classifyFromStatus(
     return classifyPastDueExpiring(source);
   }
 
-
   // about-to-expire: kept for backward compat; no longer produced by
   // getEffectiveStatus for past_due as of Issue 118.
   if (source.kind === 'about-to-expire') {
     const daysUntilExpiry = computeDaysUntilExpiry(ws, nowMs);
+
     return {
       kind: 'expire-soon',
       label: daysUntilExpiry !== null ? formatExpireSoonLabel(daysUntilExpiry) : 'Expire soon',
@@ -217,6 +223,7 @@ export function classifyFromStatus(
   // about-to-refill
   if (source.kind === 'about-to-refill') {
     const d = source.daysToRefill >= 0 ? source.daysToRefill : 0;
+
     return {
       kind: 'refill-soon',
       label: formatRefillLabel(d),
@@ -244,6 +251,7 @@ export function classifyWorkspaceDisplayStatus(
   nowMs?: number,
 ): WorkspaceDisplayStatus {
   const source = getEffectiveStatus(ws, config, nowMs);
+
   return classifyFromStatus(source, ws, nowMs);
 }
 
@@ -261,6 +269,7 @@ function buildCanceledTooltip(source: WorkspaceStatus): string {
   if (source.kind === 'expired') {
     return source.sinceIso ? 'Expired since ' + source.sinceIso : 'Expired';
   }
+
   return 'Canceled';
 }
 
@@ -272,6 +281,7 @@ function buildCanceledTooltip(source: WorkspaceStatus): string {
 function computeDaysUntilExpiry(ws: WorkspaceCredit, nowMs?: number): number | null {
   const days = daysToRefillForWs(ws, nowMs);
   if (days === null) return null;
+
   return days;
 }
 

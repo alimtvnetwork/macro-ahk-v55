@@ -56,6 +56,7 @@ interface KvBridge {
 
 function getKv(): KvBridge['kv'] | null {
     const sdk = (window as unknown as { marco?: KvBridge }).marco;
+
     return sdk && sdk.kv ? sdk.kv : null;
 }
 
@@ -106,6 +107,7 @@ export async function persistRemixNewProject(input: PersistRemixInput): Promise<
             + ' (sourceProjectId=' + input.sourceProjectId
             + ', newProjectId=' + input.newProjectId
             + ', redirectUrl=' + input.redirectUrl + ')');
+
         return false;
     }
     const kv = getKv();
@@ -113,6 +115,7 @@ export async function persistRemixNewProject(input: PersistRemixInput): Promise<
     if (isMissingKv) {
         logError('RemixNewProjectCache',
             'marco.kv unavailable — skipping cache for sourceProjectId=' + input.sourceProjectId);
+
         return false;
     }
     const row = buildRemixRow(input);
@@ -120,10 +123,12 @@ export async function persistRemixNewProject(input: PersistRemixInput): Promise<
         await kv.set(buildKey(input.sourceProjectId), JSON.stringify(row));
         log('[RemixNewProjectCache] persisted source=' + input.sourceProjectId
             + ' → new=' + input.newProjectId, 'info');
+
         return true;
     } catch (err: unknown) {
         logError('RemixNewProjectCache',
             'kv.set failed for sourceProjectId=' + input.sourceProjectId, err);
+
         return false;
     }
 }
@@ -144,10 +149,12 @@ export async function readRemixNewProject(
         const raw = await kv.get(buildKey(sourceProjectId));
         const isMissingRaw = !raw;
         if (isMissingRaw) return null;
+
         return JSON.parse(raw) as RemixNewProjectRow;
     } catch (err: unknown) {
         logError('RemixNewProjectCache',
             'read failed for sourceProjectId=' + sourceProjectId, err);
+
         return null;
     }
 }

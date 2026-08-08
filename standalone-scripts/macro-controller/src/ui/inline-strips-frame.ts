@@ -159,6 +159,7 @@ function buildHeader(): HTMLDivElement {
   actions.appendChild(remove);
 
   header.appendChild(actions);
+
   return header;
 }
 
@@ -174,6 +175,7 @@ function buildFrame(): HTMLDivElement {
 
   frame.appendChild(header);
   frame.appendChild(body);
+
   return frame;
 }
 
@@ -194,6 +196,7 @@ export function ensureInlineStripsFrame(formHost: HTMLElement): {
   const isMissingParent = !parent;
   if (isMissingParent) {
     log('InlineStripsFrame: form host has no parent — cannot mount frame', 'warn');
+
     return null;
   }
 
@@ -225,6 +228,7 @@ export function ensureInlineStripsFrame(formHost: HTMLElement): {
   const isMissingBody = !body;
   if (isMissingBody) {
     log('InlineStripsFrame: body element missing after mount — DOM corrupted', 'error');
+
     return null;
   }
 

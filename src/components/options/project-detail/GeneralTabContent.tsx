@@ -78,6 +78,7 @@ export function GeneralTabContent({ project, allProjects, onSave }: GeneralTabCo
   const handleSaveIdentity = useCallback(async () => {
     if (!isVersionValid) {
       toast.error("Invalid version format — use semver (e.g. 1.2.3)");
+
       return;
     }
     await onSave({ id: project.id, name: editName.trim(), version: editVersion.trim(), description: editDescription.trim() || undefined });
@@ -120,6 +121,7 @@ export function GeneralTabContent({ project, allProjects, onSave }: GeneralTabCo
 
   const resolveProjectName = (projectId: string) => {
     const found = allProjects.find((p) => p.id === projectId);
+
     return found?.name ?? projectId;
   };
 
@@ -312,6 +314,7 @@ export function GeneralTabContent({ project, allProjects, onSave }: GeneralTabCo
             {deps.map((dep) => {
               const depName = resolveProjectName(dep.projectId);
               const isResolved = allProjects.some((p) => p.id === dep.projectId);
+
               return (
                 <div key={dep.projectId} className="flex items-center justify-between rounded-md border border-border bg-background px-3 py-2">
                   <div className="flex items-center gap-2">

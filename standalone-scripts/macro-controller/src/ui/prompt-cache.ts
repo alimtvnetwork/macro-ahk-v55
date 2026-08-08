@@ -138,7 +138,9 @@ function readRecord<T>(storeName: string, key: string): Promise<T | null> {
         resolve(null);
       }
     });
-  }).catch(function(e: unknown) { log('[PromptCache] readRecord(' + storeName + ') IndexedDB open failed: ' + (e instanceof Error ? e.message : String(e)), 'warn'); return null; });
+  }).catch(function(e: unknown) { log('[PromptCache] readRecord(' + storeName + ') IndexedDB open failed: ' + (e instanceof Error ? e.message : String(e)), 'warn');
+
+ return null; });
 }
 
 /** Write a record to a store. */

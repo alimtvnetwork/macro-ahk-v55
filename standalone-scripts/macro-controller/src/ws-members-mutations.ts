@@ -35,6 +35,7 @@ function getMemberships(mutation: string): MembershipsApi {
     if (isMissingApi) {
       throwDiagnostic('WS_MEMBERS_MUTATE_E003', { mutation });
     }
+
     return api;
 }
 
@@ -167,11 +168,11 @@ export async function updateMemberRoleMany(
             const reasonDetail = (e as { data?: unknown }).data ? JSON.stringify((e as { data?: unknown }).data) : undefined;
             results.failures.push({ wsId, wsName, reason, reasonDetail });
             logError('Members.BulkUpdate', `Failed to update ${userId} in ${wsName}: ${reason}`);
-
         }
     }
     
     invalidateMembersCache();
+
     return results;
 }
 
@@ -199,7 +200,6 @@ export async function demoteMemberMany(wsIds: string[], userId: string, workspac
     }
 }
 
-
 export async function removeMemberMany(
     wsIds: string[], 
     userId: string,
@@ -220,10 +220,10 @@ export async function removeMemberMany(
             results.failures.push({ wsId, wsName, reason, reasonDetail });
             logError('Members.BulkRemove', `Failed to remove ${userId} from ${wsName}: ${reason}`);
         }
-
     }
     
     invalidateMembersCache();
+
     return results;
 }
 

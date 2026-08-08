@@ -40,5 +40,6 @@ export function subscribePromptsChanged(handler: (detail: PromptsChangedDetail) 
     handler(detail);
   };
   document.addEventListener(PROMPTS_CHANGED_EVENT, listener);
+
   return function() { document.removeEventListener(PROMPTS_CHANGED_EVENT, listener); };
 }

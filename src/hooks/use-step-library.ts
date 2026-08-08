@@ -45,7 +45,6 @@ import { SqlStageType } from "../../standalone-scripts/macro-controller/src/type
 
 export type { StepLibraryLoadError, UseStepLibraryApi, UseStepLibraryState };
 
-
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
@@ -78,7 +77,6 @@ const DEFAULT_PROJECT_EXTERNAL_ID = "00000000-0000-0000-0000-000000000001";
  */
 // StepLibraryLoadError type is defined in `use-step-library-types.ts` and re-exported above.
 
-
 function classifyLoadError(err: unknown, stage: SqlStageType): StepLibraryLoadError {
     const message = err instanceof Error ? err.message : String(err ?? "Unknown error");
     if (stage === "sqljs") {
@@ -105,6 +103,7 @@ function classifyLoadError(err: unknown, stage: SqlStageType): StepLibraryLoadEr
             Recoverable: true,
         };
     }
+
     return {
         Kind: "Unknown",
         Message: message,
@@ -122,6 +121,7 @@ function loadSql(): Promise<SqlJsStatic> {
     if (sqlPromise === null) {
         sqlPromise = initSqlJs({ locateFile: () => WASM_CDN_URL });
     }
+
     return sqlPromise;
 }
 
@@ -143,6 +143,7 @@ async function readBytesFromStorage(): Promise<StorageReadResult> {
     try {
         const bytes = await WorkspaceStorage.get<Uint8Array>(STORAGE_KEY);
         if (!bytes) return { Kind: "Empty" };
+
         return { Kind: "Bytes", Bytes: bytes };
     } catch (err) {
         return { Kind: "Error", Error: err };
@@ -156,9 +157,11 @@ async function readBytesFromStorage(): Promise<StorageReadResult> {
 async function writeBytesToStorage(bytes: Uint8Array): Promise<{ Ok: true } | { Ok: false; Error: unknown }> {
     try {
         await WorkspaceStorage.set(STORAGE_KEY, bytes);
+
         return { Ok: true };
     } catch (err) {
         console.warn("useStepLibrary: WorkspaceStorage write failed", err);
+
         return { Ok: false, Error: err };
     }
 }
@@ -171,6 +174,7 @@ type OpenLibraryResult =
 function openDatabase(sqljs: SqlJsStatic, readResult: StorageReadResult): Database {
     if (readResult.Kind === "Empty") return new sqljs.Database();
     if (readResult.Kind === "Bytes") return new sqljs.Database(readResult.Bytes);
+
     // Should never happen: caller filters "Error" before invoking us.
     return new sqljs.Database();
 }
@@ -185,6 +189,7 @@ async function ensureProjectSeeded(wrapper: StepLibraryDb): Promise<{ ProjectId:
     seedExampleData(wrapper, projectId);
     const writeResult = await writeBytesToStorage(wrapper.exportDbBytes());
     if (writeResult.Ok) return { ProjectId: projectId, SeedError: null };
+
     return { ProjectId: projectId, SeedError: classifyLoadError(writeResult.Error, "storage-write") };
 }
 
@@ -193,14 +198,12 @@ async function openLibraryAndMaybeSeed(sqljs: SqlJsStatic, readResult: StorageRe
         const wrapper = new StepLibraryDb(openDatabase(sqljs, readResult));
         const seeded = await ensureProjectSeeded(wrapper);
         if (seeded.SeedError !== null) return { Kind: "Err", Error: seeded.SeedError };
+
         return { Kind: "Ok", Wrapper: wrapper, ProjectId: seeded.ProjectId, Bytes: wrapper.exportDbBytes() };
     } catch (err) {
         return { Kind: "Err", Error: classifyLoadError(err, "other") };
     }
 }
-
-
-
 
 /* ------------------------------------------------------------------ */
 /*  Public hook                                                        */
@@ -258,8 +261,6 @@ export function useStepLibrary(): UseStepLibraryApi {
 }
 
 function resetSqlPromise(): void { sqlPromise = null; }
-
-
 
 /* ------------------------------------------------------------------ */
 /*  Internals                                                          */
@@ -331,7 +332,6 @@ function seedExampleData(lib: StepLibraryDb, projectId: number): void {
         Name: "Checkout", Description: "Cart + payment macros",
     });
 }
-
 
 /** StepKind id → human label, for the right-pane preview. */
 export function stepKindLabel(id: StepKindId): string {

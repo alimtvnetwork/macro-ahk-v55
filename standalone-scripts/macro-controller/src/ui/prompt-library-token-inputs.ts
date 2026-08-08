@@ -26,6 +26,7 @@ export function buildTokenRow(initialKey: string): TokenRowEls {
   input.addEventListener('input', update);
   update();
   row.appendChild(label); row.appendChild(input); row.appendChild(preview); row.appendChild(error);
+
   return { row, input, preview, error };
 }
 
@@ -51,5 +52,6 @@ export function buildValuesRow(initialValues: string[]): ValuesRowEls {
   input.addEventListener('input', update);
   update();
   row.appendChild(label); row.appendChild(input); row.appendChild(error);
+
   return { row, input, error };
 }

@@ -23,6 +23,7 @@ function getExecuteCreditFetchBody(): string {
     expect(start, 'executeCreditFetch must exist').toBeGreaterThan(-1);
     const rest = SOURCE.slice(start);
     const endRel = rest.indexOf('\n}\n');
+
     return endRel === -1 ? rest : rest.slice(0, endRel + 2);
 }
 

@@ -26,6 +26,7 @@ class IdLocator extends BannerLocator {
     }
     public override locate(): LocateResult | null {
         if (this.element === null) return null;
+
         return {
             element: this.element,
             source: "xpath",

@@ -43,7 +43,6 @@ function ws(p: Partial<WorkspaceCredit>): WorkspaceCredit {
 }
 
 const TWENTY_SIX_DAYS_AGO = new Date(Date.now() - 26 * 86_400_000).toISOString();
-
  
 describe('Free-plan expiry suppression (E2E)', () => {
   it('FREE + canceled (z L30 E3 sample case) → normal, no canceled badge', () => {

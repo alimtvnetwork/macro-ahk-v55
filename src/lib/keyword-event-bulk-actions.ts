@@ -35,6 +35,7 @@ export const DEFAULT_SEQUENCE_RENAME: SequenceRenameInput = {
 export function formatSequenceNumber(n: number, padding: number): string {
     const pad = Math.max(1, Math.min(6, Math.floor(padding)));
     const safe = Math.max(0, Math.floor(n));
+
     return safe.toString().padStart(pad, "0");
 }
 
@@ -44,6 +45,7 @@ export function renderSequenceName(input: SequenceRenameInput, index: number): s
         return input.Base.split("{n}").join(count);
     }
     const base = input.Base.trim();
+
     return base.length === 0 ? count : `${base}${input.Separator}${count}`;
 }
 
@@ -112,6 +114,7 @@ function buildOutsideIndex(outsideKeywords: ReadonlyArray<string>): Map<string, 
         if (bucket) bucket.push(raw);
         else outsideByKey.set(key, [raw]);
     }
+
     return outsideByKey;
 }
 
@@ -135,6 +138,7 @@ function countProposedKeys(proposed: ReadonlyArray<ProposedRename>): Map<string,
         if (key.length === 0) continue;
         counts.set(key, (counts.get(key) ?? 0) + 1);
     }
+
     return counts;
 }
 
@@ -164,6 +168,7 @@ function classifyProposedRow(
         issues.push("collision");
         tallies.collisionCount += 1;
     }
+
     return { Id: p.Id, Old: p.Old, Next: p.Next, Issues: issues, CollidesWith: collidesWith };
 }
 
@@ -177,6 +182,7 @@ export function computeSequencePreview(
     const counts = countProposedKeys(proposed);
     const tallies: IssueTallies = { duplicateCount: 0, collisionCount: 0, emptyCount: 0, tooLongCount: 0 };
     const rows = proposed.map(p => classifyProposedRow(p, counts, outsideByKey, tallies));
+
     return {
         Rows: rows,
         DuplicateCount: tallies.duplicateCount,
@@ -202,6 +208,7 @@ export function mergeTags(
     };
     (current ?? []).forEach(consume);
     toAdd.forEach(consume);
+
     return Array.from(seen.values()).sort((a, b) => a.localeCompare(b));
 }
 
@@ -210,6 +217,7 @@ export function removeTags(
     toRemove: readonly string[],
 ): string[] {
     const drop = new Set(toRemove.map(t => t.trim().toLowerCase()).filter(Boolean));
+
     return (current ?? [])
         .filter(t => !drop.has(t.trim().toLowerCase()))
         .slice()
@@ -236,6 +244,7 @@ export function parseTagInput(raw: string): string[] {
 export function normaliseCategory(raw: string | undefined): string | undefined {
     if (raw === undefined) return undefined;
     const trimmed = raw.replace(/\s+/g, " ").trim();
+
     return trimmed.length === 0 ? undefined : trimmed;
 }
 
@@ -251,6 +260,7 @@ export function collectCategories(
         const key = c.toLowerCase();
         if (!seen.has(key)) seen.set(key, c);
     }
+
     return Array.from(seen.values()).sort((a, b) => a.localeCompare(b));
 }
 
@@ -271,5 +281,6 @@ export function buildExportPayload(events: readonly KeywordEvent[]): ExportPaylo
 /** Slug for the .zip filename — "marco-keyword-events-2026-04-27T...". */
 export function buildExportFilename(now: Date = new Date()): string {
     const stamp = now.toISOString().replace(/[:.]/g, "-");
+
     return `marco-keyword-events-${stamp}.zip`;
 }

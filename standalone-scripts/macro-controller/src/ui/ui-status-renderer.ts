@@ -45,7 +45,6 @@ export const statusRenderStats = statusRenderState.stats;
  * Uses a dirty-flag guard to skip innerHTML rebuilds when nothing changed.
  */
 export function updateStatus(): void {
-  // eslint-disable-line max-lines-per-function
   const el = document.getElementById(IDS.STATUS);
   const isMissingEl = !el;
   if (isMissingEl) return;
@@ -72,7 +71,9 @@ export function updateStatus(): void {
   ].join('|');
 
   // Skip innerHTML rebuild if nothing changed
-  if (statusKey === statusRenderState.lastStatusKey) { statusRenderStats.skipped++; return; }
+  if (statusKey === statusRenderState.lastStatusKey) { statusRenderStats.skipped++;
+
+ return; }
   statusRenderState.lastStatusKey = statusKey;
   statusRenderStats.executed++;
 
@@ -197,6 +198,7 @@ function buildCreditBarsHtml(): string {
     const dashText = summary.source === 'Pending' ? '— fetching…' : '— unavailable';
     const dashHtml = '<span title="Credit-balance ' + summary.source + '" style="font-size:11px;color:' + cWarning + ';min-width:160px;display:inline-block;margin-top:4px;">' + dashText + '</span>';
     window._creditBarCache = { key: cacheKey, html: dashHtml };
+
     return dashHtml;
   }
 
@@ -219,6 +221,7 @@ function buildCreditBarsHtml(): string {
     compact: false, marginTop: '4px', maxTotalCredits: _maxTc
   });
   window._creditBarCache = { key: cacheKey, html };
+
   return html;
 }
 
@@ -245,6 +248,7 @@ function renderRunningStatus(statusLine: HTMLElement, progressContainer: HTMLEle
 function buildDelegateText(): string {
   const isMissingIsDelegating = !state.isDelegating;
   if (isMissingIsDelegating) return '';
+
   return state.forceDirection
     ? ' | FORCE ' + state.forceDirection.toUpperCase()
     : ' | SWITCHING...';
@@ -266,6 +270,7 @@ function buildRunningStatusParts(creditIcon: string, creditLabel: string, delega
     const dColor = state.forceDirection ? '#f97316' : '#3b82f6';
     parts.push({ text: delegateText, color: dColor, bold: !!state.forceDirection });
   }
+
   return parts;
 }
 

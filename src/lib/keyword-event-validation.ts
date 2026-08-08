@@ -57,6 +57,7 @@ function isKnownKey(token: string): boolean {
     if (t === "") { return false; }
     // Single character — printable ASCII / unicode letter, digit, or symbol.
     if (t.length === 1) { return true; }
+
     return NAMED_KEYS.has(t.toLowerCase());
 }
 
@@ -112,6 +113,7 @@ export function validateCombo(raw: string): ComboValidation {
             Message: `Unknown key "${key}". Use a single character or a named key like Enter, Tab, F5.`,
         };
     }
+
     return { Valid: true };
 }
 
@@ -154,6 +156,7 @@ export function validateWait(raw: string): WaitValidation {
             Message: `Wait duration is too large (max ${MAX_WAIT_MS} ms).`,
         };
     }
+
     return { Valid: true, Ms: Math.floor(n) };
 }
 
@@ -194,6 +197,7 @@ export function validateEventSteps(event: KeywordEvent): readonly StepIssue[] {
             }
         }
     });
+
     return issues;
 }
 
@@ -201,6 +205,7 @@ export function validateEventSteps(event: KeywordEvent): readonly StepIssue[] {
 export function isEventRunnable(event: KeywordEvent): boolean {
     if (!event.Enabled) { return false; }
     if (event.Steps.length === 0) { return false; }
+
     return validateEventSteps(event).length === 0;
 }
 

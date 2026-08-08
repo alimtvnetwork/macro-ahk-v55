@@ -32,6 +32,7 @@ export { escapeHtml } from './database-html-escape';
 
 export function truncate(text: string, maxLength: number): string {
   const isWithinLimit = text.length <= maxLength;
+
   return isWithinLimit ? text : text.substring(0, maxLength) + '…';
 }
 
@@ -93,6 +94,7 @@ export function buildDataTableElement(
   table.appendChild(buildTableBody(columns, rows));
 
   wrapper.appendChild(table);
+
   return wrapper;
 }
 
@@ -107,6 +109,7 @@ function buildTableHeader(columns: string[]): HTMLElement {
   }
 
   thead.appendChild(headerRow);
+
   return thead;
 }
 
@@ -139,6 +142,7 @@ function buildTableCell(value: unknown): HTMLTableCellElement {
     cell.title = 'NULL';
     cell.style.color = '#64748b';
     cell.style.fontStyle = 'italic';
+
     return cell;
   }
 

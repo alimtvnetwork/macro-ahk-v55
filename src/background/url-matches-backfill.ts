@@ -28,6 +28,7 @@ interface BackfillResult {
 /** Normalizes a script identifier (basename, lowercased) for cross-matching. */
 function basename(path: string): string {
     const slash = path.replace(/\\/g, "/").split("/").pop() ?? path;
+
     return slash.split(/[?#]/)[0]!.toLowerCase();
 }
 
@@ -43,6 +44,7 @@ function projectBindsScript(
     return (project.scripts ?? []).some((entry) => {
         if (entry.path === script.id) return true;
         if (entry.path === script.name) return true;
+
         return scriptKeys.has(basename(entry.path));
     });
 }
@@ -58,6 +60,7 @@ async function readStoredArrays(): Promise<{ scripts: StoredScript[]; projects: 
     const projects: StoredProject[] = Array.isArray(projectsRaw[STORAGE_KEY_PROJECTS])
         ? (projectsRaw[STORAGE_KEY_PROJECTS] as StoredProject[])
         : [];
+
     return { scripts, projects };
 }
 
@@ -69,6 +72,7 @@ function collectPatternsForScript(script: StoredScript, projects: StoredProject[
             if (rule?.pattern) patterns.add(rule.pattern);
         }
     }
+
     return patterns;
 }
 
@@ -89,7 +93,9 @@ function processScript(
     result: BackfillResult,
 ): boolean {
     const hasMatches = Array.isArray(script.urlMatches) && script.urlMatches.length > 0;
-    if (hasMatches) { result.skippedAlreadyPopulated += 1; return false; }
+    if (hasMatches) { result.skippedAlreadyPopulated += 1;
+
+ return false; }
 
     const patterns = collectPatternsForScript(script, projects);
     if (patterns.size === 0) {
@@ -99,11 +105,13 @@ function processScript(
             script.id,
             script.name,
         );
+
         return false;
     }
 
     applyPatternsToScript(script, patterns);
     result.updated += 1;
+
     return true;
 }
 
@@ -128,5 +136,6 @@ export async function backfillScriptUrlMatches(): Promise<BackfillResult> {
     if (mutated) {
         await chrome.storage.local.set({ [STORAGE_KEY_SCRIPTS]: scripts });
     }
+
     return result;
 }

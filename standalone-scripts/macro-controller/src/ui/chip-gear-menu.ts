@@ -126,6 +126,7 @@ function buildPromptActionRow(item: GearMenuItem, role: PromptRole): HTMLButtonE
     item.onSelect();
   };
   row.dataset.role = role + '-prompt-action';
+
   return row;
 }
 
@@ -137,6 +138,7 @@ function buildPromptActionsTrigger(input: BuildChipGearButtonInput, label: strin
   trigger.setAttribute('aria-haspopup', 'menu');
   trigger.setAttribute('aria-expanded', 'false');
   trigger.style.cssText = 'width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 7px;cursor:pointer;font-size:10.5px;font-weight:700;line-height:1.25;color:' + input.accent + ';border:0;background:rgba(255,255,255,0.04);border-radius:4px;text-align:left;font-family:inherit;';
+
   return trigger;
 }
 
@@ -153,6 +155,7 @@ function buildPromptActionsSubmenu(
   submenu.style.cssText = 'position:fixed;display:none;flex-direction:column;gap:1px;padding:5px;background:#1a1a2e;border:1px solid ' + input.accent + ';border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.55);z-index:2147483647;min-width:' + String(SUBMENU_MIN_WIDTH) + 'px;max-width:280px;';
   submenu.dataset.role = role + '-prompt-actions-submenu';
   for (const item of items) submenu.appendChild(buildPromptActionRow(item, role));
+
   return submenu;
 }
 
@@ -224,6 +227,7 @@ export function buildChipGearActionSection(input: BuildChipGearButtonInput): HTM
   wirePromptActionsSubmenu(trigger, submenu);
 
   section.append(trigger, submenu);
+
   return section;
 }
 
@@ -246,7 +250,6 @@ function wrapAction(name: string, role: PromptRole, action: () => Promise<void> 
   }
 }
 
-
 interface PromptLibraryModule {
   openPromptLibraryModal?: () => void;
   openPromptLibrary?: () => void;
@@ -264,6 +267,7 @@ async function openLibraryModal(): Promise<void> {
         { op: 'resolveOpener', reason: 'prompt-library-modal exposes no known opener export' },
         '❌ Prompt Library unavailable',
       );
+
       return;
     }
     opener();
@@ -296,6 +300,7 @@ async function runReseedAndOpen(role: PromptRole, force: boolean): Promise<void>
       { force, role, reason },
       '❌ Re-seed failed: ' + reason,
     );
+
     return;
   }
   const suffix = force && typeof result.forcedUpdates === 'number'
@@ -351,7 +356,9 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
   const picked = await pickPromptFromRole({ role, roleLabel, title: 'Set active ' + roleLabel + ' prompt', confirmLabel: 'Set active' });
   const isMissingPicked = !picked;
   if (isMissingPicked) return;
-  if (picked.IsDefault === 1) { showToast('Already active', 'info'); return; }
+  if (picked.IsDefault === 1) { showToast('Already active', 'info');
+
+ return; }
   const res = await setDefaultPromptForRole(picked.Id, role);
   const isMissingOk = !res.ok;
   if (isMissingOk) {
@@ -361,6 +368,7 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
       { role, promptId: picked.Id, reason },
       '❌ Failed to set active ' + roleLabel + ' prompt: ' + reason,
     );
+
     return;
   }
   // v4.401.0: invalidate the in-memory prompt cache so the numbered Next/PlanTierType
@@ -396,6 +404,7 @@ async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> 
       { promptId: picked.Id, name: picked.Name, reason },
       '❌ Delete "' + picked.Name + '" failed: ' + reason,
     );
+
     return;
   }
   const loader = await import('./prompt-loader');

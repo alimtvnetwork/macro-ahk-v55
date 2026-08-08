@@ -24,6 +24,7 @@ export function collectRows(
     }
 
     stmt.free();
+
     return rows;
 }
 
@@ -74,6 +75,7 @@ export function queryWithSource(db: PreparedDb, source: string, limit: number): 
         "SELECT * FROM Logs WHERE Source = ? ORDER BY Timestamp DESC LIMIT ?",
     );
     stmt.bind([source, limit]);
+
     return collectRows(stmt);
 }
 
@@ -81,5 +83,6 @@ export function queryWithSource(db: PreparedDb, source: string, limit: number): 
 export function queryAll(db: PreparedDb, limit: number): SqlRow[] {
     const stmt = db.prepare("SELECT * FROM Logs ORDER BY Timestamp DESC LIMIT ?");
     stmt.bind([limit]);
+
     return collectRows(stmt);
 }

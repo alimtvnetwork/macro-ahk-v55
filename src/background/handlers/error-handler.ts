@@ -39,6 +39,7 @@ function getErrorsDb() {
             "Check service worker console for boot errors.",
         );
     }
+
     return dbManager!.getErrorsDb();
 }
 
@@ -49,6 +50,7 @@ function collectRows(stmt: { step(): boolean; getAsObject(): SqlRow; free(): voi
         rows.push(stmt.getAsObject());
     }
     stmt.free();
+
     return rows;
 }
 
@@ -64,6 +66,7 @@ export async function handleGetActiveErrors(): Promise<{ errors: SqlRow[] }> {
     if (hasErrors) {
         setHealthState("DEGRADED");
     }
+
     return { errors };
 }
 
@@ -99,6 +102,7 @@ function queryUnresolvedErrors(db: ReturnType<typeof getErrorsDb>): SqlRow[] {
          LIMIT 100`,
     );
     stmt.bind([currentSessionId]);
+
     return collectRows(stmt);
 }
 
@@ -121,6 +125,7 @@ export async function handleUserScriptError(
     insertUserScriptError(request);
     dbManager!.markDirty();
     broadcastErrorCountChange();
+
     return { isOk: true };
 }
 
@@ -166,6 +171,7 @@ export async function handleClearErrors(): Promise<OkResponse> {
     dbManager!.markDirty();
     setHealthState("HEALTHY");
     broadcastErrorCountChange();
+
     return { isOk: true };
 }
 

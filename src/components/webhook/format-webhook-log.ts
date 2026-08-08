@@ -30,6 +30,7 @@ function fmt(value: string | number | boolean | null | undefined): string {
   if (value === null || value === undefined || value === "") {
     return MISSING;
   }
+
   return String(value);
 }
 
@@ -37,6 +38,7 @@ function fmtHeaders(headers: Record<string, string> | undefined): string {
   if (!headers || Object.keys(headers).length === 0) {
     return "  (none)";
   }
+
   return Object.entries(headers)
     .map(([key, value]) => `  ${key}: ${value}`)
     .join("\n");
@@ -46,6 +48,7 @@ function fmtBody(body: string | undefined, label: string): string {
   if (!body) {
     return `${label}:\n  (empty)`;
   }
+
   return `${label}:\n${body
     .split("\n")
     .map((line) => `  ${line}`)
@@ -75,5 +78,6 @@ export function formatWebhookDeliveryLog(entry: WebhookDeliveryResult): string {
     fmtBody(entry.ResponseBody, "ResponseBody"),
     "============================",
   ];
+
   return lines.join("\n");
 }

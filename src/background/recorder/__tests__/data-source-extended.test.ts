@@ -108,6 +108,7 @@ describe("executeHttpStep", () => {
         let capturedUrl = "";
         const fakeFetch = vi.fn(async (url: string) => {
             capturedUrl = url;
+
             return new Response("{}", { status: 200 });
         }) as unknown as typeof fetch;
 
@@ -159,6 +160,7 @@ describe("executeHttpStep", () => {
         let capturedHeaders: Record<string, string> | undefined;
         const fakeFetch = vi.fn(async (_url: string, init: RequestInit) => {
             capturedHeaders = init.headers as Record<string, string>;
+
             return new Response("{}", { status: 200 });
         }) as unknown as typeof fetch;
 

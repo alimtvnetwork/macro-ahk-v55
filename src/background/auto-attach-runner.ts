@@ -59,6 +59,7 @@ interface ScriptAttachExtras {
 
 function toLibraryScriptForAttach(s: StoredScript): LibraryScriptForAttach {
     const extras = s as unknown as ScriptAttachExtras;
+
     return {
         id: s.id,
         name: s.name,

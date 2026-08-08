@@ -158,6 +158,7 @@ function TreePaneBody(props: LibraryTreePaneProps) {
     if (props.filteredTree.length === 0) {
         return <NoMatchesState query={props.query} onClear={() => props.setQuery("")} />;
     }
+
     return <TreeList {...props} />;
 }
 

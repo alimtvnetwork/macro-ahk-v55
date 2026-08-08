@@ -4,6 +4,7 @@ import { renderAllRoles } from './prompt-library-list';
 export function chipCss(isActive: boolean): string {
   const bg = isActive ? '#3a2f6b' : '#243050';
   const fg = isActive ? '#ffe08a' : '#e6edf7';
+
   return [
     'background:' + bg, 'color:' + fg,
     'border:1px solid #3a465c', 'border-radius:999px',
@@ -32,6 +33,7 @@ export function buildFilterChips(refs: ModalRefs): HTMLElement {
     });
     wrap.appendChild(chip);
   }
+
   return wrap;
 }
 
@@ -57,6 +59,7 @@ export function buildSortSelect(refs: ModalRefs): HTMLElement {
   });
   wrap.appendChild(label);
   wrap.appendChild(select);
+
   return wrap;
 }
 
@@ -66,6 +69,7 @@ export function buildControlsBar(refs: ModalRefs): HTMLElement {
   bar.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;padding:6px 8px;background:#0f1522;border:1px solid #2b3648;border-radius:6px;';
   bar.appendChild(buildFilterChips(refs));
   bar.appendChild(buildSortSelect(refs));
+
   return bar;
 }
 
@@ -102,6 +106,7 @@ function buildHeaderPreviewGroup() {
   previewFileInput.hidden = true;
   previewGroup.appendChild(previewBtn);
   previewGroup.appendChild(previewFileInput);
+
   return { previewGroup, previewBtn, previewFileInput };
 }
 
@@ -131,6 +136,7 @@ function buildHeaderImportGroup() {
   importGroup.appendChild(importRoleSelect);
   importGroup.appendChild(importBtn);
   importGroup.appendChild(fileInput);
+
   return { importGroup, importRoleSelect, importBtn, fileInput };
 }
 
@@ -153,6 +159,7 @@ function buildHeaderExportGroup() {
   exportBtn.style.cssText = 'background:#243050;color:#e6edf7;border:1px solid #3a465c;border-radius:6px;padding:4px 12px;font-size:11.5px;cursor:pointer;';
   exportGroup.appendChild(includeRevisionsLabel);
   exportGroup.appendChild(exportBtn);
+
   return { exportGroup, includeRevisionsCb, exportBtn };
 }
 
@@ -173,6 +180,7 @@ function buildHeaderMiscButtons() {
   sampleBtn.addEventListener('click', () => {
       void import('./prompt-sample-json').then((m) => m.downloadSamplePromptsJson());
   });
+
   return { closeBtn, sampleBtn };
 }
 
@@ -219,6 +227,7 @@ function buildDropZone(importBtn: HTMLButtonElement, fileInput: HTMLInputElement
   };
   dropZone.addEventListener('focus', applyFocusRing);
   dropZone.addEventListener('blur', clearFocusRing);
+
   return dropZone;
 }
 

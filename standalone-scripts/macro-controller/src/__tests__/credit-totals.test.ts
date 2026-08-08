@@ -139,6 +139,7 @@ describe('aggregateCreditTotals', () => {
 
 function expectedNextMidnightFor(d: Date): string {
   const next = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 0, 0, 0, 0);
+
   return next.toISOString();
 }
 

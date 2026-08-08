@@ -16,6 +16,7 @@ function items(spec: { matched: number; unmatched: number }): DiffItem[] {
   const out: DiffItem[] = [];
   for (let i = 0; i < spec.matched; i++) out.push({ name: `m${i}`, status: "overwrite" });
   for (let i = 0; i < spec.unmatched; i++) out.push({ name: `u${i}`, status: "new" });
+
   return out;
 }
 
@@ -29,6 +30,7 @@ function makePreview(spec: PreviewSpec): BundlePreview {
   const projectItems = items(spec.projects);
   const scriptItems = items(spec.scripts);
   const configItems = items(spec.configs);
+
   return {
     projectCount: projectItems.length,
     scriptCount: scriptItems.length,

@@ -46,6 +46,7 @@ const evaluateUrlMatchesMock = evaluateUrlMatches as unknown as Mock;
 function mockActiveProject(project: unknown): void {
     handleMessageMock.mockImplementation((_msg, _sender, sendResponse: (r: unknown) => void) => {
         sendResponse({ activeProject: project });
+
         return Promise.resolve();
     });
 }

@@ -50,5 +50,6 @@ export function isNewTabOrBlankUrl(url: string | undefined | null): boolean {
     if (matchesPrefix(lower, "about:blank")) {
         return true;
     }
+
     return NEW_TAB_PREFIXES.some((prefix) => matchesPrefix(lower, prefix));
 }

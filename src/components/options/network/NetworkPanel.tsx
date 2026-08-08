@@ -31,6 +31,7 @@ export function NetworkPanel() {
         statusFilter === "all" || categorizeStatus(r.status) === statusFilter;
       const isTypeMatch =
         typeFilter === "all" || r.requestType === typeFilter;
+
       return isStatusMatch && isTypeMatch;
     });
   }, [requests, statusFilter, typeFilter]);

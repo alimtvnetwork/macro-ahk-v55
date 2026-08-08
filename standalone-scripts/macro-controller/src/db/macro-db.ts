@@ -209,6 +209,7 @@ async function runOrphanRepairStage(stages: Stage[]): Promise<OrphanRepairReport
   } else {
     stages.push({ stage: STAGE_ORPHAN_REPAIR, status: 'ok', metrics });
   }
+
   return report;
 }
 
@@ -220,6 +221,7 @@ async function runSeedPlanNextStage(stages: Stage[]): Promise<void> {
     const reason = seedResult.error ?? UNKNOWN_ERROR;
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'seed-plan-next', reason });
     stages.push({ stage: 'seed-plan-next', status: 'failed', reason });
+
     return;
   }
   stages.push({ stage: 'seed-plan-next', status: 'ok' });
@@ -234,11 +236,13 @@ async function runAutoRepairStage(stages: Stage[]): Promise<void> {
   if (isMissingIsHealthy) {
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: STAGE_AUTO_REPAIR, reason: 'residual issues=' + finalIssues });
     stages.push({ stage: STAGE_AUTO_REPAIR, status: 'failed', reason: 'residual issues=' + finalIssues, metrics: { initialIssues, finalIssues } });
+
     return;
   }
   if (health.repairAttempted) {
     log('[MacroDb] Prompt defaults auto-repaired on boot (initial issues=' + initialIssues + ')', 'success');
     stages.push({ stage: STAGE_AUTO_REPAIR, status: 'ok', metrics: { initialIssues, finalIssues: 0 } });
+
     return;
   }
   stages.push({ stage: STAGE_AUTO_REPAIR, status: 'ok', metrics: { initialIssues: 0, finalIssues: 0 } });
@@ -252,6 +256,7 @@ async function runReadMemoryDuplicateStage(stages: Stage[]): Promise<void> {
     const reason = 'detected=' + report.detected + ' disabled=' + report.disabled;
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'read-memory-duplicate-validation', reason });
     stages.push({ stage: 'read-memory-duplicate-validation', status: 'failed', reason, metrics });
+
     return;
   }
   stages.push({ stage: 'read-memory-duplicate-validation', status: 'ok', metrics });
@@ -266,6 +271,7 @@ async function runPostSchemaStages(stages: Stage[]): Promise<OrphanRepairReport 
   await runSeedPlanNextStage(stages);
   await runAutoRepairStage(stages);
   await runReadMemoryDuplicateStage(stages);
+
   return orphanReport;
 }
 
@@ -301,7 +307,6 @@ export async function initMacroDb(): Promise<void> {
     });
   }
 }
-
 
 /**
  * Save project metadata.
@@ -412,9 +417,11 @@ export async function getCommunicationHistory(projectId: string, limit: number =
   const sql = `SELECT * FROM v_prompt_history WHERE ProjectId = '${projectId.replace(/'/g, "''")}' ORDER BY Timestamp DESC LIMIT ${limit}`;
   try {
     const resp = await runSqlBridge('QUERY', sql);
+
     return resp?.isOk ? (Array.isArray(resp.rows) ? (resp.rows as unknown[]) : []) : [];
   } catch (err) {
     logDiagnosticFromCode('DB_MACRO_READ_E001', { op: 'getCommunicationHistory', reason: err instanceof Error ? err.message : String(err) }, err);
+
     return [];
   }
 }

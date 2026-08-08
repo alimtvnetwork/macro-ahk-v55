@@ -94,6 +94,7 @@ function buildDropdownItem(entry: MenuEntry, ctx: ProjectNameDropdownCtx): HTMLE
     removeProjectNameDropdown();
     void entry.run(ctx);
   };
+
   return item;
 }
 
@@ -141,6 +142,7 @@ export function showProjectNameDropdown(
     }
     document.addEventListener('click', removeProjectNameDropdown, { once: true });
   }, 10);
+
   return dd;
 }
 
@@ -170,5 +172,6 @@ export function buildProjectNameCaret(
     }
     showProjectNameDropdown(arrow, ctx, handlers);
   };
+
   return arrow;
 }

@@ -97,6 +97,7 @@ export function buildXPathsPanel(makeField: MakeFieldFn): XPathPanelResult {
     inputs[f.key] = field.input;
     panel.appendChild(field.row);
   });
+
   return { panel, inputs };
 }
 
@@ -148,7 +149,6 @@ export function buildTimingPanel(makeField: MakeFieldFn): TimingPanelResult {
   const cbField = _buildCreditFetchDelaySlider(overrides.creditFetchDelayMs ?? 3000);
   inputs['creditFetchDelayMs'] = cbField.input;
   panel.appendChild(cbField.row);
-
 
   // Toggles for Delay and Retry
   const automationToggles = _buildAutomationToggles(panel, overrides);
@@ -223,6 +223,7 @@ function _buildAutomationToggles(panel: HTMLElement, overrides: SettingsOverride
     panel.appendChild(row);
     toggles[item.key] = sw;
   });
+
   return toggles;
 }
 
@@ -284,11 +285,11 @@ export function buildTaskNextPanel(makeField: MakeFieldFn): TaskNextPanelResult 
     inputs[f.key] = field.input;
     panel.appendChild(field.row);
   });
+
   return { panel, inputs };
 }
 
 // ── Logging Panel ──
-
 
 export function buildLoggingPanel(deps: SettingsDeps): LoggingPanelResult {
   const { btnStyle, showToast } = deps;
@@ -307,6 +308,7 @@ export function buildLoggingPanel(deps: SettingsDeps): LoggingPanelResult {
     sw.style.cssText = 'width:16px;height:16px;cursor:pointer;accent-color:' + cPrimary + ';';
     row.appendChild(lbl);
     row.appendChild(sw);
+
     return row;
   };
 
@@ -382,6 +384,7 @@ export function buildConfigDbPanel(
       empty.style.cssText = 'color:#64748b;font-size:11px;padding:12px 0;';
       empty.textContent = 'No config found in database. Config will be seeded on next injection.';
       panel.appendChild(empty);
+
       return;
     }
 
@@ -499,6 +502,7 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
     listContainer.innerHTML = '';
     if (filtered.length === 0) {
       listContainer.innerHTML = '<div style="color:#64748b;font-size:11px;text-align:center;padding-top:40px;">No history found</div>';
+
       return;
     }
 
@@ -556,6 +560,7 @@ function _mountSubmitHistoryPanel(panel: HTMLElement): void {
         empty.style.cssText = 'color:#64748b;font-size:11px;text-align:center;padding:12px;';
         empty.textContent = 'Open a Lovable project to see chat submit history.';
         submitMount.appendChild(empty);
+
         return;
       }
       const { openProjectHistoryPanel } = await import('./project-history-panel');
@@ -583,6 +588,7 @@ function buildModalOverlay(): HTMLElement {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
   overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
   return overlay;
 }
 
@@ -590,6 +596,7 @@ function buildHistoryModalContainer(): HTMLElement {
   const modal = document.createElement('div');
   const s = state as unknown as Record<string, string>;
   modal.style.cssText = 'background:' + (s.cPanelBg || '#1a1625') + ';border:1px solid ' + (s.cPanelBorder || '#2d2b3b') + ';border-radius:12px;width:90%;max-width:600px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,0.6);overflow:hidden;';
+
   return modal;
 }
 
@@ -602,6 +609,7 @@ function buildHistoryModalHeader(overlay: HTMLElement): HTMLElement {
   closeBtn.style.cssText = 'cursor:pointer;color:#64748b;font-size:18px;';
   closeBtn.onclick = () => overlay.remove();
   header.appendChild(closeBtn);
+
   return header;
 }
 
@@ -609,6 +617,7 @@ function buildHistoryModalContent(row: Record<string, unknown>): HTMLElement {
   const content = document.createElement('div');
   content.style.cssText = 'flex:1;overflow-y:auto;padding:20px;font-family:monospace;font-size:12px;color:' + cPanelText + ';white-space:pre-wrap;line-height:1.5;background:' + cPanelBgAlt + ';';
   content.textContent = (row as { Prompt?: string }).Prompt || '';
+
   return content;
 }
 
@@ -623,9 +632,9 @@ function buildHistoryModalFooter(row: Record<string, unknown>): HTMLElement {
     showToast('✅ Prompt copied to clipboard', 'info');
   };
   footer.appendChild(copyBtn);
+
   return footer;
 }
-
 
 /* ------------------------------------------------------------------ */
 /*  Per-workspace lifecycle overrides editor                           */
@@ -654,6 +663,7 @@ function _buildPerWorkspaceEditor(): HTMLElement {
   section.appendChild(addRow);
 
   _renderPerWsList(list);
+
   return section;
 }
 
@@ -667,6 +677,7 @@ function _renderPerWsList(list: HTMLElement): void {
     empty.style.cssText = 'font-size:10px;color:#64748b;padding:6px 0;font-style:italic;';
     empty.textContent = 'No per-workspace overrides set.';
     list.appendChild(empty);
+
     return;
   }
   for (const wsId of ids) {
@@ -757,11 +768,14 @@ function _buildPerWsAddRow(onAdded: () => void): HTMLElement {
   addBtn.onclick = function (): void {
     const wsId = idInp.value.trim();
     const isMissingWsId = !wsId;
-    if (isMissingWsId) { showToast('Enter a workspace id first', 'warn'); return; }
+    if (isMissingWsId) { showToast('Enter a workspace id first', 'warn');
+
+ return; }
     const grace = graceInp.value.trim() === '' ? undefined : Number(graceInp.value);
     const refill = refillInp.value.trim() === '' ? undefined : Number(refillInp.value);
     if (grace === undefined && refill === undefined) {
       showToast('Set at least one of grace / refill', 'warn');
+
       return;
     }
     void _persistPerWs(function (map) {
@@ -782,6 +796,7 @@ function _buildPerWsAddRow(onAdded: () => void): HTMLElement {
     });
   };
   row.appendChild(addBtn);
+
   return row;
 }
 
@@ -794,6 +809,7 @@ function _numField(initial: number | undefined, kind: NumFieldKindType): HTMLInp
   inp.title = kind === 'grace' ? 'Expiry grace period (days)' : 'Refill warning threshold (days)';
   inp.style.cssText = 'padding:4px 6px;border:1px solid ' + cInputBorder + ';border-radius:4px;'
     + 'background:' + cInputBg + ';color:' + cInputFg + ';font-family:monospace;font-size:10px;width:100%;box-sizing:border-box;';
+
   return inp;
 }
 
@@ -848,6 +864,7 @@ function _buildOverrideToggles(panel: HTMLElement): Record<string, HTMLInputElem
     panel.appendChild(row);
     toggles[item.key] = sw;
   });
+
   return toggles;
 }
 
@@ -949,5 +966,6 @@ function _buildVersionInfo(): HTMLDivElement {
   const verInfo = document.createElement('div');
   verInfo.style.cssText = 'margin-top:16px;padding:10px;background:' + cPanelBgAlt + ';border-radius:6px;font-size:10px;color:#64748b;';
   verInfo.innerHTML = '<strong style="color:' + cPrimaryLight + '">MacroLoop</strong> v' + VERSION + '<br>Changes are saved to the running instance. For permanent changes, update the config JSON or extension settings.';
+
   return verInfo;
 }

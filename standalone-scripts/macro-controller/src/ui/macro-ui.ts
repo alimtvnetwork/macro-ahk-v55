@@ -19,7 +19,6 @@ let _activeQueueTab: ActiveQueueTabType = 'active';
 const _selectedTaskIds: Set<string> = new Set();
 let _selectionMode = false;
 
-
 /**
  * Build the Task Queue section for the Tools panel.
  */
@@ -85,7 +84,6 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
 
   bulkRow.appendChild(bulkBtns);
   section.appendChild(bulkRow);
-
 
   // Settings Row
   const settingsRow = document.createElement('div');
@@ -185,7 +183,6 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
   tabsRow.appendChild(historyTab);
   tabsRow.appendChild(liveTab);
   section.appendChild(tabsRow);
-
 
   section.appendChild(listContainer);
 
@@ -306,6 +303,7 @@ function _buildQueueHeader(listContainer: HTMLElement): HTMLElement { // eslint-
   controls.appendChild(clearBtn);
 
   header.appendChild(controls);
+
   return header;
 }
 
@@ -326,7 +324,6 @@ async function _updateQueueCountdown(badge: HTMLElement, title?: HTMLElement): P
   }
 }
 
-
 /**
  * Refresh the task list UI.
  */
@@ -335,6 +332,7 @@ async function refreshTaskQueueUI(container: HTMLElement): Promise<void> { // es
   
   if (_activeQueueTab === 'live') {
     renderLiveStream(container);
+
     return;
   }
 
@@ -350,6 +348,7 @@ async function refreshTaskQueueUI(container: HTMLElement): Promise<void> { // es
 
   if (tasksToShow.length === 0) {
     container.innerHTML = `<div style="padding:12px;text-align:center;color:#64748b;font-size:10px;">${_activeQueueTab === 'active' ? 'No active tasks' : 'History is empty'}</div>`;
+
     return;
   }
 
@@ -475,6 +474,7 @@ function renderLiveStream(container: HTMLElement): void {
   
   if (logs.length === 0) {
     container.innerHTML = '<div style="padding:12px;text-align:center;color:#64748b;font-size:10px;">No active execution logs</div>';
+
     return;
   }
 
@@ -503,8 +503,6 @@ function renderLiveStream(container: HTMLElement): void {
     if (_activeQueueTab === 'live') refreshTaskQueueUI(container);
   });
 }
-
-
 
 /** Show a modal with full task details. */
 function showTaskDetailModal(task: MacroTask): void {
@@ -541,6 +539,7 @@ function showTaskDetailModal(task: MacroTask): void {
     v.textContent = value;
     v.style.cssText = `font-size:11px;color:${cPanelFg};white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,0.2);padding:8px;border-radius:6px;` + (isMonospace ? 'font-family:ui-monospace,monospace;' : '');
     wrap.appendChild(v);
+
     return wrap;
   };
 
@@ -554,7 +553,6 @@ function showTaskDetailModal(task: MacroTask): void {
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
 }
-
 
 function getStatusColor(status: MacroTask['status']): string {
   switch (status) {
@@ -570,7 +568,9 @@ function getStatusColor(status: MacroTask['status']): string {
 /** Opens a full-screen modal showing the task queue. */
 export function showTaskQueueModal(): void {
   const existing = document.getElementById('macro-task-queue-modal');
-  if (existing) { existing.remove(); return; }
+  if (existing) { existing.remove();
+
+ return; }
 
   const overlay = document.createElement('div');
   overlay.id = 'macro-task-queue-modal';

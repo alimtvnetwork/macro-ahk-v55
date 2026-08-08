@@ -115,6 +115,7 @@ function RepairConfirmDialog({ state }: { state: SettingsState }) {
 
 export default function WebhookSettingsDialog({ open, onOpenChange }: Props) {
     const state = useWebhookSettingsState(open, onOpenChange);
+
     return (
         <>
             <Dialog open={open} onOpenChange={onOpenChange}>

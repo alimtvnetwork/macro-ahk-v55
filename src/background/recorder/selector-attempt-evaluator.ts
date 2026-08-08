@@ -84,6 +84,7 @@ function orderPrimaryFirst(
 ): ReadonlyArray<PersistedSelector> {
     const primary = selectors.filter((s) => s.IsPrimary === 1);
     const fallback = selectors.filter((s) => s.IsPrimary !== 1);
+
     return [...primary, ...fallback];
 }
 
@@ -111,6 +112,7 @@ function evaluateOne(
     if (strategy === "Css" || strategy === "Aria") {
         return evaluateCss(selector, strategy, isPrimary, resolved, doc);
     }
+
     return evaluateXPath(selector, strategy, isPrimary, resolved, doc);
 }
 
@@ -136,6 +138,7 @@ function evaluateXPath(
         return failure(selector, strategy, isPrimary, expression, "ZeroMatches",
             `XPath '${expression}' returned 0 nodes.`);
     }
+
     return success(selector, strategy, isPrimary, expression, count);
 }
 
@@ -158,6 +161,7 @@ function evaluateCss(
         return failure(selector, strategy, isPrimary, expression, "ZeroMatches",
             `Selector '${expression}' returned 0 nodes.`);
     }
+
     return success(selector, strategy, isPrimary, expression, count);
 }
 
@@ -187,6 +191,7 @@ function resolveRelativeAnchor(
     if (anchor === undefined) {
         throw new Error(`Anchor selector ${selector.AnchorSelectorId} not in provided set.`);
     }
+
     return joinRelative(resolveOne(anchor, byId, chain, depth + 1), selector.Expression);
 }
 
@@ -201,6 +206,7 @@ function resolveOne(
     if (selector.SelectorKindId === SelectorKindId.XPathRelative) {
         return resolveRelativeAnchor(selector, byId, chain, depth);
     }
+
     return selector.Expression;
 }
 
@@ -208,6 +214,7 @@ function joinRelative(anchor: string, relative: string): string {
     const stripped = relative.startsWith(".") ? relative.slice(1) : relative;
     if (stripped.length === 0) { return anchor; }
     if (stripped.startsWith("/")) { return `${anchor}${stripped}`; }
+
     return `${anchor}/${stripped}`;
 }
 
@@ -216,6 +223,7 @@ function strategyOf(kindId: number): AttemptStrategy {
     if (kindId === SelectorKindId.XPathRelative) { return "XPathRelative"; }
     if (kindId === SelectorKindId.Css) { return "Css"; }
     if (kindId === SelectorKindId.Aria) { return "Aria"; }
+
     return "Unknown";
 }
 

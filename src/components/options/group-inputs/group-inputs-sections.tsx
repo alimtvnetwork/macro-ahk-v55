@@ -22,6 +22,7 @@ export function DropZone(props: DropZoneProps): JSX.Element {
         "flex items-center justify-between gap-3 rounded border-2 border-dashed px-3 py-2 text-xs transition-colors",
         dragOver ? "border-primary bg-primary/5" : "border-border bg-muted/30",
     ].join(" ");
+
     return (
         <div
             onDragOver={(event) => { event.preventDefault(); if (!dragOver) setDragOver(true); }}
@@ -96,5 +97,6 @@ function ParseStatus({ text, parseResult }: { text: string; parseResult: GroupIn
             </span>
         );
     }
+
     return <span className="text-destructive">{parseResult.Reason}</span>;
 }

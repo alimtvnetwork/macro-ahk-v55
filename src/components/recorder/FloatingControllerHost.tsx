@@ -35,6 +35,7 @@ export function FloatingControllerHost(): JSX.Element {
     const { session, start, pause, resume, stop } = useRecordingSession();
     useRecorderShortcuts({ session, onResume: resume, onPause: pause, onStop: stop });
     const view = useMemo(() => session ?? IDLE_PLACEHOLDER, [session]);
+
     return (
         <FloatingController
             session={view}

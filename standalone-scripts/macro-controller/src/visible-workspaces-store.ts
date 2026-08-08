@@ -37,6 +37,7 @@ export function subscribeVisibleWorkspaces(cb: Listener): () => void {
             logError("AutoCatch", "Unhandled exception", _e);
         }
     }
+
     return function unsubscribe(): void {
         listeners.delete(cb);
     };

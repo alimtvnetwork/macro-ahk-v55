@@ -42,6 +42,7 @@ export class PaymentBannerHider implements PaymentBannerHiderApi {
                 this.check();
                 this.startObserver();
             });
+
             return;
         }
 
@@ -61,6 +62,7 @@ export class PaymentBannerHider implements PaymentBannerHiderApi {
                     timestamp: Date.now(),
                 };
                 if (this.overlayActive) renderDebugOverlay(this.lastMatch);
+
                 return;
             }
 
@@ -81,6 +83,7 @@ export class PaymentBannerHider implements PaymentBannerHiderApi {
         } else {
             hideDebugOverlay();
         }
+
         return this.lastMatch;
     }
 
@@ -124,6 +127,7 @@ export class PaymentBannerHider implements PaymentBannerHiderApi {
             out.push(parentEl);
             cur = parentEl;
         }
+
         return out;
     }
 

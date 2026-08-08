@@ -20,17 +20,20 @@ let nextResp: Record<string, unknown> = { isOk: true, rows: [], lastInsertId: 1 
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
+
         return nextResp;
     }),
 }));
 vi.mock('../../ui/extension-relay', () => ({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
+
         return nextResp;
     }),
 }));
 vi.mock('../../error-utils', async () => {
     const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+
     return { ...actual, logDiagnosticFromCode: vi.fn(), logError: vi.fn() };
 });
 vi.mock('../../logging', () => ({ log: vi.fn() }));
@@ -50,10 +53,12 @@ function pickWhere(): string | undefined {
     const isMissingCall = !call;
     if (isMissingCall) return undefined;
     const context = call[1] as { where?: string };
+
     return context.where;
 }
 function pickCode(): string | undefined {
     const call = logDiagnosticMock.mock.calls[0];
+
     return call ? (call[0] as string) : undefined;
 }
 

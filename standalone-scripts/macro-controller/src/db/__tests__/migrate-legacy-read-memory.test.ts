@@ -18,6 +18,7 @@ const clearPromptCacheSpy = vi.fn(async () => { /* void */ });
 vi.mock('../extension-bridge', () => ({
     sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
         captured.push({ method: payload.method, sql: payload.params.sql });
+
         return responsesQueue.shift() ?? { isOk: true };
     }),
 }));
@@ -26,6 +27,7 @@ vi.mock('../../ui/prompt-cache', () => ({
 }));
 vi.mock('../../error-utils', async () => {
     const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+
     return { ...actual, logDiagnosticFromCode: vi.fn() };
 });
 vi.mock('../../logging', () => ({ log: vi.fn() }));

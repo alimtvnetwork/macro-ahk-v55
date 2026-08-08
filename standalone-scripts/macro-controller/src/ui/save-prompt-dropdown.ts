@@ -110,6 +110,7 @@ export function renderChatboxPromptsDropdown(dropdown: HTMLElement, deps: SavePr
 
     if (hasNoEntries) {
       dropdown.innerHTML = '<div style="padding:10px 14px;color:#9ca3af;font-size:12px;text-align:center;">No prompts available</div>';
+
       return;
     }
 

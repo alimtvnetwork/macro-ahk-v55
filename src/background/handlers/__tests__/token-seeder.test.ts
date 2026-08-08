@@ -70,6 +70,7 @@ function buildChromeMock(executeScriptImpl?: ChromeMock["scripting"]["executeScr
 
 async function loadSeederWithChrome(chromeMock: ChromeMock) {
   (globalThis as Record<string, unknown>).chrome = chromeMock;
+
   return import("../token-seeder");
 }
 

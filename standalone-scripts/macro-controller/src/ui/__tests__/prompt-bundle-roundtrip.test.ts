@@ -33,6 +33,7 @@ async function streamToBytes(stream: ReadableStream<Uint8Array>): Promise<Uint8A
 
 function loadFixture(name: string): unknown {
   const path = resolve(__dirname, '../../../../../test/fixtures/prompt-bundles', name);
+
   return JSON.parse(readFileSync(path, 'utf8'));
 }
 

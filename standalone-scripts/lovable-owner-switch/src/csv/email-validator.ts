@@ -36,6 +36,7 @@ const isValidPart = (part: string): boolean => {
     if (part.length === 0) return false;
     if (part.startsWith(".") || part.endsWith(".")) return false;
     if (part.includes("..")) return false;
+
     return true;
 };
 

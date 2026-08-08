@@ -96,6 +96,7 @@ function ScriptEntryCard({
     if (!config) return;
     if (binding.configBindings.some((b) => b.configId === configId)) {
       toast.info("Config already bound");
+
       return;
     }
     onUpdate({
@@ -133,7 +134,9 @@ function ScriptEntryCard({
   };
 
   const handleJsonFileDrop = (name: string, content: string) => {
-    if (!validateJson(content)) { toast.error("Invalid JSON file"); return; }
+    if (!validateJson(content)) { toast.error("Invalid JSON file");
+
+ return; }
     const inlineId = `inline_${crypto.randomUUID().slice(0, 8)}`;
     onUpdate({
       configBindings: [
@@ -366,6 +369,7 @@ export function ProjectScriptSelector({ availableScripts, availableConfigs, sele
 
     if (selectedScripts.some((s) => s.scriptId === scriptId)) {
       toast.info("Script already added");
+
       return;
     }
 
@@ -375,6 +379,7 @@ export function ProjectScriptSelector({ availableScripts, availableConfigs, sele
     const configBindings: ScriptConfigEntry[] = bindingIds
       .map((id, i) => {
         const config = availableConfigs.find((c) => c.id === id);
+
         return config ? { configId: config.id, configName: config.name, json: formatJson(config.json), order: i } : null;
       })
       .filter((x): x is ScriptConfigEntry => x !== null);
@@ -538,7 +543,9 @@ export function ProjectScriptSelector({ availableScripts, availableConfigs, sele
 /* ------------------------------------------------------------------ */
 
 function validateJson(raw: string): boolean {
-  try { JSON.parse(raw); return true; } catch { return false; }
+  try { JSON.parse(raw);
+
+ return true; } catch { return false; }
 }
 
 function formatJson(input: JsonValue): string {

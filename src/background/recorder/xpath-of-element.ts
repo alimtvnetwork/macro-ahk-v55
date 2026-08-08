@@ -41,6 +41,7 @@ function tryIdShortcut(el: Element, id: string): string | null {
     } catch (err) {
         logError("AutoCatch", "Unhandled exception", err);
     }
+
     return null;
 }
 
@@ -54,6 +55,7 @@ function buildPositionalXPath(el: Element): string {
         segments.unshift(`/${tag}[${positionAmongSameTagSiblings(current)}]`);
         current = parent;
     }
+
     return segments.join("");
 }
 
@@ -66,6 +68,7 @@ export function xpathOfElement(el: Element | null, opts: XPathOptions = {}): str
         const short = tryIdShortcut(el, id);
         if (short !== null) return short;
     }
+
     return buildPositionalXPath(el);
 }
 
@@ -82,6 +85,7 @@ function positionAmongSameTagSiblings(el: Element): number {
         if (sibling === el) return index;
         if (sibling.tagName === tag) index++;
     }
+
     // Should be unreachable (sibling === el always hits) — defensive.
     return index;
 }
@@ -94,6 +98,7 @@ function cssEscapeId(id: string): string {
     if (cssNs?.escape !== undefined) {
         return cssNs.escape(id);
     }
+
     return id.replace(/([ !"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, "\\$1");
 }
 
@@ -109,6 +114,7 @@ function escapeXPathLiteral(s: string): string {
         // optimise for the common case of no embedded quote.
         return s; // single quotes get re-escaped by the consumer pattern.
     }
+
     return s; // worst-case, leave as-is — caller still produces parseable XPath via single quotes.
 }
 

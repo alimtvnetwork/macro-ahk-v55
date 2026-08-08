@@ -29,7 +29,6 @@ const ERROR_DB_CONSUMERS = [
 
 const FORBIDDEN_PATTERN = /SELECT\s+.*\bFROM\s+Sessions\b/i;
 const CROSS_DB_SUBQUERY = /\(\s*SELECT\s+Id\s+FROM\s+Sessions/i;
-
  
 describe("Sessions table cross-database guard", () => {
     for (const filePath of ERROR_DB_CONSUMERS) {

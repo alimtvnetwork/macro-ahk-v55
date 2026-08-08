@@ -8,7 +8,6 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, act } from "@testing-library/react";
 import { ProjectEditor } from "@/options/sections/ProjectEditor";
 
-
 const mockProject = {
     id: "test-project-1",
     schemaVersion: 1,

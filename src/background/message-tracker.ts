@@ -30,5 +30,6 @@ export function trackMessage(type: string, durationMs: number, ok: boolean): voi
 /** Returns the most recent tracked messages (newest first). */
 export function getRecentTrackedMessages(limit = 10): TrackedMessageEvent[] {
     const count = Math.min(limit, trackedMessages.length);
+
     return trackedMessages.slice(-count).reverse();
 }

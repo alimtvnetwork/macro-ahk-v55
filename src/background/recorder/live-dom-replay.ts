@@ -150,6 +150,7 @@ async function persistIfRequested(
     finishedAt: string,
 ): Promise<PersistedReplayRun | null> {
     if (options.Persist === undefined) return null;
+
     return saveReplayRun(options.Persist.ProjectSlug, {
         StartedAt: startedAt, FinishedAt: finishedAt,
         Notes: options.Persist.Notes ?? "",
@@ -170,6 +171,7 @@ export async function executeReplay(
     }
     const finishedAt = toIso(now());
     const persistedRun = await persistIfRequested(options, results, startedAt, finishedAt);
+
     return { Results: results, StartedAt: startedAt, FinishedAt: finishedAt, PersistedRun: persistedRun };
 }
 
@@ -204,6 +206,7 @@ async function executeStep(
     if (step.Kind === "Wait") {
         return runWaitStep(step, options, sleep, startedAt, now);
     }
+
     return runActionStep(step, options, sleep, startedAt, now);
 }
 
@@ -215,6 +218,7 @@ async function runWaitStep(
     now: () => Date,
 ): Promise<ReplayStepResult> {
     await sleep(step.WaitMs ?? 0);
+
     return finalize(step, options, startedAt, now(), { Ok: true });
 }
 
@@ -255,6 +259,7 @@ async function runActionPipeline(
     actuateStep(step, state.target, options.Row);
     const waitResult = await checkPostWait(step, options, sleep, now, startedAt, resolved, state);
     if (waitResult !== null) { return waitResult; }
+
     return finalize(step, options, startedAt, now(), { Ok: true, ResolvedXPath: resolved.Expression });
 }
 
@@ -271,6 +276,7 @@ async function checkPreConditionGate(
         Sleep: sleep, Now: () => now().getTime(),
     });
     if (gateOutcome.Ok) { return null; }
+
     return buildGateFailure(step, options, startedAt, now(), gateOutcome);
 }
 
@@ -291,6 +297,7 @@ function buildGateFailure(
         });
     }
     const reasonDetail = `Gate condition not met within ${gate.TimeoutMs}ms (${detail}). Last evaluation: ${JSON.stringify(gateOutcome.LastEvaluation)}`;
+
     return finalize(step, options, startedAt, finishedAt, {
         Ok: false, Reason: "ConditionTimeout", ReasonDetail: reasonDetail,
         Error: new Error(`Gate condition not met within ${gate.TimeoutMs}ms`),
@@ -311,12 +318,17 @@ function applyStepVariables(
     state.variables = detailed.Variables;
     if (detailed.FirstFailure === null) { return null; }
     const message = detailed.FirstFailure.FailureDetail ?? `Variable {{${detailed.FirstFailure.Name}}} failed`;
+
     return { Ok: false, Variables: detailed.Variables, Error: new Error(message) };
 }
 
 function actuateStep(step: ReplayStepInput, target: HTMLElement, row: FieldRow | undefined): void {
-    if (step.Kind === "Click")  { dispatchClick(target); return; }
-    if (step.Kind === "Type")   { dispatchType(target,   resolveValue(step.Value, row)); return; }
+    if (step.Kind === "Click")  { dispatchClick(target);
+
+ return; }
+    if (step.Kind === "Type")   { dispatchType(target,   resolveValue(step.Value, row));
+
+ return; }
     if (step.Kind === "Select") { dispatchSelect(target, resolveValue(step.Value, row)); }
 }
 
@@ -349,6 +361,7 @@ async function checkPostWait(
         Doc: options.Doc, Sleep: sleep, Now: () => now().getTime(),
     });
     if (waitOutcome.Ok) { return null; }
+
     return buildWaitFailure(step, options, startedAt, now(), resolved, state, effectiveWait, waitOutcome);
 }
 
@@ -356,6 +369,7 @@ function detectWaitKind(spec: WaitForSpec): PredicateEvaluationKind {
     const declared = spec.Kind ?? "Auto";
     if (declared === "XPath") { return "XPath"; }
     if (declared === "Css")   { return "Css"; }
+
     return spec.Expression.trim().startsWith("/") ? "XPath" : "Css";
 }
 
@@ -376,6 +390,7 @@ function buildWaitFailure(
     const reasonDetail = waitOutcome.Reason === "Timeout"
         ? `WaitFor selector '${effectiveWait.Expression}' (Kind=${resolvedKind}) did not appear within ${effectiveWait.TimeoutMs} ms (elapsed ${waitOutcome.DurationMs} ms).`
         : `WaitFor selector '${effectiveWait.Expression}' (Kind=${resolvedKind}) is invalid: ${waitOutcome.Detail}`;
+
     return finalize(step, options, startedAt, finishedAt, {
         Ok: false, ResolvedXPath: resolved.Expression, Variables: state.variables, Target: state.target,
         Reason: reasonCode, ReasonDetail: reasonDetail, Error: new Error(reasonDetail),
@@ -394,6 +409,7 @@ function finalize(
     outcome: FinalizeOutcome,
 ): ReplayStepResult {
     if (outcome.Ok) { return buildSuccessResult(step, started, finished, outcome); }
+
     return buildFailureResult(step, options, started, finished, outcome);
 }
 
@@ -420,6 +436,7 @@ function buildFailureResult(
     outcome: FinalizeOutcome,
 ): ReplayStepResult {
     const report = createFailureReport(step, options, outcome);
+
     return {
         StepId: step.StepId, Index: step.Index, Ok: false,
         Error: report.Message, ResolvedXPath: outcome.ResolvedXPath,
@@ -436,6 +453,7 @@ function createFailureReport(
 ): FailureReport {
     const evaluatedAttempts = step.Kind === "Wait" ? undefined : evaluateAllSelectors(step.Selectors, options.Doc);
     const verbose = options.Verbose !== undefined ? options.Verbose : resolveVerboseLogging(options.Persist?.ProjectSlug);
+
     return logFailure({
         Phase: "Replay", Error: outcome.Error, StepId: step.StepId, Index: step.Index,
         StepKind: step.Kind, Selectors: step.Selectors, EvaluatedAttempts: evaluatedAttempts,
@@ -446,13 +464,13 @@ function createFailureReport(
     });
 }
 
-
 function toStepResultDraft(r: ReplayStepResult): ReplayStepResultDraft {
     // When a structured FailureReport exists, persist it as JSON so the
     // user can later copy the full diagnostic blob from the project DB.
     const errorMessage = r.FailureReport !== undefined
         ? JSON.stringify(r.FailureReport)
         : (r.Skipped === true ? (r.Error ?? "Skipped: gate condition not met") : (r.Error ?? null));
+
     return {
         StepId: r.StepId,
         OrderIndex: r.Index,
@@ -478,6 +496,7 @@ function defaultNow(): Date {
 function resolveValue(raw: string | undefined, row: FieldRow | undefined): string {
     if (raw === undefined || raw === "") { return ""; }
     if (row === undefined)               { return raw; }
+
     return resolveFieldReferences(raw, row);
 }
 
@@ -489,14 +508,17 @@ function locateElement(resolved: ResolvedSelector, doc: Document): HTMLElement |
     if (resolved.Kind === "XPath") {
         const r = doc.evaluate(resolved.Expression, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
         const node = r.singleNodeValue;
+
         return node instanceof HTMLElement ? node : null;
     }
     if (resolved.Kind === "Css") {
         const element = doc.querySelector(resolved.Expression);
+
         return element instanceof HTMLElement ? element : null;
     }
     // Aria — minimal support: `[aria-label="…"]`-style expressions are passed straight to querySelector
     const element = doc.querySelector(resolved.Expression);
+
     return element instanceof HTMLElement ? element : null;
 }
 
@@ -573,6 +595,7 @@ function persistedWaitToSpec(config: WaitConfig | null): WaitForSpec | null {
             `not yet supported by waitForElement; falling back to 'Appears'.`,
         );
     }
+
     return {
         Expression: config.Selector,
         Kind: config.Kind === "XPath" ? "XPath" : "Css",

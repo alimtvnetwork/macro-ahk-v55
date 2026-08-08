@@ -52,6 +52,7 @@ export function buildEditorEl(row: PromptRow): EditorEls {
   saveBtn.style.cssText = btnCss('#2f4a2f', '#d6f5d6');
   bar.appendChild(cancelBtn); bar.appendChild(saveBtn);
   wrap.appendChild(nameInput); wrap.appendChild(tokenEls.row); wrap.appendChild(valuesEls.row); wrap.appendChild(bodyInput); wrap.appendChild(bar);
+
   return {
     wrap, nameInput, bodyInput,
     tokenInput: tokenEls.input, tokenPreview: tokenEls.preview, tokenError: tokenEls.error,
@@ -83,6 +84,7 @@ export async function handleEditSave(refs: ModalRefs, row: PromptRow, payload: E
     if (isMissingOk) {
       refs.status.textContent = 'Save failed: ' + (res.error ?? 'unknown');
       logError(LOG_SCOPE, 'edit save failed', res);
+
       return;
     }
     log('PromptLibraryModal: edited id=' + row.Id + ' slug=' + row.Slug + ' key=' + payload.replaceKey + ' values=' + payload.replaceValues.length, 'info');
@@ -101,11 +103,13 @@ export function openInlineEditor(refs: ModalRefs, rowEl: HTMLElement, row: Promp
     if (ed.tokenError.textContent) {
       refs.status.textContent = 'Invalid Token: ' + ed.tokenError.textContent;
       ed.tokenInput.focus();
+
       return;
     }
     if (ed.valuesError.textContent) {
       refs.status.textContent = 'Invalid N options: ' + ed.valuesError.textContent;
       ed.valuesInput.focus();
+
       return;
     }
     const parsedValues = ed.valuesInput.value.split(',').map((s) => s.trim()).filter((s) => s.length > 0);

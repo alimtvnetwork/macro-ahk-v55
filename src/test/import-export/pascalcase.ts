@@ -14,6 +14,7 @@ export function isPascalCase(name: string): boolean {
   if (name.includes("_") || name.includes("-")) {
     return false;
   }
+
   return PASCAL_RE.test(name);
 }
 

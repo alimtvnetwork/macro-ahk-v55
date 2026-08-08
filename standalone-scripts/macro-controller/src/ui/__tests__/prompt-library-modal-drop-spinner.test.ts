@@ -43,6 +43,7 @@ vi.mock('../../db/prompt-db', () => ({
 
 const io = vi.hoisted(() => {
     let releaseFn: ((ok: boolean) => void) | null = null;
+
     return {
         exportPromptsToJson: vi.fn(async () => undefined),
         parsePromptsText: vi.fn(() => ({

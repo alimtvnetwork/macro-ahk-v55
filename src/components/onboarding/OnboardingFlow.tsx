@@ -534,6 +534,7 @@ class OnboardingStepBoundary extends Component<
 
   static getDerivedStateFromError(error: Error): OnboardingStepBoundaryState {
     const message = error?.message ?? String(error);
+
     return { errorMessage: message || "Unknown error rendering onboarding step" };
   }
 

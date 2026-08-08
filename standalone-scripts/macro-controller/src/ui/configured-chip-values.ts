@@ -26,6 +26,7 @@ export function parseNumericValues(raw: readonly string[]): number[] {
         seen.add(n);
         out.push(n);
     }
+
     return out;
 }
 
@@ -51,9 +52,11 @@ export async function resolveConfiguredChipValues(
             && raw.every((v, i) => v === REPLACE_VALUES_DEFAULT[i]);
         if (isDefault) return [...fallback];
         const numeric = parseNumericValues(raw);
+
         return numeric.length > 0 ? numeric : [...fallback];
     } catch (err) {
         logError('ConfiguredChipValues', 'resolve failed for role=' + role, err);
+
         return [...fallback];
     }
 }

@@ -45,6 +45,7 @@ export function getExtensionChrome(): ChromeLike | null {
     if (candidate.runtime === undefined || candidate.runtime.id === undefined) {
         return null;
     }
+
     return candidate;
 }
 
@@ -79,5 +80,6 @@ export function requireExtension(scope: string): ChromeLike | null {
             + "  Reason: Popup is running in Lovable web preview, not as a Chrome extension popup. "
             + "Side-load the extension via chrome://extensions to exercise this code path.",
     );
+
     return null;
 }

@@ -60,6 +60,7 @@ function AddChildButton({ value, path, onUpdate }: AddChildButtonProps) {
     if (isObj) {
       const newKey = generateUniqueKey(value as JsonObject, "newKey");
       onUpdate([...path, newKey], "");
+
       return;
     }
 

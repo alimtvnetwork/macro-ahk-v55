@@ -64,6 +64,7 @@ async function buildThrottledResult(
             ' reason=' + reason + ' waitMs=' + String(waitMs),
         'skip',
     );
+
     return { workspaceId, outcome: 'throttled', response: null, row: cached, waitMs };
 }
 
@@ -83,6 +84,7 @@ async function buildSuccessResult(
             ' granted=' + row.TotalGranted,
         'success',
     );
+
     return { workspaceId, outcome: 'fetched', response, row, waitMs: 0 };
 }
 
@@ -110,8 +112,10 @@ export async function fetchAndPersist(
                 'CreditBalance.fetchAndPersist',
                 'fetchCreditBalance returned null for ws=' + workspaceId,
             );
+
             return { workspaceId, outcome: 'failed', response: null, row: cached, waitMs: 0 };
         }
+
         return buildSuccessResult(workspaceId, response, options.source);
     } catch (caught: unknown) {
         logError(
@@ -120,6 +124,7 @@ export async function fetchAndPersist(
             caught,
         );
         const cached = await readCreditBalanceCache(workspaceId);
+
         return { workspaceId, outcome: 'failed', response: null, row: cached, waitMs: 0 };
     }
 }

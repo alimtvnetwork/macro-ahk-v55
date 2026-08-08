@@ -53,7 +53,6 @@ import {
     handleGetAutoAttachDecisions,
 } from "./handlers/project-handler";
 
-
 import {
     handleDeleteConfig,
     handleDeleteScript,
@@ -314,6 +313,7 @@ export const BROADCAST_TYPES = new Set<MessageType>([
 
 function getProjectIdHint(message: MessageRequest): string | undefined {
     const maybeProjectId = (message as Record<string, string | undefined>).projectId;
+
     return typeof maybeProjectId === "string" && maybeProjectId.length > 0
         ? maybeProjectId
         : undefined;
@@ -334,6 +334,7 @@ function getTabUrlHint(
     }
 
     const maybePageUrl = (message as Record<string, string | undefined>).pageUrl;
+
     return typeof maybePageUrl === "string" && maybePageUrl.length > 0
         ? maybePageUrl
         : undefined;
@@ -394,7 +395,9 @@ export const HANDLER_REGISTRY = new Map<MessageType, MessageHandler>([
     [MessageType.NETWORK_REQUEST, async (payload) => handleNetworkRequest(payload)],
     [MessageType.GET_NETWORK_REQUESTS, async () => ({ requests: getRecentNetworkRequests() })],
     [MessageType.GET_NETWORK_STATS, async () => getNetworkStats()],
-    [MessageType.CLEAR_NETWORK_REQUESTS, async () => { clearNetworkRequests(); return { isOk: true }; }],
+    [MessageType.CLEAR_NETWORK_REQUESTS, async () => { clearNetworkRequests();
+
+ return { isOk: true }; }],
     [MessageType.GET_STORAGE_STATS, async () => handleGetStorageStats()],
     [MessageType.QUERY_LOGS, async (payload) => handleQueryLogs(payload)],
     [MessageType.GET_LOG_DETAIL, async (payload) => handleGetLogDetail(payload)],
@@ -439,13 +442,16 @@ export const HANDLER_REGISTRY = new Map<MessageType, MessageHandler>([
     [MessageType.SAVE_PROMPT, async (payload) => handleSavePrompt(payload)],
     [MessageType.DELETE_PROMPT, async (payload) => handleDeletePrompt(payload)],
     [MessageType.REORDER_PROMPTS, async (payload) => handleReorderPrompts(payload)],
-    [MessageType.RESEED_PROMPTS, async () => { await reseedPrompts(); return { isOk: true }; }],
+    [MessageType.RESEED_PROMPTS, async () => { await reseedPrompts();
+
+ return { isOk: true }; }],
     [MessageType.GET_PROMPT_CHAINS, async () => handleGetPromptChains()],
     [MessageType.SAVE_PROMPT_CHAIN, async (payload) => handleSavePromptChain(payload)],
     [MessageType.DELETE_PROMPT_CHAIN, async (payload) => handleDeletePromptChain(payload)],
     [MessageType.EXECUTE_CHAIN_STEP, async (payload) => handleExecuteChainStep(payload)],
     [MessageType.GET_RECENT_MESSAGES, async (payload) => {
         const limit = (payload as Record<string, unknown>).limit as number ?? 10;
+
         return { messages: getRecentTrackedMessages(limit) };
     }],
     [MessageType.GET_SESSION_LOGS, async () => handleGetSessionLogs()],
@@ -489,10 +495,14 @@ export const HANDLER_REGISTRY = new Map<MessageType, MessageHandler>([
     [MessageType.LIST_UPDATERS, async () => ({ updaters: handleListUpdaters() })],
     [MessageType.GET_UPDATER, async (payload) => ({ updater: handleGetUpdater((payload as Record<string, unknown>).updaterId as number) })],
     [MessageType.CREATE_UPDATER, async (payload) => ({ updaterId: handleCreateUpdater((payload as Record<string, unknown>).data as Record<string, unknown>) })],
-    [MessageType.DELETE_UPDATER, async (payload) => { handleDeleteUpdater((payload as Record<string, unknown>).updaterId as number); return { isOk: true }; }],
+    [MessageType.DELETE_UPDATER, async (payload) => { handleDeleteUpdater((payload as Record<string, unknown>).updaterId as number);
+
+ return { isOk: true }; }],
     [MessageType.CHECK_FOR_UPDATE, async (payload) => handleCheckForUpdate((payload as Record<string, unknown>).updaterId as number)],
     [MessageType.GET_UPDATE_SETTINGS, async () => ({ settings: handleGetUpdateSettings() })],
-    [MessageType.SAVE_UPDATE_SETTINGS, async (payload) => { handleSaveUpdateSettings((payload as Record<string, unknown>).data as Record<string, unknown>); return { isOk: true }; }],
+    [MessageType.SAVE_UPDATE_SETTINGS, async (payload) => { handleSaveUpdateSettings((payload as Record<string, unknown>).data as Record<string, unknown>);
+
+ return { isOk: true }; }],
     // ─── SDK Bridge (marco.*) ───
     [MessageType.AUTH_GET_TOKEN, async () => handleSdkAuthGetToken()],
     [MessageType.AUTH_GET_SOURCE, async () => handleSdkAuthGetSource()],
@@ -532,10 +542,12 @@ export const HANDLER_REGISTRY = new Map<MessageType, MessageHandler>([
     // ─── Cache Management (Issue 88) ───
     [MessageType.INVALIDATE_CACHE, async () => {
         const result = await cacheClearAll();
+
         return { isOk: true, cleared: result.cleared };
     }],
     [MessageType.GET_CACHE_STATS, async () => {
         const stats = await cacheStats();
+
         return { isOk: true, ...stats };
     }],
     // ─── Dynamic Script Loading ───

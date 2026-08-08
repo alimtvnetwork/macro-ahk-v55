@@ -64,6 +64,7 @@ function clampLimit(limit: number | undefined): number {
   const floored = Math.floor(limit);
   if (floored < 1) return 1;
   if (floored > MAX_HISTORY_LIMIT) return MAX_HISTORY_LIMIT;
+
   return floored;
 }
 
@@ -89,6 +90,7 @@ async function hydrateBodies(projectId: string, rows: ChatSubmitRow[]): Promise<
       body,
     });
   }
+
   return entries;
 }
 
@@ -97,11 +99,13 @@ export async function getProjectHistory(
   limit?: number,
 ): Promise<HistoryEntry[]> {
   const rows = await listRecentChatSubmits(projectId, clampLimit(limit));
+
   return hydrateBodies(projectId, rows);
 }
 
 export async function exportProjectHistoryAsJson(projectId: string): Promise<HistoryExport> {
   const entries = await getProjectHistory(projectId, MAX_HISTORY_LIMIT);
+
   return {
     schemaVersion: HISTORY_EXPORT_SCHEMA_VERSION,
     projectId,
@@ -124,5 +128,6 @@ export async function deleteHistoryEntry(
     return { isDeleted: false, opfsRemoved: false, rowRemoved: false };
   }
   const rowRemoved = await deleteChatSubmit(id);
+
   return { isDeleted: rowRemoved, opfsRemoved, rowRemoved };
 }

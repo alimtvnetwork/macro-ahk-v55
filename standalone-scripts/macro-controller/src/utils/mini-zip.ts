@@ -21,6 +21,7 @@ function buildCrc32Table(): Uint32Array {
     }
     table[index] = value >>> 0;
   }
+
   return table;
 }
 
@@ -31,6 +32,7 @@ function crc32(bytes: Uint8Array): number {
     const tableIndex = (crc ^ byte) & 0xff;
     crc = (crc >>> 8) ^ (CRC32_TABLE[tableIndex] ?? 0);
   }
+
   return (crc ^ 0xffffffff) >>> 0;
 }
 
@@ -69,6 +71,7 @@ function buildLocalHeader(record: CentralRecord): Uint8Array {
   writeUint16Le(view, 26, record.nameBytes.length);
   writeUint16Le(view, 28, 0);
   header.set(record.nameBytes, 30);
+
   return header;
 }
 
@@ -93,6 +96,7 @@ function buildCentralHeader(record: CentralRecord): Uint8Array {
   writeUint32Le(view, 38, 0);
   writeUint32Le(view, 42, record.offset);
   header.set(record.nameBytes, 46);
+
   return header;
 }
 
@@ -107,6 +111,7 @@ function buildEndOfCentral(count: number, cdSize: number, cdOffset: number): Uin
   writeUint32Le(view, 12, cdSize);
   writeUint32Le(view, 16, cdOffset);
   writeUint16Le(view, 20, 0);
+
   return buffer;
 }
 
@@ -138,5 +143,6 @@ export function buildStoredZip(entries: MiniZipEntry[]): Blob {
     cdSize += central.length;
   }
   chunks.push(buildEndOfCentral(records.length, cdSize, cdOffset));
+
   return new Blob(chunks as BlobPart[], { type: 'application/zip' });
 }

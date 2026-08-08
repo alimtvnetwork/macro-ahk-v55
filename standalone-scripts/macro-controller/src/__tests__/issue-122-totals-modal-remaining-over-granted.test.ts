@@ -25,6 +25,7 @@ function tileText(body: HTMLElement, label: string): string {
   const labelEl = Array.from(body.querySelectorAll('span'))
     .find((s) => (s.textContent || '').trim() === label);
   const value = labelEl?.nextElementSibling;
+
   return (value?.textContent || '').replace(/\s+/g, ' ').trim();
 }
 

@@ -40,6 +40,7 @@ export interface BenignWarningEntryLike {
 export function isBenignWarning(entry: BenignWarningEntryLike): boolean {
     if (entry.level !== "warn") return false;
     const haystack = `${entry.message} ${entry.detail ?? ""}`;
+
     return BENIGN_WARNING_PATTERNS.some((p) => p.re.test(haystack));
 }
 
@@ -76,5 +77,6 @@ export function tallyBenignWarnings(entries: ReadonlyArray<BenignWarningEntryLik
             total += count;
         }
     }
+
     return { total, matched };
 }

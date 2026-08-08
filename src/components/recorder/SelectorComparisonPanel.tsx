@@ -81,6 +81,7 @@ function elementSummary(el: DomContext | null): string {
     const attrSegment = attrs.length > 0 ? ` ${attrs.join("")}` : "";
     const head = `<${el.TagName}${attrSegment}>`;
     if (el.TextSnippet.length === 0) return head;
+
     return `${head} "${el.TextSnippet}"`;
 }
 
@@ -93,6 +94,7 @@ const STATUS_TONE: Record<SelectorHistoryBucket["Status"], string> = {
 
 function HistoryBlock({ bucket }: { bucket: SelectorHistoryBucket }) {
     const last10 = bucket.Outcomes.slice(-10);
+
     return (
         <div className={`mt-2 ml-5 rounded-md border ${STATUS_TONE[bucket.Status]} bg-card/50 p-2 text-[11px] space-y-1`}>
             <div className="flex items-center gap-2">

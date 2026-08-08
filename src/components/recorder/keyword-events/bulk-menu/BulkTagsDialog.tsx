@@ -39,6 +39,7 @@ export function BulkTagsDialog(props: BulkTagsDialogProps): JSX.Element {
         for (const ev of selectedEvents) {
             (ev.Tags ?? []).forEach(t => all.add(t));
         }
+
         return Array.from(all).sort((a, b) => a.localeCompare(b));
     }, [selectedEvents]);
 

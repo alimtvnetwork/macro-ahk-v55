@@ -71,8 +71,6 @@ vi.mock("@/platform", () => ({
   }),
 }));
 
-
-
 import OptionsPage from "@/pages/Options";
 
 const getText = (element: Element | null): string =>

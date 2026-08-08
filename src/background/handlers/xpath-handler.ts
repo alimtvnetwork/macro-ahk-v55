@@ -71,6 +71,7 @@ async function resolveTargetTabId(): Promise<number | null> {
         if (url.startsWith("chrome-extension://")) return false;
         if (url.startsWith("edge://")) return false;
         if (url.startsWith("about:")) return false;
+
         return true;
     };
 
@@ -158,6 +159,7 @@ export async function handleClearRecordedXPaths(
     _sender: chrome.runtime.MessageSender,
 ): Promise<OkResponse> {
     recordedXPaths = [];
+
     return { isOk: true };
 }
 /* ------------------------------------------------------------------ */

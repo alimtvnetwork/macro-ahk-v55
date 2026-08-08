@@ -17,6 +17,7 @@ export interface CsvDropZoneProps {
 
 export function CsvDropZone(props: CsvDropZoneProps): JSX.Element {
     const fileInputRef = useRef<HTMLInputElement>(null);
+
     return (
         <div
             onDragOver={(event) => { event.preventDefault(); if (!props.dragOver) props.onDragOverChange(true); }}

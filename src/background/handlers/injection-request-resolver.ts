@@ -102,6 +102,7 @@ export async function resolveInjectionRequestScripts(
 
     if (hasOnlyProjectEntries) {
         const result = await resolveProjectEntryScripts(projectEntries);
+
         return {
             prepared: result.prepared,
             skipped: [...skipped, ...result.skipped],
@@ -177,6 +178,7 @@ function readCandidateFields(candidate: Record<string, unknown>, index: number):
     const rawCode = typeof candidate.code === "string" ? candidate.code : null;
     const rawOrder = typeof candidate.order === "number" ? candidate.order : null;
     const displayId = rawId ?? rawPath ?? `unknown-${index}`;
+
     return {
         rawId, rawPath, rawCode, rawOrder,
         hasCodeKey: "code" in candidate,
@@ -214,9 +216,9 @@ function classifyEntry(entry: RawEntry, index: number): Classified {
     if (fields.rawCode.trim().length === 0) {
         return { kind: "empty-code", id: fields.displayId, name: fields.displayName };
     }
+
     return { kind: "injectable", value: entry as InjectableScript };
 }
-
 
 /** Sorts prepared scripts by execution order. */
 function sortPreparedScripts(

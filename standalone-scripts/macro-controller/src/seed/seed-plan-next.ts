@@ -61,6 +61,7 @@ const PLAN_DEFAULT_CURRENT_MARKERS = [
 
 async function rawSql(method: MethodEnum1, sql: string): Promise<RawSqlResp> {
     void DB_NAME;
+
     return runSqlBridge(method, sql);
 }
 
@@ -73,6 +74,7 @@ function buildInsertOrIgnoreSql(now: number): string {
             String(now), String(now),
         ].join(', ') + ')';
     }).join(', ');
+
     return 'INSERT OR IGNORE INTO Prompt '
         + '(Slug, Name, Body, Role, IsDefault, ReplaceKey, ReplaceValues, CreatedAt, UpdatedAt) VALUES '
         + values;
@@ -88,6 +90,7 @@ async function selectExistingSlugs(): Promise<Set<string>> {
         const slug = (row as { Slug?: unknown }).Slug;
         if (typeof slug === 'string') out.add(slug);
     }
+
     return out;
 }
 
@@ -97,6 +100,7 @@ async function hasDefaultForRole(role: PromptRole): Promise<boolean> {
     const resp = await rawSql('QUERY', sql);
     const isMissingIsOk = !resp.isOk;
     if (isMissingIsOk) return false;
+
     return Array.isArray(resp.rows) && resp.rows.length > 0;
 }
 
@@ -109,9 +113,11 @@ async function promoteSeedDefault(role: PromptRole, slug: string): Promise<boole
         const message = resp.errorMessage ?? '?';
         logDiagnosticFromCode('SEED_PROMOTE_E001', { role, slug, reason: message });
         emitPromptSeedEvent({ event: 'seed.promote-default', role, slug, outcome: 'failed', detail: message });
+
         return false;
     }
     emitPromptSeedEvent({ event: 'seed.promote-default', role, slug, outcome: 'ok' });
+
     return true;
 }
 
@@ -126,6 +132,7 @@ function initTelemetry(): Map<PromptRole, RoleTelemetry> {
             replaceValueCount: REPLACE_VALUES_DEFAULT.length,
         });
     }
+
     return m;
 }
 
@@ -189,6 +196,7 @@ function emitTelemetry(tel: RoleTelemetry[]): void {
 function legacyBodiesForSlug(slug: string): readonly string[] {
     if (slug === 'next-default') return NEXT_DEFAULT_LEGACY_BODIES;
     if (slug === 'plan-default') return PLAN_DEFAULT_LEGACY_BODIES;
+
     return [];
 }
 
@@ -198,6 +206,7 @@ function normalizePromptBody(body: string): string {
 
 function findLegacyBodyIndex(currentBody: string, legacyBodies: readonly string[]): number {
     const normalizedCurrent = normalizePromptBody(currentBody);
+
     return legacyBodies.findIndex(body => normalizePromptBody(body) === normalizedCurrent);
 }
 
@@ -214,6 +223,7 @@ function isManagedNextPromptDrift(slug: string, body: string): boolean {
     const hasNextHeading = normalized.startsWith('# next ');
     const hasToken = normalized.includes('{{n}}') || normalized.includes('${n}');
     const hasManagedShape = normalized.includes('exactly') && normalized.includes('remaining');
+
     return slug === 'next-default' && hasNextHeading && hasToken && hasManagedShape && !hasCurrentNextMarkers(body);
 }
 
@@ -222,6 +232,7 @@ function isManagedPlanPromptDrift(slug: string, body: string): boolean {
     const hasPlanHeading = normalized.startsWith('# ') && normalized.includes('plan');
     const hasToken = normalized.includes('{{n}}') || normalized.includes('${n}');
     const hasManagedShape = normalized.includes('parse the number') || normalized.includes('step count is law');
+
     return slug === 'plan-default' && hasPlanHeading && hasToken && hasManagedShape && !hasCurrentPlanMarkers(body);
 }
 
@@ -231,6 +242,7 @@ function isBundledDefaultDrift(row: typeof PLAN_NEXT_SEED_ROWS[number], body: st
     if (normalizePromptBody(body) === normalizePromptBody(row.body)) return false;
     if (row.slug === 'plan-default') return isManagedPlanDefault(body);
     if (row.slug === 'next-default') return isManagedNextDefault(body);
+
     return false;
 }
 
@@ -238,6 +250,7 @@ function isManagedPlanDefault(body: string): boolean {
     const normalized = normalizePromptBody(body).toLowerCase();
     const hasToken = normalized.includes('{{n}}') || normalized.includes('${n}');
     const hasManagedShape = normalized.includes('parse the number') || normalized.includes('step count is law');
+
     return normalized.startsWith('# ') && normalized.includes('plan') && hasToken && hasManagedShape;
 }
 
@@ -245,6 +258,7 @@ function isManagedNextDefault(body: string): boolean {
     const normalized = normalizePromptBody(body).toLowerCase();
     const hasToken = normalized.includes('{{n}}') || normalized.includes('${n}');
     const hasManagedShape = normalized.includes('exactly') && normalized.includes('remaining');
+
     return normalized.startsWith('# next ') && normalized.includes('steps') && hasToken && hasManagedShape;
 }
 
@@ -260,6 +274,7 @@ function resolveUpgradeMatch(row: typeof PLAN_NEXT_SEED_ROWS[number], currentBod
     if (isManagedNextPromptDrift(row.slug, currentBody)) {
         return { isMatch: true, detail: 'managed-next-drift', legacyIndex: -1 };
     }
+
     return { isMatch: false, detail: 'user-customized', legacyIndex: -1 };
 }
 
@@ -268,6 +283,7 @@ async function readCurrentBody(slug: string): Promise<string | null> {
     const readResp = await rawSql('QUERY', readSql);
     if (!readResp.isOk || !Array.isArray(readResp.rows) || readResp.rows.length === 0) return null;
     const body = (readResp.rows[0] as { Body?: unknown }).Body;
+
     return typeof body === 'string' ? body : null;
 }
 
@@ -314,10 +330,12 @@ async function applyLegacyBodyUpgrade(
     const isMissingIsOk = !updateResp.isOk;
     if (isMissingIsOk) {
         emitLegacyUpgradeFailure(row, match, updateResp.errorMessage ?? '?');
+
         return false;
     }
     emitLegacyUpgradeOk(row, match);
     log('[SeedPlanNext] Upgraded legacy default body for ' + row.slug, 'success');
+
     return true;
 }
 
@@ -325,14 +343,20 @@ async function upgradeLegacyBodyForRow(row: typeof PLAN_NEXT_SEED_ROWS[number]):
     const legacyBodies = legacyBodiesForSlug(row.slug);
     if (legacyBodies.length === 0) return false;
     const currentBody = await readCurrentBody(row.slug);
-    if (currentBody === null) { emitLegacySkip(row, 'row-missing'); return false; }
-    if (currentBody === row.body) { emitLegacySkip(row, 'already-current'); return false; }
+    if (currentBody === null) { emitLegacySkip(row, 'row-missing');
+
+ return false; }
+    if (currentBody === row.body) { emitLegacySkip(row, 'already-current');
+
+ return false; }
     const match = resolveUpgradeMatch(row, currentBody);
     const isMissingIsMatch = !match.isMatch;
     if (isMissingIsMatch) {
         emitLegacySkip(row, match.detail, currentBody.length);
+
         return false;
     }
+
     return applyLegacyBodyUpgrade(row, match);
 }
 
@@ -342,6 +366,7 @@ async function upgradeLegacyDefaultBodies(): Promise<number> {
         const applied = await upgradeLegacyBodyForRow(row);
         if (applied) upgraded += 1;
     }
+
     return upgraded;
 }
 
@@ -367,6 +392,7 @@ async function writeSeedAuditRow(params: {
             detail: 'no-observable-change',
             metrics: { inserted: 0, promoted: 0, upgraded: 0 },
         });
+
         return;
     }
     let version = '';
@@ -394,6 +420,7 @@ async function writeSeedAuditRow(params: {
         const message = resp.errorMessage ?? '?';
         logDiagnosticFromCode('SEED_AUDIT_E001', { reason: message });
         emitPromptSeedEvent({ event: 'seed.audit-write', outcome: 'failed', detail: message });
+
         return;
     }
     emitPromptSeedEvent({
@@ -402,11 +429,9 @@ async function writeSeedAuditRow(params: {
     });
 }
 
-
 import { ServiceResult } from '../utils/result-wrapper';
 import { MethodEnum1 } from "../types/enums";
-
-// eslint-disable-next-line max-lines-per-function
+ 
 export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> {
     const startedAt = Date.now();
     try {
@@ -426,6 +451,7 @@ export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> 
                 event: 'seed.failed', outcome: 'failed', detail: message,
                 metrics: { elapsedMs: Date.now() - startedAt },
             });
+
             return ServiceResult.wrap({ ok: false, error: message });
         }
         const insertedTotal = Array.from(tel.values()).reduce((s, t) => s + t.inserted, 0);
@@ -454,6 +480,7 @@ export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> 
                 promoted: telemetry.reduce((s, t) => s + t.promotedDefault, 0),
             },
         });
+
         return ServiceResult.wrap({ ok: true, telemetry });
     } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
@@ -464,6 +491,7 @@ export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> 
             event: 'seed.failed', outcome: 'failed', detail: message,
             metrics: { elapsedMs: Date.now() - startedAt },
         });
+
         return ServiceResult.wrap({ ok: false, error: message });
     }
 }

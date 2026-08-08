@@ -41,6 +41,7 @@ function estimateBytes(value: JsonValue): number {
 function toCookieUrl(cookie: chrome.cookies.Cookie): string {
     const protocol = cookie.secure ? "https" : "http";
     const domain = cookie.domain.startsWith(".") ? cookie.domain.slice(1) : cookie.domain;
+
     return `${protocol}://${domain}${cookie.path}`;
 }
 
@@ -78,6 +79,7 @@ function resolveSetCookieUrl(input: {
     const protocol = input.secure ? "https" : "http";
     const normalizedDomain = domain.startsWith(".") ? domain.slice(1) : domain;
     const path = input.path && input.path.startsWith("/") ? input.path : "/";
+
     return `${protocol}://${normalizedDomain}${path}`;
 }
 
@@ -109,6 +111,7 @@ export async function handleStorageSessionSet(
     }
 
     await chrome.storage.session.set({ [key]: value });
+
     return { isOk: true };
 }
 
@@ -121,6 +124,7 @@ export async function handleStorageSessionDelete(
     }
 
     await chrome.storage.session.remove(key);
+
     return { isOk: true };
 }
 
@@ -135,6 +139,7 @@ export async function handleStorageSessionClear(
         const raw = await chrome.storage.session.get(null);
         const total = Object.keys(raw).length;
         await chrome.storage.session.clear();
+
         return { isOk: true, cleared: total };
     }
 
@@ -164,12 +169,14 @@ export async function handleStorageCookiesList(
     const filtered = cookies
         .filter((cookie) => {
             if (!nameContains || !nameContains.trim()) return true;
+
             return cookie.name.toLowerCase().includes(nameContains.trim().toLowerCase());
         })
         .map(toCookieEntry)
         .sort((a, b) => {
             const byDomain = a.domain.localeCompare(b.domain);
             if (byDomain !== 0) return byDomain;
+
             return a.name.localeCompare(b.name);
         });
 
@@ -236,6 +243,7 @@ export async function handleStorageCookiesDelete(
     }
 
     await chrome.cookies.remove({ name, url, storeId });
+
     return { isOk: true };
 }
 
@@ -255,6 +263,7 @@ export async function handleStorageCookiesClear(
     const allCookies = await chrome.cookies.getAll(query);
     const targetCookies = allCookies.filter((cookie) => {
         if (!nameContains || !nameContains.trim()) return true;
+
         return cookie.name.toLowerCase().includes(nameContains.trim().toLowerCase());
     });
 
@@ -269,5 +278,6 @@ export async function handleStorageCookiesClear(
     );
 
     const cleared = removals.filter((entry) => entry !== null).length;
+
     return { isOk: true, cleared };
 }

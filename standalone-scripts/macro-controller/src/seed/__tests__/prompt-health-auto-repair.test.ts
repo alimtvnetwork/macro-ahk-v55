@@ -20,6 +20,7 @@ vi.mock('../../toast', () => ({
 }));
 vi.mock('../../error-utils', async () => {
     const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+
     return { ...actual, logError: vi.fn(), logDiagnosticFromCode: vi.fn() };
 });
 
@@ -36,6 +37,7 @@ let reseedResult: { ok: boolean; error?: string; mode: ReseedModeType } = { ok: 
 vi.mock('../reseed-command', () => ({
     reseedPromptsOnDemand: vi.fn(async (opts?: { force?: boolean }) => {
         reseedCalls.push({ force: opts?.force });
+
         return reseedResult;
     }),
 }));
@@ -52,6 +54,7 @@ interface Row {
 function healthyRow(role: PromptRowRoleType, overrides: Partial<Row> = {}): Row {
     const seed = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault);
     if (!seed) throw new Error('seed row missing');
+
     return {
         Id: role === 'plan' ? 1 : 2, Slug: seed.slug, Name: seed.name, Body: seed.body,
         Role: role, IsDefault: 1, ReplaceKey: '{{n}}',

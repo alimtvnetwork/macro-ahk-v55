@@ -47,7 +47,6 @@ interface RunResultsSummaryPanelProps {
     readonly groupName?: (id: number) => string;
 }
 
-
 export default function RunResultsSummaryPanel(props: RunResultsSummaryPanelProps) {
     const { reports, totalDurationMs, groupName } = props;
     const counts = aggregate(reports);
@@ -114,6 +113,7 @@ export default function RunResultsSummaryPanel(props: RunResultsSummaryPanelProp
                             const reason = result !== null && !result.Ok ? result.Reason : "Unknown";
                             const detail = result !== null && !result.Ok ? result.ReasonDetail : "";
                             const name = groupName?.(r.StepGroupId) ?? `Group #${r.StepGroupId}`;
+
                             return (
                                 <li
                                     key={r.StepGroupId}
@@ -154,6 +154,7 @@ function Stat({ icon, label, value, hint, tone = "default" }: StatProps) {
         tone === "success" ? "text-emerald-600 dark:text-emerald-400"
         : tone === "muted" ? "text-muted-foreground"
         : "text-foreground";
+
     return (
         <div className="rounded-md border bg-muted/30 px-3 py-2" title={hint}>
             <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-muted-foreground">

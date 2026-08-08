@@ -47,6 +47,7 @@ export function extractProjectIdFromUrl(): string | null {
   }
   _cachedHref = url;
   _cachedProjectId = computeProjectIdFromUrl(url);
+
   return _cachedProjectId;
 }
 
@@ -308,6 +309,7 @@ function handleSingleWorkspace(fn: string, perWs: import('./types').WorkspaceCre
     log(fn + ': Single workspace — keeping existing name: "' + state.workspaceName + '"', 'success');
     loopCreditState.currentWs = perWs[0];
   }
+
   return true;
 }
 
@@ -318,10 +320,12 @@ function checkAuthoritativeGuard(fn: string, perWs: import('./types').WorkspaceC
   if (matched) {
     loopCreditState.currentWs = matched;
     log(fn + ': ✅ GUARD — workspace already set authoritatively: "' + state.workspaceName + '" (skipping detection)', 'success');
+
     return true;
   }
   log(fn + ': GUARD — workspaceFromApi=true but "' + state.workspaceName + '" not found in list, falling through to Tier 1', 'warn');
   state.workspaceFromApi = false;
+
   return false;
 }
 
@@ -334,12 +338,14 @@ export async function autoDetectLoopCurrentWorkspace(
 
   if (state.isManualCheck) {
     log(fn + ': ⚠️ GUARD — manual Check in progress (isManualCheck=true) — skipping autoDetect to prevent race', 'warn');
+
     return;
   }
 
   const perWs = loopCreditState.perWorkspace || [];
   if (perWs.length === 0) {
     log(fn + ': No workspaces loaded', 'warn');
+
     return;
   }
 
@@ -354,6 +360,7 @@ export async function autoDetectLoopCurrentWorkspace(
   if (isMissingProjectId) {
     log(fn + ': No projectId in URL — skipping Tier 1, falling to passive fallback', 'info');
     await fallbackDetect(fn, perWs, skipDialog);
+
     return;
   }
 
@@ -362,6 +369,7 @@ export async function autoDetectLoopCurrentWorkspace(
   if (isMissingToken) {
     log(fn + ': No bearer token — skipping Tier 1, falling to passive fallback', 'info');
     await fallbackDetect(fn, perWs, skipDialog);
+
     return;
   }
 

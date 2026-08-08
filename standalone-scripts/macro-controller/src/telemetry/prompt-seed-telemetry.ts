@@ -62,6 +62,7 @@ interface EmitInput {
 function levelFor(outcome: PromptSeedOutcome): StepNotifyLevel {
   if (outcome === 'failed') return 'error';
   if (outcome === 'skipped') return 'warning';
+
   return 'success';
 }
 
@@ -74,6 +75,7 @@ function formatLine(evt: PromptSeedEvent): string {
     for (const [k, v] of Object.entries(evt.metrics)) parts.push(k + '=' + String(v));
   }
   if (evt.detail) parts.push('detail=' + evt.detail);
+
   return '[PromptSeed:' + evt.event + '] ' + parts.join(' ');
 }
 
@@ -119,6 +121,7 @@ export function emitPromptSeedEvent(input: EmitInput): PromptSeedEvent {
   }
   appendToTraceBuffer(evt);
   dispatchWindowEvent(evt);
+
   return evt;
 }
 
@@ -129,9 +132,11 @@ export function readPromptSeedTrace(): PromptSeedEvent[] {
     const isMissingRaw = !raw;
     if (isMissingRaw) return [];
     const parsed = JSON.parse(raw) as unknown;
+
     return Array.isArray(parsed) ? (parsed as PromptSeedEvent[]) : [];
   } catch (err) {
     logError('PromptSeedTelemetry', 'readPromptSeedTrace failed', err);
+
     return [];
   }
 }

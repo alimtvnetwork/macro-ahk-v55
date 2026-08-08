@@ -56,6 +56,7 @@ function SeverityIcon({ severity }: { severity: ImportErrorSeverity }) {
     const cls = `h-5 w-5 ${SEVERITY_STYLE[severity]}`;
     if (severity === "Conflict") return <AlertTriangle className={cls} />;
     if (severity === "Bundle") return <FileWarning className={cls} />;
+
     return <AlertCircle className={cls} />;
 }
 
@@ -85,11 +86,13 @@ export default function ImportErrorDialog(props: ImportErrorDialogProps) {
 
 function ImportErrorHeader(props: { explanation: ImportErrorExplanation; fileName: string | null }): JSX.Element {
     const { explanation, fileName } = props;
+
     return <><div className="flex items-center gap-2"><SeverityIcon severity={explanation.Severity} /><DialogTitle>{explanation.Title}</DialogTitle></div><DialogDescription><span className={`text-xs font-medium ${SEVERITY_STYLE[explanation.Severity]}`}>{SEVERITY_LABEL[explanation.Severity]}</span>{fileName !== null && <span className="ml-2 text-xs text-muted-foreground">: <span className="font-mono">{fileName}</span></span>}</DialogDescription></>;
 }
 
 function ImportErrorBody(props: { explanation: ImportErrorExplanation; failure: ImportErrorExplanation["Failure"] }): JSX.Element {
     const { explanation, failure } = props;
+
     return <div className="space-y-3"><p className="text-sm leading-relaxed">{explanation.Summary}</p><Suggestion text={explanation.Suggestion} /><ImportTechnicalDetails failure={failure} /></div>;
 }
 

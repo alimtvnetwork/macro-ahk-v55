@@ -42,6 +42,7 @@ export interface ParsedFolder {
 /** Checks if a DataTransfer contains a directory entry. */
 export function hasFolderEntry(dt: DataTransfer): boolean {
   const dirEntry = findDirectoryEntry(dt);
+
   return dirEntry !== null;
 }
 
@@ -51,6 +52,7 @@ function findDirectoryEntry(dt: DataTransfer): FileSystemDirectoryEntry | null {
     const entry = dt.items[i].webkitGetAsEntry?.();
     if (entry?.isDirectory) return entry as FileSystemDirectoryEntry;
   }
+
   return null;
 }
 
@@ -103,6 +105,7 @@ async function findFile(
 
     dir = match as FileSystemDirectoryEntry;
   }
+
   return null;
 }
 

@@ -184,6 +184,7 @@ async function loadAndRender(body: HTMLElement, opts?: { bypassCache?: boolean }
             +   '<div style="color:#cbd5e1;margin-bottom:4px;">No workspaces loaded yet.</div>'
             +   '<div style="font-size:10px;">Open the workspace list first, then reopen this modal.</div>'
             + '</div>';
+
         return;
     }
 
@@ -215,6 +216,7 @@ async function loadAndRender(body: HTMLElement, opts?: { bypassCache?: boolean }
                 };
             })
             : null;
+
         return { ws, projects: seeded, error: null, loading: true };
     });
     const tabIndex = await openTabsPromise;
@@ -236,10 +238,12 @@ async function loadAndRender(body: HTMLElement, opts?: { bypassCache?: boolean }
             blocks[i] = { ws, projects: blocks[i].projects, error: null, loading: false };
             state.blocks = blocks;
             renderBody(body);
+
             return Promise.resolve();
         }
         cacheMisses += 1;
         log('Projects: cache miss ws=' + ws.id + ' — fetching projects.list', 'info');
+
         return fetchProjects(ws.id).then(function (projects) {
             blocks[i] = { ws, projects, error: null, loading: false };
             writeProjectListCache(ws.id, projects.map(function (p) {
@@ -265,7 +269,6 @@ async function loadAndRender(body: HTMLElement, opts?: { bypassCache?: boolean }
     log('Projects: load complete — cacheHits=' + cacheHits + ' cacheMisses=' + cacheMisses + ' bypass=' + String(bypassCache), 'info');
 }
 
-
 async function loadOpenTabIndex(): Promise<OpenTabIndex> {
     const idx: OpenTabIndex = { byProjectId: new Map(), byUrlProjectId: new Map() };
     try {
@@ -280,6 +283,7 @@ async function loadOpenTabIndex(): Promise<OpenTabIndex> {
     } catch (e) {
         log('Projects: open-tabs probe failed: ' + String(e), 'warn');
     }
+
     return idx;
 }
 
@@ -320,6 +324,7 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
             lastMessageAt: pickString(p, ['last_message_at', 'lastMessageAt', 'updated_at', 'updatedAt']),
         });
     }
+
     return out;
 }
 
@@ -354,6 +359,7 @@ function attachRowClicks(body: HTMLElement): void {
             if (maxInput) maxInput.value = '';
             state.refreshWorkspaceFilter?.();
             renderBody(body);
+
             return;
         }
 
@@ -367,6 +373,7 @@ function attachRowClicks(body: HTMLElement): void {
             else state.collapsed.add(wsId);
             saveCollapsedState();
             renderBody(body);
+
             return;
         }
 
@@ -405,6 +412,7 @@ function buildZeroResultsPanel(
         const hi = creditsMax === null ? '+∞' : String(creditsMax);
         activeChips.push('credits ' + lo + '–' + hi);
     }
+
     return '<div style="text-align:center;padding:24px 12px;color:' + cPanelFgDim + ';font-size:11px;'
         + 'border:1px dashed rgba(124,58,237,0.35);border-radius:6px;margin-top:4px;">'
         + '<div style="font-size:22px;margin-bottom:6px;opacity:0.6;">🔍</div>'
@@ -436,8 +444,10 @@ function applyProjectFilters(
             )) return false;
             if (onlyOpen && !isOpen(p.id, tabIndex)) return false;
             if (onlyRepo && !p.githubRepo) return false;
+
             return true;
         });
+
         return { ws: b.ws, projects, error: b.error, loading: b.loading };
     });
 }
@@ -479,9 +489,9 @@ function renderAll(blocks: ReadonlyArray<WorkspaceBlock>, tabIndex: OpenTabIndex
     if (filterActive && matchCount === 0 && visibleBlocks === 0) {
         html += buildZeroResultsPanel(q, onlyOpen, onlyRepo, hasWorkspaceFilter, creditsMin, creditsMax);
     }
+
     return html;
 }
-
 
 interface WorkspaceVisibilityBlock {
     readonly ws: Pick<WorkspaceCredit, 'id'>;
@@ -503,6 +513,7 @@ export function filterWorkspaceBlocksByVisibility<T extends WorkspaceVisibilityB
 export function isWorkspaceWithinCreditsRange(used: number, min: number | null, max: number | null): boolean {
     if (min !== null && used < min) return false;
     if (max !== null && used > max) return false;
+
     return true;
 }
 
@@ -543,6 +554,7 @@ function renderBlock(b: WorkspaceBlock, tabIndex: OpenTabIndex): string {
 
     const collapsed = state.collapsed.has(b.ws.id);
     const caret = collapsed ? '▸' : '▾';
+
     return '<div style="margin-bottom:8px;">'
         + '<div data-ws-toggle="' + escapeHtml(b.ws.id) + '" '
         +   'style="font-size:10px;color:' + cPrimaryLighter + ';font-weight:700;text-transform:uppercase;'
@@ -582,6 +594,7 @@ function renderProjectRow(p: ProjectEntry, tabIndex: OpenTabIndex, isOpenFlag: b
         + 'onmouseover="this.style.background=\'rgba(124,58,237,0.25)\';this.style.color=\'#a78bfa\'" '
         + 'onmouseout="this.style.background=\'transparent\';this.style.color=\''
         + (isOpenFlag ? '#10b981' : '#64748b') + '\'">↗</span>';
+
     return ''
         + '<div data-open-url="' + escapeHtml(url) + '" '
         +   'title="' + escapeHtml(p.name) + (isOpenFlag ? '\n(open in Chrome)' : '') + '\nClick to open" '
@@ -598,6 +611,7 @@ function renderProjectRow(p: ProjectEntry, tabIndex: OpenTabIndex, isOpenFlag: b
 
 function shortRepo(full: string): string {
     const slash = full.lastIndexOf('/');
+
     return slash >= 0 ? full.slice(slash + 1) : full;
 }
 
@@ -608,6 +622,7 @@ function isOpen(projectId: string, tabIndex: OpenTabIndex): boolean {
 function extractProjectIdFromUrl(url: string): string | null {
     try {
         const m = /\/projects\/([^/?#]+)/.exec(new URL(url).pathname);
+
         return m ? m[1] : null;
     } catch { return null; }
 }
@@ -622,6 +637,7 @@ function createPanel(): HTMLDivElement {
         + ';border:1px solid ' + cPrimary
         + ';border-radius:8px;padding:0;min-width:480px;max-width:640px;'
         + 'box-shadow:0 8px 32px rgba(0,0,0,.6);font-family:monospace;resize:both;overflow:hidden;';
+
     return panel;
 }
 
@@ -640,6 +656,7 @@ function createTitleBar(panel: HTMLElement): HTMLElement {
     bar.appendChild(title);
     bar.appendChild(closeBtn);
     attachDrag(panel, bar, closeBtn);
+
     return bar;
 }
 
@@ -710,6 +727,7 @@ function createSearchBar(onChange: () => void): HTMLElement {
         }
         btn.onclick = function (): void { toggle(); paint(); onChange(); };
         paint();
+
         return btn;
     }
 
@@ -753,6 +771,7 @@ function createSearchBar(onChange: () => void): HTMLElement {
     wrap.appendChild(row2);
     wrap.appendChild(row3);
     paintWorkspaceFilters();
+
     return wrap;
 }
 
@@ -775,13 +794,18 @@ function createCreditsRangeRow(onChange: () => void): HTMLElement {
             + 'border-radius:4px;padding:2px 6px;font-size:10px;font-family:inherit;outline:none;';
         input.addEventListener('input', function () {
             const raw = input.value.trim();
-            if (raw === '') { setValue(null); onChange(); return; }
+            if (raw === '') { setValue(null); onChange();
+
+ return; }
             const n = Number(raw);
-            if (Number.isFinite(n) && n >= 0) { setValue(n); onChange(); return; }
+            if (Number.isFinite(n) && n >= 0) { setValue(n); onChange();
+
+ return; }
             setValue(null);
             onChange();
         });
         input.addEventListener('keydown', function (e) { e.stopPropagation(); });
+
         return input;
     }
 
@@ -798,6 +822,7 @@ function createCreditsRangeRow(onChange: () => void): HTMLElement {
     row.appendChild(minInput);
     row.appendChild(dash);
     row.appendChild(maxInput);
+
     return row;
 }
 
@@ -827,6 +852,7 @@ function toggleWorkspaceFilter(workspaceId: string): void {
     if (state.hiddenWorkspaces.has(workspaceId)) {
         state.hiddenWorkspaces.delete(workspaceId);
         log('Projects: workspace filter changed (hidden=' + state.hiddenWorkspaces.size + ')', 'info');
+
         return;
     }
     state.hiddenWorkspaces.add(workspaceId);
@@ -881,6 +907,7 @@ function createFooter(
     footer.appendChild(legend);
     footer.appendChild(actions);
     footer.appendChild(status);
+
     return footer;
 }
 
@@ -966,6 +993,7 @@ function exportCsv(statusEl: HTMLElement): void {
     if (blocks.length === 0 || !tabIndex) {
         statusEl.style.color = '#fca5a5';
         statusEl.textContent = '⚠ No workspaces loaded yet — wait for the list to populate.';
+
         return;
     }
 
@@ -979,6 +1007,7 @@ function exportCsv(statusEl: HTMLElement): void {
     if (tasks.length === 0) {
         statusEl.style.color = '#fca5a5';
         statusEl.textContent = '⚠ No projects to export.';
+
         return;
     }
 
@@ -1093,9 +1122,9 @@ function pickString(obj: Record<string, unknown>, keys: ReadonlyArray<string>): 
         const v = obj[k];
         if (typeof v === 'string' && v.length > 0) return v;
     }
+
     return '';
 }
-
 
 function buildCsv(rows: ReadonlyArray<ExportRow>): string {
     const lines: string[] = [];
@@ -1103,11 +1132,13 @@ function buildCsv(rows: ReadonlyArray<ExportRow>): string {
     for (const row of rows) {
         lines.push(EXPORT_HEADERS.map(function (h) { return escapeCsv(String(row[h] ?? '')); }).join(','));
     }
+
     return lines.join('\r\n') + '\r\n';
 }
 
 function escapeCsv(value: string): string {
     if (value === '' || !/[",\r\n]/.test(value)) return value;
+
     return '"' + value.replace(/"/g, '""') + '"';
 }
 

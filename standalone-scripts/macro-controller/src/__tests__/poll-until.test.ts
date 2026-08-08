@@ -6,7 +6,6 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { pollUntil } from '../async-utils';
-
  
 describe('pollUntil', () => {
   beforeEach(() => {
@@ -69,7 +68,9 @@ describe('pollUntil', () => {
     let callCount = 0;
 
     const promise = pollUntil(
-      () => { callCount++; return callCount >= 2 ? 'ok' : false; },
+      () => { callCount++;
+
+ return callCount >= 2 ? 'ok' : false; },
       { intervalMs: 100, timeoutMs: 5000, onFound },
     );
 
@@ -101,7 +102,9 @@ describe('pollUntil', () => {
     let callCount = 0;
 
     const promise = pollUntil(
-      () => { callCount++; return callCount >= 2 ? 'ok' : null; },
+      () => { callCount++;
+
+ return callCount >= 2 ? 'ok' : null; },
       { intervalMs: 50, timeoutMs: 500, onTimeout },
     );
 

@@ -121,6 +121,7 @@ async function handleActivated(
     } catch (err) {
         // Tab disappeared between activate and get — non-fatal.
         logCaughtError(BgLogTag.MARCO, "tabs.onActivated: tabs.get failed", err);
+
         return;
     }
     const url = tab.url ?? "";
@@ -169,6 +170,7 @@ function classifyRestriction(url: string): RestrictionMatch {
     if (url === "about:blank") { return { restricted: true, branch: "about-blank", matchedPrefix: "about:blank" }; }
     const hit = RESTRICTED_URL_PREFIXES.find((prefix) => url.startsWith(prefix)) ?? null;
     if (hit !== null) { return { restricted: true, branch: "prefix", matchedPrefix: hit }; }
+
     return { restricted: false, branch: "allowed", matchedPrefix: null };
 }
 
@@ -200,6 +202,7 @@ async function runGate(
         // silently after ONE contextual debug log per (tab, prefix) pair.
         clearTabDecision(tabId);
         logRestrictedOnce(tabId, url, trigger, restriction);
+
         return;
     }
     restrictedLogSeen.delete(tabId);
@@ -308,6 +311,7 @@ function handleSentinelError(tabId: number, decision: TabDecision, err: unknown)
         console.debug(
             `[url-trigger] sentinel refused (tab=${tabId}, url=${decision.url}, trigger=${decision.trigger}, branch=host-permission, marker="${marker}")`,
         );
+
         return;
     }
     logCaughtError(

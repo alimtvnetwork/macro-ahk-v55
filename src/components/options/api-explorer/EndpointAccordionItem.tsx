@@ -15,11 +15,13 @@ import {
 
 function generateCurl(type: string, payload: Record<string, unknown>): string {
   const body = JSON.stringify({ Type: type, ...toPascalCaseKeys(payload) });
+
   return `curl -X POST "chrome-extension://<EXTENSION_ID>/_generated_background_page.html" \\\n  -H "Content-Type: application/json" \\\n  -d '${body}'`;
 }
 
 function generatePowerShell(type: string, payload: Record<string, unknown>): string {
   const body = JSON.stringify({ Type: type, ...toPascalCaseKeys(payload) });
+
   return `Invoke-RestMethod -Uri "chrome-extension://<EXTENSION_ID>/_generated_background_page.html" \`\n  -Method POST \`\n  -ContentType "application/json" \`\n  -Body '${body}'`;
 }
 
@@ -43,6 +45,7 @@ export function EndpointAccordionItem({ endpoint }: Props) {
     const base = endpoint.ExampleRequest
       ? toPascalCaseKeys(endpoint.ExampleRequest)
       : {};
+
     return toPrettyJson({ Type: endpoint.Type, ...base });
   });
   const [responseJson, setResponseJson] = useState<string>("");
@@ -57,10 +60,12 @@ export function EndpointAccordionItem({ endpoint }: Props) {
       parsed = requestJson.trim() ? JSON.parse(requestJson) : {};
     } catch {
       toast.error("Invalid JSON in request body");
+
       return;
     }
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
       toast.error("Request must be a JSON object");
+
       return;
     }
 

@@ -30,10 +30,6 @@ import { requireUserGesture } from './user-gesture-guard';
 import { autoResumeQueueIfNeeded } from './queue-control';
 import { TaskQueueManager } from './task-manager';
 
-
-
-
-
 // Re-export runCheck from loop-check.ts (barrel pattern)
 export { runCheck } from './loop-check';
 
@@ -47,11 +43,13 @@ function mc() { return MacroController.getInstance(); }
 function validateLoopPreconditions(): boolean {
   if (state.running) {
     log('Cannot start - loop is already running', 'warn');
+
     return false;
   }
 
   if (!isOnProjectPage()) {
     logError('Cannot', 'start - must be on a supported project/preview page (not settings)');
+
     return false;
   }
 
@@ -91,6 +89,7 @@ function verifyControllerInjection(): boolean {
     logError('unknown', '❌ Controller script NOT injected (marker=\' + !!marker + \', __loopStart=\' + (typeof loopStartFn) + \') — aborting');
     state.running = false;
     nsCallTyped(NS_UPDATE_START_STOP, false);
+
     return false;
   }
 
@@ -100,10 +99,12 @@ function verifyControllerInjection(): boolean {
     logError('unknown', '❌ Controller UI container NOT found in DOM (id=\' + IDS.CONTAINER + \') — aborting');
     state.running = false;
     nsCallTyped(NS_UPDATE_START_STOP, false);
+
     return false;
   }
 
   logInjectionPosition(xpathTarget, uiContainer);
+
   return true;
 }
 
@@ -121,6 +122,7 @@ function startLoopTimers(): void {
   const isMissingRunning = !state.running;
   if (isMissingRunning) {
     log('Loop was stopped during initial check — not starting timers', 'warn');
+
     return;
   }
 
@@ -146,7 +148,9 @@ async function handleAuthAndStartCheck(): Promise<void> {
   refreshBearerTokenFromBestSource(function(authToken: string, authSource: string) {
     logAuthResult(authToken, authSource);
     const isMissingRunning = !state.running;
-    if (isMissingRunning) { log('Loop was stopped during auth resolution — aborting', 'warn'); return; }
+    if (isMissingRunning) { log('Loop was stopped during auth resolution — aborting', 'warn');
+
+ return; }
 
     log('Step 2: Running initial workspace check...', 'check');
     let checkPromise;
@@ -191,7 +195,6 @@ export function startLoop(direction: LoopDirectionType | string): boolean {
   // No-autorun guard: refuse any startLoop() that isn't backed by a recent user gesture.
   if (!requireUserGesture('startLoop')) return false;
   if (!validateLoopPreconditions()) return false;
-
 
   initLoopState(direction);
   logLoopStartInfo();
@@ -264,6 +267,7 @@ function triggerBackgroundCreditFetch(): void {
 function refreshStatusRunning(): void {
   if (isUserTypingInPrompt()) {
     log('Workspace auto-check: user is typing in prompt — skipping', 'skip');
+
     return;
   }
 
@@ -278,6 +282,7 @@ function refreshStatusRunning(): void {
   if (isMissingOpened) {
     logSub('Workspace auto-check: could not open project dialog', 1);
     mc().updateUILight();
+
     return;
   }
 
@@ -314,6 +319,7 @@ export function refreshStatus(): void {
   if (isMissingRunning) {
     refreshStatusStopped();
     emitCreditPollTick();
+
     return;
   }
   // Issue 128 — auto-resume the Lovable Queue if it's paused with pending tasks.
@@ -331,7 +337,6 @@ export function refreshStatus(): void {
   emitCreditPollTick();
 }
 
-
 /**
  * Install (or reinstall) the workspace status-refresh interval at the period
  * appropriate for the current `state.running` flag.
@@ -346,7 +351,6 @@ export function startStatusRefresh(): void {
   const overrides = getSettingsOverrides();
   const pollSecs = (overrides.creditPollIntervalSeconds !== undefined) ? overrides.creditPollIntervalSeconds : (TIMING.WS_CHECK_INTERVAL / 1000);
   const intervalMs = state.running ? (pollSecs * 1000) : 30000;
-
 
   // Fast path: already running at the desired cadence.
   if (state.statusRefreshId && state.statusRefreshPeriodMs === intervalMs) {

@@ -30,6 +30,7 @@ function mountComposer(opts: { submit: boolean; iconPath: string | null }): HTML
         root.appendChild(btn);
     }
     document.body.appendChild(root);
+
     return root;
 }
 

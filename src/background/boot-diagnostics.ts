@@ -301,5 +301,6 @@ function extractSql(body: string): string | null {
         return sqlMatch[1].trim();
     }
     const trimmed = body.trim();
+
     return trimmed.length > 0 ? trimmed : null;
 }

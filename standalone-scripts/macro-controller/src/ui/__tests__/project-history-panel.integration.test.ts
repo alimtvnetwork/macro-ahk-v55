@@ -37,6 +37,7 @@ vi.mock('../../db/project-chat-submit-db', () => {
       FileId: 'file-12', CharCount: 33, CreatedAt: 1_700_000_001_000, MetaJson: null,
     },
   ];
+
   return {
     listRecentChatSubmits: vi.fn(async (projectId: string) =>
       rows.filter((r) => r.ProjectId === projectId),
@@ -45,6 +46,7 @@ vi.mock('../../db/project-chat-submit-db', () => {
       const before = rows.length;
       const idx = rows.findIndex((r) => r.Id === id);
       if (idx >= 0) rows.splice(idx, 1);
+
       return rows.length < before;
     }),
     __rows: rows,
@@ -56,6 +58,7 @@ vi.mock('../../storage/chat-submit-opfs-store', () => {
     ['proj-A/file-11', 'hello from file-11'],
     ['proj-A/file-12', 'hello from file-12'],
   ]);
+
   return {
     readEntry: vi.fn(async (projectId: string, fileId: string) =>
       blobs.get(`${projectId}/${fileId}`) ?? null,

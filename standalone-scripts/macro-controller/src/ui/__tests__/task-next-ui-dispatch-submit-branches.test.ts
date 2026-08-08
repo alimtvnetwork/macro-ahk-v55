@@ -31,6 +31,7 @@ function mountSendButton(parent: HTMLElement): HTMLButtonElement {
     btn.type = 'submit';
     btn.setAttribute('aria-label', 'Send message');
     parent.appendChild(btn);
+
     return btn;
 }
 
@@ -147,6 +148,7 @@ describe('dispatchTaskNextSubmit — branch 3: defensive/error paths', () => {
         const original = document.getElementById.bind(document);
         const getSpy = vi.spyOn(document, 'getElementById').mockImplementation((id: string) => {
             if (id === 'chat-input') throw new Error('gebi-fail');
+
             return original(id);
         });
 

@@ -140,6 +140,7 @@ export function filterEntries(
       const isNameMatch = name.indexOf(searchQuery) !== -1;
       const isTextMatch = text.indexOf(searchQuery) !== -1;
       const isCategoryMatch = category.indexOf(searchQuery) !== -1;
+
       return isNameMatch || isTextMatch || isCategoryMatch;
     });
   }
@@ -164,6 +165,7 @@ export function renderPromptItems(
     empty.style.cssText = 'padding:10px 14px;color:#6b7280;font-size:11px;text-align:center;';
     empty.textContent = 'No prompts found';
     container.appendChild(empty);
+
     return;
   }
 
@@ -234,6 +236,7 @@ function buildEditButton(
     dropdown.style.display = 'none';
     deps.openPromptCreationModal({ name: prompt.name || '', text: prompt.text || '', category: prompt.category || '' });
   };
+
   return button;
 }
 
@@ -254,5 +257,6 @@ function buildCopyButton(prompt: PromptEntry): HTMLElement {
       showPasteToast('❌ Failed to copy', true);
     });
   };
+
   return button;
 }

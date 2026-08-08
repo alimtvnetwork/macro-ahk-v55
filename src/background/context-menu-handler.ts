@@ -178,6 +178,7 @@ async function rebuildProjectSubmenu(): Promise<void> {
     // the in-flight promise. After it settles, we'll run exactly one more pass.
     if (rebuildInFlight) {
         rebuildPending = true;
+
         return rebuildInFlight;
     }
 
@@ -214,6 +215,7 @@ async function doRebuildProjectSubmenu(): Promise<void> {
 
     if (isMissingHasProjects) {
         createNoProjectsMenuItem();
+
         return;
     }
 
@@ -251,15 +253,16 @@ function createNoProjectsMenuItem(): void {
 
 function dedupeProjectsById<T extends { id: string }>(projects: T[]): T[] {
     const seen = new Set<string>();
+
     return projects.filter((project) => {
         if (seen.has(project.id)) return false;
         seen.add(project.id);
+
         return true;
     });
 }
 
 let trackedProjectIds: string[] = [];
-
 
 /* ------------------------------------------------------------------ */
 /*  Internal Message Dispatch                                          */
@@ -289,6 +292,7 @@ async function handleMenuClick(
     if (isProjectSelection) {
         const projectId = menuItemId.replace(PROJECT_ID_PREFIX, "");
         await sendInternalMessage({ type: MessageType.SET_ACTIVE_PROJECT, projectId });
+
         return;
     }
 

@@ -54,6 +54,7 @@ function defer(): Deferred {
     const promise = new Promise<{ added: number; updated: number; errors: unknown[] }>((res) => {
         resolveFn = () => res({ added: 1, updated: 0, errors: [] });
     });
+
     return { promise, resolve: resolveFn };
 }
 const firstImport = defer();
@@ -86,6 +87,7 @@ function makeDropEvent(filename: string): DragEvent {
     const dt = { files: [file], dropEffect: 'copy', types: ['Files'] } as unknown as DataTransfer;
     const ev = new Event('drop', { bubbles: true, cancelable: true }) as DragEvent;
     Object.defineProperty(ev, 'dataTransfer', { value: dt, configurable: true });
+
     return ev;
 }
 

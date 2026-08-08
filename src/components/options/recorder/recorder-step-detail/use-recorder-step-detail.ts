@@ -73,7 +73,9 @@ export function useRecorderStepDetail(args: UseRecorderStepDetailArgs) {
     const handleAddTag = useCallback(async () => {
         const next = draftTag.trim();
         if (next.length === 0) return;
-        if (tags.includes(next)) { setDraftTag(""); return; }
+        if (tags.includes(next)) { setDraftTag("");
+
+ return; }
         setTagsError(null);
         try { await onTagsSave(step.StepId, [...tags, next]); setDraftTag(""); }
         catch (err) { setTagsError(errorText(err)); }

@@ -49,6 +49,7 @@ function makeAdapter(init: AdapterInit = {}): TabsAdapter & {
         async createTab(url) {
             calls.created.push(url);
             const ref: TabRef = { Id: 999, Url: url };
+
             return init.OpenedTab ?? ref;
         },
         async dispatchClick(sel, kind) {
@@ -56,6 +57,7 @@ function makeAdapter(init: AdapterInit = {}): TabsAdapter & {
             if (init.DispatchThrows !== undefined) {
                 throw new Error(init.DispatchThrows);
             }
+
             return init.OpenedTab ?? { Id: 777, Url: "about:blank" };
         },
         async waitForMatchingTab(predicate) {
@@ -63,9 +65,11 @@ function makeAdapter(init: AdapterInit = {}): TabsAdapter & {
             if (candidate !== undefined && candidate !== null && predicate(candidate.Url)) {
                 return candidate;
             }
+
             return null;
         },
     };
+
     return Object.assign(adapter, { Calls: calls });
 }
 

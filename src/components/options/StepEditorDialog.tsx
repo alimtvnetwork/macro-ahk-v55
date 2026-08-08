@@ -117,6 +117,7 @@ function hydrateHotkeyForm(
             ? parsed.Keys.filter((entry): entry is string => typeof entry === "string")
             : [];
         const waitMs = typeof parsed.WaitMs === "number" ? String(parsed.WaitMs) : "";
+
         return { chords, waitMs };
     } catch {
         return { chords: [], waitMs: "" };
@@ -151,6 +152,7 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
             setHotkeyChords([]);
             setHotkeyWaitMs("");
             setUrlTabClick({ ...URL_TAB_CLICK_DEFAULTS });
+
             return;
         }
         const step = mode.Step;
@@ -193,6 +195,7 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
                 }
             }
         }
+
         return groups.filter((group) => !descendants.has(group.StepGroupId) && !group.IsArchived);
     }, [groups, mode]);
 
@@ -211,6 +214,7 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
             } else {
                 toast.error(result.ErrorMessage);
             }
+
             return;
         }
         onSubmit(result.Input);

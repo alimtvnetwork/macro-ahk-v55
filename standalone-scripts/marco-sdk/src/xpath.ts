@@ -38,6 +38,7 @@ export function createXPathApi(): XPathApi {
                 XPathResult.FIRST_ORDERED_NODE_TYPE,
                 null,
             );
+
             return result.singleNodeValue as Element | null;
         },
         resolveAll(key: string): Element[] {
@@ -56,6 +57,7 @@ export function createXPathApi(): XPathApi {
                 const node = result.snapshotItem(i);
                 if (node) elements.push(node as Element);
             }
+
             return elements;
         },
         async refreshCache() {

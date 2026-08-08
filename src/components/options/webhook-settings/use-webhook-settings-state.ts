@@ -35,6 +35,7 @@ function computeLogCounts(log: ReadonlyArray<WebhookDeliveryResult>): LogCounts 
         else if (isWebhookSuccess(entry)) success += 1;
         else failure += 1;
     }
+
     return { all: log.length, success, skipped, failure };
 }
 
@@ -42,6 +43,7 @@ function entryMatchesStatus(entry: WebhookDeliveryResult, filter: StatusFilter):
     if (filter === "skipped") return isWebhookSkipped(entry);
     if (filter === "success") return isWebhookSuccess(entry);
     if (filter === "failure") return !isWebhookSkipped(entry) && !isWebhookSuccess(entry);
+
     return true;
 }
 
@@ -51,11 +53,13 @@ function entryMatchesQuery(entry: WebhookDeliveryResult, query: string): boolean
     const emitted = entry.EmittedAt?.toLowerCase() ?? "";
     const statusValue = isWebhookSkipped(entry) ? null : entry.Status;
     const status = statusValue === null || statusValue === undefined ? "" : String(statusValue);
+
     return event.includes(query) || emitted.includes(query) || status.includes(query);
 }
 
 function filterLog(log: ReadonlyArray<WebhookDeliveryResult>, statusFilter: StatusFilter, searchQuery: string): ReadonlyArray<WebhookDeliveryResult> {
     const query = searchQuery.trim().toLowerCase();
+
     return log.filter((entry) => entryMatchesStatus(entry, statusFilter) && entryMatchesQuery(entry, query));
 }
 
@@ -79,11 +83,13 @@ function useDraftHandlers(setDraft: React.Dispatch<React.SetStateAction<WebhookC
     const toggleEvent = (kind: WebhookEventKind, on: boolean) => setDraft((prev) => {
         const next = new Set(prev.Events);
         if (on) next.add(kind); else next.delete(kind);
+
         return { ...prev, Events: ALL_WEBHOOK_EVENTS.filter((k) => next.has(k)) };
     });
     const updateHeader = (idx: number, patch: Partial<WebhookHeader>) => setDraft((prev) => ({ ...prev, Headers: prev.Headers.map((h, i) => (i === idx ? { ...h, ...patch } : h)) }));
     const addHeader = () => setDraft((prev) => ({ ...prev, Headers: [...prev.Headers, { Name: "", Value: "" }] }));
     const removeHeader = (idx: number) => setDraft((prev) => ({ ...prev, Headers: prev.Headers.filter((_, i) => i !== idx) }));
+
     return { toggleEvent, updateHeader, addHeader, removeHeader };
 }
 
@@ -92,6 +98,7 @@ function useWebhookDraft(open: boolean) {
     useEffect(() => { if (open) setDraft(loadWebhookConfig()); }, [open]);
     const eventSet = useMemo(() => new Set(draft.Events), [draft.Events]);
     const handlers = useDraftHandlers(setDraft);
+
     return { draft, setDraft, eventSet, ...handlers };
 }
 
@@ -105,6 +112,7 @@ function useWebhookLog(open: boolean) {
     const logCounts = useMemo(() => computeLogCounts(log), [log]);
     const filteredLog = useMemo(() => filterLog(log, statusFilter, searchQuery), [log, statusFilter, searchQuery]);
     const corruptCount = useMemo(() => log.reduce((acc, e) => acc + (isCorruptPlaceholder(e) ? 1 : 0), 0), [log]);
+
     return { log, setLog, statusFilter, setStatusFilter, searchQuery, setSearchQuery, expandedIdx, setExpandedIdx, payloadOpenIdx, setPayloadOpenIdx, logCounts, filteredLog, corruptCount };
 }
 
@@ -112,7 +120,9 @@ function useTestHandler(draft: WebhookConfig, setDraft: React.Dispatch<React.Set
     return async () => {
         const cfgToUse = saveWebhookConfig({ ...draft, Enabled: true });
         setDraft(cfgToUse);
-        if (cfgToUse.Url.trim().length === 0) { toast.error("Add a URL before sending a test ping"); return; }
+        if (cfgToUse.Url.trim().length === 0) { toast.error("Add a URL before sending a test ping");
+
+ return; }
         setBusy(true);
         const result = await dispatchWebhook("GroupRunSucceeded", buildTestPayload(), { config: cfgToUse });
         setBusy(false);
@@ -147,5 +157,6 @@ export function useWebhookSettingsState(open: boolean, onOpenChange: (open: bool
     const handleClearLog = () => { clearDeliveryLog(); logCtl.setLog([]); logCtl.setExpandedIdx(null); logCtl.setPayloadOpenIdx(null); };
     const refreshLog = () => logCtl.setLog(getDeliveryLog());
     const handleRepair = useRepairHandler(logCtl, setRepairBusy, setRepairConfirmOpen);
+
     return { ...draftCtl, ...logCtl, busy, repairConfirmOpen, setRepairConfirmOpen, repairBusy, handleSave, handleTest, handleClearLog, refreshLog, handleRepair };
 }

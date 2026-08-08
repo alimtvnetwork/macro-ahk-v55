@@ -67,6 +67,7 @@ export interface PendingRestoreUndo {
 function safeLocalStorage(): Storage | null {
     try {
         if (typeof window === 'undefined' || !window.localStorage) return null;
+
         return window.localStorage;
     } catch {
         return null;
@@ -100,9 +101,11 @@ export function readPendingRestoreUndo(): PendingRestoreUndo | null {
         if (!parsed || typeof parsed !== 'object') return null;
         if (typeof parsed.expiresAt !== 'number' || typeof parsed.createdAt !== 'number') return null;
         if (!parsed.payload || typeof parsed.payload !== 'object') return null;
+
         return parsed;
     } catch (err) {
         logError(LOG_SCOPE, 'parse failed', err);
+
         return null;
     }
 }
@@ -130,11 +133,13 @@ async function reverseUpdate(p: UpdatePayload): Promise<{ ok: boolean; error?: s
         replaceKey: p.preReplaceKey,
         replaceValues: p.preReplaceValues,
     });
+
     return revert.ok ? new DbResult(true, undefined) : new DbResult(false, undefined, revert.error ?? 'unknown');
 }
 
 async function reverseInsert(p: InsertPayload): Promise<{ ok: boolean; error?: string }> {
     const del = await deletePromptById(p.newId);
+
     return del.ok ? new DbResult(true, undefined) : new DbResult(false, undefined, del.error ?? 'unknown');
 }
 
@@ -150,6 +155,7 @@ export function hydratePendingRestoreUndo(now: number = Date.now()): boolean {
     const remaining = record.expiresAt - now;
     if (remaining <= 0) {
         clearPendingRestoreUndo();
+
         return false;
     }
     const restoredId = record.payload.kind === 'update'
@@ -165,6 +171,7 @@ export function hydratePendingRestoreUndo(now: number = Date.now()): boolean {
         if (isMissingOk) {
             logError(LOG_SCOPE, 'reverse failed after refresh', result.error);
             showToast('❌ Undo failed: ' + (result.error ?? 'unknown'), 'error');
+
             return;
         }
         showToast('↺ Reverted restore', 'success');

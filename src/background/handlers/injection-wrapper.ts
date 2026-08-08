@@ -24,6 +24,7 @@ const DEFAULT_LAUNCH_SOURCE: InjectionLaunchSource = "manual";
 
 function buildLaunchPreamble(launchSource: InjectionLaunchSource): string {
     const safeLaunchSource = JSON.stringify(launchSource);
+
     return `window.__MARCO_LAUNCH_SOURCE__ = ${safeLaunchSource};`;
 }
 

@@ -63,9 +63,9 @@ export function toDiagnosticId(
   if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
     return value;
   }
+
   return String(value);
 }
-
 
 /** JSON report shape emitted by `toReport()`. */
 export interface DiagnosticReport {
@@ -157,6 +157,7 @@ export class DiagnosticError extends Error {
           context: maskedContext,
           timestamp: this.timestamp,
         };
+
     return report;
   }
 }
@@ -195,6 +196,7 @@ function assertRequiredKeys(entry: ErrorCodeEntry, context: DiagnosticContext): 
 function formatTemplate(template: string, context: DiagnosticContext): string {
   return template.replace(/(^|[^{])\{([a-zA-Z_][a-zA-Z0-9_]*)\}/g, (_full, prefix: string, name: string) => {
     const value = context[name];
+
     return `${prefix}${stringifyValue(value)}`;
   });
 }
@@ -216,6 +218,7 @@ function extractCauseInfo(cause: unknown): DiagnosticReport['cause'] | undefined
       : { name: cause.name, message: cause.message };
   }
   if (typeof cause === 'string') return { name: 'string', message: cause };
+
   return undefined;
 }
 

@@ -48,6 +48,7 @@ function isCastleDenied(status: number, data: unknown): boolean {
   if (status !== 403) return false;
   if (!data || typeof data !== 'object') return false;
   const body = data as Record<string, unknown>;
+
   return body.type === 'castle_denied';
 }
 
@@ -58,6 +59,7 @@ function extractCastleMessage(data: unknown): string {
       return body.message;
     }
   }
+
   return 'This transfer was blocked by Lovable security. Verify your account on lovable.dev and try again.';
 }
 
@@ -306,6 +308,7 @@ async function resolveMoveToken(isRetry: boolean): Promise<string> {
     return await getBearerToken(isRetry ? { force: true } : undefined);
   } catch (caught: unknown) {
     logError('executeMove.getBearerToken', 'token fetch threw', caught);
+
     return resolveToken();
   }
 }
@@ -315,6 +318,7 @@ async function buildMoveHeaders(): Promise<Record<string, string>> {
   const headers: Record<string, string> = {};
   if (castleToken) headers['x-castle-request-token'] = castleToken;
   logSub('Castle token: ' + (castleToken ? 'present (len=' + castleToken.length + ')' : 'MISSING — request may be blocked'), 1);
+
   return headers;
 }
 
@@ -333,15 +337,18 @@ async function handleMoveResponse(
     updateLoopMoveStatus('error', 'Blocked by Lovable security (castle_denied)');
     showToast('Move blocked by Lovable security: ' + castleMsg + ' Verify your account on lovable.dev, then retry.', 'error', { noStop: true });
     clearDelegationState();
+
     return;
   }
   if (isAuthFailure(resp.status) && !isRetry) {
     await handleMoveAuthFailure(projectId, targetWorkspaceId, targetWorkspaceName, token, resp.status);
+
     return;
   }
   if (resp.ok) {
     log('Move response: ' + resp.status + label, 'success');
     handleMoveSuccess(targetWorkspaceName, label);
+
     return;
   }
   logError('ws-move', 'Move response: ' + resp.status + label);
@@ -360,7 +367,9 @@ async function executeMove(
 ): Promise<void> {
   const token = await resolveMoveToken(isRetry);
   const isMissingToken = !token;
-  if (isMissingToken) { handleMoveNoToken(); return; }
+  if (isMissingToken) { handleMoveNoToken();
+
+ return; }
 
   const currentUserId = extractUserIdFromBearer(token);
   const isMissingCurrentUserId = !currentUserId;
@@ -368,6 +377,7 @@ async function executeMove(
     logError('Move aborted', 'unable to extract user id (sub) from bearer for v2 endpoint');
     updateLoopMoveStatus('error', 'User id missing from token');
     showToast('Cannot move workspace: user id missing from token.', 'error', { noStop: true });
+
     return;
   }
 
@@ -395,7 +405,6 @@ async function executeMove(
   }
 }
 
-
 // ============================================
 // executeSwitchContext — fallback GET request when no project ID
 // ============================================
@@ -405,6 +414,7 @@ async function resolveSwitchToken(isRetry: boolean): Promise<string> {
     return await getBearerToken(isRetry ? { force: true } : undefined);
   } catch (caught: unknown) {
     logError('executeSwitchContext.getBearerToken', 'token fetch threw', caught);
+
     return resolveToken();
   }
 }
@@ -423,6 +433,7 @@ async function handleSwitchAuthFailure(
   const fallbackToken = resolveToken();
   if (fallbackToken) {
     await executeSwitchContext(targetWorkspaceId, targetWorkspaceName, true);
+
     return;
   }
 
@@ -430,6 +441,7 @@ async function handleSwitchAuthFailure(
     const recoveredToken = await recoverAuthOnce();
     if (recoveredToken || resolveToken()) {
       await executeSwitchContext(targetWorkspaceId, targetWorkspaceName, true);
+
       return;
     }
   } catch { // allow-swallow: Auth recovery failure is intentionally handled by the no-token fallback path below.
@@ -447,6 +459,7 @@ async function executeSwitchContext(
   const isMissingToken = !token;
   if (isMissingToken) {
     handleMoveNoToken();
+
     return;
   }
 
@@ -470,11 +483,13 @@ async function executeSwitchContext(
       updateLoopMoveStatus('error', 'Blocked by Lovable security (castle_denied)');
       showToast('Switch blocked by Lovable security: ' + castleMsg + ' Verify your account on lovable.dev, then retry.', 'error', { noStop: true });
       clearDelegationState();
+
       return;
     }
 
     if (isAuthFailure(resp.status) && !isRetry) {
       await handleSwitchAuthFailure(resp.status, token, targetWorkspaceId, targetWorkspaceName);
+
       return;
     }
 
@@ -484,6 +499,7 @@ async function executeSwitchContext(
       const bodyPreview = JSON.stringify(resp.data).substring(0, 500);
       logError('Switch context failed', 'HTTP ' + resp.status + ' | body: ' + bodyPreview);
       updateLoopMoveStatus('error', 'HTTP ' + resp.status + ': ' + bodyPreview.substring(0, 80));
+
       return;
     }
 

@@ -16,13 +16,13 @@ import { formatOffset } from "./timeline-format";
 
 const CSS_TEXT_DESTRUCTIVE = "text-destructive";
 
-
 export interface TimelineRowProps {
     readonly entry: TimelineEntry;
 }
 
 function EventStartRow(props: { entry: Extract<TimelineEntry, { Kind: "EventStart" }> }): JSX.Element {
     const { entry } = props;
+
     return (
         <div className="flex items-start gap-2 text-foreground" data-testid="timeline-event-start">
             <span className="text-muted-foreground tabular-nums">{formatOffset(entry.AtMs)}</span>
@@ -37,6 +37,7 @@ function EventStartRow(props: { entry: Extract<TimelineEntry, { Kind: "EventStar
 
 function StepRow(props: { entry: Extract<TimelineEntry, { Kind: "Step" }> }): JSX.Element {
     const { entry } = props;
+
     return (
         <div className="flex items-start gap-2 text-muted-foreground pl-3" data-testid="timeline-step">
             <span className="tabular-nums">{formatOffset(entry.AtMs)}</span>
@@ -51,12 +52,14 @@ function StepRow(props: { entry: Extract<TimelineEntry, { Kind: "Step" }> }): JS
 function eventEndTone(entry: Extract<TimelineEntry, { Kind: "EventEnd" }>): { tone: string; label: string; Icon: typeof CheckCircle2 } {
     if (entry.Aborted) return { tone: CSS_TEXT_DESTRUCTIVE, label: "aborted", Icon: XCircle };
     if (entry.Completed) return { tone: "text-emerald-500", label: "done", Icon: CheckCircle2 };
+
     return { tone: CSS_TEXT_DESTRUCTIVE, label: "failed", Icon: XCircle };
 }
 
 function EventEndRow(props: { entry: Extract<TimelineEntry, { Kind: "EventEnd" }> }): JSX.Element {
     const { entry } = props;
     const { tone, label, Icon } = eventEndTone(entry);
+
     return (
         <div className="flex items-start gap-2" data-testid="timeline-event-end">
             <span className="text-muted-foreground tabular-nums">{formatOffset(entry.AtMs)}</span>
@@ -71,6 +74,7 @@ function EventEndRow(props: { entry: Extract<TimelineEntry, { Kind: "EventEnd" }
 function ChainEndRow(props: { entry: Extract<TimelineEntry, { Kind: "ChainEnd" }> }): JSX.Element {
     const { entry } = props;
     const tone = entry.Aborted ? CSS_TEXT_DESTRUCTIVE : "text-emerald-500";
+
     return (
         <div className="flex items-start gap-2 mt-1" data-testid="timeline-chain-end">
             <span className="text-muted-foreground tabular-nums">{formatOffset(entry.AtMs)}</span>
@@ -87,5 +91,6 @@ export function TimelineRow(props: TimelineRowProps): JSX.Element {
     if (entry.Kind === "EventStart") return <EventStartRow entry={entry} />;
     if (entry.Kind === "Step") return <StepRow entry={entry} />;
     if (entry.Kind === "EventEnd") return <EventEndRow entry={entry} />;
+
     return <ChainEndRow entry={entry} />;
 }

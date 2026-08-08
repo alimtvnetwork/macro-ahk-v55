@@ -55,6 +55,7 @@ function escapeSqlLiteral(value: string): string {
 
 function quoteOrNull(value: string | null): string {
   if (value === null) return 'NULL';
+
   return `'${escapeSqlLiteral(value)}'`;
 }
 
@@ -63,9 +64,11 @@ async function runSchemaSql(sql: string, scope: string): Promise<boolean> {
     const resp = await runSqlBridge('SCHEMA', sql);
     if (resp?.isOk) return true;
     logDiagnosticFromCode('DB_CHAT_SUBMIT_E001', { op: scope, kind: 'schema-failure', reason: resp?.errorMessage || 'unknown error' });
+
     return false;
   } catch (err) {
     logDiagnosticFromCode('DB_CHAT_SUBMIT_E001', { op: scope, kind: 'schema-threw', reason: err instanceof Error ? err.message : String(err) }, err);
+
     return false;
   }
 }
@@ -75,9 +78,11 @@ async function runQuerySql<T>(sql: string, scope: string): Promise<T[]> {
     const resp = await runSqlBridge('QUERY', sql);
     if (resp?.isOk && Array.isArray(resp.rows)) return resp.rows as T[];
     logDiagnosticFromCode('DB_CHAT_SUBMIT_E001', { op: scope, kind: 'query-failure', reason: resp?.errorMessage || 'no rows' });
+
     return [];
   } catch (err) {
     logDiagnosticFromCode('DB_CHAT_SUBMIT_E001', { op: scope, kind: 'query-threw', reason: err instanceof Error ? err.message : String(err) }, err);
+
     return [];
   }
 }
@@ -89,12 +94,14 @@ export async function insertChatSubmit(input: ChatSubmitInsertInput): Promise<bo
     '${escapeSqlLiteral(input.source)}', '${escapeSqlLiteral(input.fileId)}',
     ${Math.max(0, Math.floor(input.charCount))}, ${Math.floor(input.createdAt)},
     ${quoteOrNull(input.metaJson)})`;
+
   return runSchemaSql(sql, 'insertChatSubmit');
 }
 
 export async function countChatSubmits(projectId: string): Promise<number> {
   const sql = `SELECT COUNT(*) AS n FROM ProjectChatSubmit WHERE ProjectId = '${escapeSqlLiteral(projectId)}'`;
   const rows = await runQuerySql<{ n: number }>(sql, 'countChatSubmits');
+
   return rows.length > 0 ? Number(rows[0].n) || 0 : 0;
 }
 
@@ -103,6 +110,7 @@ export async function listRecentChatSubmits(projectId: string, limit: number): P
   const sql = `SELECT * FROM ProjectChatSubmit
     WHERE ProjectId = '${escapeSqlLiteral(projectId)}'
     ORDER BY CreatedAt DESC LIMIT ${safeLimit}`;
+
   return runQuerySql<ChatSubmitRow>(sql, 'listRecentChatSubmits');
 }
 
@@ -111,16 +119,19 @@ export async function listOldestChatSubmits(projectId: string, limit: number): P
   const sql = `SELECT * FROM ProjectChatSubmit
     WHERE ProjectId = '${escapeSqlLiteral(projectId)}'
     ORDER BY CreatedAt ASC LIMIT ${safeLimit}`;
+
   return runQuerySql<ChatSubmitRow>(sql, 'listOldestChatSubmits');
 }
 
 export async function deleteChatSubmit(id: number): Promise<boolean> {
   const sql = `DELETE FROM ProjectChatSubmit WHERE Id = ${Math.floor(id)}`;
+
   return runSchemaSql(sql, 'deleteChatSubmit');
 }
 
 export async function deleteAllChatSubmitsForProject(projectId: string): Promise<boolean> {
   const sql = `DELETE FROM ProjectChatSubmit WHERE ProjectId = '${escapeSqlLiteral(projectId)}'`;
+
   return runSchemaSql(sql, 'deleteAllChatSubmitsForProject');
 }
 
@@ -128,5 +139,6 @@ export async function renameProjectChatSubmits(projectId: string, newName: strin
   const sql = `UPDATE ProjectChatSubmit
     SET ProjectName = '${escapeSqlLiteral(newName)}'
     WHERE ProjectId = '${escapeSqlLiteral(projectId)}'`;
+
   return runSchemaSql(sql, 'renameProjectChatSubmits');
 }

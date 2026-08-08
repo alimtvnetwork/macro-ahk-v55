@@ -52,6 +52,7 @@ export function buildWaterfallSection(): { waterfallContainer: HTMLElement; rend
 
     if (hasNoEntries) {
       renderWaterfallSkeletons(waterfallBody);
+
       return;
     }
 
@@ -78,6 +79,7 @@ export function getWaterfallClipboardLines(): string[] {
   }
 
   lines.push('Total: ' + (getTimingSinceLoadMs() / 1000).toFixed(1) + 's');
+
   return lines;
 }
 

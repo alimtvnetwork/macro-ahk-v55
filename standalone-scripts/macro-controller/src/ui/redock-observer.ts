@@ -46,6 +46,7 @@ class RedockState {
   /** Invalidate any in-flight redock poll. Returns the new generation token. */
   invalidate(): number {
     this._generation += 1;
+
     return this._generation;
   }
 }
@@ -77,6 +78,7 @@ export function startRedockObserver(ctx: PanelLayoutCtx): void {
     function () {
       // Cancel: a newer generation has started, or state was reset.
       if (redockState.generation !== myGeneration) return true as unknown as null;
+
       return tryRedock(ctx) || null;
     },
     {
@@ -106,6 +108,7 @@ function tryRedock(ctx: PanelLayoutCtx): boolean {
   // Already inside the target — just mark as docked
   if (target.contains(ui)) {
     redockState.docked = true;
+
     return true;
   }
 
@@ -127,9 +130,11 @@ function tryRedock(ctx: PanelLayoutCtx): boolean {
     const dockMs = Math.round((performance.now() - startTime) * 10) / 10;
     log('[redock] ✅ Panel relocated from body to XPath target in ' + dockMs + 'ms', 'success');
     showToast('Panel docked ✓', 'success', { noStop: true });
+
     return true;
   } catch (err) {
     logError('redock', '❌ Failed to relocate panel: ' + (err instanceof Error ? err.message : String(err)));
+
     return false;
   }
 }

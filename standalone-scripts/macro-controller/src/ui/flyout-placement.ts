@@ -54,6 +54,7 @@ function resolveHorizontal(trigger: RectLike, size: SizeLike, viewport: Viewport
 
   const flippedLeft = trigger.left - FLYOUT_GUTTER_PX - size.width;
   const clampedLeft = Math.max(FLYOUT_GUTTER_PX, flippedLeft);
+
   return { left: clampedLeft, horizontal: 'left' };
 }
 
@@ -67,11 +68,13 @@ function resolveVertical(trigger: RectLike, size: SizeLike, viewport: ViewportLi
 
   const flippedTop = trigger.bottom - size.height;
   const clampedTop = Math.max(FLYOUT_GUTTER_PX, flippedTop);
+
   return { top: clampedTop, vertical: 'up' };
 }
 
 export function resolveFlyoutPlacement(trigger: RectLike, size: SizeLike, viewport: ViewportLike): PlacementResult {
   const h = resolveHorizontal(trigger, size, viewport);
   const v = resolveVertical(trigger, size, viewport);
+
   return { top: v.top, left: h.left, horizontal: h.horizontal, vertical: v.vertical };
 }

@@ -71,6 +71,7 @@ export function useBenignWarningStats(bumpKey: number, limit = 500): BenignWarni
             }
         };
         void run();
+
         return () => {
             cancelled = true;
         };

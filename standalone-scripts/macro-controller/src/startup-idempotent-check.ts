@@ -74,6 +74,7 @@ function handleVersionMismatch(marker: HTMLElement, existingVersion: string): Id
   marker.remove();
   const staleContainer = document.getElementById(IDS.CONTAINER);
   if (staleContainer) staleContainer.remove();
+
   return 'proceed';
 }
 
@@ -81,22 +82,26 @@ function handleGlobalsIntact(marker: HTMLElement): IdempotentResult {
   const existingContainer = document.getElementById(IDS.CONTAINER);
   if (existingContainer) {
     console.log(CONSOLE_PREFIX + VERSION + '] Already embedded (marker=' + IDS.SCRIPT_MARKER + '), skipping injection, UI and state intact', STYLE_GREEN);
+
     return 'abort';
   }
 
   if (window.__MARCO_LAUNCH_SOURCE__ === 'manual' && marker.getAttribute('data-launch-source') === 'passive') {
     console.log(CONSOLE_PREFIX + VERSION + '] Manual Run script after passive attach, upgrading to full panel bootstrap', STYLE_GREEN);
     marker.remove();
+
     return 'proceed';
   }
 
   if (window.__MARCO_LAUNCH_SOURCE__ === 'passive' && marker.getAttribute('data-launch-source') === 'passive') {
     console.log(CONSOLE_PREFIX + VERSION + '] Passive attach detected, keeping panel hidden until manual Run script', STYLE_BLUE);
+
     return 'abort';
   }
 
   // Same version + globals intact, but UI container missing (SPA DOM wipe/race)
   console.warn(LabelType.LogMacroloopV + VERSION + '] Marker+globals present but UI missing, attempting controller UI recovery');
+
   return attemptUiRecovery(marker);
 }
 
@@ -120,6 +125,7 @@ function attemptUiRecovery(marker: HTMLElement): IdempotentResult {
 
   if (document.getElementById(IDS.CONTAINER)) {
     console.log(CONSOLE_PREFIX + VERSION + '] UI recovered without full re-bootstrap', STYLE_GREEN);
+
     return 'abort';
   }
 
@@ -130,9 +136,9 @@ function attemptUiRecovery(marker: HTMLElement): IdempotentResult {
     logSub('UI recovery fallback: loop stop failed, ' + (_e instanceof Error ? _e.message : String(_e)), 1);
   }
   marker.remove();
+
   return 'proceed';
 }
-
 
 function healAllManagers(existingController: RecoverableController | null): void {
   const isMissingExistingController = !existingController;
@@ -196,5 +202,6 @@ function handleStaleMarker(marker: HTMLElement): IdempotentResult {
   marker.remove();
   const staleContainer = document.getElementById(IDS.CONTAINER);
   if (staleContainer) staleContainer.remove();
+
   return 'proceed';
 }

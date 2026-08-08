@@ -21,6 +21,7 @@ export interface CsvMappingCoerceCellProps {
 export function CsvMappingCoerceCell(props: CsvMappingCoerceCellProps): JSX.Element {
     const { mapping, coercionOptions, onUpdate } = props;
     const skipped = mapping.Variable === null;
+
     return (
         <Select
             value={mapping.Coerce}

@@ -79,6 +79,7 @@ describe('buildBreakdownTable — drag-drop', () => {
 
   function makeDt(data: Record<string, string> = {}): DataTransfer {
     const store: Record<string, string> = { ...data };
+
     return {
       data: store,
       effectAllowed: 'move',
@@ -91,6 +92,7 @@ describe('buildBreakdownTable — drag-drop', () => {
   function fire(element: Element, type: string, dt: DataTransfer): boolean {
     const ev = new Event(type, { bubbles: true, cancelable: true }) as Event & { dataTransfer?: DataTransfer };
     ev.dataTransfer = dt;
+
     return element.dispatchEvent(ev);
   }
 

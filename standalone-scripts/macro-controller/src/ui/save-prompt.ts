@@ -42,6 +42,7 @@ export function onSavePromptClick(deps: SavePromptDeps): void {
 
   if (isTargetMissing) {
     showPasteToast('❌ Chatbox not found — cannot save prompt', true);
+
     return;
   }
 
@@ -50,6 +51,7 @@ export function onSavePromptClick(deps: SavePromptDeps): void {
 
   if (isEmpty) {
     showPasteToast('⚠️ Chatbox is empty — nothing to save', true);
+
     return;
   }
 
@@ -94,9 +96,11 @@ const SAVE_PROMPT_CSS_FALLBACKS = [
 function evalXPath(xpath: string): Element | null {
   try {
     const node = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+
     return (node as Element) ?? null;
   } catch (_e: unknown) {
     log('Save Prompt: XPath eval error: ' + (_e instanceof Error ? _e.message : String(_e)), 'warn');
+
     return null;
   }
 }
@@ -108,6 +112,7 @@ export function findSavePromptContainer(): Element | null {
     const row = evalXPath(xpath);
     if (row) {
       log('Save Prompt: Container found via action-row XPath', 'check');
+
       return row;
     }
   }
@@ -116,6 +121,7 @@ export function findSavePromptContainer(): Element | null {
   const legacy = evalXPath(SAVE_PROMPT_XPATH);
   if (legacy) {
     log('Save Prompt: Container found via legacy XPath (left-side fallback)', 'check');
+
     return legacy;
   }
 
@@ -126,8 +132,10 @@ function tryToolbarButtonFallback(fallbackSelector: string, fallbackIndex: numbe
   const toolbarBtn = document.querySelector(fallbackSelector);
   if (toolbarBtn?.parentElement) {
     log('Save Prompt: Container found via CSS fallback #' + (fallbackIndex + 1) + ' (parent of toolbar button)', 'check');
+
     return toolbarBtn.parentElement;
   }
+
   return null;
 }
 
@@ -135,8 +143,10 @@ function tryDirectFallback(fallbackSelector: string, fallbackIndex: number): Ele
   const element = document.querySelector(fallbackSelector);
   if (element) {
     log('Save Prompt: Container found via CSS fallback #' + (fallbackIndex + 1), 'check');
+
     return element;
   }
+
   return null;
 }
 
@@ -194,6 +204,7 @@ export function insertBeforeFirstButton(container: Element, ...wrappers: HTMLEle
     if (isOurs) return false;
     const isButton = child.tagName === 'BUTTON';
     const wrapsButton = child.querySelector(':scope > button') !== null;
+
     return isButton || wrapsButton;
   }) ?? null;
 
@@ -201,6 +212,7 @@ export function insertBeforeFirstButton(container: Element, ...wrappers: HTMLEle
     for (const wrapper of wrappers) {
       container.insertBefore(wrapper, firstButton);
     }
+
     return;
   }
 
@@ -240,6 +252,7 @@ function tryInjectSavePrompt(ctx: InjectCtx): boolean {
   } catch (e: unknown) {
     logError('savePrompt', 'Prompt save failed', e);
     showToast('❌ Prompt save failed', 'error');
+
     return false;
   }
 }
@@ -279,6 +292,7 @@ function buildPromptsButton(deps: SavePromptDeps): HTMLElement {
 
     if (isCurrentlyOpen) {
       dropdown.style.display = 'none';
+
       return;
     }
 
@@ -288,6 +302,7 @@ function buildPromptsButton(deps: SavePromptDeps): HTMLElement {
 
   addHoverEffect(button);
   wrapper.appendChild(button);
+
   return wrapper;
 }
 
@@ -296,6 +311,7 @@ function renderToolbarPromptsDropdown(dropdown: HTMLElement, deps: SavePromptDep
   const isMissingTaskNextDeps = !taskNextDeps;
   if (isMissingTaskNextDeps) {
     renderChatboxPromptsDropdown(dropdown, deps);
+
     return;
   }
 
@@ -330,5 +346,6 @@ function buildSaveButton(deps: SavePromptDeps): HTMLElement {
 
   addHoverEffect(button);
   wrapper.appendChild(button);
+
   return wrapper;
 }

@@ -27,6 +27,7 @@ export const validateSplitterN = (n: number): number => {
     if (n < MIN_N || n > MAX_N) {
         throwDiagnostic('SPLITTER_INVALID_N_E002', { value: n, minN: MIN_N, maxN: MAX_N });
     }
+
     return n;
 };
 

@@ -712,6 +712,7 @@ describe("LastEvaluation order preservation in ReasonDetail", () => {
             if (l.startsWith("ConditionSerialized:")) break;
             out.push(l);
         }
+
         return out;
     }
 
@@ -719,6 +720,7 @@ describe("LastEvaluation order preservation in ReasonDetail", () => {
     function indexOf(line: string): number {
         const m = /^ {2}\[(\d+)\] /.exec(line);
         expect(m, `line lacks "  [N] " prefix: ${line}`).not.toBeNull();
+
         return Number(m![1]);
     }
 

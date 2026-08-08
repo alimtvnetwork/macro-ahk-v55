@@ -23,6 +23,7 @@ function bigButton(): HTMLButtonElement {
     // 500-char text + lots of attributes so truncation differences are obvious.
     const text = "x".repeat(500);
     document.body.innerHTML = `<div><button id="go" class="primary big" name="submit" type="button">${text}</button></div>`;
+
     return document.getElementById("go") as HTMLButtonElement;
 }
 

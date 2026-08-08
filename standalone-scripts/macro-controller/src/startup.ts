@@ -93,6 +93,7 @@ export function bootstrap(deps: {
 
   if (window.__MARCO_LAUNCH_SOURCE__ === 'passive') {
     bootstrapPassiveAttach(deps);
+
     return;
   }
 
@@ -154,6 +155,7 @@ function initializeMacroDbAndCapture(): void {
     }
     setupPromptCapture(getPromptsConfig(), (xpath) => {
       const node = getByXPath(xpath);
+
       return node instanceof Element ? node : null;
     });
   });
@@ -270,7 +272,6 @@ function _logWorkspaceCacheStatus(): void {
  * then falls back to direct `loadPromptsFromJson()`.
  */
 function _preWarmPrompts(attempt: number): void {
-
   const sdk = (window as unknown as Record<string, unknown>).marco as { prompts?: { preWarm(): Promise<unknown[]> } } | undefined;
 
   const hasSdk = sdk !== null && sdk !== undefined;
@@ -289,6 +290,7 @@ function _preWarmPrompts(attempt: number): void {
       log('Startup: SDK prompt pre-warm failed (attempt ' + (attempt + 1) + '): ' + (e instanceof Error ? e.message : String(e)), 'warn');
       _preWarmViaLoader();
     });
+
     return;
   }
 
@@ -296,6 +298,7 @@ function _preWarmPrompts(attempt: number): void {
   if (attempt < MAX_SDK_ATTEMPTS - 1) {
     log('Startup: SDK not available for prompt pre-warm (attempt ' + (attempt + 1) + '/' + MAX_SDK_ATTEMPTS + '), retrying in ' + SDK_RETRY_DELAY_MS + 'ms', 'info');
     setTimeout(function() { _preWarmPrompts(attempt + 1); }, SDK_RETRY_DELAY_MS);
+
     return;
   }
 
@@ -360,7 +363,6 @@ function _checkPendingTasksOnStartup(): void {
       } else if (pending.length > 0 && queueState.isPaused) {
         showToast(`📋 ${pending.length} task${pending.length > 1 ? 's' : ''} in queue (paused). Open Task Queue to resume.`, 'info', { noStop: true });
       }
-
     } catch (err: unknown) {
       logError('Startup', 'Pending tasks check failed', err);
     }
@@ -417,10 +419,10 @@ function _showStartupResumeDialog(count: number): void {
   setTimeout(() => { if (overlay.parentElement) overlay.remove(); }, 15000);
 }
 
-
 function tryCreateUiNow(mc: MacroController): boolean {
   if (window.__MARCO_LAUNCH_SOURCE__ === 'passive') {
     log('Startup: passive injection registered globals only, panel hidden until manual Run script', 'info');
+
     return true;
   }
 
@@ -436,6 +438,7 @@ function tryCreateUiNow(mc: MacroController): boolean {
   }
 
   ui.create();
+
   return true;
 }
 
@@ -449,6 +452,7 @@ function ensureUiManagerRegistered(mc: MacroController): boolean {
     try {
       mc.registerUI(factory());
       log('Startup: self-healed UIManager from persisted factory', 'success');
+
       return true;
     } catch (err) {
       logError('Startup', 'persisted UIManager factory failed', err);
@@ -461,6 +465,7 @@ function ensureUiManagerRegistered(mc: MacroController): boolean {
     uiManager.setCreateFn(legacyCreateFn);
     mc.registerUI(uiManager);
     log('Startup: self-healed UIManager from legacy createUI wrapper', 'success');
+
     return true;
   }
 
@@ -472,9 +477,9 @@ function buildUiManagerFromFactory(): UIManager {
 }
 
 function scheduleUiCreationRetry(mc: MacroController, attempt: number): void {
-  
   if (attempt > MAX_UI_CREATE_RETRIES) {
     logError('Startup', '❌ UIManager recovery exhausted after \' + MAX_UI_CREATE_RETRIES + \' attempts');
+
     return;
   }
 
@@ -485,6 +490,7 @@ function scheduleUiCreationRetry(mc: MacroController, attempt: number): void {
 
     if (tryCreateUiNow(mc)) {
       log('Startup: ✅ UI created after recovery retry #' + attempt, 'success');
+
       return;
     }
 
@@ -521,6 +527,7 @@ function loadWorkspacesOnStartup(): void {
 
     if (hasNoToken) {
       handleTokenFailure(tokenResult);
+
       return;
     }
 
@@ -589,10 +596,12 @@ function launchCreditAndWorkspaceLoad(): void {
   const tier1Promise = (currentProjectId && startupToken)
     ? fetchTier1Prefetch(currentProjectId, startupToken).then(function (data) {
         tier1Data = data;
+
         return data;
       })
     : Promise.resolve(null).then(function () {
         timingEnd(LabelType.WsPrefetch, 'warn', 'No projectId or token');
+
         return null;
       });
 
@@ -672,14 +681,17 @@ function fetchTier1Prefetch(projectId: string, _token: string): Promise<MarkView
     if (isMissingMarkViewed) {
       log('Startup: Tier 1 prefetch skipped, marco-sdk workspace API unavailable', 'warn');
       timingEnd(LabelType.WsPrefetch, 'warn', 'SDK workspace API unavailable');
+
       return Promise.resolve(null);
     }
+
     return workspaceApi.markViewed(projectId)
       .then(handleTier1Response)
       .catch(handleTier1Error);
   } catch (err: unknown) {
     logError('Startup', 'Tier 1 prefetch error', err);
     timingEnd(LabelType.WsPrefetch, 'warn', toErrorMessage(err));
+
     return Promise.resolve(null);
   }
 }
@@ -689,15 +701,18 @@ function handleTier1Response(resp: { ok: boolean; status?: number; data?: unknow
   if (isFailed) {
     log('Startup: Tier 1 prefetch HTTP ' + resp.status, 'warn');
     timingEnd(LabelType.WsPrefetch, 'warn', 'HTTP ' + resp.status);
+
     return null;
   }
   timingEnd(LabelType.WsPrefetch, 'ok');
+
   return (resp.data ?? null) as MarkViewedResponse | null;
 }
 
 function handleTier1Error(err: unknown): null {
   log('Startup: Tier 1 prefetch error: ' + toErrorMessage(err), 'warn');
   timingEnd(LabelType.WsPrefetch, 'warn', toErrorMessage(err));
+
   return null;
 }
 
@@ -748,13 +763,13 @@ function resolveTier1Workspace(tier1Data: MarkViewedResponse): boolean {
   updateUI();
   timingEnd('bootstrap', 'ok');
   logTimingSummary();
+
   return true;
 }
 
 // ── Workspace Retry ──
 
 // Retry policy: first retry forces cookie refresh, second retry is the final pass.
-
 
 // eslint-disable-next-line max-lines-per-function
 function scheduleWorkspaceRetry(attempt: number): void {
@@ -769,6 +784,7 @@ function scheduleWorkspaceRetry(attempt: number): void {
       + '; reason=Tier 1 mark-viewed + passive fallback did not identify the current workspace',
       'error',
     );
+
     return;
   }
 
@@ -779,6 +795,7 @@ function scheduleWorkspaceRetry(attempt: number): void {
     const isAlreadyResolved = !!state.workspaceName && !state.workspaceFromCache;
     if (isAlreadyResolved) {
       log('Startup: Workspace already resolved ("' + state.workspaceName + '"), skipping retry #' + attempt, 'success');
+
       return;
     }
 
@@ -803,6 +820,7 @@ function scheduleWorkspaceRetry(attempt: number): void {
     if (isMissingRetryToken2) {
       log(LabelType.StartupRetry + attempt + ', no token available after cookie fallback, moving to next retry', 'warn');
       scheduleWorkspaceRetry(attempt + 1);
+
       return;
     }
 
@@ -870,6 +888,7 @@ function tryAutoAuthResync(trigger: string): void {
     if (hasNoToken) {
       log(LabelType.AuthAutoResync + trigger + '): no token yet (user may still be logged out)', 'warn');
       updateAuthBadge(false, 'none');
+
       return;
     }
 

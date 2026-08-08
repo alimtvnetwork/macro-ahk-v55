@@ -83,13 +83,17 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
         errorMessage?: string;
       }>({ type: "GENERATE_SCHEMA_DOCS", project: projectSlug, format: "meta" });
 
-      if (!resp.isOk) { toast.error(resp.errorMessage || "Failed to load schema"); return; }
+      if (!resp.isOk) { toast.error(resp.errorMessage || "Failed to load schema");
+
+ return; }
 
       const metaTables = resp.tables ?? [];
       const metaCols = resp.columns ?? [];
       const metaRels = resp.relations ?? [];
 
-      if (metaTables.length === 0) { toast.info("No existing tables found in meta"); return; }
+      if (metaTables.length === 0) { toast.info("No existing tables found in meta");
+
+ return; }
 
       const loaded: TableDefinition[] = metaTables.map((t) => ({
         name: t.Name,
@@ -123,7 +127,9 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
   }, [projectSlug]);
 
   const handleExport = useCallback(() => {
-    if (tables.length === 0) { toast.error("No tables to export"); return; }
+    if (tables.length === 0) { toast.error("No tables to export");
+
+ return; }
     const exportData = {
       _type: "marco-schema-export", version: "1.0.0",
       exportedAt: new Date().toISOString(),
@@ -145,7 +151,9 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
       try {
         const data = JSON.parse(reader.result as string);
         if (data._type !== "marco-schema-export" || !Array.isArray(data.tables)) {
-          toast.error("Invalid schema file"); return;
+          toast.error("Invalid schema file");
+
+ return;
         }
         const imported: TableDefinition[] = data.tables.map((t: Record<string, unknown>) => ({
           name: t.name ?? "", description: t.description ?? "",
@@ -164,7 +172,9 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
 
   const handleApply = useCallback(async () => {
     const validTables = tables.filter((t) => t.name.trim() && t.columns.some((c) => c.name.trim()));
-    if (validTables.length === 0) { toast.error("Add at least one table with columns"); return; }
+    if (validTables.length === 0) { toast.error("Add at least one table with columns");
+
+ return; }
 
     setApplying(true);
     setLastResult(null);
@@ -217,6 +227,7 @@ function buildSchemaPayload(validTables: TableDefinition[]) {
         if (c.defaultValue) col.Default = c.defaultValue;
         if (c.description) col.Description = c.description;
         if (c.validation) col.Validation = c.validation;
+
         return col;
       });
 
@@ -228,6 +239,7 @@ function buildSchemaPayload(validTables: TableDefinition[]) {
             TargetColumn: r.targetColumn || "Id", OnDelete: r.onDelete,
           }));
       }
+
       return tableDef;
     }),
   };

@@ -57,6 +57,7 @@ function clampPause(n: unknown): number {
     if (typeof n !== "number" || !Number.isFinite(n)) { return DEFAULT_CHAIN_SETTINGS.PauseMs; }
     if (n < PAUSE_MIN) { return PAUSE_MIN; }
     if (n > PAUSE_MAX) { return PAUSE_MAX; }
+
     return Math.round(n);
 }
 
@@ -72,6 +73,7 @@ export function loadChainSettings(): KeywordEventChainSettings {
     try {
         const parsed: unknown = JSON.parse(raw);
         if (!isSettings(parsed)) { return DEFAULT_CHAIN_SETTINGS; }
+
         return {
             Enabled: typeof parsed.Enabled === "boolean" ? parsed.Enabled : DEFAULT_CHAIN_SETTINGS.Enabled,
             PauseMs: clampPause(parsed.PauseMs),
@@ -141,8 +143,12 @@ export interface ChainRunResult {
 
 function pause(ms: number, signal?: AbortSignal): Promise<void> {
     return new Promise((resolve, reject) => {
-        if (ms <= 0) { resolve(); return; }
-        if (signal?.aborted) { reject(new DOMException("Aborted", "AbortError")); return; }
+        if (ms <= 0) { resolve();
+
+ return; }
+        if (signal?.aborted) { reject(new DOMException("Aborted", "AbortError"));
+
+ return; }
         const t = setTimeout(() => {
             signal?.removeEventListener("abort", onAbort);
             resolve();

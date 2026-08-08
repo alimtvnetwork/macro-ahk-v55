@@ -27,7 +27,6 @@ beforeEach(() => {
   clearDiffPrefs();
 });
 
-
 describe('diffLines()', () => {
   it('marks identical bodies as all-equal', () => {
     const ops = diffLines('a\nb\nc', 'a\nb\nc');
@@ -84,6 +83,7 @@ function openEditorWith(baseline: string): {
   const toggle = overlay.querySelector<HTMLButtonElement>('[data-testid="prompt-editor-diff-toggle"]')!;
   const host = overlay.querySelector<HTMLElement>('[data-testid="prompt-editor-diff-host"]')!;
   const textarea = overlay.querySelector('textarea') as HTMLTextAreaElement;
+
   return { overlay, toggle, host, textarea };
 }
 

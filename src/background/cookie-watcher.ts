@@ -177,6 +177,7 @@ async function handleCookieUpdated(
                 token: jwtToken,
                 source: "cookie-change-jwt",
             });
+
             return;
         }
 
@@ -206,6 +207,7 @@ async function attemptProactiveRefresh(): Promise<string | null> {
         return null;
     } catch (refreshError) {
         logCaughtError(BgLogTag.COOKIE_WATCHER, "Proactive refresh failed", refreshError);
+
         return null;
     }
 }

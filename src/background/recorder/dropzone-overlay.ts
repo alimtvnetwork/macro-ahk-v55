@@ -90,6 +90,7 @@ export function mountDropZoneOverlay(
     const state: DropZoneState = { dragDepth: 0, active: false };
     const handlers = createDropZoneHandlers(nodes.overlay, state, options);
     attachDropZoneListeners(handlers);
+
     return buildDropZoneHandle(nodes, state, handlers);
 }
 
@@ -101,12 +102,14 @@ function buildDropZoneNodes(container: ParentNode): DropZoneNodes {
     const overlay = buildDropZoneOverlayEl();
     root.appendChild(overlay);
     container.appendChild(host);
+
     return { host, root, overlay };
 }
 
 function buildDropZoneStyle(): HTMLStyleElement {
     const style = document.createElement("style");
     style.textContent = STYLE;
+
     return style;
 }
 
@@ -116,6 +119,7 @@ function buildDropZoneOverlayEl(): HTMLDivElement {
     overlay.dataset.active = "false";
     overlay.innerHTML =
         '<div class="panel">Drop CSV or JSON to attach<small>.csv · .json — first row used as header for CSV</small></div>';
+
     return overlay;
 }
 
@@ -128,6 +132,7 @@ function createDropZoneHandlers(
         state.active = on;
         overlay.dataset.active = on ? "true" : "false";
     };
+
     return {
         onDragEnter: (event) => handleDragEnter(event, state, setActive),
         onDragOver:  (event) => handleDragOver(event),
@@ -183,6 +188,7 @@ function buildDropZoneHandle(
     handlers: DropZoneHandlers,
 ): DropZoneHandle {
     let destroyed = false;
+
     return {
         Host: nodes.host,
         Root: nodes.root,
@@ -205,6 +211,7 @@ function detachDropZoneListeners(handlers: DropZoneHandlers): void {
 
 function hasFiles(dt: DataTransfer | null): boolean {
     if (dt === null) { return false; }
+
     return Array.from(dt.types).includes("Files");
 }
 
@@ -230,6 +237,7 @@ function detectMimeKind(file: File): "csv" | "json" | null {
     if (lower.endsWith(".json")) { return "json"; }
     if (file.type === "text/csv")          { return "csv";  }
     if (file.type === "application/json")  { return "json"; }
+
     return null;
 }
 

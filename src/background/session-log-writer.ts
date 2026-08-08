@@ -81,11 +81,13 @@ async function ensureSessionDir(): Promise<FileSystemDirectoryHandle | null> {
         const root = await navigator.storage.getDirectory();
         const logsRoot = await root.getDirectoryHandle(LOGS_DIR_NAME, { create: true });
         sessionDir = await logsRoot.getDirectoryHandle(`${SESSION_PREFIX}${sessionId}`, { create: true });
+
         return sessionDir;
     } catch (err) {
         const absDir = `opfs-root/${LOGS_DIR_NAME}/${SESSION_PREFIX}${sessionId}`;
         console.error(`[session-log-writer::ensureSessionDir] Failed to access OPFS directory\n  Path: ${absDir}\n  Missing: Writable OPFS directory handle for session "${sessionId}"\n  Reason: ${err instanceof Error ? err.message : String(err)} — OPFS may not be supported or navigator.storage.getDirectory() failed`, err);
         sessionDir = null;
+
         return null;
     }
 }
@@ -234,6 +236,7 @@ function formatLogLine(msg: LogLine): string {
     const act = msg.action ?? "";
     const det = msg.detail ?? "";
     const sid = msg.scriptId ? ` [${msg.scriptId}]` : "";
+
     return `${t}  ${lvl}  ${src}  ${cat}  ${act}${sid}  ${det}\n`;
 }
 
@@ -246,6 +249,7 @@ function formatErrorLine(msg: ErrorLine): string {
     const file = msg.scriptFile ? ` [${msg.scriptFile}]` : "";
     const stack = msg.stackTrace ? `\n    Stack: ${msg.stackTrace}` : "";
     const ctx = msg.context ? `\n    Context: ${msg.context}` : "";
+
     return `${t}  ${lvl}  ${src}  ${code}${file}  ${m}${stack}${ctx}\n`;
 }
 
@@ -303,6 +307,7 @@ export async function buildSessionReport(sid?: string): Promise<string> {
                 `  Falling back to most recent session #${fallbackSid}.`,
                 "",
             ].join("\n");
+
             return notice + fallback.report;
         }
     }
@@ -310,6 +315,7 @@ export async function buildSessionReport(sid?: string): Promise<string> {
     // No fallback available
     const absDir = `opfs-root/${LOGS_DIR_NAME}/${SESSION_PREFIX}${targetSid}`;
     const expectedPaths = [EVENTS_LOG, ERRORS_LOG, SCRIPTS_LOG].map((f) => `${absDir}/${f}`);
+
     return `[session-log-writer] Failed to read session #${targetSid} at OPFS dir "${absDir}". Expected file paths: [${expectedPaths.join(", ")}]. Available sessions: [${availableList}]. No fallback session had readable data.`;
 }
 
@@ -346,6 +352,7 @@ async function tryReadSessionDir(sid: string): Promise<{ ok: true; report: strin
         if (sections.length === 0) {
             const missingList = missing.length > 0 ? ` Missing files: [${missing.join(", ")}].` : "";
             const foundList = found.length > 0 ? ` Found but empty: [${found.join(", ")}].` : "";
+
             return { ok: false, error: `Session #${sid} has no readable log data at dir "${absDir}".${missingList}${foundList}` };
         }
 
@@ -365,6 +372,7 @@ async function tryReadSessionDir(sid: string): Promise<{ ok: true; report: strin
         const errName = err instanceof DOMException ? err.name : "UnknownError";
         const errMsg = err instanceof Error ? err.message : String(err);
         const expectedPaths = expectedFiles.map((f) => `${absDir}/${f}`);
+
         return { ok: false, error: `Failed to read session #${sid} at "${absDir}" (${errName}: ${errMsg}). Expected: [${expectedPaths.join(", ")}]` };
     }
 }
@@ -407,6 +415,7 @@ export async function pruneOldSessionLogs(maxAgeDays = 7): Promise<number> {
     } catch (err) {
         console.error(`[session-log-writer::pruneOldSessionLogs] Pruning failed\n  Path: opfs-root/${LOGS_DIR_NAME}/\n  Missing: Successful cleanup of old session directories\n  Reason: ${err instanceof Error ? err.message : String(err)} — OPFS directory iteration or removal failed`, err);
     }
+
     return removed;
 }
 
@@ -446,9 +455,11 @@ export async function getOpfsSessionStatus(): Promise<OpfsStatusData> {
         }
 
         const allExist = files.every((f) => f.exists);
+
         return { sessionId: sid, dirExists: true, files, healthy: allExist };
     } catch {
         const files = expectedFiles.map((f) => ({ name: f, absolutePath: `${absBase}/${f}`, sizeBytes: 0, exists: false }));
+
         return { sessionId: sid, dirExists: false, files, healthy: false };
     }
 }
@@ -456,6 +467,7 @@ export async function getOpfsSessionStatus(): Promise<OpfsStatusData> {
 /** Lists all available session IDs from OPFS. */
 export async function listSessionIds(): Promise<string[]> {
     const sessions = await listSessionsWithTimestamps();
+
     return sessions.map((s) => s.id);
 }
 
@@ -584,5 +596,6 @@ export async function browseOpfsSessions(): Promise<{
     }
 
     sessions.sort((a, b) => Number(b.sessionId) - Number(a.sessionId));
+
     return { rootPath, sessions, totalSessions: sessions.length };
 }

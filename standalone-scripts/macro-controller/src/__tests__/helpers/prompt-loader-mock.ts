@@ -34,5 +34,6 @@ export function buildPromptLoaderMock(overrides: Partial<PromptLoaderMockShape> 
         sendToExtension: async () => ({ isOk: true, rows: [] }),
         getPromptsConfig: () => ({ editorXPath: '//div' }),
     };
+
     return { ...defaults, ...overrides };
 }

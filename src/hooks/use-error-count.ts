@@ -43,9 +43,11 @@ function attachBroadcastListener(runtime: RuntimeLike | undefined, handler: Broa
   if (!runtime?.onMessage) { return false; }
   try {
     runtime.onMessage.addListener(handler);
+
     return true;
   } catch (caught) {
     logError("useErrorCount.attachBroadcast", "chrome.runtime.onMessage.addListener threw — extension context likely invalidated, falling back to polling", caught);
+
     return false;
   }
 }
@@ -69,6 +71,7 @@ function createPollingControls(refresh: RefreshErrorCount, pollIntervalMs: numbe
     clearInterval(pollId);
     pollId = null;
   };
+
   return { start, stop };
 }
 
@@ -86,6 +89,7 @@ function bindVisibilityPolling(
   };
   if (typeof document !== "undefined") { document.addEventListener("visibilitychange", handleVisibility); }
   if (typeof document === "undefined" || !document.hidden) { pollingControls.start(); }
+
   return () => {
     pollingControls.stop();
     if (typeof document !== "undefined") { document.removeEventListener("visibilitychange", handleVisibility); }
@@ -98,6 +102,7 @@ function setupErrorCountSubscriptions(refresh: RefreshErrorCount, setCountValue:
   const listenerAttached = attachBroadcastListener(runtime, broadcastHandler);
   const pollingControls = createPollingControls(refresh, pollIntervalMs, listenerAttached);
   const cleanupPolling = bindVisibilityPolling(pollingControls, refresh, listenerAttached);
+
   return () => {
     cleanupPolling();
     if (listenerAttached) { detachBroadcastListener(runtime, broadcastHandler); }
@@ -119,6 +124,7 @@ export function useErrorCount(pollIntervalMs = 30_000) {
 
   useEffect(() => {
     void refresh();
+
     return setupErrorCountSubscriptions(refresh, setCount, pollIntervalMs);
   }, [refresh, pollIntervalMs]);
 

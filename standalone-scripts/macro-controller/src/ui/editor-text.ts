@@ -29,11 +29,14 @@ function isBlockElement(element: Element): boolean {
 function walkNode(node: Node, out: string[]): void {
   if (node.nodeType === Node.TEXT_NODE) {
     out.push(node.nodeValue || '');
+
     return;
   }
   if (node.nodeType !== Node.ELEMENT_NODE) return;
   const element = node as Element;
-  if (element.tagName === 'BR') { out.push('\n'); return; }
+  if (element.tagName === 'BR') { out.push('\n');
+
+ return; }
   const isBlock = isBlockElement(element);
   if (isBlock && out.length > 0 && !out[out.length - 1].endsWith('\n')) out.push('\n');
   for (const child of Array.from(element.childNodes)) walkNode(child, out);
@@ -52,6 +55,7 @@ export function extractEditorPlainText(target: Element): string {
   const parts: string[] = [];
   walkNode(target, parts);
   const joined = parts.join('').replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n');
+
   return joined.replace(/^\n+/, '').replace(/\n+$/, '');
 }
 
@@ -74,6 +78,7 @@ function insertLineWithBreaks(line: string, isFirst: boolean): boolean {
   }
   const isMissingLine = !line;
   if (isMissingLine) return true;
+
   return document.execCommand('insertText', false, line);
 }
 
@@ -85,6 +90,7 @@ export function replaceEditorText(target: Element, text: string): boolean {
   if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) {
     return writeTextInput(target, text);
   }
+
   return writeContentEditable(target as HTMLElement, text);
 }
 
@@ -98,9 +104,11 @@ function writeTextInput(target: HTMLTextAreaElement | HTMLInputElement, text: st
     else target.value = text;
     target.dispatchEvent(new Event('input', { bubbles: true }));
     target.dispatchEvent(new Event('change', { bubbles: true }));
+
     return true;
   } catch (e) {
     logError(SCOPE, 'writeTextInput failed', e);
+
     return false;
   }
 }
@@ -119,9 +127,11 @@ function writeContentEditable(editor: HTMLElement, text: string): boolean {
       if (isMissingIsOk) allOk = false;
     }
     editor.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: text }));
+
     return allOk;
   } catch (e) {
     logError(SCOPE, 'writeContentEditable failed', e);
+
     return false;
   }
 }

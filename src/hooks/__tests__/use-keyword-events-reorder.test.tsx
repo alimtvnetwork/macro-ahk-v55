@@ -27,6 +27,7 @@ describe("useKeywordEvents, reorderEvents", () => {
         act(() => { aId = result.current.addEvent("alpha"); });
         act(() => { bId = result.current.addEvent("beta"); });
         act(() => { cId = result.current.addEvent("gamma"); });
+
         return { result, aId, bId, cId };
     }
 

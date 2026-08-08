@@ -66,6 +66,7 @@ export function trackedSetInterval(
   entries.set(handle, { label, periodMs, startedAt: Date.now() });
   labelCounts.set(label, (labelCounts.get(label) ?? 0) + 1);
   ensureHeartbeat();
+
   return handle;
 }
 
@@ -96,6 +97,7 @@ export function getIntervalSnapshot(): IntervalSnapshot {
   }
   const byLabel: Record<string, number> = {};
   for (const [label, count] of labelCounts) { byLabel[label] = count; }
+
   return { total: entries.size, byLabel, oldestAgeMs, capturedAt: now };
 }
 

@@ -31,6 +31,7 @@ export function countCategory(
   const matched = items.filter((i) => i.status === "overwrite").length;
   const unmatched = items.filter((i) => i.status === "new").length;
   const untouched = mode === "replace" ? 0 : Math.max(0, existing - matched);
+
   return { matched, unmatched, untouched };
 }
 
@@ -67,5 +68,6 @@ export function buildImportSummary(preview: BundlePreview, mode: PopupActionsMod
     totalUnmatched += counts.unmatched;
   }
   lines.push(`Total: ${totalMatched} matched, ${totalUnmatched} new`);
+
   return lines.join("\n");
 }

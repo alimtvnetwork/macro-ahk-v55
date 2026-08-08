@@ -41,6 +41,7 @@ export function buildFailureBundle(
     opts: BuildBundleOpts = {},
 ): FailureBundle {
     const now = opts.Now ?? ((): Date => new Date());
+
     return {
         Generator: "marco-extension",
         Version: 1,
@@ -83,6 +84,7 @@ export function buildFailureBundleFilename(now: Date = new Date()): string {
     const iso = now.toISOString();             // 2026-04-26T10:30:00.000Z
     const date = iso.slice(0, 10);             // 2026-04-26
     const time = iso.slice(11, 16).replace(":", ""); // 1030
+
     return `marco-failure-reports-${date}-${time}.json`;
 }
 
@@ -107,6 +109,7 @@ export function pickLastFailureReport(
             best = candidate;
         }
     }
+
     return best;
 }
 
@@ -123,6 +126,7 @@ export function buildLastFailureFilename(
     const date = iso.slice(0, 10);
     const time = iso.slice(11, 16).replace(":", "");
     const stepTag = report.StepId !== null ? `-step${report.StepId}` : "";
+
     return `marco-last-failure${stepTag}-${date}-${time}.json`;
 }
 
@@ -151,6 +155,7 @@ export function listStepFailureOptions(
     reports: ReadonlyArray<FailureReport>,
 ): ReadonlyArray<StepFailureOption> {
     const buckets = buildStepFailureBuckets(reports);
+
     return sortStepFailureOptions(Array.from(buckets.values()));
 }
 
@@ -159,6 +164,7 @@ function buildStepFailureBuckets(reports: ReadonlyArray<FailureReport>): Map<str
     for (const report of reports) {
         upsertStepFailureBucket(buckets, report);
     }
+
     return buckets;
 }
 
@@ -174,11 +180,13 @@ function createStepFailureOption(report: FailureReport): StepFailureOption {
 
 function updateStepFailureOption(option: StepFailureOption, report: FailureReport): StepFailureOption {
     const latest = report.Timestamp >= option.LatestTimestamp ? report : null;
+
     return { ...option, Count: option.Count + 1, LatestTimestamp: latest?.Timestamp ?? option.LatestTimestamp, StepKind: latest?.StepKind ?? option.StepKind };
 }
 
 function sortStepFailureOptions(options: StepFailureOption[]): ReadonlyArray<StepFailureOption> {
     options.sort(compareStepFailureOptions);
+
     return options;
 }
 
@@ -186,6 +194,7 @@ function compareStepFailureOptions(a: StepFailureOption, b: StepFailureOption): 
     if (a.StepId === null && b.StepId !== null) return 1;
     if (b.StepId === null && a.StepId !== null) return -1;
     if (a.LatestTimestamp === b.LatestTimestamp) return 0;
+
     return a.LatestTimestamp < b.LatestTimestamp ? 1 : -1;
 }
 
@@ -206,7 +215,7 @@ export function pickFailureReportByStepId(
             best = r;
         }
     }
+
     return best;
 }
-
 

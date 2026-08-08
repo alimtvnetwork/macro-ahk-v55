@@ -461,12 +461,14 @@ export function ActivityLogTimeline() {
           const msg = e.message;
           const detail = e.detail ? ` | ${e.detail}` : "";
           const stack = e.stack ? `\n    Stack: ${e.stack}` : "";
+
           return `${ts}  ${lvl}  [${src}]  ${msg}${detail}${stack}`;
         });
 
         const version = (() => {
           try {
             const g = globalThis as { chrome?: { runtime?: { getManifest?: () => { version?: string } } } };
+
             return g.chrome?.runtime?.getManifest?.().version ?? "?";
           } catch { return "?"; }
         })();

@@ -85,6 +85,7 @@ export async function handleGetSettings(): Promise<{ settings: ExtensionSettings
     // every recorder log site (which reads via `resolveVerboseLogging`) sees
     // the user's choice without an extra storage round-trip.
     setVerboseLogging(null, merged.verboseLogging);
+
     return { settings: merged };
 }
 
@@ -98,6 +99,7 @@ export async function handleSaveSettings(
     await saveSettings(merged);
     setVerboseLogging(null, merged.verboseLogging);
     invalidateSettingsNsCache();
+
     return { isOk: true };
 }
 
@@ -121,6 +123,7 @@ export async function getChatBoxXPath(): Promise<string> {
         logError("AutoCatch", "Unhandled exception", err);
     } // allow-swallow: per-project chatBoxXPath lookup failed; fall through to global settings
     const stored = await loadSettings();
+
     return stored.chatBoxXPath ?? DEFAULT_SETTINGS.chatBoxXPath;
 }
 
@@ -133,6 +136,7 @@ const VARIABLES_KEY = "marco_prompt_variables";
 /** Built-in variables that are always available (computed at runtime). */
 function getBuiltInVariables(): Record<string, string> {
     const now = new Date();
+
     return {
         date: now.toISOString().split("T")[0],
         time: now.toTimeString().split(" ")[0],
@@ -148,6 +152,7 @@ function getBuiltInVariables(): Record<string, string> {
 export async function handleGetPromptVariables(): Promise<{ variables: Record<string, string>; builtIn: string[] }> {
     const custom = await loadPromptVariables();
     const builtIn = getBuiltInVariables();
+
     return {
         variables: { ...builtIn, ...custom },
         builtIn: Object.keys(builtIn),
@@ -160,6 +165,7 @@ export async function handleSavePromptVariables(
 ): Promise<OkResponse> {
     const payload = message as MessageRequest & { variables: Record<string, string> };
     await chrome.storage.local.set({ [VARIABLES_KEY]: payload.variables });
+
     return { isOk: true };
 }
 
@@ -172,6 +178,7 @@ export async function applyTemplateVariables(text: string): Promise<string> {
     const custom = await loadPromptVariables();
     const builtIn = getBuiltInVariables();
     const merged = { ...builtIn, ...custom };
+
     return text.replace(/\{\{(\w+)\}\}/g, (match, key: string) => {
         return merged[key] ?? match;
     });
@@ -180,6 +187,7 @@ export async function applyTemplateVariables(text: string): Promise<string> {
 async function loadPromptVariables(): Promise<Record<string, string>> {
     try {
         const result = await chrome.storage.local.get(VARIABLES_KEY);
+
         return (result[VARIABLES_KEY] as Record<string, string>) ?? {};
     } catch {
         return {};
@@ -193,6 +201,7 @@ async function loadPromptVariables(): Promise<Record<string, string>> {
 async function loadSettings(): Promise<Partial<ExtensionSettings>> {
     try {
         const result = await chrome.storage.local.get(STORAGE_KEY);
+
         return (result[STORAGE_KEY] as Partial<ExtensionSettings>) ?? {};
     } catch {
         return {};

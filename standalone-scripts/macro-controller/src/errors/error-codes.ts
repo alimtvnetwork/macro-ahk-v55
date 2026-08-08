@@ -22,7 +22,6 @@ export type ErrorSeverity = ErrorSeverityType;
 export type ErrorArea =
   ErrorAreaType;
 
-
 export interface ErrorCodeEntry {
   readonly code: string;
   readonly area: ErrorArea;
@@ -724,8 +723,6 @@ export const ERROR_CODES: Readonly<Record<string, ErrorCodeEntry>> = Object.free
     nextFixHint: 'No action needed; the loop will move to the next workspace automatically.',
   },
 
-
-
   // --- credit-api.ts (reserved) ---
   CREDIT_ASSERT_E001: {
     code: 'CREDIT_ASSERT_E001',
@@ -899,7 +896,6 @@ export const ERROR_CODES: Readonly<Record<string, ErrorCodeEntry>> = Object.free
     requiredContextKeys: ['missingApi'],
     nextFixHint: 'Reload the tab; if it persists, reinstall the extension.',
   },
-
 
   // --- rename-api.ts ---
   RENAME_REQUEST_E001: {
@@ -1343,5 +1339,6 @@ export function extractTemplatePlaceholders(template: string): readonly string[]
     const name = match[2];
     if (name && !out.includes(name)) out.push(name);
   }
+
   return out;
 }

@@ -55,6 +55,7 @@ export function StepEditorKindBody(props: StepEditorKindBodyProps): JSX.Element 
     if (kind === StepKindId.UrlTabClick) {
         return <UrlTabClickFields value={props.urlTabClick} onPatch={props.onUrlTabClickPatch} />;
     }
+
     return (
         <div className="space-y-1">
             <LabelType htmlFor="step-payload">Payload JSON</LabelType>

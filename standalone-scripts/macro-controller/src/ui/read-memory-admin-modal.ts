@@ -24,6 +24,7 @@ interface ReadMemoryRow { Id: number; Slug: string; Name: string; IsDefault: num
 
 function isReadMemoryRow(value: unknown): value is ReadMemoryRow {
   const raw = value as { Id?: unknown; Slug?: unknown; Name?: unknown; IsDefault?: unknown };
+
   return typeof raw?.Id === 'number' && typeof raw?.Slug === 'string' && typeof raw?.Name === 'string';
 }
 
@@ -34,6 +35,7 @@ function coerceRows(rows: readonly unknown[]): ReadMemoryRow[] {
     const flag = typeof raw.IsDefault === 'number' ? raw.IsDefault : Number(raw.IsDefault);
     out.push({ Id: raw.Id, Slug: raw.Slug, Name: raw.Name, IsDefault: Number.isFinite(flag) ? flag : 0 });
   }
+
   return out;
 }
 
@@ -46,6 +48,7 @@ async function fetchReadMemoryRows(): Promise<ReadMemoryRow[]> {
     + 'ORDER BY IsDefault DESC, Slug ASC';
   const resp = await runSqlBridge('QUERY', sql);
   if (!resp?.isOk || !Array.isArray(resp.rows)) return [];
+
   return coerceRows(resp.rows as unknown[]);
 }
 
@@ -77,9 +80,11 @@ async function deactivateRow(row: ReadMemoryRow): Promise<boolean> {
       column: 'read-memory-admin-deactivate',
       reason: resp?.errorMessage ?? 'unknown error',
     });
+
     return false;
   }
   await invalidateJsonCopy();
+
   return true;
 }
 
@@ -99,6 +104,7 @@ function buildStatusBadge(row: ReadMemoryRow): HTMLElement {
   badge.style.cssText =
     'display:inline-block;padding:2px 6px;border-radius:3px;font-size:10px;'
     + 'font-weight:600;color:#fff;background:' + bg + ';';
+
   return badge;
 }
 
@@ -115,6 +121,7 @@ function buildDeactivateButton(row: ReadMemoryRow, onDone: () => void): HTMLElem
     + 'color:#fff;background:' + (disabled ? 'rgba(75,85,99,0.4)' : '#dc2626') + ';';
   if (isCanonical) btn.title = 'Cannot deactivate the canonical Read Memory prompt';
   btn.onclick = () => { void handleDeactivateClick(row, btn, onDone); };
+
   return btn;
 }
 
@@ -125,6 +132,7 @@ async function handleDeactivateClick(row: ReadMemoryRow, btn: HTMLButtonElement,
   if (ok) {
     log('[ReadMemoryAdmin] Deactivated ' + row.Slug + ' (Id=' + row.Id + ')', 'success');
     onDone();
+
     return;
   }
   btn.disabled = false;
@@ -142,6 +150,7 @@ function buildTableHeader(): HTMLElement {
     tr.appendChild(th);
   }
   thead.appendChild(tr);
+
   return thead;
 }
 
@@ -159,6 +168,7 @@ function buildRow(row: ReadMemoryRow, onDone: () => void): HTMLElement {
   appendCell(tr, row.Name);
   appendCell(tr, buildStatusBadge(row));
   appendCell(tr, buildDeactivateButton(row, onDone));
+
   return tr;
 }
 
@@ -166,6 +176,7 @@ function buildEmptyState(): HTMLElement {
   const empty = document.createElement('div');
   empty.textContent = 'No Read Memory prompts found in the database.';
   empty.style.cssText = 'padding:16px;text-align:center;color:#9ca3af;font-size:12px;';
+
   return empty;
 }
 
@@ -173,6 +184,7 @@ function buildLoadingState(): HTMLElement {
   const loading = document.createElement('div');
   loading.textContent = 'Loading Read Memory prompts…';
   loading.style.cssText = 'padding:16px;text-align:center;color:#9ca3af;font-size:12px;';
+
   return loading;
 }
 
@@ -183,6 +195,7 @@ function buildTable(rows: readonly ReadMemoryRow[], onDone: () => void): HTMLEle
   const tbody = document.createElement('tbody');
   for (const row of rows) tbody.appendChild(buildRow(row, onDone));
   table.appendChild(tbody);
+
   return table;
 }
 
@@ -201,6 +214,7 @@ function buildHeader(onClose: () => void): HTMLElement {
   close.onclick = onClose;
   header.appendChild(title);
   header.appendChild(close);
+
   return header;
 }
 
@@ -210,6 +224,7 @@ function buildSubtitle(count: number): HTMLElement {
   sub.textContent = canonicalNote
     + count + ' row(s) matched. Deactivating flips IsDefault=0 and prefixes Name with `' + DUPLICATE_PREFIX + '`.';
   sub.style.cssText = 'padding:8px 14px;font-size:11px;color:#c4b5fd;background:rgba(124,58,237,0.08);';
+
   return sub;
 }
 
@@ -222,6 +237,7 @@ function mountBackdrop(panel: HTMLElement, onClose: () => void): HTMLElement {
   backdrop.onclick = (evt) => { if (evt.target === backdrop) onClose(); };
   backdrop.appendChild(panel);
   document.body.appendChild(backdrop);
+
   return backdrop;
 }
 
@@ -231,6 +247,7 @@ function buildPanel(): HTMLElement {
     'width:min(760px,92vw);max-height:80vh;overflow:auto;'
     + 'background:#0f0620;border:1px solid rgba(124,58,237,0.6);'
     + 'border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,0.6);color:#e5e7eb;';
+
   return panel;
 }
 

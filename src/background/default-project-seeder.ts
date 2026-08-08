@@ -9,8 +9,6 @@ import { DomainConstants } from "../constants/domain";
  * See: spec/05-chrome-extension/58-updater-system.md
  */
 
-/* eslint-disable sonarjs/no-duplicate-string -- seeder data repeats URL and field values */
-
 import type { StoredProject, CookieBinding, ScriptEntry, ConfigEntry } from "../shared/project-types";
 import { DEFAULT_CHATBOX_XPATH } from "../shared/defaults";
 import {
@@ -147,6 +145,7 @@ async function handleInstalled(
     if (details.reason === "install") {
         await markFirstRun();
         console.log("[seeder] Default project/scripts/updater seeded (single-script architecture)");
+
         return;
     }
 
@@ -197,6 +196,7 @@ function ensureSdkUpdaterEntry(): void {
 /** Builds the Riseup Macro SDK global project. See spec/21-app/02-features/devtools-and-injection/sdk-convention.md */
 function buildSdkProject(): StoredProject {
     const now = nowTimestamp();
+
     return {
         id: SDK_PROJECT_ID,
         schemaVersion: 1,
@@ -355,6 +355,7 @@ function normalizeDefaultProject(project: StoredProject): StoredProject {
 /** Normalizes the SDK project to ensure cookie bindings and fields are current. */
 function normalizeSdkProject(project: StoredProject): StoredProject {
     const canonical = buildSdkProject();
+
     return {
         ...project,
         name: canonical.name,
@@ -412,6 +413,7 @@ function normalizeConfigs(configs: ConfigEntry[]): ConfigEntry[] {
 function normalizePath(path: string): string {
     const normalized = path.trim().toLowerCase().replace(/\\/g, "/");
     const fileName = normalized.split("/").pop() ?? normalized;
+
     return fileName.split(/[?#]/)[0] ?? fileName;
 }
 

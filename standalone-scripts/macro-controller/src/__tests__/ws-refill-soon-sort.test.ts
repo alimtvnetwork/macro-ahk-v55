@@ -37,6 +37,7 @@ describe('Refill-soon filter — invariants', () => {
 
 function mkWs(id: string, available: number, daysToRefill: number): WorkspaceCredit {
   const refillIso = new Date(Date.now() + daysToRefill * 86_400_000).toISOString();
+
   return {
     id,
     name: id,

@@ -17,8 +17,10 @@ function useHeffLatestDetail(): [HttpFailFastEventDetail | null, (next: HttpFail
             setDetail(ce.detail);
         };
         window.addEventListener(HTTP_FAIL_FAST_EVENT, onEvent);
+
         return () => window.removeEventListener(HTTP_FAIL_FAST_EVENT, onEvent);
     }, []);
+
     return [detail, setDetail];
 }
 
@@ -42,6 +44,7 @@ function useCopyReport(detail: HttpFailFastEventDetail | null): { copied: boolea
         logError('AutoCatch', 'Unhandled exception', err);
  /* intentionally empty */ }
     }, [detail]);
+
     return { copied, handleCopy };
 }
 
@@ -60,6 +63,7 @@ function HeffBannerHeadline({ detail }: { detail: HttpFailFastEventDetail }) {
 
 function HeffBannerBodySnippet({ snippet }: { snippet: string | null }) {
     if (snippet === null || snippet.length === 0) return null;
+
     return (
         <pre className="mt-1 text-[10px] font-mono text-destructive/80 bg-background/40 rounded p-1.5 max-h-24 overflow-auto whitespace-pre-wrap break-words border border-destructive/20">
             {snippet}
@@ -94,6 +98,7 @@ export function HttpFailFastBanner() {
     const [detail, setDetail] = useHeffLatestDetail();
     const { copied, handleCopy } = useCopyReport(detail);
     if (detail === null) return null;
+
     return (
         <div
             role="alert"

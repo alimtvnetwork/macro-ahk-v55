@@ -32,6 +32,7 @@ interface Props {
 
 export default function InputSourceDialog({ open, onOpenChange }: Props) {
     const api = useInputSourceDraft(open, onOpenChange);
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-2xl">

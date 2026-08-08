@@ -59,6 +59,7 @@ function noopExecutor(): LeafStepExecutor {
 function recordingExecutor(log: Array<{ id: number; path: ReadonlyArray<string> }>): LeafStepExecutor {
     return (step, ctx) => {
         log.push({ id: step.StepId, path: ctx.GroupPath });
+
         return null;
     };
 }
@@ -68,6 +69,7 @@ function asSuccess(r: RunGroupResult): RunGroupSuccess {
     if (isMissingOk) {
         throw new Error(`Expected success but got ${r.Reason}: ${r.ReasonDetail}`);
     }
+
     return r;
 }
 
@@ -75,6 +77,7 @@ function asFailure(r: RunGroupResult): RunGroupFailure {
     if (r.Ok) {
         throw new Error(`Expected failure but got success with ${r.StepsExecuted} steps executed`);
     }
+
     return r;
 }
 
@@ -353,6 +356,7 @@ describe("runGroup, disabled steps & leaf failures", () => {
             db, projectId, rootGroupId: g,
             executeLeafStep: (step) => {
                 seen.push(step.StepId);
+
                 return step.StepId === s2 ? ({
                     Phase: "Replay", Message: "x", Reason: "Unknown", ReasonDetail: "x",
                     StackTrace: null, StepId: step.StepId, Index: step.OrderIndex, StepKind: "Click",

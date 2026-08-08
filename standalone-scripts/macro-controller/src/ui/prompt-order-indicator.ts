@@ -53,6 +53,7 @@ export function analyzePromptOrderCompliance(): OrderComplianceReport {
     const dIdx = defaultRank.get(slug);
     if (dIdx === undefined) {
       rows.push({ slug, effectiveIndex: idx, defaultIndex: null, status: 'unknown' });
+
       return;
     }
     const knownPos = known.indexOf(slug);
@@ -76,6 +77,7 @@ export function analyzePromptOrderCompliance(): OrderComplianceReport {
   const actualTerminal = effective.slice(Math.max(0, effective.length - TERMINAL_COUNT));
   const terminalOk = arraysEqual(expectedTerminal, actualTerminal);
   const violationCount = rows.filter((r) => r.status !== 'ok').length + (terminalOk ? 0 : 1);
+
   return { rows, terminalOk, expectedTerminal, actualTerminal, violationCount };
 }
 
@@ -84,12 +86,14 @@ function isMonotonicAt(ranks: number[], pos: number): boolean {
   const curr = ranks[pos];
   if (curr === undefined) return true;
   if (prev !== undefined && prev >= curr) return false;
+
   return true;
 }
 
 function arraysEqual(a: readonly string[], b: readonly string[]): boolean {
   if (a.length !== b.length) return false;
   for (let i = 0; i < a.length; i += 1) if (a[i] !== b[i]) return false;
+
   return true;
 }
 
@@ -117,6 +121,7 @@ export function buildPromptOrderIndicator(): HTMLElement {
   badge.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openOrderPopover(badge); }
   });
+
   return badge;
 }
 
@@ -178,6 +183,7 @@ function buildPopoverHeader(
   count.textContent = ok ? '✓ compliant' : '⚠ ' + report.violationCount + ' issue(s)';
   head.appendChild(title);
   head.appendChild(count);
+
   return head;
 }
 
@@ -188,6 +194,7 @@ function buildTerminalSummary(report: OrderComplianceReport): HTMLElement {
     (ok ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.14)') + ';color:' + (ok ? '#bbf7d0' : '#fecaca') + ';';
   box.textContent = (ok ? '✓' : '⚠') + ' Terminal-7 tail ' + (ok ? 'matches' : 'MISMATCH') +
     ' — expected: ' + report.expectedTerminal.join(' → ');
+
   return box;
 }
 
@@ -195,6 +202,7 @@ function buildRowsList(report: OrderComplianceReport): HTMLElement {
   const list = document.createElement('div');
   list.style.cssText = 'display:flex;flex-direction:column;gap:2px;';
   report.rows.forEach((row) => list.appendChild(buildRow(row)));
+
   return list;
 }
 
@@ -213,6 +221,7 @@ function buildRow(row: OrderRow): HTMLElement {
   right.textContent = row.status === 'ok' ? dIdx : row.status.toUpperCase() + ' · ' + dIdx;
   line.appendChild(left);
   line.appendChild(right);
+
   return line;
 }
 
@@ -220,6 +229,7 @@ function statusPalette(status: ViolationKind): { bg: string; fg: string; icon: s
   if (status === 'ok') return { bg: 'transparent', fg: '#d1d5db', icon: '·' };
   if (status === 'out-of-order') return { bg: 'rgba(234,179,8,0.15)', fg: '#fde68a', icon: '↕' };
   if (status === 'unknown') return { bg: 'rgba(107,114,128,0.18)', fg: '#e5e7eb', icon: '?' };
+
   return { bg: 'rgba(239,68,68,0.16)', fg: '#fecaca', icon: '×' };
 }
 

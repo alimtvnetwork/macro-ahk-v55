@@ -118,6 +118,7 @@ async function unpackBundle(
     if (versionCheck !== null) { return versionCheck; }
     const dbResult = await readAndVerifyDb(zipResult, manifestResult);
     if ("Reason" in dbResult) { return dbResult; }
+
     return { Manifest: manifestResult, DbBytes: dbResult };
 }
 
@@ -160,6 +161,7 @@ async function readManifest(zip: JSZipType): Promise<StepGroupExportManifest | I
     }
     const validation = validateManifestShape(manifest);
     if (validation !== null) { return validation; }
+
     return manifest;
 }
 
@@ -172,6 +174,7 @@ function checkManifestVersion(manifest: StepGroupExportManifest): ImportFailure 
                 `(${STEP_GROUP_BUNDLE_FORMAT_VERSION}). Please update the extension.`,
         };
     }
+
     return null;
 }
 
@@ -212,9 +215,9 @@ async function readAndVerifyDb(
                 "Bundle was tampered with or truncated.",
         };
     }
+
     return dbBytes;
 }
-
 
 function validateManifestShape(m: unknown): ImportFailure | null {
     if (m === null || typeof m !== "object") {
@@ -249,6 +252,7 @@ function validateManifestShape(m: unknown): ImportFailure | null {
     if (typeof obj.DbSha256 !== "string" || !/^[0-9a-f]{64}$/.test(obj.DbSha256)) {
         return { Reason: "ManifestMalformed", Detail: "DbSha256 must be 64 lowercase hex chars." };
     }
+
     return null;
 }
 
@@ -265,6 +269,7 @@ function uniqueRenameFor(
         const candidate = n === 1 ? `${desired} (imported)` : `${desired} (imported ${n})`;
         if (!existingLower.has(candidate.toLowerCase())) return candidate;
     }
+
     return null;
 }
 
@@ -286,6 +291,7 @@ function readGroupsFromSource(db: Database): StepGroupRow[] {
             const r = stmt.getAsObject() as unknown as StepGroupRow;
             rows.push({ ...r, IsArchived: Boolean(r.IsArchived) });
         }
+
         return rows;
     } finally {
         stmt.free();
@@ -307,6 +313,7 @@ function readStepsForGroup(db: Database, stepGroupId: number): StepRow[] {
             const r = stmt.getAsObject() as unknown as StepRow;
             rows.push({ ...r, IsDisabled: Boolean(r.IsDisabled) });
         }
+
         return rows;
     } finally {
         stmt.free();
@@ -342,6 +349,7 @@ function orderByAncestry(rows: ReadonlyArray<StepGroupRow>): StepGroupRow[] {
             break;
         }
     }
+
     return out;
 }
 
@@ -410,6 +418,7 @@ function openSourceDb(dbBytes: Uint8Array, sqlJs: SqlJsStatic): Database | Impor
 function applySourceSchema(sourceDb: Database): ImportFailure | null {
     try {
         applySchema(sourceDb);
+
         return null;
     } catch (err) {
         return {
@@ -455,6 +464,7 @@ function validateDestination(
             };
         }
     }
+
     return { destGroups };
 }
 
@@ -483,11 +493,13 @@ function collectSourceGraph(sourceDb: Database): SourceGraph {
             }
         }
     }
+
     return { sourceGroups, sourceIdSet, allSourceSteps, danglingRunGroupIds: dangling, runGroupRefs };
 }
 
 function checkRunGroupTargets(graph: SourceGraph): ImportFailure | null {
     if (graph.danglingRunGroupIds.length === 0) { return null; }
+
     return {
         Reason: "RunGroupTargetMissing",
         Detail:
@@ -547,6 +559,7 @@ function resolveNameConflicts(input: ResolveNameConflictsInput): NameConflictPla
         if (name === "") skippedRootIds.add(id);
     }
     const skippedSubtree = collectSubtree(sourceGroups, skippedRootIds);
+
     return { effectiveName, renamedRoots, skippedSubtree };
 }
 
@@ -575,6 +588,7 @@ function resolveRootNameConflict(
             OffendingNames: [g.Name],
         };
     }
+
     return { Kind: "Rename", OldName: g.Name, NewName: renamed };
 }
 
@@ -589,17 +603,20 @@ function applyRootOutcome(
     if (outcome.Kind === "Keep") {
         effectiveName.set(g.StepGroupId, g.Name);
         destSiblingNamesLower.add(g.Name.toLowerCase());
+
         return;
     }
-    if (outcome.Kind === "Collision") { collisions.push(g.Name); return; }
-    if (outcome.Kind === "Skip") { effectiveName.set(g.StepGroupId, ""); return; }
+    if (outcome.Kind === "Collision") { collisions.push(g.Name);
+
+ return; }
+    if (outcome.Kind === "Skip") { effectiveName.set(g.StepGroupId, "");
+
+ return; }
     if (outcome.Kind === "Rename") {
         renamedRoots.push({ OldName: outcome.OldName, NewName: outcome.NewName });
         destSiblingNamesLower.add(outcome.NewName.toLowerCase());
         effectiveName.set(g.StepGroupId, outcome.NewName);
     }
-
-
 }
 
 interface AtomicMergeInput {
@@ -622,6 +639,7 @@ function performAtomicMerge(ctx: AtomicMergeInput): StepGroupImportResult {
         });
         const stepCount = insertSteps({ destLib, graph, plan, idMap });
         rawDest.exec("COMMIT;");
+
         return {
             Reason: "Ok",
             Manifest: manifest,
@@ -642,6 +660,7 @@ function performAtomicMerge(ctx: AtomicMergeInput): StepGroupImportResult {
         } catch (err) {
             logError("AutoCatch", "Unhandled exception", err);
         }
+
         return {
             Reason: "InternalError",
             Detail: err instanceof Error ? err.message : "merge transaction failed",
@@ -683,6 +702,7 @@ function insertGroups(
         importedGroupCount += 1;
         if (isRoot) rootStepGroupIds.push(newId);
     }
+
     return { importedGroupCount, rootStepGroupIds };
 }
 
@@ -736,9 +756,9 @@ function insertSteps(input: InsertStepsInput): number {
         });
         stepCount += 1;
     }
+
     return stepCount;
 }
-
 
 function collectSubtree(
     rows: ReadonlyArray<StepGroupRow>,
@@ -756,5 +776,6 @@ function collectSubtree(
             }
         }
     }
+
     return out;
 }

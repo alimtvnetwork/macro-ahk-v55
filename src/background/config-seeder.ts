@@ -58,6 +58,7 @@ async function sha256(text: string): Promise<string> {
     const data = encoder.encode(text);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
+
     return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
@@ -137,6 +138,7 @@ export async function seedConfigToDb(
         const storedHash = String(existing[0].values[0][0]);
         if (storedHash === sourceHash) {
             console.log(`[config-seeder] Hash match for "${configName}" — skipping (user edits preserved)`);
+
             return false;
         }
         console.log(`[config-seeder] Hash mismatch for "${configName}" — re-seeding`);
@@ -150,6 +152,7 @@ export async function seedConfigToDb(
         parsed = JSON.parse(configJson);
     } catch (e) {
         logCaughtError(BgLogTag.CONFIG_SEEDER, `Invalid JSON for "${configName}"`, e);
+
         return false;
     }
 
@@ -180,6 +183,7 @@ export async function seedConfigToDb(
 
     manager.markDirty();
     console.log(`[config-seeder] Seeded ${rows.length} config rows for "${configName}"`);
+
     return true;
 }
 
@@ -247,9 +251,11 @@ export function updateConfigValue(
             );
         }
         manager.markDirty();
+
         return true;
     } catch (e) {
         logCaughtError(BgLogTag.CONFIG_SEEDER, "Update failed", e);
+
         return false;
     }
 }

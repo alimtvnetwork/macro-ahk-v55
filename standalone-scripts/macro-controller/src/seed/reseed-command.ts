@@ -52,10 +52,9 @@ type RawSqlResp = SqlBridgeResp;
 
 const EV_RESEED_COMPLETE = 'reseed.complete' as const;
 
-
-
 async function rawSql(method: RunSqlMethod, sql: string): Promise<RawSqlResp> {
   void DB_NAME;
+
   return runSqlBridge(method, sql);
 }
 
@@ -78,6 +77,7 @@ async function forceResetDefaultBodies(): Promise<{ forced: number; error?: stri
         event: 'reseed.force', role: row.role, slug: row.slug,
         outcome: 'failed', detail: message,
       });
+
       return { forced, error: message };
     }
     forced += 1;
@@ -86,6 +86,7 @@ async function forceResetDefaultBodies(): Promise<{ forced: number; error?: stri
       outcome: 'ok', metrics: { bodyLen: row.body.length },
     });
   }
+
   return { forced };
 }
 
@@ -107,6 +108,7 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
         event: EV_RESEED_COMPLETE, outcome: 'failed',
         detail: 'seedPlanNextPrompts: ' + (seedResult.error ?? '?'),
       });
+
       return { ok: false, mode, error: seedResult.error ?? 'seed failed' };
     }
     let forcedUpdates: number | undefined;
@@ -118,6 +120,7 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
           event: EV_RESEED_COMPLETE, outcome: 'failed', detail: error,
           metrics: { forcedUpdates: forced },
         });
+
         return { ok: false, mode, forcedUpdates: forced, error };
       }
     }
@@ -129,11 +132,13 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
     emitPromptSeedEvent(completeEvent);
     const result: ReseedResult = { ok: true, mode };
     if (forcedUpdates !== undefined) result.forcedUpdates = forcedUpdates;
+
     return result;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     logError('ReseedCommand', 'reseedPromptsOnDemand threw', err);
     emitPromptSeedEvent({ event: EV_RESEED_COMPLETE, outcome: 'failed', detail: message });
+
     return { ok: false, mode, error: message };
   }
 }
@@ -156,6 +161,7 @@ export function installReseedCommandGlobal(): void {
   if (isMissing__marcoCheckPromptHealth) {
     w.__marcoCheckPromptHealth = async () => {
       const { runPromptHealthCheck } = await import('./prompt-health-check');
+
       return runPromptHealthCheck();
     };
     log('[ReseedCommand] window.__marcoCheckPromptHealth installed', 'info');

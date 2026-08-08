@@ -23,5 +23,6 @@ export const hasFreshCreditBalanceCache: FreshCacheProbe = function hasFreshCred
 ): boolean {
   const isMissingWorkspaceId = !workspaceId;
   if (isMissingWorkspaceId) return false;
+
   return readCreditBalanceUpdateCacheSync(workspaceId) !== null;
 };

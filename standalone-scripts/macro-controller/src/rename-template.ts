@@ -27,6 +27,7 @@ export function applyRenameTemplate(
   const base = template ? applyVars(template, starts, index) : originalName;
   const resolvedPrefix = applyVars(prefix || '', starts, index);
   const resolvedSuffix = applyVars(suffix || '', starts, index);
+
   return resolvedPrefix + base + resolvedSuffix;
 }
 
@@ -35,6 +36,7 @@ function normalizeStartNumbers(startNums: number | Record<string, number>): Vari
 
   if (isObjectInput) {
     const obj = startNums as Record<string, number>;
+
     return {
       dollar: obj.dollar || 1,
       hash: obj.hash || 1,
@@ -43,6 +45,7 @@ function normalizeStartNumbers(startNums: number | Record<string, number>): Vari
   }
 
   const n = (startNums as number) || 1;
+
   return { dollar: n, hash: n, star: n };
 }
 
@@ -68,5 +71,6 @@ function applyVars(text: string, starts: VariableStartNumbers, index: number): s
 function zeroPad(n: number, minLength: number): string {
   let s = String(n);
   while (s.length < minLength) s = '0' + s;
+
   return s;
 }

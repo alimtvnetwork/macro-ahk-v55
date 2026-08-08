@@ -36,6 +36,7 @@ export function KeywordEventCardHeader(props: KeywordEventCardHeaderProps): JSX.
         dragHandle, selected, onToggleSelect,
         onUpdate, onPlay, onCancel, onRemove,
     } = props;
+
     return (
         <div className="flex items-center gap-2">
             {dragHandle}

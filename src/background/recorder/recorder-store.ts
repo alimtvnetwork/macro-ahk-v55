@@ -77,6 +77,7 @@ function applyStart(state: RecordingSession, a: Extract<RecorderAction, { Kind: 
     if (state.Phase !== "Idle") {
         throw new RecorderStateError(`Cannot Start from phase '${state.Phase}'. Stop first.`);
     }
+
     return { SessionId: a.SessionId, ProjectSlug: a.ProjectSlug, StartedAt: a.StartedAt, Phase: "Recording", Steps: [] };
 }
 
@@ -84,6 +85,7 @@ function applyPause(state: RecordingSession): RecordingSession {
     if (state.Phase !== "Recording") {
         throw new RecorderStateError(`Cannot Pause from phase '${state.Phase}'.`);
     }
+
     return { ...state, Phase: "Paused" };
 }
 
@@ -91,11 +93,13 @@ function applyResume(state: RecordingSession): RecordingSession {
     if (state.Phase !== "Paused") {
         throw new RecorderStateError(`Cannot Resume from phase '${state.Phase}'.`);
     }
+
     return { ...state, Phase: "Recording" };
 }
 
 function applyStop(state: RecordingSession): RecordingSession {
     if (state.Phase === "Idle") { return state; }
+
     return { ...state, Phase: "Idle" };
 }
 
@@ -105,6 +109,7 @@ function applyCapture(state: RecordingSession, a: Extract<RecorderAction, { Kind
     }
     assertVariableUnique(state.Steps, a.Step.VariableName);
     const next: RecordedStep = { StepId: a.StepId, Index: state.Steps.length + 1, CapturedAt: a.CapturedAt, ...a.Step };
+
     return { ...state, Steps: [...state.Steps, next] };
 }
 
@@ -113,12 +118,14 @@ function applyRename(state: RecordingSession, a: Extract<RecorderAction, { Kind:
     const target = state.Steps.find((s) => s.StepId === a.StepId);
     if (target === undefined) { throw new RecorderStateError(`Unknown StepId '${a.StepId}'.`); }
     const updated = state.Steps.map((s) => (s.StepId === a.StepId ? { ...s, VariableName: a.VariableName } : s));
+
     return { ...state, Steps: updated };
 }
 
 function rewriteAnchorOnDelete(steps: ReadonlyArray<RecordedStep>, deletedStepId: string): RecordedStep[] {
     return steps.map((s) => {
         if (s.Selector.AnchorStepId !== deletedStepId) { return s; }
+
         return { ...s, Selector: { ...s.Selector, AnchorStepId: null } };
     });
 }
@@ -129,6 +136,7 @@ function applyDelete(state: RecordingSession, a: Extract<RecorderAction, { Kind:
         throw new RecorderStateError(`Cannot delete unknown StepId '${a.StepId}'.`);
     }
     const rewritten = rewriteAnchorOnDelete(remaining, a.StepId);
+
     return { ...state, Steps: reindex(rewritten) };
 }
 
@@ -154,5 +162,6 @@ export function recorderReducer(state: RecordingSession, action: RecorderAction)
 export function nextPhaseOnPrimary(phase: RecordingPhase): RecordingPhase {
     if (phase === "Idle") { return "Recording"; }
     if (phase === "Recording") { return "Paused"; }
+
     return "Recording";
 }

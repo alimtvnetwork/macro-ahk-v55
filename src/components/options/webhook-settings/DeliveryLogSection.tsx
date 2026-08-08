@@ -211,11 +211,13 @@ function StatusChips({
         { key: "skipped", label: "Skipped", count: logCounts.skipped, activeClass: "bg-muted text-foreground border-muted-foreground/60" },
         { key: "failure", label: "Failed", count: logCounts.failure, activeClass: "bg-destructive/20 text-destructive border-destructive/60" },
     ] as const;
+
     return (
         <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter deliveries by status">
             {chips.map((chip) => {
                 const active = statusFilter === chip.key;
                 const disabled = chip.key !== "all" && chip.count === 0;
+
                 return (
                     <button
                         key={chip.key}
@@ -322,6 +324,7 @@ function LogEntryRow({
 }) {
     const presentation = presentVariant(entry);
     const hasSummaryDetail = presentation.summaryDetail !== null;
+
     return (
         <li className={presentation.rowClass}>
             <button
@@ -372,6 +375,7 @@ function LogEntryDetails({ entry }: { readonly entry: WebhookDeliveryResult }) {
         httpText = ",";
         httpClass = "font-mono text-muted-foreground";
     }
+
     return (
         <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[11px]">
             <dt className="text-muted-foreground">Emitted</dt>
@@ -412,6 +416,7 @@ function PayloadPanel({
     readonly onToggle: () => void;
 }) {
     const payloadJson = formatPayloadJson(entry);
+
     return (
         <div className="mt-2 space-y-2">
             <div className="flex items-center justify-between gap-2">

@@ -11,9 +11,11 @@ export async function buildWorkspaceDictionary(): Promise<WorkspaceDictionary> {
     try {
         const items = scrapeWorkspaceItems();
         const credits = await loadCreditMap();
+
         return assembleDictionary(items, credits);
     } catch (caught) {
         logError("WorkspaceDictionary.build", caught);
+
         return emptyDictionary();
     }
 }
@@ -22,8 +24,10 @@ function scrapeWorkspaceItems(): Omit<WorkspaceRecord, "creditAvailable" | "cred
     const list = resolveElement(HomepageDashboardVariables.WorkspacesList.full);
     if (!list) {
         logWarn("WorkspaceDictionary.scrape", `CODE RED: WorkspacesList missing at ${HomepageDashboardVariables.WorkspacesList.full}`);
+
         return [];
     }
+
     return Array.from(list.children).map((el, i) => buildItemRecord(el, i + 1));
 }
 
@@ -32,11 +36,13 @@ function buildItemRecord(_el: Element, oneBased: number): Omit<WorkspaceRecord, 
     const proLabelXPath = resolveFullXPath("ProLabel", oneBased);
     const name = readItemName(oneBased);
     const isSelected = resolveElement(resolveFullXPath("SelectionMarkerSvg", oneBased)) !== null;
+
     return { index: oneBased, name, fullXPath, proLabelXPath, isSelected };
 }
 
 function readItemName(oneBased: number): string {
     const textEl = resolveElement(resolveFullXPath("WorkspaceItemText", oneBased));
+
     return textEl?.textContent?.trim() ?? "";
 }
 
@@ -47,6 +53,7 @@ function assembleDictionary(
     const byIndex = items.map((p) => mergeCredit(p, credits));
     const byName = Object.fromEntries(byIndex.map((r) => [r.name, r]));
     const selectedIndex = findSelectedIndex(byIndex);
+
     return { byIndex, byName, selectedIndex };
 }
 
@@ -55,11 +62,13 @@ function mergeCredit(partial: Omit<WorkspaceRecord, "creditAvailable" | "creditT
     if (!pair) {
         logWarn("WorkspaceDictionary.merge", `no credit for "${partial.name}"`);
     }
+
     return { ...partial, creditAvailable: pair?.available ?? 0, creditTotal: pair?.total ?? 0 };
 }
 
 function findSelectedIndex(records: WorkspaceRecord[]): number | null {
     const idx = records.findIndex((r) => r.isSelected);
+
     return idx === -1 ? null : idx;
 }
 
@@ -79,5 +88,6 @@ export function getSelected(dict: WorkspaceDictionary): WorkspaceRecord | null {
     if (dict.selectedIndex === null) {
         return null;
     }
+
     return dict.byIndex[dict.selectedIndex] ?? null;
 }

@@ -43,6 +43,7 @@ export function clampCap(value: number): number {
   const floored = Math.floor(value);
   if (floored < MIN_CHAT_SUBMIT_CAP) return MIN_CHAT_SUBMIT_CAP;
   if (floored > MAX_CHAT_SUBMIT_CAP) return MAX_CHAT_SUBMIT_CAP;
+
   return floored;
 }
 
@@ -55,9 +56,11 @@ async function readCapFromStorage(projectId: string): Promise<number | null> {
     const bag = await get.call(chromeApi!.storage!.local, key);
     const raw = bag?.[key];
     if (typeof raw !== 'number') return null;
+
     return clampCap(raw);
   } catch (err) {
     logError(SCOPE, `readCapFromStorage failed (projectId=${projectId})`, err);
+
     return null;
   }
 }
@@ -66,6 +69,7 @@ export async function resolveCap(projectId: string, override?: number): Promise<
   if (typeof override === 'number') return clampCap(override);
   const stored = await readCapFromStorage(projectId);
   if (stored !== null) return stored;
+
   return DEFAULT_CHAT_SUBMIT_CAP;
 }
 
@@ -95,5 +99,6 @@ export async function enforceChatSubmitWindow(
     if (isRowGone) pruned += 1;
     else failed += 1;
   }
+
   return { cap, countBefore, prunedCount: pruned, failedCount: failed };
 }

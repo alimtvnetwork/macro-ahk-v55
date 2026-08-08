@@ -25,6 +25,7 @@ vi.mock('../../settings-store', () => ({ getSettingsOverrides: () => ({}) }));
 vi.mock('../task-next-ui', () => ({ findAddToTasksButton: () => null }));
 vi.mock('../prompt-utils', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../prompt-utils')>();
+
   return {
     ...actual,
     pasteIntoEditor: mocks.pasteIntoEditor,

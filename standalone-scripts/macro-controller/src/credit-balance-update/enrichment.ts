@@ -21,6 +21,7 @@ async function enrichOne(ws: WorkspaceCredit): Promise<boolean> {
         if (result.outcome === CreditFetchOutcomeType.Skipped || result.outcome === CreditFetchOutcomeType.InlineHit) {
             return false;
         }
+
         return before !== snapshot(ws);
     } catch (caught: CaughtError) {
         logError(
@@ -28,11 +29,13 @@ async function enrichOne(ws: WorkspaceCredit): Promise<boolean> {
             'Path: standalone-scripts/macro-controller/src/credit-balance-update/enrichment.ts. Missing item: enriched credit-balance row for workspace ' + ws.id + '. Reason: requestCredits threw before returning a typed outcome.',
             caught,
         );
+
         return false;
     }
 }
 
 export async function enrichCreditBalanceUpdateWorkspaces(perWs: WorkspaceCredit[]): Promise<number> {
     const results = await Promise.all(perWs.map(enrichOne));
+
     return results.filter(Boolean).length;
 }

@@ -47,6 +47,7 @@ function defer(): Deferred {
         resolveFn = () => res({ added: 1, updated: 0, errors: [] });
         rejectFn = (e) => rej(e);
     });
+
     return { promise, resolve: resolveFn, reject: rejectFn };
 }
 

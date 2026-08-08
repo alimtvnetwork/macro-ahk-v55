@@ -20,6 +20,7 @@ const TOAST_EXIT_TRANSFORM = "translateY(8px) scale(0.96)";
 export async function isInjectionToastEnabled(): Promise<boolean> {
     try {
         const { settings } = await handleGetSettings();
+
         return settings.showInjectionToast !== false;
     } catch {
         return true; // default on
@@ -54,7 +55,9 @@ export async function showInjectionToastInTab(
 
                 const m = (window as unknown as Record<string, Record<string, ((...args: unknown[]) => void)>>).marco;
                 if (m?.notify?.success) {
-                    try { m.notify.success(toastMessage, { duration: 4000 }); return; } catch (sdkErr) { console.debug("[Marco] SDK toast.success failed, falling through to DOM toast:", sdkErr); }
+                    try { m.notify.success(toastMessage, { duration: 4000 });
+
+ return; } catch (sdkErr) { console.debug("[Marco] SDK toast.success failed, falling through to DOM toast:", sdkErr); }
                 }
 
                 const CONTAINER_ID = "__marco-inject-toast";
@@ -172,7 +175,9 @@ export async function showInjectionFailureToastInTab(
 
                 const m = (window as unknown as Record<string, Record<string, ((...args: unknown[]) => void)>>).marco;
                 if (m?.notify?.error) {
-                    try { m.notify.error(toastMessage, { duration: 6000 }); return; } catch (sdkErr) { console.debug("[Marco] SDK toast.error failed, falling through to DOM toast:", sdkErr); }
+                    try { m.notify.error(toastMessage, { duration: 6000 });
+
+ return; } catch (sdkErr) { console.debug("[Marco] SDK toast.error failed, falling through to DOM toast:", sdkErr); }
                 }
 
                 const CONTAINER_ID = "__marco-inject-toast";

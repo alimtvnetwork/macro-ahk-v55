@@ -59,6 +59,7 @@ function StatTile(props: {
         props.tone === "warn"
             ? "border-destructive/40 bg-destructive/5 text-destructive"
             : "border-border bg-muted/30 text-foreground";
+
     return (
         <div className={`flex flex-col gap-1 rounded-md border p-3 ${toneClass}`}>
             <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide opacity-80">
@@ -77,6 +78,7 @@ function WarningRow(props: { readonly warning: DanglingRunGroupRef }) {
             ? "no target set"
             : `target #${warning.TargetStepGroupId} is outside the selection`;
     const label = warning.StepLabel ?? `Step #${warning.StepId}`;
+
     return (
         <li className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs">
             <div className="font-medium text-destructive">
@@ -117,6 +119,7 @@ export default function ExportPreviewDialog(props: ExportPreviewDialogProps) {
 
 function ExportPreviewHeader({ includeDescendants }: { includeDescendants: boolean }): JSX.Element {
     const suffix = includeDescendants ? " Descendants are included." : " Descendants are skipped, only ticked groups ship.";
+
     return <DialogHeader><DialogTitle className="flex items-center gap-2"><FileArchive className="h-5 w-5 text-primary" />Export preview</DialogTitle><DialogDescription>Review what will be packaged before the .zip is generated.{suffix}</DialogDescription></DialogHeader>;
 }
 

@@ -41,6 +41,7 @@ describe('Badge visual regression matrix (Issue 119 Step 9)', () => {
   it('full tone→style snapshot is locked', () => {
     const snapshot = ALL_TONES.reduce<Record<string, BadgeStyle>>((acc, tone) => {
       acc[tone] = resolveBadgeStyle(tone);
+
       return acc;
     }, {});
 

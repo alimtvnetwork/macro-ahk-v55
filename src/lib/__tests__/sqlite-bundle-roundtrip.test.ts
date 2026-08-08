@@ -62,34 +62,42 @@ vi.mock("@/lib/message-client", () => ({
       case "SAVE_PROJECT": {
         const p = msg.project as StoredProject;
         store.projects = store.projects.filter((x) => x.id !== p.id).concat(p);
+
         return {};
       }
       case "SAVE_SCRIPT": {
         const s = msg.script as StoredScript;
         store.scripts = store.scripts.filter((x) => x.id !== s.id).concat(s);
+
         return {};
       }
       case "SAVE_CONFIG": {
         const c = msg.config as StoredConfig;
         store.configs = store.configs.filter((x) => x.id !== c.id).concat(c);
+
         return {};
       }
       case "SAVE_PROMPT": {
         const p = msg.prompt as PromptEntry;
         store.prompts = store.prompts.filter((x) => x.id !== p.id).concat(p);
+
         return {};
       }
       case "DELETE_PROJECT":
         store.projects = store.projects.filter((x) => x.id !== msg.projectId);
+
         return {};
       case "DELETE_SCRIPT":
         store.scripts = store.scripts.filter((x) => x.id !== msg.id);
+
         return {};
       case "DELETE_CONFIG":
         store.configs = store.configs.filter((x) => x.id !== msg.id);
+
         return {};
       case "DELETE_PROMPT":
         store.prompts = store.prompts.filter((x) => x.id !== msg.promptId);
+
         return {};
       default:
         throw new Error(`Mock store: unhandled message type "${msg.type}"`);
@@ -117,6 +125,7 @@ vi.mock("sql.js", async () => {
       // Always resolve from the local install, ignore the caller's URL.
       locateFile: (file: string) => resolvePath(wasmDir, file),
     })) as typeof realInit;
+
   return { ...real, default: localInit };
 });
 
@@ -136,6 +145,7 @@ beforeEach(() => {
         const buf = readFileSync(
           resolvePath(__dirname, "../../../node_modules/sql.js/dist/sql-wasm.wasm"),
         );
+
         return new Response(buf, { status: 200 });
       }
       throw new Error(`Unexpected fetch in test: ${path}`);
@@ -167,6 +177,7 @@ beforeEach(() => {
     writable: true,
     value: (b: Blob) => {
       lastExportedBlob = b;
+
       return "blob:test/" + Math.random().toString(36).slice(2);
     },
   });
@@ -560,6 +571,7 @@ async function buildZipFromDb(buildSchema: (db: import("sql.js").Database) => vo
   const zip = new JSZip();
   zip.file("marco-backup.db", dbData);
   const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE" });
+
   return new File([blob], "marco-backup.zip", { type: "application/zip" });
 }
 

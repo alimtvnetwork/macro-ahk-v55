@@ -120,6 +120,7 @@ function useTreeNodeDrag(
             );
         }
     };
+
     return { dragOver, onDragStart, onDragOver, onDragLeave, onDrop };
 }
 
@@ -131,6 +132,7 @@ function TreeNodeMoveArrows(props: {
     readonly onMove: TreeNodeRowProps["onMove"];
 }): JSX.Element {
     const { id, name, isFirst, isLast, onMove } = props;
+
     return (
         <div className="flex items-center opacity-0 group-hover:opacity-100">
             <Button variant="ghost" size="icon" className="h-6 w-6" disabled={isFirst}
@@ -163,6 +165,7 @@ interface ActionsMenuProps {
 
 function ActionsMenuStructureItems(props: ActionsMenuProps): JSX.Element {
     const { node, id, isFirst, isLast } = props;
+
     return (
         <>
             <DropdownMenuItem onSelect={() => props.onCreateChild(id)}>
@@ -184,6 +187,7 @@ function ActionsMenuStructureItems(props: ActionsMenuProps): JSX.Element {
 
 function ActionsMenuDataItems(props: ActionsMenuProps): JSX.Element {
     const { node, id, hasInputs } = props;
+
     return (
         <>
             <DropdownMenuItem onSelect={() => props.onToggleSubtree(node, true)}>
@@ -209,6 +213,7 @@ function ActionsMenuDataItems(props: ActionsMenuProps): JSX.Element {
 
 function ActionsMenuArchiveItems(props: ActionsMenuProps): JSX.Element {
     const { node, isArchived } = props;
+
     return (
         <>
             <DropdownMenuItem onSelect={() => props.onArchiveToggle(node.Group)}>
@@ -248,7 +253,6 @@ function TreeNodeActionsMenu(props: ActionsMenuProps): JSX.Element {
     );
 }
 
-
 interface LabelBodyProps {
     readonly node: TreeNode;
     readonly id: number;
@@ -264,6 +268,7 @@ interface LabelBodyProps {
 
 function TreeNodeLabelBody(props: LabelBodyProps): JSX.Element {
     const { node, id, hasChildren, isOpen, isChecked, isArchived, hasInputs } = props;
+
     return (
         <>
             <GripVertical
@@ -349,6 +354,7 @@ function TreeNodeRowBody(body: RowBodyProps): JSX.Element {
         event.stopPropagation();
         if (hoveredId === id) onHover(null);
     };
+
     return (
         <div
             draggable
@@ -386,13 +392,13 @@ function TreeNodeRowBody(body: RowBodyProps): JSX.Element {
     );
 }
 
-
 export function TreeNodeRow(props: TreeNodeRowProps): JSX.Element {
     const { node, siblingIndex, siblingCount, selected, expanded, activeGroupId, hoveredId } = props;
     const id = node.Group.StepGroupId;
     const parentId = node.Group.ParentStepGroupId ?? null;
     const hasChildren = node.Children.length > 0;
     const isOpen = expanded.has(id);
+
     return (
         <li>
             <TreeNodeRowBody

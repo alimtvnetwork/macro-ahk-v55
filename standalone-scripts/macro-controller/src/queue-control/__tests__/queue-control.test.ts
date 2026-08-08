@@ -24,6 +24,7 @@ function mountQueueButton(ariaLabel: string): HTMLButtonElement {
     btn.type = 'button';
     btn.setAttribute('aria-label', ariaLabel);
     document.body.appendChild(btn);
+
     return btn;
 }
 
@@ -32,6 +33,7 @@ function mountComposerSubmit(): HTMLButtonElement {
     btn.id = SUBMIT_BUTTON_ID;
     btn.type = 'submit';
     document.body.appendChild(btn);
+
     return btn;
 }
 

@@ -135,6 +135,7 @@ function readEditorText(): string {
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
   const isMissingTarget = !target;
   if (isMissingTarget) return '';
+
   return extractEditorPlainText(target);
 }
 
@@ -142,6 +143,7 @@ function setEditorText(text: string): boolean {
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
   const isMissingTarget = !target;
   if (isMissingTarget) return false;
+
   return replaceEditorText(target, text);
 }
 
@@ -158,6 +160,7 @@ async function waitForSubmitReady(maxMs: number): Promise<HTMLElement | null> {
     if (btn && !(btn as HTMLButtonElement).disabled) return btn;
     await sleep(POLL_MS);
   }
+
   return null;
 }
 
@@ -184,6 +187,7 @@ async function waitBetweenIterations(): Promise<void> {
     while (Date.now() < until && !repeatLoopState.cancelled) {
       await sleep(Math.min(POLL_MS, until - Date.now()));
     }
+
     return;
   }
   setPhase('waiting-completion', 0);
@@ -215,6 +219,7 @@ function getRepeatChatForm(TAG: string): HTMLElement | null {
     const m = errMsg(e);
     showPasteToast('⚠ ' + TAG + ': getElementById threw (' + m + ')', true);
     log('Repeat: getElementById threw — ' + m, 'warn');
+
     return null;
   }
 }
@@ -227,6 +232,7 @@ function tryRepeatSubmitForm(TAG: string, form: HTMLElement | null): boolean {
         showPasteToast('⚠ ' + TAG + ': requestSubmit unsupported — using submit event', false);
         form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
       }
+
       return true;
     } catch (e) {
       const m = errMsg(e);
@@ -239,6 +245,7 @@ function tryRepeatSubmitForm(TAG: string, form: HTMLElement | null): boolean {
   } else {
     showPasteToast('⚠ ' + TAG + ': no #chat-input form — using button fallback', true);
   }
+
   return false;
 }
 
@@ -248,16 +255,19 @@ function tryRepeatSubmitButton(TAG: string): boolean {
   catch (e) { log('Repeat: findAddToTasksButton threw — ' + errMsg(e), 'warn'); }
   if (!btn || (btn as HTMLButtonElement).disabled) {
     showPasteToast('❌ ' + TAG + ': no enabled submit button — submit failed', true);
+
     return false;
   }
   try {
     btn.click();
     showPasteToast('✅ ' + TAG + ': submitted via submit-button fallback', false);
+
     return true;
   } catch (e) {
     const m = errMsg(e);
     showPasteToast('❌ ' + TAG + ': button click threw (' + m + ')', true);
     log('Repeat: submit-button .click() threw — ' + m, 'warn');
+
     return false;
   }
 }
@@ -267,19 +277,21 @@ function dispatchChatSubmit(): boolean {
   if (typeof document === 'undefined' || !document.body) {
     showPasteToast('❌ ' + TAG + ': submit aborted — document not ready', true);
     log('Repeat: submit aborted — document/body not available', 'warn');
+
     return false;
   }
   const form = getRepeatChatForm(TAG);
   if (tryRepeatSubmitForm(TAG, form)) return true;
+
   return tryRepeatSubmitButton(TAG);
 }
-
 
 /** Returns true if iteration submitted successfully; false if loop should break. */
 async function submitOneIteration(): Promise<boolean> {
   setPhase('submitting', 0);
   if (!setEditorText(repeatLoopState.capturedText)) {
     showPasteToast('❌ Repeat: editor not found — stopped at ' + repeatLoopState.completed + '/' + repeatLoopState.count, true);
+
     return false;
   }
   const btn = await waitForSubmitReady(MAX_WAIT_MS);
@@ -289,10 +301,12 @@ async function submitOneIteration(): Promise<boolean> {
     if (isMissingCancelled) {
       showPasteToast('❌ Repeat: submit button never ready — stopped at ' + repeatLoopState.completed + '/' + repeatLoopState.count, true);
     }
+
     return false;
   }
   if (!dispatchChatSubmit()) {
     showPasteToast('❌ Repeat: no form#chat-input nor submit button — stopped at ' + repeatLoopState.completed + '/' + repeatLoopState.count, true);
+
     return false;
   }
   repeatLoopState.completed++;
@@ -304,6 +318,7 @@ async function submitOneIteration(): Promise<boolean> {
     metaJson: JSON.stringify({ iteration: repeatLoopState.completed, total: repeatLoopState.count }),
   });
   notify();
+
   return true;
 }
 
@@ -340,12 +355,14 @@ function finishRepeatLoop(): void {
 export function startRepeatLoop(): void {
   if (repeatLoopState.running) {
     log('Repeat: already running', 'warn');
+
     return;
   }
   const text = readEditorText().trim();
   const isMissingText = !text;
   if (isMissingText) {
     showPasteToast('❌ Repeat: chat box is empty — type or paste something first', true);
+
     return;
   }
   const n = Math.max(1, Math.min(1000, Math.floor(repeatLoopState.count) || 1));
@@ -418,6 +435,7 @@ export function nextPresetAbove(current: number): number {
   for (const p of PRESETS) {
     if (p > PRESET_INLINE_MAX) return p;
   }
+
   return PRESETS[PRESETS.length - 1];
 }
 
@@ -432,6 +450,7 @@ export function prevPresetBelow(current: number): number {
     else break;
   }
   if (prev !== null) return prev;
+
   return PRESETS[PRESETS.length - 1];
 }
 
@@ -469,6 +488,7 @@ function buildCountInput(): HTMLInputElement {
     setRepeatCount(next);
     input.value = String(repeatLoopState.count);
   }, { passive: false });
+
   return input;
 }
 
@@ -514,6 +534,7 @@ function wireTogglePopover(
   trigger.addEventListener('click', function () {
     if (pop.hidden) open(); else close();
   });
+
   return { open, close };
 }
 
@@ -521,6 +542,7 @@ function clampPopoverLeft(rect: DOMRect): number {
   const maxWidth = 340;
   const margin = 8;
   const maxLeft = Math.max(margin, window.innerWidth - maxWidth - margin);
+
   return Math.max(margin, Math.min(Math.round(rect.left), maxLeft));
 }
 
@@ -542,9 +564,9 @@ function makePresetButton(n: number, small: boolean): HTMLButtonElement {
   const pad = small ? '2px 8px' : '2px 6px';
   b.style.cssText = 'padding:' + pad + ';background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';cursor:pointer;font-size:10px;';
   b.onclick = function () { setRepeatCount(n); };
+
   return b;
 }
-
 
 /**
  * Attach a "More ▾" popover holding the overflow presets. Popover teardown
@@ -580,9 +602,9 @@ function buildMorePresetsPopover(overflow: readonly number[]): HTMLElement {
 
   wrap.appendChild(trigger);
   wrap.appendChild(pop);
+
   return wrap;
 }
-
 
 export function buildCountPresets(): DocumentFragment {
   const frag = document.createDocumentFragment();
@@ -599,6 +621,7 @@ export function buildCountPresets(): DocumentFragment {
     frag.appendChild(chip);
   }
   if (overflow.length > 0) frag.appendChild(buildMorePresetsPopover(overflow));
+
   return frag;
 }
 
@@ -626,6 +649,7 @@ function buildSchemeSummary(tailLadder: string, tail: readonly number[]): HTMLBu
     'Past ' + tail[tail.length - 1] + ' wraps back to ' + tail[0] + '; stepping down under 1 wraps to ' + tail[tail.length - 1] + '.\n' +
     'Numeric clamp stays [1, 1000] regardless.';
   summary.style.cssText = 'padding:2px 6px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';cursor:pointer;font-size:10px;white-space:nowrap;';
+
   return summary;
 }
 
@@ -715,9 +739,9 @@ export function buildRepeatSchemeLegend(): HTMLElement {
 
   wrap.appendChild(summary);
   wrap.appendChild(pop);
+
   return wrap;
 }
-
 
 interface WaitControls {
   wrap: HTMLElement;
@@ -776,11 +800,13 @@ function formatPhaseTimer(): string {
   if (phase === 'submitting') return '⏳ submitting…';
   if (phase === 'waiting-completion') {
     const elapsed = Math.max(0, Math.floor((now - repeatLoopState.phaseStartedAt) / 1000));
+
     return '⏱ waiting reply ' + elapsed + 's';
   }
   // waiting-delay (fixed delay): show countdown
   const remainMs = Math.max(0, repeatLoopState.phaseDeadlineAt - now);
   const remainSec = Math.ceil(remainMs / 1000);
+
   return '⏱ next in ' + remainSec + 's';
 }
 
@@ -829,9 +855,9 @@ function buildActionButton(): HTMLButtonElement {
     if (repeatLoopState.running) stopRepeatLoop();
     else startRepeatLoop();
   };
+
   return action;
 }
-
 
 function buildCollapseButton(): HTMLButtonElement {
   const btn = document.createElement('button');
@@ -840,6 +866,7 @@ function buildCollapseButton(): HTMLButtonElement {
   btn.style.cssText = 'margin-left:4px;padding:2px 6px;background:transparent;border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';cursor:pointer;font-size:11px;line-height:1;';
   btn.textContent = '–';
   btn.onclick = function () { toggleRepeatCollapsed(); };
+
   return btn;
 }
 
@@ -890,6 +917,7 @@ function buildPresetsWrap(): { wrap: HTMLElement, sentinel: HTMLElement } {
   const sentinel = document.createElement('span');
   sentinel.style.cssText = 'display:none;flex-shrink:0;';
   wrap.appendChild(sentinel);
+
   return { wrap, sentinel };
 }
 
@@ -910,6 +938,7 @@ function buildRepeatChipForOverflow(n: number, highlighted: boolean): HTMLElemen
   chip.dataset['chip'] = '1';
   chip.dataset['n'] = String(n);
   chip.dataset['highlighted'] = highlighted ? '1' : '0';
+
   return chip;
 }
 
@@ -922,6 +951,7 @@ function buildBottomRow(): { row: HTMLElement; wait: WaitControls } {
   wait.wrap.style.paddingLeft = '0';
   wait.wrap.style.borderLeft = 'none';
   row.appendChild(wait.wrap);
+
   return { row, wait };
 }
 
@@ -931,6 +961,7 @@ function buildCollapsedPill(): HTMLButtonElement {
   pill.title = 'Expand repeat controls';
   pill.style.cssText = 'display:none;align-items:center;gap:4px;padding:3px 8px;background:' + cSectionBg + ';border:1px solid rgba(124,58,237,0.3);border-radius:999px;color:' + cPrimaryLight + ';cursor:pointer;font:600 11px system-ui,-apple-system,sans-serif;flex:0 0 auto;';
   pill.onclick = function () { toggleRepeatCollapsed(); };
+
   return pill;
 }
 
@@ -989,14 +1020,15 @@ function buildControl(opts: { compact: boolean; useLocalCollapse: boolean }): HT
     if (typeof window !== 'undefined') window.removeEventListener('pagehide', teardown);
   };
   tickId = trackedSetInterval('RepeatLoopUI.tick', function () {
-    if (typeof document === 'undefined' || !document.body || !document.body.contains(host)) { teardown(); return; }
+    if (typeof document === 'undefined' || !document.body || !document.body.contains(host)) { teardown();
+
+ return; }
     if (repeatLoopState.running) render();
   }, 1000);
   if (typeof window !== 'undefined') window.addEventListener('pagehide', teardown, { once: true });
+
   return host;
 }
-
-
 
 /** Macro-panel section (compact, sits in the panel body). */
 export function buildRepeatPanelSection(): HTMLElement {
@@ -1039,6 +1071,7 @@ function tryMountInline(): boolean {
   // click, since Repeat used to have its own toggle.
   subscribeInlineStripGroupCollapse(function () { applyInlineStripGroupCollapse(); });
   log('Repeat: inline strip mounted into unified frame', 'info');
+
   return true;
 }
 

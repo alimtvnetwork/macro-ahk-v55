@@ -113,6 +113,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
     if (!projectSlug) {
       setTables([]);
       setLoading(false);
+
       return;
     }
     setLoading(true);
@@ -148,6 +149,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
     const trimmedName = newTableName.trim();
     if (!trimmedName) {
       toast.error("Table name is required");
+
       return;
     }
     const validColumns = newColumns.filter((c) => c.name.trim()).map((c) => ({
@@ -155,6 +157,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
     }));
     if (validColumns.length === 0) {
       toast.error("At least one column is required");
+
       return;
     }
 
@@ -221,6 +224,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
 
       if (!result.isOk) {
         toast.error(result.errorMessage || "Failed to generate docs");
+
         return;
       }
 
@@ -393,6 +397,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
                   const cols: ColumnDef[] = (() => {
                     try { return JSON.parse(t.ColumnDefs); } catch { return []; }
                   })();
+
                   return (
                     <TableRow key={t.TableName}>
                       <TableCell className="text-xs font-mono font-medium">{t.TableName}</TableCell>

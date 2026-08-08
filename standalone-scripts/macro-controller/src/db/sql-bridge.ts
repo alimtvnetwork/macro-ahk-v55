@@ -91,6 +91,7 @@ export function getSqlBridgeState(): SqlBridgeState {
         WRITE: winning.WRITE ?? null,
         ALTER: winning.ALTER ?? null,
     };
+
     return {
         winning: w,
         rejections: {
@@ -112,7 +113,9 @@ export function getSqlBridgeState(): SqlBridgeState {
  * retry-once path so a stale cache does not surface `PROMPT_LOAD_E001`.
  */
 export function resetSqlBridgeCache(bucket?: Bucket): void {
-    if (typeof bucket === 'string') { delete winning[bucket]; return; }
+    if (typeof bucket === 'string') { delete winning[bucket];
+
+ return; }
     for (const k of Object.keys(winning)) delete winning[k as Bucket];
 }
 
@@ -127,11 +130,13 @@ export function isSqlBridgeContractError(message: string | undefined): boolean {
 
 function isContractError(message: string | undefined): boolean {
     if (typeof message !== 'string' || message.length === 0) return false;
+
     return CONTRACT_ERR_PATTERNS.some(function(re) { return re.test(message); });
 }
 
 function classify(legacy: LegacyMethod, sql: string): Bucket {
     if (legacy === 'QUERY') return 'SELECT';
+
     // legacy === 'SCHEMA'
     return /^\s*alter\s+table\b/i.test(sql) ? 'ALTER' : 'WRITE';
 }
@@ -140,6 +145,7 @@ async function sendOnce(method: string, sql: string, project: string): Promise<S
     const resp = await sendToExtension('PROJECT_API', {
         project, method, endpoint: 'rawSql', params: { sql },
     });
+
     return (resp as SqlBridgeResp) ?? { isOk: false, errorMessage: 'no response' };
 }
 
@@ -163,6 +169,7 @@ export async function runSql(legacy: LegacyMethod, sql: string, project: string 
         const resp = await sendOnce(method, sql, project);
         if (resp.isOk) {
             winning[bucket] = method;
+
             return resp;
         }
         if (!isContractError(resp.errorMessage)) {
@@ -172,6 +179,7 @@ export async function runSql(legacy: LegacyMethod, sql: string, project: string 
         recordRejection(bucket, method, resp.errorMessage ?? 'unknown');
         lastResp = resp;
     }
+
     return {
         isOk: false,
         errorMessage:
@@ -194,8 +202,10 @@ export async function runLoggedQuery(
     const isMissingIsOk = !resp.isOk;
     if (isMissingIsOk) {
         logError(contextInfo, `Database query failed: ${resp.errorMessage || 'Unknown error'}`, { sql, project });
+
         return new ServiceResult<SqlBridgeResp, Error>(false, resp, new Error(resp.errorMessage || 'unknown error'));
     }
+
     return new ServiceResult<SqlBridgeResp, Error>(true, resp);
 }
 
@@ -230,13 +240,16 @@ export async function runWithBridgeRetry<T>(
         const message = isFailure(first);
         if (message && isSqlBridgeContractError(message)) {
             resetSqlBridgeCache();
+
             return await operation();
         }
+
         return first;
     } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         if (isSqlBridgeContractError(message)) {
             resetSqlBridgeCache();
+
             return await operation();
         }
         throw err;

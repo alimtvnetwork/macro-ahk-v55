@@ -163,6 +163,7 @@ export async function handleDataSet(
     };
 
     await writeStore(data);
+
     return { isOk: true };
 }
 
@@ -271,6 +272,7 @@ export async function handleDataClear(
     }
 
     await writeStore(data);
+
     return { isOk: true, cleared };
 }
 

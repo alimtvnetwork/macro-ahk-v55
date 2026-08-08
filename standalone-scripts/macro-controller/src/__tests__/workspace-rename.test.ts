@@ -35,7 +35,6 @@ const mockLocalStorage = {
 Object.defineProperty(globalThis, 'localStorage', { value: mockLocalStorage, writable: true });
 
 import { applyRenameTemplate, getRenameDelayMs, setRenameDelayMs, cancelRename, isRenameCancelled, getRenameHistory, getRenameAvgOpMs } from '../workspace-rename';
-
  
 describe('workspace-rename', () => {
   describe('applyRenameTemplate', () => {

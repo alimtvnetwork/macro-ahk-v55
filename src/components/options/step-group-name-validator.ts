@@ -46,5 +46,6 @@ export function validateStepGroupName(
     const lower = trimmed.toLowerCase();
     const clash = siblingNames.find((s) => s.toLowerCase() === lower);
     if (clash !== undefined) return "Another group at this level already has that name.";
+
     return null;
 }

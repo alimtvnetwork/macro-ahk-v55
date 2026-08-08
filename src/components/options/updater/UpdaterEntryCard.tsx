@@ -81,7 +81,6 @@ export function UpdaterEntryCard({
   onUpdateStep,
   toggleCategory,
 }: UpdaterEntryCardProps) {
-
   const statusIconNode = () => {
     switch (u.status) {
       case STATUS_UP_TO_DATE:
@@ -399,6 +398,7 @@ function Section({ icon, title, children, collapsible }: { icon: React.ReactNode
       </Collapsible>
     );
   }
+
   return (
     <div className="space-y-2">
       <h4 className="flex items-center gap-2 text-xs font-semibold text-foreground">{icon}{title}</h4>

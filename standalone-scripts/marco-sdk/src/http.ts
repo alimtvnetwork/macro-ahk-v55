@@ -93,6 +93,7 @@ client.interceptors.response.use(
                 if (newToken) {
                     config.headers.Authorization = `Bearer ${newToken}`;
                     config.__retryCount = 1;
+
                     return client(config);
                 }
             } catch (err) {
@@ -111,6 +112,7 @@ client.interceptors.response.use(
 
             await new Promise<void>((resolve) => setTimeout(resolve, delay));
             config.__retryCount = retryCount + 1;
+
             return client(config);
         }
 
@@ -179,6 +181,7 @@ async function resolveAuthToken(): Promise<string | null> {
             cachedToken = token;
             cacheExpiresAt = Date.now() + TOKEN_CACHE_TTL_MS;
         }
+
         return token;
     } finally {
         inflightResolve = null;
@@ -201,6 +204,7 @@ async function resolveAuthTokenInner(): Promise<string | null> {
             bridgeOutcome = "hit";
             lastAuthDiag = { source: "bridge", durationMs: ms, bridgeOutcome };
             console.log("[marco-sdk:auth] ✅ Bridge token resolved in %.1fms", ms);
+
             return bridgeToken;
         }
         bridgeOutcome = "timeout";
@@ -219,6 +223,7 @@ async function resolveAuthTokenInner(): Promise<string | null> {
             const ms = performance.now() - t0;
             lastAuthDiag = { source: "localStorage", durationMs: ms, bridgeOutcome };
             console.log("[marco-sdk:auth] 🔑 localStorage fallback resolved in %.1fms (bridge: %s)", ms, bridgeOutcome);
+
             return stored;
         }
     } catch (caught) {
@@ -228,5 +233,6 @@ async function resolveAuthTokenInner(): Promise<string | null> {
     const ms = performance.now() - t0;
     lastAuthDiag = { source: "none", durationMs: ms, bridgeOutcome };
     console.warn("[marco-sdk:auth] ⚠ No token from any source after %.1fms (bridge: %s)", ms, bridgeOutcome);
+
     return null;
 }

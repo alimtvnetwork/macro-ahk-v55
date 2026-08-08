@@ -33,6 +33,7 @@ beforeEach(() => {
         if (/^\s*(select|pragma)/i.test(sql)) {
             return [{ columns: ["Id", "Slug"], values: [[1, "plan-default"]] }];
         }
+
         return [];
     });
 });

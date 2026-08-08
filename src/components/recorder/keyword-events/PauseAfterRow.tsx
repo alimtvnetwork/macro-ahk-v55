@@ -66,6 +66,7 @@ function EnabledBody(props: {
     onDraftChange: (raw: string) => void;
 }): JSX.Element {
     const { eventId, draft, draftValid, onDraftChange } = props;
+
     return (
         <div className="flex items-center gap-2">
             <Input
@@ -95,6 +96,7 @@ function PauseAfterHeader(props: {
     onToggle: (checked: boolean) => void;
 }): JSX.Element {
     const { eventId, enabled, onToggle } = props;
+
     return (
         <div className="flex items-center gap-2">
             <Clock className="h-3.5 w-3.5 text-muted-foreground" />
@@ -116,7 +118,6 @@ function PauseAfterHeader(props: {
     );
 }
 
-
 export function PauseAfterRow(props: PauseAfterRowProps): JSX.Element {
     const { eventId, value, onChange } = props;
     const enabled = typeof value === "number" && Number.isFinite(value) && value >= 0;
@@ -125,6 +126,7 @@ export function PauseAfterRow(props: PauseAfterRowProps): JSX.Element {
     const handleToggle = (checked: boolean): void => {
         if (!checked) {
             onChange(undefined);
+
             return;
         }
         const restore = draftValid ? Math.floor(parsed) : DEFAULT_CHAIN_SETTINGS.PauseMs;

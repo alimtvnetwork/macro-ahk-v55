@@ -33,9 +33,11 @@ export function getStatusBucketColor(bucket: string): string {
 export function truncateUrl(url: string): string {
   try {
     const parsed = new URL(url);
+
     return parsed.pathname + parsed.search;
   } catch (urlParseError: unknown) {
     const isTooLong = url.length > 60;
+
     return isTooLong ? url.slice(0, 60) + "…" : url;
   }
 }

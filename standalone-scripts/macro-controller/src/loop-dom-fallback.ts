@@ -65,6 +65,7 @@ export function runCycleDomFallback(): void {
 
   if (isUserTypingInPrompt()) {
     log('SKIP: User is typing — cannot open dialog', 'skip');
+
     return;
   }
 
@@ -72,12 +73,14 @@ export function runCycleDomFallback(): void {
   const isMissingClicked = !clicked;
   if (isMissingClicked) {
     logError('DOM Fallback', 'project button not found');
+
     return;
   }
 
   pollForDialogReady().then(function() {
     if (!state.running || state.isDelegating) {
       closeProjectDialog();
+
       return;
     }
 
@@ -91,6 +94,7 @@ export function runCycleDomFallback(): void {
     if (hasProgressBar) {
       log('DOM Fallback: Free credit found — NO move needed', 'success');
       mc().updateUI();
+
       return;
     }
 
@@ -105,6 +109,7 @@ export function runCycleDomFallback(): void {
 export function forceSwitch(direction: LoopDirectionType | string): void {
   if (state.isDelegating) {
     log('BLOCKED: Already moving, ignoring force ' + direction.toUpperCase(), 'warn');
+
     return;
   }
   log('=== FORCE ' + direction.toUpperCase() + ' ===', 'delegate');

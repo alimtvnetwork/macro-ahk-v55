@@ -26,5 +26,6 @@ export function toCodeName(slug: string): string {
  */
 export function toSdkNamespace(slugOrCodeName: string): string {
   const codeName = slugOrCodeName.includes("-") ? toCodeName(slugOrCodeName) : slugOrCodeName;
+
   return `RiseupAsiaMacroExt.Projects.${codeName}`;
 }

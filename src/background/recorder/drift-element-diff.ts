@@ -79,6 +79,7 @@ export function diffDriftElements(
     if (primary === null && fallback === null) return emptyDiff("PrimaryMissing");
     if (primary === null) return oneSidedDiff(fallback as DomContext, "PrimaryMissing", true);
     if (fallback === null) return oneSidedDiff(primary, "FallbackMissing", false);
+
     return buildTwoSidedDiff(primary, fallback);
 }
 
@@ -86,6 +87,7 @@ function pairFieldDiffs(primary: DomContext, fallback: DomContext): DriftFieldDi
     return DIFF_FIELDS.map((field) => {
         const a = readField(primary, field);
         const b = readField(fallback, field);
+
         return { Field: field, Primary: a, Fallback: b, Change: classifyChange(a, b) };
     });
 }
@@ -94,6 +96,7 @@ function buildTwoSidedDiff(primary: DomContext, fallback: DomContext): DriftElem
     const fields = pairFieldDiffs(primary, fallback);
     const classList = diffClassList(primary.ClassName, fallback.ClassName);
     const hasChanges = fields.some((f) => f.Change !== "Unchanged");
+
     return {
         Verdict: classifyVerdict(primary, fallback, fields, hasChanges),
         Fields: fields, ClassList: classList, HasChanges: hasChanges,
@@ -104,6 +107,7 @@ function classifyChange(a: string | null, b: string | null): DriftChangeKind {
     if (a === b) return "Unchanged";
     if (a === null || a === "") return "Added";
     if (b === null || b === "") return "Removed";
+
     return "Modified";
 }
 
@@ -140,11 +144,13 @@ function diffClassList(a: string | null, b: string | null): DriftClassListDiff {
     removed.sort();
     added.sort();
     shared.sort();
+
     return { Removed: removed, Added: added, Shared: shared };
 }
 
 function toClassSet(value: string | null): Set<string> {
     if (value === null || value.trim() === "") return new Set();
+
     return new Set(value.trim().split(/\s+/));
 }
 
@@ -177,6 +183,7 @@ function oneSidedDiff(
 ): DriftElementDiff {
     const fields: DriftFieldDiff[] = DIFF_FIELDS.map((field) => {
         const value = readField(present, field);
+
         return {
             Field: field,
             Primary: fallbackSide ? null : value,
@@ -187,6 +194,7 @@ function oneSidedDiff(
     const classList = fallbackSide
         ? diffClassList(null, present.ClassName)
         : diffClassList(present.ClassName, null);
+
     return {
         Verdict: verdict,
         Fields: fields,

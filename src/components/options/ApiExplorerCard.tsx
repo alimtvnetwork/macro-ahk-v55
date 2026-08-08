@@ -109,11 +109,13 @@ export function ApiExplorerCard() {
       parsedBody = requestJson.trim() ? JSON.parse(requestJson) : {};
     } catch {
       toast.error("Request JSON is invalid");
+
       return;
     }
 
     if (parsedBody === null || typeof parsedBody !== "object" || Array.isArray(parsedBody)) {
       toast.error("Request JSON must be an object");
+
       return;
     }
 
@@ -166,6 +168,7 @@ export function ApiExplorerCard() {
           <div className="max-h-56 overflow-y-auto rounded-md border border-border bg-muted/20 p-2 space-y-1.5">
             {endpoints.map((endpoint) => {
               const active = endpoint.type === selectedType;
+
               return (
                 <button
                   key={endpoint.type}

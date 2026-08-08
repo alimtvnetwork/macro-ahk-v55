@@ -68,14 +68,17 @@ function makeFakeDb(log: DbCallLog): SqlJsDatabase {
     const db = {
         run: (sql: string, params?: unknown) => {
             log.runs.push({ sql, params });
+
             return db;
         },
         exec: (sql: string, params?: unknown) => {
             log.execs.push({ sql, params });
+
             return [] as ReturnType<SqlJsDatabase["exec"]>;
         },
         prepare: (sql: string) => {
             log.prepares.push(sql);
+
             // Returns a minimal Statement stub. Should never be reached in
             // missing-field tests, if it is, the assertion below catches it.
             return {
@@ -87,6 +90,7 @@ function makeFakeDb(log: DbCallLog): SqlJsDatabase {
             } as unknown as ReturnType<SqlJsDatabase["prepare"]>;
         },
     };
+
     return db as unknown as SqlJsDatabase;
 }
 
@@ -97,6 +101,7 @@ function makeFakeDbManager(): { manager: DbManager; log: DbCallLog } {
         getLogsDb: () => fakeDb,
         markDirty: () => {},
     } as unknown as DbManager;
+
     return { manager, log };
 }
 

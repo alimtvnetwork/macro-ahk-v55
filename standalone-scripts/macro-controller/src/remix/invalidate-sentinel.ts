@@ -57,10 +57,12 @@ function removeDomSentinel(): boolean {
         const isMissingElement = !element;
         if (isMissingElement) return false;
         element.remove();
+
         return true;
     } catch (err: unknown) {
         logError('SentinelInvalidate',
             'removeDomSentinel failed (id=' + MARCO_SENTINEL_DOM_ID + ')', err);
+
         return false;
     }
 }
@@ -75,10 +77,12 @@ function clearRelayFlag(): boolean {
         const bag = window as unknown as Record<string, unknown>;
         if (!(MARCO_RELAY_ACTIVE_KEY in bag)) return false;
         delete bag[MARCO_RELAY_ACTIVE_KEY];
+
         return true;
     } catch (err: unknown) {
         logError('SentinelInvalidate',
             'clearRelayFlag failed (key=' + MARCO_RELAY_ACTIVE_KEY + ')', err);
+
         return false;
     }
 }
@@ -90,10 +94,12 @@ function clearRelayFlag(): boolean {
 async function sendInvalidateCache(): Promise<boolean> {
     try {
         await sendToExtension(INVALIDATE_CACHE_MSG, {});
+
         return true;
     } catch (err: unknown) {
         logError('SentinelInvalidate',
             'sendToExtension(INVALIDATE_CACHE) failed — background may be sleeping', err);
+
         return false;
     }
 }

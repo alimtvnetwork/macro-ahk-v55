@@ -92,6 +92,7 @@ describe('prompt-library-modal - Export -> Import round-trip', () => {
         // exporter hands off for download.
         (URL as unknown as { createObjectURL: (b: Blob) => string }).createObjectURL = (b: Blob) => {
             capturedBlob = b;
+
             return 'blob:mock';
         };
         (URL as unknown as { revokeObjectURL: (u: string) => void }).revokeObjectURL = () => undefined;

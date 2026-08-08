@@ -59,6 +59,7 @@ export function parseCombo(combo: string): ParsedCombo {
         else if (lower === "meta" || lower === "cmd" || lower === "command") Meta = true;
         else Key = p;
     }
+
     return { Key, Ctrl, Shift, Alt, Meta };
 }
 
@@ -91,6 +92,7 @@ export function resolveEventTarget(
             if (sel === "") { return fallback; }
             try {
                 const node = d.querySelector(sel);
+
                 return node ?? fallback;
             } catch {
                 // Invalid CSS selector — surface a fallback rather than throw
@@ -106,6 +108,7 @@ function resolveTarget(
     eventCfg: KeywordEventTarget | undefined,
 ): EventTarget {
     if (explicit) { return explicit; }
+
     return resolveEventTarget(eventCfg);
 }
 
@@ -125,7 +128,9 @@ function dispatchKey(target: EventTarget, type: DispatchKeyType, parsed: ParsedC
 
 function wait(ms: number, signal?: AbortSignal): Promise<void> {
     return new Promise((resolve, reject) => {
-        if (signal?.aborted) { reject(new DOMException("Aborted", "AbortError")); return; }
+        if (signal?.aborted) { reject(new DOMException("Aborted", "AbortError"));
+
+ return; }
         const timer = setTimeout(() => {
             signal?.removeEventListener("abort", onAbort);
             resolve();
@@ -176,6 +181,7 @@ export async function runKeywordEvent(
             }
             stepsRun += 1;
         }
+
         return { Completed: true, StepsRun: stepsRun, Aborted: false };
     } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") {

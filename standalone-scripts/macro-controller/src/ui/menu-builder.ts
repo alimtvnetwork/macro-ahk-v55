@@ -143,11 +143,15 @@ function _addLoopSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLElem
 function _addForceSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLElement }, menuDropdown: HTMLElement, forceMoveTracker: { isInFlight: () => boolean; set: () => void }): void {
   const forceMenu = createSubmenu(menuCtx, '⚡', 'Force');
   forceMenu.panel.appendChild(createMenuItem(menuCtx, '⏫', 'Force Move Up', 'Force move project to previous workspace via API (Ctrl+Up)', function() {
-    if (forceMoveTracker.isInFlight()) { log('Force move: cooldown active', 'warn'); return; }
+    if (forceMoveTracker.isInFlight()) { log('Force move: cooldown active', 'warn');
+
+ return; }
     forceMoveTracker.set(); moveToAdjacentWorkspace('up');
   }));
   forceMenu.panel.appendChild(createMenuItem(menuCtx, '⏬', 'Force Move Down', 'Force move project to next workspace via API (Ctrl+Down)', function() {
-    if (forceMoveTracker.isInFlight()) { log('Force move: cooldown active', 'warn'); return; }
+    if (forceMoveTracker.isInFlight()) { log('Force move: cooldown active', 'warn');
+
+ return; }
     forceMoveTracker.set(); moveToAdjacentWorkspace('down');
   }));
   menuDropdown.appendChild(forceMenu.el);
@@ -167,6 +171,7 @@ function buildBundleHeader(bundle: string, now: Date): string {
   header += '// Paste this entire script into any browser DevTools Console.\n';
   header += '// TIP: If Domain Guard blocks, run: window.__comboForceInject = true  first.\n';
   header += '// ============================================\n\n';
+
   return header;
 }
 
@@ -193,8 +198,10 @@ async function fetchBundleSource(): Promise<string | null> {
     const reason = response?.errorMessage || 'Bundled macro controller source is unavailable';
     logError('Export', reason);
     showToast('❌ ' + reason, 'error');
+
     return null;
   }
+
   return scriptSource;
 }
 
@@ -206,6 +213,7 @@ function formatDiagnosticDump(diag: DiagnosticDump): string {
     const formatted = Array.isArray(value) ? '[' + value.join(', ') + ']' : String(value);
     lines.push(key + ': ' + formatted);
   }
+
   return lines.join('\n');
 }
 
@@ -241,6 +249,7 @@ function _addExportSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLEl
     if (result === undefined) {
       log('Diagnostic dump not available', 'warn');
       showToast('⚠️ Diagnostic dump not available', 'warn');
+
       return;
     }
     const now = new Date();

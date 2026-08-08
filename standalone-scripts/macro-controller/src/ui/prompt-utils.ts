@@ -1,4 +1,3 @@
- 
 import { toErrorMessage, logError } from '../error-utils';
 /**
  * MacroLoop Controller — Prompt Utility Functions
@@ -23,7 +22,6 @@ async function capturePasteSubmit(text: string, source: ChatSubmitSource): Promi
   try { await captureChatSubmit({ source, text }); }
   catch (e) { logError('capturePasteSubmit', 'chat-submit capture threw', e); }
 }
-
 
 // ── Prompt entry normalization ──
 // eslint-disable-next-line sonarjs/cognitive-complexity -- field-by-field validation with optional property copying
@@ -63,6 +61,7 @@ export function normalizePromptEntries(entries: Partial<PromptEntry & { order?: 
   if (droppedCount > 0) {
     console.warn('[normalizePromptEntries] ⚠️ Dropped ' + droppedCount + '/' + entries.length + ' entries due to missing name or text');
   }
+
   return out;
 }
 
@@ -94,6 +93,7 @@ function buildExpandedEntry(
   if (raw.slug) { entry.parentSlug = raw.slug; }
   entry.variantValue = value;
   entry.tags = Array.isArray(raw.tags) ? raw.tags : autoTagPrompt(expandedName, expandedText);
+
   return entry;
 }
 
@@ -147,8 +147,6 @@ export function parseWithRecovery(content: string): unknown {
 
 // ── Toast notification system (solid dark minimal, left accent bar, stacking max 3) ──
 
-
-
 function _getOrCreateToastContainer(): HTMLElement {
   let container = document.getElementById(DomIdType.ToastStack);
   const isMissingContainer = !container;
@@ -159,6 +157,7 @@ function _getOrCreateToastContainer(): HTMLElement {
       'display:flex;flex-direction:column-reverse;gap:6px;z-index:1000000;pointer-events:none;';
     document.body.appendChild(container);
   }
+
   return container;
 }
 
@@ -262,6 +261,7 @@ function _buildUndoToastShell(): { toast: HTMLDivElement; content: HTMLDivElemen
   content.appendChild(icon);
   body.appendChild(content);
   toast.appendChild(body);
+
   return { toast, content, body };
 }
 
@@ -273,6 +273,7 @@ function _buildIdChip(restoredId: number | string): HTMLSpanElement {
   chip.style.cssText = 'flex-shrink:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;' +
     'font-size:10px;padding:2px 6px;border-radius:3px;background:rgba(196,181,253,0.12);' +
     'color:#c4b5fd;border:1px solid rgba(196,181,253,0.25);';
+
   return chip;
 }
 
@@ -318,6 +319,7 @@ function _buildCountdown(durationMs: number): {
   const stop = function(): void {
     if (tickId !== null) { clearInterval(tickId); tickId = null; }
   };
+
   return { wrap, bar, label, start, stop };
 }
 
@@ -328,6 +330,7 @@ function _buildUndoButton(label: string): HTMLButtonElement {
   undoBtn.textContent = label;
   undoBtn.style.cssText = 'padding:4px 10px;background:transparent;border:1px solid rgba(196,181,253,0.5);' +
     'border-radius:4px;color:#c4b5fd;font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0;';
+
   return undoBtn;
 }
 
@@ -412,13 +415,6 @@ export function showUndoToast(
   }, duration);
 }
 
-
-
-
-
-
-
-
 // ── Find editor paste target via XPath/CSS selectors ──
 export function findPasteTarget(promptsCfg: PromptsCfg, getByXPath: (xpath: string) => Element | null): Element | null {
   let el: Element | null = null;
@@ -441,6 +437,7 @@ export function findPasteTarget(promptsCfg: PromptsCfg, getByXPath: (xpath: stri
 
     if (el) { return el; }
   }
+
   return null;
 }
 
@@ -479,6 +476,7 @@ function pasteIntoContentEditable(target: HTMLElement, text: string): boolean {
   const execResult = document.execCommand('insertText', false, fullText);
   if (execResult) {
     target.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: fullText }));
+
     return true;
   }
 
@@ -491,6 +489,7 @@ function pasteIntoContentEditable(target: HTMLElement, text: string): boolean {
 
   if (pasteHandled) {
     target.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: fullText }));
+
     return true;
   }
 
@@ -499,6 +498,7 @@ function pasteIntoContentEditable(target: HTMLElement, text: string): boolean {
   navigator.clipboard.writeText(text).then(function() {
     showPasteToast('📋 Copied to clipboard — paste with Ctrl+V', false);
   });
+
   return false;
 }
 
@@ -631,6 +631,7 @@ export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, g
     }).catch(function() {
       showPasteToast('❌ Could not paste or copy — editor target not found', true);
     });
+
     return 'clipboard';
   }
 
@@ -651,6 +652,7 @@ export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, g
     log('Prompt injected: "' + text.substring(0, 80) + '..." (' + text.length + ' total chars)', 'success');
     showPasteToast('✓ Prompt injected (' + text.length + ' chars)', false);
     void capturePasteSubmit(text, captureSource);
+
     return 'injected';
   } catch (e: unknown) {
     const errMsg = toErrorMessage(e);
@@ -662,6 +664,7 @@ export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, g
       showToast('❌ Prompt copy to clipboard failed', 'error');
       showPasteToast('❌ Inject and clipboard both failed', true);
     });
+
     return 'failed';
   }
 }

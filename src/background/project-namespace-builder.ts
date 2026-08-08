@@ -295,6 +295,7 @@ console.log("[namespace] Registered RiseupAsiaMacroExt.Projects.${cn}");
     /* Touch the imported keys list so tree-shaking keeps it for runtime
        diagnostics consumers that import it from this module. */
     void PROJECT_NAMESPACE_KEYS;
+
     return iife;
 }
 

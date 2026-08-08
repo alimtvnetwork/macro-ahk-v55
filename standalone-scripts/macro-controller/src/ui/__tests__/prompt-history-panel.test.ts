@@ -28,6 +28,7 @@ vi.mock('../../db/prompt-db', () => ({
 }));
 vi.mock('../../error-utils', async () => {
   const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+
   return { ...actual, logDiagnosticFromCode: vi.fn() };
 });
 vi.mock('../../toast', () => ({ showToast: vi.fn() }));
@@ -159,7 +160,9 @@ describe('openPromptHistoryPanel', () => {
     const created: string[] = [];
     const originalCreate = URL.createObjectURL;
     const originalRevoke = URL.revokeObjectURL;
-    URL.createObjectURL = vi.fn(() => { const u = 'blob:mock-' + created.length; created.push(u); return u; });
+    URL.createObjectURL = vi.fn(() => { const u = 'blob:mock-' + created.length; created.push(u);
+
+ return u; });
     URL.revokeObjectURL = vi.fn();
     const clicked: string[] = [];
     const originalAnchorClick = HTMLAnchorElement.prototype.click;
@@ -377,8 +380,6 @@ describe('openPromptHistoryPanel', () => {
     expect(stages).toContain('oversized');
     expect(stages).toContain('wrong-type');
   });
-
-
 
   // ── v4.186.0: Import Undo path ───────────────────────────────────────
   it('handleImportFile wraps success in undoToast; onUndo deletes only rows Id>sinceId', async () => {

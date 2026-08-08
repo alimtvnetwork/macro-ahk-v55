@@ -68,6 +68,7 @@ function normalize(report: FailureReport): unknown {
     if (typeof cloned.StackTrace === "string" && cloned.StackTrace.length > 0) {
         cloned.StackTrace = "<stripped-for-snapshot>";
     }
+
     return sortKeys(cloned);
 }
 
@@ -78,8 +79,10 @@ function sortKeys(value: unknown): unknown {
         for (const k of Object.keys(value as Record<string, unknown>).sort()) {
             out[k] = sortKeys((value as Record<string, unknown>)[k]);
         }
+
         return out;
     }
+
     return value;
 }
 

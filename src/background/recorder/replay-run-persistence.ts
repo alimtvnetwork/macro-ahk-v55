@@ -80,6 +80,7 @@ function insertRunHeader(db: SqlJsDatabase, draft: ReplayRunDraft): number {
          VALUES (?, ?, ?, ?, ?, ?)`,
         [draft.StartedAt, draft.FinishedAt, total, ok, total - ok, draft.Notes],
     );
+
     return lastInsertId(db);
 }
 
@@ -101,6 +102,7 @@ export function insertReplayRunRow(
     for (const r of draft.StepResults) {
         insertStepResultRow(db, runId, r);
     }
+
     return readReplayRun(db, runId);
 }
 
@@ -113,6 +115,7 @@ export function listReplayRunRows(
          ORDER BY StartedAt DESC, ReplayRunId DESC`,
     );
     const values = result[0]?.values ?? [];
+
     return values.map(rowToRun);
 }
 
@@ -129,6 +132,7 @@ export function listStepResultsForRun(
         [replayRunId],
     );
     const values = result[0]?.values ?? [];
+
     return values.map(rowToStepResult);
 }
 
@@ -150,6 +154,7 @@ export function listStepResultsForStep(
         [stepId],
     );
     const values = result[0]?.values ?? [];
+
     return values.map(rowToStepResult);
 }
 
@@ -172,6 +177,7 @@ export async function saveReplayRun(
     const mgr = await initProjectDb(projectSlug);
     const run = insertReplayRunRow(mgr.getDb(), draft);
     mgr.markDirty();
+
     return run;
 }
 
@@ -179,6 +185,7 @@ export async function listReplayRuns(
     projectSlug: string,
 ): Promise<ReadonlyArray<PersistedReplayRun>> {
     const mgr = await initProjectDb(projectSlug);
+
     return listReplayRunRows(mgr.getDb());
 }
 
@@ -187,6 +194,7 @@ export async function listReplayStepResults(
     replayRunId: number,
 ): Promise<ReadonlyArray<PersistedReplayStepResult>> {
     const mgr = await initProjectDb(projectSlug);
+
     return listStepResultsForRun(mgr.getDb(), replayRunId);
 }
 
@@ -199,6 +207,7 @@ export async function listReplayStepResultsForStep(
     stepId: number,
 ): Promise<ReadonlyArray<PersistedReplayStepResult>> {
     const mgr = await initProjectDb(projectSlug);
+
     return listStepResultsForStep(mgr.getDb(), stepId);
 }
 
@@ -217,6 +226,7 @@ export async function deleteReplayRun(
 
 function lastInsertId(db: SqlJsDatabase): number {
     const result = db.exec("SELECT last_insert_rowid()");
+
     return result[0].values[0][0] as number;
 }
 
@@ -230,6 +240,7 @@ function readReplayRun(db: SqlJsDatabase, runId: number): PersistedReplayRun {
     if (row === undefined) {
         throw new Error(`ReplayRun row missing for ReplayRunId ${runId} after insert`);
     }
+
     return rowToRun(row);
 }
 

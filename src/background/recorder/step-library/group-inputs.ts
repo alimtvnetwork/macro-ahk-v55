@@ -67,6 +67,7 @@ export function parseGroupInputJson(raw: string): ParseResult {
     } catch (err) {
         const detail = err instanceof Error ? err.message : "Unknown parse error";
         const pos = extractPositionHint(detail, trimmed);
+
         return {
             Ok: false,
             Reason: pos === null
@@ -80,12 +81,14 @@ export function parseGroupInputJson(raw: string): ParseResult {
             Reason: `Expected a JSON object (e.g. { "Email": "you@example.com" }), got ${describeKind(parsed)}.`,
         };
     }
+
     return { Ok: true, Value: parsed as GroupInputBag };
 }
 
 function describeKind(v: JsonValue): string {
     if (v === null) return "null";
     if (Array.isArray(v)) return "an array";
+
     return typeof v;
 }
 
@@ -106,6 +109,7 @@ function extractPositionHint(message: string, source: string): string | null {
             col++;
         }
     }
+
     return `line ${line}, column ${col}`;
 }
 
@@ -130,6 +134,7 @@ function safeReadStore(): RawStore {
                 out[k] = v as GroupInputBag;
             }
         }
+
         return out;
     } catch {
         return {};
@@ -155,6 +160,7 @@ export function readAllGroupInputs(): GroupInputsMap {
             map.set(id, v);
         }
     }
+
     return map;
 }
 
@@ -162,6 +168,7 @@ export function readAllGroupInputs(): GroupInputsMap {
 export function readGroupInput(stepGroupId: number): GroupInputBag | null {
     const store = safeReadStore();
     const v = store[String(stepGroupId)];
+
     return v === undefined ? null : v;
 }
 

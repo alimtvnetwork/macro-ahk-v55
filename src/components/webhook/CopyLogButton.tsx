@@ -19,6 +19,7 @@ async function writeToClipboard(text: string): Promise<boolean> {
   try {
     if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(text);
+
       return true;
     }
   } catch (err) {
@@ -34,9 +35,11 @@ async function writeToClipboard(text: string): Promise<boolean> {
     textarea.select();
     const ok = document.execCommand("copy");
     document.body.removeChild(textarea);
+
     return ok;
   } catch (err) {
     console.warn("[CopyLogButton] legacy execCommand copy fallback failed", err);
+
     return false;
   }
 }

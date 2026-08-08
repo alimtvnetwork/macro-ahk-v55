@@ -70,11 +70,13 @@ function stubMarco(workspaceResp: { ok: boolean; status: number; data: unknown }
 
 function firstToastCode(): string {
   const err = showDiagnosticToastSpy.mock.calls[0]?.[0] as DiagnosticError;
+
   return err.code;
 }
 
 async function loadModule(): Promise<typeof import('../credit-balance')> {
   vi.resetModules();
+
   return await import('../credit-balance');
 }
 

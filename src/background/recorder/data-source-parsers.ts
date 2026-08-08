@@ -71,15 +71,25 @@ function splitNonEmptyLines(text: string): string[] {
 interface CsvScanState { current: string; inQuotes: boolean; skipNext: boolean }
 
 function scanQuotedChar(ch: string, next: string | undefined, state: CsvScanState): void {
-    if (ch === '"' && next === '"') { state.current += '"'; state.skipNext = true; return; }
-    if (ch === '"') { state.inQuotes = false; return; }
+    if (ch === '"' && next === '"') { state.current += '"'; state.skipNext = true;
+
+ return; }
+    if (ch === '"') { state.inQuotes = false;
+
+ return; }
     state.current += ch;
 }
 
 function scanCsvChar(ch: string, next: string | undefined, state: CsvScanState, out: string[]): void {
-    if (state.inQuotes) { scanQuotedChar(ch, next, state); return; }
-    if (ch === '"') { state.inQuotes = true; return; }
-    if (ch === ",") { out.push(state.current.trim()); state.current = ""; return; }
+    if (state.inQuotes) { scanQuotedChar(ch, next, state);
+
+ return; }
+    if (ch === '"') { state.inQuotes = true;
+
+ return; }
+    if (ch === ",") { out.push(state.current.trim()); state.current = "";
+
+ return; }
     state.current += ch;
 }
 
@@ -91,6 +101,7 @@ function parseCsvLine(line: string): string[] {
         scanCsvChar(line[i]!, line[i + 1], state, out);
     }
     out.push(state.current.trim());
+
     return out;
 }
 
@@ -160,6 +171,7 @@ function collectJsonColumns(rows: ReadonlyArray<unknown>): string[] {
 function runJsEvaluator(body: string): unknown {
     try {
         const evaluator = new Function(`"use strict"; ${body}`);
+
         return evaluator();
     } catch (caughtError) {
         const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
@@ -178,6 +190,7 @@ export function evaluateJsDataSource(body: string): ParsedDataSource {
     }
     const columns = collectJsonColumns(rows);
     const normalized = rows.map((r) => normalizeRow(r as Record<string, unknown>));
+
     return {
         DataSourceKindId: ExtendedDataSourceKindId.Js,
         Columns: columns, RowCount: rows.length, Rows: normalized,
@@ -190,6 +203,7 @@ function normalizeRow(row: Record<string, unknown>): Record<string, string> {
         const v = row[key];
         out[key] = v === null || v === undefined ? "" : String(v);
     }
+
     return out;
 }
 

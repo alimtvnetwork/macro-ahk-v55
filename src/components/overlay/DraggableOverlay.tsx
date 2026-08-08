@@ -43,6 +43,7 @@ function loadGeometry(): Geometry {
     } catch (err) {
         console.warn("[DraggableOverlay] failed to load geometry from localStorage", err);
     }
+
     return { ...DEFAULT_GEOMETRY };
 }
 
@@ -57,6 +58,7 @@ function resolveInitial(g: Geometry): Geometry {
     const height = Math.min(Math.max(g.height, MIN_H), vh);
     const x = g.x < 0 ? vw - width - 16 : Math.min(Math.max(0, g.x), vw - width);
     const y = g.y < 0 ? vh - height - 16 : Math.min(Math.max(0, g.y), vh - height);
+
     return { x, y, width, height };
 }
 
@@ -180,10 +182,12 @@ export function DraggableOverlay({ title = "Marco", children, headerExtra, statu
                 const height = Math.min(prev.height, vh);
                 const x = Math.min(prev.x, vw - width);
                 const y = Math.min(prev.y, vh - height);
+
                 return { x: Math.max(0, x), y: Math.max(0, y), width, height };
             });
         };
         window.addEventListener("resize", onResize);
+
         return () => window.removeEventListener("resize", onResize);
     }, []);
 

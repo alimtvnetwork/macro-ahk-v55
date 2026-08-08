@@ -19,6 +19,7 @@ export function hashSettingsKey(settings: Record<string, unknown>, guideKey: str
 /** Returns cached script if hash matches, or null for a miss. */
 export function getSettingsNsCache(hash: string): string | null {
     if (_cache && _cache.hash === hash) return _cache.script;
+
     return null;
 }
 

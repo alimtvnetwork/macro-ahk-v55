@@ -78,12 +78,14 @@ function handleTokenBroadcast(event: MessageEvent): void {
     } else {
       log('[TokenBroadcast] Ignored TOKEN_UPDATED payload because token is not a valid JWT', 'warn');
     }
+
     return;
   }
 
   if (data.type === 'TOKEN_EXPIRED') {
     log('[TokenBroadcast] Received TOKEN_EXPIRED — reason: ' + reason, 'warn');
     updateAuthBadge(false, 'expired[broadcast]');
+
     return;
   }
 }

@@ -64,6 +64,7 @@ function makeDb(spec: BundleSpec): SqlExecCapable {
                 const tableName = pragmaMatch[1];
                 const table = spec.tables.find((t) => t.name === tableName);
                 if (!table) return [];
+
                 // PRAGMA table_info returns rows shaped as
                 //   [cid, name, type, notnull, dflt_value, pk]
                 // Validator reads column index 1 ("name").
@@ -81,6 +82,7 @@ function makeDb(spec: BundleSpec): SqlExecCapable {
                 if (spec.formatVersion === null) {
                     return [{ columns: ["Value"], values: [] }];
                 }
+
                 return [{
                     columns: ["Value"],
                     values: [[spec.formatVersion]],

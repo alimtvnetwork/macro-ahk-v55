@@ -34,7 +34,6 @@ export class TaskQueueManager {
   getExecutionLogs(): string[] { return this._executionLogs; }
   onLogUpdate(cb: (logs: string[]) => void): void { this._onLogUpdate = cb; }
 
-
   isProcessing(): boolean { return this._isProcessing; }
   isPaused(): boolean { return this._isPaused; }
   isStopped(): boolean { return this._isStopped; }
@@ -46,6 +45,7 @@ export class TaskQueueManager {
     if (isMissing_instance) {
       TaskQueueManager._instance = new TaskQueueManager();
     }
+
     return TaskQueueManager._instance;
   }
 
@@ -115,12 +115,14 @@ export class TaskQueueManager {
     this._logExecution('Injecting prompt into editor...', 'info');
     const outcome = pasteIntoEditor(task.prompt, promptsCfg, (xpath) => {
       const node = getByXPath(xpath);
+
       return node instanceof Element ? node : null;
     });
 
     if (String(outcome) === 'failed') {
       this._logExecution('Injection failed', 'error');
       await this._handleTaskFailure(task, 'Injection failed');
+
       return;
     }
 
@@ -151,7 +153,6 @@ export class TaskQueueManager {
     const maxRetries = overrides.maxTaskRetries ?? 3;
 
     if (overrides.retryOnFailure !== false && retries < maxRetries) {
-
       const nextRetry = retries + 1;
       const holdMs = 10000 * nextRetry; // 10s, 20s, 30s backoff
       this._logExecution(`Task failed (${reason}). Retry ${nextRetry}/${maxRetries} in ${holdMs / 1000}s.`, 'warn');
@@ -177,7 +178,6 @@ export class TaskQueueManager {
         await saveTaskQueue(queueState);
       }
     }
-
   }
 
   private findSubmitButton(): HTMLElement | null {
@@ -193,6 +193,7 @@ export class TaskQueueManager {
       if (el instanceof HTMLButtonElement && !el.disabled) return el;
       if (el instanceof HTMLInputElement && !el.disabled) return el;
     }
+
     return null;
   }
 

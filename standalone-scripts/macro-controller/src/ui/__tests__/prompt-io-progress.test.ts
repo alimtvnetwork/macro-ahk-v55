@@ -42,6 +42,7 @@ vi.mock('../prompt-io-db-bridge', () => ({
     partitionByRole: vi.fn((entries: { role?: string }[]) => {
         const dbEntries = entries.filter((e) => e.role === 'plan' || e.role === 'next' || e.role === 'generic');
         const cacheEntries = entries.filter((e) => !dbEntries.includes(e));
+
         return { dbEntries, cacheEntries };
     }),
     commitDbEntries: vi.fn(async (entries: unknown[]) => ({ upserted: entries.length, errors: [] })),

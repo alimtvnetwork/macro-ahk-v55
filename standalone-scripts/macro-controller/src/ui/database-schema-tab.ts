@@ -279,6 +279,7 @@ function handleCreateTable(
 
   if (hasValidationError) {
     showMsg(msgArea, 'err', validationError);
+
     return;
   }
 
@@ -383,6 +384,7 @@ function refreshTableList(
 
     if (isEmpty) {
       renderEmptyTablesList(container);
+
       return;
     }
 
@@ -470,5 +472,6 @@ function buildTableEntry(
   };
 
   entry.appendChild(dropButton);
+
   return entry;
 }

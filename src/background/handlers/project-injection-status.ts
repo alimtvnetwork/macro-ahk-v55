@@ -128,5 +128,6 @@ function resolveScriptAliases(
 function normalizeScriptKey(value: string): string {
     const normalized = value.trim().toLowerCase().replace(/\\/g, "/");
     const fileName = normalized.split("/").pop() ?? normalized;
+
     return fileName.split(/[?#]/)[0] ?? fileName;
 }

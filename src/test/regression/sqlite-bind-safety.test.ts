@@ -51,6 +51,7 @@ function makeStubStatement(): StubStatement {
         runCalls: [] as Array<unknown>,
         bind(params?: unknown) {
             stmt.bindCalls.push(params);
+
             return true;
         },
         run(params?: unknown) {
@@ -59,6 +60,7 @@ function makeStubStatement(): StubStatement {
         free() { return true; },
         step() { return false; },
     } as unknown as StubStatement;
+
     return stmt;
 }
 
@@ -69,19 +71,23 @@ function makeStubDatabase(stmt: StubStatement = makeStubStatement()): StubDataba
         prepareCalls: [] as string[],
         run(sql: string, params?: unknown) {
             db.runCalls.push({ sql, params });
+
             return db as unknown as SqlJsDatabase;
         },
         exec(sql: string, params?: unknown) {
             db.execCalls.push({ sql, params });
+
             return [] as unknown as ReturnType<SqlJsDatabase["exec"]>;
         },
         prepare(sql: string) {
             db.prepareCalls.push(sql);
+
             return stmt as unknown as Statement;
         },
         close() { /* no-op */ },
         export() { return new Uint8Array(); },
     } as unknown as StubDatabase;
+
     return db;
 }
 
@@ -112,7 +118,6 @@ describe("BindError", () => {
 /* ------------------------------------------------------------------ */
 /*  2. assertBindable, column-name inference across SQL shapes        */
 /* ------------------------------------------------------------------ */
-
  
 describe("assertBindable, column-name inference", () => {
     it("returns params unchanged when nothing is undefined", () => {
@@ -142,7 +147,9 @@ describe("assertBindable, column-name inference", () => {
     it("infers column from INSERT OR REPLACE INTO ... (a, b) VALUES (?, ?)", () => {
         const sql = "INSERT OR REPLACE INTO Settings (Key, Value) VALUES (?, ?)";
         const thrown = (() => {
-            try { assertBindable(sql, ["k", undefined]); return null; }
+            try { assertBindable(sql, ["k", undefined]);
+
+ return null; }
             catch (e) { return e as BindError; }
         })();
         expect(thrown).toBeInstanceOf(BindError);
@@ -153,7 +160,9 @@ describe("assertBindable, column-name inference", () => {
     it("infers column from UPDATE Foo SET Col = ?, Col2 = ? WHERE Id = ?", () => {
         const sql = "UPDATE Projects SET Name = ?, UpdatedAt = ? WHERE ProjectId = ?";
         const thrown = (() => {
-            try { assertBindable(sql, ["new-name", undefined, "p1"]); return null; }
+            try { assertBindable(sql, ["new-name", undefined, "p1"]);
+
+ return null; }
             catch (e) { return e as BindError; }
         })();
         expect(thrown).toBeInstanceOf(BindError);
@@ -164,7 +173,9 @@ describe("assertBindable, column-name inference", () => {
     it("infers column from SELECT ... WHERE Col = ? AND Col2 = ?", () => {
         const sql = "SELECT * FROM Projects WHERE ProjectId = ? AND IsActive = ?";
         const thrown = (() => {
-            try { assertBindable(sql, ["p1", undefined]); return null; }
+            try { assertBindable(sql, ["p1", undefined]);
+
+ return null; }
             catch (e) { return e as BindError; }
         })();
         expect(thrown).toBeInstanceOf(BindError);
@@ -174,7 +185,9 @@ describe("assertBindable, column-name inference", () => {
     it("infers column from DELETE FROM Foo WHERE Col = ?", () => {
         const sql = "DELETE FROM Cache WHERE CacheKey = ?";
         const thrown = (() => {
-            try { assertBindable(sql, [undefined]); return null; }
+            try { assertBindable(sql, [undefined]);
+
+ return null; }
             catch (e) { return e as BindError; }
         })();
         expect(thrown).toBeInstanceOf(BindError);
@@ -185,7 +198,9 @@ describe("assertBindable, column-name inference", () => {
     it("falls back to <param N> when SQL shape is unrecognised", () => {
         const sql = "SOME_NON_STANDARD_OP ? ? ?";
         const thrown = (() => {
-            try { assertBindable(sql, [1, undefined, 3]); return null; }
+            try { assertBindable(sql, [1, undefined, 3]);
+
+ return null; }
             catch (e) { return e as BindError; }
         })();
         expect(thrown).toBeInstanceOf(BindError);
@@ -195,7 +210,9 @@ describe("assertBindable, column-name inference", () => {
     it("throws on the FIRST undefined param even when later params are also undefined", () => {
         const sql = "INSERT INTO Foo (A, B, C) VALUES (?, ?, ?)";
         const thrown = (() => {
-            try { assertBindable(sql, [undefined, undefined, undefined]); return null; }
+            try { assertBindable(sql, [undefined, undefined, undefined]);
+
+ return null; }
             catch (e) { return e as BindError; }
         })();
         expect(thrown!.paramIndex).toBe(0);
@@ -206,7 +223,9 @@ describe("assertBindable, column-name inference", () => {
         const longSql = "INSERT INTO Foo (" + Array.from({ length: 50 }, (_, i) => `Col${i}`).join(", ") + ") VALUES (" + "?, ".repeat(49) + "?)";
         const params = Array.from({ length: 50 }, (_, i) => i === 25 ? undefined : i);
         const thrown = (() => {
-            try { assertBindable(longSql, params); return null; }
+            try { assertBindable(longSql, params);
+
+ return null; }
             catch (e) { return e as BindError; }
         })();
         expect(thrown!.sqlPreview.length).toBeLessThanOrEqual(120);
@@ -214,7 +233,6 @@ describe("assertBindable, column-name inference", () => {
     });
 
     it("treats null as a valid bind value (only undefined is rejected)", () => {
-         
         const sql = "INSERT INTO Foo (A, B) VALUES (?, ?)";
         expect(() => assertBindable(sql, ["x", null])).not.toThrow();
     });
@@ -223,7 +241,6 @@ describe("assertBindable, column-name inference", () => {
 /* ------------------------------------------------------------------ */
 /*  3. wrapDatabaseWithBindSafety, Database Proxy interception        */
 /* ------------------------------------------------------------------ */
-
  
 describe("wrapDatabaseWithBindSafety, Database Proxy", () => {
     it("intercepts db.run() and throws BindError BEFORE delegating", () => {

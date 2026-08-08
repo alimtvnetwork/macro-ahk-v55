@@ -1,4 +1,3 @@
-
 import { DataAttrType } from '../types';
 /**
  * Skeleton UI — Shimmer loading placeholders for macro controller panel.
@@ -10,7 +9,6 @@ import { DataAttrType } from '../types';
  * Ref: .lovable/fixes/macro-controller-toast-crash-and-slow-startup.md
  * Ref: .lovable/memory/features/macro-controller/startup-initialization.md
  */
-
 
 // ============================================
 // CSS Keyframes (injected once)
@@ -79,6 +77,7 @@ export function createSkeletonBar(opts?: SkeletonBarOpts): HTMLElement {
     opts.marginBottom ? 'margin-bottom:' + opts.marginBottom : '',
     opts.display ? 'display:' + opts.display : '',
   ].filter(Boolean).join(';') + ';';
+
   return bar;
 }
 

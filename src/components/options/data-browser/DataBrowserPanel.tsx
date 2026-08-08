@@ -20,6 +20,7 @@ type ActiveView = ActiveViewEnum;
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
@@ -62,6 +63,7 @@ export function DataBrowserPanel() {
     const tableCount = dbList.reduce((sum, db) => sum + Object.keys(db.tables).length, 0);
     const totalRows = (stats?.logCount ?? 0) + (stats?.errorCount ?? 0) + (stats?.sessionCount ?? 0);
     const estimatedSize = totalRows * 200;
+
     return {
       tables: tableCount,
       views: 1,

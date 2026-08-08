@@ -108,6 +108,7 @@ const SEQUENCE_TOKEN = "{n}";
 
 function formatSequenceNumber(n: number, padding: number): string {
     const width = Math.max(1, Math.min(6, Math.floor(padding)));
+
     return String(Math.max(0, Math.floor(n))).padStart(width, "0");
 }
 
@@ -119,6 +120,7 @@ function applySequence(t: TransformInput, index: number): string {
     }
     const base = t.SequenceBase.trim();
     if (base.length === 0) return n;
+
     return `${base}${t.SequenceSeparator}${n}`;
 }
 
@@ -128,6 +130,7 @@ function applyTransform(name: string, t: TransformInput, index: number): string 
             // Empty Find = identity. Splitting on empty string would
             // explode the name into per-character pieces.
             if (t.Find === "") return name;
+
             return name.split(t.Find).join(t.Replace);
         case "prefix":
             return `${t.Prefix}${name}`;
@@ -210,6 +213,7 @@ function buildPreview(
         if (count > 1) {
             return { ...r, Issue: "Two selected groups would share this name." };
         }
+
         return r;
     });
 }
@@ -256,6 +260,7 @@ function useBatchRenameForm(): BatchRenameFormState {
         SequenceBase: sequenceBase, SequenceStart: sequenceStart,
         SequencePadding: sequencePadding, SequenceSeparator: sequenceSeparator,
     };
+
     return {
         mode, setMode, find, setFind, replace, setReplace,
         prefix, setPrefix, suffix, setSuffix,
@@ -406,6 +411,7 @@ function PreviewRowItem({ row }: { row: PreviewRow }) {
     const newNameCls = row.Issue !== null
         ? "text-destructive"
         : row.Changed ? "text-foreground" : "text-muted-foreground";
+
     return (
         <li className={[
             "flex items-center gap-2 px-3 py-2",

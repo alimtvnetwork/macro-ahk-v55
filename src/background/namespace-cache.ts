@@ -103,5 +103,6 @@ export async function readNamespaceCaches(
             map.set(pid, entry.script);
         }
     }
+
     return map;
 }

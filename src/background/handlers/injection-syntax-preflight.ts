@@ -74,6 +74,7 @@ export function detectSyntaxError(code: string): string | null {
             sourceType: "script",
             allowReturnOutsideFunction: false,
         });
+
         return null;
     } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
@@ -82,6 +83,7 @@ export function detectSyntaxError(code: string): string | null {
             code.length,
             message,
         );
+
         return message;
     }
 }
@@ -115,6 +117,7 @@ export function requestHasInlineSyntaxError(
                 inlineScript.name ?? inlineScript.id,
                 inlineScript.code.length,
             );
+
             return false;
         }
 
@@ -128,6 +131,7 @@ export function requestHasInlineSyntaxError(
             inlineScript.code.length,
             syntaxError,
         );
+
         return true;
     });
 

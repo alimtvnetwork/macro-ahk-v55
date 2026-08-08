@@ -74,6 +74,7 @@ export function buildErrorResult(
 export function resolveInjectionPath(result: CspInjectionResult): string {
     if (result.world === "USER_SCRIPT") return "userScripts";
     if (result.isFallback && result.world === "ISOLATED") return "isolated-blob";
+
     return "main-blob";
 }
 
@@ -105,6 +106,7 @@ export function buildSkipMessage(reason: SkipReason, scriptName: string): string
  */
 export function extractMacroVersion(code: string): string | null {
     const match = code.match(/VERSION\s*=\s*['"](\d+\.\d+\.\d+)['"]/);
+
     return match?.[1] ?? null;
 }
 

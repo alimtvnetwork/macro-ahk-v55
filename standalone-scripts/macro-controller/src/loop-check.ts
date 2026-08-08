@@ -52,6 +52,7 @@ function restoreOnFailure(
     state.workspaceName = previousWsName;
     loopCreditState.currentWs = previousCurrentWs;
     log('Restored previous workspace (detection failed): ' + previousWsName, 'warn');
+
     return;
   }
 
@@ -90,6 +91,7 @@ function doXPathDetect(
     syncCurrentWsFromName(wsList);
     logDetectionResult();
     state.workspaceFromApi = false;
+
     return dialogBtn;
   });
 }
@@ -140,9 +142,11 @@ function buildDetectPromise(
     if (freshPerWs.length === 0) {
       log('Credit fetch returned 0 workspaces — will try raw XPath text as workspace name', 'warn');
     }
+
     return doXPathDetect(freshPerWs, previousWsName, previousCurrentWs);
   }).catch(function(err: Error) {
     log('Credit fetch failed: ' + err.message + ' — detecting via XPath without workspace list', 'warn');
+
     return doXPathDetect([], previousWsName, previousCurrentWs);
   });
 }

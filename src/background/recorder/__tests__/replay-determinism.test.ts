@@ -39,6 +39,7 @@ function freshDb(): SqlJsDatabase {
     const db = new SQL.Database();
     db.run("PRAGMA foreign_keys = ON;");
     db.run(RECORDER_DB_SCHEMA);
+
     return db;
 }
 
@@ -58,6 +59,7 @@ function renderFixture(): HTMLElement {
             <button id="cancel" class="primary">Cancel</button>
         </main>
     `;
+
     return document.body;
 }
 
@@ -84,6 +86,7 @@ function evaluateXPath(expr: string): Element {
     if (!(node instanceof Element)) {
         throw new Error(`XPath "${expr}" matched a non-Element node`);
     }
+
     return node;
 }
 

@@ -22,6 +22,7 @@ export function showDatabaseModal(): void {
 
   if (isAlreadyOpen) {
     existing.remove();
+
     return;
   }
 
@@ -98,6 +99,7 @@ function createOverlay(): HTMLElement {
     const isBackdropClick = event.target === overlay;
     if (isBackdropClick) overlay.remove();
   };
+
   return overlay;
 }
 
@@ -172,6 +174,7 @@ function buildTabBody(isVisible: boolean): HTMLElement {
   const body = document.createElement('div');
   body.className = 'marco-db-body';
   body.style.display = isVisible ? 'flex' : 'none';
+
   return body;
 }
 

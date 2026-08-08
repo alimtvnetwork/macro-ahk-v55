@@ -50,6 +50,7 @@ import { renderPromptsDropdown } from '../ui/prompt-dropdown';
 function makeCtx() {
   const dropdown = document.createElement('div');
   document.body.appendChild(dropdown);
+
   return { promptsDropdown: dropdown } as never;
 }
 

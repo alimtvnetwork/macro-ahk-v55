@@ -1,4 +1,3 @@
- 
 import { Timings } from "./constants/timing";
 import { toErrorMessage , logError } from './error-utils';
 /**
@@ -64,6 +63,7 @@ export function initXPathUtils(): void {
 export function reactClick(el: Element, callerXpath?: string): void {
   if (hasXPathUtils()) {
     window.XPathUtils.reactClick(el, callerXpath);
+
     return;
   }
   // Fallback: inline implementation
@@ -90,8 +90,10 @@ export function getByXPath(xpath: string): Node | null {
   const isMissingXpath = !xpath;
   if (isMissingXpath) {
     logError('XPath', 'is empty or undefined');
+
     return null;
   }
+
   return domCache.getByXPath(xpath);
 }
 
@@ -99,8 +101,10 @@ export function getAllByXPath(xpath: string): Node[] {
   const isMissingXpath = !xpath;
   if (isMissingXpath) {
     logError('XPath', 'is empty or undefined');
+
     return [];
   }
+
   return domCache.getAllByXPath(xpath);
 }
 
@@ -126,9 +130,11 @@ function findViaXPath(desc: ElementDescriptor): Element | null {
   const result = getByXPath(desc.xpath);
   if (result) {
     log('  ' + desc.name + ' FOUND via XPath: ' + desc.xpath, 'success');
+
     return result as Element;
   }
   log('  ' + desc.name + ' XPath failed: ' + desc.xpath + ' — trying fallbacks', 'warn');
+
   return null;
 }
 
@@ -144,10 +150,12 @@ function findViaTextScan(desc: ElementDescriptor): Element | null {
     for (const text of texts) {
       if (elText === text || elText.indexOf(text) !== -1) {
         log('  ' + desc.name + ' FOUND via text: "' + elText.substring(0, 40) + '"', 'success');
+
         return tagEl;
       }
     }
   }
+
   return null;
 }
 
@@ -163,6 +171,7 @@ function findViaCssSelector(desc: ElementDescriptor): Element | null {
       const result = document.querySelector(sel);
       if (result) {
         log('    ✅ FOUND via selector [' + (sIdx + 1) + ']: ' + sel + ' → <' + result.tagName.toLowerCase() + '>', 'success');
+
         return result;
       }
       log('    ❌ Not found', 'warn');
@@ -170,6 +179,7 @@ function findViaCssSelector(desc: ElementDescriptor): Element | null {
       logError('unknown', '    ❌ Invalid selector: ' + toErrorMessage(e));
     }
   }
+
   return null;
 }
 
@@ -183,6 +193,7 @@ function findViaAriaLabel(desc: ElementDescriptor): Element | null {
       const result = document.querySelector('[aria-label*="' + label + '" i], [title*="' + label + '" i]');
       if (result) {
         log('  ' + desc.name + ' FOUND via ARIA: ' + label, 'success');
+
         return result;
       }
     } catch (_e) {
@@ -190,6 +201,7 @@ function findViaAriaLabel(desc: ElementDescriptor): Element | null {
       logSub('ARIA label query skipped for "' + label + '": ' + toErrorMessage(_e), 1);
     }
   }
+
   return null;
 }
 
@@ -200,8 +212,10 @@ function findViaRole(desc: ElementDescriptor): Element | null {
   const result = document.querySelector('[role="' + desc.role + '"]');
   if (result) {
     log('  ' + desc.name + ' FOUND via role: ' + desc.role, 'success');
+
     return result;
   }
+
   return null;
 }
 
@@ -209,6 +223,7 @@ function findViaRole(desc: ElementDescriptor): Element | null {
 function findViaAria(desc: ElementDescriptor): Element | null {
   if (!desc.ariaLabel && !desc.role) return null;
   log('  Method 4 (ARIA/role)', 'check');
+
   return findViaAriaLabel(desc) || findViaRole(desc);
 }
 
@@ -268,8 +283,10 @@ export function updateProjectButtonXPath(newXPath: string): boolean {
     CONFIG.PROJECT_BUTTON_XPATH = newXPath.trim();
     ML_ELEMENTS.PROJECT_BUTTON.xpath = newXPath.trim();
     log('Project Button XPath updated to: ' + CONFIG.PROJECT_BUTTON_XPATH, 'success');
+
     return true;
   }
+
   return false;
 }
 
@@ -278,8 +295,10 @@ export function updateProgressXPath(newXPath: string): boolean {
     CONFIG.PROGRESS_XPATH = newXPath.trim();
     ML_ELEMENTS.PROGRESS.xpath = newXPath.trim();
     log('Progress Bar XPath updated to: ' + CONFIG.PROGRESS_XPATH, 'success');
+
     return true;
   }
+
   return false;
 }
 
@@ -287,8 +306,10 @@ export function updateWorkspaceXPath(newXPath: string): boolean {
   if (newXPath && newXPath.trim()) {
     CONFIG.WORKSPACE_XPATH = newXPath.trim();
     log('Workspace XPath updated to: ' + CONFIG.WORKSPACE_XPATH, 'success');
+
     return true;
   }
+
   return false;
 }
 
@@ -304,6 +325,7 @@ export function isReturnButtonVisible(): boolean {
     selector: ['#ql-native-return-btn', '.ql-native-return-btn'],
     tag: 'button'
   };
+
   // Use findElement which handles XPath and multiple fallbacks
   return !!findElement(descriptor);
 }

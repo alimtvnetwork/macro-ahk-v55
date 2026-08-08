@@ -35,6 +35,7 @@ function elementSummary(el: DomContext | null): string {
     const attrSegment = attrs.length > 0 ? ` ${attrs.join("")}` : "";
     const head = `<${el.TagName}${attrSegment}>`;
     if (el.TextSnippet.length === 0) return head;
+
     return `${head} "${el.TextSnippet}"`;
 }
 
@@ -51,6 +52,7 @@ export function SelectorTesterPanel({ doc }: SelectorTesterPanelProps = {}) {
 
     const result = useMemo(() => {
         if (targetDoc === null || expression.trim().length === 0) return null;
+
         return testSelector(expression, targetDoc, kind);
     }, [expression, kind, targetDoc]);
 

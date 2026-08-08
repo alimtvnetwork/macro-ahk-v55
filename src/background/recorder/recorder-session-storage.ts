@@ -33,6 +33,7 @@ function getStorage(): ChromeStorageLike {
             "This module must run in an extension context (service worker, content script, or popup).",
         );
     }
+
     return local;
 }
 
@@ -41,6 +42,7 @@ export async function persistSession(session: RecordingSession): Promise<void> {
     const storage = getStorage();
     if (session.Phase === "Idle") {
         await storage.remove(RECORDER_SESSION_STORAGE_KEY);
+
         return;
     }
     await storage.set({ [RECORDER_SESSION_STORAGE_KEY]: session });
@@ -52,6 +54,7 @@ export async function loadSession(): Promise<RecordingSession | null> {
     const result = await storage.get(RECORDER_SESSION_STORAGE_KEY);
     const value = result[RECORDER_SESSION_STORAGE_KEY];
     if (!isRecordingSession(value)) { return null; }
+
     return value;
 }
 
@@ -64,6 +67,7 @@ function isRecordingSession(value: unknown): value is RecordingSession {
     if (typeof value !== "object" || value === null) { return false; }
     const v = value as Record<string, unknown>;
     const phaseOk = v.Phase === "Idle" || v.Phase === "Recording" || v.Phase === "Paused";
+
     return (
         typeof v.SessionId === "string" &&
         typeof v.ProjectSlug === "string" &&

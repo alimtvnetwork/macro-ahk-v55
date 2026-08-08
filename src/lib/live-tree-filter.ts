@@ -46,6 +46,7 @@ function normalize(query: string): string {
 function stepMatches(step: StepRow, q: string): boolean {
     const label = (step.LabelType ?? "").toLowerCase();
     if (label.includes(q)) { return true; }
+
     return stepKindLabel(step.StepKindId).toLowerCase().includes(q);
 }
 
@@ -105,6 +106,7 @@ export function filterLiveTree(
             filteredSteps.set(node.Group.StepGroupId, matchedSteps);
         }
         expand.add(node.Group.StepGroupId);
+
         return { Group: node.Group, Children: children };
     }
 

@@ -105,6 +105,7 @@ function ensureBackdrop(): HTMLDivElement {
   bd.id = BACKDROP_ID;
   bd.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:' + (Z_INDEX - 1) + ';display:none;';
   document.body.appendChild(bd);
+
   return bd;
 }
 
@@ -125,6 +126,7 @@ function ensureModalEl(): HTMLDivElement {
     'display:none',
   ].join(';') + ';';
   document.body.appendChild(el);
+
   return el;
 }
 
@@ -153,6 +155,7 @@ export function hideRemixModal(): void {
 export function showRemixModal(opts: RemixModalOpts): void {
   if (!opts.projectId || !opts.workspaceId) {
     showToast('Remix unavailable — missing project or workspace id', 'warn');
+
     return;
   }
   const bd = ensureBackdrop();
@@ -196,6 +199,7 @@ export function showRemixModal(opts: RemixModalOpts): void {
       state = { submitting: false, error: 'Project name cannot be empty.' };
       rerender();
       nameInput.focus();
+
       return;
     }
     state = { submitting: true, error: '' };

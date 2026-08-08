@@ -73,6 +73,7 @@ function inferColumnNames(sql: string): string[] {
         for (let i = 0; i < cols.length && i < names.length; i++) {
             names[i] = cols[i] || fallback(i);
         }
+
         return names;
     }
 
@@ -87,6 +88,7 @@ function inferColumnNames(sql: string): string[] {
 
 function previewSql(sql: string): string {
     const flat = sql.replace(/\s+/g, " ").trim();
+
     return flat.length > 120 ? `${flat.slice(0, 117)}...` : flat;
 }
 
@@ -114,6 +116,7 @@ export function assertBindable<T extends ReadonlyArray<unknown>>(
             throw new BindError(i, colName, previewSql(sql));
         }
     }
+
     return params;
 }
 
@@ -146,6 +149,7 @@ export function wrapDatabaseWithBindSafety(db: SqlJsDatabase): SqlJsDatabase {
                         assertBindable(sql, params as ReadonlyArray<unknown>);
                     }
                     target.run(sql, params);
+
                     return receiver as SqlJsDatabase;
                 };
             }
@@ -155,6 +159,7 @@ export function wrapDatabaseWithBindSafety(db: SqlJsDatabase): SqlJsDatabase {
                     if (Array.isArray(params) && params.length > 0) {
                         assertBindable(sql, params as ReadonlyArray<unknown>);
                     }
+
                     // sql.js Database.exec accepts an optional params array even
                     // though our typings only declare the single-arg form.
                     return (target.exec as unknown as (s: string, p?: BindParams) => ReturnType<SqlJsDatabase["exec"]>)(sql, params);
@@ -164,6 +169,7 @@ export function wrapDatabaseWithBindSafety(db: SqlJsDatabase): SqlJsDatabase {
             if (prop === "prepare") {
                 return function wrappedPrepare(sql: string): Statement {
                     const stmt = target.prepare(sql);
+
                     return wrapStatementWithBindSafety(stmt, sql);
                 };
             }
@@ -181,6 +187,7 @@ function wrapStatementWithBindSafety(stmt: Statement, sql: string): Statement {
                     if (Array.isArray(params) && params.length > 0) {
                         assertBindable(sql, params as ReadonlyArray<unknown>);
                     }
+
                     return target.bind(params);
                 };
             }
@@ -192,6 +199,7 @@ function wrapStatementWithBindSafety(stmt: Statement, sql: string): Statement {
                     target.run(params);
                 };
             }
+
             return Reflect.get(target, prop, receiver);
         },
     });

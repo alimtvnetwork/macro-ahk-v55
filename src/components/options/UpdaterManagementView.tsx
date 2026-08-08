@@ -198,12 +198,14 @@ export function UpdaterManagementView() {
       const cats = (u.Categories ?? "").split(",").map((c) => c.trim());
       if (!cats.includes(filterCategory)) return false;
     }
+
     return true;
   });
 
   const handleAdd = async () => {
     if (!newName.trim() || !newScriptUrl.trim()) {
       toast.error("Name and Script URL are required");
+
       return;
     }
     try {
@@ -308,6 +310,7 @@ export function UpdaterManagementView() {
     if (!u.LastCheckedAt) return "unchecked";
     if (u.CurrentVersion && u.LatestVersion && u.CurrentVersion !== u.LatestVersion) return STATUS_UPDATE_AVAILABLE;
     if (u.LastCheckedAt) return STATUS_UP_TO_DATE;
+
     return "unchecked";
   };
 

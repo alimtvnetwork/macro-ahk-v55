@@ -64,6 +64,7 @@ export function validateRegexPattern(pattern: string): RegexValidation {
 function checkSyntax(pattern: string): string | null {
     try {
         new RegExp(pattern);
+
         return null;
     } catch (syntaxError) {
         const errorMessage = syntaxError instanceof Error

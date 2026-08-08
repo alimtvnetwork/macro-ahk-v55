@@ -168,6 +168,7 @@ export function mountRecorderToolbar(
     wireToolbarButtons(nodes, actions, sessionRef);
     render();
     const lifecycle = installToolbarLifecycle(nodes, render);
+
     return buildToolbarHandle(nodes, sessionRef, actions, lifecycle);
 }
 
@@ -182,6 +183,7 @@ function buildToolbarNodes(options: RecorderToolbarOptions, container: ParentNod
     bar.append(chips.phaseLabel, chips.projectChip, chips.healthChip, buttons.startBtn, buttons.pauseBtn, buttons.stopBtn);
     root.appendChild(bar);
     container.appendChild(host);
+
     return { host, root, ...chips, ...buttons };
 }
 
@@ -196,6 +198,7 @@ function createToolbarBar(): HTMLDivElement {
     bar.className = "toolbar";
     bar.setAttribute("role", "toolbar");
     bar.setAttribute("aria-label", "Marco Recorder");
+
     return bar;
 }
 
@@ -212,6 +215,7 @@ function buildToolbarChips(options: RecorderToolbarOptions): ToolbarChips {
     phaseLabel.className = "phase";
     const projectChip = buildProjectChip(options.ProjectSlug);
     const { healthChip, healthText, healthCapture } = buildHealthChip();
+
     return { phaseLabel, projectChip, healthChip, healthText, healthCapture };
 }
 
@@ -226,6 +230,7 @@ function buildProjectChip(slug: string): HTMLSpanElement {
     text.className = "label";
     text.textContent = slug;
     projectChip.append(dot, text);
+
     return projectChip;
 }
 
@@ -245,6 +250,7 @@ function buildHealthChip(): {
     const healthCapture = document.createElement("span");
     healthCapture.className = "muted";
     healthChip.append(dot, healthText, sep, healthCapture);
+
     return { healthChip, healthText, healthCapture };
 }
 
@@ -267,6 +273,7 @@ function createToolbarActions(
         render();
         options.OnPhaseChange?.(next.Phase, next);
     };
+
     return {
         start: () => dispatch({
             Kind: "Start",
@@ -287,7 +294,9 @@ function wireToolbarButtons(
     nodes.stopBtn.addEventListener("click",  () => actions.stop());
     nodes.pauseBtn.addEventListener("click", () => {
         const phase = sessionRef.current.Phase;
-        if (phase === "Recording") { actions.pause(); return; }
+        if (phase === "Recording") { actions.pause();
+
+ return; }
         if (phase === "Paused") { actions.resume(); }
     });
 }
@@ -317,6 +326,7 @@ function renderPauseButton(pauseBtn: HTMLButtonElement, phase: RecordingPhase): 
         pauseBtn.textContent = "Resume";
         pauseBtn.dataset.action = "resume";
         pauseBtn.disabled = false;
+
         return;
     }
     pauseBtn.textContent = "Pause";
@@ -344,6 +354,7 @@ function computeHealthStatus(
     if (isMissingProjectOk) { return "error"; }
     if (phase === "Recording") { return stepCount > 0 ? "ok" : "warn"; }
     if (phase === "Paused") { return "warn"; }
+
     return "idle";
 }
 
@@ -351,6 +362,7 @@ function formatCaptureLabel(
     phase: RecordingPhase, lastStep: RecordingSession["Steps"][number] | null, nowIso: string,
 ): string {
     if (lastStep === null) { return phase === "Idle" ? "not recording" : "awaiting capture"; }
+
     return `last ${formatRelative(lastStep.CapturedAt, nowIso)}`;
 }
 
@@ -380,6 +392,7 @@ function installToolbarLifecycle(nodes: ToolbarNodes, render: () => void): Toolb
     const destroy = (): void => teardownToolbar(state, nodes.host, tickInterval, onVisibilityChange, onPageHide, hasWindow, hasDocument);
     const onPageHide = (): void => destroy();
     if (hasWindow) { window.addEventListener("pagehide", onPageHide, { once: true }); }
+
     return { destroy };
 }
 
@@ -421,6 +434,7 @@ function makeButton(action: MakeButtonAction, label: string): HTMLButtonElement 
     btn.className = "btn";
     btn.dataset.action = action;
     btn.textContent = label;
+
     return btn;
 }
 
@@ -434,5 +448,6 @@ function formatRelative(thenIso: string, nowIso: string): string {
     const min = Math.floor(deltaSec / 60);
     if (min < 60) { return `${min}m ago`; }
     const hr = Math.floor(min / 60);
+
     return `${hr}h ago`;
 }

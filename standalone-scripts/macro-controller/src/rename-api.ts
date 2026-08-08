@@ -114,9 +114,9 @@ function rejectNoBearerToken(wsId: string): Error {
     noStop: true,
     requestDetail: { method: 'PUT', url: ApiPathType.UserWorkspacesSlash + wsId },
   });
+
   return err;
 }
-
 
 // ============================================
 // Response handlers
@@ -218,7 +218,6 @@ function handleRenameError(
 
   return err;
 }
-
 
 // ============================================
 // Core rename execution via SDK

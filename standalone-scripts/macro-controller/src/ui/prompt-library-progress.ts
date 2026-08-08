@@ -42,6 +42,7 @@ export function buildImportProgressElement(): {
 
   wrap.appendChild(row);
   wrap.appendChild(track);
+
   return { wrap, label, bar, counter };
 }
 
@@ -78,6 +79,7 @@ export function updateImportProgress(refs: ModalRefs, progress: ImportProgress):
     p.bar.style.width = String(pct) + '%';
     p.bar.setAttribute(ATTR_ARIA_VALUENOW, String(pct));
     p.bar.setAttribute(ATTR_ARIA_VALUETEXT, p.label.textContent);
+
     return;
   }
   if (progress.phase === 'revisions') {
@@ -94,6 +96,7 @@ export function updateImportProgress(refs: ModalRefs, progress: ImportProgress):
       + String(progress.totalRevisions) + ' revisions'
       + ' (' + String(progress.groupsDone) + '/' + String(progress.totalGroups) + ' prompts)',
     );
+
     return;
   }
   p.label.textContent = 'Import complete';
@@ -116,6 +119,7 @@ export function renderPartialImportErrors(
   if (total === 0) {
     panel.hidden = true;
     panel.style.display = 'none';
+
     return;
   }
   const header = document.createElement('div');

@@ -97,10 +97,12 @@ const INITIAL_ERROR: ImportErrorState = { Open: false, Explanation: null, FileNa
 async function readFileBytes(file: File): Promise<Uint8Array | null> {
     try {
         const ab = await file.arrayBuffer();
+
         return new Uint8Array(ab);
     } catch (err) {
         const detail = err instanceof Error ? err.message : "Could not read file bytes";
         toast.error("Failed to read ZIP", { description: detail });
+
         return null;
     }
 }
@@ -143,7 +145,9 @@ function useImportFile(
     setErrorState: (state: ImportErrorState) => void,
 ): (file: File) => Promise<void> {
     return useCallback(async (file: File) => {
-        if (libNotReady(lib)) { toast.error("Library not ready"); return; }
+        if (libNotReady(lib)) { toast.error("Library not ready");
+
+ return; }
         const bytes = await readFileBytes(file);
         if (bytes === null) { return; }
         const result = await runImportForBytes(bytes, lib);
@@ -151,6 +155,7 @@ function useImportFile(
             const explanation = explainImportFailure(result);
             setErrorState({ Open: true, Explanation: explanation, FileName: file.name });
             toast.error(explanation.Title, { description: "See dialog for details" });
+
             return;
         }
         handleSuccess(result, file.name);

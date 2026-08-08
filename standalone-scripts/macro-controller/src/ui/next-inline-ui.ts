@@ -94,7 +94,6 @@ interface NextPromptEntry {
 // v4.16+: buildGroupToggleButton removed — frame header owns the single
 // minimize/maximize chevron. See inline-strips-frame.ts.
 
-
 // ── Next stager (paste-only) ────────────────────────────────────────
 
 function readEditorText(): string {
@@ -102,6 +101,7 @@ function readEditorText(): string {
   const isMissingTarget = !target;
   if (isMissingTarget) return '';
   if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) return target.value || '';
+
   return (target as HTMLElement).innerText || (target as HTMLElement).textContent || '';
 }
 
@@ -115,9 +115,11 @@ function findNextVariant(entries: NextPromptEntry[], n: number): string | null {
     if ((e.slug || '').toLowerCase() === slug && e.text) {
       const key = e.replaceKey || REPLACE_KEY_DEFAULT;
       log('NextInline.resolve: using next variant ' + slug + ' with key=' + key + ' for N=' + n, 'info');
+
       return substituteNextValue(e.text, key, n);
     }
   }
+
   return null;
 }
 
@@ -126,8 +128,10 @@ function findNextTemplate(entries: NextPromptEntry[], n: number, source: string)
     if ((e.slug || '').toLowerCase() !== 'next-steps' || !e.text) continue;
       const key = e.replaceKey || REPLACE_KEY_DEFAULT;
     log('NextInline.resolve: using raw next template from ' + source + ' for N=' + n, 'info');
+
     return substituteNextValue(e.text, key, n);
   }
+
   return null;
 }
 
@@ -140,6 +144,7 @@ function resolveNextVariantText(deps: TaskNextDeps, n: number): string | null {
 
   // Fallback: legacy single static "Next Tasks" prompt
   const legacy = findNextTasksPrompt(deps);
+
   return legacy && legacy.text ? legacy.text : null;
 }
 
@@ -166,15 +171,16 @@ async function resolveNextTextDbFirst(deps: TaskNextDeps, n: number): Promise<st
     if (result.ok && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
       const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
       log('NextInline.resolve: using DB next-default (' + result.value.Body.length + ' chars, key=' + key + ') for N=' + n, 'info');
+
       return substituteToken(result.value.Body, key, n);
     }
     log('NextInline.resolve: no next-default row in DB; falling back to JSON library', 'info');
   } catch (err) {
     logError('NextInline', 'resolveNextTextDbFirst DB read failed; falling back to JSON library', err);
   }
+
   return resolveNextVariantText(deps, n);
 }
-
 
 /**
  * Paste-only stager for the Next strip. Appends the Next-${N}-steps prompt
@@ -183,6 +189,7 @@ async function resolveNextTextDbFirst(deps: TaskNextDeps, n: number): Promise<st
 export async function stageNextPrompt(deps: TaskNextDeps, n: number): Promise<void> {
   if (taskNextState.running || isSplitterRunning()) {
     showPasteToast('⏸ Another run is in progress', true);
+
     return;
   }
   const text = await resolveNextTextDbFirst(deps, n);
@@ -190,6 +197,7 @@ export async function stageNextPrompt(deps: TaskNextDeps, n: number): Promise<vo
   if (isMissingText) {
     showPasteToast('❌ Next ' + n + ': prompt not found in library', true);
     logError('NextInline', 'next-' + n + '-steps prompt missing');
+
     return;
   }
   const existing = readEditorText();
@@ -200,6 +208,7 @@ export async function stageNextPrompt(deps: TaskNextDeps, n: number): Promise<vo
     const outcome = await pasteIntoEditor(combined, getPromptsConfig(), (xp) => getByXPath(xp) as Element | null, 'next-chip');
     if (String(outcome) === 'failed') {
       showPasteToast('❌ Next ' + n + ': paste failed', true);
+
       return;
     }
     log('NextInline.stage: appended Next ' + n + ' (' + text.length + ' chars) — no submit', 'info');
@@ -215,6 +224,7 @@ export async function stageNextPrompt(deps: TaskNextDeps, n: number): Promise<vo
 function planClickHandler(n: number): void {
   if (taskNextState.running || isSplitterRunning()) {
     showPasteToast('⏸ Another run is in progress', true);
+
     return;
   }
   const clamped = Math.max(PLAN_MIN, Math.min(PLAN_MAX, n));
@@ -241,6 +251,7 @@ function makePlanPresetButton(n: number, highlighted: boolean): HTMLButtonElemen
   b.dataset['highlighted'] = highlighted ? '1' : '0';
   attachChipHover(b, hoverBg);
   b.onclick = function () { planClickHandler(n); };
+
   return b;
 }
 
@@ -271,6 +282,7 @@ function getPopoverAnnouncer(): HTMLElement {
   announcerElement.style.cssText = CSS_VISUALLY_HIDDEN;
   document.body.appendChild(announcerElement);
   _popoverAnnouncer = announcerElement;
+
   return announcerElement;
 }
 function announcePopover(message: string): void {
@@ -282,6 +294,7 @@ function announcePopover(message: string): void {
 function itemLabel(element: HTMLElement | null): string {
   const isMissingElement = !element;
   if (isMissingElement) return '';
+
   return (
     element.getAttribute(ATTR_ARIA_LABEL)
     || element.getAttribute('title')
@@ -303,6 +316,7 @@ function isVisibleMenuItem(element: HTMLElement): boolean {
     if (current === document.body) break;
     current = current.parentElement;
   }
+
   return true;
 }
 
@@ -348,6 +362,7 @@ function createDocumentFocusTrap(panel: HTMLElement, trigger: HTMLElement): (eve
 
 function createTrapActivator(focusTrap: (event: FocusEvent) => void): (active: boolean) => void {
   let isTrapInstalled = false;
+
   return (active: boolean): void => {
     if (active && !isTrapInstalled) document.addEventListener('focusin', focusTrap, true);
     if (!active && isTrapInstalled) document.removeEventListener('focusin', focusTrap, true);
@@ -389,12 +404,15 @@ function focusTabbedMenuItem(event: KeyboardEvent, menuItems: HTMLElement[], cur
 function handleMenuNavigation(event: KeyboardEvent, menuItems: HTMLElement[], currentIndex: number): boolean {
   if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
     focusMenuItemByDelta(event, menuItems, currentIndex, 1);
+
     return true;
   }
   if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
     focusMenuItemByDelta(event, menuItems, currentIndex, -1);
+
     return true;
   }
+
   return false;
 }
 
@@ -402,13 +420,16 @@ function handleMenuEdgeKey(event: KeyboardEvent, menuItems: HTMLElement[]): bool
   if (event.key === 'Home') {
     event.preventDefault();
     menuItems[0]?.focus();
+
     return true;
   }
   if (event.key === 'End') {
     event.preventDefault();
     menuItems[menuItems.length - 1]?.focus();
+
     return true;
   }
+
   return false;
 }
 
@@ -419,6 +440,7 @@ function createMenuKeydownHandler(panel: HTMLElement, trigger: HTMLElement, onCl
       event.stopPropagation();
       onClose();
       trigger.focus();
+
       return;
     }
     const menuItems = getVisibleMenuItems(panel);
@@ -509,6 +531,7 @@ function createOverflowButton(panelId: string, title: string, label: string, acc
   button.setAttribute(ATTR_ARIA_EXPANDED, 'false');
   button.setAttribute(ATTR_ARIA_CONTROLS, panelId);
   button.style.cssText = 'padding:3px 10px;background:rgba(255,255,255,0.06);border:1px solid ' + accent + ';border-radius:4px;color:' + cPanelFg + ';cursor:pointer;font-size:13px;font-weight:700;line-height:1.2;' + CSS_CHIP_TRANSITION;
+
   return button;
 }
 
@@ -518,6 +541,7 @@ function createOverflowPanel(panelId: string, label: string, cssText: string): H
   panel.setAttribute(ATTR_ROLE, MENU_ROLE);
   panel.setAttribute(ATTR_ARIA_LABEL, label);
   panel.style.cssText = cssText;
+
   return panel;
 }
 
@@ -537,6 +561,7 @@ function buildOverflowShell(config: {
   const button = createOverflowButton(config.panelId, config.title, config.label, config.accent);
   const panel = createOverflowPanel(config.panelId, config.panelLabel, config.panelCss);
   wrap.append(button, panel);
+
   return { wrap, button, panel };
 }
 
@@ -611,6 +636,7 @@ function handlePopoverButtonKeydown(event: KeyboardEvent, panel: HTMLElement, se
   if (event.key === 'Escape' && isPopoverOpen(panel)) {
     event.stopPropagation();
     setOpen(false);
+
     return;
   }
   if ((event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') && !isPopoverOpen(panel)) {
@@ -642,6 +668,7 @@ function resetChipOverflow(body: HTMLElement, panel: HTMLElement, overflowWrap: 
   for (const chip of chips) chip.style.display = '';
   while (panel.firstChild) panel.removeChild(panel.firstChild);
   overflowWrap.style.display = STYLE_DISPLAY_NONE;
+
   return chips;
 }
 
@@ -657,6 +684,7 @@ function collectHiddenChipPresets(body: HTMLElement, chips: HTMLElement[]): Hidd
     hiddenPresets.unshift({ n, hi });
     if (body.scrollWidth <= body.clientWidth + 1) break;
   }
+
   return hiddenPresets;
 }
 
@@ -674,6 +702,7 @@ function recomputeChipOverflow(body: HTMLElement, shell: PopoverShell, buildChip
 
 function buildChipOverflowShell(accent: string): PopoverShell {
   const panelId = 'marco-chip-overflow-' + Math.random().toString(36).slice(2, 9);
+
   return buildOverflowShell({
     role: DATA_CHIP_OVERFLOW_ROLE,
     panelId,
@@ -693,6 +722,7 @@ function wireChipOverflowPopover(shell: PopoverShell): PopoverA11y {
   };
   wirePopoverButton(shell.button, shell.panel, setOpen);
   registerPointerPopoverCloser(createOutsidePopoverCloser(shell.wrap, shell.panel, shell.button, setOpen));
+
   return a11y;
 }
 
@@ -707,6 +737,7 @@ export function installChipOverflow(
   const a11y = wireChipOverflowPopover(shell);
   const recompute = (): void => recomputeChipOverflow(body, shell, buildChipByN, a11y);
   observeOverflow(body, recompute);
+
   return recompute;
 }
 
@@ -736,6 +767,7 @@ function collectOverflowActions(body: HTMLElement, actions: HTMLElement[]): HTML
     hiddenActions.unshift(actionElement);
     if (body.scrollWidth <= body.clientWidth + 1) break;
   }
+
   return hiddenActions;
 }
 
@@ -794,6 +826,7 @@ export function installActionOverflow(
     recomputeActionOverflow(body, shell, original, a11y, setOpen);
   };
   observeOverflow(body, recompute);
+
   return recompute;
 }
 
@@ -826,6 +859,7 @@ function createPlanDropupPanel(): HTMLElement {
   panel.setAttribute(ATTR_ARIA_LABEL, 'PlanTierType menu');
   panel.style.cssText = 'position:fixed;display:none;flex-direction:column;gap:4px;padding:7px;background:#1a1a2e;border:1px solid rgba(245,158,11,0.6);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.5);z-index:2147483646;min-width:226px;max-width:300px;';
   panel.dataset['role'] = 'plan-dropup';
+
   return panel;
 }
 
@@ -861,6 +895,7 @@ function buildPlanDropup(anchor: HTMLElement, trigger: HTMLButtonElement): PlanD
   schedulePlanDropupDbRefresh(rePopulate);
   anchor.appendChild(panel);
   registerPointerPopoverCloser(createOutsidePopoverCloser(anchor, panel, trigger, setOpen));
+
   return { panel, setOpen, a11y };
 }
 
@@ -874,7 +909,6 @@ function buildSplitStrip(): HTMLElement {
   label.textContent = '📋 PlanTierType';
   label.style.cssText = 'font-weight:600;color:#fbbf24;';
   root.appendChild(label);
-  
 
   const body = document.createElement('span');
   body.dataset['role'] = 'plan-body';
@@ -942,6 +976,7 @@ function makeNextPresetButton(deps: TaskNextDeps, n: number, highlighted: boolea
       void guarded();
     });
   };
+
   return b;
 }
 
@@ -965,6 +1000,7 @@ function buildNextStripLabel(): HTMLElement {
   const label = document.createElement('span');
   label.textContent = '▶ Next';
   label.style.cssText = 'font-weight:600;color:' + cPrimaryLight + ';cursor:pointer;';
+
   return label;
 }
 
@@ -979,6 +1015,7 @@ function buildNextStripBody(deps: TaskNextDeps): HTMLElement {
   for (const n of NEXT_PRESETS) {
     body.appendChild(makeNextPresetButton(deps, n, NEXT_PRESETS_HIGHLIGHT.has(n)));
   }
+
   return body;
 }
 
@@ -1000,6 +1037,7 @@ function buildNextMoreWrap(): HTMLElement {
     if (willOpen) positionPopoverFixed(panel, moreBtn);
     panel.style.display = willOpen ? 'flex' : 'none';
   };
+
   return moreWrap;
 }
 
@@ -1041,6 +1079,7 @@ function buildNextStrip(deps: TaskNextDeps): HTMLElement {
     if (detail.role && detail.role !== 'next') return;
     void refreshNextChipsFromDb(deps, body, moreWrap, recomputeOverflow);
   });
+
   return root;
 }
 
@@ -1053,6 +1092,7 @@ function tryMountInline(deps: TaskNextDeps): boolean {
   const isMissingINLINE_AUTOCHAIN_DISABLED = !INLINE_AUTOCHAIN_DISABLED;
   if (isMissingINLINE_AUTOCHAIN_DISABLED) {
     logError('NextInline', 'INLINE_AUTOCHAIN_DISABLED flipped — refusing to mount');
+
     return true;
   }
   if (document.getElementById(INLINE_ID) && document.getElementById(SPLIT_ID)) return true;
@@ -1089,6 +1129,7 @@ function tryMountInline(deps: TaskNextDeps): boolean {
   }
   applyInlineStripGroupCollapse();
   log('NextInline: strips mounted (plan + next, paste-only) into unified frame', 'info');
+
   return true;
 }
 
@@ -1131,7 +1172,6 @@ function attachDropupOutsideCloser(panel: HTMLElement, anchor: HTMLElement): voi
   _dropupClosers.push(closer);
 }
 
-
 function _registerNextInlineTeardownOnce(): void {
   if (_pagehideRegistered || typeof window === 'undefined') return;
   _pagehideRegistered = true;
@@ -1161,8 +1201,6 @@ export function __positionPopoverFixedForTests(panel: HTMLElement, button: HTMLE
   positionPopoverFixed(panel, button);
 }
 
-
-
 /**
  * v4.11+: PlanTierType and Next inline strips above the chat textarea are HIDDEN by
  * default. They have been folded into the prompts dropdown header. Set
@@ -1176,6 +1214,7 @@ export const SHOW_LEGACY_INLINE_STRIPS = true;
 function isLegacyStripsEnabled(): boolean {
   if (SHOW_LEGACY_INLINE_STRIPS) return true;
   const w = (typeof window !== 'undefined' ? window : {}) as Record<string, unknown>;
+
   return w['__MARCO_SHOW_LEGACY_INLINE_STRIPS__'] === true;
 }
 
@@ -1186,6 +1225,7 @@ export function mountNextInlineStrip(deps: TaskNextDeps): void {
     if (a && a.parentElement) a.parentElement.removeChild(a);
     const b = document.getElementById(SPLIT_ID);
     if (b && b.parentElement) b.parentElement.removeChild(b);
+
     return;
   }
   if (tryMountInline(deps)) return;

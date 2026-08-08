@@ -529,6 +529,7 @@ function UrlVariablesSubTab({ targetUrls, onChange }: { targetUrls: UrlRule[]; o
 function extractLabelFromUrl(url: string): string {
   try {
     const u = new URL(url);
+
     return u.hostname.replace(/^www\./, "").split(".")[0] || url;
   } catch {
     return url.substring(0, 30);

@@ -84,16 +84,20 @@ function _checkLoopPreconditions(): boolean {
     state.__cycleInFlight = false;
     state.__cycleRetryPending = false;
     log('SKIP: Loop not running', 'skip');
+
     return true;
   }
   if (state.__cycleRetryPending) {
     log('SKIP: Retry already scheduled - waiting', 'skip');
+
     return true;
   }
   if (state.__cycleInFlight) {
     log('SKIP: Previous cycle still in flight', 'skip');
+
     return true;
   }
+
   return false;
 }
 

@@ -150,6 +150,7 @@ function buildMinCreditsRow(populate: () => void): HTMLElement {
 
   row.appendChild(labelWrap);
   row.appendChild(input);
+
   return row;
 }
 
@@ -166,6 +167,7 @@ function buildLegendBlock(): HTMLElement {
     + '<span style="font-size:8px;color:#22d3ee;" title="Total available credits">⚡Total</span>'
     + '<span style="font-size:8px;color:#4ade80;" title="Trial credits">🎁Trial</span>'
     + '<span style="font-size:8px;color:#94a3b8;" title="📍=Current 🟢=OK 🟡=Low 🔴=Empty">📍🟢🟡🔴</span>';
+
   return legend;
 }
 
@@ -242,6 +244,7 @@ function buildCreditSortHeader(): HTMLElement {
     + 'text-transform:uppercase;letter-spacing:0.5px;border-top:1px solid rgba(255,255,255,.1);'
     + 'margin-top:2px;';
   h.textContent = 'Credit sort';
+
   return h;
 }
 
@@ -385,6 +388,7 @@ export function buildWsFilterMenuButton(deps: WsFilterMenuDeps): HTMLElement {
       const isOpen = popover.style.display !== 'none';
       if (isOpen) {
         close();
+
         return;
       }
       popover.style.display = 'block';
@@ -404,5 +408,6 @@ export function buildWsFilterMenuButton(deps: WsFilterMenuDeps): HTMLElement {
   };
 
   wrap.appendChild(btn);
+
   return wrap;
 }

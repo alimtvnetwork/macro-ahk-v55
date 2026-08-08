@@ -72,6 +72,7 @@ function resolveAnchoredRelative(
     if (anchor === undefined) {
         throw new Error(`Anchor selector ${selector.AnchorSelectorId} not in provided set`);
     }
+
     return joinRelative(resolveOne(anchor, byId, chain, depth + 1), selector.Expression);
 }
 
@@ -87,6 +88,7 @@ function resolveOne(
     if (selector.SelectorKindId === SelectorKindId.XPathRelative) {
         return resolveAnchoredRelative(selector, byId, chain, depth);
     }
+
     // Css / Aria selectors return raw expression; replay engine routes on Kind.
     return selector.Expression;
 }
@@ -95,12 +97,14 @@ function joinRelative(anchor: string, relative: string): string {
     const stripped = relative.startsWith(".") ? relative.slice(1) : relative;
     if (stripped.length === 0) return anchor;
     if (stripped.startsWith("/")) return `${anchor}${stripped}`;
+
     return `${anchor}/${stripped}`;
 }
 
 function kindOf(selectorKindId: number): ResolvedSelector["Kind"] {
     if (selectorKindId === SelectorKindId.Css) return "Css";
     if (selectorKindId === SelectorKindId.Aria) return "Aria";
+
     return "XPath";
 }
 

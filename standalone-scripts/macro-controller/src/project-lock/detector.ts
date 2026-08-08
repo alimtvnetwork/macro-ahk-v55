@@ -33,6 +33,7 @@ function bodyMatches(body: string | null | undefined): boolean {
             return true;
         }
     }
+
     return false;
 }
 
@@ -40,6 +41,7 @@ function bannerMatches(text: string | null | undefined): boolean {
     if (typeof text !== 'string' || text.length === 0) {
         return false;
     }
+
     return text.toLowerCase().indexOf('project is locked') !== -1;
 }
 
@@ -62,6 +64,7 @@ export function detectProjectLocked(input: DetectInput): ProjectLockEvent | null
     if (reason === null) {
         return null;
     }
+
     return {
         WorkspaceId: input.workspaceId,
         ProjectId: input.projectId,

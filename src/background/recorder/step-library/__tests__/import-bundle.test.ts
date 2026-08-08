@@ -98,6 +98,7 @@ function makeSource(): SourceFixture {
         LabelType: "Type email",
         PayloadJson: JSON.stringify({ Selector: "#email", Value: "{{Email}}" }),
     });
+
     return { Lib: lib, ProjectId: projectId, Root: root, Child: child };
 }
 
@@ -112,6 +113,7 @@ function makeDest(): DestFixture {
         ExternalId: "dst-0000",
         Name: "Destination Project",
     });
+
     return { Lib: lib, ProjectId: projectId };
 }
 
@@ -131,6 +133,7 @@ async function makeBundle(
         JsZip: JSZip,
     });
     if (r.Reason !== "Ok") throw new Error(`export failed: ${r.Reason}`);
+
     return r;
 }
 
@@ -138,6 +141,7 @@ function expectOk(r: ImportSummary | ImportFailure): ImportSummary {
     if (r.Reason !== "Ok") {
         throw new Error(`import failed: ${r.Reason}, ${(r as ImportFailure).Detail}`);
     }
+
     return r;
 }
 

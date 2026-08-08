@@ -24,6 +24,7 @@ function installChromeStorageStub(initial: StorageMap = {}): StorageMap {
         },
         runtime: { lastError: null },
     };
+
     return store;
 }
 

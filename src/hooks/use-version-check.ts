@@ -38,6 +38,7 @@ function extractVersionNumber(value?: string): string | null {
   }
 
   const match = value.match(/\d+(?:\.\d+)+/);
+
   return match ? match[0] : null;
 }
 
@@ -125,6 +126,7 @@ export function useVersionCheck(): VersionCheckResult {
         bundledScriptVersion: null,
         error: null,
       });
+
       return;
     }
 
@@ -142,6 +144,7 @@ export function useVersionCheck(): VersionCheckResult {
           bundledScriptVersion: null,
           error: info.errorMessage ?? "Could not read bundled script version",
         });
+
         return;
       }
 

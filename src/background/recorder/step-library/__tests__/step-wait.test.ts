@@ -186,6 +186,7 @@ describe("evaluateSelector", () => {
         const root = {
             querySelectorAll: vi.fn(() => {
                 const items = [stubElement(true), stubElement(true)];
+
                 return {
                     forEach: (cb: (el: ElementLike) => void) => items.forEach(cb),
                 };
@@ -233,6 +234,7 @@ describe("waitForSelector", () => {
         return {
             querySelectorAll: () => {
                 const items = ticker() >= matchesAtTick ? [stubElement(true)] : [];
+
                 return {
                     forEach: (cb: (el: ElementLike) => void) => items.forEach(cb),
                 };

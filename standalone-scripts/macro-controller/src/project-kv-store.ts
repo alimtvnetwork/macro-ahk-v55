@@ -65,6 +65,7 @@ function openDb(dbName: string): Promise<IDBDatabase> {
     } catch (err) {
       logError(FN, 'IndexedDB open failed for DB "' + dbName + '"', err);
       reject(err);
+
       return;
     }
 
@@ -149,6 +150,7 @@ async function getDb(projectName: string): Promise<IDBDatabase> {
   }
   const db = await openDb(dbName);
   dbCache[dbName] = db;
+
   return db;
 }
 
@@ -160,9 +162,11 @@ export function getProjectKvStore(projectName: string): ProjectKvStore {
     async get<T = unknown>(section: string, key: string): Promise<T | null> {
       try {
         const db = await getDb(projectName);
+
         return await txGet<T>(db, compoundKey(section, key));
       } catch (err) {
         logError(FN, 'get failed — DB "' + dbName + '", store "' + STORE_NAME + '", key "' + compoundKey(section, key) + '"', err);
+
         return null;
       }
     },
@@ -194,11 +198,13 @@ export function getProjectKvStore(projectName: string): ProjectKvStore {
       try {
         const db = await getDb(projectName);
         const records = await txGetAllBySection(db, section);
+
         return records.map(function (r) {
           return { key: stripSection(r.key, section), value: r.value };
         });
       } catch (err) {
         logError(FN, 'list failed — DB "' + dbName + '", section "' + section + '"', err);
+
         return [];
       }
     },
@@ -211,9 +217,11 @@ export function getProjectKvStore(projectName: string): ProjectKvStore {
         for (const r of records) {
           result[stripSection(r.key, section)] = r.value;
         }
+
         return result;
       } catch (err) {
         logError(FN, 'getAll failed — DB "' + dbName + '", section "' + section + '"', err);
+
         return {};
       }
     },

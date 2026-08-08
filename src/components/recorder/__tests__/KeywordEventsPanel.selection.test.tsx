@@ -33,12 +33,14 @@ function eventCards(): HTMLElement[] {
     // dashes). Filter by structural depth: the outer card directly hosts an
     // input labelled "Keyword".
     const all = Array.from(document.querySelectorAll<HTMLElement>("[data-testid^='keyword-event-']"));
+
     return all.filter(el => {
         const tid = el.getAttribute("data-testid") ?? "";
         if (!tid.startsWith("keyword-event-")) return false;
         if (tid.startsWith("keyword-event-step")) return false;
         if (tid.startsWith("keyword-event-sortable-")) return false;
         if (tid.startsWith("keyword-events-")) return false;
+
         // The outer card hosts the keyword input directly.
         return !!el.querySelector("input[aria-label='Keyword']");
     });

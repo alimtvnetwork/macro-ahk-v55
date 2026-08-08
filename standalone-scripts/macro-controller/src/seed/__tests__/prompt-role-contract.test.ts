@@ -40,6 +40,7 @@ describe('Prompt role contract matrix (v4.179.0)', () => {
                 const required = getRequiredTokensForRole(role);
                 if (role === 'generic') {
                     expect(required).toEqual([]);
+
                     return;
                 }
                 const defaultRow = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault);

@@ -34,6 +34,7 @@ function readOverride(flag: FeatureFlagName): boolean | null {
     if (override === true || override === false) {
         return override;
     }
+
     return null;
 }
 
@@ -42,6 +43,7 @@ export function isFeatureFlagEnabled(flag: FeatureFlagName): boolean {
     if (override !== null) {
         return override;
     }
+
     return DEFAULTS[flag];
 }
 

@@ -52,6 +52,7 @@ export async function handleRecorderFieldBindingUpsert(
         req.dataSourceId,
         req.columnName,
     );
+
     return { isOk: true, binding };
 }
 
@@ -82,6 +83,7 @@ export async function handleRecorderFieldBindingList(
         throw new Error("RECORDER_FIELD_BINDING_LIST requires projectSlug");
     }
     const bindings = await listFieldBindings(req.projectSlug);
+
     return { bindings };
 }
 
@@ -99,5 +101,6 @@ export async function handleRecorderFieldBindingDelete(
         );
     }
     await deleteFieldBinding(req.projectSlug, req.stepId);
+
     return { isOk: true };
 }

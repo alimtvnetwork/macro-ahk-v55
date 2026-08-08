@@ -66,6 +66,7 @@ export function shouldFetch(
     if (interWsWait > 0) {
         return { allowed: false, waitMs: interWsWait, reason: 'inter-ws-cooldown' };
     }
+
     return { allowed: true, waitMs: 0, reason: 'ok' };
 }
 

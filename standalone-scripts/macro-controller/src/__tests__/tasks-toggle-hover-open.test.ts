@@ -36,6 +36,7 @@ function buildHarness(): { btn: HTMLElement; group: HTMLElement; root: HTMLEleme
     e.stopPropagation();
     if (group.style.display === 'none') open(); else close();
   });
+
   return { btn, group, root };
 }
 

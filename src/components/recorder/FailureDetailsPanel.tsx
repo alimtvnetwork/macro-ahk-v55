@@ -310,6 +310,7 @@ function SelectorAttemptRow({ attempt }: { attempt: SelectorAttempt }) {
 
 function VariablesBlock({ variables }: { variables: ReadonlyArray<VariableContext> }) {
     const failed = variables.filter((v) => v.FailureReason !== "Resolved");
+
     return (
         <section data-testid="failure-variables" className="space-y-1.5">
             <header className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted-foreground">

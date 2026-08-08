@@ -16,5 +16,6 @@ export async function sendMessage<T = unknown>(
   message: MessagePayload,
 ): Promise<T> {
   const platform = getPlatform();
+
   return platform.sendMessage<T>(message);
 }

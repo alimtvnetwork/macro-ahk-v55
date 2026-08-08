@@ -214,6 +214,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
 
       if (!result.isOk || !result.tables?.length) {
         toast.info("No tables found in MetaTables. Apply a schema first.");
+
         return;
       }
 
@@ -232,6 +233,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
                 logError("JsonSchemaTab.exportDdl", `Column "${c.Name}" has invalid ValidationJson — skipping Validation field`, caught);
               }
             }
+
             return col;
           });
 
@@ -241,6 +243,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
             const rel: Record<string, string> = { SourceColumn: r.SourceColumn, TargetTable: r.TargetTable };
             if (r.TargetColumn && r.TargetColumn !== "Id") rel.TargetColumn = r.TargetColumn;
             if (r.OnDelete) rel.OnDelete = r.OnDelete;
+
             return rel;
           });
 
@@ -248,6 +251,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
         if (t.Description) def.Description = t.Description;
         def.Columns = cols;
         if (rels.length > 0) def.Relations = rels;
+
         return def;
       });
 
@@ -294,6 +298,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
         setDbSchemaJson(JSON.stringify({ version: "1.0.0", tables: [] }, null, 2));
         setDiffMode(true);
         toast.info("No existing tables in DB — showing empty baseline");
+
         return;
       }
 
@@ -311,6 +316,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
                 logError("JsonSchemaTab.exportCopy", `Column "${c.Name}" has invalid ValidationJson — skipping Validation field`, caught);
               }
             }
+
             return col;
           });
 
@@ -320,6 +326,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
             const rel: Record<string, string> = { SourceColumn: r.SourceColumn, TargetTable: r.TargetTable };
             if (r.TargetColumn && r.TargetColumn !== "Id") rel.TargetColumn = r.TargetColumn;
             if (r.OnDelete) rel.OnDelete = r.OnDelete;
+
             return rel;
           });
 
@@ -327,6 +334,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
         if (t.Description) def.Description = t.Description;
         def.Columns = cols;
         if (rels.length > 0) def.Relations = rels;
+
         return def;
       });
 
@@ -364,6 +372,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
           return { valid: false, error: `Table "${t.TableName}" needs at least one column` };
         }
       }
+
       return { valid: true, schema: parsed, error: null };
     } catch (e) {
       return { valid: false, error: `Invalid JSON: ${(e as Error).message}` };
@@ -376,6 +385,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
   const handleMigrate = async () => {
     if (!validation.valid) {
       toast.error(validation.error || "Invalid schema");
+
       return;
     }
 

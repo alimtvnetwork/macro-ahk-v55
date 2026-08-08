@@ -264,6 +264,7 @@ export function registerJsIntelliSense(monaco: MonacoModule): void {
         endLineNumber: position.lineNumber,
         endColumn: position.column,
       };
+
       return {
         suggestions: snippets.map((s) => ({ ...s, range })),
       };

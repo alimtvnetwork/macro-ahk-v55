@@ -112,11 +112,13 @@ function ChainEditor({ chain, prompts, maxLength, onSave, onCancel }: ChainEdito
     const handleSave = async () => {
         if (!name.trim()) {
             toast.error("Chain name required");
+
             return;
         }
 
         if (selectedIds.length === 0) {
             toast.error("Select at least one prompt");
+
             return;
         }
 
@@ -176,6 +178,7 @@ function ChainEditor({ chain, prompts, maxLength, onSave, onCancel }: ChainEdito
                         <label className="text-xs font-medium">Chain Order ({selectedIds.length}/{maxLength})</label>
                         {selectedIds.map((id, index) => {
                             const prompt = prompts.find((entry) => entry.id === id);
+
                             return (
                                 <div key={id} className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-muted/50 border border-border text-xs">
                                     <span className="text-muted-foreground w-5 text-center font-mono">{index + 1}</span>
@@ -293,6 +296,7 @@ export function PromptChainPanel() {
                             {execution.stepStatuses.map((status, index) => {
                                 const promptId = chains.find((chain) => chain.id === execution.chainId)?.promptIds[index];
                                 const prompt = prompts.find((entry) => entry.id === promptId);
+
                                 return (
                                     <div key={index} className="flex items-center gap-2 text-xs">
                                         <span className="text-muted-foreground w-5 text-center font-mono">{index + 1}</span>
@@ -381,6 +385,7 @@ export function PromptChainPanel() {
                                 <div className="flex flex-wrap gap-1">
                                     {chain.promptIds.map((id, index) => {
                                         const prompt = prompts.find((entry) => entry.id === id);
+
                                         return (
                                             <Badge key={index} variant="secondary" className="text-[10px]">
                                                 {index + 1}. {prompt?.name ?? "?"}

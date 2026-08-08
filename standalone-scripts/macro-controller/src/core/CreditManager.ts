@@ -16,7 +16,6 @@ import { fetchCreditBalance } from '../credit-balance';
 import { fetchLoopCredits, fetchLoopCreditsAsync, parseLoopApiResponse, syncCreditStateFromApi } from '../credit-fetch';
 
 export class CreditManager implements CreditManagerInterface {
-
   /** Callback-style credit fetch (with optional retry) */
   fetch(isRetry?: boolean): void {
     fetchLoopCredits(isRetry);

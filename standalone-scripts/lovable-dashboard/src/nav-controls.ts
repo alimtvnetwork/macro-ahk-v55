@@ -17,6 +17,7 @@ export function mountNavControls(getDict: () => WorkspaceDictionary): () => void
         return doMount(getDict);
     } catch (caught) {
         logError("navControls.mount", caught);
+
         return () => undefined;
     }
 }
@@ -29,6 +30,7 @@ function doMount(getDict: () => WorkspaceDictionary): () => void {
     const wrap = buildNavWrapper();
     anchor.insertAdjacentElement("afterend", wrap);
     bindClicks(wrap, getDict);
+
     return () => wrap.remove();
 }
 
@@ -45,6 +47,7 @@ export function readStep(): number {
     try {
         const el = document.querySelector<HTMLInputElement>(`[${NAV_ATTR}="${NAV_STEP_VALUE}"]`);
         const parsed = Number.parseInt(el?.value ?? "1", 10);
+
         return Number.isFinite(parsed) && parsed >= 1 ? parsed : 1;
     } catch {
         return 1;
@@ -57,12 +60,14 @@ export function computeTargetIndex(currentOneBased: number, total: number, dir: 
     if (next >= 1 && next <= total) {
         return next;
     }
+
     return clampToRange(next, total);
 }
 
 function clampToRange(n: number, total: number): number {
     if (n < 1) return 1;
     if (n > total) return total;
+
     return n;
 }
 

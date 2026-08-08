@@ -45,6 +45,7 @@ export function getProjectsCacheTtlMs(): number {
     if (typeof h === 'number' && Number.isFinite(h) && h >= 0) {
         return Math.floor(h) * 60 * 60 * 1000;
     }
+
     return DEFAULT_PROJECT_CACHE_TTL_MS;
 }
 
@@ -73,6 +74,7 @@ interface KvBridge {
 
 function getKv(): KvBridge['kv'] | null {
     const sdk = (window as unknown as { marco?: KvBridge }).marco;
+
     return sdk && sdk.kv ? sdk.kv : null;
 }
 
@@ -101,12 +103,15 @@ export async function readProjectListCache(workspaceId: string): Promise<Project
         if (typeof parsed.ExpiresAt !== 'number' || !Array.isArray(parsed.Projects)) return null;
         if (parsed.ExpiresAt <= Date.now()) {
             log('ProjectsCache: expired for ws=' + workspaceId, 'info');
+
             return null;
         }
         log('ProjectsCache: hit for ws=' + workspaceId + ' (' + parsed.Projects.length + ' projects)', 'info');
+
         return parsed as ProjectListCacheRow;
     } catch (err: unknown) {
         logError('ProjectsCache.read', 'kv.get failed for ws=' + workspaceId, err);
+
         return null;
     }
 }
@@ -126,6 +131,7 @@ export function writeProjectListCache(
     const isMissingKv = !kv;
     if (isMissingKv) {
         logError('ProjectsCache.write', 'marco.kv unavailable — skipping SQLite upsert for ws=' + workspaceId);
+
         return;
     }
     const now = Date.now();

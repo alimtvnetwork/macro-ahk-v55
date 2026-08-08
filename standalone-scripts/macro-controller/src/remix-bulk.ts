@@ -55,6 +55,7 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
     const name = typeof p.name === 'string' ? p.name : '';
     if (id) out.push({ id, name: name || id });
   }
+
   return out;
 }
 
@@ -70,6 +71,7 @@ function pickTargetProject(projects: ReadonlyArray<ProjectEntry>, sourceBase: st
       if (baseFamily(p.name) === sourceBase) return p;
     }
   }
+
   return projects[0];
 }
 
@@ -87,6 +89,7 @@ export async function actionBulkRemixNext(hint: BulkRemixSourceHint = {}): Promi
   const checked = Object.keys(getLoopWsCheckedIds());
   if (checked.length === 0) {
     showToast('Bulk Remix Next — no workspaces checked', 'warn');
+
     return;
   }
 
@@ -99,6 +102,7 @@ export async function actionBulkRemixNext(hint: BulkRemixSourceHint = {}): Promi
     const isMissingOk = !ok;
     if (isMissingOk) {
       showToast('Bulk Remix Next — cancelled', 'info');
+
       return;
     }
   }

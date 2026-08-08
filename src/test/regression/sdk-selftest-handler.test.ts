@@ -55,6 +55,7 @@ function installStorageStub(): Map<string, unknown> {
             },
         },
     };
+
     return store;
 }
 

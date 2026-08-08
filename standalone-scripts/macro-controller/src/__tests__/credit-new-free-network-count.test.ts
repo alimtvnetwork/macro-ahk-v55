@@ -49,6 +49,7 @@ function newFreeWs(id: string): WorkspaceCredit {
         billing_period_credits_limit: 0,
         grant_type_balances: [{ available: 0, total: 0, grant_type: 'free' }],
     };
+
     return ws;
 }
 
@@ -57,6 +58,7 @@ function proWsWithInline(id: string): WorkspaceCredit {
     ws.limit = 100;
     ws.totalCredits = 100;
     ws.available = 80;
+
     return ws;
 }
 

@@ -20,6 +20,7 @@ import type { PromptEntry } from '../../types/ui-types';
 
 function loadFixture(name: string): unknown {
   const path = resolve(__dirname, '../../../../../test/fixtures/prompt-bundles', name);
+
   return JSON.parse(readFileSync(path, 'utf8'));
 }
 

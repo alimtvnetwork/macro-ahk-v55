@@ -49,6 +49,7 @@ export function buildFriendlyImportError(
     // branch so per-row messages that mention "entries[..]" aren't misrouted.
     if (/invalid prompt schema/i.test(first) || /requires name and text/i.test(first) || /^Row \d+/i.test(first) || /^\/entries\//i.test(first) || /^\/\d+\//.test(first)) {
         const rejected = rawErrors.length;
+
         return {
             headline: 'No importable prompts found in ' + safeName + '.',
             hint: rejected === 1
@@ -67,5 +68,6 @@ export function buildFriendlyImportError(
 
     // Fallback: surface the raw first error but keep it terse.
     const trimmed = first.length > 140 ? first.slice(0, 137) + '...' : first;
+
     return { headline: 'Import failed: ' + trimmed, hint: HINT_DEFAULT };
 }

@@ -52,6 +52,7 @@ export function clearWsSelection(): void {
 export function subscribeSelectedWorkspaces(cb: (ids: Set<string>) => void): () => void {
   listeners.add(cb);
   cb(new Set(selectedIds));
+
   return function unsubscribe(): void {
     listeners.delete(cb);
   };

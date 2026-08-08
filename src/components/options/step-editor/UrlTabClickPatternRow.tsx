@@ -20,6 +20,7 @@ export interface UrlTabClickPatternRowProps {
 
 export function UrlTabClickPatternRow(props: UrlTabClickPatternRowProps): JSX.Element {
     const { value, onPatch } = props;
+
     return (
         <div className="grid grid-cols-3 gap-2">
             <div className="space-y-1 col-span-2">

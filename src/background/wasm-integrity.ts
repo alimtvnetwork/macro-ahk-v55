@@ -99,6 +99,7 @@ async function sha256Hex(bytes: ArrayBuffer): Promise<string> {
     for (let i = 0; i < view.length; i++) {
         hex += view[i].toString(16).padStart(2, "0");
     }
+
     return hex;
 }
 
@@ -126,6 +127,7 @@ async function loadChecksumManifest(checksumUrl: string): Promise<
             `[HEFF] HTTP ${response.status} on GET ${checksumUrl} — checksum manifest unavailable; ` +
             `do NOT retry. Loop halted. Awaiting user instruction.`,
         );
+
         return { kind: "missing", httpStatus: response.status, fetchError: null };
     }
 

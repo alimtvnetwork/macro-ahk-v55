@@ -76,6 +76,7 @@ beforeEach(() => {
     mocks.deletePromptById.mockReset();
     mocks.deletePromptById.mockImplementation(async (id: number) => {
         store.plan = store.plan.filter((r) => r.Id !== id);
+
         return new DbResult(true, undefined);
     });
     mocks.upsertPrompt.mockReset();

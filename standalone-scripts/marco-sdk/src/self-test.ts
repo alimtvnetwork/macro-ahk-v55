@@ -84,6 +84,7 @@ export function runSdkSelfTest(expectedVersion: string): SelfTestResult {
     checks++;
     if (!root || !root.Projects) {
         failures.push("RiseupAsiaMacroExt.Projects missing");
+
         return finalize(FN, failures, checks, expectedVersion);
     }
 
@@ -92,6 +93,7 @@ export function runSdkSelfTest(expectedVersion: string): SelfTestResult {
     const ns = root.Projects[SDK_CODE_NAME] as Record<string, unknown> | undefined;
     if (!ns) {
         failures.push(`Projects.${SDK_CODE_NAME} not registered`);
+
         return finalize(FN, failures, checks, expectedVersion);
     }
 
@@ -143,6 +145,7 @@ function checkMeta(
         | undefined;
     if (!meta) {
         failures.push(".meta missing");
+
         return;
     }
     if (meta.version !== expectedVersion) {
@@ -159,12 +162,14 @@ function checkMeta(
 function checkKvListSync(kv: KvApi | undefined, failures: string[]): void {
     if (!kv || typeof kv.list !== "function") {
         failures.push(".kv.list is not a function");
+
         return;
     }
     try {
         const result = kv.list();
         if (!result || typeof (result as { then?: unknown }).then !== "function") {
             failures.push(".kv.list() did not return a Promise");
+
             return;
         }
         /* Swallow rejection — the contract is "returns a Promise without
@@ -189,6 +194,7 @@ async function runKvRoundTrip(kv: KvApi): Promise<void> {
             FN_KV,
             "FAIL — kv.set/get/delete missing on RiseupMacroSdk.kv (cannot round-trip)",
         );
+
         return;
     }
 
@@ -219,6 +225,7 @@ async function verifyKvGetEquals(
         observed = await kv.get!(RT_KEY);
     } catch (err) {
         failures.push(`kv.get threw: ${(err as Error).message}`);
+
         return;
     }
     if (observed !== expected) {
@@ -247,6 +254,7 @@ async function runFilesRoundTrip(files: FilesApi): Promise<void> {
             FN_FILES,
             "FAIL — files.save/read/delete/list missing on RiseupMacroSdk.files (cannot round-trip)",
         );
+
         return;
     }
 
@@ -284,14 +292,17 @@ async function verifyFilesListIncludes(
         listed = await files.list!();
     } catch (err) {
         failures.push(`${label} threw: ${(err as Error).message}`);
+
         return;
     }
     if (!Array.isArray(listed)) {
         failures.push(`${label} returned non-array: ${JSON.stringify(listed)}`);
+
         return;
     }
     const found = listed.some((entry) => {
         const e = entry as { filename?: string; path?: string } | null;
+
         return e !== null && (e.filename === RT_FILE_PATH || e.path === RT_FILE_PATH);
     });
     if (expectPresent && !found) {
@@ -312,6 +323,7 @@ async function verifyFilesReadEquals(
         observed = await files.read!(RT_FILE_PATH);
     } catch (err) {
         failures.push(`files.read threw: ${(err as Error).message}`);
+
         return;
     }
     const content = (observed as { content?: unknown } | null)?.content;
@@ -350,6 +362,7 @@ async function verifyGkvGetEquals(expected: string, failures: string[]): Promise
         observed = await sendMessage("GKV_GET", { group: RT_GKV_GROUP, key: RT_GKV_KEY });
     } catch (err) {
         failures.push(`gkv:get threw: ${(err as Error).message}`);
+
         return;
     }
     /* Background may return either the raw string or an object envelope —
@@ -416,6 +429,7 @@ function reportRoundTrip(
 function roundTripSurfaceFromFn(fn: string): "kv" | "files" | "gkv" {
     if (fn === FN_KV) return "kv";
     if (fn === FN_FILES) return "files";
+
     return "gkv";
 }
 
@@ -440,6 +454,7 @@ function finalize(
     /* Mirror sync result to background — pass version only here so the
        popup can show the SDK build that produced the latest snapshot. */
     void sendSelfTestReport("sync", pass, failures, version);
+
     return { pass, failures, checks };
 }
 

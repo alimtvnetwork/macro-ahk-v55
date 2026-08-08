@@ -39,6 +39,7 @@ export function toErrorMessage(e: CaughtError): string {
   if (e instanceof Error) return e.message;
   if (typeof e === 'string') return e;
   if (e !== null && e !== undefined) return String(e);
+
   return 'Unknown error';
 }
 
@@ -49,6 +50,7 @@ export function toErrorMessage(e: CaughtError): string {
 function readSdkNamespace(): RiseupAsiaMacroExtNamespace | undefined {
   try {
     if (typeof window === 'undefined') return undefined;
+
     return window.RiseupAsiaMacroExt;
   } catch {
     return undefined;
@@ -96,6 +98,7 @@ function isFunction(value: unknown): value is (...args: unknown[]) => unknown {
  */
 function isSdkLogger(value: unknown): value is SdkLogger {
   if (!isObjectRecord(value)) return false;
+
   return isFunction(value.error) && isFunction(value.console);
 }
 
@@ -104,6 +107,7 @@ function getLogger(): SdkLogger | undefined {
   const ns = readSdkNamespace();
   const isMissingNs = !ns;
   if (isMissingNs) return undefined;
+
   return isSdkLogger(ns.Logger) ? ns.Logger : undefined;
 }
 
@@ -115,11 +119,12 @@ function prefix(scope: string): string {
 /** Structured error logging, delegates to RiseupAsiaMacroExt.Logger.error(). */
 export function logError(scope: string, message: string, error?: CaughtError): void {
   const logger = getLogger();
-  if (logger) { logger.error(scope, message, error); return; }
+  if (logger) { logger.error(scope, message, error);
+
+ return; }
   const base = prefix(scope) + message;
   // eslint-disable-next-line no-restricted-syntax -- fallback when RiseupAsiaMacroExt.Logger is not yet registered
   if (error !== undefined) { console.error(base, error); } else { console.error(base); }
-
 }
 
 /** Type guard for a method on the logger object without double-casting. */
@@ -131,7 +136,9 @@ function hasLoggerMethod(logger: object, name: string): boolean {
 export function logDebug(scope: string, message: string): void {
   const logger = getLogger();
   if (logger && hasLoggerMethod(logger, 'debug')) {
-    logger.debug(scope, message); return;
+    logger.debug(scope, message);
+
+ return;
   }
   console.debug(prefix(scope) + message);
 }
@@ -140,7 +147,9 @@ export function logDebug(scope: string, message: string): void {
 export function logWarn(scope: string, message: string): void {
   const logger = getLogger();
   if (logger && hasLoggerMethod(logger, 'warn')) {
-    logger.warn(scope, message); return;
+    logger.warn(scope, message);
+
+ return;
   }
   console.warn(prefix(scope) + message);
 }
@@ -148,7 +157,9 @@ export function logWarn(scope: string, message: string): void {
 /** General structured console output, delegates to RiseupAsiaMacroExt.Logger.console(). */
 export function logConsole(scope: string, message: string, ...args: RiseupAsiaLogArg[]): void {
   const logger = getLogger();
-  if (logger) { logger.console(scope, message, ...args); return; }
+  if (logger) { logger.console(scope, message, ...args);
+
+ return; }
   const base = prefix(scope) + message;
   if (args.length > 0) { console.log(base, ...args); } else { console.log(base); }
 }
@@ -157,15 +168,15 @@ export function logConsole(scope: string, message: string, ...args: RiseupAsiaLo
 export function logStackTrace(scope: string, message: string, error?: CaughtError): void {
   const logger = getLogger();
   if (logger && hasLoggerMethod(logger, 'stackTrace')) {
-    logger.stackTrace(scope, message, error); return;
+    logger.stackTrace(scope, message, error);
+
+ return;
   }
   const base = prefix(scope) + message;
   const stack = (error instanceof Error && error.stack) ? error.stack : new Error().stack || '';
   // eslint-disable-next-line no-restricted-syntax -- fallback when RiseupAsiaMacroExt.Logger is not yet registered
   console.error(base + '\n' + stack);
-
 }
-
 
 /* ============================================================================
  * PlanTierType 26, step 6: Diagnostic logging overload
@@ -225,7 +236,6 @@ export {
 };
 export type { DiagnosticContext, DiagnosticContextValue, DiagnosticReport, DiagnosticToast, ErrorCodeEntry };
 
-
 /** Convert a DiagnosticReport into a RiseupAsiaLogArg-compatible plain object. */
 function reportToLogArg(report: DiagnosticReport): RiseupAsiaLogArg {
   const out: Record<string, RiseupAsiaLogArg> = {
@@ -242,6 +252,7 @@ function reportToLogArg(report: DiagnosticReport): RiseupAsiaLogArg {
       ? { name: report.cause.name, message: report.cause.message, stack: report.cause.stack }
       : { name: report.cause.name, message: report.cause.message };
   }
+
   return out;
 }
 
@@ -257,6 +268,7 @@ export function logDiagnostic(err: DiagnosticError): DiagnosticReport {
   if (logger) {
     logger.error(scope, '[' + report.code + '] ' + report.message, err);
     logger.console(scope, 'diagnostic-report', reportToLogArg(report));
+
     return report;
   }
   const base = prefix(scope) + '[' + report.code + '] ' + report.message;
@@ -264,6 +276,7 @@ export function logDiagnostic(err: DiagnosticError): DiagnosticReport {
   console.error(base, err);
 
   console.log(prefix(scope) + 'diagnostic-report', report);
+
   return report;
 }
 
@@ -285,6 +298,7 @@ export function logDiagnosticFromCode(
   cause?: unknown,
 ): DiagnosticReport {
   const err = new DiagnosticError(code, context, cause);
+
   return logDiagnostic(err);
 }
 
@@ -296,6 +310,7 @@ export function logDiagnosticFromCode(
 export function reportDiagnostic(err: DiagnosticError): { report: DiagnosticReport; toast: DiagnosticToast } {
   const report = logDiagnostic(err);
   const toast = formatDiagnosticToast(err);
+
   return { report, toast };
 }
 
@@ -311,6 +326,7 @@ export function wrapCaught(
   caught: CaughtError,
 ): DiagnosticError {
   if (isDiagnosticError(caught)) return caught;
+
   return new DiagnosticError(code, context, caught);
 }
 

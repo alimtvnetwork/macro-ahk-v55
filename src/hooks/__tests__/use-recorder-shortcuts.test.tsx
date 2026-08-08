@@ -20,6 +20,7 @@ interface ProbeProps {
 
 function Probe(props: ProbeProps): JSX.Element {
     useRecorderShortcuts(props);
+
     return <div data-testid="probe" />;
 }
 

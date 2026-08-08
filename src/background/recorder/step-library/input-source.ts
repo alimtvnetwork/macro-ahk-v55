@@ -133,6 +133,7 @@ function sanitiseHeaders(raw: unknown): InputSourceHeader[] {
         if (name.length === 0) continue;
         out.push({ Name: name, Value: value });
     }
+
     return out;
 }
 
@@ -146,6 +147,7 @@ function sanitiseFailurePolicy(raw: unknown): InputSourceFailurePolicy {
 
 function clampTimeout(raw: unknown): number {
     const n = typeof raw === "number" && Number.isFinite(raw) ? raw : DEFAULT_TIMEOUT_MS;
+
     return Math.min(60_000, Math.max(1_000, Math.round(n)));
 }
 
@@ -156,6 +158,7 @@ export function loadInputSourceConfig(): InputSourceConfig {
         if (raw === null) return DEFAULT_INPUT_SOURCE_CONFIG;
         const parsed = JSON.parse(raw) as StoredShape;
         if (!isPlainObject(parsed)) return DEFAULT_INPUT_SOURCE_CONFIG;
+
         return {
             Enabled: parsed.Enabled === true,
             Url: typeof parsed.Url === "string" ? parsed.Url : "",
@@ -183,6 +186,7 @@ export function saveInputSourceConfig(config: InputSourceConfig): InputSourceCon
     if (typeof localStorage !== "undefined") {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(normalised));
     }
+
     return normalised;
 }
 
@@ -212,6 +216,7 @@ export function mergeInputBags(
     if (incoming !== null) {
         for (const [k, v] of Object.entries(incoming)) out[k] = v;
     }
+
     return out;
 }
 
@@ -255,6 +260,7 @@ function parseResponseBag(
         parsed = JSON.parse(raw) as JsonValue;
     } catch (e) {
         const detail = e instanceof Error ? e.message : "Unknown parse error";
+
         return { Ok: false, Reason: `Response was not valid JSON: ${detail}` };
     }
     if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
@@ -263,6 +269,7 @@ function parseResponseBag(
             Reason: `Expected a JSON object at the top level (e.g. { "Email": "you@example.com" }).`,
         };
     }
+
     return { Ok: true, Bag: parsed as GroupInputBag };
 }
 
@@ -289,6 +296,7 @@ function preflight(deps: FetchInputDeps, config: InputSourceConfig): FetchPrefli
             ContinueOnFail: continueOnFail,
         };
     }
+
     return { Skip: null, FetchImpl: fetchImpl, ContinueOnFail: continueOnFail };
 }
 
@@ -302,6 +310,7 @@ function buildRequest(config: InputSourceConfig): { headers: Record<string, stri
             headers["Content-Type"] = "application/json";
         }
     }
+
     return { headers, body };
 }
 
@@ -320,6 +329,7 @@ function handleResponse(
     if (isMissingOk) {
         return buildErrorResult({ url: config.Url, status: res.status, error: parsed.Reason, durationMs, continueOnFail });
     }
+
     return { Ok: true, Skipped: false, Bag: parsed.Bag, Status: res.status, DurationMs: durationMs, Url: config.Url };
 }
 
@@ -341,10 +351,12 @@ export async function fetchInputSource(
     try {
         const res = await pre.FetchImpl(config.Url, { method: config.Method, headers, body, signal: controller?.signal });
         const text = await res.text();
+
         return handleResponse(res, text, config, Date.now() - startedAt, pre.ContinueOnFail);
     } catch (e) {
         const message = e instanceof Error ? e.message : String(e);
         const isAbort = e instanceof Error && e.name === "AbortError";
+
         return buildErrorResult({
             url: config.Url,
             status: null,
@@ -356,7 +368,6 @@ export async function fetchInputSource(
         if (timer !== null) clearTimeout(timer);
     }
 }
-
 
 /* ------------------------------------------------------------------ */
 /*  Snapshot — captured once per batch and shared across groups        */
@@ -384,5 +395,6 @@ export async function resolveBatchInputSnapshot(
     if (result.Ok && !result.Skipped) {
         return { Bag: result.Bag, Result: result };
     }
+
     return { Bag: null, Result: result };
 }

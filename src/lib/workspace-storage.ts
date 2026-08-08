@@ -20,9 +20,9 @@ export class WorkspaceStorage {
                 },
             });
         }
+
         return this.db;
     }
-
 
     static async set(key: string, value: unknown): Promise<void> {
         const db = await this.getDB();
@@ -31,6 +31,7 @@ export class WorkspaceStorage {
 
     static async get<T>(key: string): Promise<T | undefined> {
         const db = await this.getDB();
+
         return db.get(STORE_NAME, key);
     }
 

@@ -37,6 +37,7 @@ function makeButton(rect: Rect): HTMLButtonElement {
     y: rect.top,
     toJSON: () => rect,
   }) as DOMRect;
+
   return button;
 }
 
@@ -47,6 +48,7 @@ function makePanel(height: number, width = 220): HTMLElement {
   document.body.appendChild(panel);
   Object.defineProperty(panel, 'offsetHeight', { configurable: true, get: () => height });
   Object.defineProperty(panel, 'offsetWidth', { configurable: true, get: () => width });
+
   return panel;
 }
 

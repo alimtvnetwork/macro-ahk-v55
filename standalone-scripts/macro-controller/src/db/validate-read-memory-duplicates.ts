@@ -42,6 +42,7 @@ function toDuplicateRows(rows: readonly unknown[]): DuplicateRow[] {
       out.push({ Id: id, Slug: slug, Name: name });
     }
   }
+
   return out;
 }
 
@@ -49,6 +50,7 @@ async function findDuplicates(): Promise<DuplicateRow[]> {
   const sql = 'SELECT Id, Slug, Name FROM Prompt WHERE ' + READ_MEMORY_MATCH_WHERE;
   const resp = await runSqlBridge('QUERY', sql);
   if (!resp?.isOk || !Array.isArray(resp.rows)) return [];
+
   return toDuplicateRows(resp.rows as unknown[]);
 }
 
@@ -66,8 +68,10 @@ async function demoteDuplicates(ids: readonly number[]): Promise<boolean> {
       column: 'read-memory-duplicates',
       reason: resp?.errorMessage ?? 'unknown error',
     });
+
     return false;
   }
+
   return true;
 }
 
@@ -112,12 +116,14 @@ export async function validateAndDisableReadMemoryDuplicates(): Promise<ReadMemo
         + slugs.join(', '),
       'success',
     );
+
     return { detected: duplicates.length, disabled: duplicates.length, slugs };
   } catch (err) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'read-memory-duplicates',
       reason: err instanceof Error ? err.message : String(err),
     }, err);
+
     return { detected: 0, disabled: 0, slugs: [] };
   }
 }

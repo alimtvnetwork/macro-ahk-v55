@@ -55,14 +55,12 @@ export function isValidWorkspaceCandidateName(name: string, projectName?: string
 export function matchWorkspaceByName(rawName: string, perWs: WorkspaceCredit[]): WorkspaceCredit | null {
   const normalizedRaw = normalizeWorkspaceName(rawName);
   if (!normalizedRaw || !perWs || perWs.length === 0) {
-
     return null;
   }
 
   for (const ws of perWs) {
     const fullName = (ws.fullName || ws.name || '') as string;
     if (normalizeWorkspaceName(fullName) === normalizedRaw) {
-
       return ws;
     }
   }
@@ -78,13 +76,11 @@ export function pushWorkspaceNameCandidate(target: Array<{ name: string; selecte
   const cleaned = (name || '').replace(/\u00a0/g, ' ').trim();
   const isMissingCleaned = !cleaned;
   if (isMissingCleaned) {
-
     return;
   }
   const normalized = normalizeWorkspaceName(cleaned);
   const isMissingNormalized = !normalized;
   if (isMissingNormalized) {
-
     return;
   }
 
@@ -104,7 +100,6 @@ export function expandWorkspaceNameCandidates(rawText: string, selected: boolean
   const base = (rawText || '').replace(/\u00a0/g, ' ').trim();
   const isMissingBase = !base;
   if (isMissingBase) {
-
     return;
   }
 
@@ -142,7 +137,6 @@ export function expandWorkspaceNameCandidates(rawText: string, selected: boolean
 
 export function isLikelySelectedWorkspaceNode(node: Node): boolean {
   if (!(node instanceof Element)) {
-
     return false;
   }
 
@@ -151,7 +145,6 @@ export function isLikelySelectedWorkspaceNode(node: Node): boolean {
     !!node.closest(SELECTED_WS_SELECTOR) ||
     !!node.querySelector(SELECTED_WS_SELECTOR)
   ) {
-
     return true;
   }
 
@@ -159,7 +152,6 @@ export function isLikelySelectedWorkspaceNode(node: Node): boolean {
   for (let i = 0; i < 4 && el; i++) {
     const className = ((el.className as string) || '').toLowerCase();
     if (/(^|\s)(selected|active|current|checked)(\s|$)/.test(className) || /\bis-(selected|active|current|checked)\b/.test(className)) {
-
       return true;
     }
     el = el.parentElement;

@@ -61,12 +61,14 @@ export async function loadOrCreateFromOpfs(
         const db = new SQL.Database(new Uint8Array(existingBuffer));
         // Ensure views and IF NOT EXISTS objects are created on pre-existing DBs
         ensureIdempotentSchema(db, schema);
+
         return db;
     }
 
     const db = new SQL.Database();
     db.run(schema);
     await saveToOpfs(root, name, db);
+
     return db;
 }
 
@@ -119,11 +121,13 @@ export async function loadFromStorage(
         const db = new SQL.Database(new Uint8Array(stored[key] as ArrayBuffer | ArrayLike<number>));
         // Ensure views and IF NOT EXISTS objects are created on pre-existing DBs
         ensureIdempotentSchema(db, schema);
+
         return db;
     }
 
     const db = new SQL.Database();
     db.run(schema);
+
     return db;
 }
 

@@ -43,6 +43,7 @@ function getSdk(op: string): MarcoSDKApiModule {
   if (!sdk || !sdk.api) {
     throwDiagnostic('REMIX_FETCH_E001', { missingApi: 'window.marco.api', op });
   }
+
   return sdk.api;
 }
 
@@ -89,12 +90,15 @@ export async function fetchWorkspaceProjectNames(wsId: string, force = false): P
   }
   cache[wsId] = { names, fetchedAt: Date.now() };
   log('[Remix] ✅ ' + names.size + ' existing project names fetched', 'success');
+
   return names;
 }
 
 /** Drop the cached project-name list for a workspace. */
 export function clearProjectNamesCache(wsId?: string): void {
-  if (wsId) { delete cache[wsId]; return; }
+  if (wsId) { delete cache[wsId];
+
+ return; }
   for (const k of Object.keys(cache)) delete cache[k];
 }
 
@@ -143,5 +147,6 @@ export async function submitRemix(opts: {
       projectName: opts.projectName,
     });
   }
+
   return { newProjectId, redirectUrl, raw: data };
 }

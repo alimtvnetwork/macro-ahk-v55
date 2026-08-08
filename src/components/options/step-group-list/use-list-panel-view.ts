@@ -15,6 +15,7 @@ function matchesQuery(group: StepGroupRow, query: string): boolean {
     if (group.Name.toLowerCase().includes(q)) return true;
     const desc = group.Description ?? "";
     if (desc !== "" && desc.toLowerCase().includes(q)) return true;
+
     return false;
 }
 
@@ -36,6 +37,7 @@ export function useListPanelView({
     const groupsById = useMemo(() => {
         const m = new Map<number, StepGroupRow>();
         for (const g of groups) m.set(g.StepGroupId, g);
+
         return m;
     }, [groups]);
 

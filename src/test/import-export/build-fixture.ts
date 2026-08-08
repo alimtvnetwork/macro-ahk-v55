@@ -19,6 +19,7 @@ export function buildFixtureProject(): StoredProject {
     Foo: "bar",
     Nested: { A: 1, B: [true, false, null] },
   });
+
   return {
     id: "project-fixture-uid-0001",
     schemaVersion: 1,

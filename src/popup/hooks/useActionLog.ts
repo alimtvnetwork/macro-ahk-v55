@@ -39,6 +39,7 @@ export function useActionLog() {
                     ...prev,
                 ];
                 const isOverLimit = next.length > MAX_LOG_ENTRIES;
+
                 return isOverLimit ? next.slice(0, MAX_LOG_ENTRIES) : next;
             });
         },

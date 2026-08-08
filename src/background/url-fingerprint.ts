@@ -25,6 +25,7 @@ export function urlFingerprint(rawUrl: string): string {
     try {
         const parsed = new URL(rawUrl);
         const sortedSearch = sortSearchParams(parsed.searchParams);
+
         return `${parsed.origin}${parsed.pathname}${sortedSearch}`;
     } catch {
         return rawUrl;
@@ -50,6 +51,7 @@ function sortSearchParams(params: URLSearchParams): string {
     for (const [key, value] of entries) {
         sorted.append(key, value);
     }
+
     return `?${sorted.toString()}`;
 }
 
@@ -59,5 +61,6 @@ function compareEntries(a: [string, string], b: [string, string]): number {
     if (keyDelta !== 0) {
         return keyDelta;
     }
+
     return a[1].localeCompare(b[1]);
 }

@@ -21,6 +21,7 @@ export function mountSearchBar(getDict: () => WorkspaceDictionary): () => void {
         return doMount(getDict);
     } catch (caught) {
         logError("SearchBar.mount", caught);
+
         return () => undefined;
     }
 }
@@ -33,6 +34,7 @@ function doMount(getDict: () => WorkspaceDictionary): () => void {
     const wrapper = buildWrapper();
     anchor.insertAdjacentElement("afterend", wrapper);
     bindInput(wrapper, getDict);
+
     return () => wrapper.remove();
 }
 
@@ -41,6 +43,7 @@ function buildWrapper(): HTMLDivElement {
     wrap.className = SearchBarClasses.WRAPPER;
     wrap.setAttribute(ATTR, WRAPPER_VALUE);
     wrap.appendChild(buildInput());
+
     return wrap;
 }
 
@@ -51,6 +54,7 @@ function buildInput(): HTMLInputElement {
     input.placeholder = "Search workspaces…";
     input.setAttribute(ATTR, INPUT_VALUE);
     input.setAttribute("aria-label", "Search workspaces");
+
     return input;
 }
 
@@ -77,6 +81,7 @@ export function onSearchInput(value: string, dict: WorkspaceDictionary): Workspa
     if (needle === "") {
         return dict.byIndex;
     }
+
     return dict.byIndex.filter((r) => r.name.toLowerCase().includes(needle));
 }
 

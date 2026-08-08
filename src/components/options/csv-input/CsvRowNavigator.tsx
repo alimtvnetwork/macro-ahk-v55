@@ -20,6 +20,7 @@ export function CsvRowNavigator(props: CsvRowNavigatorProps): JSX.Element {
     const { headerCount, totalRows, delimiter, rowIndex, onRowIndexChange } = props;
     const canStepBack = rowIndex > 0;
     const canStepFwd = rowIndex < totalRows - 1;
+
     return (
         <div className="flex items-center justify-between rounded border bg-muted/30 px-3 py-2 text-xs">
             <div className="text-muted-foreground">

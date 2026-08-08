@@ -23,6 +23,7 @@ const { autoDetectSpy, stopLoopSpy, resolveTokenSpy, showToastSpy, stateRef, loo
 vi.mock('../workspace-detection', () => ({
   extractProjectIdFromUrl: () => {
     const m = window.location.href.match(/\/projects\/([^/?#]+)/);
+
     return m ? m[1] : null;
   },
   invalidateProjectIdCache: vi.fn(),

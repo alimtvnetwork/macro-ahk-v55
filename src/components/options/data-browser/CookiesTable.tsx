@@ -31,6 +31,7 @@ export function CookiesTable({ entries, loading, onRefresh, searchTerm = "" }: C
   const filtered = useMemo(() => {
     if (!effectiveSearch.trim()) return entries;
     const q = effectiveSearch.toLowerCase();
+
     return entries.filter(
       (e) =>
         e.name.toLowerCase().includes(q) ||

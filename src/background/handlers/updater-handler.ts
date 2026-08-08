@@ -114,6 +114,7 @@ export function bindUpdaterDbManager(manager: DbManager): void {
 function getDb(): SqlJsDatabase {
     const isMissingDbManager = !dbManager;
     if (isMissingDbManager) throw new Error("[updater] DbManager not bound");
+
     return dbManager.getLogsDb();
 }
 
@@ -130,6 +131,7 @@ export function handleListUpdaters(): UpdaterEntry[] {
         rows.push(stmt.getAsObject() as UpdaterEntry);
     }
     stmt.free();
+
     return rows;
 }
 
@@ -140,6 +142,7 @@ export function handleGetUpdater(updaterId: number): UpdaterEntry | null {
     stmt.bind([updaterId]);
     const row = stmt.step() ? (stmt.getAsObject() as UpdaterEntry) : null;
     stmt.free();
+
     return row;
 }
 
@@ -194,6 +197,7 @@ export function handleCreateUpdater(data: {
     const result = db.exec("SELECT last_insert_rowid() AS Id");
     const newId = result[0]?.values[0]?.[0] as number;
     dbManager?.markDirty();
+
     return newId;
 }
 
@@ -340,6 +344,7 @@ export function ensureUpdaterCategory(name: string): number {
     db.run("INSERT INTO UpdaterCategory (Name, CreatedAt) VALUES (?, datetime('now'))", [trimmed]);
     const result = db.exec("SELECT last_insert_rowid() AS Id");
     dbManager?.markDirty();
+
     return result[0]?.values[0]?.[0] as number;
 }
 
@@ -377,6 +382,7 @@ export function handleGetUpdateSettings(): GlobalUpdateSettings {
     const stmt = db.prepare("SELECT * FROM UpdateSettings LIMIT 1");
     const row = stmt.step() ? (stmt.getAsObject() as GlobalUpdateSettings) : null;
     stmt.free();
+
     return row ?? {
         Id: 0,
         AutoCheckIntervalMinutes: 1440,

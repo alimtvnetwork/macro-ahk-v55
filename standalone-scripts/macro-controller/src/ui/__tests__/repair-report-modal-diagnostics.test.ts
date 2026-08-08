@@ -4,6 +4,7 @@ import type { Mock } from 'vitest';
 vi.mock('../../logging', () => ({ log: vi.fn() }));
 vi.mock('../../error-utils', async () => {
   const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+
   return { ...actual, logDiagnosticFromCode: vi.fn() };
 });
 

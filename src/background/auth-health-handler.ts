@@ -98,6 +98,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
         if (refreshCookie !== null) {
             return { isSuccess: true, detail: "Refresh cookie found (no session cookie)" };
         }
+
         return { isSuccess: false, detail: "No auth cookies found" };
     });
     strategies.push(s1);
@@ -131,6 +132,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
                                 }
                             }
                         } catch (parseErr) { console.debug("[auth-health] localStorage JWT parse skipped:", parseErr); }
+
                         return null;
                     },
                 });
@@ -143,6 +145,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
                 logBgWarnError(BgLogTag.AUTH_HEALTH, `chrome.scripting.executeScript JWT scan failed for tabId=${tab.id} (url=${tab.url ?? "?"}) — tab may be discarded, restricted (chrome://, devtools), or closed mid-scan`, tabErr instanceof Error ? tabErr : new Error(String(tabErr)));
             }
         }
+
         return { isSuccess: false, detail: `Scanned ${tabs.length} tab(s) — no JWT found` };
     });
     strategies.push(s2);
@@ -185,6 +188,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
         const detail = projectId
             ? `Disabled — cookie/localStorage-only mode (no call to ${AUTH_API_BASE}/projects/${projectId}/auth-token)`
             : `Disabled — cookie/localStorage-only mode (no call to ${AUTH_API_BASE}/projects/{id}/auth-token)`;
+
         return { isSuccess: false, detail };
     });
     strategies.push(s4);
@@ -203,9 +207,11 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
                 if (isExpired) {
                     return { isSuccess: false, detail: `Cookie "${sessionCookie.name}" expired` };
                 }
+
                 return { isSuccess: true, detail: `Cookie "${sessionCookie.name}" (domain=${sessionCookie.domain})` };
             }
             const count = Array.isArray(cookies) ? cookies.length : 0;
+
             return { isSuccess: false, detail: `${count} cookies scanned — no session cookie` };
         } catch (e) {
             return { isSuccess: false, detail: (e as Error).message };
@@ -248,6 +254,7 @@ async function timedStrategy(
     const t0 = performance.now();
     try {
         const result = await strategyRunner();
+
         return {
             name,
             tier,
@@ -284,9 +291,11 @@ async function getActivePlatformTabs(): Promise<PlatformTab[]> {
     }
     // Dedupe by tab ID
     const seen = new Set<number>();
+
     return results.filter((t: PlatformTab) => {
         if (typeof t.id !== "number" || seen.has(t.id)) return false;
         seen.add(t.id);
+
         return true;
     });
 }
@@ -295,5 +304,6 @@ function extractProjectId(url: string | null): string | null {
     const isMissingUrl = !url;
     if (isMissingUrl) return null;
     const match = url.match(/\/projects\/([a-f0-9-]{36})/);
+
     return match?.[1] ?? null;
 }

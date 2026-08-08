@@ -40,6 +40,7 @@ export function mapPlanFromWire(wirePlan: string | null | undefined): PlanTierTy
                 LOG_SCOPE,
                 '[CODE RED] Unknown workspace plan. Path: standalone-scripts/macro-controller/src/credit-balance-update/plan-mapper.ts. Missing item: PlanTierType enum mapping for wire plan "' + normalized + '". Reason: unknown plan cannot safely trigger /credit-balance; falling back to inline fields.',
             );
+
             return PlanTierType.Unknown;
     }
 }

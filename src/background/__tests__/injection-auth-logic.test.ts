@@ -33,6 +33,7 @@ function collectGlobalScripts(globalProjects: MinimalProject[]): unknown[] {
             scripts.push({ ...script, order: baseOrder + script.order });
         }
     }
+
     return scripts;
 }
 
@@ -213,6 +214,7 @@ describe("Auth: buildAuthCookieHeader", () => {
         if (refreshLookup.value !== null) {
             parts.push(`${refreshLookup.cookieName ?? "lovable-session-id.refresh"}=${refreshLookup.value}`);
         }
+
         return parts.join("; ");
     }
 

@@ -79,6 +79,7 @@ function testStringValidation(value: string, v: StringValidation): boolean {
   if (v.contains && !value.includes(v.contains)) return false;
   if (v.minLength !== undefined && value.length < v.minLength) return false;
   if (v.maxLength !== undefined && value.length > v.maxLength) return false;
+
   return true;
 }
 
@@ -90,6 +91,7 @@ function testDateValidation(value: string, v: DateValidation): boolean {
   if (v.format === "YYYY-MM-DD") {
     return /^\d{4}-\d{2}-\d{2}$/.test(value) && !isNaN(Date.parse(value));
   }
+
   // Fallback: try parsing
   return !isNaN(Date.parse(value));
 }
@@ -97,6 +99,7 @@ function testDateValidation(value: string, v: DateValidation): boolean {
 function testRegexValidation(value: string, v: RegexValidation): boolean {
   try {
     const re = new RegExp(v.pattern, v.flags ?? "");
+
     return re.test(value);
   } catch {
     return false;
@@ -113,6 +116,7 @@ function testNumberValidation(value: string, v: NumberValidation): boolean {
   if (v.integer && !Number.isInteger(count)) return false;
   if (v.min !== undefined && count < v.min) return false;
   if (v.max !== undefined && count > v.max) return false;
+
   return true;
 }
 
@@ -141,6 +145,7 @@ export function ValidationRuleEditor({ rule, onChange, readOnly = false }: Valid
 
   const testResult = useMemo(() => {
     if (!rule || !testValue) return null;
+
     return testValidation(testValue, rule);
   }, [rule, testValue]);
 

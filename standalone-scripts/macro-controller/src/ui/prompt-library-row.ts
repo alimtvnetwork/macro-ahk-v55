@@ -29,6 +29,7 @@ export function buildRowLeft(refs: ModalRefs, row: PromptRow, container: HTMLEle
   slug.style.cssText = 'font-size:10px;color:#7a8699;margin-top:2px;';
   left.appendChild(name);
   left.appendChild(slug);
+
   return left;
 }
 
@@ -80,6 +81,7 @@ export function buildRowRight(refs: ModalRefs, row: PromptRow, rowEl: HTMLElemen
     right.appendChild(resetBtn);
   }
   right.appendChild(delBtn);
+
   return right;
 }
 
@@ -90,6 +92,7 @@ export function buildRowEl(refs: ModalRefs, row: PromptRow, container: HTMLEleme
   rowEl.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 4px;border-top:1px solid #1c2536;font-size:12px;';
   rowEl.appendChild(buildRowLeft(refs, row, container, renderAllRoles));
   rowEl.appendChild(buildRowRight(refs, row, rowEl, renderAllRoles));
+
   return rowEl;
 }
 
@@ -100,6 +103,7 @@ export function buildPreviewEl(row: PromptRow): HTMLElement {
   const body = row.Body.length > PREVIEW_MAX_CHARS ? row.Body.slice(0, PREVIEW_MAX_CHARS) + ' ...(+' + (row.Body.length - PREVIEW_MAX_CHARS) + ' chars)' : row.Body;
   pre.textContent = body;
   pre.style.cssText = 'margin:0 4px 6px 4px;padding:6px 8px;background:#0b1220;color:#c9d5ea;border:1px solid #1c2536;border-radius:6px;font-family:ui-monospace,monospace;font-size:10px;white-space:pre-wrap;max-height:180px;overflow:auto;';
+
   return pre;
 }
 
@@ -110,6 +114,7 @@ export function buildRowContainer(refs: ModalRefs, row: PromptRow, renderAllRole
   if (refs.view.expandedIds.has(row.Id)) {
     container.appendChild(buildPreviewEl(row));
   }
+
   return container;
 }
 

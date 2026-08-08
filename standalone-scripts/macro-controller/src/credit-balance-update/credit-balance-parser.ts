@@ -23,11 +23,13 @@ function readNumber(raw: CreditBalanceWire, key: string): number {
         return value;
     }
     logCreditParseWarning('Missing or invalid numeric field "' + key + '" — defaulting to 0');
+
     return 0;
 }
 
 function readString(raw: CreditBalanceWire, key: string): string {
     const value = raw[key];
+
     return typeof value === 'string' ? value : '';
 }
 
@@ -35,6 +37,7 @@ function parseGrantTypeBalance(value: JsonValue): GrantTypeBalance | null {
     if (!isRecord(value)) {
         return null;
     }
+
     return {
         grantType: mapGrantTypeFromWire(readString(value, 'grant_type')),
         granted: readNumber(value, 'granted'),
@@ -50,6 +53,7 @@ function readNumberAlias(raw: CreditBalanceWire, keys: ReadonlyArray<string>): n
         }
     }
     logCreditParseWarning('Missing or invalid numeric field "' + keys.join('|') + '" — defaulting to 0');
+
     return 0;
 }
 
@@ -57,6 +61,7 @@ function parseExpiringGrant(value: JsonValue): ExpiringGrant | null {
     if (!isRecord(value)) {
         return null;
     }
+
     return {
         grantType: mapGrantTypeFromWire(readString(value, 'grant_type')),
         // 2026-06 wire shape uses `credits`; legacy uses `remaining`.
@@ -78,6 +83,7 @@ function parseGrantTypeBalances(raw: CreditBalanceWire): ReadonlyArray<GrantType
             balances.push(parsed);
         }
     }
+
     return balances;
 }
 
@@ -93,16 +99,19 @@ function parseExpiringGrants(raw: CreditBalanceWire): ReadonlyArray<ExpiringGran
             grants.push(parsed);
         }
     }
+
     return grants;
 }
 
 function readNumberOptional(raw: CreditBalanceWire, key: string): number {
     const value = raw[key];
+
     return typeof value === 'number' && Number.isFinite(value) ? value : 0;
 }
 
 function readBooleanOptional(raw: CreditBalanceWire, key: string): boolean {
     const value = raw[key];
+
     return typeof value === 'boolean' ? value : false;
 }
 

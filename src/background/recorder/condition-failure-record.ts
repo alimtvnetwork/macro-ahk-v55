@@ -54,6 +54,7 @@ export function buildConditionFailureRecord(
     input: BuildFailureRecordInput,
 ): ConditionFailureRecord {
     const flat = flattenConditionSelectors(input.Condition);
+
     return {
         Reason: input.ReasonOverride ?? input.Outcome.Reason,
         ConditionSerialized: serializeCondition(input.Condition),
@@ -72,5 +73,6 @@ function serializeCondition(c: Condition): string {
 
 function trimLogTail(lines: ReadonlyArray<string>): ReadonlyArray<string> {
     if (lines.length <= MAX_LOG_TAIL) return lines;
+
     return lines.slice(lines.length - MAX_LOG_TAIL);
 }

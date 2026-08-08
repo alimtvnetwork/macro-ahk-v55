@@ -46,12 +46,14 @@ export interface CaptureChatSubmitResult {
 
 function truncateForOpfs(text: string): string {
   if (text.length <= MAX_TEXT_CHARS) return text;
+
   return text.slice(0, MAX_TEXT_CHARS);
 }
 
 function bodyForDisk(text: string, isVerbose: boolean): string {
   const isMissingIsVerbose = !isVerbose;
   if (isMissingIsVerbose) return REDACTED_PLACEHOLDER;
+
   return truncateForOpfs(text);
 }
 
@@ -81,6 +83,7 @@ async function persistCapture(
   void enforceChatSubmitWindow(projectId).catch((err) => {
     logError(SCOPE, `enforceChatSubmitWindow threw (projectId=${projectId})`, err);
   });
+
   return { isCaptured: true, projectId, fileId };
 }
 
@@ -97,9 +100,11 @@ export async function captureChatSubmit(input: CaptureChatSubmitInput): Promise<
   const isMissingProjectId = !projectId;
   if (isMissingProjectId) {
     logError(SCOPE, `captureChatSubmit: no projectId (source=${input.source}, chars=${trimmed.length})`);
+
     return { isCaptured: false, projectId: null, fileId: null, reason: 'no-project-id' };
   }
   const isVerbose = input.isVerbose === true;
   const metaJson = input.metaJson ?? null;
+
   return persistCapture(projectId, projectName, input.source, trimmed, metaJson, isVerbose);
 }

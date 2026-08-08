@@ -63,6 +63,7 @@ export function computeRange<Id extends SelectionId>(
     const toIdx = orderedIds.indexOf(to);
     if (fromIdx < 0 || toIdx < 0) return [];
     const [lo, hi] = fromIdx <= toIdx ? [fromIdx, toIdx] : [toIdx, fromIdx];
+
     return orderedIds.slice(lo, hi + 1);
 }
 
@@ -92,6 +93,7 @@ export function reduceSelectionClick<Id extends SelectionId>(
         } else {
             next.add(clickedId);
         }
+
         return { next, nextAnchor: clickedId };
     }
 
@@ -135,6 +137,7 @@ export function useShiftClickSelection<Id extends SelectionId>(
         );
         setSelected(next);
         setAnchor(nextAnchor);
+
         return next;
     }, []);
 
@@ -146,7 +149,6 @@ export function useShiftClickSelection<Id extends SelectionId>(
         selected, anchor, isSelected, handleClick, setSelection, clear,
     }), [selected, anchor, isSelected, handleClick, setSelection, clear]);
 }
-
 
 /**
  * Convenience: derive {shiftKey, toggleKey} from a native MouseEvent honouring

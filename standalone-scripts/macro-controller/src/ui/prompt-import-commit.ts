@@ -79,6 +79,7 @@ function handleCommitSuccess(
       renamed: counts.renamed, skipped: counts.skipped,
     },
   });
+
   return { auditId, results, counts };
 }
 
@@ -89,6 +90,7 @@ async function attemptRollback(auditId: string, snapshot: CachedPromptEntry[], c
       namespace: 'ImportCommit', code: 'ROLLBACK_OK', level: 'info',
       fields: { auditId, restoredEntries: snapshot.length },
     });
+
     return false;
   } catch (rollbackErr) {
     const rbMsg = rollbackErr instanceof Error ? rollbackErr.message : String(rollbackErr);
@@ -96,6 +98,7 @@ async function attemptRollback(auditId: string, snapshot: CachedPromptEntry[], c
       namespace: 'ImportCommit', code: 'COMMIT_DOUBLE_FAULT', level: 'error',
       fields: { auditId, rollbackError: rbMsg, originalError: classifiedMessage },
     });
+
     return true;
   }
 }
@@ -148,6 +151,7 @@ export async function commitPromptImportAtomic(
   });
   try {
     const results = await performPromptImport(input.entries, { overwrite: true });
+
     return handleCommitSuccess(auditId, results, input);
   } catch (err) {
     return handleCommitFailure(auditId, err, snapshot, input);

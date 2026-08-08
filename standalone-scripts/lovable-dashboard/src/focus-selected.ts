@@ -12,6 +12,7 @@ export function focusSelectedWorkspace(dict: WorkspaceDictionary): void {
         const selected = getSelected(dict);
         if (selected) {
             scrollWorkspaceIntoView(selected.fullXPath);
+
             return;
         }
         logWarn("focusSelected", "no selected workspace detected");

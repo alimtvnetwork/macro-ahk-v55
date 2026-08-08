@@ -69,7 +69,9 @@ interface Props {
 /* ------------------------------------------------------------------ */
 
 function validateJson(raw: string): boolean {
-  try { JSON.parse(raw); return true; } catch { return false; }
+  try { JSON.parse(raw);
+
+ return true; } catch { return false; }
 }
 
 function formatJson(input: JsonValue): string {
@@ -162,6 +164,7 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
   const initialConfigs: BundleConfigEntry[] = bindingIds
     .map((id, i) => {
       const config = configs.find((c) => c.id === id);
+
       return config ? { id: config.id, name: config.name, json: formatJson(config.json), order: i } : null;
     })
     .filter((x): x is BundleConfigEntry => x !== null);
@@ -209,6 +212,7 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
       const newIdx = idx + direction;
       if (newIdx < 0 || newIdx >= entries.length) return prev;
       [entries[idx], entries[newIdx]] = [entries[newIdx], entries[idx]];
+
       return entries.map((e, i) => ({ ...e, order: i }));
     });
     markDirty();
@@ -224,7 +228,9 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
 
   const addExistingConfig = (configId: string) => {
     if (configId === "__none__") return;
-    if (configEntries.some((c) => c.id === configId)) { toast.info("Config already added"); return; }
+    if (configEntries.some((c) => c.id === configId)) { toast.info("Config already added");
+
+ return; }
     const config = configs.find((c) => c.id === configId);
     if (!config) return;
     setConfigEntries((prev) => [...prev, { id: config.id, name: config.name, json: formatJson(config.json), order: prev.length }]);
@@ -249,6 +255,7 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
       const newIdx = idx + direction;
       if (newIdx < 0 || newIdx >= entries.length) return prev;
       [entries[idx], entries[newIdx]] = [entries[newIdx], entries[idx]];
+
       return entries.map((e, i) => ({ ...e, order: i }));
     });
     markDirty();
@@ -256,11 +263,17 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
 
   /* -- Save -- */
   const handleSave = useCallback(async () => {
-    if (!name.trim()) { toast.error("Script name is required"); return; }
-    if (jsEntries.length === 0) { toast.error("At least one JavaScript file is required"); return; }
+    if (!name.trim()) { toast.error("Script name is required");
+
+ return; }
+    if (jsEntries.length === 0) { toast.error("At least one JavaScript file is required");
+
+ return; }
 
     for (const config of configEntries) {
-      if (!validateJson(config.json)) { toast.error(`Config "${config.name}" has invalid JSON`); return; }
+      if (!validateJson(config.json)) { toast.error(`Config "${config.name}" has invalid JSON`);
+
+ return; }
       await onSaveConfig({ id: config.id.startsWith("cfg_") ? undefined : config.id, name: config.name, json: config.json });
     }
 
@@ -466,7 +479,9 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
                   label="Drop JSON"
                   icon={Upload}
                   onFile={(entryName, content) => {
-                    if (!validateJson(content)) { toast.error("Invalid JSON"); return; }
+                    if (!validateJson(content)) { toast.error("Invalid JSON");
+
+ return; }
                     addConfigEntry(entryName, content);
                   }}
                   multiple

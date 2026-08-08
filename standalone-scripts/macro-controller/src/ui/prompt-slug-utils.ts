@@ -32,6 +32,7 @@ export function sanitizeSlug(rawSlug: string, fallbackIndex: number): string {
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
   const hasSafeChars = safe.length > 0;
+
   return hasSafeChars ? safe : `entry-${fallbackIndex}`;
 }
 
@@ -46,6 +47,7 @@ export function sanitizeSlug(rawSlug: string, fallbackIndex: number): string {
  */
 export function slugKey(entry: PromptEntry): string {
   const source = entry.slug ?? entry.name;
+
   return source.toLowerCase();
 }
 
@@ -66,5 +68,6 @@ export function makeUniqueSlug(base: string, taken: Set<string>): string {
     candidate = base + suffix + '-' + counter;
     counter += 1;
   }
+
   return candidate;
 }

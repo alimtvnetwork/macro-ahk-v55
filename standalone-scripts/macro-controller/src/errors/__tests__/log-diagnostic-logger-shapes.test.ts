@@ -38,6 +38,7 @@ interface FallbackSpies {
 function spyOnFallback(): FallbackSpies {
   const err = vi.spyOn(console, 'error').mockImplementation(() => { /* silence */ });
   const log = vi.spyOn(console, 'log').mockImplementation(() => { /* silence */ });
+
   return {
     err,
     log,
@@ -146,6 +147,7 @@ describe('logDiagnosticFromCode — rejected logger shapes fall back cleanly', (
         // the fallback exactly once for BOTH sinks.
         if (label === 'error is a getter that throws') {
           expect(threw).toBeInstanceOf(Error);
+
           return;
         }
 

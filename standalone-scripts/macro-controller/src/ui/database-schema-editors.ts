@@ -122,6 +122,7 @@ function testDateValidation(value: string, validation: ColumnValidation): Valida
   if (isIsoFormat) {
     const parsedDate = new Date(value);
     const isInvalidDate = isNaN(parsedDate.getTime());
+
     return isInvalidDate
       ? { pass: false, reason: 'Invalid ISO8601 date' }
       : { pass: true, reason: 'Valid ISO8601 date' };
@@ -132,6 +133,7 @@ function testDateValidation(value: string, validation: ColumnValidation): Valida
   if (isYmdFormat) {
     const isMatchingFormat = /^\d{4}-\d{2}-\d{2}$/.test(value);
     const isValidDate = isMatchingFormat && !isNaN(new Date(value).getTime());
+
     return isValidDate
       ? { pass: true, reason: 'Valid YYYY-MM-DD' }
       : { pass: false, reason: 'Invalid YYYY-MM-DD format' };
@@ -150,6 +152,7 @@ function testRegexValidation(value: string, validation: ColumnValidation): Valid
   try {
     const regex = new RegExp(validation.pattern!, validation.flags || '');
     const isMatch = regex.test(value);
+
     return isMatch
       ? { pass: true, reason: 'Matches pattern' }
       : { pass: false, reason: 'Does not match pattern' };
@@ -199,6 +202,7 @@ function buildValidationTypeSelector(
   };
 
   typeRow.appendChild(typeSelect);
+
   return typeRow;
 }
 

@@ -94,6 +94,7 @@ export async function cacheGet<T>(category: CacheCategory, subKey = ""): Promise
                 const isMissingEntry = !entry;
                 if (isMissingEntry) {
                     resolve(null);
+
                     return;
                 }
                 // Version guard — stale cache from old extension version
@@ -101,6 +102,7 @@ export async function cacheGet<T>(category: CacheCategory, subKey = ""): Promise
                     console.log("[injection-cache] Version mismatch for %s (cached=%s, current=%s) — miss",
                         key, entry.version, EXTENSION_VERSION);
                     resolve(null);
+
                     return;
                 }
                 resolve(entry.value);
@@ -282,6 +284,7 @@ export async function syncCacheWithBuildId(
         return { changed: true, cleared: clearResult.cleared };
     } catch (err) {
         logCaughtError(BgLogTag.INJECTION_CACHE, `Build sync failed\n  Path: chrome.storage.local["${STORAGE_KEY_LAST_BUILD_ID}"]\n  Missing: Successful build ID comparison and cache invalidation\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
+
         return { changed: false, cleared: 0 };
     }
 }

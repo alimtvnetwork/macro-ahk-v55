@@ -14,6 +14,7 @@ export interface KeywordEventsSearchRowProps {
 export function KeywordEventsSearchRow(props: KeywordEventsSearchRowProps): JSX.Element {
     const { value, onChange } = props;
     const isFiltering = value.trim().length > 0;
+
     return (
         <div className="relative" data-testid="keyword-events-search-row">
             <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />

@@ -549,7 +549,6 @@ function renderErrorList(): void {
     list.appendChild(buildErrorItem(error));
   }
 }
-
  
 function buildErrorItem(error: OverlayError): HTMLElement {
   const item = document.createElement('div');

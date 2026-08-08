@@ -25,6 +25,7 @@ function fireDrag(type: FireDragType, files?: File[]): DragEvent {
     const ev = new Event(type, { bubbles: true, cancelable: true }) as DragEvent;
     Object.defineProperty(ev, "dataTransfer", { value: dt });
     window.dispatchEvent(ev);
+
     return ev;
 }
 

@@ -61,6 +61,7 @@ function describeSkipped(entry: WebhookDeliverySkipped): string {
 
 function describeFailure(entry: WebhookDeliveryFailure): string {
     const httpPart = entry.Status !== null ? ` (HTTP ${entry.Status})` : "";
+
     return `Status: Failed${httpPart}\nError: ${entry.Error}`;
 }
 
@@ -111,6 +112,7 @@ function presentFailure(entry: WebhookDeliveryFailure): VariantPresentation {
     const statusSuffix = entry.Status !== null ? ` ${entry.Status}` : "";
     const errorText = entry.Error && entry.Error.length > 0 ? entry.Error : "(no error message)";
     const httpPrefix = entry.Status !== null ? `HTTP ${entry.Status} , ` : "";
+
     return {
         badgeLabel: `Failed${statusSuffix}`,
         badgeVariant: "destructive",
@@ -126,6 +128,7 @@ function presentFailure(entry: WebhookDeliveryFailure): VariantPresentation {
 export function presentVariant(entry: WebhookDeliveryResult): VariantPresentation {
     if (isWebhookSuccess(entry)) return presentSuccess(entry);
     if (isWebhookSkipped(entry)) return presentSkipped(entry);
+
     return presentFailure(entry);
 }
 
@@ -135,6 +138,7 @@ const CLIP_EOL = "\r\n";
 function variantHeader(entry: WebhookDeliveryResult): string {
     if (isWebhookSkipped(entry)) return "[SKIPPED] Webhook Delivery";
     if (isWebhookSuccess(entry)) return "[SUCCESS] Webhook Delivery";
+
     return "[FAILURE] Webhook Delivery";
 }
 
@@ -142,6 +146,7 @@ function variantStatusBlock(entry: WebhookDeliveryResult): string {
     if (isWebhookSkipped(entry)) return describeSkipped(entry);
     if (isWebhookSuccess(entry)) return describeSuccess(entry);
     if (isWebhookFailure(entry)) return describeFailure(entry);
+
     return "Status: <unknown>";
 }
 
@@ -166,6 +171,7 @@ function buildLogClipboardText(entry: WebhookDeliveryResult): string {
         sections.push(payloadJson);
     }
     sections.push(CLIP_SEPARATOR);
+
     return sections.join(CLIP_EOL).replace(/\r?\n/g, CLIP_EOL);
 }
 
@@ -182,17 +188,20 @@ export async function copyLogEntry(entry: WebhookDeliveryResult): Promise<void> 
 function entryStatusLabel(entry: WebhookDeliveryResult): string {
     if (isWebhookSkipped(entry)) return "Skipped";
     if (isWebhookSuccess(entry)) return "Success";
+
     return "Failure";
 }
 
 function entryStatusCode(entry: WebhookDeliveryResult): number | null {
     if (isWebhookSkipped(entry)) return null;
+
     return entry.Status ?? null;
 }
 
 function entryDetail(entry: WebhookDeliveryResult): string {
     if (isWebhookSkipped(entry)) return entry.SkipReason;
     if (isWebhookFailure(entry)) return entry.Error;
+
     return "";
 }
 
@@ -200,6 +209,7 @@ function csvCell(value: string | number | null): string {
     if (value === null || value === undefined) return "";
     const s = String(value);
     if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+
     return s;
 }
 
@@ -230,6 +240,7 @@ function buildCsvExport(entries: ReadonlyArray<WebhookDeliveryResult>): string {
             csvCell(payload ?? ""),
         ].join(","));
     }
+
     return rows.join("\n");
 }
 
@@ -248,6 +259,7 @@ function downloadFile(filename: string, mimeType: string, content: string): void
 export function exportFilteredLog(entries: ReadonlyArray<WebhookDeliveryResult>, format: MimeKindType): void {
     if (entries.length === 0) {
         toast.error("No entries match the current filters");
+
         return;
     }
     const stamp = new Date().toISOString().replace(/[:.]/g, "-");

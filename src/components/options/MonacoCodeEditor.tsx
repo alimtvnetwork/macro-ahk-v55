@@ -39,6 +39,7 @@ interface ChromeWindow {
 
 function isExtensionRuntime(): boolean {
   const win = globalThis as ChromeWindow;
+
   return typeof win.chrome?.runtime?.id === "string";
 }
 
@@ -167,6 +168,7 @@ function highlightJavascript(raw: string): string {
   // Build HTML from tokens
   return tokens.map((t) => {
     const safe = escHtml(t.text);
+
     return t.cls ? `<span class="${t.cls}">${safe}</span>` : safe;
   }).join("");
 }
@@ -262,7 +264,9 @@ function wrapSelection(
   onChange: (v: string) => void,
 ): void {
   const textarea = textareaRef.current;
-  if (!textarea) { onChange(prefix + value + suffix); return; }
+  if (!textarea) { onChange(prefix + value + suffix);
+
+ return; }
   const start = textarea.selectionStart;
   const end = textarea.selectionEnd;
   const selectedText = value.slice(start, end);
@@ -282,7 +286,9 @@ function insertLinePrefix(
   onChange: (v: string) => void,
 ): void {
   const textarea = textareaRef.current;
-  if (!textarea) { onChange(prefix + value); return; }
+  if (!textarea) { onChange(prefix + value);
+
+ return; }
   const start = textarea.selectionStart;
   const lineStart = value.lastIndexOf("\n", start - 1) + 1;
   const newText = value.slice(0, lineStart) + prefix + value.slice(lineStart);
@@ -313,6 +319,7 @@ function formatMarkdown(value: string): string {
   result = result.replace(/\n{3,}/g, "\n\n");
   result = result.replace(/([^\n])\n(#{1,6}\s)/g, "$1\n\n$2");
   if (!result.endsWith("\n")) result += "\n";
+
   return result;
 }
 
@@ -421,6 +428,7 @@ function HighlightedFallback({
     if (language === "json") return highlightJson(value);
     if (language === "javascript") return highlightJavascript(value);
     if (language === "markdown") return highlightMarkdown(value);
+
     return null;
   }, [value, language]);
 
@@ -440,6 +448,7 @@ function HighlightedFallback({
     const textarea = textareaRef.current;
     if (!textarea || !showHighlight) return;
     textarea.addEventListener("scroll", handleScroll);
+
     return () => textarea.removeEventListener("scroll", handleScroll);
   }, [textareaRef, showHighlight, handleScroll]);
 
@@ -520,11 +529,15 @@ export function MonacoCodeEditor({ value, onChange, language, height = "240px", 
 
   const handleFormat = useCallback(() => {
     if (language === "json") {
-      try { onChange(JSON.stringify(JSON.parse(safeValue), null, 2)); return; } catch (caught) {
+      try { onChange(JSON.stringify(JSON.parse(safeValue), null, 2));
+
+ return; } catch (caught) {
         logError("MonacoCodeEditor.handleFormat", "JSON.parse failed during format — user content is not valid JSON, leaving as-is", caught);
       }
     }
-    if (language === "markdown") { onChange(formatMarkdown(safeValue)); return; }
+    if (language === "markdown") { onChange(formatMarkdown(safeValue));
+
+ return; }
     if (useFallback) return;
     editorRef.current?.getAction("editor.action.formatDocument")?.run().catch((error: unknown) => {
       setEditorError(error instanceof Error ? error.message : "Formatting failed");
@@ -555,7 +568,9 @@ export function MonacoCodeEditor({ value, onChange, language, height = "240px", 
     : ".js,.mjs";
 
   const jsonValid = language === "json" ? (() => {
-    try { JSON.parse(safeValue); return true; } catch { return false; }
+    try { JSON.parse(safeValue);
+
+ return true; } catch { return false; }
   })() : true;
 
   return (

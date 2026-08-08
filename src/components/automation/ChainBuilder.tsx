@@ -40,6 +40,7 @@ interface StepLocation {
 /** Encode a location to a sortable ID string */
 function encodeId(loc: StepLocation): string {
   if (loc.container === "top") return `top-${loc.index}`;
+
   return `cond-${loc.conditionIndex}-${loc.container}-${loc.index}`;
 }
 
@@ -56,6 +57,7 @@ function decodeId(id: string): StepLocation | null {
       index: Number(branchMatch[3]),
     };
   }
+
   return null;
 }
 
@@ -97,6 +99,7 @@ function buildDisplaySteps(steps: ChainStep[]): DisplayStep[] {
       });
     }
   });
+
   return result;
 }
 
@@ -137,6 +140,7 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
     const parent = source[loc.conditionIndex!];
     if (!parent || parent.type !== "condition") return null;
     const branch = loc.container === "then" ? parent.then : parent.else;
+
     return branch[loc.index] ?? null;
   }, []);
 
@@ -145,11 +149,13 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
     const newSteps = source.map((s) => s.type === "condition" ? { ...s, then: [...s.then], else: [...s.else] } : s);
     if (loc.container === "top") {
       const [removed] = newSteps.splice(loc.index, 1);
+
       return [newSteps, removed];
     }
     const parent = newSteps[loc.conditionIndex!] as StepCondition;
     const branch = loc.container === "then" ? parent.then : parent.else;
     const [removed] = branch.splice(loc.index, 1);
+
     return [newSteps, removed];
   }, []);
 
@@ -158,11 +164,13 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
     const newSteps = target.map((s) => s.type === "condition" ? { ...s, then: [...s.then], else: [...s.else] } : s);
     if (loc.container === "top") {
       newSteps.splice(loc.index, 0, step);
+
       return newSteps;
     }
     const parent = newSteps[loc.conditionIndex!] as StepCondition;
     const branch = loc.container === "then" ? parent.then : parent.else;
     branch.splice(loc.index, 0, step);
+
     return newSteps;
   }, []);
 
@@ -176,6 +184,7 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
         const branch = loc.container === "then" ? parent.then : parent.else;
         branch[loc.index] = updated;
       }
+
       return newSteps;
     });
   }, []);
@@ -198,6 +207,7 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
           branch.splice(loc.index + 1, 0, clone);
         }
       }
+
       return newSteps;
     });
   }, []);
@@ -227,8 +237,10 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
         const reordered = arrayMove(branch, fromLoc.index, toLoc.index);
         if (fromLoc.container === "then") parent.then = reordered;
         else parent.else = reordered;
+
         return newSteps;
       });
+
       return;
     }
 
@@ -244,14 +256,21 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
       ) {
         adjustedTo.index--;
       }
+
       return insertAtLocation(adjustedTo, movedStep, afterRemove);
     });
   };
 
   const handleSave = async () => {
-    if (!name.trim()) { toast.error("Chain name is required"); return; }
-    if (!slug.trim()) { toast.error("Chain slug is required"); return; }
-    if (steps.length === 0) { toast.error("Add at least one step"); return; }
+    if (!name.trim()) { toast.error("Chain name is required");
+
+ return; }
+    if (!slug.trim()) { toast.error("Chain slug is required");
+
+ return; }
+    if (steps.length === 0) { toast.error("Add at least one step");
+
+ return; }
 
     setSaving(true);
     try {
@@ -309,6 +328,7 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
               <DropdownMenuContent align="end" className="min-w-[200px]">
                 {(Object.keys(STEP_TYPE_META) as ChainStep["type"][]).map((type) => {
                   const meta = STEP_TYPE_META[type];
+
                   return (
                     <DropdownMenuItem key={type} onClick={() => addStep(type)} className="text-xs gap-2">
                       <span>{meta.icon}</span> {meta.label}

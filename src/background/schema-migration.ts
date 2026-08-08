@@ -266,6 +266,7 @@ export async function migrateSchema(
     }
 
     const pending = getPendingMigrations(fromVersion);
+
     return applyMigrations(pending, logsDb, errorsDb, fromVersion);
 }
 
@@ -354,6 +355,7 @@ async function applySingleMigration(
         await persistVersion(migration.version);
 
         console.log(`[migration] v${migration.version}: ${migration.description}`);
+
         return true;
     } catch (err) {
         const reason = err instanceof Error ? err.message : String(err);
@@ -467,6 +469,7 @@ function inferSchemaVersion(logsDb: SqlJsDatabase, errorsDb: SqlJsDatabase): num
         if (logsTables.has("UpdateSettings")) { return 6; }
         if (logsTables.has("UpdaterInfo")) { return 5; }
         if (errorsTables.has("ErrorCodes")) { return 4; }
+
         return 4;
     }
 

@@ -25,6 +25,7 @@ function safeStack(caught: unknown): string | undefined {
     if (caught instanceof Error && typeof caught.stack === "string") {
         return caught.stack;
     }
+
     return undefined;
 }
 

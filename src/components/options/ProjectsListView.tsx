@@ -473,6 +473,7 @@ function BundlePreviewDialog({ open, preview, importing, onConfirm, onMerge, onC
 function CategoryBreakdownTable({ preview }: { preview: BundlePreview }) {
   const rows = SUMMARY_CATEGORY_ORDER.map((entry) => {
     const { items, existing } = entry.pick(preview);
+
     return {
       label: entry.label,
       merge: countCategory(items, existing, "merge"),
@@ -573,7 +574,6 @@ function DiffSection({ label, icon, items }: { label: string; icon: React.ReactN
     </TooltipProvider>
   );
 }
-
 
 /* ------------------------------------------------------------------ */
 
@@ -737,6 +737,7 @@ function SelectProjectsExportDialog({
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (on) next.add(id); else next.delete(id);
+
       return next;
     });
   };
@@ -751,6 +752,7 @@ function SelectProjectsExportDialog({
     const chosen = projects.filter((p) => selectedIds.has(p.id));
     if (chosen.length === 0) {
       toast.error("Pick at least one project to export");
+
       return;
     }
     setBusy(true);
@@ -803,6 +805,7 @@ function SelectProjectsExportDialog({
           <ul className="space-y-1.5">
             {projects.map((p) => {
               const checked = selectedIds.has(p.id);
+
               return (
                 <li key={p.id}>
                   <label className="flex cursor-pointer items-center gap-2 rounded-md border border-transparent px-2 py-1.5 text-sm hover:border-border hover:bg-muted/40">

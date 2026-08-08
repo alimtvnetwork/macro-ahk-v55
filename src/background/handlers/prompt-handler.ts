@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/no-duplicate-string -- prompt seed data repeats timestamps and fields */
 /**
  * Marco Extension — Prompt CRUD Handler (Spec 15 T-10)
  *
@@ -65,6 +64,7 @@ function getDb(): SqlJsDatabase {
     if (isMissingDbManager) {
         throw new Error("[prompts] DbManager not bound. Call bindPromptDbManager() first.");
     }
+
     return dbManager.getLogsDb();
 }
 
@@ -174,6 +174,7 @@ function ensureCategoryId(categoryName: string): string {
         [trimmed, now],
     );
     const result = db.exec("SELECT last_insert_rowid()");
+
     return String(result[0].values[0][0]);
 }
 
@@ -183,6 +184,7 @@ function findExistingDefaultPromptId(slug: string | undefined, legacySlug: strin
     const marks = candidates.map(() => "?").join(", ");
     const result = getDb().exec(`SELECT Id FROM Prompts WHERE Slug IN (${marks}) ORDER BY Id ASC LIMIT 1`, candidates);
     const value = result[0]?.values[0]?.[0];
+
     return typeof value === "number" ? value : null;
 }
 
@@ -208,11 +210,13 @@ function parseTagsField(raw: unknown): string[] {
     if (typeof raw === "string" && raw.trim().length > 0) {
         return raw.split(",").map(t => t.trim()).filter(Boolean);
     }
+
     return [];
 }
 
 function rowToPrompt(row: Record<string, unknown>): PromptEntry {
     const tags = parseTagsField(row.Tags ?? row.tags);
+
     return {
         id: String(row.Id ?? row.PromptId ?? row.id ?? row.promptId ?? ""),
         name: String(row.Name ?? row.Title ?? row.name ?? row.title ?? ""),
@@ -240,6 +244,7 @@ function queryAllPromptsViaView(): PromptEntry[] {
             results.push(rowToPrompt(stmt.getAsObject()));
         }
         stmt.free();
+
         return results;
     } catch (viewErr) {
         // View may not exist yet — fall back to direct query
@@ -249,6 +254,7 @@ function queryAllPromptsViaView(): PromptEntry[] {
             "PromptsDetails view missing — falling back to direct Prompts table query",
             viewErr instanceof Error ? viewErr : String(viewErr),
         );
+
         return queryAllPromptsDirect();
     }
 }
@@ -261,6 +267,7 @@ function queryAllPromptsDirect(): PromptEntry[] {
         results.push(rowToPrompt(stmt.getAsObject()));
     }
     stmt.free();
+
     return results;
 }
 
@@ -272,6 +279,7 @@ function queryAllCustomPrompts(): PromptEntry[] {
         results.push(rowToPrompt(stmt.getAsObject()));
     }
     stmt.free();
+
     return results;
 }
 
@@ -306,6 +314,7 @@ async function migrateFromStorageIfNeeded(): Promise<void> {
                 await chrome.storage.sync.remove(LEGACY_STORAGE_KEY);
                 console.log(`[prompts] Migrated ${syncData.length} prompts from sync → SQLite`);
                 markDirty();
+
                 return;
             }
         } catch (syncErr) {
@@ -326,7 +335,7 @@ async function migrateFromStorageIfNeeded(): Promise<void> {
     }
 }
 
-// eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity
+// eslint-disable-next-line max-lines-per-function
 function insertPromptRow(prompt: PromptEntry): void {
     const db = getDb();
     const now = new Date().toISOString();
@@ -347,6 +356,7 @@ function insertPromptRow(prompt: PromptEntry): void {
                 const categoryId = ensureCategoryId(category);
                 linkPromptToCategory(promptId, categoryId);
             }
+
             return;
     }
 
@@ -409,6 +419,7 @@ async function seedDefaultPromptsIfEmpty(): Promise<void> {
         markDirty();
         await chrome.storage.local.set({ [PROMPTS_SEED_VERSION_KEY]: bundledVersion });
         console.log(`[prompts] Seeded ${defaults.length} default prompts (version: ${bundledVersion})`);
+
         return;
     }
 
@@ -442,11 +453,13 @@ function computeBundledVersion(prompts: PromptEntry[]): string {
     for (let i = 0; i < signature.length; i++) {
         hash = ((hash << 5) - hash + signature.charCodeAt(i)) | 0;
     }
+
     return `${prompts.length}-${(hash >>> 0).toString(36)}`;
 }
 
 function getFallbackDefaultPrompts(): PromptEntry[] {
     const now = new Date().toISOString();
+
     return getBundledFallbackEntries()
         .map((entry, index) => mapRawToPromptEntry(entry, index, now))
         .filter((entry): entry is PromptEntry => entry !== null);
@@ -467,6 +480,7 @@ interface RawDefaultPromptEntry {
 
 function getBundledFallbackEntries(): RawDefaultPromptEntry[] {
     const bundle = bundledPromptBundle as { prompts?: RawDefaultPromptEntry[] };
+
     return Array.isArray(bundle.prompts) ? bundle.prompts : [];
 }
 
@@ -491,6 +505,7 @@ function mapRawToPromptEntry(entry: RawDefaultPromptEntry, index: number, now: s
     if (rawSlug) prompt.slug = rawSlug;
     if (typeof entry.version === "string" && entry.version) prompt.version = entry.version;
     if (category) prompt.category = category;
+
     return prompt;
 }
 
@@ -507,6 +522,7 @@ export async function loadBundledDefaultPrompts(): Promise<PromptEntry[] | null>
                 "loadBundledDefaults",
                 `HEFF: HTTP ${response.status} on GET ${url} — bundled prompts missing. Loop halted.`,
             );
+
             return mapBundledFallbackDefaults();
         }
 
@@ -522,6 +538,7 @@ export async function loadBundledDefaultPrompts(): Promise<PromptEntry[] | null>
 
         if (defaults.length === 0) return mapBundledFallbackDefaults();
         bundledDefaultsCache = defaults;
+
         return defaults;
     } catch (defaultsErr) {
         logSampledDebug(
@@ -530,6 +547,7 @@ export async function loadBundledDefaultPrompts(): Promise<PromptEntry[] | null>
             "Failed to load bundled default prompts JSON — caller will fall back to seeded DB rows",
             defaultsErr instanceof Error ? defaultsErr : String(defaultsErr),
         );
+
         return mapBundledFallbackDefaults();
     }
 }
@@ -540,6 +558,7 @@ function mapBundledFallbackDefaults(): PromptEntry[] | null {
         .map((entry, index) => mapRawToPromptEntry(entry, index, now))
         .filter((entry): entry is PromptEntry => entry !== null);
     bundledDefaultsCache = defaults.length > 0 ? defaults : null;
+
     return bundledDefaultsCache;
 }
 
@@ -548,6 +567,7 @@ export async function handleGetPrompts(): Promise<{ prompts: PromptEntry[] }> {
 
     // All prompts (defaults + custom) are now in the DB — read via view
     const prompts = queryAllPromptsViaView();
+
     return { prompts };
 }
 
@@ -643,6 +663,7 @@ export async function handleDeletePrompt(payload: { promptId: string }): Promise
     db.run("DELETE FROM Prompts WHERE Id = ?", [numId]);
     if (db.getRowsModified() < 1) return promptDeleteError(numId, "no rows deleted", candidate.name);
     markDirty();
+
     return { isOk: true };
 }
 
@@ -651,12 +672,14 @@ function getDeletePromptCandidate(promptId: number): DeletePromptCandidate | nul
     const firstResult = result[0];
     const firstRow = firstResult?.values[0];
     if (firstRow === undefined) return null;
+
     return { name: String(firstRow[0] ?? ""), isDefault: Number(firstRow[1] ?? 0) === 1 };
 }
 
 function promptDeleteError(promptId: number, reason: string, name = ""): HandlerErrorResponse {
     const message = `[DB_WRITE_E004][DELETE_PROMPT] Delete failed for prompt id=${promptId} name="${name}": ${reason}`;
     logBgError(BgLogTag.PROMPTS, "DB_WRITE_E004", message, undefined, { contextDetail: message });
+
     return { isOk: false, errorMessage: message };
 }
 
@@ -677,6 +700,7 @@ export async function handleReorderPrompts(payload: { promptIds: string[] }): Pr
     }
 
     markDirty();
+
     return { isOk: true };
 }
 

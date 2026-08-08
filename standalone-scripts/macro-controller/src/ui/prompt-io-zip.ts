@@ -38,6 +38,7 @@ function buildCrcTable(): Uint32Array {
     for (let k = 0; k < 8; k++) c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
     table[i] = c >>> 0;
   }
+
   return table;
 }
 
@@ -46,6 +47,7 @@ function crc32(bytes: Uint8Array): number {
   if (isMissingCRC_TABLE) CRC_TABLE = buildCrcTable();
   let c = 0xffffffff;
   for (let i = 0; i < bytes.length; i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+
   return (c ^ 0xffffffff) >>> 0;
 }
 
@@ -88,6 +90,7 @@ function buildLocalHeader(member: ZipMember): Uint8Array {
   writeUint16LE(view, 26, nameBytes.length);
   writeUint16LE(view, 28, 0);              // extra field length
   header.set(nameBytes, 30);
+
   return header;
 }
 
@@ -113,6 +116,7 @@ function buildCentralEntry(member: ZipMember): Uint8Array {
   writeUint32LE(view, 38, 0);              // external attrs
   writeUint32LE(view, 42, member.offset);
   entry.set(nameBytes, 46);
+
   return entry;
 }
 
@@ -127,6 +131,7 @@ function buildEocd(centralOffset: number, centralSize: number, count: number): U
   writeUint32LE(view, 12, centralSize);
   writeUint32LE(view, 16, centralOffset);
   writeUint16LE(view, 20, 0);              // comment length
+
   return eocd;
 }
 
@@ -141,6 +146,7 @@ function assembleZip(members: ZipMember[]): Blob {
   const centralSize = centralParts.reduce((sum, p) => sum + p.length, 0);
   centralParts.forEach((p) => parts.push(p));
   parts.push(buildEocd(centralStart, centralSize, members.length));
+
   return new Blob(parts as BlobPart[], { type: 'application/zip' });
 }
 
@@ -157,6 +163,7 @@ interface StagedEntry {
 function stripBody(entry: PromptEntry): Record<string, unknown> {
   const clone: Record<string, unknown> = { ...entry };
   delete clone.text;
+
   return clone;
 }
 
@@ -164,6 +171,7 @@ function stageEntries(entries: PromptEntry[]): StagedEntry[] {
   return entries.map((entry, index) => {
     const slugSource = entry.slug ?? entry.name;
     const slug = sanitizeSlug(slugSource, index + 1);
+
     return {
       slug,
       bodyMd: encodeUtf8(entry.text),

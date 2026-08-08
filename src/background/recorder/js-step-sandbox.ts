@@ -78,6 +78,7 @@ function compileBody(
     body: string,
 ): (ctx: JsInlineContext, log: (msg: string) => void) => unknown {
     const wrapped = `"use strict"; ${body}`;
+
     return new Function("Ctx", "Log", wrapped) as (
         ctx: JsInlineContext,
         log: (msg: string) => void,
@@ -103,6 +104,7 @@ async function runCompiledBody(
     const frozen = freezeCtx(ctx);
     const log = (message: string): void => { logs.push(String(message)); };
     const out = fn.call(null, frozen, log);
+
     return out instanceof Promise ? await out : out;
 }
 
@@ -116,6 +118,7 @@ export async function executeJsBody(
     const start = Date.now();
     try {
         const value = await runCompiledBody(fn, ctx, logs);
+
         return { ReturnValue: value, LogLines: logs, DurationMs: Date.now() - start };
     } catch (err) {
         const message = err instanceof Error ? err.message : String(err);

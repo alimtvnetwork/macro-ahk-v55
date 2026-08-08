@@ -26,6 +26,7 @@ interface MaybeNamespaceWindow {
 function getLogger(): NamespaceLogger | null {
     try {
         const w = window as unknown as MaybeNamespaceWindow;
+
         return w.RiseupAsiaMacroExt?.Logger ?? null;
     } catch {
         return null;
@@ -42,6 +43,7 @@ export function logError(scope: string, message: string, caught?: unknown): void
     const logger = getLogger();
     if (logger) {
         logger.error(fullScope, caught ?? new Error(message));
+
         return;
     }
     if (caught !== undefined) {

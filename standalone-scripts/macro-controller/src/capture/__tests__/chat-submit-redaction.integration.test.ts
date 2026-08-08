@@ -42,6 +42,7 @@ vi.mock('../../storage/chat-submit-opfs-store', () => ({
     fileCounter += 1;
     const fileId = `file-${fileCounter}`;
     opfs.files.set(`${projectId}/${fileId}`, text);
+
     return fileId;
   },
   readEntry: async (projectId: string, fileId: string): Promise<string | null> => {
@@ -57,6 +58,7 @@ vi.mock('../../db/project-chat-submit-db', () => ({
       FileId: input.fileId,
       CharCount: input.charCount,
     });
+
     return true;
   },
 }));
@@ -79,6 +81,7 @@ vi.mock('../chat-submit-rename-backfill', () => ({
 
 vi.mock('../../error-utils', async () => {
   const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+
   return { ...actual, logError: vi.fn() };
 });
 

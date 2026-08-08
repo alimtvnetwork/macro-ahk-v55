@@ -231,6 +231,7 @@ function VerdictBadge({ verdict, label }: { verdict: DriftVerdict; label: string
             </Badge>
         );
     }
+
     return <Badge variant="secondary">{label}</Badge>;
 }
 
@@ -247,6 +248,7 @@ function ColumnHeader() {
 
 function FieldRow({ field }: { field: DriftFieldDiff }) {
     const label = FIELD_LABELS[field.Field] ?? field.Field;
+
     return (
         <div className="grid grid-cols-[110px_1fr_24px_1fr] items-start gap-2 px-2 py-2 text-sm">
             <span className="pt-0.5 font-mono text-xs text-muted-foreground">{label}</span>
@@ -268,6 +270,7 @@ function ValueCell({
 }) {
     const empty = value === null || value === "";
     const highlight = changeClass(change, side);
+
     return (
         <code
             className={`block whitespace-pre-wrap break-words rounded px-1.5 py-1 font-mono text-xs ${highlight}`}
@@ -291,6 +294,7 @@ function changeClass(change: DriftChangeKind, side: SideEnum): string {
             ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
             : "bg-muted/40 text-muted-foreground";
     }
+
     // Removed
     return side === "primary"
         ? "bg-rose-500/10 text-rose-700 dark:text-rose-300 line-through"

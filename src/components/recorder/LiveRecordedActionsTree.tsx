@@ -85,6 +85,7 @@ export function LiveRecordedActionsTree(props: LiveRecordedActionsTreeProps): JS
     const [transport, setTransport] = useState<RecorderSyncTransport>(() => detectTransport());
     useEffect(() => {
         setTransport(detectTransport());
+
         return subscribeRecorderSession(setSession);
     }, []);
 
@@ -95,6 +96,7 @@ export function LiveRecordedActionsTree(props: LiveRecordedActionsTreeProps): JS
     // drive which row is highlighted without extra plumbing.
     const activeStepId = useMemo<string | null>(() => {
         if (controlledStepId !== undefined && controlledStepId !== null) { return controlledStepId; }
+
         return internalStepId;
     }, [controlledStepId, internalStepId]);
 
@@ -106,7 +108,9 @@ export function LiveRecordedActionsTree(props: LiveRecordedActionsTreeProps): JS
     const scrollRef = useRef<HTMLDivElement | null>(null);
     const rowRefs = useRef<Map<string, HTMLLIElement>>(new Map());
     const setRowRef = (stepId: string) => (node: HTMLLIElement | null): void => {
-        if (node === null) { rowRefs.current.delete(stepId); return; }
+        if (node === null) { rowRefs.current.delete(stepId);
+
+ return; }
         rowRefs.current.set(stepId, node);
     };
 
@@ -138,12 +142,12 @@ export function LiveRecordedActionsTree(props: LiveRecordedActionsTreeProps): JS
         node.scrollIntoView({ block: "nearest", behavior: "smooth" });
         setPulseStepId(activeStepId);
         const timer = window.setTimeout(() => { setPulseStepId(null); }, HIGHLIGHT_PULSE_MS);
+
         return () => { window.clearTimeout(timer); };
     }, [activeStepId, steps.length]);
 
     const isRecording = session?.Phase === "Recording";
     const isPaused = session?.Phase === "Paused";
-
 
     return (
         <div

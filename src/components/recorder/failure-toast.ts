@@ -32,6 +32,7 @@ export async function copyFailureReportToClipboard(
     const blob = `${formatFailureReport(report)}\n\n--- JSON ---\n${JSON.stringify(report, null, 2)}`;
     try {
         await target.writeText(blob);
+
         return true;
     } catch {
         return false;
@@ -58,11 +59,13 @@ export function showFailureToast(
         return showCopyOnlyFailureToast(report, where, copyAction);
     }
     const onRetry = opts.OnRetry;
+
     return showRetryFailureToast(report, where, copyAction, onRetry);
 }
 
 function formatFailureLocation(report: FailureReport): string {
     const kindSuffix = report.StepKind !== null ? ` (${report.StepKind})` : "";
+
     return report.StepId !== null ? `Step #${report.StepId}${kindSuffix}` : `${report.Phase} failure`;
 }
 

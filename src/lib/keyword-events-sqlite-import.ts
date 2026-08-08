@@ -79,11 +79,13 @@ export interface KeywordEventsImportResult {
 
 async function initDb(data: Uint8Array): Promise<Database> {
     const SQL = await initSqlJs({ locateFile: () => WASM_URL });
+
     return new SQL.Database(data);
 }
 
 async function loadJSZip(): Promise<typeof JSZipType> {
     const mod = await import("jszip");
+
     return mod.default;
 }
 
@@ -138,6 +140,7 @@ function readMeta(db: Database, key: string): string | null {
         stmt.bind([key]);
         if (!stmt.step()) return null;
         const value = stmt.get()[0];
+
         return typeof value === "string" ? value : null;
     } finally {
         stmt.free();
@@ -158,6 +161,7 @@ function listTables(db: Database): Set<string> {
     } finally {
         stmt.free();
     }
+
     return tables;
 }
 
@@ -177,6 +181,7 @@ function listColumns(db: Database, tableName: string): Set<string> {
     } finally {
         stmt.free();
     }
+
     return cols;
 }
 
@@ -222,6 +227,7 @@ function readKeywordEvents(db: Database): ImportedKeywordEvent[] {
     } finally {
         stmt.free();
     }
+
     return rows;
 }
 
@@ -253,6 +259,7 @@ export async function readKeywordEventsSqliteDb(
                 + `this file was tagged as a different export type.`,
             );
         }
+
         return {
             bundleKind,
             formatVersion: readMeta(db, "format_version"),
@@ -284,6 +291,7 @@ export async function readKeywordEventsZip(
         );
     }
     const bytes = await entry.async("uint8array");
+
     return readKeywordEventsSqliteDb(bytes);
 }
 
@@ -371,6 +379,7 @@ export function planImportMatches(
 
     void matches;
     const unmatchedSelected = selected.filter(ev => !consumedSelectedIds.has(ev.Id));
+
     return {
         matches: matchesMutable,
         unmatchedImports,
@@ -395,6 +404,7 @@ export function buildPatchFromImport(
     if (src.Tags !== undefined) patch.Tags = src.Tags;
     if (src.Category !== undefined) patch.Category = src.Category;
     if (src.PauseAfterMs !== undefined) patch.PauseAfterMs = src.PauseAfterMs;
+
     return patch;
 }
 
@@ -436,6 +446,7 @@ export function diffMatchedFields(
     compare("Tags", target.Tags, source.Tags);
     compare("Category", target.Category, source.Category);
     compare("PauseAfterMs", target.PauseAfterMs, source.PauseAfterMs);
+
     return diffs;
 }
 

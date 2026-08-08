@@ -14,6 +14,7 @@ import { PhaseEnum } from "../../../types/enums";
 function seed(phase: PhaseEnum): void {
     if (phase === "Idle") {
         window.localStorage.removeItem(RECORDER_SESSION_STORAGE_KEY);
+
         return;
     }
     window.localStorage.setItem(

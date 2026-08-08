@@ -86,6 +86,7 @@ export function SchemaDiffPreview({ projectSlug, pendingTables }: SchemaDiffPrev
           const modified = pt.columns.filter((c) => {
             if (!c.name || !existColNames.has(c.name)) return false;
             const ex = existing.find((e) => e.name === c.name);
+
             return ex && ex.type !== c.type;
           }).map((c) => c.name);
 
@@ -140,6 +141,7 @@ export function SchemaDiffPreview({ projectSlug, pendingTables }: SchemaDiffPrev
       modify: "bg-amber-500/10 text-amber-700 border-amber-500/20",
       drop: "bg-destructive/10 text-destructive border-destructive/20",
     };
+
     return variants[action] ?? "";
   };
 

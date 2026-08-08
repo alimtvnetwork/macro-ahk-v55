@@ -65,6 +65,7 @@ const handleStepAFailure = async (
     startedAt: number, errorMessage: string,
 ): Promise<UserAddRowResult> => {
     logStep(ctx, sink, UserAddLogPhaseType.StepA, UserAddLogSeverityType.Error, `Step A failed: ${errorMessage}`);
+
     return finalizeUserAddRow(ctx, sink, store, buildRowFailure({
         rowIndex: ctx.Row.RowIndex, startedAt,
         outcome: UserAddRowOutcomeCode.StepAFailed,
@@ -82,6 +83,7 @@ const runStepBPhase = async (
     if (stepB.Error !== null) {
         logStep(ctx, sink, UserAddLogPhaseType.StepB, UserAddLogSeverityType.Error, `Step B promote failed: ${stepB.Error}`);
         logNoRollback(ctx, sink, workspaceId, userId);
+
         return finalizeUserAddRow(ctx, sink, store, buildRowFailure({
             rowIndex: ctx.Row.RowIndex, startedAt,
             outcome: UserAddRowOutcomeCode.StepBFailedMemberAdded,
@@ -91,6 +93,7 @@ const runStepBPhase = async (
     }
 
     logStep(ctx, sink, UserAddLogPhaseType.StepB, UserAddLogSeverityType.Info, "Step B PUT promote ok");
+
     return finalizeUserAddRow(ctx, sink, store, buildRowSuccess({
         rowIndex: ctx.Row.RowIndex, startedAt, stepBRan: true, workspaceId, userId,
     }));

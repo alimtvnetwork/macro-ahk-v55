@@ -49,6 +49,7 @@ export function bindLibraryDbManager(manager: DbManager): void {
 function getDb(): SqlJsDatabase {
     const isMissingDbManager = !dbManager;
     if (isMissingDbManager) throw new Error("[library] DbManager not bound\n  Path: src/background/handlers/library-handler.ts\n  Missing: DbManager binding\n  Reason: bindLibraryDbManager() was never called");
+
     return dbManager.getLogsDb();
 }
 
@@ -169,6 +170,7 @@ export async function handleGetSharedAssets(payload: AssetTypeMsg): Promise<{ as
     const stmt = db.prepare(sql);
     stmt.bind(params);
     const assets = collectTypedRows(stmt) as SharedAsset[];
+
     return { assets };
 }
 
@@ -180,6 +182,7 @@ export async function handleGetSharedAsset(payload: AssetIdMsg): Promise<{ asset
     const cols = result[0].columns;
     const vals = result[0].values[0];
     const asset = Object.fromEntries(cols.map((c, i) => [c, vals[i]])) as SharedAsset;
+
     return { asset };
 }
 
@@ -214,6 +217,7 @@ export async function handleSaveSharedAsset(payload: SaveAssetMsg): Promise<{ as
             [asset.Name, asset.Type, asset.ContentJson, contentHash, version, asset.Slug, asset.Id],
         );
         markDirty();
+
         return { assetId: asset.Id };
     }
 
@@ -227,6 +231,7 @@ export async function handleSaveSharedAsset(payload: SaveAssetMsg): Promise<{ as
     // Snapshot initial version
     snapshotVersion(db, newId, version, asset.ContentJson, contentHash, "create");
     markDirty();
+
     return { assetId: newId };
 }
 
@@ -254,6 +259,7 @@ export async function handleDeleteSharedAsset(payload: AssetIdMsg): Promise<{ is
 
     db.run("DELETE FROM SharedAsset WHERE Id = ?", [assetId]);
     markDirty();
+
     return { isOk: true, detachedCount };
 }
 
@@ -288,6 +294,7 @@ export async function handleGetAssetLinks(payload: LinkFilterMsg): Promise<{ lin
         links.push(stmt.getAsObject() as AssetLink);
     }
     stmt.free();
+
     return { links };
 }
 
@@ -307,6 +314,7 @@ export async function handleSaveAssetLink(payload: SaveLinkMsg): Promise<{ linkI
             [linkState, bindOpt(link.PinnedVersion), bindOpt(link.LocalOverrideJson), link.Id],
         );
         markDirty();
+
         return { linkId: link.Id };
     }
 
@@ -317,6 +325,7 @@ export async function handleSaveAssetLink(payload: SaveLinkMsg): Promise<{ linkI
     const idResult = db.exec(SQL_LAST_INSERT_ROWID);
     const newId = idResult[0].values[0][0] as number;
     markDirty();
+
     return { linkId: newId };
 }
 
@@ -325,6 +334,7 @@ export async function handleDeleteAssetLink(payload: LinkIdMsg): Promise<{ isOk:
     const db = getDb();
     db.run("DELETE FROM AssetLink WHERE Id = ?", [linkId]);
     markDirty();
+
     return { isOk: true };
 }
 
@@ -366,6 +376,7 @@ export async function handleSyncLibraryAsset(payload: AssetIdMsg): Promise<{ syn
 
     markDirty();
     broadcastLibrarySynced({ assetId, syncedCount, pinnedNotified });
+
     return { syncedCount, pinnedNotified };
 }
 
@@ -395,6 +406,7 @@ export async function handlePromoteAsset(payload: PromoteMsg): Promise<{
         const newId = idResult[0].values[0][0] as number;
         snapshotVersion(db, newId, "1.0.0", contentJson, hash, "promote");
         markDirty();
+
         return { action: "created", assetId: newId };
     }
 
@@ -433,6 +445,7 @@ export async function handleReplaceLibraryAsset(payload: ReplaceMsg): Promise<{ 
         params,
     );
     markDirty();
+
     return { isOk: true, newVersion };
 }
 
@@ -461,6 +474,7 @@ export async function handleForkLibraryAsset(payload: ForkMsg): Promise<{ assetI
     const idResult = db.exec(SQL_LAST_INSERT_ROWID);
     const newId = idResult[0].values[0][0] as number;
     markDirty();
+
     return { assetId: newId, slug: forkSlug };
 }
 
@@ -476,6 +490,7 @@ export async function handleGetProjectGroups(): Promise<{ groups: ProjectGroup[]
         groups.push(stmt.getAsObject() as ProjectGroup);
     }
     stmt.free();
+
     return { groups };
 }
 
@@ -497,6 +512,7 @@ export async function handleSaveProjectGroup(payload: GroupMsg): Promise<{ group
         const cascadedCount = group.SharedSettingsJson
             ? cascadeSettingsToMembers(db, group.Id, group.SharedSettingsJson)
             : 0;
+
         return { groupId: group.Id, cascadedCount };
     }
 
@@ -507,6 +523,7 @@ export async function handleSaveProjectGroup(payload: GroupMsg): Promise<{ group
     const idResult = db.exec(SQL_LAST_INSERT_ROWID);
     const newId = idResult[0].values[0][0] as number;
     markDirty();
+
     return { groupId: newId, cascadedCount: 0 };
 }
 
@@ -515,6 +532,7 @@ export async function handleDeleteProjectGroup(payload: GroupIdMsg): Promise<{ i
     const db = getDb();
     db.run("DELETE FROM ProjectGroup WHERE Id = ?", [groupId]);
     markDirty();
+
     return { isOk: true };
 }
 
@@ -532,6 +550,7 @@ export async function handleGetGroupMembers(payload: GroupIdMsg): Promise<{ memb
         members.push(stmt.getAsObject() as ProjectGroupMember);
     }
     stmt.free();
+
     return { members };
 }
 
@@ -545,6 +564,7 @@ export async function handleAddGroupMember(payload: GroupMemberMsg): Promise<{ m
     const idResult = db.exec(SQL_LAST_INSERT_ROWID);
     const newId = idResult[0].values[0][0] as number;
     markDirty();
+
     return { memberId: newId };
 }
 
@@ -553,6 +573,7 @@ export async function handleRemoveGroupMember(payload: GroupMemberMsg): Promise<
     const db = getDb();
     db.run("DELETE FROM ProjectGroupMember WHERE GroupId = ? AND ProjectIdUuid = ?", [groupId, projectId]);
     markDirty();
+
     return { isOk: true };
 }
 
@@ -570,6 +591,7 @@ function cascadeSettingsToMembers(db: ReturnType<typeof getDb>, groupId: number,
         parsed = JSON.parse(settingsJson);
     } catch {
         console.warn(`[library] Cannot parse SharedSettingsJson for group ${groupId} — skipping cascade`);
+
         return 0;
     }
 
@@ -597,6 +619,7 @@ function cascadeSettingsToMembers(db: ReturnType<typeof getDb>, groupId: number,
     }
 
     markDirty();
+
     return projectIds.length;
 }
 
@@ -619,6 +642,7 @@ export async function handleCascadeGroupSettings(payload: GroupIdMsg): Promise<{
     }
 
     const cascadedCount = cascadeSettingsToMembers(db, groupId, settingsJson);
+
     return { cascadedCount };
 }
 
@@ -636,6 +660,7 @@ export async function handleGetAssetVersions(payload: AssetIdMsg): Promise<{ ver
         versions.push(stmt.getAsObject() as AssetVersion);
     }
     stmt.free();
+
     return { versions };
 }
 
@@ -671,6 +696,7 @@ export async function handleRollbackAssetVersion(payload: VersionIdMsg): Promise
         [contentJson, contentHash, newVersion, assetId],
     );
     markDirty();
+
     return { isOk: true, rolledBackTo: newVersion };
 }
 
@@ -708,6 +734,7 @@ function exportAssets(db: SqlJsDatabase): LibraryExport["assets"] {
         assets.push({ type: row.Type, slug: row.Slug, name: row.Name, version: row.Version, content });
     }
     stmt.free();
+
     return assets;
 }
 
@@ -728,11 +755,13 @@ function exportGroups(db: SqlJsDatabase): LibraryExport["groups"] {
         groups.push({ name: row.Name, sharedSettings, memberProjectIds });
     }
     stmt.free();
+
     return groups;
 }
 
 export async function handleExportLibrary(): Promise<{ bundle: LibraryExport }> {
     const db = getDb();
+
     return {
         bundle: {
             exportVersion: "1.0",

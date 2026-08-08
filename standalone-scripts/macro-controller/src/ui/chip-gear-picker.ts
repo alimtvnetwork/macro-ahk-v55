@@ -52,6 +52,7 @@ async function attemptInitialLoad(role: PromptRole): Promise<{ res: ListRes; ini
     const retry = await listPromptsByRole(role);
     if (retry.ok) { res = retry; initialReason = null; }
   }
+
   return { res, initialReason };
 }
 
@@ -78,6 +79,7 @@ async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ re
     seedReason = reasonOf(err, 'auto-seed threw');
     logError('ChipGearPicker', 'auto-seed import/call threw for ' + role, err);
   }
+
   return { res, stage, seedReason, seedAttempted: true };
 }
 
@@ -89,6 +91,7 @@ async function retryOnContractError(role: PromptRole, state: LoadState): Promise
     const retry = await listPromptsByRole(role);
     if (retry.ok) return retry;
   }
+
   return state.res;
 }
 
@@ -103,6 +106,7 @@ function emitLoadFailure(opts: PickPromptOptions, state: LoadState): null {
     role: opts.role, roleLabel: opts.roleLabel, stage: state.stage,
     seedAttempted: String(state.seedAttempted), reason: detail,
   }));
+
   return null;
 }
 
@@ -111,6 +115,7 @@ function emitEmptyToast(opts: PickPromptOptions, seedReason: string | null): nul
     ? '⚠ No ' + opts.roleLabel + ' prompts available. Auto-seed reported: ' + seedReason
     : 'No ' + opts.roleLabel + ' prompts available';
   showToast(text, 'warn');
+
   return null;
 }
 
@@ -129,6 +134,7 @@ export async function pickPromptFromRole(opts: PickPromptOptions): Promise<Promp
   if (isMissingOk) return emitLoadFailure(opts, state);
   const rows = (state.res.value ?? []).filter((r) => !opts.excludeDefault || r.IsDefault !== 1);
   if (rows.length === 0) return emitEmptyToast(opts, state.seedReason);
+
   return await promptPickerModal(rows, opts);
 }
 
@@ -151,11 +157,9 @@ function buildLoadFailureDetail(input: LoadFailureDetailInput): string {
   if (input.seedAttempted) {
     parts.push('auto-seed=' + (input.seedReason ?? 'ok'));
   }
+
   return parts.join(' | ');
 }
-
-
-
 
 function promptPickerModal(rows: PromptRow[], opts: PickPromptOptions): Promise<PromptRow | null> {
   return new Promise((resolve) => {

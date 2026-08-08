@@ -71,13 +71,16 @@ async function resolveShortcutTarget(): Promise<{ tabId: number; url: string } |
     const tab = await getActiveTab();
     if (tab === null || typeof tab.id !== "number") {
         logBgWarnError(BgLogTag.SHORTCUT, "Aborting: no active tab found (reason=no-active-tab)");
+
         return null;
     }
     const url = tab.url ?? "";
     if (isNewTabOrBlankUrl(url)) {
         logBgWarnError(BgLogTag.SHORTCUT, `Aborting: active tab is a new-tab/blank page (tabId=${tab.id}, url='${url}', reason=new-tab-blank-url)`);
+
         return null;
     }
+
     return { tabId: tab.id, url };
 }
 
@@ -124,6 +127,7 @@ async function runScriptsFromShortcut(forceReload: boolean): Promise<void> {
                 `Aborting: no scripts to inject (tabId=${target.tabId}, url='${target.url}', project=${projectLabel}, source=${source}, reason=empty-script-set). ` +
                 `Hint: open the popup to confirm an active project is set and has enabled scripts, or add a URL rule so auto-attach can resolve scripts for this page.`,
             );
+
             return;
         }
         await dispatchShortcutInjection(target.tabId, scripts, projectLabel, source, t0);
@@ -132,14 +136,15 @@ async function runScriptsFromShortcut(forceReload: boolean): Promise<void> {
     }
 }
 
-
 /** Returns the active tab (with url), or null if unavailable. */
 async function getActiveTab(): Promise<chrome.tabs.Tab | null> {
     try {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
         return tab ?? null;
     } catch (err) {
         logCaughtError(BgLogTag.SHORTCUT, "chrome.tabs.query failed", err);
+
         return null;
     }
 }
@@ -173,6 +178,7 @@ export async function resolveScriptsForShortcut(tabUrl: string): Promise<Resolve
 
     if (project && projectScripts.length > 0) {
         console.log("[Marco] Shortcut: using active project=%s with %d scripts", projectLabel, projectScripts.length);
+
         return { scripts: projectScripts, source: "active-project", projectLabel };
     }
 
@@ -231,6 +237,7 @@ async function toggleRecordingFromShortcut(): Promise<void> {
         const projectSlug = await getActiveProjectSlug();
         if (current.Phase === "Idle" && projectSlug === null) {
             logBgWarnError(BgLogTag.SHORTCUT, "Toggle-recording: no active project — aborting Start");
+
             return;
         }
 
@@ -264,6 +271,7 @@ function chooseToggleAction(
         return { Kind: "Start", ProjectSlug: projectSlug, SessionId: generateSessionId(), StartedAt: new Date().toISOString() };
     }
     if (phase === "Recording") { return { Kind: "Pause" }; }
+
     return { Kind: "Resume" };
 }
 
@@ -272,6 +280,7 @@ function generateSessionId(): string {
     // for one-session-at-a-time recorder use.
     const ts = Date.now().toString(36);
     const rand = Math.random().toString(16).slice(2, 10).padStart(8, "0");
+
     return `${ts}-${rand}`;
 }
 
@@ -280,5 +289,6 @@ async function getActiveProjectSlug(): Promise<string | null> {
         type: MessageType.GET_ACTIVE_PROJECT,
     });
     const slug = response?.activeProject?.slug;
+
     return typeof slug === "string" && slug.length > 0 ? slug : null;
 }

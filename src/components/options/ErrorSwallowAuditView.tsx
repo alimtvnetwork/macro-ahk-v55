@@ -98,6 +98,7 @@ function validateItem(raw: any, index: number): AuditItem | string {
     if (id === null || severity === null || file === null || line === null || rule === null || message === null) {
         return `Items[${index}]: missing required field (Id|Severity|File|Line|Rule|Message)`;
     }
+
     return { Id: id, Severity: severity, File: file, Line: line, Rule: rule, Message: message, Snippet: snippet };
 }
 
@@ -121,6 +122,7 @@ function validateReport(raw: any): AuditReport | string {
         }
         items.push(result);
     }
+
     return { GeneratedAt: generatedAt, Items: items };
 }
 
@@ -131,6 +133,7 @@ function validateReport(raw: any): AuditReport | string {
 function severityMeta(severity: AuditSeverity): { label: string; badge: BadgeEnum; Icon: typeof AlertOctagon; ring: string } {
     if (severity === "P0") return { label: "P0 · Critical", badge: "destructive", Icon: AlertOctagon, ring: "border-destructive/60 bg-destructive/10" };
     if (severity === "P1") return { label: "P1 · High",     badge: "default",     Icon: AlertTriangle, ring: "border-amber-500/40 bg-amber-500/10" };
+
     return                        { label: "P2 · Medium",   badge: "outline",     Icon: FileWarning,   ring: "border-muted-foreground/30 bg-muted/20" };
 }
 
@@ -163,6 +166,7 @@ export default function ErrorSwallowAuditView() {
             const res = ServiceResult.wrapFetch(await fetch(DEFAULT_AUDIT_URL, { cache: "no-store" }));
             if (res.status === HttpCodes.NOT_FOUND) {
                 setState({ kind: "missing" });
+
                 return;
             }
             if (res.isFail) {
@@ -171,12 +175,14 @@ export default function ErrorSwallowAuditView() {
                     kind: "error",
                     message: `HEFF: HTTP ${res.status} on GET ${DEFAULT_AUDIT_URL} — ${res.statusText}. Loop halted.`,
                 });
+
                 return;
             }
             const raw = await res.json();
             const validated = validateReport(raw);
             if (typeof validated === "string") {
                 setState({ kind: "error", message: `Malformed audit report — ${validated}` });
+
                 return;
             }
             setState({ kind: "ok", report: validated });
@@ -188,6 +194,7 @@ export default function ErrorSwallowAuditView() {
             // the actionable empty state instead of a scary error banner.
             if (/Failed to fetch|NetworkError|Unexpected token/.test(message)) {
                 setState({ kind: "missing" });
+
                 return;
             }
             setState({ kind: "error", message });
@@ -202,6 +209,7 @@ export default function ErrorSwallowAuditView() {
         for (const item of state.report.Items) {
             empty[item.Severity].push(item);
         }
+
         return empty;
     }, [state]);
 
@@ -241,6 +249,7 @@ export default function ErrorSwallowAuditView() {
                     ]).map((chip) => {
                         const active = severityFilter === chip.key;
                         const disabled = chip.key !== "all" && chip.count === 0;
+
                         return (
                             <button
                                 key={chip.key}
@@ -315,6 +324,7 @@ function SeverityGroup({ severity, items }: { severity: AuditSeverity; items: Re
             </section>
         );
     }
+
     return (
         <section className="space-y-2">
             <h3 className="flex items-center gap-2 text-sm font-semibold">
@@ -406,6 +416,7 @@ function computeTopFiles(items: ReadonlyArray<AuditItem>, limit: number): Array<
     for (const item of items) {
         tally.set(item.File, (tally.get(item.File) ?? 0) + 1);
     }
+
     return Array.from(tally.entries())
         .map(([file, count]) => ({ file, count }))
         .sort((a, b) => b.count - a.count)
@@ -417,6 +428,7 @@ function computeTopRules(items: ReadonlyArray<AuditItem>, limit: number): Array<
     for (const item of items) {
         tally.set(item.Rule, (tally.get(item.Rule) ?? 0) + 1);
     }
+
     return Array.from(tally.entries())
         .map(([rule, count]) => ({ rule, count }))
         .sort((a, b) => b.count - a.count)
@@ -447,6 +459,7 @@ function AuditSummaryPanel({ state, onReload }: { state: LoadState; onReload: ()
     const counts = useMemo(() => {
         const c = { P0: 0, P1: 0, P2: 0 };
         for (const it of items) c[it.Severity] += 1;
+
         return c;
     }, [items]);
     const topFiles = useMemo(() => computeTopFiles(items, 5), [items]);
@@ -524,6 +537,7 @@ function StatTile({ label, value, tone }: { label: string; value: number; tone: 
         : tone === "warn"      ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
         : tone === "muted"     ? "border-muted-foreground/30 bg-muted/30 text-muted-foreground"
         :                        "border-border bg-background/40 text-foreground";
+
     return (
         <div className={`rounded-md border px-2 py-1.5 ${toneClass}`}>
             <div className="text-base font-bold leading-none">{value}</div>

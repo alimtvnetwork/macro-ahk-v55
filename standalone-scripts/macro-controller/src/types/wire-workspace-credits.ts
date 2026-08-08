@@ -37,6 +37,7 @@ export interface WireWorkspaceCredits {
 export function toWireWorkspaceCredits(source: Record<string, unknown>): WireWorkspaceCredits {
   const totalUsed = readNum(source, 'total_credits_used');
   const bpUsedRaw = readNum(source, 'total_credits_used_in_billing_period');
+
   return {
     credits_used: readNum(source, 'credits_used'),
     credits_granted: readNum(source, 'credits_granted'),

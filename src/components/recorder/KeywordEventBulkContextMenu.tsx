@@ -167,6 +167,7 @@ interface BulkContextMenuContentProps {
 // eslint-disable-next-line max-lines-per-function -- flat menu-item list; PlanTierType 25 Step 18
 function BulkContextMenuContent(p: BulkContextMenuContentProps): JSX.Element {
     const { count, onEnable, onOpenDialog } = p;
+
     return (
         <ContextMenuContent
             className="w-56"
@@ -249,6 +250,7 @@ interface BulkDialogsHostProps {
 // eslint-disable-next-line max-lines-per-function -- eight sibling <Dialog/> instances; PlanTierType 25 Step 18
 function BulkDialogsHost(p: BulkDialogsHostProps): JSX.Element {
     const { dialog, setDialog, selectedEvents, allEvents, onUpdateEvent, onDeleteConfirmed } = p;
+
     return (
         <>
             <BulkTagsDialog
@@ -323,7 +325,6 @@ function BulkDialogsHost(p: BulkDialogsHostProps): JSX.Element {
 /* ------------------------------------------------------------------ */
 /*  Tags dialog: extracted; see keyword-events/bulk-menu/              */
 /* ------------------------------------------------------------------ */
-
 
 /* ------------------------------------------------------------------ */
 /*  Rename in sequence dialog                                          */
@@ -413,6 +414,7 @@ function migrateSequencePayload(payload: Partial<SequenceRenameInput>, fromVersi
         current = migration(current);
         v++;
     }
+
     return current;
 }
 
@@ -426,10 +428,12 @@ function loadPersistedSequence(): SequenceRenameInput {
             // Versioned envelope?
             if (parsed && typeof parsed === "object" && "v" in parsed && typeof parsed.v === "number" && "data" in parsed && parsed.data) {
                 const migrated = migrateSequencePayload(parsed.data, parsed.v);
+
                 return coerceSequenceInput(migrated);
             }
             // Bare object found under the new key (shouldn't happen, but treat as v1).
             const migrated = migrateSequencePayload(parsed as Partial<SequenceRenameInput>, 1);
+
             return coerceSequenceInput(migrated);
         }
         // 2. Fall back to the legacy v1 key (one-shot migration; we'll
@@ -438,8 +442,10 @@ function loadPersistedSequence(): SequenceRenameInput {
         if (legacy) {
             const parsed = JSON.parse(legacy) as Partial<SequenceRenameInput>;
             const migrated = migrateSequencePayload(parsed, 1);
+
             return coerceSequenceInput(migrated);
         }
+
         return DEFAULT_SEQUENCE_RENAME;
     } catch {
         return DEFAULT_SEQUENCE_RENAME;
@@ -494,6 +500,7 @@ export function BulkRenameSequenceDialog(props: BulkRenameSequenceDialogProps): 
             setInput(loadPersistedSequence());
         };
         window.addEventListener("storage", handler);
+
         return () => window.removeEventListener("storage", handler);
     }, [open]);
 
@@ -511,6 +518,7 @@ export function BulkRenameSequenceDialog(props: BulkRenameSequenceDialogProps): 
     const outsideKeywords = useMemo(() => {
         if (!allEvents || allEvents.length === 0) return [];
         const selectedIds = new Set(selectedEvents.map(e => e.Id));
+
         return allEvents
             .filter(e => !selectedIds.has(e.Id))
             .map(e => e.Keyword);
@@ -658,6 +666,7 @@ export function BulkRenameSequenceDialog(props: BulkRenameSequenceDialogProps): 
                                 const nextClass = hasIssue
                                     ? "truncate text-destructive font-semibold"
                                     : "truncate text-foreground";
+
                                 return (
                                     <li
                                         key={row.Id}
@@ -777,6 +786,7 @@ function SequenceFormulaExample({ start, padding }: { readonly start: number; re
         Separator: "",
     };
     const samples = [0, 1, 2].map(i => renderSequenceName(example, i));
+
     return (
         <p
             className="mt-2 text-[11px] text-muted-foreground"
@@ -793,17 +803,13 @@ function SequenceFormulaExample({ start, padding }: { readonly start: number; re
 /*  Category dialog: extracted; see keyword-events/bulk-menu/          */
 /* ------------------------------------------------------------------ */
 
-
 /* ------------------------------------------------------------------ */
 /*  Export dialog: extracted; see keyword-events/bulk-menu/            */
 /* ------------------------------------------------------------------ */
 
-
 /* ------------------------------------------------------------------ */
 /*  Delete confirm dialog: extracted; see keyword-events/bulk-menu/    */
 /* ------------------------------------------------------------------ */
-
-
 
 /* ------------------------------------------------------------------ */
 /*  Import dialog                                                      */
@@ -982,6 +988,7 @@ function BulkImportDialog(props: BulkImportDialogProps): JSX.Element {
                                     {/* eslint-disable-next-line max-lines-per-function -- per-row diff renderer; PlanTierType 25 Step 19 */}
                                     {plan.matches.map((m) => {
                                         const diffs = diffMatchedFields(m.target, m.source);
+
                                         return (
                                             <li key={m.target.Id} className="p-2 space-y-1">
                                                 <div className="flex items-center justify-between gap-2">

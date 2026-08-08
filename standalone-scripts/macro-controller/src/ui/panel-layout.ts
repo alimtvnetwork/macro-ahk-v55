@@ -1,4 +1,3 @@
- 
 /**
  * MacroLoop Controller — Panel Layout & Drag/Resize
  * Step 03: Extracted from createUI() closure
@@ -23,7 +22,9 @@ function savePanelState(state: string): void {
 }
 
 function loadPanelState(): string {
-  try { return localStorage.getItem(StorageKeyType.PanelState) || 'expanded'; } catch (_e) { logSub('Failed to load panel state: ' + (_e instanceof Error ? _e.message : String(_e)), 1); return 'expanded'; }
+  try { return localStorage.getItem(StorageKeyType.PanelState) || 'expanded'; } catch (_e) { logSub('Failed to load panel state: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
+
+ return 'expanded'; }
 }
 
 interface PanelGeometry {
@@ -57,8 +58,11 @@ export function loadPanelGeometry(): PanelGeometry | null {
   try {
     const raw = localStorage.getItem(StorageKeyType.PanelGeometry);
     if (!raw) return null;
+
     return JSON.parse(raw) as PanelGeometry;
-  } catch (_e) { logSub('Failed to parse panel geometry: ' + (_e instanceof Error ? _e.message : String(_e)), 1); return null; }
+  } catch (_e) { logSub('Failed to parse panel geometry: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
+
+ return null; }
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -175,6 +179,7 @@ export function setBackdropOpacity(opacity: number): void {
   if (!backdrop) return;
   if (clamped === 0) {
     backdrop.remove();
+
     return;
   }
   backdrop.style.background = 'rgba(0,0,0,' + clamped + ')';

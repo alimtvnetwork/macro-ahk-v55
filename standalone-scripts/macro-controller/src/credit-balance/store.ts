@@ -62,6 +62,7 @@ interface KvBridge {
 
 function getKv(): KvBridge['kv'] | null {
     const sdk = (window as unknown as { marco?: KvBridge }).marco;
+
     return sdk && sdk.kv ? sdk.kv : null;
 }
 
@@ -117,6 +118,7 @@ export async function readCreditBalanceCache(
         if (isMissingHasShape) {
             return null;
         }
+
         return parsed as CreditBalanceCacheRow;
     } catch (caught: unknown) {
         logError(
@@ -124,6 +126,7 @@ export async function readCreditBalanceCache(
             'kv.get failed for ws=' + workspaceId,
             caught,
         );
+
         return null;
     }
 }
@@ -144,6 +147,7 @@ export function writeCreditBalanceCache(row: CreditBalanceCacheRow): void {
             'CreditBalanceCache.write',
             'marco.kv unavailable — skipping SQLite upsert for ws=' + row.WorkspaceId,
         );
+
         return;
     }
     kv.set(buildKey(row.WorkspaceId), JSON.stringify(row))
@@ -211,9 +215,11 @@ export async function listCreditBalanceCache(): Promise<ReadonlyArray<CreditBala
                 );
             }
         }
+
         return rows;
     } catch (caught: unknown) {
         logError('CreditBalanceCache.list', 'kv.list failed', caught);
+
         return [];
     }
 }

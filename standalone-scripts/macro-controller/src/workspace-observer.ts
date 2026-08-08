@@ -1,4 +1,3 @@
- 
 import { Timings } from "./constants/timing";
 /**
  * MacroLoop Controller — Workspace Observer Module
@@ -49,6 +48,7 @@ export function isKnownWorkspaceName(name: string): boolean {
     if (ws.name === name) { return true; }
     if (ws.fullName && ws.fullName.toLowerCase() === name.toLowerCase()) { return true; }
   }
+
   return false;
 }
 
@@ -60,10 +60,12 @@ export function isKnownWorkspaceName(name: string): boolean {
 function tryApplyWorkspaceName(name: string, source: string): boolean {
   if (!isKnownWorkspaceName(name)) {
     logSub(source + ' returned "' + name + '" — not a known workspace, skipping', 1);
+
     return false;
   }
   if (state.workspaceFromApi) {
     logSub(source + ' returned "' + name + LabelType.IgnoringApiSet + state.workspaceName, 1);
+
     return true; // accepted but not changed
   }
   if (name !== state.workspaceName) {
@@ -76,6 +78,7 @@ function tryApplyWorkspaceName(name: string, source: string): boolean {
   } else {
     logSub('Workspace unchanged: ' + name, 1);
   }
+
   return true;
 }
 
@@ -83,6 +86,7 @@ export function fetchWorkspaceName(): void {
   const wsXpath = CONFIG.WORKSPACE_XPATH;
   if (!wsXpath || wsXpath.indexOf('__') === 0) {
     log('Workspace XPath not configured (placeholder not replaced)', 'warn');
+
     return;
   }
   try {
@@ -115,6 +119,7 @@ export function autoDiscoverWorkspaceNavElement(): Element | null {
     candidates.sort(function (a, b) { return a.y - b.y || a.x - b.x; });
     const best = candidates[0];
     log('Auto-discovered workspace nav element: "' + best.text + '" <' + best.el.tagName.toLowerCase() + '> at (' + Math.round(best.x) + ',' + Math.round(best.y) + ')', 'success');
+
     return best.el;
   }
 
@@ -141,6 +146,7 @@ function collectFromNavButtons(): NavCandidate[] {
       results.push({ el, text, y: rect.top, x: rect.left });
     }
   }
+
   return results;
 }
 
@@ -165,11 +171,13 @@ function collectFromTopNav(): NavCandidate[] {
       results.push({ el: el2, text: text2, y: rect2.top, x: rect2.left });
     }
   }
+
   return results;
 }
 
 function collectNavCandidates(): NavCandidate[] {
   const candidates = collectFromNavButtons();
+
   return candidates.length > 0 ? candidates : collectFromTopNav();
 }
 
@@ -191,13 +199,16 @@ export function fetchWorkspaceNameFromNav(): boolean {
       if (name) {
         const accepted = tryApplyWorkspaceName(name, 'Nav');
         if (accepted) mc().updateUI();
+
         return accepted;
       }
     }
     logSub('Nav workspace element not found or empty', 1);
+
     return false;
   } catch (e) {
     logError('fetchWorkspaceNameFromNav error', '' + (e as Error).message);
+
     return false;
   }
 }
@@ -256,10 +267,12 @@ class WorkspaceObserverState {
     }
     if (this._mutationReinstallCount >= MUTATION_REINSTALL_CAP) {
       this._mutationCapReached = true;
+
       return null;
     }
     const idx = Math.min(this._mutationReinstallCount, MUTATION_BACKOFF_LADDER_MS.length - 1);
     this._mutationReinstallCount += 1;
+
     return MUTATION_BACKOFF_LADDER_MS[idx];
   }
 
@@ -286,6 +299,7 @@ export function startWorkspaceObserver(): void {
 
   if (isMissingNavEl) {
     scheduleObserverRetry();
+
     return;
   }
 
@@ -357,6 +371,7 @@ function applyInitialObserverName(name: string): void {
   if (isMissingName) return;
   if (name === state.workspaceName) {
     logSub('Workspace name already set: ' + name, 1);
+
     return;
   }
   if (!isKnownWorkspaceName(name)) {
@@ -386,6 +401,7 @@ function handleObserverMutation(navEl: Node | Element): void {
         'standalone-scripts/macro-controller/src/workspace-observer.ts',
         'Reason=ReinstallCapHit ReasonDetail=workspace observer reinstall cap (' + MUTATION_REINSTALL_CAP + ' per ' + (MUTATION_REINSTALL_WINDOW_MS / 1000) + 's) hit; halting auto-reinstall to prevent leak loop'
       );
+
       return;
     }
     const handle = setTimeout(function () {
@@ -393,16 +409,19 @@ function handleObserverMutation(navEl: Node | Element): void {
       startWorkspaceObserver();
     }, backoff);
     wsObserverState.trackTimer(handle);
+
     return;
   }
 
   const newName = (navEl!.textContent || '').trim();
   if (!isKnownWorkspaceName(newName)) {
     logSub('Observer mutation: "' + newName + '" not a known workspace — ignoring', 1);
+
     return;
   }
   if (state.workspaceFromApi) {
     logSub('Observer mutation: "' + newName + LabelType.IgnoringApiSet + state.workspaceName, 1);
+
     return;
   }
   if (newName && newName !== state.workspaceName) {
@@ -437,11 +456,13 @@ export function triggerCreditCheckOnWorkspaceChange(): void {
   if (isMissingRunning) {
     log('Skipping dialog-based credit check — loop is stopped (Issue 82 policy)', 'skip');
     mc().updateUI();
+
     return;
   }
 
   if (isUserTypingInPrompt()) {
     log('Skipping credit check — user is typing in prompt', 'skip');
+
     return;
   }
 
@@ -449,6 +470,7 @@ export function triggerCreditCheckOnWorkspaceChange(): void {
   const isMissingOpened = !opened;
   if (isMissingOpened) {
     log('Could not open project dialog for credit check', 'warn');
+
     return;
   }
 

@@ -97,6 +97,7 @@ function buildExportResult(
 
     if (isFound) {
         const slug = project.name.toLowerCase().replace(/\s+/g, "-");
+
         return {
             json: JSON.stringify(project, null, 2),
             filename: `marco-${slug}.json`,

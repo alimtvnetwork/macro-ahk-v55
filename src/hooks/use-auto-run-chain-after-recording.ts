@@ -64,6 +64,7 @@ export function shouldAutoRun(
     if (prev === null) { return false; }
     const wasActive = prev.Phase === "Recording" || prev.Phase === "Paused";
     if (!wasActive) { return false; }
+
     return next === null || next.Phase === "Idle";
 }
 

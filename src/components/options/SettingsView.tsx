@@ -385,8 +385,6 @@ export function SettingsView() {
         <DismissedSitesCard />
       </SettingsGroup>
 
-
-
       {/* Debugging */}
       <SettingsGroup
         icon={Shield}

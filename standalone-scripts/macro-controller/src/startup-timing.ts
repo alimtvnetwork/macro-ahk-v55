@@ -51,6 +51,7 @@ export function getTimingEntries(): TimingEntry[] {
   _pending.forEach(function(v, k) {
     all.push({ phase: k, label: v.label, startMs: v.startMs, endMs: now, status: 'pending' });
   });
+
   return all.sort(function(a, b) { return a.startMs - b.startMs; });
 }
 
@@ -72,6 +73,7 @@ export function logTimingSummary(): void {
 
   if (entries.length === 0) {
     console.log('[MacroLoop] ── TIMING ── No phases recorded');
+
     return;
   }
 

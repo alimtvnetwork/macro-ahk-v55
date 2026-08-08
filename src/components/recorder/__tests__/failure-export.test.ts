@@ -168,6 +168,7 @@ function reportAt(stepId: number | null, ts: string, kind: string | null = "Clic
         SourceFile: "src/test.ts",
         Now: () => new Date(ts),
     });
+
     // buildFailureReport defaults StepId/StepKind to null when undefined; ensure we honor null intent.
     return { ...r, StepId: stepId, StepKind: kind, Timestamp: ts };
 }

@@ -32,12 +32,14 @@ function mount(onPhase?: (p: RecordingPhase) => void): RecorderToolbarHandle {
         Now: () => "2026-04-26T00:00:00.000Z",
         OnPhaseChange: onPhase,
     });
+
     return handle;
 }
 
 function btn(h: RecorderToolbarHandle, action: BtnAction): HTMLButtonElement {
     const element = h.Root.querySelector<HTMLButtonElement>(`button[data-action="${action}"]`);
     if (element === null) { throw new Error(`button[data-action="${action}"] not found`); }
+
     return element;
 }
 

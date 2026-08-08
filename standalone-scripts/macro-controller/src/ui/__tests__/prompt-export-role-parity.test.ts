@@ -87,6 +87,7 @@ describe('PlanTierType-14 close-out: export-format parity for role-scoped rows',
         const key = e.role ?? '__none__';
         acc[key] = (acc[key] ?? 0) + 1;
       }
+
       return acc;
     };
 

@@ -57,6 +57,7 @@ const IDLE_TIMEOUT_MS = 1000;
 
 function describeObserveTarget(target: Element): string {
   if (target === document.body) return 'document.body';
+
   return target.tagName + (target.id ? '#' + target.id : '');
 }
 
@@ -71,6 +72,7 @@ function attachVisibilityHandler(createUI: () => void): () => void {
     }
   }
   document.addEventListener('visibilitychange', onVisibilityChange);
+
   return function () { document.removeEventListener('visibilitychange', onVisibilityChange); };
 }
 

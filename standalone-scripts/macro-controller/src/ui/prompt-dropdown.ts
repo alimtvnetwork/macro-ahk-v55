@@ -63,10 +63,10 @@ const POSITION_SOURCE_META: Record<SlugPositionSourceType, { glyph: string; bg: 
   drag: { glyph: '⇅',      bg: 'rgba(16,185,129,0.85)',  tooltip: 'Position set by your drag-and-drop and persisted to localStorage.' },
 };
 
-
 /** Adapter: getByXPath returns Node|null, pasteIntoEditor needs Element|null */
 function getByXPathAsElement(xpath: string): Element | null {
   const node = getByXPath(xpath);
+
   return node instanceof Element ? node : null;
 }
 
@@ -82,6 +82,7 @@ function keepTaskNextSubInView(promptsDropdown: HTMLElement, taskNextSub: HTMLEl
     const PAD = 6;
     if (subRect.bottom > dropRect.bottom) {
       promptsDropdown.scrollTop += Math.ceil(subRect.bottom - dropRect.bottom + PAD);
+
       return;
     }
     if (subRect.top < dropRect.top) {
@@ -109,6 +110,7 @@ function measureSubMenuWidth(sub: HTMLElement): number {
   sub.style.display = 'block';
   const width = Math.max(sub.getBoundingClientRect().width || 0, 180);
   sub.style.visibility = prevVisibility;
+
   return width;
 }
 
@@ -116,6 +118,7 @@ function hasRightSpaceForMenu(row: HTMLElement, measuredWidth: number): boolean 
   const PAD = 8;
   const rowRect = row.getBoundingClientRect();
   const rightSpace = window.innerWidth - rowRect.right - PAD;
+
   return rightSpace >= measuredWidth;
 }
 
@@ -144,13 +147,12 @@ function anchorTaskNextSub(row: HTMLElement, sub: HTMLElement, host: HTMLElement
   
   if (isRightAnchored) {
     anchorSubMenuRight(row, sub);
+
     return;
   }
   
   anchorSubMenuBelow(sub, host);
 }
-
-
 
 // Legacy single-pick chip helper removed in favor of the new Filter menu.
 // (Multi-select state lives in prompt-loader.ts via getPromptCategoryFilterSet.)
@@ -225,6 +227,7 @@ export function renderPromptsDropdown(ctx: PromptContext, taskNextDeps: TaskNext
     promptsDropdown.innerHTML = _memSnapshot.html;
     promptsDropdown.scrollTop = _memSnapshot.scrollTop;
     _rebindDropdownListeners(promptsDropdown, entries, promptsCfg, ctx, taskNextDeps);
+
     return;
   }
 
@@ -284,9 +287,9 @@ export function isHiddenBySlug(entry: { slug?: string; parentSlug?: string; id?:
   for (const frag of HIDDEN_SLUG_FRAGMENTS) {
     if (slug.includes(frag) || parentSlug.includes(frag) || id.includes(frag) || name.includes(frag)) return true;
   }
+
   return false;
 }
-
 
 /** Build the search input for filtering prompts. */
 function buildSearchInput(ctx: PromptContext, taskNextDeps: TaskNextDeps): HTMLElement {
@@ -314,6 +317,7 @@ function buildSearchInput(ctx: PromptContext, taskNextDeps: TaskNextDeps): HTMLE
   }
 
   container.appendChild(input);
+
   return container;
 }
 
@@ -337,6 +341,7 @@ function _renderFresh(
 
   if (isMissingLength) {
     renderEmptyState(promptsDropdown, ctx, taskNextDeps);
+
     return;
   }
 
@@ -367,8 +372,6 @@ function _appendHeaderAndSubmenu(
 }
 
 // _buildFloatingGroup removed (v4.27+): PlanTierType/Next tabbed floating groups are no longer used.
-
-
 
 /** Append filtered prompt items or empty-category message. */
 function _appendFilteredItems(
@@ -422,6 +425,7 @@ function _appendFilteredItems(
     empty.style.cssText = 'padding:12px 8px;text-align:center;color:' + cPanelFgDim + ';font-size:13px;';
     empty.textContent = 'No prompts found';
     container.appendChild(empty);
+
     return;
   }
 
@@ -431,9 +435,7 @@ function _appendFilteredItems(
   for (const [idx, p] of filtered.entries()) {
     container.appendChild(renderPromptItem(idx, p, container, promptsCfg, ctx, taskNextDeps));
   }
-
 }
-
 
 /** Save UI snapshot + HtmlCopy for fast restore. */
 function _persistSnapshot(container: HTMLElement, entries: LoaderPromptEntry[], dataHash: string, categoryFilter: string | null): void {
@@ -528,7 +530,6 @@ function _rebindHeader(container: HTMLElement, ctx: PromptContext, taskNextDeps:
   }
 }
 
-
 /** Rebuild the Next floating popover after snapshot restore. */
 function _rebindTaskNextSubmenu(container: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): void {
   const nextGroup = container.querySelector('[data-next-group]') as HTMLElement | null;
@@ -568,9 +569,7 @@ function _rebindFilterMenu(
       }
     }
   }
-
 }
-
 
 /** Re-attach prompt item click/hover handlers from snapshot. */
 function _rebindPromptItems(
@@ -724,6 +723,7 @@ function normalizeCategory(raw: string | undefined): string {
     return 'audit';
   }
   if (cat.includes('bump') || cat.includes('release')) return 'release';
+
   return cat;
 }
 
@@ -737,6 +737,7 @@ function collectUniqueCategories(entries: Array<{ category?: string }>): string[
       catSeen[cat] = true;
     }
   }
+
   return categories;
 }
 
@@ -744,6 +745,7 @@ function collectUniqueCategories(entries: Array<{ category?: string }>): string[
 function _computeFilterKey(): string {
   const legacy = getPromptCategoryFilter() || '';
   const multi = Array.from(getPromptCategoryFilterSet()).sort().join(',');
+
   return legacy + '|' + multi + '|' + _currentSearchQuery;
 }
 
@@ -761,13 +763,13 @@ function filterByCategory<T extends { name: string; text: string; slug?: string;
     }
   }
 
-
   if (_currentSearchQuery) {
     const q = _currentSearchQuery.toLowerCase();
     filtered = filtered.filter(entry => {
       const name = (entry.name || '').toLowerCase();
       const text = (entry.text || '').toLowerCase();
       const tags = (entry.tags || []).join(' ').toLowerCase();
+
       return name.includes(q) || text.includes(q) || tags.includes(q);
     });
   }
@@ -867,6 +869,7 @@ function _appendPresetCounts(taskNextSub: HTMLElement, promptsDropdown: HTMLElem
       const isMissingPrompt = !prompt;
       if (isMissingPrompt) {
         showPasteToast('❌ "Next Tasks" prompt not found', true);
+
         return;
       }
       const projectName = getDisplayProjectName();
@@ -896,7 +899,6 @@ function _appendPresetCounts(taskNextSub: HTMLElement, promptsDropdown: HTMLElem
   }
 }
 
-
 function _appendCustomCountRow(taskNextSub: HTMLElement, promptsDropdown: HTMLElement, taskNextDeps: TaskNextDeps): void {
   const customRow = document.createElement('div');
   customRow.style.cssText = 'display:flex;align-items:center;gap:4px;padding:5px 12px;border-top:1px solid rgba(124,58,237,0.2);';
@@ -915,7 +917,9 @@ function _appendCustomCountRow(taskNextSub: HTMLElement, promptsDropdown: HTMLEl
   goBtn.onclick = function(e: Event) {
     e.stopPropagation();
     const n = parseInt(customInput.value);
-    if (!n || n < 1 || n > 999) { showPasteToast('⚠️ Enter 1–999', true); return; }
+    if (!n || n < 1 || n > 999) { showPasteToast('⚠️ Enter 1–999', true);
+
+ return; }
     promptsDropdown.style.display = 'none';
     taskNextSub.style.display = 'none';
     if (n <= 1) runTaskNextLoop(taskNextDeps, n);
@@ -955,6 +959,7 @@ interface PromptEntry {
 
 function getPromptVariantValue(p: PromptEntry): number | null {
   const parsed = Number.parseInt(String(p.variantValue || ''), 10);
+
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
@@ -962,6 +967,7 @@ function resolvePromptPasteText(p: PromptEntry): string {
   const variantValue = getPromptVariantValue(p);
   const isMissingVariantValue = !variantValue;
   if (isMissingVariantValue) return p.text;
+
   return substituteToken(p.text, p.replaceKey || REPLACE_KEY_DEFAULT, variantValue);
 }
 
@@ -969,6 +975,7 @@ function makeTagEl(tag: string): HTMLElement {
   const tagEl = document.createElement('span');
   tagEl.textContent = tag;
   tagEl.style.cssText = 'font-size:10px;line-height:1.2;background:rgba(124,58,237,0.18);color:' + cPrimaryLight + ';padding:0 4px;border-radius:2px;border:1px solid rgba(124,58,237,0.2);';
+
   return tagEl;
 }
 
@@ -979,6 +986,7 @@ function resolveTags(p: PromptEntry): string[] {
   if (isReleaseFamily && !rawTags.some(t => (t || '').toLowerCase() === 'release')) {
     rawTags.unshift('release');
   }
+
   return rawTags;
 }
 
@@ -1015,6 +1023,7 @@ function bindPromptItemClick(
     if (e.altKey) {
       e.stopPropagation();
       _openInlinePromptEditor(item, p, ctx, taskNextDeps);
+
       return;
     }
     log('Prompt clicked: "' + p.name + '" (' + p.text.length + ' chars)', 'info');
@@ -1087,6 +1096,7 @@ function renderPromptItem(
     _memSnapshot = null;
     renderPromptsDropdown(ctx, taskNextDeps);
   });
+
   return item;
 }
 
@@ -1156,7 +1166,6 @@ function _openInlinePromptEditor(item: HTMLElement, p: LoaderPromptEntry, ctx: P
   nameInput.focus();
 }
 
-
 function appendPromptActions(
   actions: HTMLElement, p: PromptEntry, promptsDropdown: HTMLElement,
   _promptsCfg: ReturnType<typeof getPromptsConfig>, ctx: PromptContext, taskNextDeps: TaskNextDeps,
@@ -1184,6 +1193,7 @@ function _buildFavoriteIcon(p: LoaderPromptEntry, _dropdown: HTMLElement, ctx: P
       }
     });
   };
+
   return icon;
 }
 
@@ -1195,6 +1205,7 @@ function _buildEditablePromptFromEntry(p: PromptEntry): EditablePrompt {
   if (typeof p.isDefault === 'boolean') out.isDefault = p.isDefault;
   const exc = (p as { excludeFromExport?: boolean }).excludeFromExport;
   if (typeof exc === 'boolean') out.excludeFromExport = exc;
+
   return out;
 }
 
@@ -1206,6 +1217,7 @@ function _buildEditIcon(p: PromptEntry, dropdown: HTMLElement, ctx: PromptContex
     dropdown.style.display = 'none';
     openPromptCreationModal(ctx, taskNextDeps, _buildEditablePromptFromEntry(p));
   };
+
   return icon;
 }
 
@@ -1217,6 +1229,7 @@ function _buildDeleteIcon(p: PromptEntry, dropdown: HTMLElement, ctx: PromptCont
     if (!confirm('Delete prompt "' + p.name + '"?')) return;
     _executeDeletePrompt(p, dropdown, ctx, taskNextDeps);
   };
+
   return icon;
 }
 
@@ -1225,6 +1238,7 @@ function _executeDeletePrompt(p: PromptEntry, _dropdown: HTMLElement, ctx: Promp
   sendToExtension('DELETE_PROMPT', { promptId: p.id }).then(function(resp: ExtensionResponse) {
     if (resp && resp.isOk) {
       handlePromptDeleteSuccess(p, ctx, taskNextDeps);
+
       return;
     }
     handlePromptDeleteFailure(p, resp?.errorMessage ?? 'DELETE_PROMPT returned no success flag');
@@ -1246,11 +1260,13 @@ function handlePromptDeleteSuccess(p: PromptEntry, ctx: PromptContext, taskNextD
         if (p.id && e.id === p.id) return false;
         if (p.slug && e.slug === p.slug) return false;
         if (!p.id && !p.slug && e.name === p.name) return false;
+
         return true;
       });
       if (filtered.length !== record.entries.length) {
         return mod.writeJsonCopy(filtered);
       }
+
       return undefined;
     });
   }).catch(function(cacheErr: unknown) {
@@ -1276,6 +1292,7 @@ function _buildCopyIcon(p: PromptEntry): HTMLElement {
       setTimeout(function() { icon.textContent = '📋'; }, 1500);
     });
   };
+
   return icon;
 }
 
@@ -1287,6 +1304,7 @@ function _makeActionIcon(emoji: string, title: string, baseOpacity: string): HTM
   icon.style.cssText = 'cursor:pointer;font-size:13px;opacity:' + baseOpacity + ';';
   icon.onmouseover = function() { (this as HTMLElement).style.opacity = '1'; };
   icon.onmouseout = function() { (this as HTMLElement).style.opacity = baseOpacity + ';'; };
+
   return icon;
 }
 
@@ -1301,5 +1319,6 @@ function buildAddPromptButton(promptsDropdown: HTMLElement, ctx: PromptContext, 
     promptsDropdown.style.display = 'none';
     openPromptCreationModal(ctx, taskNextDeps, null);
   };
+
   return addBtn;
 }

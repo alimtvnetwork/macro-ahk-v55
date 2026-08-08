@@ -90,6 +90,7 @@ export interface StepDraft {
 export function nextOrderIndex(db: SqlJsDatabase): number {
     const result = db.exec("SELECT COALESCE(MAX(OrderIndex), 0) FROM Step");
     const max = (result[0]?.values[0]?.[0] as number | undefined) ?? 0;
+
     return max + 1;
 }
 
@@ -115,6 +116,7 @@ export function insertStepRow(
     const stepId = lastInsertId(db);
     const step = readStepRow(db, stepId);
     insertSelectorsForStep(db, stepId, draft.Selectors);
+
     return step;
 }
 
@@ -140,6 +142,7 @@ function insertSelectorRow(db: SqlJsDatabase, stepId: number, draft: SelectorDra
          VALUES (?, ?, ?, ?, ?)`,
         [stepId, draft.SelectorKindId, draft.Expression, draft.AnchorSelectorId, draft.IsPrimary ? 1 : 0],
     );
+
     return readSelector(db, lastInsertId(db));
 }
 
@@ -153,6 +156,7 @@ export function insertSelectorsForStep(
     for (const draft of drafts) {
         inserted.push(insertSelectorRow(db, stepId, draft));
     }
+
     return inserted;
 }
 
@@ -167,6 +171,7 @@ export function listStepRows(db: SqlJsDatabase): ReadonlyArray<PersistedStep> {
         `SELECT ${STEP_SELECT_COLUMNS} FROM Step ORDER BY OrderIndex ASC`,
     );
     const values = result[0]?.values ?? [];
+
     return values.map(rowToStep);
 }
 
@@ -182,6 +187,7 @@ export function listSelectorsForStep(
         [stepId],
     );
     const values = result[0]?.values ?? [];
+
     return values.map(rowToSelector);
 }
 
@@ -221,6 +227,7 @@ export function updateStepVariableNameRow(
         `UPDATE Step SET VariableName = ?, UpdatedAt = datetime('now') WHERE StepId = ?`,
         [newVariableName, stepId],
     );
+
     return readStepRow(db, stepId);
 }
 
@@ -237,6 +244,7 @@ export async function insertStep(
     const step = insertStepRow(db, draft);
     const selectors = listSelectorsForStep(db, step.StepId);
     mgr.markDirty();
+
     return { step, selectors };
 }
 
@@ -244,6 +252,7 @@ export async function listSteps(
     projectSlug: string,
 ): Promise<ReadonlyArray<PersistedStep>> {
     const mgr = await initProjectDb(projectSlug);
+
     return listStepRows(mgr.getDb());
 }
 
@@ -252,6 +261,7 @@ export async function listSelectors(
     stepId: number,
 ): Promise<ReadonlyArray<PersistedSelector>> {
     const mgr = await initProjectDb(projectSlug);
+
     return listSelectorsForStep(mgr.getDb(), stepId);
 }
 
@@ -272,6 +282,7 @@ export async function updateStepVariableName(
     const mgr = await initProjectDb(projectSlug);
     const step = updateStepVariableNameRow(mgr.getDb(), stepId, newVariableName);
     mgr.markDirty();
+
     return step;
 }
 
@@ -291,6 +302,7 @@ function validateStepDraft(draft: StepDraft): void {
 
 function lastInsertId(db: SqlJsDatabase): number {
     const result = db.exec("SELECT last_insert_rowid()");
+
     return result[0].values[0][0] as number;
 }
 
@@ -308,6 +320,7 @@ export function readStepRow(db: SqlJsDatabase, stepId: number): PersistedStep {
     if (row === undefined) {
         throw new Error(`Step row missing for StepId ${stepId}`);
     }
+
     return rowToStep(row);
 }
 
@@ -321,6 +334,7 @@ function readSelector(db: SqlJsDatabase, selectorId: number): PersistedSelector 
     if (row === undefined) {
         throw new Error(`Selector row missing for SelectorId ${selectorId}`);
     }
+
     return rowToSelector(row);
 }
 

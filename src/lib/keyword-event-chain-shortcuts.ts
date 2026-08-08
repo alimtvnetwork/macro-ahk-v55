@@ -48,6 +48,7 @@ export function isTypingTarget(target: EventTarget | null): boolean {
     const tag = typeof el.tagName === "string" ? el.tagName.toUpperCase() : "";
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") { return true; }
     if (el.isContentEditable === true) { return true; }
+
     return false;
 }
 
@@ -64,6 +65,7 @@ export function matchChainShortcut(
         // Allow Escape from text fields too — closing an editor focus is
         // a common reflex and we don't want it swallowed by the chain.
         if (isTypingTarget(event.target)) { return null; }
+
         return context.chainRunning ? "stop" : null;
     }
 
@@ -76,6 +78,7 @@ export function matchChainShortcut(
         if (isTypingTarget(event.target)) { return null; }
         if (context.chainRunning) { return null; }
         if (context.enabledCount <= 0) { return null; }
+
         return "run";
     }
 
@@ -95,5 +98,6 @@ export function describeStopShortcut(): string {
 function detectMac(): boolean {
     if (typeof navigator === "undefined") { return false; }
     const platform = navigator.platform ?? "";
+
     return /Mac|iPhone|iPad|iPod/.test(platform);
 }

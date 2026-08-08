@@ -81,12 +81,14 @@ export const DEFAULT_ENSURE_DEADLINE_MS = 30_000;
 function getSdk(): SdkBridge | null {
     const sdk = (window as unknown as { marco?: SdkBridge }).marco;
     if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') return null;
+
     return sdk;
 }
 
 function pickJobId(body: SyncPostBody | null): string | null {
     const isMissingBody = !body;
     if (isMissingBody) return null;
+
     return body.job_id ?? body.jobId ?? body.id ?? null;
 }
 
@@ -116,6 +118,7 @@ async function postSync(
         const reason = 'sdk_unavailable';
         logError('EnsureRepo', 'postSync: marco.api.call unavailable'
             + ' [ws=' + wsId + ' conn=' + connId + ' pid=' + projectId + ']');
+
         return { ok: false, jobId: null, httpStatus: 0, reason };
     }
 
@@ -128,6 +131,7 @@ async function postSync(
     } catch (err: unknown) {
         logError('EnsureRepo', 'postSync sdk.api.call threw'
             + ' [ws=' + wsId + ' conn=' + connId + ' pid=' + projectId + ']', err);
+
         return { ok: false, jobId: null, httpStatus: 0, reason: 'network_error' };
     }
 
@@ -138,6 +142,7 @@ async function postSync(
         logError('EnsureRepo', 'postSync HTTP ' + resp.status
             + ' [ws=' + wsId + ' conn=' + connId + ' pid=' + projectId + ']'
             + ' bodyPreview=' + preview);
+
         return { ok: false, jobId: null, httpStatus: resp.status, reason: 'http_' + resp.status };
     }
 
@@ -146,8 +151,10 @@ async function postSync(
     if (isMissingJobId) {
         // Server may key job by the well-known id even when not returned.
         log('[EnsureRepo] postSync ok but no job_id in body → using well-known id', 'info');
+
         return { ok: true, jobId: wellKnownJobId(projectId), httpStatus: resp.status, reason: 'ok' };
     }
+
     return { ok: true, jobId, httpStatus: resp.status, reason: 'ok' };
 }
 
@@ -159,6 +166,7 @@ function isTerminal(body: GitsyncProgressBody | null): boolean {
     const isMissingBody = !body;
     if (isMissingBody) return false;
     const s = body.status;
+
     return s === 'completed' || s === 'failed';
 }
 
@@ -177,11 +185,13 @@ async function pollUntilTerminal(
         } catch (err: unknown) {
             logError('EnsureRepo', 'pollUntilTerminal probe failed'
                 + ' [ws=' + wsId + ' pid=' + projectId + ' job=' + jobId + ']', err);
+
             return null;
         }
         if (isTerminal(body)) return body;
         await sleep(PROBE_POLL_INTERVAL_MS);
     }
+
     return 'deadline';
 }
 
@@ -205,6 +215,7 @@ export async function ensureGithubRepo(
     if (!wsId || !connId || !projectId) {
         logError('EnsureRepo', 'missing required arg(s) ws=' + wsId
             + ' conn=' + connId + ' pid=' + projectId);
+
         return { status: 'failed', reason: 'missing_args' };
     }
     const deadlineMs = options.deadlineMs ?? DEFAULT_ENSURE_DEADLINE_MS;
@@ -215,6 +226,7 @@ export async function ensureGithubRepo(
     const probed = await resolveConnection(wsId, connId, projectId);
     if (probed.connected) {
         setGitsyncCache(wsId, projectId, 'found', probed.repoUrl);
+
         return { status: 'connected', repoUrl: probed.repoUrl, created: false };
     }
 
@@ -222,6 +234,7 @@ export async function ensureGithubRepo(
     const posted = await postSync(wsId, connId, projectId);
     if (!posted.ok || !posted.jobId) {
         setGitsyncCache(wsId, projectId, 'error');
+
         return { status: 'failed', reason: posted.reason, httpStatus: posted.httpStatus };
     }
 
@@ -230,21 +243,26 @@ export async function ensureGithubRepo(
     if (terminal === 'deadline') {
         log('[EnsureRepo] deadline ws=' + wsId + ' pid=' + projectId
             + ' job=' + posted.jobId + ' after ' + deadlineMs + 'ms', 'info');
+
         return { status: 'syncing', jobId: posted.jobId, reason: 'deadline' };
     }
     if (terminal === null) {
         setGitsyncCache(wsId, projectId, 'error');
+
         return { status: 'failed', reason: 'poll_error' };
     }
     if (terminal.status === 'failed') {
         setGitsyncCache(wsId, projectId, 'error');
+
         return { status: 'failed', reason: 'sync_failed' };
     }
     const url = terminal.result?.repo_url;
     if (typeof url === 'string' && url.length > 0) {
         setGitsyncCache(wsId, projectId, 'found', url);
+
         return { status: 'connected', repoUrl: url, created: true };
     }
     setGitsyncCache(wsId, projectId, 'error');
+
     return { status: 'failed', reason: 'no_repo_url' };
 }

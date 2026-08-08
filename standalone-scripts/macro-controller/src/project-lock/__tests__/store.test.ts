@@ -28,6 +28,7 @@ beforeEach(() => {
                         out.push({ key, value });
                     }
                 });
+
                 return out;
             }),
         },

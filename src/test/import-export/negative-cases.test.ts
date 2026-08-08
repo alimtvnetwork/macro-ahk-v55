@@ -13,6 +13,7 @@ async function buildZipWith(entries: Record<string, Uint8Array>): Promise<Uint8A
     // hand it a plain number[] so it routes through the binary path.
     zip.file(name, Array.from(bytes));
   }
+
   return new Uint8Array(await zip.generateAsync({ type: "uint8array" }));
 }
 

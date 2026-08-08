@@ -16,6 +16,7 @@ interface Props {
 
 export function TokenSeederDetailsList(props: Props): JSX.Element {
     const { targets, now } = props;
+
     return (
         <div className="mt-2 rounded-md border border-warning/30 bg-background/40">
             <ul
@@ -33,6 +34,7 @@ export function TokenSeederDetailsList(props: Props): JSX.Element {
 function TokenSeederDetailsRow(props: { readonly target: InaccessibleSeedTarget; readonly now: number }): JSX.Element {
     const { target: t, now } = props;
     const remaining = Math.max(0, t.cooldownMs - (now - t.lastFailureAt));
+
     return (
         <li
             className="px-3 py-2 text-xs space-y-1"

@@ -167,6 +167,7 @@ export function XPathValidationPanel() {
                             {result.results.map((entry) => {
                                 const config = STATUS_CONFIG[entry.status];
                                 const Icon = config.icon;
+
                                 return (
                                     <div
                                         key={entry.name}

@@ -78,6 +78,7 @@ export function missingFieldError(
  */
 export function bindOpt(value: unknown): string | null {
     if (value === undefined || value === null || value === "") return null;
+
     return typeof value === "string" ? value : String(value);
 }
 
@@ -87,6 +88,7 @@ export function bindOpt(value: unknown): string | null {
  */
 export function bindReq(value: unknown, fallback: string): string {
     if (value === undefined || value === null || value === "") return fallback;
+
     return typeof value === "string" ? value : String(value);
 }
 
@@ -135,5 +137,6 @@ export function safeBind(
         // Fallback: stringify objects so they at least don't crash sql.js
         out.push(String(v));
     }
+
     return out;
 }

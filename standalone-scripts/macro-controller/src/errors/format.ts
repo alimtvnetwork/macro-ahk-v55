@@ -71,6 +71,7 @@ export function formatDiagnosticToast(
   };
 
   assertProfessionalWording(payload);
+
   return payload;
 }
 
@@ -80,6 +81,7 @@ export function formatDiagnosticToastPlain(
   context?: DiagnosticContext,
 ): string {
   const t = formatDiagnosticToast(input, context);
+
   return t.title + '\n' + t.body + '\n' + t.footerCode;
 }
 
@@ -90,6 +92,7 @@ export function formatDiagnosticToastPlain(
 function buildTitle(area: string, action: string, severity: ErrorSeverity): string {
   const icon = severity === 'fatal' ? '⛔' : severity === 'error' ? '❌' : severity === 'warn' ? '⚠️' : 'ℹ️';
   const human = humanizeArea(area) + ' — ' + humanizeAction(action);
+
   return icon + ' ' + human;
 }
 
@@ -127,6 +130,7 @@ function humanizeAction(action: string): string {
     .split('_')
     .map(function(w, i) {
       if (i === 0 && w.length > 0) return w.charAt(0).toUpperCase() + w.slice(1);
+
       return w;
     })
     .join(' ');
@@ -139,6 +143,7 @@ function buildAttemptedLine(err: DiagnosticError): string {
   const stripped = raw.startsWith('[' + err.code + '] ')
     ? raw.slice(('[' + err.code + '] ').length)
     : raw;
+
   return 'What happened: ' + stripped;
 }
 
@@ -154,6 +159,7 @@ function buildRejectedLine(err: DiagnosticError): string {
     parts.push(k + '=' + String(v));
   }
   if (parts.length === 0) return '';
+
   return 'Details: ' + parts.join(', ');
 }
 
@@ -166,8 +172,10 @@ function buildNextFixLine(err: DiagnosticError): string {
   const interpolated = hint.replace(/(^|[^{])\{([a-zA-Z_][a-zA-Z0-9_]*)\}/g,
     function(_full, prefix, name) {
       const value = err.context[name as keyof typeof err.context];
+
       return prefix + (value === undefined || value === null ? String(value) : String(value));
     });
+
   return 'Next: ' + interpolated;
 }
 
@@ -206,5 +214,6 @@ export function previewToast(code: string, context: DiagnosticContext): Diagnost
   if (isMissingEntry) {
     throw new Error('[DIAGNOSTIC_META_E001] Unknown error code "' + code + '".');
   }
+
   return formatDiagnosticToast(code, context);
 }

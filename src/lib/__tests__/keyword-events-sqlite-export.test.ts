@@ -23,6 +23,7 @@ vi.mock("sql.js", async () => {
             ...(config ?? {}),
             locateFile: (file: string) => resolvePath(wasmDir, file),
         })) as typeof realInit;
+
     return { ...real, default: localInit };
 });
 
@@ -35,6 +36,7 @@ beforeEach(() => {
                 const buf = readFileSync(
                     resolvePath(__dirname, "../../../node_modules/sql.js/dist/sql-wasm.wasm"),
                 );
+
                 return new Response(buf, { status: 200 });
             }
             throw new Error(`Unexpected fetch in test: ${path}`);
@@ -81,6 +83,7 @@ const sample: KeywordEvent[] = [
 
 async function openDb(data: Uint8Array) {
     const SQL = await initSqlJs();
+
     return new SQL.Database(data);
 }
 

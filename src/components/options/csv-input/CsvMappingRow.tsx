@@ -21,6 +21,7 @@ export interface CsvMappingRowProps {
 
 export function CsvMappingRow(props: CsvMappingRowProps): JSX.Element {
     const { header, cell, mapping, coercionOptions, onUpdate } = props;
+
     return (
         <tr className="border-b last:border-0">
             <td className="px-2 py-1.5 align-middle font-medium">{header}</td>

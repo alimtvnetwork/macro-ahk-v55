@@ -25,6 +25,7 @@ function makeEnvelope(overrides: Record<string, unknown> = {}): string {
     entryCount: 1,
     entries: [{ name: 'P1', text: 'body', slug: 'p1', role: 'plan' }],
   };
+
   return JSON.stringify({ ...base, ...overrides });
 }
 

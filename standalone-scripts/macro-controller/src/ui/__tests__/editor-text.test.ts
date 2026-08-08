@@ -12,6 +12,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 vi.mock('../../error-utils', async () => {
   const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+
   return { ...actual, logError: vi.fn() };
 });
 
@@ -22,6 +23,7 @@ function makeContentEditable(html: string): HTMLElement {
   element.contentEditable = 'true';
   element.innerHTML = html;
   document.body.appendChild(element);
+
   return element;
 }
 
@@ -78,6 +80,7 @@ describe('replaceEditorText — newline re-injection', () => {
     const calls: Array<[string, string | undefined]> = [];
     const stub = (cmd: string, _ui?: boolean, value?: string): boolean => {
       calls.push([cmd, value]);
+
       return true;
     };
     const original = (document as unknown as { execCommand?: unknown }).execCommand;

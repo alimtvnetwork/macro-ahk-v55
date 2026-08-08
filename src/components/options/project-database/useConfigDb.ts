@@ -57,7 +57,9 @@ export function useConfigDb(projectSlug: string) {
       });
       if (resp.isOk) {
         toast.success(`Updated ${row.Section}.${row.Key}`);
-        setEdits((prev) => { const next = { ...prev }; delete next[ek]; return next; });
+        setEdits((prev) => { const next = { ...prev }; delete next[ek];
+
+ return next; });
         void load();
       } else {
         toast.error(resp.errorMessage || "Update failed");
@@ -72,6 +74,7 @@ export function useConfigDb(projectSlug: string) {
   const handleBulkSave = async () => {
     const dirtyEntries = Object.entries(edits).filter(([ek, editedValue]) => {
       const row = rows.find((r) => editKey(r.Section, r.Key) === ek);
+
       return row && editedValue !== row.Value;
     });
     if (dirtyEntries.length === 0) return;
@@ -116,6 +119,7 @@ export function useConfigDb(projectSlug: string) {
   // Group by section
   const sections = rows.reduce<Record<string, ConfigRow[]>>((acc, row) => {
     (acc[row.Section] ??= []).push(row);
+
     return acc;
   }, {});
 

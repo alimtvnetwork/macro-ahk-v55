@@ -30,6 +30,7 @@ export interface LocateResult {
 function isHtmlElement(node: Node | null): node is HTMLElement {
     if (node === null) return false;
     if (typeof HTMLElement === "undefined") return false;
+
     return node instanceof HTMLElement;
 }
 
@@ -48,6 +49,7 @@ function tryPattern(pattern: BannerPattern): { element: HTMLElement; text: strin
     for (const needle of pattern.anyText) {
         if (text.includes(needle)) return { element: node, text: needle };
     }
+
     return null;
 }
 
@@ -56,6 +58,7 @@ function matchNeedle(text: string): string | null {
     for (const needle of BANNER_TEXT_NEEDLES) {
         if (haystack.includes(needle)) return needle;
     }
+
     return null;
 }
 
@@ -72,6 +75,7 @@ function considerNode(
     if (best === null || size < best.size) {
         return { element: node, text: needle, size };
     }
+
     return best;
 }
 
@@ -97,6 +101,7 @@ function textFallback(root: ParentNode): { element: HTMLElement; text: string } 
     }
 
     if (best === null) return null;
+
     return { element: best.element, text: best.text };
 }
 

@@ -23,7 +23,6 @@ import { toErrorMessage } from './error-utils';
 import { DiagnosticError } from './errors/diagnostic-error';
 import { showDiagnosticToast } from './errors/show-diagnostic-toast';
 
-
 // ============================================
 // Config — reads from window.__MARCO_CONFIG__.creditStatus.balance
 // ============================================
@@ -172,7 +171,6 @@ export async function resolveWorkspaceId(): Promise<string | null> {
   }
 }
 
-
 // ============================================
 // fetchCreditBalance — GET /workspaces/{id}/credit-balance
 // Uses marco.api.credits.fetchBalance()
@@ -295,7 +293,6 @@ export async function fetchCreditBalance(
   }
 }
 
-
 // ============================================
 // checkAndActOnCreditBalance — The main free-credit detection function
 // ============================================
@@ -339,7 +336,6 @@ export async function checkAndActOnCreditBalance(): Promise<boolean> {
     }),
     { noStop: true },
   );
-
 
   const { performDirectMove } = await import('./loop-dom-fallback');
   performDirectMove(direction);

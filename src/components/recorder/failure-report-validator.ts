@@ -122,6 +122,7 @@ export function validateFailureReportPayload(
     if ("Issue" in parsed) return failResult([parsed.Issue], [], 0);
     if (isBundleShape(parsed.Obj)) return validateBundle(parsed.Obj);
     const reportIssues = validateOneReport(parsed.Obj, "$");
+
     return finalize([], reportIssues, 1);
 }
 
@@ -143,6 +144,7 @@ function coercePayloadToObject(input: unknown): CoerceResult {
             },
         };
     }
+
     return { Obj: payload as Record<string, unknown> };
 }
 
@@ -164,7 +166,6 @@ function parseIfString(
     }
 }
 
-
 function isBundleShape(obj: Record<string, unknown>): boolean {
     return "Reports" in obj || "Generator" in obj || "ExportedAt" in obj;
 }
@@ -181,9 +182,11 @@ function validateBundle(bundle: Record<string, unknown>): ValidationResult {
             Path: "Reports", Problem: PROBLEM_WRONG_TYPE,
             Expected: "array", Actual: kindOf(reports),
         });
+
         return finalize(rootIssues, [], 0);
     }
     const reportIssues = collectReportIssues(reports);
+
     return finalize(rootIssues, reportIssues, reports.length);
 }
 
@@ -195,6 +198,7 @@ function collectBundleRootIssues(bundle: Record<string, unknown>): FieldIssue[] 
             Path: f, Problem: "missing", Expected: null, Actual: "undefined",
         });
     }
+
     return rootIssues;
 }
 
@@ -213,6 +217,7 @@ function collectReportIssues(reports: ReadonlyArray<unknown>): FieldIssue[] {
             ...validateOneReport(r as Record<string, unknown>, `Reports[${i}]`),
         );
     }
+
     return reportIssues;
 }
 
@@ -226,6 +231,7 @@ function validateOneReport(
         const issue = validateReportField(r, field, path, spec);
         if (issue !== null) out.push(issue);
     }
+
     return out;
 }
 
@@ -240,6 +246,7 @@ function validateReportField(
     }
     const v = r[field];
     if (matchesKind(v, spec.kind)) return null;
+
     return {
         Path: path,
         Problem: v === null ? "null-not-allowed" : PROBLEM_WRONG_TYPE,
@@ -247,7 +254,6 @@ function validateReportField(
         Actual: kindOf(v),
     };
 }
-
 
 function matchesKind(v: unknown, kind: FieldKind): boolean {
     switch (kind) {
@@ -265,6 +271,7 @@ function matchesKind(v: unknown, kind: FieldKind): boolean {
 function kindOf(v: unknown): string {
     if (v === null) return "null";
     if (Array.isArray(v)) return "array";
+
     return typeof v;
 }
 
@@ -283,6 +290,7 @@ function finalize(
 ): ValidationResult {
     const total = rootIssues.length + reportIssues.length;
     if (total === 0) return okResult(reportsChecked);
+
     return {
         Valid: false,
         RootIssues: rootIssues,
@@ -311,6 +319,7 @@ function summarizeIssues(
     const more = total - 1;
     const tail = more > 0 ? ` (+${more} more)` : "";
     const expected = first.Expected ? `, expected ${first.Expected}, got ${first.Actual}` : "";
+
     return `${first.Path}: ${first.Problem}${expected}${tail}`;
 }
 

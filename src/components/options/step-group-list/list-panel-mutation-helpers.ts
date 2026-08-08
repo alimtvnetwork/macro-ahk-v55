@@ -17,6 +17,7 @@ export function validateName(raw: string, siblingNames: ReadonlyArray<string>): 
     const lower = trimmed.toLowerCase();
     const clash = siblingNames.find((s) => s.toLowerCase() === lower);
     if (clash !== undefined) return "Another group at this level already has that name.";
+
     return null;
 }
 
@@ -24,6 +25,7 @@ export function useDialogStates() {
     const [createDialog, setCreateDialog] = useState<{ open: boolean; name: string }>({ open: false, name: "" });
     const [renameDialog, setRenameDialog] = useState<{ open: boolean; group: StepGroupRow | null; name: string }>({ open: false, group: null, name: "" });
     const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; group: StepGroupRow | null }>({ open: false, group: null });
+
     return { createDialog, setCreateDialog, renameDialog, setRenameDialog, deleteDialog, setDeleteDialog };
 }
 
@@ -40,6 +42,7 @@ export function useValidationErrors(
     const renameSiblingNames = useMemo(() => {
         if (renameGroup === null) return [] as string[];
         const parentId = renameGroup.ParentStepGroupId ?? null;
+
         return lib.Groups
             .filter((g) => (g.ParentStepGroupId ?? null) === parentId && g.StepGroupId !== renameGroup.StepGroupId)
             .map((g) => g.Name);
@@ -50,8 +53,10 @@ export function useValidationErrors(
         const baseError = validateName(renameName, renameSiblingNames);
         if (baseError !== null) return baseError;
         if (renameName.trim() === renameGroup.Name) return "Type a different name to rename.";
+
         return null;
     }, [renameName, renameGroup, renameSiblingNames]);
+
     return { createError, renameError };
 }
 

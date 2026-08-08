@@ -17,6 +17,7 @@ export interface HotkeyFieldsProps {
 
 export function HotkeyFields(props: HotkeyFieldsProps): JSX.Element {
     const { chords, waitMs, onChordsChange, onWaitMsChange } = props;
+
     return (
         <div className="space-y-3">
             <div className="space-y-1">

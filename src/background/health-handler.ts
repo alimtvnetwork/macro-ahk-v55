@@ -92,6 +92,7 @@ export function recoverHealth(): void {
 async function checkStorageAvailability(): Promise<boolean> {
     try {
         await _chr.storage.local.get("__health_check__");
+
         return true;
     } catch (storageError) {
         const errorMessage = storageError instanceof Error
@@ -99,6 +100,7 @@ async function checkStorageAvailability(): Promise<boolean> {
             : String(storageError);
 
         logCaughtError(BgLogTag.HEALTH, "Storage check failed", storageError);
+
         return false;
     }
 }
@@ -115,6 +117,7 @@ function checkStorageQuota(): ApplyQuotaResultResult {
 
         if (isCritical) return "critical";
         if (isWarning) return "warning";
+
         return "ok";
     } catch {
         return "ok";
@@ -145,6 +148,7 @@ function checkErrorRate(): ApplyErrorRateResultResult {
 
         if (isError) return "error";
         if (isDegraded) return "degraded";
+
         return "ok";
     } catch {
         return "ok";
@@ -217,6 +221,7 @@ function computeOverallState(
     if (hasHighErrors) return "ERROR";
     if (hasCriticalStorage) return "DEGRADED";
     if (hasAnyIssue) return "DEGRADED";
+
     return "HEALTHY";
 }
 

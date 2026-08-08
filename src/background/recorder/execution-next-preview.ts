@@ -90,6 +90,7 @@ function buildOnePreview(
     const defaultNext: NextNode = onSuccess !== null ? onSuccess
         : next !== undefined ? { Kind: "Step", Step: next }
         : { Kind: "End" };
+
     return { StepId: step.StepId, Next: defaultNext, OnSuccess: onSuccess, OnFailure: onFailure };
 }
 
@@ -99,6 +100,7 @@ export function buildExecutionNextPreview(
     const sorted = [...input.steps].sort((a, b) => a.OrderIndex - b.OrderIndex);
     const links = input.links ?? new Map<number, StepLinks>();
     const projects = input.projects ?? new Map<string, ProjectSummary>();
+
     return sorted.map((step, idx) => buildOnePreview(step, sorted[idx + 1], links.get(step.StepId), projects));
 }
 
@@ -106,6 +108,7 @@ export function buildExecutionNextPreview(
 export function describeNextNode(node: NextNode): string {
     if (node.Kind === "End")     return "End of chain";
     if (node.Kind === "Step")    return `Step #${node.Step.OrderIndex} — ${node.Step.VariableName}`;
+
     return `Run project "${node.Project.Name}" (${node.Branch.toLowerCase()} branch)`;
 }
 
@@ -115,5 +118,6 @@ function projectNode(
     projects: ReadonlyMap<string, ProjectSummary>,
 ): NextNode {
     const summary = projects.get(slug) ?? { Slug: slug, Name: slug };
+
     return { Kind: "Project", Project: summary, Branch: branch };
 }

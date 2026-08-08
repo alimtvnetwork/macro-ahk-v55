@@ -40,6 +40,7 @@ function KindSelector(props: {
     onKindChange: (raw: string) => void;
 }): JSX.Element {
     const { eventId, kind, onKindChange } = props;
+
     return (
         <div className="flex items-center gap-2">
             <Target className="h-3.5 w-3.5 text-muted-foreground" />
@@ -85,6 +86,7 @@ function SelectorHint(props: { status: SelectorStatus }): JSX.Element {
     if (status === "match") {
         return <p className="text-[10px] text-emerald-500">Matches an element on the current page.</p>;
     }
+
     return <p className="text-[10px] text-muted-foreground">Enter a CSS selector for the dispatch target.</p>;
 }
 
@@ -95,6 +97,7 @@ function SelectorInputRow(props: {
     onChange: (next: KeywordEventTarget) => void;
 }): JSX.Element {
     const { eventId, selectorText, status, onChange } = props;
+
     return (
         <div className="space-y-1">
             <Input
@@ -135,6 +138,7 @@ export function TargetPickerRow(props: TargetPickerRowProps): JSX.Element {
     const handleKindChange = (raw: string): void => {
         if (raw === "ActiveElement" || raw === "Body") {
             onChange({ Kind: raw });
+
             return;
         }
         if (raw === "Selector") {

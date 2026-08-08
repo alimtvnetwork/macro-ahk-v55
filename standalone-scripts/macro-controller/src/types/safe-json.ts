@@ -15,11 +15,13 @@
 /** Read a string field; returns '' when absent or non-string. */
 export function readStr(source: Record<string, unknown>, key: string): string {
   const value = source[key];
+
   return typeof value === 'string' ? value : '';
 }
 
 /** Read a finite number field; returns 0 when absent, non-number, or NaN/Infinity. */
 export function readNum(source: Record<string, unknown>, key: string): number {
   const value = source[key];
+
   return typeof value === 'number' && Number.isFinite(value) ? value : 0;
 }

@@ -42,18 +42,22 @@ function createTimerControls(tickRef: TickRef, intervalMs: number): {
     const stop = (): void => {
         if (timerId !== null) { clearInterval(timerId); timerId = null; }
     };
+
     return { start, stop };
 }
 
 function installVisibilityLoop(tickRef: TickRef, intervalMs: number): () => void {
     const { start, stop } = createTimerControls(tickRef, intervalMs);
     const handleVisibility = (): void => {
-        if (document.hidden) { stop(); return; }
+        if (document.hidden) { stop();
+
+ return; }
         tickRef.current();
         start();
     };
     document.addEventListener("visibilitychange", handleVisibility);
     if (!document.hidden) { tickRef.current(); start(); }
+
     return () => {
         document.removeEventListener("visibilitychange", handleVisibility);
         stop();
@@ -72,8 +76,10 @@ export function useVisibilityPausedInterval(
         if (!enabled) { return; }
         if (typeof document === "undefined") {
             const id = setInterval(() => tickRef.current(), intervalMs);
+
             return () => clearInterval(id);
         }
+
         return installVisibilityLoop(tickRef, intervalMs);
     }, [intervalMs, enabled]);
 }

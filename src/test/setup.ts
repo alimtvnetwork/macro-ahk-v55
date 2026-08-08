@@ -18,6 +18,7 @@ if (typeof globalThis !== "undefined" && !("__marcoActRatchetInstalled" in globa
     if (message.includes("not wrapped in act(")) {
       if (allow) {
         originalError(...args);
+
         return;
       }
       const detail = args.map((a) => {
@@ -81,6 +82,7 @@ try {
   const isWasm = (p: unknown): boolean => {
     if (typeof p === "string") return p.includes("sql-wasm.wasm");
     if (p instanceof URL) return p.href.includes("sql-wasm.wasm");
+
     return false;
   };
 
@@ -93,6 +95,7 @@ try {
     if (isWasm(p)) {
       const callback = rest[rest.length - 1] as ReadFileCb;
       callback(null, wasmBytes);
+
       return;
     }
     (origReadFile as unknown as (...a: unknown[]) => void)(p, ...rest);
@@ -101,6 +104,7 @@ try {
     p: string, ...rest: unknown[]
   ): Buffer | string => {
     if (isWasm(p)) return wasmBytes;
+
     return (origReadFileSync as unknown as (...a: unknown[]) => Buffer | string)(p, ...rest);
   };
 

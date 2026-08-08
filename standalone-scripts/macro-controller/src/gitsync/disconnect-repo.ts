@@ -48,6 +48,7 @@ interface SdkBridge {
 function getSdk(): SdkBridge | null {
   const sdk = (window as unknown as { marco?: SdkBridge }).marco;
   if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') return null;
+
   return sdk;
 }
 
@@ -70,6 +71,7 @@ export async function disconnectGithubRepo(
   const isMissingSdk = !sdk;
   if (isMissingSdk) {
     logError('GitsyncDisconnect', 'marco.api.call unavailable for ws=' + wsId + ' pid=' + pid);
+
     return { status: 'error', message: 'sdk_unavailable' };
   }
 
@@ -82,12 +84,14 @@ export async function disconnectGithubRepo(
     });
   } catch (err: unknown) {
     logError('GitsyncDisconnect', 'sdk.api.call threw for ws=' + wsId + ' pid=' + pid, err);
+
     return { status: 'error', message: 'network_error' };
   }
 
   if (resp.status === HttpCodes.NOT_FOUND) {
     invalidateGitsyncCache(wsId, pid);
     log('[GitsyncDisconnect] HTTP 404 ws=' + wsId + ' pid=' + pid + ' → already not_linked', 'info');
+
     return { status: 'not_linked' };
   }
   const isMissingOk = !resp.ok;
@@ -95,11 +99,13 @@ export async function disconnectGithubRepo(
     logError('GitsyncDisconnect',
       'HTTP ' + resp.status + ' for ws=' + wsId + ' pid=' + pid
       + ' bodyPreview=' + JSON.stringify(resp.data).substring(0, 200));
+
     return { status: 'error', message: 'http_' + resp.status, httpStatus: resp.status };
   }
 
   invalidateGitsyncCache(wsId, pid);
   log('[GitsyncDisconnect] disconnected ws=' + wsId + ' pid=' + pid, 'info');
+
   return { status: 'ok' };
 }
 
@@ -123,13 +129,16 @@ export async function confirmAndDisconnectGithubRepo(
   if (isMissingAskFn) {
     logError('GitsyncDisconnect.confirm', 'window.confirm unavailable — refusing to disconnect ws='
       + wsId + ' pid=' + pid);
+
     return { status: 'error', message: 'confirm_unavailable' };
   }
   const ok = askFn(message);
   const isMissingOk = !ok;
   if (isMissingOk) {
     log('[GitsyncDisconnect] user cancelled ws=' + wsId + ' pid=' + pid, 'info');
+
     return { status: 'cancelled' };
   }
+
   return disconnectGithubRepo(wsId, pid);
 }

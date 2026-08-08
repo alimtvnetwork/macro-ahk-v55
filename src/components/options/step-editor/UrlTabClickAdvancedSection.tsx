@@ -14,6 +14,7 @@ export interface UrlTabClickAdvancedSectionProps {
 
 export function UrlTabClickAdvancedSection(props: UrlTabClickAdvancedSectionProps): JSX.Element {
     const { value, onPatch } = props;
+
     return (
         <>
             <div className="space-y-1">

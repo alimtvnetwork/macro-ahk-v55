@@ -26,6 +26,7 @@ const ICONS: Record<string, string> = {
 export function Toast({ message, variant, onDismiss }: ToastProps) {
     useEffect(() => {
         const timer = setTimeout(onDismiss, DURATION[variant] ?? 3000);
+
         return () => clearTimeout(timer);
     }, [variant, onDismiss]);
 

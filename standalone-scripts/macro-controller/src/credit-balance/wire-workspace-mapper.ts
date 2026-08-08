@@ -42,11 +42,13 @@ async function toCandidate(wire: WireWorkspace, hasCache: FreshCacheProbe): Prom
     workspace: { id: wire.id, plan: wire.plan, tier: wire.tier },
     hasFreshCache: fresh,
   });
+
   return { workspace: wire, verdict };
 }
 
 function narrowRow(row: unknown): WireWorkspace | null {
   if (!isWireWorkspace(row)) return null;
+
   return toWireWorkspace(row as unknown as Record<string, unknown>);
 }
 
@@ -67,6 +69,7 @@ export async function mapWireToEnrichmentCandidates(
     if (wire === null) continue;
     results.push(await toCandidate(wire, hasFreshCache));
   }
+
   return results;
 }
 

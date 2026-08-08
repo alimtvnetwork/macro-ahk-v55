@@ -50,9 +50,9 @@ function normalizeLevel(level: string): string {
   const lower = (level ?? "info").toLowerCase();
   if (lower === "warning") return "warn";
   if (lower === "fatal") return "error";
+
   return lower;
 }
-
 
 // eslint-disable-next-line max-lines-per-function
 export function useActivityTimeline(limit = 500) {
@@ -114,6 +114,7 @@ export function useActivityTimeline(limit = 500) {
   const merged = useMemo(() => {
     const all = [...logs, ...errors];
     all.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
     return all;
   }, [logs, errors]);
 
@@ -126,6 +127,7 @@ export function useActivityTimeline(limit = 500) {
         if (severityFilter === "info") return lvl === "info" || lvl === "log" || lvl === "debug";
         if (severityFilter === "warn") return lvl === "warn";
         if (severityFilter === "error") return lvl === "error";
+
         return true;
       });
     }
@@ -158,6 +160,7 @@ export function useActivityTimeline(limit = 500) {
       else if (lvl === "warn") warnCount++;
       else infoCount++;
     }
+
     return { total: merged.length, info: infoCount, warn: warnCount, error: errorCount };
   }, [merged]);
 

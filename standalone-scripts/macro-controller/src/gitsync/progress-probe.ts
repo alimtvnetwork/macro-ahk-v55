@@ -90,6 +90,7 @@ export function wellKnownJobId(projectId: string): string {
 function getSdk(): SdkBridge | null {
     const sdk = (window as unknown as { marco?: SdkBridge }).marco;
     if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') return null;
+
     return sdk;
 }
 
@@ -137,12 +138,14 @@ export async function probeProgress(
     if (resp.status === HttpCodes.NOT_FOUND) {
         log('[GitsyncProbe] 404 — no job yet for ws=' + wsId + ' pid=' + projectId
             + ' job=' + jobId, 'info');
+
         return null;
     }
     if (resp.status === HttpCodes.UNAUTHORIZED || resp.status === HttpCodes.FORBIDDEN) {
         // Caller lacks access → treat as no visible job.
         log('[GitsyncProbe] HTTP ' + resp.status + ' for ws=' + wsId
             + ' pid=' + projectId + ' → null', 'info');
+
         return null;
     }
     const isMissingOk = !resp.ok;
@@ -168,6 +171,7 @@ function isTerminal(body: GitsyncProgressBody | null): boolean {
     const isMissingBody = !body;
     if (isMissingBody) return false;
     const s = body.status;
+
     return s === 'completed' || s === 'failed';
 }
 
@@ -181,6 +185,7 @@ function toConnected(body: GitsyncProgressBody): GitsyncConnectionState | null {
             owner: body.result?.owner ?? null,
         };
     }
+
     return null;
 }
 
@@ -220,6 +225,7 @@ export async function resolveConnection(
     } catch (err: unknown) {
         logError('GitsyncProbe', 'resolveConnection initial probe failed'
             + ' [ws=' + wsId + ' pid=' + projectId + ']', err);
+
         return { connected: false, reason: 'error' };
     }
 
@@ -239,6 +245,7 @@ export async function resolveConnection(
         } catch (err: unknown) {
             logError('GitsyncProbe', 'resolveConnection poll probe failed'
                 + ' [ws=' + wsId + ' pid=' + projectId + ']', err);
+
             return { connected: false, reason: 'error' };
         }
         if (body === null) {
@@ -251,5 +258,6 @@ export async function resolveConnection(
 
     log('[GitsyncProbe] resolveConnection deadline ws=' + wsId
         + ' pid=' + projectId + ' after ' + deadlineMs + 'ms', 'info');
+
     return { connected: false, reason: 'deadline' };
 }

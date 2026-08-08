@@ -53,6 +53,7 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
             if (p.method === 'SELECT') {
                 return Promise.resolve({ isOk: true, rows: [fakePlanRow()] });
             }
+
             return Promise.resolve({ isOk: false, errorMessage: 'unexpected: ' + String(p.method) });
         });
 
@@ -92,6 +93,7 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
             if (p.method === 'SELECT') {
                 return Promise.resolve({ isOk: true, rows: [fakePlanRow()] });
             }
+
             return Promise.resolve({ isOk: false, errorMessage: 'unexpected' });
         });
 

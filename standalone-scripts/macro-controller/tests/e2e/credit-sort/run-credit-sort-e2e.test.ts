@@ -77,7 +77,6 @@ const SNAPSHOT: WorkspaceCredit[] = [
 function ids(survivors: ReturnType<typeof filterAndSortWorkspaces>): string[] {
   return survivors.map((s) => String(s.ws.id));
 }
-
  
 describe('Credit-sort filter E2E (v3.30.0)', () => {
   beforeEach(() => {

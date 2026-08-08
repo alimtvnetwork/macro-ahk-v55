@@ -93,6 +93,7 @@ function formatBytes(bytes: number): string {
   const units = ["B", "KB", "MB", "GB"];
   const idx = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
   const value = bytes / Math.pow(1024, idx);
+
   return `${value.toFixed(idx === 0 ? 0 : 1)} ${units[idx]}`;
 }
 
@@ -110,6 +111,7 @@ function keyToLabel(key: IDBValidKey): string {
   if (typeof key === "string") return key;
   if (typeof key === "number" || typeof key === "bigint") return String(key);
   if (key instanceof Date) return key.toISOString();
+
   return toPrettyJson(key as unknown as JsonValue);
 }
 
@@ -139,6 +141,7 @@ function readStoreRecords(store: IDBObjectStore, limit = 100): Promise<IndexedRe
       const cursor = request.result;
       if (!cursor || rows.length >= limit) {
         resolve(rows);
+
         return;
       }
       rows.push({ key: cursor.key, value: cursor.value });
@@ -247,6 +250,7 @@ async function listIndexedDbNames(): Promise<Array<{ name: string; version: numb
   }
 
   const raw = await idbFactory.databases();
+
   return raw
     .filter((entry): entry is { name: string; version?: number } => typeof entry.name === "string")
     .map((entry) => ({ name: entry.name, version: Number(entry.version ?? 1) }))
@@ -293,6 +297,7 @@ function SessionPanel() {
   const handleSave = async () => {
     if (!editorKey.trim()) {
       toast.error("Key is required");
+
       return;
     }
     try {
@@ -516,6 +521,7 @@ function CookiesPanel() {
   const handleSave = async () => {
     if (!editorName.trim()) {
       toast.error("Cookie name is required");
+
       return;
     }
 
@@ -765,6 +771,7 @@ function IndexedDbPanel() {
     if (!selectedDatabase) {
       setDatabaseView(null);
       setSelectedStore("");
+
       return;
     }
 

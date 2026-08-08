@@ -9,7 +9,6 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { DiagnosticsPanel } from "@/options/sections/DiagnosticsPanel";
 import { flushEffects } from "@/test/support";
 
-
 async function assertPanelRenders(): Promise<void> {
         const { container } = render(<DiagnosticsPanel />);
         await flushEffects();

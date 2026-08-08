@@ -14,6 +14,7 @@ import { PromptOperationKind } from "./enums";
 function resolvePromptBySlug(db: Awaited<ReturnType<typeof openCachedDb>>, slug: string): string | null {
   const res = db.exec("SELECT Text FROM Prompts WHERE Slug = ?", [slug]);
   const v = res[0]?.values[0]?.[0];
+
   return typeof v === "string" ? v : null;
 }
 

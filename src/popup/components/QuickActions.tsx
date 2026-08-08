@@ -132,6 +132,7 @@ export function QuickActions({
 
             if (!projectData?.activeProject?.id) {
                 logError("Export Project", "No active project");
+
                 return;
             }
 

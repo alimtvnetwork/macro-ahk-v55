@@ -85,6 +85,7 @@ export function useLibraryLinkMap(projectId?: number | null): {
         map.set(asset.Slug, { state: link.LinkStateType, pinnedVersion: link.PinnedVersion, updateAvailable });
       }
     }
+
     return map;
   }, [assets, links, projectId]);
 

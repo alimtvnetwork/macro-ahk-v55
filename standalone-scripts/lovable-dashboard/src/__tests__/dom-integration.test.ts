@@ -12,6 +12,7 @@ vi.mock("../homepage-dashboard-variables", async () => {
     const actual = await vi.importActual<typeof import("../homepage-dashboard-variables")>(
         "../homepage-dashboard-variables",
     );
+
     return {
         ...actual,
         // Resolve any XPath by reading data-test-xpath attrs we set on fixtures.
@@ -42,6 +43,7 @@ function rec(index: number, name: string, isSelected = false, available = 0, tot
 function dictOf(records: WorkspaceRecord[]): WorkspaceDictionary {
     const byName = Object.fromEntries(records.map((r) => [r.name, r]));
     const selectedIndex = records.findIndex((r) => r.isSelected);
+
     return { byIndex: records, byName, selectedIndex: selectedIndex === -1 ? null : selectedIndex };
 }
 
@@ -103,6 +105,7 @@ describe("mountSearchBar — DOM lifecycle", () => {
         const anchor = document.createElement("div");
         anchor.setAttribute("data-test-xpath", HomepageDashboardVariables.AllWorkspaceName.full);
         document.body.appendChild(anchor);
+
         return anchor;
     }
 
@@ -144,6 +147,7 @@ describe("mountNavControls — DOM lifecycle", () => {
         const anchor = document.createElement("div");
         anchor.setAttribute("data-test-xpath", HomepageDashboardVariables.LifetimeDeal.full);
         document.body.appendChild(anchor);
+
         return anchor;
     }
 

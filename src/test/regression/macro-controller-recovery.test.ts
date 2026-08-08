@@ -41,7 +41,6 @@ describe("MacroController namespace registration", () => {
         expect(content).toContain("markInitialized()");
     });
 });
-
  
 describe("Startup recovery hooks are wired", () => {
     it("startup.ts imports setupPersistenceObserver", () => {
@@ -90,7 +89,6 @@ describe("Post-injection verification exists", () => {
         expect(content).toContain("macro-loop-container");
     });
 });
-
 
 describe("MacroController runtime namespace healing", () => {
     it("api-namespace.ts heals frozen sub-branches and writes a structured diagnostic", () => {

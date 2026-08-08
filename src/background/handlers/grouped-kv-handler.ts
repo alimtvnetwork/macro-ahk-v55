@@ -32,6 +32,7 @@ export function bindGroupedKvDbManager(manager: DbManager): void {
 function getDb(): SqlJsDatabase {
     const isMissingDbManager = !dbManager;
     if (isMissingDbManager) throw new Error("[grouped-kv] DbManager not bound");
+
     return dbManager.getLogsDb();
 }
 
@@ -59,6 +60,7 @@ export async function handleGkvGet(
         result.length > 0 && result[0].values.length > 0
             ? String(result[0].values[0][0])
             : null;
+
     return { value };
 }
 
@@ -81,6 +83,7 @@ export async function handleGkvSet(
         [group, key, safeValue],
     );
     markDirty();
+
     return { isOk: true };
 }
 
@@ -98,6 +101,7 @@ export async function handleGkvDelete(
     const db = getDb();
     db.run("DELETE FROM GroupedKv WHERE GroupName = ? AND Key = ?", [group, key]);
     markDirty();
+
     return { isOk: true };
 }
 
@@ -120,6 +124,7 @@ export async function handleGkvList(
         entries.push({ key: String(row.Key), value: String(row.Value) });
     }
     stmt.free();
+
     return { entries };
 }
 
@@ -134,5 +139,6 @@ export async function handleGkvClearGroup(
     const db = getDb();
     db.run("DELETE FROM GroupedKv WHERE GroupName = ?", [group]);
     markDirty();
+
     return { isOk: true };
 }

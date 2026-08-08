@@ -129,6 +129,7 @@ function findPromptBySlug(slug: string): PromptEntry | null {
   for (const e of entries) {
     if ((e.slug || '').toLowerCase().indexOf(target) !== -1) return e;
   }
+
   return null;
 }
 
@@ -139,6 +140,7 @@ function resolvePerStepPrompt(): PromptEntry | null {
   }
   // Auto: next-${N}-steps (cap at 8 — the dropdown's max variant)
   const n = Math.min(state.stepCount, 8);
+
   return findPromptBySlug('next-' + n + '-steps')
       || findPromptBySlug('next-steps');
 }
@@ -146,6 +148,7 @@ function resolvePerStepPrompt(): PromptEntry | null {
 function resolvePerStepPromptText(): string | null {
   const per = resolvePerStepPrompt();
   if (!per || !per.text) return null;
+
   return substituteToken(per.text, per.replaceKey || REPLACE_KEY_DEFAULT, state.stepCount);
 }
 
@@ -161,6 +164,7 @@ function getChatForm(TAG: string): HTMLElement | null {
     const m = errMsg(e);
     showPasteToast('⚠ ' + TAG + ': getElementById threw (' + m + ') — trying button', true);
     log('TaskSplitter: getElementById threw — ' + m, 'warn');
+
     return null;
   }
 }
@@ -173,6 +177,7 @@ function trySubmitForm(TAG: string, form: HTMLElement | null): boolean {
         showPasteToast('⚠ ' + TAG + ': requestSubmit unsupported — using submit event', false);
         form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
       }
+
       return true;
     } catch (e) {
       const m = errMsg(e);
@@ -185,6 +190,7 @@ function trySubmitForm(TAG: string, form: HTMLElement | null): boolean {
   } else {
     showPasteToast('⚠ ' + TAG + ': no #chat-input form — using button fallback', true);
   }
+
   return false;
 }
 
@@ -194,16 +200,19 @@ function trySubmitButton(TAG: string): boolean {
   catch (e) { logError('TaskSplitter', 'findAddToTasksButton threw', e); }
   if (!btn || (btn as HTMLButtonElement).disabled) {
     showPasteToast('❌ ' + TAG + ': no enabled submit button found — submit failed', true);
+
     return false;
   }
   try {
     btn.click();
     showPasteToast('✅ ' + TAG + ': submitted via submit-button fallback', false);
+
     return true;
   } catch (e) {
     const m = errMsg(e);
     showPasteToast('❌ ' + TAG + ': button click threw (' + m + ')', true);
     logError('TaskSplitter', 'submit-button .click() threw', e);
+
     return false;
   }
 }
@@ -213,15 +222,16 @@ function dispatchSubmit(): boolean {
   if (typeof document === 'undefined' || !document.body) {
     showPasteToast('❌ ' + TAG + ': submit aborted — document not ready', true);
     log('TaskSplitter: submit aborted — document/body not available', 'warn');
+
     return false;
   }
   const form = getChatForm(TAG);
   if (trySubmitForm(TAG, form)) return true;
   if (trySubmitButton(TAG)) return true;
   log('TaskSplitter: submit failed — no form#chat-input and no enabled submit button', 'warn');
+
   return false;
 }
-
 
 async function pasteAndSubmit(text: string): Promise<boolean> {
   try {
@@ -229,13 +239,16 @@ async function pasteAndSubmit(text: string): Promise<boolean> {
     const outcome = await pasteIntoEditor(text, promptsConfig, (xp) => getByXPath(xp) as Element | null);
     if (String(outcome) === 'failed') {
       log('TaskSplitter: pasteIntoEditor returned failed', 'warn');
+
       return false;
     }
     // small grace for editor to settle, then submit
     await sleep(200);
+
     return dispatchSubmit();
   } catch (e) {
     logError('TaskSplitter', 'pasteAndSubmit threw', e);
+
     return false;
   }
 }
@@ -261,19 +274,24 @@ function readEditorText(): string {
     const isMissingTarget = !target;
     if (isMissingTarget) return '';
     if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) return target.value || '';
+
     return (target.textContent || '');
-  } catch (e) { log('TaskSplitter: readEditorText failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); return ''; }
+  } catch (e) { log('TaskSplitter: readEditorText failed — ' + (e instanceof Error ? e.message : String(e)), 'warn');
+
+ return ''; }
 }
 
 async function breakIntoSteps(): Promise<void> {
   if (state.running) {
     showPasteToast('⏸ Task Splitter is already running', true);
+
     return;
   }
   const text = readEditorText().trim();
   const isMissingText = !text;
   if (isMissingText) {
     showPasteToast('❌ Task Splitter: type your instruction in the Lovable chat box first', true);
+
     return;
   }
   state.bigText = text;
@@ -294,10 +312,14 @@ async function sendSplitterPromptAndQueue(text: string, expectedN: number): Prom
   log('TaskSplitter: sending split JSON prompt (' + prompt.length + ' chars, n=' + expectedN + ')', 'info');
   const ok = await pasteAndSubmit(prompt);
   const isMissingOk = !ok;
-  if (isMissingOk) { showPasteToast('❌ Task Splitter: paste/submit failed', true); return; }
+  if (isMissingOk) { showPasteToast('❌ Task Splitter: paste/submit failed', true);
+
+ return; }
   showPasteToast('✂ Task Splitter: split sent — waiting for JSON reply', false);
   const idle = await waitForLovableIdle({ isCancelled: function () { return state.cancelled; } });
-  if (idle !== 'idle') { showPasteToast('❌ Task Splitter: idle wait ' + idle, true); return; }
+  if (idle !== 'idle') { showPasteToast('❌ Task Splitter: idle wait ' + idle, true);
+
+ return; }
   await parseAndEnqueueLatestReply(expectedN);
 }
 
@@ -309,6 +331,7 @@ async function parseAndEnqueueLatestReply(expectedN: number): Promise<void> {
     if (overrides.splitterAutoEnqueue === false) {
       log('TaskSplitter: auto-enqueue disabled — parsed ' + subtasks.length + ' subtasks, skipped enqueue', 'info');
       showPasteToast('ℹ Task Splitter: parsed ' + subtasks.length + ' (auto-enqueue off)', false);
+
       return;
     }
     const projectId = resolveTaskQueueProjectId();
@@ -326,11 +349,11 @@ async function parseAndEnqueueLatestReply(expectedN: number): Promise<void> {
   }
 }
 
-
 function reportSplitterParseFailure(caught: CaughtError, expectedN: number): void {
   if (caught instanceof SplitterParseError) {
     logError('TaskSplitter.parse', JSON.stringify(caught.failure), caught);
     showPasteToast('❌ Splitter parse failed (got ' + caught.failure.ReceivedN + ' of ' + expectedN + ')', true);
+
     return;
   }
   logError('TaskSplitter.parse', 'Unexpected splitter queue failure for ExpectedN=' + expectedN, caught);
@@ -343,19 +366,25 @@ async function sendOneStep(): Promise<boolean> {
   if (isMissingPerText) {
     logError('TaskSplitter', 'per-step prompt not found (slug="' + state.perStepPromptSlug + '" / auto next-${N}-steps)');
     showPasteToast('❌ Task Splitter: per-step prompt not found', true);
+
     return false;
   }
   const ok = await pasteAndSubmit(perText);
   const isMissingOk = !ok;
-  if (isMissingOk) { showPasteToast('❌ Task Splitter: paste/submit failed', true); return false; }
+  if (isMissingOk) { showPasteToast('❌ Task Splitter: paste/submit failed', true);
+
+ return false; }
   state.completed++;
   notify();
   showPasteToast('▶ Task Splitter: ' + state.completed + '/' + state.stepCount, false);
+
   return true;
 }
 
 async function manualNext(): Promise<void> {
-  if (state.running) { showPasteToast('⏸ Auto-run is active — stop it first', true); return; }
+  if (state.running) { showPasteToast('⏸ Auto-run is active — stop it first', true);
+
+ return; }
   await sendOneStep();
 }
 
@@ -415,12 +444,14 @@ function makeInput(value: string, width: string): HTMLInputElement {
   const i = document.createElement('input');
   i.value = value;
   i.style.cssText = 'width:' + width + ';padding:3px 6px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:11px;';
+
   return i;
 }
 
 function makeSelect(): HTMLSelectElement {
   const s = document.createElement('select');
   s.style.cssText = 'padding:3px 6px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:11px;max-width:170px;';
+
   return s;
 }
 
@@ -435,6 +466,7 @@ function makeBtn(label: string, primary: boolean): HTMLButtonElement {
     ? '0 2px 6px rgba(79,70,229,0.4), inset 0 1px 0 rgba(255,255,255,0.18)'
     : 'none';
   b.style.cssText = 'padding:4px 10px;border:1px solid rgba(124,58,237,0.3);border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;color:#fff;background:' + bg + ';box-shadow:' + shadow + ';';
+
   return b;
 }
 
@@ -493,7 +525,6 @@ function buildControl(): HTMLElement {
   hint.textContent = '↳ Reads the instruction directly from the Lovable chat box.';
   hint.style.cssText = 'font-size:10px;opacity:0.7;font-style:italic;';
   body.appendChild(hint);
-
 
   // Row 1: N + Delay
   const row1 = document.createElement('div');
@@ -588,6 +619,7 @@ function buildControl(): HTMLElement {
   const tickId = setInterval(function () {
     if (typeof document === 'undefined' || !document.body?.contains(root)) {
       clearInterval(tickId);
+
       return;
     }
     if (state.running) render();
@@ -616,6 +648,7 @@ export async function triggerSplitFromInline(stepCount: number): Promise<void> {
   }
   if (state.running) {
     showPasteToast('⏸ Task Splitter is already running', true);
+
     return;
   }
   state.running = true;
@@ -652,9 +685,11 @@ async function resolvePlanPromptFromDb(n: number): Promise<string | null> {
     if (!result.ok || !result.value || result.value.Body.length === 0) return null;
     const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
     logPlanSource(n, 'db-default', 'Prompt table plan default');
+
     return substitutePlanN(result.value.Body, key, n);
   } catch (caught) {
     logError('TaskSplitter', 'plan-default DB lookup failed', caught);
+
     return null;
   }
 }
@@ -666,9 +701,11 @@ function resolveRawPlanTemplate(entries: PlanPromptEntry[], n: number, source: P
     if (isPlanTemplate && hasTemplate) {
       const key = entry.replaceKey || REPLACE_KEY_DEFAULT;
       logPlanSource(n, source, detail + ', replaceKey=' + key);
+
       return substitutePlanN(entry.text, key, n);
     }
   }
+
   return null;
 }
 
@@ -678,9 +715,11 @@ function resolveExpandedPlanVariant(entries: PlanPromptEntry[], n: number): stri
     if ((entry.parentSlug || '').toLowerCase() === 'plan-steps' && entry.variantValue === want) {
       const key = entry.replaceKey || REPLACE_KEY_DEFAULT;
       logPlanSource(n, 'parent-slug-variant', 'expanded parentSlug match for N=' + want);
+
       return entry.text ? substitutePlanN(entry.text, key, n) : null;
     }
   }
+
   return null;
 }
 
@@ -692,9 +731,11 @@ function resolveSlugPlanVariant(entries: PlanPromptEntry[], n: number): string |
     if (isSlugMatch || isNameMatch) {
       const key = entry.replaceKey || REPLACE_KEY_DEFAULT;
       logPlanSource(n, 'slug-variant', 'expanded slug/name match for N=' + n);
+
       return entry.text ? substitutePlanN(entry.text, key, n) : null;
     }
   }
+
   return null;
 }
 
@@ -717,6 +758,7 @@ function resolvePlanPrompt(n: number): string | null {
   const fromSlug = resolveSlugPlanVariant(entries, n);
   if (fromSlug) return fromSlug;
   logPlanSource(n, 'not-found', 'no raw template or expanded variant found');
+
   return null;
 }
 
@@ -726,6 +768,7 @@ async function resolvePlanPromptDbFirst(n: number): Promise<string> {
   const libraryBody = resolvePlanPrompt(n);
   if (libraryBody) return libraryBody;
   logPlanSource(n, 'default-prompts', 'PLAN_DEFAULT_BODY static fallback');
+
   return substitutePlanN(PLAN_DEFAULT_BODY, REPLACE_KEY_DEFAULT, n);
 }
 
@@ -742,6 +785,7 @@ export async function triggerPlanPasteFromInline(stepCount: number): Promise<voi
   const n = clamp(stepCount, 2, 200);
   if (state.running) {
     showPasteToast('⏸ Task Splitter is already running', true);
+
     return;
   }
   const planText = await resolvePlanPromptDbFirst(n);
@@ -754,6 +798,7 @@ export async function triggerPlanPasteFromInline(stepCount: number): Promise<voi
     const outcome = await pasteIntoEditor(combined, promptsCfg, (xp) => getByXPath(xp) as Element | null);
     if (String(outcome) === 'failed') {
       showPasteToast('❌ PlanTierType: paste failed', true);
+
       return;
     }
     showPasteToast('📋 PlanTierType ' + n + ' appended [src:' + getLastPlanPromptSource() + '] — review and Send manually', false);
@@ -762,6 +807,4 @@ export async function triggerPlanPasteFromInline(stepCount: number): Promise<voi
     showPasteToast('❌ PlanTierType: paste threw', true);
   }
 }
-
-
 

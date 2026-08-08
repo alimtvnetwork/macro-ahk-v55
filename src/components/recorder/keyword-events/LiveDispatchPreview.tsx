@@ -34,6 +34,7 @@ function KeyPreviewBody(props: {
     preview: Extract<DispatchPreview, { Kind: "Key" }>;
 }): JSX.Element {
     const { eventId, preview } = props;
+
     return (
         <div
             className="flex items-center gap-1 flex-wrap"
@@ -75,6 +76,7 @@ function WaitPreviewBody(props: {
     preview: Extract<DispatchPreview, { Kind: "Wait" }>;
 }): JSX.Element {
     const { eventId, preview } = props;
+
     return (
         <div
             className="flex items-center gap-1.5"

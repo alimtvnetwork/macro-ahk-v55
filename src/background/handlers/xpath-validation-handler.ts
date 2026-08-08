@@ -55,6 +55,7 @@ export async function handleValidateAllXPaths(
             status: "fail" as const,
             error: "No active tab found",
         }));
+
         return { results: entries, passCount: 0, failCount: entries.length, fallbackCount: 0 };
     }
 
@@ -78,6 +79,7 @@ export async function handleValidateAllXPaths(
 
 async function getActiveTabId(): Promise<number | null> {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+
     return tabs.length > 0 && tabs[0].id !== undefined ? tabs[0].id! : null;
 }
 
@@ -127,6 +129,7 @@ async function validateSingleXPath(
         };
     } catch (err) {
         const errorMessage = err instanceof Error ? err.message : String(err);
+
         return { name, xpath, selector, found: 0, status: "fail", error: errorMessage };
     }
 }

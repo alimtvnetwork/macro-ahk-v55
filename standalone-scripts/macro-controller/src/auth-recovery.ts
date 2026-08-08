@@ -70,6 +70,7 @@ export class AuthRecoveryManager {
     if (this.lazyRecoveryLock === null) {
       this.lazyRecoveryLock = createConcurrencyLock<string>();
     }
+
     return this.lazyRecoveryLock;
   }
 

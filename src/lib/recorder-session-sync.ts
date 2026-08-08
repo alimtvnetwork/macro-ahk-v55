@@ -68,6 +68,7 @@ function getChrome(): ChromeApiLike | null {
     const api = (globalThis as { chrome?: ChromeApiLike }).chrome;
     if (api === undefined) { return null; }
     if (api.runtime?.id === undefined) { return null; } // Excludes preview where chrome may be partly polyfilled.
+
     return api;
 }
 
@@ -77,6 +78,7 @@ export function detectTransport(): RecorderSyncTransport {
     if (typeof window !== "undefined" && typeof window.localStorage !== "undefined") {
         return "localStorage";
     }
+
     return "memory";
 }
 
@@ -97,6 +99,7 @@ export function parseSession(value: unknown): RecordingSession | null {
     ) {
         return null;
     }
+
     return value as RecordingSession;
 }
 
@@ -112,15 +115,18 @@ export async function readSession(): Promise<RecordingSession | null> {
     if (transport === "chrome.storage") {
         const local = getChrome()!.storage!.local!;
         const result = await local.get(RECORDER_SESSION_STORAGE_KEY);
+
         return parseSession(result[RECORDER_SESSION_STORAGE_KEY]);
     }
     if (transport === "localStorage") {
         try {
             const raw = window.localStorage.getItem(RECORDER_SESSION_STORAGE_KEY);
             if (raw === null) { return null; }
+
             return parseSession(JSON.parse(raw));
         } catch { return null; }
     }
+
     return memoryStore.current;
 }
 
@@ -137,6 +143,7 @@ export async function writeSession(session: RecordingSession): Promise<void> {
         // bus too in case React surfaces are colocated with the writer
         // (e.g. popup) and want sub-tick updates.
         emitLocalChange(session);
+
         return;
     }
     if (transport === "localStorage") {
@@ -146,6 +153,7 @@ export async function writeSession(session: RecordingSession): Promise<void> {
             window.localStorage.setItem(RECORDER_SESSION_STORAGE_KEY, JSON.stringify(session));
         }
         emitLocalChange(session);
+
         return;
     }
     memoryStore.current = session.Phase === "Idle" ? null : session;

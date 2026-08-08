@@ -13,6 +13,7 @@ export function validateImportFile(file: File): { headline: string; hint: string
   if (file.size === 0) return { headline: 'File is empty', hint: 'Choose a non-empty prompt library JSON file.' };
   if (file.size > IMPORT_MAX_BYTES) {
     const mb = (file.size / (1024 * 1024)).toFixed(1);
+
     return { headline: 'File is too large (' + mb + ' MB)', hint: 'Maximum allowed is 5 MB.' };
   }
   const name = (file.name || '').toLowerCase();
@@ -20,6 +21,7 @@ export function validateImportFile(file: File): { headline: string; hint: string
   const extOk = name.endsWith('.json');
   const typeOk = type === '' || type === 'application/json' || type === 'text/json' || type.endsWith('+json');
   if (!extOk || !typeOk) return { headline: 'Unsupported file type', hint: 'Choose a .json file.' };
+
   return null;
 }
 
@@ -49,6 +51,7 @@ function buildPreviewList(preview: PromptImportPreview, skipped: number): HTMLUL
     li.textContent = label + String(count);
     list.appendChild(li);
   }
+
   return list;
 }
 
@@ -59,6 +62,7 @@ function buildPreviewButton(text: string, testid: string, css: string, onClick: 
   btn.dataset.testid = testid;
   btn.style.cssText = css;
   btn.addEventListener('click', onClick);
+
   return btn;
 }
 
@@ -69,6 +73,7 @@ function buildPreviewButtons(onConfirm: () => void, onCancel: () => void): HTMLD
   const cancelCss = 'background:#2b3648;color:#e6edf7;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:12px;';
   btnRow.appendChild(buildPreviewButton('Confirm import', 'library-import-preview-confirm', confirmCss, onConfirm));
   btnRow.appendChild(buildPreviewButton('Cancel', 'library-import-preview-cancel', cancelCss, onCancel));
+
   return btnRow;
 }
 
@@ -118,6 +123,7 @@ export async function computeAndRenderPreview(
     try { previewFileInput.value = ''; } catch (err) {
       logError("AutoCatch", "Unhandled exception", err);
     }
+
     return;
   }
   refs.status.textContent = 'Previewing ' + file.name + ' ...';
@@ -129,6 +135,7 @@ export async function computeAndRenderPreview(
       refs.status.textContent = 'Preview parse failed: ' + friendly.headline;
       renderImportErrorBanner(refs, friendly.headline, friendly.hint);
       showToast(PREVIEW_FAILED_PREFIX + friendly.headline, TOAST_ERROR);
+
       return;
     }
     const roleSel = refs.importRoleSelect?.value;

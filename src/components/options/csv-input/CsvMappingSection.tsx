@@ -26,6 +26,7 @@ export interface CsvMappingSectionProps {
 
 export function CsvMappingSection(props: CsvMappingSectionProps): JSX.Element {
     const { csv, mappings, rowIndex, onRowIndexChange, onUpdateMapping, coercionOptions, buildResult } = props;
+
     return (
         <div className="space-y-3">
             {csv.Warnings.length > 0 && (

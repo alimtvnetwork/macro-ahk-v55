@@ -100,6 +100,7 @@ function splitForCaseFold(url: string): { readonly Lead: string; readonly Tail: 
     const isMissingMatch = !match;
     if (isMissingMatch) return { Lead: "", Tail: url };
     const lead = (match[1] + match[2]).toLowerCase();
+
     return { Lead: lead, Tail: match[3] ?? "" };
 }
 
@@ -113,6 +114,7 @@ function globTokenAt(pattern: string, i: number): { readonly Out: string; readon
         return { Out: ch.replace(/[.+?^${}()|[\]\\]/g, "\\$&"), Advance: 1 };
     }
     if (pattern[i + 1] === "*") return { Out: ".*", Advance: 2 };
+
     return { Out: "[^/]*", Advance: 1 };
 }
 
@@ -124,16 +126,19 @@ function globToRegex(pattern: string): RegExp {
         out += tok.Out;
         i += tok.Advance;
     }
+
     return new RegExp(out + "$");
 }
 
 function compileExact(pattern: string): CompileResult {
     const want = stripTrailingSlash(pattern);
     const wantSplit = splitForCaseFold(want);
+
     return {
         Ok: true,
         Test: (url) => {
             const gotSplit = splitForCaseFold(stripTrailingSlash(url));
+
             return gotSplit.Lead === wantSplit.Lead && gotSplit.Tail === wantSplit.Tail;
         },
     };
@@ -141,12 +146,14 @@ function compileExact(pattern: string): CompileResult {
 
 function compilePrefix(pattern: string): CompileResult {
     const wantSplit = splitForCaseFold(pattern);
+
     return {
         Ok: true,
         Test: (url) => {
             const gotSplit = splitForCaseFold(url);
             if (wantSplit.Lead === "") return url.startsWith(pattern);
             if (!gotSplit.Lead.startsWith(wantSplit.Lead)) return false;
+
             return gotSplit.Tail.startsWith(wantSplit.Tail);
         },
     };
@@ -156,13 +163,16 @@ function compileGlob(pattern: string): CompileResult {
     const split = splitForCaseFold(pattern);
     if (split.Lead === "") {
         const re = globToRegex(pattern);
+
         return { Ok: true, Test: (url) => re.test(url) };
     }
     const tailRe = globToRegex(split.Tail);
+
     return {
         Ok: true,
         Test: (url) => {
             const gotSplit = splitForCaseFold(url);
+
             return gotSplit.Lead === split.Lead && tailRe.test(gotSplit.Tail);
         },
     };
@@ -171,9 +181,11 @@ function compileGlob(pattern: string): CompileResult {
 function compileRegex(pattern: string): CompileResult {
     try {
         const re = new RegExp(pattern);
+
         return { Ok: true, Test: (url) => re.test(url) };
     } catch (err) {
         const detail = err instanceof Error ? err.message : "regex compile failed";
+
         return { Ok: false, Detail: detail };
     }
 }
@@ -190,6 +202,7 @@ export function compileUrlPattern(
         case "Regex": return compileRegex(pattern);
         default: {
             const exhaust: never = dialect;
+
             return { Ok: false, Detail: `unknown dialect ${String(exhaust)}` };
         }
     }
@@ -212,6 +225,7 @@ function validateDirectOpen(params: UrlTabClickParams): ValidationError | null {
     if (params.Url === undefined || params.Url === "") {
         return { Reason: "InvalidUrlPattern", Detail: "DirectOpen requires a literal Url" };
     }
+
     return null;
 }
 
@@ -226,6 +240,7 @@ export function validateUrlTabClickParams(
     const compiled = compileUrlPattern(params.UrlPattern, params.UrlMatch);
     const isMissingOk = !compiled.Ok;
     if (isMissingOk) return { Reason: "InvalidUrlPattern", Detail: compiled.Detail };
+
     return null;
 }
 
@@ -248,8 +263,10 @@ export function deriveGlobPattern(url: string): string {
         if (seg === "") return seg;
         if (/^\d+$/.test(seg)) return "*";
         if (UUID_RE.test(seg)) return "*";
+
         return seg;
     });
+
     return split.Lead + segments.join("/");
 }
 
@@ -280,6 +297,7 @@ export function shouldRecordAsUrlTabClick(ctx: CaptureClickContext): boolean {
     if (hasCrossOriginAnchorHref(ctx)) return true;
     if (ctx.WindowOpenCalled) return true;
     if (ctx.OpenedTabUrl !== undefined && ctx.OpenedTabUrl !== "") return true;
+
     return false;
 }
 
@@ -300,6 +318,7 @@ function selectorKind(params: UrlTabClickParams): PredicateEvaluationKind {
     if (kind === "Css") return "Css";
     const sel = (params.Selector ?? "").trim();
     if (sel.startsWith("/") || sel.startsWith("(")) return "XPath";
+
     return "Css";
 }
 
@@ -334,11 +353,13 @@ async function tryFocusExisting(
     const hit = existing.find((t) => test(t.Url));
     if (hit !== undefined) {
         await tabs.focusTab(hit.Id);
+
         return buildResult(base, "Ok", { ResolvedTabId: hit.Id, ResolvedUrl: hit.Url });
     }
     if (base.params.OperationModeType === "FocusExisting") {
         return buildResult(base, "TabNotFound", { Detail: `no tab matched ${base.params.UrlPattern}` });
     }
+
     return null;
 }
 
@@ -347,6 +368,7 @@ type OpenOutcome = { readonly Kind: "opened"; readonly Tab: TabRef } | { readonl
 async function openViaDirect(base: ResultBase, tabs: TabsAdapter): Promise<OpenOutcome> {
     const url = base.params.Url ?? "";
     const tab = await tabs.createTab(url);
+
     return { Kind: "opened", Tab: tab };
 }
 
@@ -356,6 +378,7 @@ async function openViaSelector(base: ResultBase, tabs: TabsAdapter): Promise<Ope
     }
     const sel = base.params.Selector ?? "";
     const tab = await tabs.dispatchClick(sel, selectorKind(base.params));
+
     return { Kind: "opened", Tab: tab };
 }
 
@@ -364,9 +387,11 @@ async function openNewTab(base: ResultBase, tabs: TabsAdapter): Promise<OpenOutc
     try {
         if (params.DirectOpen === true && params.Url !== undefined) return await openViaDirect(base, tabs);
         if (params.Selector !== undefined && params.Selector !== "") return await openViaSelector(base, tabs);
+
         return { Kind: "error", Result: buildResult(base, "BadParams", { Detail: "OpenNew requires either DirectOpen+Url or Selector" }) };
     } catch (err) {
         const detail = err instanceof Error ? err.message : "click dispatch failed";
+
         return { Kind: "error", Result: buildResult(base, "SelectorNotFound", { Detail: detail }) };
     }
 }
@@ -377,6 +402,7 @@ function settledResult(base: ResultBase, opened: TabRef | null, settled: TabRef 
     }
     const observed = opened?.Url ?? "(none)";
     const reason: UrlTabClickReason = opened === null ? "UrlTabClickTimeout" : "UrlPatternMismatch";
+
     return buildResult(base, reason, {
         ResolvedTabId: opened?.Id,
         ResolvedUrl: opened?.Url,
@@ -397,6 +423,7 @@ async function awaitOpenedSettle(
     }
     const remaining = Math.max(0, timeoutMs - (base.now() - base.startedAt));
     const settled = await tabs.waitForMatchingTab(test, remaining);
+
     return settledResult(base, opened, settled);
 }
 
@@ -405,17 +432,20 @@ function precheck(base: ResultBase): { readonly test?: (url: string) => boolean;
     const hasValidationError = validation !== null;
     if (hasValidationError) {
         const reason: UrlTabClickReason = validation.Reason === "BadParams" ? "BadParams" : "InvalidUrlPattern";
+
         return { error: buildResult(base, reason, { Detail: validation.Detail }) };
     }
     const compiled = compileUrlPattern(base.params.UrlPattern, base.params.UrlMatch);
     const isCompileFailed = !compiled.Ok;
     if (isCompileFailed) return { error: buildResult(base, "InvalidUrlPattern", { Detail: compiled.Detail }) };
+
     return { test: compiled.Test };
 }
 
 export async function executeUrlTabClick(init: ExecuteUrlTabClickInit): Promise<UrlTabClickResult> {
     const now = init.NowMs ?? (() => Date.now());
     const base: ResultBase = { params: init.Params, now, startedAt: now() };
+
     return executeWithBase(base, init);
 }
 
@@ -439,5 +469,6 @@ async function executeWithBase(base: ResultBase, init: ExecuteUrlTabClickInit): 
     if (isErrorOutcome) return outcome.Result;
     
     const timeoutMs = init.Params.TimeoutMs ?? DEFAULT_TIMEOUT_MS;
+
     return awaitOpenedSettle(base, init.Tabs, test, outcome.Tab, timeoutMs);
 }

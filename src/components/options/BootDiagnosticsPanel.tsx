@@ -11,6 +11,7 @@ const stepColors: Record<string, string> = {
 function getStepColor(step: string): string {
   const isFailed = step.startsWith("failed:");
   if (isFailed) return "bg-destructive text-destructive-foreground";
+
   return stepColors[step] ?? "bg-[hsl(var(--warning))] text-[hsl(var(--warning-foreground))]";
 }
 

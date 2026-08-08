@@ -19,6 +19,7 @@ function HashRedirect({ hash }: { hash: string }) {
   useEffect(() => {
     window.location.replace(`/#${hash}`);
   }, [hash]);
+
   return null;
 }
 

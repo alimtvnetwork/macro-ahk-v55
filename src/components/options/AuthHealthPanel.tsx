@@ -159,6 +159,7 @@ export function AuthHealthPanel() {
                                         const barWidth = data.totalMs > 0
                                             ? Math.min(100, Math.round((s.durationMs / data.totalMs) * 100))
                                             : 0;
+
                                         return (
                                             <TableRow key={s.tier} className={s.success ? "bg-primary/5" : ""}>
                                                 <TableCell className="font-mono text-xs">T{s.tier}</TableCell>

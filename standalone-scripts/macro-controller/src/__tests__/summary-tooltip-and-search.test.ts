@@ -102,6 +102,7 @@ describe('computeSummaryDetails', () => {
         const resolver = (w: WorkspaceCredit): WorkspaceDisplayKind => {
             if (w.id === 'b') return 'canceled';
             if (w.id === 'c') return 'expire-soon';
+
             return 'normal';
         };
         const d = computeSummaryDetails(rows, resolver);

@@ -20,6 +20,7 @@ export function logLibraryImportFailure(key: string, detail: string, cause?: unk
   if (prev && (now - prev.lastAt) < 60000) {
     prev.suppressed += 1;
     prev.lastAt = now;
+
     return;
   }
   const suffix = prev && prev.suppressed > 0
@@ -36,6 +37,7 @@ export function logLibraryImportFailure(key: string, detail: string, cause?: unk
 export function extractImportErrorReason(err: unknown): string {
   if (err instanceof Error && err.message) return err.message.split('\n')[0]!.slice(0, 240);
   if (typeof err === 'string' && err.length > 0) return err.split('\n')[0]!.slice(0, 240);
+
   return 'Unknown error';
 }
 

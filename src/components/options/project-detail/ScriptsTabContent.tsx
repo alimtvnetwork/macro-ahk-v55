@@ -43,6 +43,7 @@ export function ScriptsTabContent({ project, availableScripts, availableConfigs,
     const exact = availableScripts.find((as) => as.name === path);
     if (exact) return exact;
     const basename = path.includes("/") ? path.split("/").pop()! : path;
+
     return availableScripts.find((as) => as.name === basename || as.name.endsWith("/" + basename));
   };
 
@@ -52,6 +53,7 @@ export function ScriptsTabContent({ project, availableScripts, availableConfigs,
     const byName = availableConfigs.find((c) => c.name === idOrPath);
     if (byName) return byName;
     const basename = idOrPath.includes("/") ? idOrPath.split("/").pop()! : idOrPath;
+
     return availableConfigs.find((c) => c.name === basename || c.name.endsWith("/" + basename));
   };
 
@@ -62,6 +64,7 @@ export function ScriptsTabContent({ project, availableScripts, availableConfigs,
         set.add(s.path);
       }
     }
+
     return set;
     // eslint-disable-next-line react-hooks/exhaustive-deps -- recompute on library or project changes
   }, [project.scripts, availableScripts]);
@@ -93,6 +96,7 @@ export function ScriptsTabContent({ project, availableScripts, availableConfigs,
     const configBindings = bindingIds
       .map((id, i) => {
         const config = findConfig(id);
+
         return config ? { configId: config.id, configName: config.name, json: formatJson(config.json), order: i } : null;
       })
       .filter((x): x is { configId: string; configName: string; json: string; order: number } => x !== null);

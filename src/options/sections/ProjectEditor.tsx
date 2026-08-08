@@ -66,6 +66,7 @@ export function ProjectEditor({ project, onBack }: ProjectEditorProps) {
     const handleSave = useCallback(async () => {
         if (name.trim() === "") {
             setToast({ message: "Project name is required.", variant: "error" });
+
             return;
         }
 
@@ -86,7 +87,6 @@ export function ProjectEditor({ project, onBack }: ProjectEditorProps) {
             } catch (err) {
                 console.warn("[ProjectEditor] variables JSON invalid; keeping existing settings.variables", err);
             }
-
 
             const payload: StoredProject = {
                 id: project?.id ?? crypto.randomUUID(),

@@ -99,6 +99,7 @@ async function fetchInstruction(folder: string): Promise<InstructionManifest> {
     if (res.isFail) {
         throw new Error(`Failed to fetch instruction.json: ${res.status}`);
     }
+
     return res.json() as Promise<InstructionManifest>;
 }
 
@@ -108,6 +109,7 @@ function getPrimaryOutputFile(instruction: InstructionManifest): string | null {
     if (!scripts?.length) return null;
     // Sort by Order and return the first script's File
     const sorted = [...scripts].sort((a, b) => a.Order - b.Order);
+
     return sorted[0].File;
 }
 

@@ -66,6 +66,7 @@ export function getRecentlyOpenedTabUrl(sinceTimestampMs: number): string | unde
     const cutoff = sinceTimestampMs - 500;
     const recent = recentTabs.filter(t => t.timestamp >= cutoff);
     if (recent.length === 0) return undefined;
+
     // Return the latest
     return recent[recent.length - 1].url;
 }

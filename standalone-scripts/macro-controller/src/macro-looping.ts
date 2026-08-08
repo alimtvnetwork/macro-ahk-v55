@@ -1,4 +1,3 @@
- 
 declare const chrome: { runtime: { sendMessage: (message: unknown, callback?: (response: unknown) => void) => void } };
 /**
  * MacroLoop Controller — Thin Orchestrator (V2 Phase 02)
@@ -52,6 +51,7 @@ import { LabelType } from './types';
   timingStart(LabelType.DomainGuard, 'Domain Guard');
   if (!shouldInject()) {
     timingEnd(LabelType.DomainGuard, 'error', 'Injection blocked');
+
     return;
   }
   timingEnd(LabelType.DomainGuard, 'ok');
@@ -60,6 +60,7 @@ import { LabelType } from './types';
   timingStart('idempotent', 'Idempotent Check');
   if (runIdempotentCheck() === 'abort') {
     timingEnd('idempotent', 'warn', 'Aborted (already injected)');
+
     return;
   }
   timingEnd('idempotent', 'ok');
@@ -120,7 +121,9 @@ import { LabelType } from './types';
 
   // ── Persist factories for self-healing ──
   nsWrite('_internal.createUIWrapper', createUIWrapper);
-  nsWrite('_internal.createUIManager', function() { const ui = new UIManager(); ui.setCreateFn(createUIWrapper); return ui; });
+  nsWrite('_internal.createUIManager', function() { const ui = new UIManager(); ui.setCreateFn(createUIWrapper);
+
+ return ui; });
   nsWrite('_internal.createWorkspaceManager', function() { return new WorkspaceManager(); });
   nsWrite('_internal.createAuthManager', function() { return new AuthManager(); });
   nsWrite('_internal.createCreditManager', function() { return new CreditManager(); });
@@ -160,6 +163,7 @@ function buildBulkRenameFn(): (template: string, prefix: string, suffix: string,
     const checkedIds = Object.keys(getLoopWsCheckedIds());
     if (checkedIds.length === 0) {
       log('[Rename] No workspaces checked — select some first', 'warn');
+
       return;
     }
     const perWs = loopCreditState.perWorkspace || [];

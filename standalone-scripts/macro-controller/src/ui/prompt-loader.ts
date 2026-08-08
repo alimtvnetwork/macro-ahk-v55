@@ -49,6 +49,7 @@ interface BundledPromptBundle {
 function loadFallbackPromptEntries(): PromptEntry[] {
   const bundle = bundledPromptBundle as BundledPromptBundle;
   const entries = Array.isArray(bundle.prompts) ? bundle.prompts : [];
+
   return normalizePromptEntries(entries);
 }
 
@@ -174,6 +175,7 @@ function tryLoadByMessage(type: string): Promise<PromptEntry[] | null> {
     const isMissingResponse = !response;
     if (isMissingResponse) return null;
     const prompts = normalizePromptEntries((response.prompts) as Partial<PromptEntry>[]);
+
     return prompts.length > 0 ? prompts : null;
   });
 }
@@ -223,12 +225,13 @@ function finishLegacyLoad(
       log('[PromptCache] Cached ' + prompts.length + ' prompts to IndexedDB', 'info');
     });
     promptLoaderState.flushPendingCallbacks(promptLoaderState.loadedJsonPrompts);
+
     return promptLoaderState.loadedJsonPrompts;
   }
   promptLoaderState.flushPendingCallbacks(null);
+
   return null;
 }
-
  
 function handleSdkSuccess(entries: unknown[], loadStartMs: number): PromptEntry[] {
   const prompts = normalizePromptEntries(entries as Partial<PromptEntry>[]);
@@ -240,6 +243,7 @@ function handleSdkSuccess(entries: unknown[], loadStartMs: number): PromptEntry[
       logError('loadPromptsFromJson.sdk', 'JsonCopy sync after SDK fetch failed', cacheErr);
     });
     promptLoaderState.flushPendingCallbacks(prompts);
+
     return prompts;
   }
   log('[PromptLoad] ⚠️ SDK returned empty, falling back to defaults (' + elapsed + 'ms)', 'warn');
@@ -249,6 +253,7 @@ function handleSdkSuccess(entries: unknown[], loadStartMs: number): PromptEntry[
     logError('loadPromptsFromJson.sdk', 'JsonCopy sync (empty to defaults) failed', cacheErr);
   });
   promptLoaderState.flushPendingCallbacks(defaults);
+
   return defaults;
 }
 
@@ -258,15 +263,18 @@ function handleSdkFailure(e: unknown, loadStartMs: number): PromptEntry[] {
   const defaults = loadFallbackPromptEntries();
   promptLoaderState.loadedJsonPrompts = defaults;
   promptLoaderState.flushPendingCallbacks(defaults);
+
   return defaults;
 }
 
 function loadViaSdk(sdkPrompts: { getAll(): Promise<unknown[]> }, loadStartMs: number): Promise<PromptEntry[] | null> {
   if (promptLoaderState.loadedJsonPrompts) {
     log('[PromptLoad] ✅ In-memory cache hit (' + promptLoaderState.loadedJsonPrompts.length + ' prompts, 0ms)', 'info');
+
     return Promise.resolve(promptLoaderState.loadedJsonPrompts);
   }
   log('[PromptLoad] Fetching via SDK marco.prompts.getAll()...', 'info');
+
   return sdkPrompts.getAll()
     .then(function(entries: unknown[]) { return handleSdkSuccess(entries, loadStartMs); })
     .catch(function(e: unknown) { return handleSdkFailure(e, loadStartMs); });
@@ -280,13 +288,13 @@ export function loadPromptsFromJson(): Promise<PromptEntry[] | null> {
     return loadViaSdk(sdk.prompts, loadStartMs);
   }
 
-
   // ── Legacy path (SDK not available) ──
   log('[PromptLoad] SDK not available — using legacy load path', 'info');
 
   // 1. In-memory cache
   if (promptLoaderState.loadedJsonPrompts) {
     log('[PromptLoad] ✅ In-memory cache hit (' + promptLoaderState.loadedJsonPrompts.length + ' prompts, 0ms)', 'info');
+
     return Promise.resolve(promptLoaderState.loadedJsonPrompts);
   }
   if (promptLoaderState.jsonPromptsLoading) {
@@ -315,6 +323,7 @@ export function loadPromptsFromJson(): Promise<PromptEntry[] | null> {
   }).catch(function(e: unknown) {
     logError('loadPrompts', 'Prompt loading failed', e);
     showToast('❌ Prompt loading failed', 'error');
+
     return fetchAndCacheFromExtension();
   });
 }
@@ -439,6 +448,7 @@ export function getSuggestedPrompts(allEntries: PromptEntry[]): PromptEntry[] {
 
   return allEntries.filter(p => {
     if (!p.tags || p.tags.length === 0) return false;
+
     return p.tags.some((t: string) => currentTags.includes(t.toLowerCase()));
   }).slice(0, 5);
 }

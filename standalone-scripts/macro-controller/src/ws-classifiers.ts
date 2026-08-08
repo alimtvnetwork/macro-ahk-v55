@@ -9,9 +9,11 @@ export function isRefillSoonWs(ws: WorkspaceCredit): boolean {
     const config = getWorkspaceLifecycleConfig();
     const source = getEffectiveStatus(ws, config);
     const display = classifyFromStatus(source, ws);
+
     return display.kind === 'refill-soon';
   } catch (e: unknown) {
     logError('passesFilters.refillSoon', 'Failed to classify workspace for refill-soon filter', e);
+
     return false;
   }
 }
@@ -21,9 +23,11 @@ export function isExpiringWs(ws: WorkspaceCredit): boolean {
     const config = getWorkspaceLifecycleConfig();
     const source = getEffectiveStatus(ws, config);
     const display = classifyFromStatus(source, ws);
+
     return display.kind === 'past-due-expiring';
   } catch (e: unknown) {
     logError('passesFilters.expiring', 'Failed to classify workspace for expiring filter', e);
+
     return false;
   }
 }
@@ -42,12 +46,15 @@ export function isProExpiringWs(ws: WorkspaceCredit): boolean {
       
     if (display.kind === 'canceled') {
       const sub = (ws.subscriptionStatus || '').toLowerCase().trim();
+
       return sub !== 'canceled' && sub !== 'cancelled';
     }
+
     return false;
   } catch (e: unknown) {
     logError('passesFilters.proExpiring',
       'Failed to classify workspace for pro credit-sort filter', e);
+
     return false;
   }
 }

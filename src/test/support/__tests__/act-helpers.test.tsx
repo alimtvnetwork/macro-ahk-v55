@@ -23,14 +23,17 @@ function AsyncMountProbe(): React.ReactElement {
         void Promise.resolve().then(() => {
             if (!cancelled) setReady(true);
         });
+
         return () => { cancelled = true; };
     }, []);
+
     return <div data-testid="probe">{ready ? "ready" : "loading"}</div>;
 }
 
 function PropDrivenEffect({ token }: { token: string }): React.ReactElement {
     const [seen, setSeen] = React.useState<string>("initial");
     React.useEffect(() => { setSeen(token); }, [token]);
+
     return <div data-testid="seen">{seen}</div>;
 }
 
@@ -38,8 +41,10 @@ function DelayedFlip(): React.ReactElement {
     const [flipped, setFlipped] = React.useState(false);
     React.useEffect(() => {
         const timer = setTimeout(() => setFlipped(true), 50);
+
         return () => clearTimeout(timer);
     }, []);
+
     return <div data-testid="flip">{flipped ? "on" : "off"}</div>;
 }
 

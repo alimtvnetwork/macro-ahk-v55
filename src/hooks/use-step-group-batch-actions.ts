@@ -54,6 +54,7 @@ function indexGroups(allGroups: ReadonlyArray<StepGroupRow>): GroupIndex {
         items.push(g);
         byParent.set(key, items);
     }
+
     return { byId, byParent };
 }
 
@@ -67,6 +68,7 @@ function hasSelectedAncestor(
         if (selected.has(cursor)) return true;
         cursor = byId.get(cursor)?.ParentStepGroupId ?? null;
     }
+
     return false;
 }
 
@@ -87,6 +89,7 @@ function countSubtree(
             stack.push(k.StepGroupId);
         }
     }
+
     return { Descendants: descendants, Steps: steps };
 }
 
@@ -106,9 +109,9 @@ export function buildDeletePreview(
         rows.push({ Group: g, DescendantCount: Descendants, StepCount: Steps });
     }
     rows.sort((a, b) => a.Group.Name.localeCompare(b.Group.Name));
+
     return rows;
 }
-
 
 /* ------------------------------------------------------------------ */
 /*  Rename application + undo                                          */
@@ -162,12 +165,14 @@ export function useStepGroupBatchActions(lib: UseStepLibraryApi) {
                         break;
                     }
                 }
+
                 return {
                     Applied: undone.length,
                     Error: undoError,
                     undo: () => ({ Applied: 0, Error: "Already undone", undo: () => undone[0] as never }),
                 };
             };
+
             return { Applied: applied.length, Error: firstError, undo };
         },
         [lib],

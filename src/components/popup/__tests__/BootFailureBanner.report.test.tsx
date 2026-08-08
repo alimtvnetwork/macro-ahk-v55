@@ -36,6 +36,7 @@ async function captureNextDownload(action: () => void): Promise<CapturedDownload
 
     URL.createObjectURL = (blob: Blob): string => {
         capturedBlob = blob;
+
         return "blob:mock";
     };
     URL.revokeObjectURL = (): void => { /* no-op */ };
@@ -46,6 +47,7 @@ async function captureNextDownload(action: () => void): Promise<CapturedDownload
                 capturedName = (el as HTMLAnchorElement).download;
             }});
         }
+
         return el;
     }) as typeof document.createElement;
 
@@ -53,6 +55,7 @@ async function captureNextDownload(action: () => void): Promise<CapturedDownload
         action();
         if (capturedBlob === null) throw new Error("No blob captured, download handler did not run");
         const text = await (capturedBlob as Blob).text();
+
         return { name: capturedName, text };
     } finally {
         URL.createObjectURL = origCreate;
@@ -85,6 +88,7 @@ describe("BootFailureBanner, support report parity", () => {
             clipboard: {
                 writeText: (t: string) => {
                     clipboardText = t;
+
                     return Promise.resolve();
                 },
             },
@@ -92,8 +96,6 @@ describe("BootFailureBanner, support report parity", () => {
 
         render(<BootFailureBanner {...PROPS} />);
         await flushEffects();
-
-
 
         // Trigger Copy report
         fireEvent.click(screen.getByTitle(/Copy .* diagnostic report/i));

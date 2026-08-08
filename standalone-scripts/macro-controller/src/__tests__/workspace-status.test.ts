@@ -150,7 +150,6 @@ describe('getEffectiveStatus', () => {
     expect(getEffectiveStatus(ws, CFG, NOW).kind).toBe('past-due-expiring');
   });
 
-
   it('falls back to billingPeriodEndAt when nextRefillAt missing', () => {
     const ws = makeWs({
       subscriptionStatus: 'active',

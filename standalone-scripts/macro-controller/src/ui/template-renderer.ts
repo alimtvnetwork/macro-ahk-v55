@@ -10,7 +10,6 @@
 
 import { throwDiagnostic } from '../errors/diagnostic-error';
 
-
 // ── Types ──
 
 export interface CompiledTemplate {
@@ -82,6 +81,7 @@ export function renderTemplate(name: string, data: Record<string, unknown> = {})
     const availableList = Object.keys(templateState.registry).join(', ') || '(none)';
     throwDiagnostic('UI_TEMPLATE_NOT_FOUND_E001', { templateName: name, availableList });
   }
+
   return hydrate(entry.html, data);
 }
 
@@ -171,5 +171,6 @@ function replaceVariables(html: string, data: Record<string, unknown>): string {
 function isTruthy(value: unknown): boolean {
   if (value === undefined || value === null || value === false || value === 0 || value === '') return false;
   if (Array.isArray(value) && value.length === 0) return false;
+
   return true;
 }

@@ -54,6 +54,7 @@ export function loadTables(
 
     if (isFailure) {
       renderTableListError(tableList, statusBar, response);
+
       return;
     }
 
@@ -64,6 +65,7 @@ export function loadTables(
 
     if (isEmpty) {
       renderEmptyTableList(tableList, statusBar);
+
       return;
     }
 
@@ -78,6 +80,7 @@ function parseTableList(
   return (response.tables || []).map((table: Record<string, unknown>) => {
     const out: { name: string; rowCount?: number } = { name: (table.name as string) || '' };
     if (typeof table.rowCount === 'number') out.rowCount = table.rowCount;
+
     return out;
   });
 }
@@ -195,6 +198,7 @@ export function loadTableData(
 
     if (isFailure) {
       renderDataError(content, response);
+
       return;
     }
 
@@ -219,6 +223,7 @@ function buildWhereClause(tableName: string): Record<string, unknown> | undefine
   if (isLikeMode) {
     const isCaseSensitive = filter!.caseSensitive;
     const key = isCaseSensitive ? 'like' : 'ilike';
+
     return { [filter!.column]: { [key]: '%' + filter!.value + '%' } };
   }
 
@@ -306,6 +311,7 @@ function renderDataTable(
 
   if (isEmptyFirstPage) {
     renderEmptyTableState(tableName, filter, content, statusBar);
+
     return;
   }
 

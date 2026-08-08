@@ -35,12 +35,14 @@ function seedInitial(): void {
 function extractInList(sql: string): string[] {
     const match = /IN\s*\(([^)]+)\)/i.exec(sql);
     if (!match) return [];
+
     return (match[1] ?? '').split(',').map((s) => s.trim().replace(/^'/, '').replace(/'$/, ''));
 }
 
 function handleDelete(sql: string): { isOk: true } {
     const slugs = extractInList(sql);
     state.prompts = state.prompts.filter((row) => !slugs.includes(row.Slug));
+
     return { isOk: true };
 }
 
@@ -54,6 +56,7 @@ function handleUpdate(sql: string): { isOk: true } {
         if (prefix.includes('||')) row.Name = '[duplicate] ' + row.Name;
         else if (prefix.length > 0) row.Name = prefix;
     }
+
     return { isOk: true };
 }
 
@@ -61,6 +64,7 @@ function handleSelect(sql: string): { isOk: true; rows: unknown[] } {
     if (/COUNT\(\*\)/i.test(sql)) {
         const slugs = extractInList(sql);
         const count = state.prompts.filter((row) => slugs.includes(row.Slug)).length;
+
         return { isOk: true, rows: [{ c: count }] };
     }
     const excludeCanonical = /Slug\s*<>\s*'read-memory-enhanced'/i.test(sql);
@@ -74,8 +78,10 @@ function handleSelect(sql: string): { isOk: true; rows: unknown[] } {
         if (!matchesShape) return false;
         if (excludeCanonical && row.Slug === CANONICAL_SLUG) return false;
         if (excludeDuplicatePrefix && row.Name.startsWith('[duplicate] ')) return false;
+
         return true;
     });
+
     return { isOk: true, rows: rows.map((row) => ({ ...row })) };
 }
 
@@ -85,6 +91,7 @@ vi.mock('../../../src/ui/extension-relay', () => ({
         if (payload.method === 'SCHEMA' && /^\s*DELETE/i.test(sql)) return handleDelete(sql);
         if (payload.method === 'SCHEMA' && /UPDATE\s+Prompt/i.test(sql)) return handleUpdate(sql);
         if (payload.method === 'QUERY' && /SELECT/i.test(sql)) return handleSelect(sql);
+
         return { isOk: true };
     }),
 }));
@@ -92,6 +99,7 @@ vi.mock('../../../src/ui/prompt-cache', () => ({ clearPromptCache: vi.fn(async (
 vi.mock('../../../src/logging', () => ({ log: vi.fn() }));
 vi.mock('../../../src/error-utils', async () => {
     const actual = await vi.importActual<typeof import('../../../src/error-utils')>('../../../src/error-utils');
+
     return { ...actual, logDiagnosticFromCode: vi.fn(), logError: vi.fn() };
 });
 

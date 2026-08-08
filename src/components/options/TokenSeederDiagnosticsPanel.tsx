@@ -92,6 +92,7 @@ function formatTime(epochMs: number): string {
 function formatRemaining(ms: number): string {
     if (ms <= 0) return "expired";
     const seconds = Math.ceil(ms / 1000);
+
     return `${seconds}s`;
 }
 
@@ -128,6 +129,7 @@ export function TokenSeederDiagnosticsPanel() {
     useEffect(() => {
         if (tickRef.current) clearInterval(tickRef.current);
         tickRef.current = setInterval(() => setNow(Date.now()), Timings.POLL_INTERVAL_NORMAL);
+
         return () => {
             if (tickRef.current) clearInterval(tickRef.current);
         };
@@ -137,6 +139,7 @@ export function TokenSeederDiagnosticsPanel() {
 
     const selected = useMemo<InaccessibleSeedTarget | null>(() => {
         if (selectedKey === null) return targets[0] ?? null;
+
         return targets.find((t) => `${t.tabId}::${t.tabUrl}` === selectedKey) ?? targets[0] ?? null;
     }, [targets, selectedKey]);
 
@@ -168,6 +171,7 @@ export function TokenSeederDiagnosticsPanel() {
         await navigator.clipboard.writeText(lines.join("\n"));
         setCopied(true);
         const id = window.setTimeout(() => setCopied(false), 2000);
+
         return () => clearTimeout(id);
     }, [selected, cooldownRemainingMs, data]);
 
@@ -227,6 +231,7 @@ export function TokenSeederDiagnosticsPanel() {
                                     const key = `${t.tabId}::${t.tabUrl}`;
                                     const remaining = Math.max(0, t.cooldownMs - (now - t.lastFailureAt));
                                     const isSelected = (selected && `${selected.tabId}::${selected.tabUrl}` === key) ?? false;
+
                                     return (
                                         <TableRow
                                             key={key}

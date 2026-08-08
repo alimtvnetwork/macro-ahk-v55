@@ -64,6 +64,7 @@ export function hashScriptCode(code: string): string {
     for (let i = 0; i < code.length; i += 1) {
         hash = (hash * 31 + code.charCodeAt(i)) >>> 0;
     }
+
     return hash.toString(16).padStart(8, "0");
 }
 
@@ -76,10 +77,12 @@ export function buildRequestFingerprint(
             if (orderDiff !== 0) return orderDiff;
             const aKey = getScriptIdentity(a) ?? "";
             const bKey = getScriptIdentity(b) ?? "";
+
             return aKey.localeCompare(bKey);
         })
         .map((script) => {
             const scriptKey = getScriptIdentity(script) ?? "unknown";
+
             return [
                 scriptKey,
                 script.name ?? scriptKey,
@@ -127,6 +130,7 @@ export async function injectAllScripts(
     const orderedScripts = [...scripts].sort((a, b) => {
         const aOrder = a.injectable.order ?? 0;
         const bOrder = b.injectable.order ?? 0;
+
         return aOrder - bOrder;
     });
 
@@ -141,6 +145,7 @@ export async function injectAllScripts(
             const result = await injectSingleScript(tabId, script.injectable, script.configJson, script.themeJson, script.codeSource, launchSource, forceReload);
             results.push(result);
         }
+
         return results;
     }
 
@@ -245,6 +250,7 @@ export function partitionBySyntax(
             logCaughtError(BgLogTag.INJECTION, `logInjectionFailure self-failed for "${script.injectable.name ?? script.injectable.id}" (syntax stage)`, logErr);
         });
     }
+
     return { good, syntaxFailures };
 }
 
@@ -270,6 +276,7 @@ export async function injectSingleScript(
         logInjectionFailure(script, projectId, new SyntaxError(syntaxError)).catch((logErr) => {
             logCaughtError(BgLogTag.INJECTION, `logInjectionFailure self-failed for "${script.name}" (single-script syntax stage)`, logErr);
         });
+
         return buildErrorResult(script.id, startTime, new SyntaxError(syntaxError));
     }
 
@@ -305,6 +312,7 @@ export async function injectSingleScript(
         logInjectionSuccess(script, projectId, resolvedCodeSource).catch((logErr) => {
             logBgWarnError(BgLogTag.INJECTION, `logInjectionSuccess self-failed for "${script.name}" (single-script path) — telemetry suppressed but injection succeeded`, logErr);
         });
+
         return buildSuccessResult(script.id, startTime, execResult.path, execResult.domTarget);
     } catch (injectionError) {
         logCaughtError(BgLogTag.INJECTION, `4/4 EXECUTE — "${script.name}" failed`, injectionError);
@@ -312,6 +320,7 @@ export async function injectSingleScript(
         logInjectionFailure(script, projectId, injectionError).catch((logErr) => {
             logCaughtError(BgLogTag.INJECTION, `logInjectionFailure self-failed for "${script.name}" (execute stage)`, logErr);
         });
+
         return buildErrorResult(script.id, startTime, injectionError);
     }
 }

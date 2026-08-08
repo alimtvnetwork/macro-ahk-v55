@@ -71,6 +71,7 @@ export function ProjectCreateForm({ availableScripts, availableConfigs, onSave, 
   const handleSave = async () => {
     if (name.trim() === "") {
       toast.error("Project name is required");
+
       return;
     }
 
@@ -127,6 +128,7 @@ export function ProjectCreateForm({ availableScripts, availableConfigs, onSave, 
         const msg = parseError instanceof Error ? parseError.message : "Folder parse failed";
         toast.error(msg);
       }
+
       return;
     }
 

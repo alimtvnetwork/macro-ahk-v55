@@ -35,6 +35,7 @@ function openMenu(deps: WsFilterMenuDeps): HTMLElement {
   const btn = wrap.querySelector('button');
   expect(btn).toBeTruthy();
   btn!.click();
+
   return wrap;
 }
 

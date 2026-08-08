@@ -46,6 +46,7 @@ export function renderLoopJsHistory(): void {
   if (isMissingEl) return;
   if (loopJsHistory.length === 0) {
     el.innerHTML = '<span style="color:#64748b;font-size:10px;">No commands yet</span>';
+
     return;
   }
   let html = '';
@@ -101,12 +102,14 @@ export function executeJs(): void {
   const isMissingTextbox = !textbox;
   if (isMissingTextbox) {
     logError('unknown', 'JS textbox element not found');
+
     return;
   }
   const code = (textbox as HTMLTextAreaElement).value.trim();
   const isMissingCode = !code;
   if (isMissingCode) {
     log('No code to execute', 'warn');
+
     return;
   }
 

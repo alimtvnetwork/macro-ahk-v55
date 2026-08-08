@@ -51,7 +51,6 @@ describe('toWireWorkspaceCredits', () => {
     expect(out.total_credits_used_in_billing_period).toBe(77);
   });
 
-
   it('coerces missing / non-number / non-finite fields to 0 and strings to empty', () => {
     const out = toWireWorkspaceCredits({
       credits_used: 'nope' as unknown as number,

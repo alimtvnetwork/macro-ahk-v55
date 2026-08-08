@@ -114,5 +114,6 @@ export function makeWebhookFixtureSet(): {
     const success = makeWebhookSuccess();
     const skipped = makeWebhookSkipped();
     const failure = makeWebhookFailure();
+
     return { success, skipped, failure, all: [success, skipped, failure] };
 }

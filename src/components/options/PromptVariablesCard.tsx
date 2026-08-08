@@ -70,6 +70,7 @@ export function PromptVariablesCard() {
     if (!key) return;
     if (customVars.some((v) => v.key === key) || data?.builtIn.includes(key)) {
       toast.error(`Variable "{{${key}}}" already exists`);
+
       return;
     }
     setCustomVars((prev) => [...prev, { key, value: newValue }]);

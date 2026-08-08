@@ -220,6 +220,7 @@ export function ValidatedNameField(props: {
 }): JSX.Element {
     const helpId = `${props.id}-help`;
     const invalid = props.error !== null && props.value !== "";
+
     return (
         <div className="space-y-2">
             <LabelType htmlFor={props.id}>{props.label}</LabelType>

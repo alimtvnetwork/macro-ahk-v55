@@ -41,8 +41,10 @@ export function requireUserGesture(callerId: string): boolean {
       '  Last gesture source: ' + (_userGestureSource || '(never)') + '\n' +
       '  Reason: Macro Controller auto-execution is forbidden; only explicit user clicks/keys may start the loop.'
     );
+
     return false;
   }
+
   return true;
 }
 

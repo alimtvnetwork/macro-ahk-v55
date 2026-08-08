@@ -22,12 +22,14 @@ function stubChromeStorage(): void {
 
 async function createCustomPromptId(): Promise<string> {
     const result = await handleSavePrompt({ prompt: { name: "Delete me", text: "body", order: 1 } });
+
     return result.prompt.id;
 }
 
 function createDefaultPrompt(): string {
     db.run("INSERT INTO Prompts (Name, Text, IsDefault, CreatedAt, UpdatedAt) VALUES (?, ?, 1, ?, ?)", ["Default", "body", "now", "now"]);
     const result = db.exec("SELECT last_insert_rowid()");
+
     return String(result[0]?.values[0]?.[0] ?? "");
 }
 

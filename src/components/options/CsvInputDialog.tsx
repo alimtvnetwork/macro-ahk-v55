@@ -106,5 +106,6 @@ type CsvController = ReturnType<typeof useCsvInputController>;
 
 function CsvDialogFooter(props: { groupId: number | null; parsed: CsvController["parsed"]; controller: CsvController; onOpenChange: (open: boolean) => void }): JSX.Element {
     const { groupId, parsed, controller, onOpenChange } = props;
+
     return <DialogFooter className="gap-2 sm:gap-2"><Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>{parsed !== null && <Button variant="outline" onClick={controller.resetParsed}>Load a different file</Button>}<Button onClick={controller.handleApply} disabled={groupId === null || controller.buildResult === null || !controller.buildResult.Ok}>Apply row {parsed === null ? "" : controller.rowIndex + 1}</Button></DialogFooter>;
 }

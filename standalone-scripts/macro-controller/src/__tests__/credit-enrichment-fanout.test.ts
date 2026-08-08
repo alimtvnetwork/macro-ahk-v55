@@ -59,6 +59,7 @@ describe('fanOutCreditEnrichment', () => {
         const fanOut = await fanOutCreditEnrichment(workspaces, {
             requester: async function (current) {
                 calls.push(current.id);
+
                 return result(current.id);
             },
         });
@@ -81,6 +82,7 @@ describe('fanOutCreditEnrichment', () => {
                 maxActiveCount = Math.max(maxActiveCount, activeCount);
                 await Promise.resolve();
                 activeCount -= 1;
+
                 return result(current.id);
             },
         });
@@ -100,6 +102,7 @@ describe('fanOutCreditEnrichment', () => {
                 if (current.id === 'bad_1') {
                     throw new Error('boom');
                 }
+
                 return result(current.id);
             },
         });

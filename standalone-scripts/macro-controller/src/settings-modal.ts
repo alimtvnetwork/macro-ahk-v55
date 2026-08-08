@@ -54,6 +54,7 @@ function readJsonConfigValue(key: GracePeriodKeyType): number | undefined {
   const credit = (config.creditStatus || {}) as Record<string, unknown>;
   const lifecycle = (credit.lifecycle || {}) as Record<string, unknown>;
   const v = lifecycle[key];
+
   return typeof v === 'number' ? v : undefined;
 }
 
@@ -62,6 +63,7 @@ function buildField(args: {
   effective: number; jsonValue: number | undefined; defaultValue: number;
 }): string {
   const jsonText = args.jsonValue !== undefined ? String(args.jsonValue) : '— (not set)';
+
   return ''
     + '<label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#cbd5e1;">'
     +   '<span style="font-weight:600;color:#e2e8f0;">' + args.label + '</span>'
@@ -164,6 +166,7 @@ function ensureBackdrop(): HTMLDivElement {
   bd.id = BACKDROP_ID;
   bd.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:' + (Z_INDEX - 1) + ';display:none;';
   document.body.appendChild(bd);
+
   return bd;
 }
 
@@ -184,6 +187,7 @@ function ensureModalEl(): HTMLDivElement {
     'display:none',
   ].join(';') + ';';
   document.body.appendChild(el);
+
   return el;
 }
 
@@ -218,6 +222,7 @@ function parseInput(raw: string, label: string): number | undefined {
   if (!Number.isFinite(n) || n < 0) {
     throwDiagnostic('SETTINGS_VALIDATE_E001', { fieldLabel: label, rawValue: raw });
   }
+
   return Math.floor(n);
 }
 
@@ -286,6 +291,7 @@ export function showSettingsModal(): void {
     } catch (err: unknown) {
       state = { ...state, error: err instanceof Error ? err.message : String(err) };
       rerender();
+
       return;
     }
     state = { ...state, submitting: true, error: '' };

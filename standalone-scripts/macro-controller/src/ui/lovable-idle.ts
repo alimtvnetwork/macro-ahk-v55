@@ -42,6 +42,7 @@ function sleep(ms: number): Promise<void> {
 function isPageBusy(): boolean {
   const btn = findAddToTasksButton();
   const disabled = !btn || (btn as HTMLButtonElement).disabled === true;
+
   return disabled || isReturnButtonVisible();
 }
 
@@ -67,5 +68,6 @@ export async function waitForLovableIdle(opts: LovableIdleOptions): Promise<Lova
     }
     await sleep(pollMs);
   }
+
   return 'timeout';
 }

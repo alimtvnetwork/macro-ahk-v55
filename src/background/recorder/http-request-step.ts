@@ -62,6 +62,7 @@ export function interpolateTemplate(
 ): string {
     return template.replace(TEMPLATE_PATTERN, (_match, key: string) => {
         const value = row[key];
+
         return value === undefined ? "" : value;
     });
 }
@@ -85,6 +86,7 @@ function interpolateHeaders(
     for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
         out[k] = String(v);
     }
+
     return out;
 }
 
@@ -116,6 +118,7 @@ export async function executeHttpStep(
     const body = interpolateBody(init.Params.BodyJson, init.Row);
     const headers = withDefaultContentType(headersOutcome.headers, body);
     const context: HttpRequestContext = { url, method, headers, body, now, startedAt };
+
     return performHttpRequest(fetchImpl, context, init.Params);
 }
 
@@ -131,6 +134,7 @@ function tryInterpolateHeaders(
 
 function interpolateBody(raw: string | undefined, row: Record<string, string>): string | undefined {
     if (raw === undefined || raw === "") { return undefined; }
+
     return interpolateTemplate(raw, row);
 }
 
@@ -140,6 +144,7 @@ function withDefaultContentType(
     if (body !== undefined && headers["Content-Type"] === undefined) {
         return { ...headers, "Content-Type": "application/json" };
     }
+
     return headers;
 }
 
@@ -154,6 +159,7 @@ async function performHttpRequest(
     if (fetchOutcome.error !== null) {
         return networkFailureResult(context, fetchOutcome.error, controller.signal.aborted);
     }
+
     return processHttpResponse(fetchOutcome.response, context, params);
 }
 
@@ -167,6 +173,7 @@ async function tryFetch(
             body: context.body,
             signal: controller.signal,
         });
+
         return { response, error: null };
     } catch (err) {
         return { response: null, error: err };
@@ -184,6 +191,7 @@ async function processHttpResponse(
     if (captureOutcome.error !== null) {
         return parseErrorResult(response.status, captureOutcome.error, context);
     }
+
     return okResult(response.status, snippet, captureOutcome.captured, context);
 }
 
@@ -258,6 +266,7 @@ function okResult(
 async function safeReadSnippet(response: Response): Promise<string> {
     try {
         const text = await response.text();
+
         return text.slice(0, SNIPPET_LIMIT);
     } catch {
         return "";

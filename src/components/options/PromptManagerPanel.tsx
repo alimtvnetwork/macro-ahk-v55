@@ -461,6 +461,7 @@ export function PromptManagerPanel() {
 
         if (textFiles.length === 0 && jsonFiles.length === 0) {
             toast.error("Drop .txt, .md, .prompt, or .json files to create prompts");
+
             return;
         }
 

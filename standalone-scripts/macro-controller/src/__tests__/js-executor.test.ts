@@ -28,7 +28,6 @@ vi.mock('../constants', () => ({
 import { addLoopJsHistoryEntry, navigateLoopJsHistory, executeJs } from '../ui/js-executor';
 import { log } from '../logger';
 import { logError } from '../error-utils';
-
  
 describe('js-executor', () => {
   beforeEach(() => {

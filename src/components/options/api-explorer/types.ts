@@ -48,6 +48,7 @@ export function normalizeEndpoint(raw: Record<string, unknown>): EndpointDoc {
 /** Convert a message type like GET_PROMPTS to a pseudo-REST path */
 export function toEndpointPath(type: string): string {
   const lower = type.toLowerCase().replace(/_/g, "-");
+
   return `chrome.runtime/message/${lower}`;
 }
 
@@ -62,6 +63,7 @@ export function toPascalCaseKeys(source: Record<string, unknown>): Record<string
       result[pascal] = value;
     }
   }
+
   return result;
 }
 

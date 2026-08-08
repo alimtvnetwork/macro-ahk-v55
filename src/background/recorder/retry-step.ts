@@ -58,6 +58,7 @@ export async function retryStep(
 
     const outcome = await executeReplay([step], { ...options, Persist: persist });
     const result = outcome.Results[0];
+
     return {
         Result: result,
         StartedAt: outcome.StartedAt,
@@ -69,5 +70,6 @@ export async function retryStep(
 function buildRetryNotes(stepId: number, callerNotes: string | undefined): string {
     const tag = `Retry of step #${stepId}`;
     if (callerNotes === undefined || callerNotes.trim() === "") { return tag; }
+
     return `${tag}, ${callerNotes}`;
 }

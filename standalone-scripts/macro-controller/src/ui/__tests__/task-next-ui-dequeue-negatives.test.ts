@@ -31,6 +31,7 @@ vi.mock('../../error-utils', () => ({
 }));
 vi.mock('../prompt-utils', async (importOriginal) => {
     const actual = await importOriginal<typeof import('../prompt-utils')>();
+
     return {
         ...actual,
         showPasteToast: showPasteToastMock,

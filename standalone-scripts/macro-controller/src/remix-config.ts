@@ -46,6 +46,7 @@ interface RemixConfigInput {
 function readRaw(): Partial<RemixConfigInput> {
   const config = (window.__MARCO_CONFIG__ || {}) as Record<string, unknown>;
   const remix = config.remix as Partial<RemixConfigInput> | undefined;
+
   return remix || {};
 }
 
@@ -56,6 +57,7 @@ function isVCasing(v: RemixVCasing | undefined): v is RemixVCasing {
 /** Resolved remix config with named-constant defaults applied. */
 export function getRemixConfig(): RemixConfig {
   const raw = readRaw();
+
   return {
     defaultIncludeHistory: typeof raw.defaultIncludeHistory === 'boolean'
       ? raw.defaultIncludeHistory
@@ -87,6 +89,7 @@ export function openRemixRedirect(redirectUrl: string): void {
   const config = getRemixConfig();
   if (config.openInCurrentTab) {
     window.location.href = redirectUrl;
+
     return;
   }
   window.open(redirectUrl, '_blank', 'noopener');

@@ -86,6 +86,7 @@ function computeNextRetry(
             minRetryAt = retryAt;
         }
     }
+
     return {
         nextRetryMs: minRemaining === Number.POSITIVE_INFINITY ? 0 : minRemaining,
         nextRetryAt: minRetryAt,
@@ -100,6 +101,7 @@ function computeCategoryCounts(
         const cat = categorizeCode(t.code);
         counts.set(cat, (counts.get(cat) ?? 0) + 1);
     }
+
     return counts;
 }
 
@@ -137,6 +139,7 @@ function useDiagnosticsPolling(): {
         void fetchDiagnostics();
         pollRef.current = setInterval(() => void fetchDiagnostics(), POLL_INTERVAL_MS);
         tickRef.current = setInterval(() => setNow(Date.now()), TICK_INTERVAL_MS);
+
         return () => {
             if (pollRef.current) clearInterval(pollRef.current);
             if (tickRef.current) clearInterval(tickRef.current);
@@ -146,18 +149,18 @@ function useDiagnosticsPolling(): {
     return { data, now };
 }
 
-
 export function useTokenSeederDiagnostics(): TokenSeederDiagnosticsBag {
     const { data, now } = useDiagnosticsPolling();
     const targets = useMemo(() => data?.targets ?? [], [data]);
     const retry = useMemo(() => computeNextRetry(targets, now), [targets, now]);
     const categoryCounts = useMemo(() => computeCategoryCounts(targets), [targets]);
+
     return { targets, now, ...retry, categoryCounts };
 }
 
-
 export function formatRemaining(ms: number): string {
     if (ms <= 0) return "ready";
+
     return `${Math.ceil(ms / 1000)}s`;
 }
 
@@ -179,6 +182,7 @@ export function formatOrigin(url: string): string {
     if (!url) return "(unknown)";
     try {
         const u = new URL(url);
+
         return u.origin;
     } catch {
         return url.length > 48 ? `${url.slice(0, 48)}...` : url;

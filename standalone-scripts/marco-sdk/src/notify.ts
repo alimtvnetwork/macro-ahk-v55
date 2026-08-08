@@ -163,6 +163,7 @@ function formatRequestDetail(rd: RequestDetail): string {
     if (rd.body) lines.push("Body: " + rd.body.substring(0, 500));
     if (rd.status != null) lines.push("Response: HTTP " + rd.status + (rd.statusText ? " " + rd.statusText : ""));
     if (rd.responseBody) lines.push("Response Body: " + rd.responseBody.substring(0, 500));
+
     return lines.join("\n");
 }
 
@@ -202,6 +203,7 @@ function getOrCreateContainer(): HTMLElement {
         const target = document.body || document.documentElement;
         target.appendChild(el);
     }
+
     return el;
 }
 
@@ -236,6 +238,7 @@ function showToast(message: string, level: ToastLevel = "error", opts: ToastOpts
     // Guard: defer if DOM not ready yet
     if (!document.body && !document.documentElement) {
         setTimeout(() => showToast(message, level, opts), 50);
+
         return;
     }
     // Dedup

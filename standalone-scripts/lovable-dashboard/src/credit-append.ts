@@ -15,6 +15,7 @@ export function appendCreditToProLabel(record: WorkspaceRecord): void {
         const proEl = resolveElement(record.proLabelXPath);
         if (proEl instanceof HTMLElement) {
             upsertCreditSpan(proEl, record.creditAvailable, record.creditTotal);
+
             return;
         }
         logWarn("appendCredit", `pro label missing for "${record.name}"`);
@@ -27,6 +28,7 @@ function upsertCreditSpan(parent: HTMLElement, available: number, total: number)
     const existing = parent.querySelector<HTMLSpanElement>(`[${ATTR}="${MARKER_VALUE}"]`);
     if (existing) {
         existing.textContent = formatCredit(available, total);
+
         return;
     }
     parent.appendChild(buildSpan(available, total));
@@ -37,6 +39,7 @@ function buildSpan(available: number, total: number): HTMLSpanElement {
     span.className = CreditAppendClasses.SPAN;
     span.setAttribute(ATTR, MARKER_VALUE);
     span.textContent = formatCredit(available, total);
+
     return span;
 }
 

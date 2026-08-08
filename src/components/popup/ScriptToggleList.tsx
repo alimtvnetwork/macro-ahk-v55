@@ -112,6 +112,7 @@ export function ScriptToggleList({ scripts, onToggle, lastRunResults = [] }: Pro
                       const skipCfg = result.skipReason ? SKIP_BADGE_CONFIG[result.skipReason] : null;
                       if (!skipCfg) return null;
                       const Icon = skipCfg.icon;
+
                       return (
                         <Tooltip>
                           <TooltipTrigger asChild>

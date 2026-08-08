@@ -102,6 +102,7 @@ const TEMPLATES: Record<Reason, ReasonTemplate> = {
  */
 export function explainExportFailure(failure: ExportFailure): ExportErrorExplanation {
     const tpl: ReasonTemplate = TEMPLATES[failure.Reason] ?? TEMPLATES.InternalError;
+
     return {
         Title: tpl.Title,
         Summary: tpl.Summary,

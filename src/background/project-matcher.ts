@@ -31,6 +31,7 @@ export async function evaluateUrlMatches(
         .filter(isProjectEnabled)
         .filter(isNotDependencyOnly);
     const allMatches = collectAllMatches(enabledProjects, url);
+
     return sortByPriority(allMatches);
 }
 

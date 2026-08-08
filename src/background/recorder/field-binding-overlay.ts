@@ -149,6 +149,7 @@ function buildTitle(text: string): HTMLDivElement {
     const t = document.createElement("div");
     t.className = "title";
     t.textContent = text;
+
     return t;
 }
 
@@ -168,6 +169,7 @@ function buildColumnButton(col: string, sampleRow: FieldRow | undefined, onClick
     btn.appendChild(colPreview);
     btn.addEventListener("mousedown", (e) => { e.preventDefault(); });
     btn.addEventListener("click", () => { onClick(col); });
+
     return btn;
 }
 
@@ -184,6 +186,7 @@ function buildTemplateInput(state: State): HTMLInputElement {
     templateInput.addEventListener("mousedown", (e) => { e.stopPropagation(); });
     templateInput.addEventListener("click", (e) => { e.stopPropagation(); });
     state.templateInput = templateInput;
+
     return templateInput;
 }
 
@@ -201,6 +204,7 @@ function buildPreviewBlock(state: State): DocumentFragment {
     tagsRow.className = "tags";
     frag.appendChild(tagsRow);
     state.tagsRow = tagsRow;
+
     return frag;
 }
 
@@ -212,6 +216,7 @@ function buildComposer(state: State): HTMLDivElement {
     composer.appendChild(buildTemplateInput(state));
     composer.appendChild(buildPreviewBlock(state));
     composer.appendChild(buildComposerActions(state));
+
     return composer;
 }
 
@@ -223,6 +228,7 @@ function buildBindButton(state: State): HTMLButtonElement {
     btn.addEventListener("mousedown", (e) => { e.preventDefault(); e.stopPropagation(); });
     btn.addEventListener("click", (e) => { e.stopPropagation(); commitTemplate(state); });
     state.bindBtn = btn;
+
     return btn;
 }
 
@@ -239,6 +245,7 @@ function buildClearButton(state: State): HTMLButtonElement {
         refreshPreview(state);
         state.templateInput?.focus();
     });
+
     return btn;
 }
 
@@ -247,6 +254,7 @@ function buildComposerActions(state: State): HTMLDivElement {
     actions.className = "actions";
     actions.appendChild(buildBindButton(state));
     actions.appendChild(buildClearButton(state));
+
     return actions;
 }
 
@@ -267,6 +275,7 @@ function handleColumnClick(state: State, col: string): void {
         insertTokenIntoTemplate(state, token);
         refreshPreview(state);
         state.templateInput?.focus();
+
         return;
     }
     emitBinding(state, token);
@@ -276,6 +285,7 @@ function handleColumnClick(state: State, col: string): void {
 function insertTokenIntoTemplate(state: State, token: string): void {
     if (state.templateInput === null) {
         state.template = `${state.template}${token}`;
+
         return;
     }
     const start = state.templateInput.selectionStart ?? state.template.length;
@@ -302,6 +312,7 @@ function renderResolvedPreview(state: State, preview: HTMLElement): void {
     if (state.options.SampleRow === undefined) {
         preview.textContent = state.template;
         preview.dataset.error = "false";
+
         return;
     }
     try {
@@ -321,6 +332,7 @@ function refreshPreview(state: State): void {
         state.preview.textContent = "";
         state.preview.dataset.error = "false";
         if (state.bindBtn !== null) state.bindBtn.disabled = true;
+
         return;
     }
     renderResolvedPreview(state, state.preview);
@@ -393,7 +405,9 @@ function onMove(state: State, e: MouseEvent): void {
     if (state.pinned) { return; }
     const t = e.target;
     if (isOurNode(state, t)) { return; }
-    if (!(t instanceof HTMLElement)) { hide(state); return; }
+    if (!(t instanceof HTMLElement)) { hide(state);
+
+ return; }
     const candidate = t.closest(BINDABLE_SELECTOR);
     if (candidate instanceof HTMLElement) { show(state, candidate); }
     else { hide(state); }
@@ -435,6 +449,7 @@ function buildShadowDom(container: ParentNode): { host: HTMLElement; root: Shado
     popover.setAttribute("aria-label", "Field bindings");
     root.appendChild(popover);
     container.appendChild(host);
+
     return { host, root, popover, outline };
 }
 
@@ -446,6 +461,7 @@ function initOverlayState(options: FieldBindingOptions, container: ParentNode): 
         hovered: null, pinned: false, template: "",
     };
     renderColumns(state);
+
     return { state, root };
 }
 
@@ -454,6 +470,7 @@ function attachOverlayListeners(state: State): { move: (e: MouseEvent) => void; 
     const click = (e: MouseEvent): void => onClick(state, e);
     document.addEventListener("mousemove", move, true);
     document.addEventListener("click", click, true);
+
     return { move, click };
 }
 
@@ -467,6 +484,7 @@ export function mountFieldBindingOverlay(
     const { state, root } = initOverlayState(options, container);
     const handlers = attachOverlayListeners(state);
     let destroyed = false;
+
     return {
         Host: state.host, Root: root,
         GetHoveredTarget: () => state.hovered,

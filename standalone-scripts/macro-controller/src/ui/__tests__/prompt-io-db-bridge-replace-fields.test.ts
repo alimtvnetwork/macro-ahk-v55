@@ -40,6 +40,7 @@ describe('collectDbEntriesForExport: ReplaceKey/ReplaceValues round-trip', () =>
     it('carries replaceKey and cloned replaceValues from PromptRow into CachedPromptEntry', async () => {
         listMock.mockImplementation(async (role: string) => {
             if (role !== 'plan') return new DbResult(true, []);
+
             return {
                 ok: true,
                 value: [{
@@ -64,6 +65,7 @@ describe('collectDbEntriesForExport: ReplaceKey/ReplaceValues round-trip', () =>
     it('leaves replaceValues undefined when the row column is missing/non-array', async () => {
         listMock.mockImplementation(async (role: string) => {
             if (role !== 'next') return new DbResult(true, []);
+
             return {
                 ok: true,
                 value: [{
@@ -86,6 +88,7 @@ describe('commitDbEntries: forwards replaceKey/replaceValues/previousReplaceKey'
     it('passes previousReplaceKey from the existing row so a rename passes the drift guard', async () => {
         listMock.mockImplementation(async (role: string) => {
             if (role !== 'plan') return new DbResult(true, []);
+
             return {
                 ok: true,
                 value: [{

@@ -75,6 +75,7 @@ export function toPascalCase(raw: string): string {
 function capitaliseWord(word: string): string {
     const first = word.charAt(0).toUpperCase();
     const rest = word.slice(1).toLowerCase();
+
     return first + rest;
 }
 
@@ -102,5 +103,6 @@ export function suggestVariableName(element: Element): string {
     const result = toPascalCase(source);
 
     labelCache.set(element, result);
+
     return result;
 }

@@ -39,6 +39,7 @@ vi.mock('../../db/prompt-db', () => ({
 }));
 vi.mock('../prompt-utils', async (importOriginal) => {
     const actual = await importOriginal<typeof import('../prompt-utils')>();
+
     return {
         ...actual,
         pasteIntoEditor: pasteMock,
@@ -65,6 +66,7 @@ function makeCtx(): PromptContext {
     // Only `promptsDropdown` is read by renderPlanTaskSubmenu.
     const dropdown = document.createElement('div');
     document.body.appendChild(dropdown);
+
     return { promptsDropdown: dropdown } as unknown as PromptContext;
 }
 
@@ -75,6 +77,7 @@ function firstPresetItem(container: HTMLElement): HTMLElement {
     const first = sub.querySelector<HTMLElement>('[data-plan-preset]');
     const isMissingFirst = !first;
     if (isMissingFirst) throw new Error('no preset row');
+
     return first;
 }
 

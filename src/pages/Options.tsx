@@ -70,6 +70,7 @@ function OnboardingLoadingGate({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const timer = window.setTimeout(() => setIsStuck(true), ONBOARDING_STUCK_TIMEOUT_MS);
+
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -98,7 +99,6 @@ function OnboardingLoadingGate({ children }: { children: React.ReactNode }) {
   );
 }
 
-
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
@@ -113,6 +113,7 @@ interface ChromeRuntimeLike {
 /** Safe accessor for chrome.runtime that avoids `as any` casts. */
 function getChromeRuntime(): ChromeRuntimeLike | undefined {
   const win = globalThis as unknown as { chrome?: { runtime?: ChromeRuntimeLike } };
+
   return win.chrome?.runtime;
 }
 
@@ -190,6 +191,7 @@ const OptionsPage = () => {
     if (hash !== "" && validSections.includes(hash as SidebarSection)) {
       return { section: hash as SidebarSection, stepGroupView: "tree" };
     }
+
     return { section: "projects", stepGroupView: "tree" };
   };
   const initialHash = parseHash();
@@ -226,6 +228,7 @@ const OptionsPage = () => {
       setStepGroupView(next.stepGroupView);
     };
     window.addEventListener("hashchange", onHashChange);
+
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
@@ -465,6 +468,7 @@ const OptionsPage = () => {
                 (() => {
                   const scriptObj = scripts.find((s) => s.id === selection.scriptId);
                   if (!scriptObj) return <div className="text-sm text-muted-foreground">Script not found</div>;
+
                   return (
                     <ScriptBundleDetailView
                       script={scriptObj}
@@ -480,6 +484,7 @@ const OptionsPage = () => {
                 (() => {
                   const proj = projects.find((p) => p.id === selection.projectId);
                   if (!proj) return <div className="text-sm text-muted-foreground">Project not found</div>;
+
                   return (
                     <ProjectDetailView
                       project={proj}
@@ -644,6 +649,7 @@ function StepGroupsSection(props: {
   onViewChange: (view: StepGroupViewType) => void;
 }) {
   const { view, onViewChange } = props;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">

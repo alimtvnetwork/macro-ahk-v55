@@ -19,6 +19,7 @@ function mount(): HTMLDivElement {
   const host = document.createElement('div');
   host.appendChild(buildCountPresets());
   document.body.appendChild(host);
+
   return host;
 }
 

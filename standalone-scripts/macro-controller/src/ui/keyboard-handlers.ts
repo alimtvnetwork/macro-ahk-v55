@@ -87,6 +87,7 @@ function handleTaskNextShortcut(e: KeyboardEvent, taskNextDeps?: TaskNextDeps): 
     e.preventDefault();
     log('Ctrl+Shift+' + (preset === 10 ? '0' : String(preset)) + ' → Task Next ×' + preset);
     runTaskNextLoop(taskNextDeps, preset);
+
     return true;
   }
   if (e.key >= '1' && e.key <= '9') {
@@ -94,14 +95,17 @@ function handleTaskNextShortcut(e: KeyboardEvent, taskNextDeps?: TaskNextDeps): 
     const count = parseInt(e.key, 10);
     log('Ctrl+Shift+' + e.key + ' → Task Next ×' + count);
     runTaskNextLoop(taskNextDeps, count);
+
     return true;
   }
   if (e.key === '0') {
     e.preventDefault();
     log('Ctrl+Shift+0 → Task Next ×10');
     runTaskNextLoop(taskNextDeps, 10);
+
     return true;
   }
+
   return false;
 }
 
@@ -117,13 +121,25 @@ function handleCtrlOnlyShortcut(e: KeyboardEvent, deps: KeyboardHandlerDeps): bo
       const ta = document.getElementById('marco-js-executor');
       if (ta) ta.focus();
     }
+
     return true;
   }
-  if (e.key === ',' || e.code === 'Comma') { e.preventDefault(); showSettingsDialog(settingsDeps); return true; }
-  if (e.key === '1') { e.preventDefault(); positionLoopController(plCtx, 'bottom-left'); return true; }
-  if (e.key === '3') { e.preventDefault(); positionLoopController(plCtx, 'bottom-right'); return true; }
-  if (e.key === 'ArrowUp') { e.preventDefault(); log('Ctrl+Up → Force Move UP via API'); forceSwitch('up'); return true; }
-  if (e.key === 'ArrowDown') { e.preventDefault(); log('Ctrl+Down → Force Move DOWN via API'); forceSwitch('down'); return true; }
+  if (e.key === ',' || e.code === 'Comma') { e.preventDefault(); showSettingsDialog(settingsDeps);
+
+ return true; }
+  if (e.key === '1') { e.preventDefault(); positionLoopController(plCtx, 'bottom-left');
+
+ return true; }
+  if (e.key === '3') { e.preventDefault(); positionLoopController(plCtx, 'bottom-right');
+
+ return true; }
+  if (e.key === 'ArrowUp') { e.preventDefault(); log('Ctrl+Up → Force Move UP via API'); forceSwitch('up');
+
+ return true; }
+  if (e.key === 'ArrowDown') { e.preventDefault(); log('Ctrl+Down → Force Move DOWN via API'); forceSwitch('down');
+
+ return true; }
+
   return false;
 }
 
@@ -137,11 +153,13 @@ function handleCtrlAltShortcut(e: KeyboardEvent, deps: KeyboardHandlerDeps): boo
     const isHidden = ui.style.display === 'none';
     log('Ctrl+Alt+H pressed on MacroLoop, isHidden=' + isHidden);
     if (isHidden) restorePanel(plCtx);
+
     return true;
   }
 
   if (!isOnProjectPageForShortcut()) {
     log('Not on project page, skipping MacroLoop shortcut (letting ComboSwitch handle it)', 'skip');
+
     return true;
   }
 
@@ -157,8 +175,10 @@ function handleCtrlAltShortcut(e: KeyboardEvent, deps: KeyboardHandlerDeps): boo
       markUserGesture('keyboard-handlers/ctrl-alt-' + dir);
       startLoop(dir);
     }
+
     return true;
   }
+
   return false;
 }
 
@@ -170,7 +190,9 @@ export function registerKeyboardHandlers(deps: KeyboardHandlerDeps): void {
     if (handleTaskNextShortcut(e, deps.taskNextDeps)) return;
     const isMissingCtrlKey = !e.ctrlKey;
     if (isMissingCtrlKey) return;
-    if (!e.altKey && !e.shiftKey) { handleCtrlOnlyShortcut(e, deps); return; }
+    if (!e.altKey && !e.shiftKey) { handleCtrlOnlyShortcut(e, deps);
+
+ return; }
     if (e.altKey && !e.shiftKey) { handleCtrlAltShortcut(e, deps); }
   });
 }

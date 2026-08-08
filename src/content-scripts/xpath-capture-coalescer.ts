@@ -82,6 +82,7 @@ export function enqueueCapture(payload: CapturePayload): void {
     if (state.queue.length >= MAX_BATCH) {
         cancelTimer();
         void flushNow();
+
         return;
     }
 

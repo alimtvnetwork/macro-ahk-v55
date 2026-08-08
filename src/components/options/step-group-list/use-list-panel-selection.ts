@@ -29,6 +29,7 @@ export function useListPanelSelection(
             const next = new Set(prev);
             if (on) next.add(id);
             else next.delete(id);
+
             return next;
         });
     };
@@ -38,6 +39,7 @@ export function useListPanelSelection(
             const next = new Set(prev);
             if (on) for (const id of visibleIds) next.add(id);
             else for (const id of visibleIds) next.delete(id);
+
             return next;
         });
     };

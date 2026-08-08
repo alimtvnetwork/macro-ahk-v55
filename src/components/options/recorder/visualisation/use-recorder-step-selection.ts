@@ -43,6 +43,7 @@ function useAutoSelectFirstStep(
     useEffect(() => {
         if (data === null || data.steps.length === 0) {
             setSelectedStepId(null);
+
             return;
         }
         const stillExists = data.steps.some((s) => s.StepId === selectedStepId);
@@ -59,6 +60,7 @@ function useFetchSelectorsOnStepChange(
     useEffect(() => {
         if (selectedStepId === null) {
             setSelectors([]);
+
             return;
         }
         let cancelled = false;
@@ -66,6 +68,7 @@ function useFetchSelectorsOnStepChange(
         loadSelectors(selectedStepId)
             .then((rows) => { if (!cancelled) setSelectors(rows); })
             .finally(() => { if (!cancelled) setSelectorsLoading(false); });
+
         return () => { cancelled = true; };
     }, [selectedStepId, loadSelectors, setSelectors, setSelectorsLoading]);
 }

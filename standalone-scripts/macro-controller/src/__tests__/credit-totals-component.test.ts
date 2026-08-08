@@ -54,8 +54,10 @@ afterEach(() => {
 
 function rowNames(table: HTMLElement): string[] {
   const rows = table.querySelectorAll<HTMLElement>('[data-credit-totals-row]');
+
   return Array.from(rows).map((r) => {
     const n = r.querySelector<HTMLElement>('[data-cell="name"]');
+
     return (n?.textContent || '').trim();
   });
 }

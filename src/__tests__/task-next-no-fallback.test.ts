@@ -34,6 +34,7 @@ function findNextTasksPrompt(
     const name = (e.name || '').toLowerCase();
     if (name.indexOf('next') !== -1 && name.indexOf('task') !== -1) return e;
   }
+
   // MUST return null, never fall back to entries[0]
   return null;
 }

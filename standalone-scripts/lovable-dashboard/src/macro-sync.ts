@@ -13,9 +13,11 @@ export function syncWithMacroController(dict: WorkspaceDictionary): WorkspaceRec
         if (!isOnDashboard()) {
             return null;
         }
+
         return doSync(dict);
     } catch (caught) {
         logError("syncMacro", caught);
+
         return null;
     }
 }
@@ -28,12 +30,14 @@ function doSync(dict: WorkspaceDictionary): WorkspaceRecord | null {
     const name = readCurrentWorkspaceName();
     if (!name) {
         logWarn("syncMacro", `CODE RED: CurrentWorkspaceName missing at ${HomepageDashboardVariables.CurrentWorkspaceName.full}`);
+
         return null;
     }
     const match = findByName(dict, name);
     if (!match) {
         logWarn("syncMacro", `name "${name}" not in dictionary`);
     }
+
     return match;
 }
 

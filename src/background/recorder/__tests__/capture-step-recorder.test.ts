@@ -35,6 +35,7 @@ function freshDb(): SqlJsDatabase {
     const db = new SQL.Database();
     db.run("PRAGMA foreign_keys = ON;");
     db.run(RECORDER_DB_SCHEMA);
+
     return db;
 }
 

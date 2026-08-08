@@ -39,6 +39,7 @@ vi.mock('../db/project-chat-submit-db', () => ({
       Source: input.source, FileId: input.fileId, CharCount: input.charCount,
       CreatedAt: input.createdAt, MetaJson: input.metaJson,
     });
+
     return true;
   }),
   countChatSubmits: vi.fn(async (pid: string) => rows.filter((r) => r.ProjectId === pid).length),
@@ -51,11 +52,13 @@ vi.mock('../db/project-chat-submit-db', () => ({
   deleteChatSubmit: vi.fn(async (id: number) => {
     const before = rows.length;
     rows = rows.filter((r) => r.Id !== id);
+
     return rows.length < before;
   }),
   renameProjectChatSubmits: vi.fn(async (pid: string, newName: string) => {
     let touched = 0;
     for (const r of rows) if (r.ProjectId === pid) { r.ProjectName = newName; touched += 1; }
+
     return touched > 0;
   }),
 }));
@@ -69,6 +72,7 @@ vi.mock('../storage/chat-submit-opfs-store', () => ({
     if (!opfsFiles.has(pid)) opfsFiles.set(pid, new Map());
     const fileId = `f${opfsFileIdCounter++}`;
     opfsFiles.get(pid)!.set(fileId, text);
+
     return fileId;
   }),
   readEntry: vi.fn(async (pid: string, fid: string) => opfsFiles.get(pid)?.get(fid) ?? null),
@@ -76,6 +80,7 @@ vi.mock('../storage/chat-submit-opfs-store', () => ({
     const dir = opfsFiles.get(pid);
     if (!dir || !dir.has(fid)) return false;
     dir.delete(fid);
+
     return true;
   }),
   listProject: vi.fn(async (pid: string) => Array.from(opfsFiles.get(pid)?.keys() ?? [])),

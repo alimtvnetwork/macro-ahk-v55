@@ -45,6 +45,7 @@ function parseModifier(part: string): Partial<ParsedChord> | null {
     if (lower === "alt") return { AltKey: true };
     if (lower === "shift") return { ShiftKey: true };
     if (["meta", "cmd", "command", "super", "win"].includes(lower)) return { MetaKey: true };
+
     return MODIFIERS.has(lower) ? {} : null;
 }
 
@@ -60,6 +61,7 @@ export function parseChord(chord: string): ParsedChord {
     }
     const parts = trimmed.split("+").map((p) => p.trim()).filter((p) => p !== "");
     const parsed = parseChordParts(chord, parts);
+
     return {
         ...parsed,
         Code: keyToCode(parsed.Key),
@@ -76,6 +78,7 @@ function parseChordParts(chord: string, parts: readonly string[]): ParsedChord {
             parsed = assignChordKey(chord, parsed, part);
         }
     }
+
     return requireChordKey(chord, parsed);
 }
 
@@ -87,6 +90,7 @@ function assignChordKey(chord: string, parsed: ParsedChord, part: string): Parse
     if (parsed.Key !== "") {
         throw new Error(`parseChord: chord "${chord}" has multiple non-modifier keys ("${parsed.Key}" and "${part}")`);
     }
+
     return { ...parsed, Key: part };
 }
 
@@ -94,6 +98,7 @@ function requireChordKey(chord: string, parsed: ParsedChord): ParsedChord {
     if (parsed.Key === "") {
         throw new Error(`parseChord: chord "${chord}" has no non-modifier key`);
     }
+
     return parsed;
 }
 
@@ -110,6 +115,7 @@ function keyToCode(key: string): string {
         Up: "ArrowUp", Down: "ArrowDown", Left: "ArrowLeft", Right: "ArrowRight",
         Home: "Home", End: "End", PageUp: "PageUp", PageDown: "PageDown",
     };
+
     return map[key] ?? key;
 }
 
@@ -143,6 +149,7 @@ export function parseHotkeyPayload(json: string | null): HotkeyPayload {
     if (selector !== undefined && typeof selector !== "string") {
         throw new Error("Hotkey PayloadJson.Selector must be a string when present");
     }
+
     return {
         Keys: keys as readonly string[],
         WaitMs: typeof waitMs === "number" ? waitMs : undefined,

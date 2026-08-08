@@ -24,6 +24,7 @@ const SDK_PROJECT_ID = "RiseupMacroSdk";
 
 export function createKvApi(projectId: string = SDK_PROJECT_ID): KvApi {
     const pid = projectId && projectId.length > 0 ? projectId : SDK_PROJECT_ID;
+
     return {
         get(key: string) {
             return sendMessage<string | null>("KV_GET", { projectId: pid, key });

@@ -82,6 +82,7 @@ export function parseDeclaredStepCount(body: string):
             if (Number.isInteger(n) && n >= 0) return { kind: 'literal', value: n };
         }
     }
+
     return { kind: 'none' };
 }
 
@@ -170,6 +171,7 @@ export function validateRuleZero(body: string): RuleZeroCheck {
                 + 'Step count is law — write EXACTLY ' + expected + ' steps.',
         };
     }
+
     return {
         ok: true, expectedN: expected, actualN: actual, code: 'match',
         reason: 'Rule 0: step count matches declared N=' + expected,

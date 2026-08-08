@@ -39,12 +39,14 @@ function csvVal(v: string | number | boolean | null | undefined): string {
   if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
     return '"' + s.replace(/"/g, '""') + '"';
   }
+
   return s;
 }
 
 /** Round to 1 decimal; returns '' for non-finite. */
 function pct(count: number, denom: number): string {
   if (!Number.isFinite(count) || !Number.isFinite(denom) || denom <= 0) return '';
+
   return (Math.round((count / denom) * 1000) / 10).toFixed(1);
 }
 
@@ -74,6 +76,7 @@ function buildCsvRow(
     ? ''
     : (ws.totalCreditsUsed != null ? ws.totalCreditsUsed : (r.total_credits_used != null ? r.total_credits_used : ''));
   const availableCsv: string | number = summary.renderDash ? '' : summary.available;
+
   return [
     csvVal(ws.fullName),
     csvVal(ws.name),
@@ -175,6 +178,7 @@ export function exportWorkspacesAsCsv(): void {
   const workspaces = loopCreditState.perWorkspace;
   if (!workspaces || workspaces.length === 0) {
     log('CSV Export: No workspace data — fetch credits first (💳)', 'warn');
+
     return;
   }
 
@@ -198,6 +202,7 @@ export function exportAvailableWorkspacesAsCsv(): void {
   const workspaces = loopCreditState.perWorkspace;
   if (!workspaces || workspaces.length === 0) {
     log('CSV Export (available): No workspace data — fetch credits first (💳)', 'warn');
+
     return;
   }
 
@@ -207,6 +212,7 @@ export function exportAvailableWorkspacesAsCsv(): void {
 
   if (filtered.length === 0) {
     log('CSV Export (available): No workspaces with available credits > 0', 'warn');
+
     return;
   }
 

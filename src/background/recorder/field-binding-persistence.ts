@@ -62,6 +62,7 @@ function readDataSourceColumns(
     if (raw === undefined) {
         throw new Error(`DataSource ${dataSourceId} not found`);
     }
+
     return JSON.parse(raw as string) as ReadonlyArray<string>;
 }
 
@@ -90,6 +91,7 @@ export async function upsertFieldBinding(
     );
 
     mgr.markDirty();
+
     return readBindingByStep(db, stepId);
 }
 
@@ -107,6 +109,7 @@ function readBindingByStep(
     if (row === undefined) {
         throw new Error(`FieldBinding row missing for StepId ${stepId} after upsert`);
     }
+
     return rowToRecord(row);
 }
 
@@ -125,6 +128,7 @@ export async function listFieldBindings(
          ORDER BY FieldBindingId DESC`,
     );
     const values = result[0]?.values ?? [];
+
     return values.map(rowToRecord);
 }
 

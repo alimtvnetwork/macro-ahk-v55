@@ -76,6 +76,7 @@ function previewBody(entry: HistoryEntry): string {
   if (entry.body === null) return '(body unavailable — OPFS read failed or blob was pruned)';
   if (entry.body.length === 0) return '(empty)';
   if (entry.body.length <= PREVIEW_MAX_CHARS) return entry.body;
+
   return `${entry.body.slice(0, PREVIEW_MAX_CHARS)}…`;
 }
 
@@ -109,6 +110,7 @@ function renderRow(entry: HistoryEntry, onDelete: () => void): HTMLElement {
   row.appendChild(head);
   row.appendChild(body);
   row.appendChild(actions);
+
   return row;
 }
 
@@ -136,6 +138,7 @@ async function reloadList(projectId: string, listEl: HTMLElement, statusEl: HTML
       empty.textContent = 'No chat submissions captured for this project yet.';
       listEl.appendChild(empty);
       statusEl.textContent = '';
+
       return;
     }
     for (const entry of entries) {
@@ -161,7 +164,9 @@ async function reloadList(projectId: string, listEl: HTMLElement, statusEl: HTML
 
 export function showChatHistoryModal(): void {
   const existing = document.getElementById(MODAL_ID);
-  if (existing) { existing.remove(); return; }
+  if (existing) { existing.remove();
+
+ return; }
 
   injectStyles();
 
@@ -213,6 +218,7 @@ export function showChatHistoryModal(): void {
   if (isMissingProjectId) {
     status.textContent = 'No Lovable project detected in the current URL.';
     logError(SCOPE, 'showChatHistoryModal: no projectId in URL');
+
     return;
   }
 

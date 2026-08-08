@@ -21,6 +21,7 @@ export interface RunGroupTargetFieldProps {
 
 export function RunGroupTargetField(props: RunGroupTargetFieldProps): JSX.Element {
     const { value, candidates, onChange } = props;
+
     return (
         <div className="space-y-1">
             <LabelType htmlFor="step-target">Target group</LabelType>

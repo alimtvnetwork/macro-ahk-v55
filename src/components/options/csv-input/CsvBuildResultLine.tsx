@@ -11,6 +11,7 @@ export interface CsvBuildResultLineProps {
 
 export function CsvBuildResultLine(props: CsvBuildResultLineProps): JSX.Element {
     const { buildResult, rowIndex } = props;
+
     return (
         <div className="min-h-[1.25rem] text-xs">
             {buildResult === null ? (

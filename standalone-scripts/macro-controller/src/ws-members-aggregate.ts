@@ -51,6 +51,7 @@ export function aggregateMembers(perWs: PerWsMembers[]): {
     if (b.presenceCount !== a.presenceCount) {
       return b.presenceCount - a.presenceCount;
     }
+
     return a.fullName.localeCompare(b.fullName);
   });
 

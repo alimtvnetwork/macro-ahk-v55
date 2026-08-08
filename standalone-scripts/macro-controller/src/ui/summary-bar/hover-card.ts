@@ -48,11 +48,13 @@ function fmt(n: number): string {
     if (!Number.isFinite(n)) {
         return '0';
     }
+
     return Math.round(n).toLocaleString('en-US');
 }
 
 function row(label: string, value: string, valueColor?: string): string {
     const color = valueColor ?? cPanelFg;
+
     return ''
         + '<div style="display:flex;justify-content:space-between;gap:14px;padding:1px 0;">'
         + '<span style="color:' + cPanelFgDim + ';">' + label + '</span>'
@@ -92,6 +94,7 @@ function renderProCard(d: SummaryDetails): string {
             parts.push(row(p, fmt(d.pro.byPlan[p] ?? 0)));
         }
     }
+
     return parts.join('');
 }
 
@@ -109,6 +112,7 @@ function renderProCreditsCard(d: SummaryDetails): string {
     if (d.pro.expiringCount === 0) {
         parts.push(emptyHint('No expiring pro workspaces.'));
     }
+
     return parts.join('');
 }
 
@@ -118,18 +122,21 @@ function renderFreeCard(d: SummaryDetails): string {
     parts.push(row('Workspaces with free',   fmt(d.free.workspacesWithFree)));
     parts.push(sectionTitle('Combined'));
     parts.push(row('Pro + Free spendable',   fmt(d.grand.availableSpendable), '#86efac'));
+
     return parts.join('');
 }
 
 function renderBody(kind: SummaryPillKind, d: SummaryDetails): string {
     if (kind === 'pro')         { return renderProCard(d); }
     if (kind === 'proCredits')  { return renderProCreditsCard(d); }
+
     return renderFreeCard(d);
 }
 
 function titleFor(kind: SummaryPillKind): string {
     if (kind === 'pro')        { return '🪪 Pro workspaces'; }
     if (kind === 'proCredits') { return '💳 Pro credits'; }
+
     return '⚡ Free credits';
 }
 
@@ -177,5 +184,6 @@ export function showSummaryHoverCard(
         + titleFor(kind) + '</div>'
         + renderBody(kind, details);
     document.body.appendChild(card);
+
     return card;
 }

@@ -41,6 +41,7 @@ async function requestTargetCredits(workspace: WorkspaceCredit, requester: Credi
     return [workspace.id, await requester(workspace)];
   } catch (caught: CaughtError) {
     logFanOutFailure(workspace, caught);
+
     return [workspace.id, null];
   }
 }

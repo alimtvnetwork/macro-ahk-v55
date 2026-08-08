@@ -28,6 +28,7 @@ function markBusy(element: HTMLElement, opts: GuardOptions): { restore: () => vo
   if (opts.spinner && prevText !== null) {
     element.textContent = opts.spinner + ' ' + prevText;
   }
+
   return {
     restore(): void {
       element.removeAttribute(BUSY_ATTR);

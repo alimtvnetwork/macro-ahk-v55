@@ -94,6 +94,7 @@ export function parseCsv(raw: string, context: CsvParseContext = {}): CsvParseRe
 
     const warnings = [...tok.warnings];
     const aligned = alignRowsToHeaders(dataRows, headers.length, warnings);
+
     return { Ok: true, Delimiter: delimiter, Headers: headers, Rows: aligned, Warnings: warnings };
 }
 
@@ -104,6 +105,7 @@ function failCsv(
     source: string | null,
 ): CsvParseFailure {
     const prefix = source !== null && source.length > 0 ? `[${source}] ` : "";
+
     return { Ok: false, Reason: `${prefix}${reason} (branch: ${branch})`, LineNumber: lineNumber, Branch: branch, Source: source };
 }
 
@@ -115,6 +117,7 @@ function guardSize(raw: string, source: string | null): CsvParseFailure | null {
             null, "size-limit", source,
         );
     }
+
     return null;
 }
 
@@ -134,12 +137,16 @@ function makeTokenizerState(): TokenizerState {
 /** Consume one char while inside quotes. Returns new index (may skip an escaped quote). */
 function stepQuoted(source: string, i: number, ch: string, state: TokenizerState): number {
     if (ch === '"') {
-        if (source[i + 1] === '"') { state.field += '"'; return i + 1; }
+        if (source[i + 1] === '"') { state.field += '"';
+
+ return i + 1; }
         state.inQuotes = false;
+
         return i;
     }
     if (ch === "\n") { state.line++; }
     state.field += ch;
+
     return i;
 }
 
@@ -154,21 +161,30 @@ function commitRow(state: TokenizerState): void {
 /** Consume one char while not inside quotes. Returns new index. */
 function stepUnquoted(source: string, i: number, ch: string, delimiter: string, state: TokenizerState): number {
     if (ch === '"') {
-        if (state.field.length === 0) { state.inQuotes = true; return i; }
+        if (state.field.length === 0) { state.inQuotes = true;
+
+ return i; }
         state.field += ch;
         if (state.warnings.length < 5) {
             state.warnings.push(`Stray double-quote inside an unquoted field on line ${state.line}, kept literally.`);
         }
+
         return i;
     }
-    if (ch === delimiter) { state.row.push(state.field); state.field = ""; return i; }
+    if (ch === delimiter) { state.row.push(state.field); state.field = "";
+
+ return i; }
     if (ch === "\r") {
         const next = source[i + 1] === "\n" ? i + 1 : i;
         commitRow(state);
+
         return next;
     }
-    if (ch === "\n") { commitRow(state); return i; }
+    if (ch === "\n") { commitRow(state);
+
+ return i; }
     state.field += ch;
+
     return i;
 }
 
@@ -198,12 +214,14 @@ function tokenize(source: string, delimiter: DelimiterEnum, sourceLabel: string 
         state.row.push(state.field);
         state.records.push(state.row);
     }
+
     return { records: state.records, warnings: state.warnings, error: null };
 }
 
 function trimTrailingBlankRecords(records: string[][]): string[][] {
     const out = records.slice();
     while (out.length > 0 && out[out.length - 1].every((c) => c === "")) { out.pop(); }
+
     return out;
 }
 
@@ -211,6 +229,7 @@ function validateHeaders(headers: ReadonlyArray<string>, source: string | null):
     const dupes = findDuplicateHeaders(headers);
     if (dupes.length > 0) {
         const quoted = dupes.map((h) => `"${h}"`).join(", ");
+
         return failCsv(
             `Duplicate column header(s): ${quoted}. Each column must have a unique name.`,
             1, "duplicate-headers", source,
@@ -222,6 +241,7 @@ function validateHeaders(headers: ReadonlyArray<string>, source: string | null):
             1, "empty-header", source,
         );
     }
+
     return null;
 }
 
@@ -244,6 +264,7 @@ function alignRowsToHeaders(dataRows: string[][], width: number, warnings: strin
     }
     if (padCount > 0) { warnings.push(`${padCount} row(s) had fewer columns than the header, padded with empty strings.`); }
     if (truncCount > 0) { warnings.push(`${truncCount} row(s) had extra columns, extras were dropped.`); }
+
     return aligned;
 }
 
@@ -264,6 +285,7 @@ function detectDelimiter(source: string): DelimiterEnum {
         if (ch === ",") commas++;
         else if (ch === ";") semis++;
     }
+
     return semis > commas ? ";" : ",";
 }
 
@@ -279,11 +301,13 @@ function findDuplicateHeaders(headers: ReadonlyArray<string>): string[] {
         if (seen.has(h)) dupes.add(h);
         else seen.add(h);
     }
+
     return Array.from(dupes);
 }
 
 function formatBytes(n: number): string {
     if (n < 1024) return `${n} B`;
     if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+
     return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }

@@ -87,6 +87,7 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
   const handleAdd = async () => {
     if (!newName.trim() || !newScriptUrl.trim()) {
       toast.error("Name and Script URL are required");
+
       return;
     }
     try {
@@ -200,6 +201,7 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
           isRedirectable: false,
           maxRedirectDepth: 2,
         };
+
         return { ...u, endpoints: [...u.endpoints, ep] };
       }),
     );
@@ -209,6 +211,7 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
     setUpdaters((prev) =>
       prev.map((u) => {
         if (u.id !== updaterId) return u;
+
         return { ...u, endpoints: u.endpoints.filter((e) => e.id !== endpointId) };
       }),
     );
@@ -218,6 +221,7 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
     setUpdaters((prev) =>
       prev.map((u) => {
         if (u.id !== updaterId) return u;
+
         return {
           ...u,
           endpoints: u.endpoints.map((e) =>
@@ -238,6 +242,7 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
           sortOrder: u.steps.length,
           type: "Download",
         };
+
         return { ...u, steps: [...u.steps, step] };
       }),
     );
@@ -247,6 +252,7 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
     setUpdaters((prev) =>
       prev.map((u) => {
         if (u.id !== updaterId) return u;
+
         return { ...u, steps: u.steps.filter((s) => s.id !== stepId) };
       }),
     );
@@ -256,6 +262,7 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
     setUpdaters((prev) =>
       prev.map((u) => {
         if (u.id !== updaterId) return u;
+
         return {
           ...u,
           steps: u.steps.map((s) =>

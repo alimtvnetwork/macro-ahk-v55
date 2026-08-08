@@ -54,5 +54,6 @@ export function subscribeSelection(listener: (sel: RecorderSelection) => void): 
         listener(detail);
     };
     window.addEventListener(EVENT_NAME, handler);
+
     return () => window.removeEventListener(EVENT_NAME, handler);
 }

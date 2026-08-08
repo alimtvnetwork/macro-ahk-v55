@@ -37,12 +37,14 @@ function describeStep(stepLabel: string | null): string {
     if (stepLabel === null || stepLabel.length === 0) {
         return "After this step runs, wait for the selector below to satisfy the chosen condition before continuing.";
     }
+
     return `After "${stepLabel}" runs, wait for this selector before continuing.`;
 }
 
 export default function StepWaitDialog(props: Props) {
     const { open, onOpenChange, stepId, stepLabel, onChange } = props;
     const s = useStepWaitDialog({ open, stepId, onChange, onOpenChange });
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-lg">

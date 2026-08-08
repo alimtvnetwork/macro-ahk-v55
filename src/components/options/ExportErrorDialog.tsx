@@ -56,6 +56,7 @@ function SeverityIcon({ severity }: { severity: ExportErrorSeverity }) {
     const cls = `h-5 w-5 ${SEVERITY_STYLE[severity]}`;
     if (severity === "Selection") return <AlertTriangle className={cls} />;
     if (severity === "Bundle") return <FileWarning className={cls} />;
+
     return <AlertCircle className={cls} />;
 }
 
@@ -90,6 +91,7 @@ function ExportErrorHeader({ explanation }: { explanation: ExportErrorExplanatio
 
 function ExportErrorBody(props: { explanation: ExportErrorExplanation; ids: ReadonlyArray<number>; failure: ExportErrorExplanation["Failure"] }): JSX.Element {
     const { explanation, ids, failure } = props;
+
     return <div className="space-y-3"><p className="text-sm leading-relaxed">{explanation.Summary}</p><Suggestion text={explanation.Suggestion} /><OffendingIds ids={ids} /><TechnicalDetails ids={ids} failure={failure} /></div>;
 }
 
@@ -99,6 +101,7 @@ function Suggestion({ text }: { text: string }): JSX.Element {
 
 function OffendingIds({ ids }: { ids: ReadonlyArray<number> }): JSX.Element | null {
     if (ids.length === 0) return null;
+
     return <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2"><p className="text-xs font-medium uppercase tracking-wide text-destructive">Offending IDs ({ids.length})</p><p className="mt-1 break-words font-mono text-xs text-destructive/90">{ids.join(", ")}</p></div>;
 }
 

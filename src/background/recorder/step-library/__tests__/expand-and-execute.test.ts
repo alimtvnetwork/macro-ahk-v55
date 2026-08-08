@@ -49,16 +49,19 @@ function freshDb(): StepLibraryDb {
 function asExpansionSuccess(r: ExpansionResult): ExpansionSuccess {
     const isMissingOk = !r.Ok;
     if (isMissingOk) throw new Error(`Expected expansion success, got ${r.Reason}: ${r.ReasonDetail}`);
+
     return r;
 }
 
 function asExpansionFailure(r: ExpansionResult): ExpansionFailure {
     if (r.Ok) throw new Error(`Expected expansion failure, got plan with ${r.Steps.length} steps`);
+
     return r;
 }
 
 function asExecuteFailure(r: ExecuteRunGroupOutcome): ExecuteRunGroupFailure {
     if (r.Ok) throw new Error("Expected executeRunGroup to fail");
+
     return r;
 }
 

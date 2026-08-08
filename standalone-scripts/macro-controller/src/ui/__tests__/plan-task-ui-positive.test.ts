@@ -26,6 +26,7 @@ vi.mock('../../db/prompt-db', () => ({
 }));
 vi.mock('../prompt-utils', async (importOriginal) => {
     const actual = await importOriginal<typeof import('../prompt-utils')>();
+
     return {
         ...actual,
         pasteIntoEditor: pasteMock,
@@ -51,6 +52,7 @@ import type { PromptContext } from '../prompt-loader';
 function makeCtx(): { pctx: PromptContext; dropdown: HTMLElement } {
     const dropdown = document.createElement('div');
     document.body.appendChild(dropdown);
+
     return { pctx: { promptsDropdown: dropdown } as unknown as PromptContext, dropdown };
 }
 
@@ -58,6 +60,7 @@ function sub(container: HTMLElement): HTMLElement {
     const node = container.querySelector<HTMLElement>('[data-plan-task-sub]');
     const isMissingNode = !node;
     if (isMissingNode) throw new Error('sub not rendered');
+
     return node;
 }
 
@@ -66,6 +69,7 @@ function presetAt(container: HTMLElement, index: number): HTMLElement {
     const child = presets.item(index);
     const isMissingChild = !child;
     if (isMissingChild) throw new Error('no preset at index ' + index);
+
     return child;
 }
 
@@ -185,6 +189,7 @@ describe('plan-task-ui — positive DB-backed paths', () => {
         // Let the async refresh run.
         await waitFor(() => {
             const first = sub(container).firstElementChild as HTMLElement | null;
+
             return !!first && first.textContent === 'PlanTierType 4';
         });
 

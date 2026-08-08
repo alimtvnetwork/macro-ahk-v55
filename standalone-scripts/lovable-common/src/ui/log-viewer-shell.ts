@@ -70,6 +70,7 @@ export const mountLogViewer = (host: HTMLElement, options: LogViewerOptions): vo
     if (options.Entries.length === 0) {
         root.appendChild(buildEmptyNotice(doc));
         host.appendChild(root);
+
         return;
     }
 

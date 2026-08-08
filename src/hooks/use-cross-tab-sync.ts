@@ -36,6 +36,7 @@ export function useCrossTabSync<T>(
     useEffect(() => {
         if (isRemoteUpdate.current) {
             isRemoteUpdate.current = false;
+
             return;
         }
 

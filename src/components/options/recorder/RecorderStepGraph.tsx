@@ -49,6 +49,7 @@ export function RecorderStepGraph({ steps, selectedStepId, onSelect, onDelete, l
             links,
             projects,
         });
+
         return new Map(list.map((p) => [p.StepId, p]));
     }, [steps, links, projects]);
 
@@ -67,6 +68,7 @@ export function RecorderStepGraph({ steps, selectedStepId, onSelect, onDelete, l
             {steps.map((step) => {
                 const isSelected = step.StepId === selectedStepId;
                 const preview = previewByStepId.get(step.StepId);
+
                 return (
                     <li key={step.StepId}>
                         <div

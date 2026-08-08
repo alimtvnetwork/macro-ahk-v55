@@ -77,6 +77,7 @@ export async function handleRecorderStepInsert(
         throw new Error("RECORDER_STEP_INSERT requires projectSlug and draft");
     }
     const { step, selectors } = await insertStep(req.projectSlug, req.draft);
+
     return { isOk: true, step, selectors };
 }
 
@@ -93,6 +94,7 @@ export async function handleRecorderStepList(
         throw new Error("RECORDER_STEP_LIST requires projectSlug");
     }
     const steps = await listSteps(req.projectSlug);
+
     return { steps };
 }
 
@@ -115,6 +117,7 @@ export async function handleRecorderStepSelectorsList(
         );
     }
     const selectors = await listSelectors(req.projectSlug, req.stepId);
+
     return { selectors };
 }
 
@@ -130,6 +133,7 @@ export async function handleRecorderStepDelete(
         throw new Error("RECORDER_STEP_DELETE requires projectSlug and stepId");
     }
     await deleteStep(req.projectSlug, req.stepId);
+
     return { isOk: true };
 }
 
@@ -149,6 +153,7 @@ export async function handleRecorderStepResolve(
         throw new Error(`Step ${req.stepId} has no selectors persisted`);
     }
     const resolved = resolveStepSelector(selectors);
+
     return { resolved };
 }
 
@@ -176,6 +181,7 @@ export async function handleRecorderStepRename(
         req.stepId,
         req.newVariableName,
     );
+
     return { isOk: true, step };
 }
 
@@ -197,6 +203,7 @@ export async function handleRecorderStepUpdateMeta(
         throw new Error("RECORDER_STEP_UPDATE_META requires projectSlug, stepId, patch");
     }
     const step = await updateStepMeta(req.projectSlug, req.stepId, req.patch);
+
     return { isOk: true, step };
 }
 
@@ -214,6 +221,7 @@ export async function handleRecorderStepTagsSet(
         throw new Error("RECORDER_STEP_TAGS_SET requires projectSlug, stepId, tags[]");
     }
     const tags = await setStepTags(req.projectSlug, req.stepId, req.tags);
+
     return { isOk: true, tags };
 }
 
@@ -235,5 +243,6 @@ export async function handleRecorderStepLinkSet(
         );
     }
     const step = await setStepLink(req.projectSlug, req.stepId, req.slot, req.targetProjectSlug ?? null);
+
     return { isOk: true, step };
 }

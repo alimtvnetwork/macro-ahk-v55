@@ -82,11 +82,13 @@ const reasonForStatus = (status: number): string => {
     if (status === 429) return "Rate Limited — STOP all calls to this host immediately.";
     if (status >= HttpCodes.INTERNAL_SERVER_ERROR && status < 600) return `Server Error ${status} — do NOT retry; surface to user.`;
     if (status >= HttpCodes.BAD_REQUEST && status < HttpCodes.INTERNAL_SERVER_ERROR) return `Client Error ${status} — bad request shape or auth; do NOT retry.`;
+
     return `Unexpected HTTP status ${status}.`;
 };
 
 const truncateBody = (text: string): string => {
     if (text.length <= BODY_SNIPPET_MAX) return text;
+
     return text.slice(0, BODY_SNIPPET_MAX) + "…[truncated]";
 };
 
@@ -118,6 +120,7 @@ export class HttpFailFastError extends Error {
     /** Mandatory HEFF report shape (spec §5). */
     public toReportString(): string {
         const body = this.bodySnippet === null ? "null" : this.bodySnippet;
+
         return [
             `HTTP ${this.status} on ${this.method} ${this.url}`,
             `Body: ${body}`,
@@ -129,6 +132,7 @@ export class HttpFailFastError extends Error {
     /** True for network/DNS/refused errors. Always false here. */
     public static isNetworkError(err: unknown): boolean {
         if (err instanceof HttpFailFastError) return false;
+
         return err instanceof TypeError;
     }
 }
@@ -168,5 +172,6 @@ export const httpFailFast = async (response: Response, context: HttpCallContext)
 export const httpFetchOrThrow = async (url: string, init?: RequestInit): Promise<Response> => {
     const method = (init?.method ?? "GET").toUpperCase();
     const response = ServiceResult.wrapFetch(await fetch(url, init));
+
     return httpFailFast(response, { method, url });
 };

@@ -39,7 +39,6 @@ class WsNavState {
   }
 
   getIndex(): number {
-
     return this.navIndex;
   }
 
@@ -50,7 +49,6 @@ class WsNavState {
 
 /** Shorthand for singleton access. */
 function navState(): WsNavState {
-
   return WsNavState.getInstance();
 }
 
@@ -167,6 +165,7 @@ function resolveFromKeyboardNav(): { wsId: string; wsName: string } | null {
   const wsId = navItem.getAttribute(DataAttrType.WsId) || '';
   const wsName = navItem.getAttribute('data-ws-name') || '';
   log('Move fallback: using keyboard-navigated item idx=' + currentNavIndex + ' (' + wsName + ')', 'info');
+
   return { wsId, wsName };
 }
 
@@ -183,6 +182,7 @@ function resolveFromCheckedBox(): { wsId: string; wsName: string } | null {
   log('Move fallback: using first checked workspace id=' + firstCheckedId + ' (' + wsName + ')'
     + (checkedIds.length > 1 ? ' [' + (checkedIds.length - 1) + ' other checks ignored]' : ''),
     'info');
+
   return { wsId: firstCheckedId, wsName };
 }
 
@@ -207,6 +207,7 @@ export function triggerLoopMoveFromSelection(): void {
     log('No workspace selected for move', 'warn');
     updateLoopMoveStatus('error', 'Select a workspace first');
     showToast('Select a different workspace first, then press Move', 'warn', { noStop: true });
+
     return;
   }
 
@@ -220,13 +221,13 @@ export function triggerLoopMoveFromSelection(): void {
     log('Move blocked: target workspace is already current -> ' + wsName, 'warn');
     updateLoopMoveStatus('error', 'Already on this workspace');
     showToast('You are already in this workspace — select a different one', 'info', { noStop: true });
+
     return;
   }
 
   log('Moving project to workspace=' + wsId + ' (' + wsName + ')', 'delegate');
   moveToWorkspace(wsId, wsName || '');
 }
-
 
 /** Apply active highlight styles to a navigated workspace row. */
 function highlightActiveItem(item: Element): void {

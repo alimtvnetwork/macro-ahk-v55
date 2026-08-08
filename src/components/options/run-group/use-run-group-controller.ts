@@ -14,6 +14,7 @@ const previewExecutor: LeafStepExecutor = () => null;
 
 export function formatDuration(ms: number): string {
     if (ms < 1000) return `${ms} ms`;
+
     return `${(ms / 1000).toFixed(2)} s`;
 }
 
@@ -43,6 +44,7 @@ export function useRunGroupController(args: UseRunGroupControllerArgs) {
     const handleRun = useCallback(async () => {
         if (db === null || projectId === null || group === null) {
             toast.error("Library not ready");
+
             return;
         }
         setRunning(true);
@@ -69,6 +71,7 @@ export function useRunGroupController(args: UseRunGroupControllerArgs) {
 
     const summaryReports = useMemo<ReadonlyArray<BatchGroupReport>>(() => {
         if (result === null || group === null) return [];
+
         return [{
             StepGroupId: group.StepGroupId,
             Status: result.Ok ? "Succeeded" : "Failed",

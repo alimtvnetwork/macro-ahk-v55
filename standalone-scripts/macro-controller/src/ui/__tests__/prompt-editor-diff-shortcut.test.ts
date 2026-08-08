@@ -19,11 +19,11 @@ import { clearDiffPrefs } from './helpers/clear-diff-prefs';
 
 beforeEach(() => { document.body.innerHTML = ''; clearDiffPrefs(); });
 
-
 function dispatchCtrlD(target: EventTarget, opts?: Partial<KeyboardEventInit>): boolean {
   const ev = new KeyboardEvent('keydown', {
     key: 'd', code: 'KeyD', ctrlKey: true, bubbles: true, cancelable: true, ...opts,
   });
+
   return target.dispatchEvent(ev);
 }
 
@@ -40,6 +40,7 @@ function openEditModalOnSeed(): {
   const overlay = document.getElementById('marco-prompt-modal')!;
   const diffBtn = overlay.querySelector<HTMLButtonElement>('[data-testid="prompt-editor-diff-toggle"]')!;
   const diffHost = overlay.querySelector<HTMLElement>('[data-testid="prompt-editor-diff-host"]')!;
+
   return { overlay, diffBtn, diffHost };
 }
 

@@ -144,6 +144,7 @@ export function InjectionOrderPreview({ project, allProjects, globalProjects, de
               const count = entries.filter((e) => e.stage === stage).length;
               if (count === 0) return null;
               const Icon = stageIcon(stage);
+
               return (
                 <span key={stage} className={`inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded-full border ${stageColor(stage)}`}>
                   <Icon className="h-2.5 w-2.5" />

@@ -64,11 +64,13 @@ async function runCspProbe(): Promise<CspProbeResult> {
     const at = new Date().toISOString();
     try {
         await WebAssembly.instantiate(WASM_PROBE_BYTES);
+
         return { isAllowed: true, rawError: null, blockingDirective: null, missingSource: null, at };
     } catch (probeError) {
         const message = probeError instanceof Error ? probeError.message : String(probeError);
         const directiveMatch = CSP_DIRECTIVE_REGEX.exec(message);
         const sourceMatch = CSP_SOURCE_REGEX.exec(message);
+
         return {
             isAllowed: false,
             rawError: message,
@@ -89,6 +91,7 @@ function readDeclaredCsp(): string | null {
         const manifest = chr?.runtime?.getManifest?.();
         if (manifest === undefined || manifest === null) return null;
         const csp = (manifest as { content_security_policy?: { extension_pages?: string } }).content_security_policy;
+
         return csp?.extension_pages ?? null;
     } catch {
         return null;
@@ -124,6 +127,7 @@ function evaluateBootInit(
             : null;
         const errorDetail = bootError ?? "(no error message captured)";
         const detail = headDetail !== null ? `${errorDetail}\n\n${headDetail}` : errorDetail;
+
         return { outcome: "failed", summary: `sql.js WASM initialization failed at step "${step}".`, detail };
     }
 
@@ -214,6 +218,7 @@ function buildReport(args: {
     lines.push(declaredCsp ?? "(unable to read manifest CSP)");
     lines.push("");
     lines.push("═══════════════════════════════════════════");
+
     return lines.join("\n");
 }
 
@@ -459,6 +464,7 @@ function classifyFixScenario(
     if (isCspProbeBlocked) return "csp_blocked_unknown_cause";
     if (bootMentionsCsp) return "stale_build_reload_needed";
     if (bootError !== null && bootError !== "") return "boot_failed_non_csp";
+
     return "all_clear";
 }
 

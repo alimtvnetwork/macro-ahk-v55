@@ -108,11 +108,13 @@ function buildTree(files: ProjectFile[]): FileNode[] {
   const sortNodes = (nodes: FileNode[]) => {
     nodes.sort((a, b) => {
       if (a.isDir !== b.isDir) return a.isDir ? -1 : 1;
+
       return a.name.localeCompare(b.name);
     });
     nodes.forEach((n) => n.isDir && sortNodes(n.children));
   };
   sortNodes(root.children);
+
   return root.children;
 }
 
@@ -120,6 +122,7 @@ function getLanguage(filename: string): LanguageEnum {
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
   if (ext === "json") return "json";
   if (["md", "markdown", "txt", "prompt"].includes(ext)) return "markdown";
+
   return "javascript";
 }
 
@@ -135,16 +138,19 @@ const BINARY_EXTS = new Set([
 
 function isBinaryFile(filename: string): boolean {
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
+
   return BINARY_EXTS.has(ext);
 }
 
 function isImageFile(filename: string): boolean {
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
+
   return IMAGE_EXTS.has(ext);
 }
 
 function isPdfFile(filename: string): boolean {
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
+
   return PDF_EXTS.has(ext);
 }
 
@@ -156,6 +162,7 @@ function buildDataUrl(base64: string, mimeType: string): string {
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
@@ -195,6 +202,7 @@ function guessMime(filename: string): string {
     svg: "image/svg+xml",
     pdf: "application/pdf",
   };
+
   return map[ext] ?? "application/octet-stream";
 }
 
@@ -256,6 +264,7 @@ function TreeNode({
     const sourcePath = e.dataTransfer.getData("application/x-marco-file-path");
     if (sourcePath && onMoveFile) {
       onMoveFile(sourcePath, node.path);
+
       return;
     }
 
@@ -479,6 +488,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
     const newName = renameValue.trim();
     if (newName === selectedFile.filename) {
       setRenaming(false);
+
       return;
     }
     setSaving(true);
@@ -609,6 +619,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
       const next = new Set(prev);
       if (next.has(path)) next.delete(path);
       else next.add(path);
+
       return next;
     });
   };

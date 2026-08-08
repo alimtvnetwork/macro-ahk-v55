@@ -44,6 +44,7 @@ function validateUserAddedEntriesState(raw: {
   const skipped = Number.isFinite(raw.defaultsSkipped) && (raw.defaultsSkipped as number) >= 0
     ? (raw.defaultsSkipped as number)
     : 0;
+
   return { entries, defaultsSkipped: skipped };
 }
 
@@ -56,6 +57,7 @@ export function buildHeaderPill(label: string, title: string, onClick: (e: Event
   pill.onmouseover = function() { pill.style.background = 'rgba(124,58,237,0.85)'; };
   pill.onmouseout = function() { pill.style.background = 'rgba(124,58,237,0.55)'; };
   pill.onclick = onClick;
+
   return pill;
 }
 
@@ -81,6 +83,7 @@ function todayIso(): string {
 async function readUserAddedEntries(): Promise<UserAddedEntriesState> {
   const io = await import('./prompt-io');
   const raw = await io.collectAllExportEntries();
+
   return validateUserAddedEntriesState(io.filterUserAddedEntries(raw));
 }
 
@@ -91,7 +94,9 @@ async function exportAsJson(): Promise<void> {
 
 async function exportAsZip(): Promise<void> {
   const { entries, defaultsSkipped } = await readUserAddedEntries();
-  if (entries.length === 0) { showPasteToast('No user prompts to export', true); return; }
+  if (entries.length === 0) { showPasteToast('No user prompts to export', true);
+
+ return; }
   const zip = await import('./prompt-io-zip');
   const state = await import('../shared-state');
   const result = zip.buildPromptsZip(entries, state.VERSION);
@@ -102,7 +107,9 @@ async function exportAsZip(): Promise<void> {
 
 async function exportAsSqlite(): Promise<void> {
   const { entries, defaultsSkipped } = await readUserAddedEntries();
-  if (entries.length === 0) { showPasteToast('No user prompts to export', true); return; }
+  if (entries.length === 0) { showPasteToast('No user prompts to export', true);
+
+ return; }
   const sqlite = await import('./prompt-io-sqlite');
   const state = await import('../shared-state');
   const result = await sqlite.buildPromptsSqlite(entries, state.VERSION);
@@ -125,6 +132,7 @@ function makeExportOption(pop: HTMLElement, label: string, run: () => Promise<vo
       showPasteToast('❌ Export failed: ' + String(err), true);
     });
   };
+
   return option;
 }
 
@@ -138,6 +146,7 @@ function buildExportPopover(anchor: HTMLElement): HTMLElement {
   pop.appendChild(makeExportOption(pop, '📄 JSON file', exportAsJson));
   pop.appendChild(makeExportOption(pop, '📦 ZIP bundle', exportAsZip));
   pop.appendChild(makeExportOption(pop, '🗄️ SQLite DB', exportAsSqlite));
+
   return pop;
 }
 
@@ -149,7 +158,9 @@ function attachPopoverToggle(
   e.stopPropagation();
   const target = e.currentTarget as HTMLElement;
   const existing = document.querySelector(popoverSelector);
-  if (existing) { existing.remove(); return; }
+  if (existing) { existing.remove();
+
+ return; }
   const pop = buildPopover(target);
   document.body.appendChild(pop);
   const dismiss = function(ev: Event): void {
@@ -199,6 +210,7 @@ function makeIoSectionHeader(text: string): HTMLElement {
   const h = document.createElement('div');
   h.textContent = text;
   h.style.cssText = 'font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#c4b5fd;padding:2px 6px;margin-top:2px;';
+
   return h;
 }
 
@@ -223,6 +235,7 @@ function makeIoOptionRow(pop: HTMLElement, label: string, run: () => Promise<voi
       showPasteToast('❌ ' + label + ' failed: ' + String(err), true);
     }
   };
+
   return row;
 }
 
@@ -266,6 +279,7 @@ function buildImportExportPopover(anchor: HTMLElement, rerender: Rerender): HTML
   pop.appendChild(makeIoSectionHeader('Import'));
   pop.appendChild(makeIoOptionRow(pop, '📥 Import file…', function() { openImportModalFromPill(rerender); }));
   pop.appendChild(makeIoOptionRow(pop, '🛠 Advanced IO dialog', openLegacyIoDialog));
+
   return pop;
 }
 
@@ -286,7 +300,9 @@ export function buildImportExportButton(rerender: Rerender): HTMLElement {
 }
 
 async function finalizeImport(valid: CachedPromptEntry[], label: string, rerender: Rerender): Promise<void> {
-  if (valid.length === 0) { showPasteToast('❌ ' + label + ' contained no valid entries', true); return; }
+  if (valid.length === 0) { showPasteToast('❌ ' + label + ' contained no valid entries', true);
+
+ return; }
   const io = await import('./prompt-io');
   const results = await io.performPromptImport(valid, { overwrite: true });
   showPasteToast(label + ': ' + results.added + ' new, ' + results.updated + ' updated', false);
@@ -318,6 +334,7 @@ async function runPromptImport(text: string, rerender: Rerender): Promise<void> 
     const parsed = (io as { parsePromptsText: (t: string) => { valid: CachedPromptEntry[]; errors: string[] } }).parsePromptsText(text);
     if (parsed.errors.length && parsed.valid.length === 0) {
       showPasteToast('❌ Import failed: ' + parsed.errors[0], true);
+
       return;
     }
     const results = await (io as { performPromptImport: (p: CachedPromptEntry[], o?: { overwrite?: boolean }) => Promise<{ added: number; updated: number }> })
@@ -339,8 +356,12 @@ export async function dispatchImportFile(file: File, rerender: Rerender): Promis
     const bytes = new Uint8Array(await file.arrayBuffer());
     const detector = await import('./prompt-io-format-detect');
     const detection = detector.detectBundleFormat(bytes);
-    if (detection.format === 'zip') { await runZipImport(bytes, rerender); return; }
-    if (detection.format === 'sqlite') { await runSqliteImport(bytes, rerender); return; }
+    if (detection.format === 'zip') { await runZipImport(bytes, rerender);
+
+ return; }
+    if (detection.format === 'sqlite') { await runSqliteImport(bytes, rerender);
+
+ return; }
     const text = new TextDecoder('utf-8').decode(bytes);
     await runPromptImport(text, rerender);
   } catch (err) {

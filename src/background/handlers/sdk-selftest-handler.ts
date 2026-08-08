@@ -72,6 +72,7 @@ async function readSnapshot(): Promise<SdkSelfTestSnapshot> {
         if (!raw || typeof raw !== "object") {
             return { ...EMPTY_SNAPSHOT };
         }
+
         return {
             sync: normalizeRow(raw.sync),
             kv: normalizeRow(raw.kv),
@@ -92,6 +93,7 @@ function normalizeRow(value: unknown): SdkSelfTestRow | null {
     if (typeof r.surface !== "string" || !VALID_SURFACES.includes(r.surface as Surface)) {
         return null;
     }
+
     return {
         surface: r.surface as Surface,
         pass: r.pass === true,
@@ -168,6 +170,7 @@ export async function handleSdkSelfTestReport(
  */
 export async function handleGetSdkSelfTest(): Promise<{ snapshot: SdkSelfTestSnapshot }> {
     const snapshot = await readSnapshot();
+
     return { snapshot };
 }
 

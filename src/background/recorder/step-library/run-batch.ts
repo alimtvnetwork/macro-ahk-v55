@@ -129,6 +129,7 @@ async function runOneGroup(
     };
     reports[i] = final;
     emit(opts.onGroupStatus, final, i);
+
     return { ok: result.Ok };
 }
 
@@ -164,6 +165,7 @@ async function iterateGroups(
         if (outcome.ok) succeeded++; else failed++;
         if (!outcome.ok && policy === 'StopOnFailure') aborted = true;
     }
+
     return { succeeded, failed };
 }
 
@@ -173,6 +175,7 @@ function summarize(
     durationMs: number,
 ): RunBatchResult {
     const skipped = reports.length - totals.succeeded - totals.failed;
+
     return {
         Ok: totals.failed === 0 && skipped === 0,
         TotalGroups: reports.length,
@@ -190,5 +193,6 @@ export async function runBatch(opts: RunBatchOptions): Promise<RunBatchResult> {
     const reports: BatchGroupReport[] = opts.orderedGroupIds.map(emptyReport);
     const batchStart = now();
     const totals = await iterateGroups(opts, reports, now, policy);
+
     return summarize(reports, totals, now().getTime() - batchStart.getTime());
 }

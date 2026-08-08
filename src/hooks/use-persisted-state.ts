@@ -45,9 +45,11 @@ function readPersisted<T>(key: string, initial: T, decode: (raw: unknown) => T |
         if (raw === null) return initial;
         const parsed = JSON.parse(raw) as unknown;
         const decoded = decode(parsed);
+
         return decoded === undefined ? initial : decoded;
     } catch (err) {
         console.warn(`[usePersistedState] failed to read "${key}":`, err);
+
         return initial;
     }
 }
@@ -59,6 +61,7 @@ export function decodeNumberSet(raw: unknown): Set<number> | undefined {
     for (const v of raw) {
         if (typeof v === "number" && Number.isFinite(v)) out.add(v);
     }
+
     return out;
 }
 
@@ -66,5 +69,6 @@ export function decodeNumberSet(raw: unknown): Set<number> | undefined {
 export function decodeNullableNumber(raw: unknown): number | null | undefined {
     if (raw === null) return null;
     if (typeof raw === "number" && Number.isFinite(raw)) return raw;
+
     return undefined;
 }

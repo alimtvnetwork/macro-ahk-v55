@@ -83,6 +83,7 @@ export class MacroController {
     if (isMissing_instance) {
       MacroController._instance = new MacroController();
     }
+
     return MacroController._instance;
   }
 
@@ -130,6 +131,7 @@ export class MacroController {
       const isMissing_auth = !this._auth;
       if (isMissing_auth) throw this._notRegisteredError('AuthManager');
     }
+
     return this._auth;
   }
 
@@ -144,6 +146,7 @@ export class MacroController {
       const isMissing_credits = !this._credits;
       if (isMissing_credits) throw this._notRegisteredError('CreditManager');
     }
+
     return this._credits;
   }
 
@@ -158,6 +161,7 @@ export class MacroController {
       const isMissing_workspaces = !this._workspaces;
       if (isMissing_workspaces) throw this._notRegisteredError('WorkspaceManager');
     }
+
     return this._workspaces;
   }
 
@@ -172,6 +176,7 @@ export class MacroController {
       const isMissing_loop = !this._loop;
       if (isMissing_loop) throw this._notRegisteredError('LoopEngine');
     }
+
     return this._loop;
   }
 
@@ -188,6 +193,7 @@ export class MacroController {
         this._ui = factory();
       }
     }
+
     return this._ui;
   }
 
@@ -225,6 +231,7 @@ export class MacroController {
     try {
       factoryStatus = factoryKeys.map(([nsPath]) => {
         const f = nsReadTyped(nsPath as keyof import('../api-namespace').NsPathMap);
+
         return `  ${nsPath}: ${f ? '✅ available' : '❌ missing'}`;
       }).join('\n');
     } catch (e) {

@@ -17,7 +17,6 @@ import { state } from '../shared-state';
 import type { BulkRenameEntry, BulkRenameResults, WorkspaceCredit } from '../types';
 
 export class WorkspaceManager implements WorkspaceManagerInterface {
-
   /** Auto-detect current workspace (Tier 1 API → Tier 2 XPath → Tier 3 default) */
   detect(token: string): Promise<void> {
     return autoDetectLoopCurrentWorkspace(token);

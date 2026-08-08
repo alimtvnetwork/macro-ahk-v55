@@ -44,6 +44,7 @@ export async function getCastleRequestToken(): Promise<string> {
     const isMissingCastle = !castle;
     if (isMissingCastle) {
         log('Castle: window._castle missing — request will go without x-castle-request-token', 'warn');
+
         return '';
     }
     try {
@@ -56,13 +57,16 @@ export async function getCastleRequestToken(): Promise<string> {
         const raced = await Promise.race<Promise<string | null>>([tokenPromise, timeoutPromise]);
         if (raced == null) {
             log('Castle: createRequestToken timed out after ' + CASTLE_TIMEOUT_MS + 'ms', 'warn');
+
             return '';
         }
         const token = String(raced);
         log('Castle: request token resolved (len=' + token.length + ')', 'info');
+
         return token;
     } catch (err: unknown) {
         logError('Castle.createRequestToken', 'SDK threw while creating request token', err);
+
         return '';
     }
 }

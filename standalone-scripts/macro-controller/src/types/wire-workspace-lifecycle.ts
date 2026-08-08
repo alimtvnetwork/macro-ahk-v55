@@ -33,12 +33,14 @@ export interface WireWorkspaceLifecycle {
 function readNestedRecord(source: Record<string, unknown>, key: string): Record<string, unknown> {
   const value = source[key];
   if (value === null || typeof value !== 'object') return {};
+
   return value as Record<string, unknown>;
 }
 
 export function toWireWorkspaceLifecycle(source: Record<string, unknown>): WireWorkspaceLifecycle {
   const expFeatures = readNestedRecord(source, 'experimental_features');
   const membership = readNestedRecord(source, 'membership');
+
   return {
     subscription_status: readStr(source, 'subscription_status'),
     subscription_status_changed_at: readStr(source, 'subscription_status_changed_at'),

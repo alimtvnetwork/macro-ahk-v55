@@ -1,4 +1,3 @@
- 
 import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Settings Dialog
@@ -89,6 +88,7 @@ function makeField(label: string, value: string, opts?: FieldOptions) {
     h.textContent = o.hint;
     row.appendChild(h);
   }
+
   return { row, input: inp };
 }
 
@@ -106,6 +106,7 @@ function onSettingsEsc(overlay: HTMLElement): (e: KeyboardEvent) => void {
   const handler = function(e: KeyboardEvent) {
     if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', handler); }
   };
+
   return handler;
 }
 
@@ -114,7 +115,9 @@ function onSettingsEsc(overlay: HTMLElement): (e: KeyboardEvent) => void {
 // ============================================
 export function showSettingsDialog(deps: SettingsDeps) {
   const existing = document.getElementById('macroloop-settings-dialog');
-  if (existing) { existing.remove(); return; }
+  if (existing) { existing.remove();
+
+ return; }
 
   const { btnStyle, getPromptsConfig } = deps;
   const tFontSystem = '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif';
@@ -145,6 +148,7 @@ function _buildSettingsDialogShell(tFontSystem: string): HTMLElement {
   dialog.style.cssText = CssFragmentType.Background + cPanelBg + ';border:1px solid ' + cPanelBorder + ';border-radius:12px;padding:0;max-width:560px;width:92%;max-height:80vh;display:flex;flex-direction:column;color:' + cPanelText + ';font-family:' + tFontSystem + ';box-shadow:0 25px 60px rgba(0,0,0,0.5);';
   dialog.className = 'marco-enter';
   dialog.onclick = function(e) { e.stopPropagation(); };
+
   return dialog;
 }
 
@@ -162,6 +166,7 @@ function _buildSettingsHeader(_fontSystem: string, overlay: HTMLElement): HTMLEl
   hdrClose.onclick = function() { overlay.remove(); };
   hdr.appendChild(hdrTitle);
   hdr.appendChild(hdrClose);
+
   return hdr;
 }
 
@@ -233,7 +238,6 @@ function _buildSettingsFooter(btnStyle: string, deps: SettingsDeps, _panels: HTM
   saveBtn2.style.cssText = btnStyle + CssFragmentType.Background + cSuccess + ';color:#1e1e2e;padding:6px 20px;font-size:12px;font-weight:600;';
   saveBtn2.onclick = function() {
     _persistOverrideToggles(generalResult, timingResult).then(function() {
-
       log('Settings saved', 'info');
       showToast('✅ Settings saved', 'info');
       overlay.remove();
@@ -248,6 +252,7 @@ function _buildSettingsFooter(btnStyle: string, deps: SettingsDeps, _panels: HTM
   footer.appendChild(exportBtn);
   footer.appendChild(importBtn);
   footer.appendChild(saveBtn2);
+
   return footer;
 }
 
@@ -284,8 +289,10 @@ function _importOverridesJson(
       const parsed = JSON.parse(text) as { kind?: string; overrides?: Record<string, unknown> };
       if (parsed.kind !== 'macro-controller.settings-overrides' || !parsed.overrides) {
         showToast('❌ Invalid overrides file', 'error');
+
         return;
       }
+
       return saveSettingsOverrides(parsed.overrides).then(function() {
         deps.log('Settings overrides imported', 'success');
         showToast('✅ Overrides imported — reopen Settings to refresh', 'info');
@@ -337,8 +344,6 @@ async function _persistOverrideToggles(generalResult: GeneralPanelResult, timing
   if (timingResult.inputs) {
     _applyTimingInputOverrides(timingResult.inputs, next);
   }
-
-
 
   await saveSettingsOverrides(next);
 }

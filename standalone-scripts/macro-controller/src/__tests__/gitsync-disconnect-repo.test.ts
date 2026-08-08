@@ -27,6 +27,7 @@ function installSdkMock(handler: () => { ok: boolean; status: number; data: unkn
             api: {
                 call: async (path: string, opts: { method?: string; params: Record<string, string> }) => {
                     sdkCalls.push({ path, method: opts.method, params: opts.params });
+
                     return handler();
                 },
             },
@@ -86,7 +87,9 @@ describe('disconnectGithubRepo', () => {
 
     it('makes a single SDK call (no retry)', async () => {
         let calls = 0;
-        installSdkMock(() => { calls++; return { ok: false, status: 502, data: {} }; });
+        installSdkMock(() => { calls++;
+
+ return { ok: false, status: 502, data: {} }; });
         const { disconnectGithubRepo } = await import('../gitsync/disconnect-repo');
         await disconnectGithubRepo('ws-4', 'pid-4');
         expect(calls).toBe(1);

@@ -30,11 +30,13 @@ function freshDb() {
     const db = new SQL.Database();
     db.run("PRAGMA foreign_keys = ON;");
     db.run(RECORDER_DB_SCHEMA);
+
     return db;
 }
 
 function rowCount(db: ReturnType<typeof freshDb>, table: string): number {
     const result = db.exec(`SELECT COUNT(*) FROM ${table}`);
+
     return result[0].values[0][0] as number;
 }
 

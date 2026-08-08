@@ -54,18 +54,21 @@ export function normalizeSubscriptionStatus(s: string | null | undefined): strin
 /** True for canceled / cancelled (US + UK spelling). */
 export function isCanceledStatus(s: string | null | undefined): boolean {
   const n = normalizeSubscriptionStatus(s);
+
   return n === SubscriptionStatusType.CANCELED || n === SubscriptionStatusType.CANCELLED;
 }
 
 /** True for past_due / unpaid — Stripe's "needs payment, grants still live" states. */
 export function isPastDueStatus(s: string | null | undefined): boolean {
   const n = normalizeSubscriptionStatus(s);
+
   return n === SubscriptionStatusType.PAST_DUE || n === SubscriptionStatusType.UNPAID;
 }
 
 /** True for active / trialing — healthy subscriptions. */
 export function isHealthyStatus(s: string | null | undefined): boolean {
   const n = normalizeSubscriptionStatus(s);
+
   return n === SubscriptionStatusType.ACTIVE || n === SubscriptionStatusType.TRIALING;
 }
 

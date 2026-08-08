@@ -29,6 +29,7 @@ const STORAGE_KEY = 'marco_settings_overrides_v1';
 function logSettings(message: string, type: string): void {
   if (typeof importedLog === 'function') {
     importedLog(message, type);
+
     return;
   }
   logError('SettingsStore', 'logging unavailable: ' + message);
@@ -83,9 +84,6 @@ export interface SettingsOverrides {
   /** Persistent task-queue max size per project. Default 200. */
   maxQueueSize?: number | undefined;
 
-
-
-
   /**
    * Per-workspace lifecycle overrides keyed by workspace id (string UUID).
    * Values here override the global `expiryGracePeriodDays` /
@@ -131,6 +129,7 @@ function sanitizePerWorkspace(
       out[wsId] = entry;
     }
   }
+
   return Object.keys(out).length > 0 ? out : undefined;
 }
 
@@ -189,6 +188,7 @@ function sanitize(raw: unknown): SettingsOverrides {
   if (perWs) {
     out.perWorkspace = perWs;
   }
+
   return out;
 }
 
@@ -216,6 +216,7 @@ function readFromLocalStorage(): unknown {
   if (!hasLocalStorage()) return undefined;
   try {
     const raw = window.localStorage.getItem(LS_KEY);
+
     return raw ? JSON.parse(raw) : undefined;
   } catch (_e: unknown) { return undefined; } // allow-swallow: corrupt JSON falls back to defaults.
 }
@@ -224,6 +225,7 @@ function writeToLocalStorage(value: SettingsOverrides): { ok: true } | { ok: fal
   if (!hasLocalStorage()) return { ok: false, reason: 'localStorage unavailable' };
   try {
     window.localStorage.setItem(LS_KEY, JSON.stringify(value));
+
     return new DbResult(true, undefined);
   } catch (e: unknown) {
     return { ok: false, reason: e instanceof Error ? e.message : String(e) };
@@ -236,6 +238,7 @@ export async function loadSettingsOverrides(): Promise<SettingsOverrides> {
     cache.overrides = sanitize(readFromLocalStorage());
     cache.loaded = true;
     logSettings('[Settings] loaded overrides (localStorage fallback): ' + JSON.stringify(cache.overrides), 'info');
+
     return cache.overrides;
   }
   try {
@@ -243,12 +246,14 @@ export async function loadSettingsOverrides(): Promise<SettingsOverrides> {
     cache.overrides = sanitize(result[STORAGE_KEY]);
     cache.loaded = true;
     logSettings('[Settings] loaded overrides: ' + JSON.stringify(cache.overrides), 'info');
+
     return cache.overrides;
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     logError('SettingsStore', 'load failed: ' + msg);
     cache.loaded = true;
     cache.overrides = sanitize(readFromLocalStorage());
+
     return cache.overrides;
   }
 }
@@ -292,5 +297,6 @@ export function clearSettingsOverrides(): Promise<void> {
 /** Subscribe to override changes. Returns an unsubscribe fn. */
 export function onSettingsChange(fn: SettingsListener): () => void {
   listeners.add(fn);
+
   return function () { listeners.delete(fn); };
 }

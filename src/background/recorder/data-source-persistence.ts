@@ -48,6 +48,7 @@ export async function insertDataSource(
     );
 
     mgr.markDirty();
+
     return readLatestRow(db, filePath);
 }
 
@@ -89,6 +90,7 @@ export async function listDataSources(
     );
 
     const values = result[0]?.values ?? [];
+
     return values.map(rowToRecord);
 }
 

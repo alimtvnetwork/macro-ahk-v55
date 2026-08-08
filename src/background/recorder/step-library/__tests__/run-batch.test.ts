@@ -52,6 +52,7 @@ function makeGroup(db: StepLibraryDb, projectId: number, name: string): number {
         LabelType: `Click in ${name}`,
         PayloadJson: JSON.stringify({ Selector: `#${name}` }),
     });
+
     return id;
 }
 
@@ -75,8 +76,10 @@ function failingExecutor(forGroupName: string, lib: StepLibraryDb): LeafStepExec
                 JsLog: null,
                 CapturedAt: new Date().toISOString(),
             } as unknown as FailureReport;
+
             return fr;
         }
+
         return null;
     };
 }

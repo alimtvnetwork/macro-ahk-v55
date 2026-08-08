@@ -74,6 +74,7 @@ const EXPECTED_FREE_AVAIL = 10;   // dailyFree across all visible rows
 
 function pillTexts(bar: SummaryBarHandle): string[] {
     const pills = bar.root.querySelectorAll('[role="status"]');
+
     return Array.from(pills).map((p) => (p.textContent || '').trim());
 }
 
@@ -186,12 +187,14 @@ describe('E2E — filter combinations keep totals synced with backend', () => {
     function applySearch(rows: ReadonlyArray<WorkspaceCredit>, q: string): WorkspaceCredit[] {
         const needle = q.trim().toLowerCase();
         if (needle === '') { return rows.slice(); }
+
         return rows.filter((r) => r.fullName.toLowerCase().includes(needle));
     }
     function applyType(rows: ReadonlyArray<WorkspaceCredit>, t: WsTypeFilter): WorkspaceCredit[] {
         if (t === 'all') { return rows.slice(); }
         if (t === 'pro') { return rows.filter((r) => r.plan.startsWith('pro_')); }
         if (t === 'free') { return rows.filter((r) => r.plan === 'free' || r.hasFree); }
+
         return rows.filter((r) => r.subscriptionStatus !== 'active');
     }
     function applySort(rows: WorkspaceCredit[], key: SortKey): WorkspaceCredit[] {
@@ -205,10 +208,12 @@ describe('E2E — filter combinations keep totals synced with backend', () => {
         } else {
             out.sort((a, b) => b.numProjects - a.numProjects);
         }
+
         return out;
     }
     function applyPage(rows: WorkspaceCredit[], pageSize: number, pageIndex: number): WorkspaceCredit[] {
         const start = pageIndex * pageSize;
+
         return rows.slice(start, start + pageSize);
     }
 
@@ -223,6 +228,7 @@ describe('E2E — filter combinations keep totals synced with backend', () => {
         visibleRows: WorkspaceCredit[],
     ): WorkspaceCredit[] {
         publishVisibleWorkspaces(backend);
+
         return visibleRows;
     }
 
@@ -311,6 +317,7 @@ describe('E2E — filter combinations keep totals synced with backend', () => {
         let seed = 0x1234_5678;
         function rand(maxExclusive: number): number {
             seed = (seed * 1664525 + 1013904223) >>> 0;
+
             return seed % maxExclusive;
         }
         for (let i = 0; i < 100; i++) {

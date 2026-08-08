@@ -29,6 +29,7 @@ function walk(dir: string, acc: string[] = []): string[] {
       acc.push(full);
     }
   }
+
   return acc;
 }
 

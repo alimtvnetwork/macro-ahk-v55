@@ -46,6 +46,7 @@ function stubSizing(body: HTMLElement, clientWidth: () => number): void {
       for (const c of chips) if (c.style.display !== 'none') w += CHIP_W;
       const wrap = body.querySelector<HTMLElement>('[data-role="chip-overflow"]');
       if (wrap && wrap.style.display !== 'none') w += OVERFLOW_W;
+
       return w;
     },
   });
@@ -58,6 +59,7 @@ function makeChip(n: number, highlighted = false): HTMLElement {
   b.dataset.n = String(n);
   b.dataset.highlighted = highlighted ? '1' : '0';
   b.textContent = String(n);
+
   return b;
 }
 
@@ -72,6 +74,7 @@ function buildStrip(chipNs: readonly number[]): {
   moreWrap.dataset.role = 'more';
   body.appendChild(moreWrap);
   document.body.appendChild(body);
+
   return { body, moreWrap };
 }
 

@@ -103,6 +103,7 @@ async function executeLeaf(
     const result = outcome.Results[0];
     if (result === undefined) return logEmptyResultsFailure(step, opts);
     if (result.Ok) return null;
+
     return result.FailureReport ?? logMissingReportFailure(step, result.Error, opts);
 }
 
@@ -147,6 +148,7 @@ async function executeUrlTabClickLeaf(step: StepRow, opts: ReplayBridgeOptions):
                 Verbose: opts.Verbose ?? false, Now: opts.Now,
             });
         }
+
         return null;
     } catch (err) {
         return logFailure({
@@ -192,7 +194,6 @@ function logMissingReportFailure(step: StepRow, resultError: string | undefined,
         Verbose: opts.Verbose ?? false, Now: opts.Now,
     });
 }
-
 
 /* ------------------------------------------------------------------ */
 /*  StepRow → ReplayStepInput translation                              */
@@ -254,6 +255,7 @@ function buildWait(step: StepRow, payload: StepPayload): ReplayStepInput {
             + `(${JSON.stringify(payload.WaitMs)}). Expected a non-negative number.`,
         );
     }
+
     return { StepId: step.StepId, Index: step.OrderIndex, Kind: "Wait", Selectors: [], WaitMs: ms };
 }
 
@@ -278,7 +280,6 @@ function unsupportedKind(step: StepRow, kindLabel: string, reason: string): Erro
     );
 }
 
-
 function parsePayload(step: StepRow): StepPayload {
     if (step.PayloadJson === null || step.PayloadJson === "") return {};
     try {
@@ -286,6 +287,7 @@ function parsePayload(step: StepRow): StepPayload {
         if (parsed === null || typeof parsed !== "object") {
             throw new Error(`PayloadJson must be a JSON object, got ${typeof parsed}`);
         }
+
         return parsed as StepPayload;
     } catch (err) {
         throw new Error(
@@ -308,6 +310,7 @@ function requireSelector(step: StepRow, payload: StepPayload): PersistedSelector
     const selectorKindId = trimmed.startsWith("/") || trimmed.startsWith("(")
         ? SelectorKindId.XPathFull
         : SelectorKindId.Css;
+
     return {
         // Synthetic IDs: the step-library schema doesn't persist
         // Selector rows. Negative numbers stay clearly distinct from

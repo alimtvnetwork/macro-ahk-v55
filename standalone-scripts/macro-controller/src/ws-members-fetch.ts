@@ -40,6 +40,7 @@ function getMemberships(op: string) {
   const api = sdk?.api?.memberships;
   const isMissingApi = !api;
   if (isMissingApi) throwDiagnostic('WS_MEMBERS_FETCH_E001', { op });
+
   return api;
 }
 
@@ -68,6 +69,7 @@ export async function fetchWorkspaceMembers(wsId: string, limit = DEFAULT_MEMBER
   const total = resp.data.total || members.length;
 
   membersCache.set(wsId, { members, total, expires: now + CACHE_TTL });
+
   return { members, total };
 }
 

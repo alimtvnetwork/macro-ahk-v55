@@ -22,6 +22,7 @@ function buildSelfCheckSnippet(namespace: string): string {
   // namespace looks like: RiseupAsiaMacroExt.Projects.MacroController
   const parts = namespace.split(".");
   const codeName = parts[parts.length - 1] ?? "";
+
   return `(()=>{const g=globalThis,O="color:#22c55e;font-weight:bold",X="color:#ef4444;font-weight:bold",m=g.marco,r=g.RiseupAsiaMacroExt,p=r&&r.Projects&&r.Projects["${codeName}"];console.log("%c[SDK self-check] window.marco "+(m?"\u2705 "+(m.version||""):"\u274C missing"),m?O:X);console.log("%c[SDK self-check] RiseupAsiaMacroExt "+(r?"\u2705":"\u274C missing"),r?O:X);console.log("%c[SDK self-check] Projects.${codeName} "+(p?"\u2705 v"+((p.meta&&p.meta.version)||"?"):"\u274C missing"),p?O:X);})();`;
 }
 
@@ -33,6 +34,7 @@ function buildExtendedDiagnosticsSnippet(namespace: string): string {
   const parts = namespace.split(".");
   const codeName = parts[parts.length - 1] ?? "";
   const expected = JSON.stringify([...EXPECTED_SUB_NAMESPACES]);
+
   return `(()=>{const g=globalThis,O="color:#22c55e",X="color:#ef4444",B="color:#a78bfa;font-weight:bold",p=g.RiseupAsiaMacroExt&&g.RiseupAsiaMacroExt.Projects&&g.RiseupAsiaMacroExt.Projects["${codeName}"];if(!p){console.log("%c[SDK extended] Projects.${codeName} \u274C missing — cannot enumerate sub-namespaces",X);return;}console.log("%c[SDK extended] Projects.${codeName} sub-namespaces:",B);${expected}.forEach(k=>{const ok=p[k]!==undefined&&p[k]!==null;console.log("%c  "+(ok?"\u2705":"\u274C")+" "+k,ok?O:X);});const extra=Object.keys(p).filter(k=>!${expected}.includes(k));if(extra.length){console.log("%c[SDK extended] Extra (non-standard) keys: "+extra.join(", "),"color:#f59e0b");}})();`;
 }
 
@@ -70,14 +72,17 @@ function tryResolveOne(rule: DevGuideTargetUrl): string | null {
   if (rule.matchType === "glob") {
     if (/^https?:\/\/\*/i.test(rule.pattern)) return null; // wildcard host — handled in fallback
     const concrete = rule.pattern.replace(/\*+/g, "");
+
     return /^https?:\/\//i.test(concrete) ? concrete : null;
   }
+
   return null; // regex → skip
 }
 
 function tryResolveWildcardHost(rule: DevGuideTargetUrl): string | null {
   if (rule.matchType !== "glob" || !/^https?:\/\/\*/i.test(rule.pattern)) return null;
   const concrete = rule.pattern.replace(/^(https?:\/\/)\*\.?/i, "$1www.").replace(/\*+/g, "");
+
   return /^https?:\/\//i.test(concrete) ? concrete : null;
 }
 
@@ -90,6 +95,7 @@ function resolveOpenableUrl(rules: DevGuideTargetUrl[]): string | null {
     const url = tryResolveWildcardHost(rule);
     if (url) return url;
   }
+
   return null;
 }
 
@@ -226,6 +232,7 @@ function buildFullGuideText(namespace: string, sections: string[]): string {
       lines.push("");
     }
   }
+
   return lines.join("\n");
 }
 
@@ -406,6 +413,7 @@ export function DevGuideSection({ namespace, section, targetUrls }: Props) {
           {sections.map((s) => {
             const doc = sectionDocs[s]?.(namespace);
             if (!doc) return null;
+
             return (
               <div key={s} className="space-y-2">
                 <h4 className="text-xs font-bold text-foreground">{doc.title}</h4>

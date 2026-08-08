@@ -67,6 +67,7 @@ export interface AttachDecision {
  */
 function checkAutoStart(project: StoredProject): AttachDecision | null {
     if (project.settings?.autoStart === true) return null;
+
     return {
         ok: false,
         reason: "AUTOATTACH_SKIPPED_AUTOSTART_OFF",
@@ -76,6 +77,7 @@ function checkAutoStart(project: StoredProject): AttachDecision | null {
 
 function checkOptOut(script: LibraryScriptForAttach): AttachDecision | null {
     if (script.instruction.AutoAttach !== false) return null;
+
     return {
         ok: false,
         reason: "AUTOATTACH_SKIPPED_OPT_OUT",
@@ -95,6 +97,7 @@ function checkUrlOverlap(
         ),
     );
     if (hasUrlOverlap) return null;
+
     return {
         ok: false,
         reason: "AUTOATTACH_SKIPPED_URL_NO_MATCH",
@@ -111,6 +114,7 @@ function checkAlreadyAttached(
     );
     const isMissingIsAlreadyAttached = !isAlreadyAttached;
     if (isMissingIsAlreadyAttached) return null;
+
     return {
         ok: false,
         reason: "AUTOATTACH_ALREADY_ATTACHED",
@@ -123,6 +127,7 @@ function checkRunContext(script: LibraryScriptForAttach): AttachDecision | null 
     const isIncompatibleWorld = declaredWorld !== undefined && declaredWorld !== "MAIN";
     const isMissingIsIncompatibleWorld = !isIncompatibleWorld;
     if (isMissingIsIncompatibleWorld) return null;
+
     return {
         ok: false,
         reason: "AUTOATTACH_SKIPPED_INCOMPATIBLE_RUN_CONTEXT",
@@ -137,6 +142,7 @@ function checkCookieBindings(
     const requiredCookies = script.instruction.RequiredCookies ?? [];
     const missingCookie = requiredCookies.find((name) => !projectCookieNames.has(name));
     if (missingCookie === undefined) return null;
+
     return {
         ok: false,
         reason: "AUTOATTACH_SKIPPED_COOKIE_BINDING_MISSING",
@@ -151,6 +157,7 @@ function checkDependencies(
     const declaredDeps = script.instruction.Dependencies ?? [];
     const missingDep = declaredDeps.find((depId) => !libraryIds.has(depId));
     if (missingDep === undefined) return null;
+
     return {
         ok: false,
         reason: "AUTOATTACH_SKIPPED_DEP_MISSING",
@@ -168,6 +175,7 @@ function checkInjectionConditions(
     if (isMissingHasCookieRequirement) return null;
     const cookieName = cond!.requireCookie as string;
     if (projectCookieNames.has(cookieName)) return null;
+
     return {
         ok: false,
         reason: "AUTOATTACH_SKIPPED_CONDITION_FAIL",
@@ -197,6 +205,7 @@ export function evaluateAutoAttach(
         const skip = gate();
         if (skip !== null) return skip;
     }
+
     return {
         ok: true,
         reason: "OK",

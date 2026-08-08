@@ -82,6 +82,7 @@ function findScriptByIdOrPath(
 function normalizeScriptKey(value: string): string {
     const normalized = value.trim().toLowerCase().replace(/\\/g, "/");
     const fileName = normalized.split("/").pop() ?? normalized;
+
     return fileName.split(/[?#]/)[0] ?? fileName;
 }
 
@@ -94,6 +95,7 @@ export async function handleGetAllScripts(): Promise<{
     scripts: StoredScript[];
 }> {
     const scripts = await readAllScripts();
+
     return { scripts };
 }
 
@@ -107,6 +109,7 @@ export async function handleSaveScript(
     const saved = upsertScript(scripts, script);
 
     await writeAllScripts(scripts);
+
     return { isOk: true, script: saved };
 }
 
@@ -122,6 +125,7 @@ function upsertScript(
     if (isExisting) {
         const updated = { ...script, updatedAt: now };
         scripts[existingIndex] = updated;
+
         return updated;
     }
 
@@ -133,6 +137,7 @@ function upsertScript(
     };
 
     scripts.push(created);
+
     return created;
 }
 
@@ -145,6 +150,7 @@ export async function handleDeleteScript(
     const filtered = scripts.filter((s) => s.id !== id);
 
     await writeAllScripts(filtered);
+
     return { isOk: true };
 }
 
@@ -175,6 +181,7 @@ export async function handleGetAllConfigs(): Promise<{
     configs: StoredConfig[];
 }> {
     const configs = await readAllConfigs();
+
     return { configs };
 }
 
@@ -188,6 +195,7 @@ export async function handleSaveConfig(
     const saved = upsertConfig(configs, config);
 
     await writeAllConfigs(configs);
+
     return { isOk: true, config: saved };
 }
 
@@ -203,6 +211,7 @@ function upsertConfig(
     if (isExisting) {
         const updated = { ...config, updatedAt: now };
         configs[existingIndex] = updated;
+
         return updated;
     }
 
@@ -214,6 +223,7 @@ function upsertConfig(
     };
 
     configs.push(created);
+
     return created;
 }
 
@@ -226,6 +236,7 @@ export async function handleDeleteConfig(
     const filtered = configs.filter((c) => c.id !== id);
 
     await writeAllConfigs(filtered);
+
     return { isOk: true };
 }
 
@@ -274,5 +285,6 @@ export async function handleOptionsBootstrap(): Promise<{
     ]);
     // Projects are read from the project handler to include default seeding
     const { projects } = await handleGetAllProjects();
+
     return { projects, scripts, configs };
 }

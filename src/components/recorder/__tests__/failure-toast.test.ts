@@ -15,6 +15,7 @@ import { buildFailureReport, type FailureReport } from "@/background/recorder/fa
 vi.mock("sonner", () => {
     const error = vi.fn(() => 1);
     const success = vi.fn(() => 2);
+
     return { toast: { error, success } };
 });
 

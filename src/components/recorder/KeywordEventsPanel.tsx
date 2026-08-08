@@ -47,7 +47,6 @@ import { KeywordEventsSelectionToolbar } from "./keyword-events/KeywordEventsSel
 import { ChainSettingsRow } from "./keyword-events/ChainSettingsRow";
 import { ChainTimelineLog } from "./keyword-events/ChainTimelineLog";
 
-
 export interface KeywordEventsPanelProps {
     readonly trigger?: React.ReactNode;
     readonly className?: string;
@@ -163,7 +162,6 @@ function KeywordEventsEditor(): JSX.Element {
 
             <KeywordEventsSearchRow value={search} onChange={setSearch} />
 
-
             <ChainSettingsRow
                 settings={chain}
                 onChange={setChain}
@@ -221,5 +219,4 @@ function KeywordEventsEditor(): JSX.Element {
         </div>
     );
 }
-
 

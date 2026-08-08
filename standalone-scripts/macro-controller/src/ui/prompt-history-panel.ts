@@ -108,6 +108,7 @@ function logHistoryDiagnostic(
             windowStart,
             emittedInWindow,
         });
+
         return;
     }
 
@@ -118,6 +119,7 @@ function logHistoryDiagnostic(
             windowStart,
             emittedInWindow,
         });
+
         return;
     }
 
@@ -189,6 +191,7 @@ function renderLastImportError(): void {
     const isMissingErr = !err;
     if (isMissingErr) {
         host.style.display = 'none';
+
         return;
     }
     const doc = host.ownerDocument ?? document;
@@ -217,7 +220,6 @@ function renderLastImportError(): void {
     host.appendChild(when);
     host.appendChild(clear);
 }
-
 
 const PANEL_ID = 'marco-prompt-history-panel';
 const ATTR_DATA_ACTION = 'data-action';
@@ -260,6 +262,7 @@ export async function openPromptHistoryPanel(
             + 'Open the ' + roleLabel + ' chip gear → "Edit default ' + roleLabel + ' prompt" once to seed it, then retry.',
             'error',
         );
+
         return;
     }
 
@@ -272,6 +275,7 @@ export async function openPromptHistoryPanel(
             '❌ History (last 20 edits) failed to load for "' + slug + '": ' + reason,
             { cause: revResult.error, toast },
         );
+
         return;
     }
 
@@ -306,6 +310,7 @@ async function resolveSlug(
         },
         def.ok ? undefined : def.error,
     );
+
     return null;
 }
 
@@ -314,8 +319,6 @@ function removeExistingPanel(doc: Document): void {
     if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
     _lastImportErrorEl = null;
 }
-
-
 
 function buildHeaderActions(
     doc: Document,
@@ -355,6 +358,7 @@ function buildHeaderActions(
     closeBtn.style.cssText = 'background:transparent;border:1px solid #475569;color:#e5e7eb;padding:2px 8px;border-radius:4px;cursor:pointer;';
     closeBtn.onclick = () => removeExistingPanel(doc);
     actionsGroup.appendChild(closeBtn);
+
     return actionsGroup;
 }
 
@@ -372,6 +376,7 @@ function buildPanelHeader(
     title.style.cssText = 'font-size:14px;font-weight:700;color:#a78bfa;';
     header.appendChild(title);
     header.appendChild(buildHeaderActions(doc, slug, role, revisions, deps));
+
     return header;
 }
 
@@ -380,6 +385,7 @@ function buildLastErrorArea(doc: Document): HTMLElement {
     lastErr.setAttribute('data-role', 'last-import-error');
     lastErr.setAttribute('aria-live', 'polite');
     lastErr.style.cssText = 'display:none;align-items:center;gap:8px;font-size:11px;background:#1a0e0e;border:1px solid #7f1d1d;border-radius:4px;padding:4px 8px;';
+
     return lastErr;
 }
 
@@ -446,12 +452,14 @@ function buildPanel(
     overlay.onclick = (e: MouseEvent) => {
         if (e.target === overlay) removeExistingPanel(doc);
     };
+
     return overlay;
 }
 
 function buildSubtitleText(total: number, visible: number): string {
     if (total === 0) return 'No revisions yet. Edit this prompt and the previous body will be saved here.';
     if (visible === total) return String(total) + ' revision(s), newest first. Click Restore to bring one back.';
+
     return 'Showing ' + String(visible) + ' of ' + String(total) + ' revision(s). Click Restore to bring one back.';
 }
 
@@ -495,8 +503,10 @@ export function sortRevisions(
         }
         // Deterministic tie-break: newest CreatedAt, then highest Id.
         if (a.CreatedAt !== b.CreatedAt) return b.CreatedAt - a.CreatedAt;
+
         return b.Id - a.Id;
     });
+
     return copy;
 }
 
@@ -513,6 +523,7 @@ export function filterRevisions(
         const isImported = r.PromptId === IMPORTED_REVISION_PROMPT_ID;
         if (filter.imported === 'only' && !isImported) return false;
         if (filter.imported === 'exclude' && isImported) return false;
+
         return true;
     });
 }
@@ -520,6 +531,7 @@ export function filterRevisions(
 function collectReasons(rows: readonly PromptRevisionRow[]): string[] {
     const seen = new Set<string>();
     for (const r of rows) if (typeof r.Reason === 'string' && r.Reason.length > 0) seen.add(r.Reason);
+
     return Array.from(seen).sort((a, b) => a.localeCompare(b));
 }
 
@@ -567,6 +579,7 @@ function buildImportedChip(
             : state.importedFilter === 'only' ? 'exclude' : 'all';
         rerender();
     };
+
     return importedChip;
 }
 
@@ -586,6 +599,7 @@ function buildClearFiltersButton(
         state.importedFilter = 'all';
         rerender();
     };
+
     return clear;
 }
 
@@ -703,6 +717,7 @@ function buildSortButton(
         }
         rerender();
     };
+
     return btn;
 }
 
@@ -715,9 +730,9 @@ function buildChip(doc: Document, label: string, active: boolean, dataRole: stri
     chip.style.cssText = active
         ? base + 'background:#1e293b;border:1px solid #facc15;color:#facc15;'
         : base + 'background:#111827;border:1px solid #334155;color:#94a3b8;';
+
     return chip;
 }
-
 
 function buildRevisionRow(
     doc: Document,
@@ -769,6 +784,7 @@ function buildRevisionRow(
     };
     actions.appendChild(restoreBtn);
     row.appendChild(actions);
+
     return row;
 }
 
@@ -782,6 +798,7 @@ interface RestorePreImage {
 function buildPreImage(currentRow: PromptRow | undefined): RestorePreImage | null {
     const isMissingCurrentRow = !currentRow;
     if (isMissingCurrentRow) return null;
+
     return {
         id: currentRow.Id,
         body: currentRow.Body,
@@ -844,6 +861,7 @@ async function handleRestoreUpdate(
                 '❌ Undo failed: ' + reason,
                 { cause: revert.error, toast },
             );
+
             return;
         }
         toast('↺ Reverted to previous body', 'success');
@@ -881,6 +899,7 @@ function handleRestoreInsert(
                 '❌ Undo failed: ' + reason,
                 { cause: del.error, toast },
             );
+
             return;
         }
         toast('↺ Removed restored row', 'success');
@@ -918,6 +937,7 @@ async function handleRestore(
             '❌ Restore failed: could not read current row (' + reason + ')',
             { cause: listResult.error, toast },
         );
+
         return;
     }
     const currentRow = listResult.value.find((p) => p.Slug === rev.Slug);
@@ -942,6 +962,7 @@ async function handleRestore(
             '❌ Restore failed: ' + reason,
             { cause: upsertResult.error, toast },
         );
+
         return;
     }
     const successMsg = '✅ Restored "' + rev.Name + '" from ' + formatWhen(rev.CreatedAt);
@@ -953,6 +974,7 @@ async function handleRestore(
         const newId = upsertResult.value;
         if (typeof newId !== 'number') {
             removeExistingPanel(doc);
+
             return;
         }
         handleRestoreInsert(newId, rev.Slug, rev.Id, deleteFn, undoToast, toast, successMsg, undoTimeoutMs, now);
@@ -965,9 +987,11 @@ function parseReplaceValues(raw: string): string[] {
     try {
         const parsed: unknown = JSON.parse(raw);
         if (Array.isArray(parsed)) return parsed.filter((v): v is string => typeof v === 'string');
+
         return [];
     } catch (err) {
         logHistoryDiagnostic('HISTORY_INTERNAL_E001', { stage: 'parse-replace-values', reason: 'invalid JSON, defaulting to []' }, err);
+
         return [];
     }
 }
@@ -975,6 +999,7 @@ function parseReplaceValues(raw: string): string[] {
 function truncateBody(body: string): string {
     if (typeof body !== 'string') return '';
     if (body.length <= 400) return body;
+
     return body.slice(0, 400) + '\n… (' + String(body.length - 400) + ' more chars)';
 }
 
@@ -984,6 +1009,7 @@ function formatWhen(ts: number): string {
         return new Date(ts).toLocaleString();
     } catch (err) {
         logHistoryDiagnostic('HISTORY_INTERNAL_E001', { stage: 'format-when', reason: 'toLocaleString failed' }, err);
+
         return String(ts);
     }
 }
@@ -1096,6 +1122,7 @@ function validateImportEnvelope(
     if (!Array.isArray(pRevisions)) {
         return new DbResult(false, undefined, 'revisions is not an array');
     }
+
     return { ok: true, envelope: p, revisions: pRevisions };
 }
 
@@ -1123,6 +1150,7 @@ function coerceImportRow(
     const rawReplaceValues = raw['ReplaceValues'];
     const rawCreatedAt = raw['CreatedAt'];
     const rawReason = raw['Reason'];
+
     return {
         ok: true,
         row: {
@@ -1159,6 +1187,7 @@ export function parseRevisionImportPayload(
         if (isMissingOk) return new DbResult(false, undefined, coerced.error);
         rows.push(coerced.row);
     }
+
     return { ok: true, rows, sourceSlug: expectedSlug, sourceRole: expectedRole };
 }
 
@@ -1180,6 +1209,7 @@ function validateImportFile(
             '❌ Import failed: file exceeds ' + String(maxMb) + ' MB cap. Split the archive or export a smaller subset.',
             { toast },
         );
+
         return false;
     }
     const looksLikeJson = /\.json$/i.test(file.name)
@@ -1195,8 +1225,10 @@ function validateImportFile(
             '❌ Import failed: expected a .json file (got "' + (file.type || 'unknown type') + '")',
             { toast },
         );
+
         return false;
     }
+
     return true;
 }
 
@@ -1225,6 +1257,7 @@ async function writeImportedRevisions(
             '❌ Import DB write failed: ' + reason,
             { cause: write.error, toast },
         );
+
         return;
     }
     const count = write.value ?? 0;
@@ -1242,6 +1275,7 @@ async function writeImportedRevisions(
                     '❌ Undo failed: ' + reason,
                     { cause: del.error, toast },
                 );
+
                 return;
             }
             toast('↺ Reverted import (' + String(count) + ' row(s) removed)', 'success');
@@ -1263,6 +1297,7 @@ async function handleImportFile(
     const toast = deps.toast ?? showToast;
     if (!validateImportFile(file, slug, role, toast)) {
         input.value = '';
+
         return;
     }
     try {
@@ -1277,6 +1312,7 @@ async function handleImportFile(
                 '❌ Import failed: ' + reason,
                 { toast },
             );
+
             return;
         }
         await writeImportedRevisions(slug, parsed.rows, deps, toast);

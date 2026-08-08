@@ -49,7 +49,6 @@ export interface RequestDetail {
   correlationId?: string;
 }
 
-
 export interface ToastOpts {
   stack?: string | undefined;
   noStop?: boolean | undefined;
@@ -244,6 +243,7 @@ class ToastManager {
         log('[Toast/queue] Stopping drain — SDK unavailable for 30 ticks', 'warn');
         this.stopQueueDrain();
       }
+
       return;
     }
 

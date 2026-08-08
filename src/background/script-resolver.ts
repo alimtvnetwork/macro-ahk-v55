@@ -56,6 +56,7 @@ async function resolveScriptCode(script: StoredScript): Promise<ResolvedCode> {
         if (isBuiltinScript(script)) {
             throw new Error(`Built-in script "${script.name}" is missing filePath\n  Path: chrome.storage.local script entry id="${script.id}"\n  Missing: filePath field on StoredScript\n  Reason: Built-in scripts MUST have a filePath pointing to dist/ — refusing embedded fallback to prevent stale code injection`);
         }
+
         return { code: script.code, source: "embedded" };
     }
 
@@ -72,6 +73,7 @@ async function resolveScriptCode(script: StoredScript): Promise<ResolvedCode> {
             } else {
                 console.log("[script-resolver] ✅ Cache hit for %s (%d chars, %sms)", script.filePath, cached.length, ms);
             }
+
             return { code: cached, source: "cache" };
         }
     } catch (err) {
@@ -136,6 +138,7 @@ async function resolveScriptCode(script: StoredScript): Promise<ResolvedCode> {
     }
 
     logBgWarnError(BgLogTag.SCRIPT_RESOLVER, `All filePath fetches failed for ${script.filePath}, falling back to embedded code`);
+
     return { code: script.code, source: "embedded" };
 }
 
@@ -250,6 +253,7 @@ async function resolveDependencies(
     all.sort((a, b) => {
         const aOrder = a.injectable.order;
         const bOrder = b.injectable.order;
+
         return aOrder - bOrder;
     });
 
@@ -289,6 +293,7 @@ async function resolveOneBinding(
             `[injection:resolve] FATAL: Script not found in store: "${binding.scriptId}" — URL matched a project rule but the bound script is absent. Store has ${scripts.length} scripts. Re-pick from library or re-seed builtins.`,
             { scriptId: binding.scriptId },
         );
+
         return {
             kind: "skipped",
             value: { scriptId: binding.scriptId, scriptName: binding.scriptId, reason: "missing" },
@@ -304,6 +309,7 @@ async function resolveOneBinding(
             `[injection:resolve] Script skipped (disabled): ${script!.name} (id=${script!.id})`,
             { scriptId: script!.id, configId: binding.configId ?? undefined },
         );
+
         return {
             kind: "skipped",
             value: { scriptId: script!.id, scriptName: script!.name, reason: "disabled" },
@@ -327,6 +333,7 @@ async function resolveOneBinding(
             `[injection:resolve] Script '${script!.name}' (id=${script!.id}) failed to resolve and was skipped: ${reason}`,
             { scriptId: script!.id, configId: binding.configId ?? undefined },
         );
+
         return {
             kind: "skipped",
             value: { scriptId: script!.id, scriptName: script!.name, reason: "empty_code" as SkipReason },
@@ -340,6 +347,7 @@ async function resolveOneBinding(
             `[injection:resolve] Script '${script!.name}' (id=${script!.id}) resolved with empty code and was skipped. filePath=${script!.filePath ?? "(none)"}, source=${codeSource}`,
             { scriptId: script!.id, configId: binding.configId ?? undefined },
         );
+
         return {
             kind: "skipped",
             value: { scriptId: script!.id, scriptName: script!.name, reason: "empty_code" as SkipReason },
@@ -412,12 +420,14 @@ function findScript(
 function normalizeScriptKey(value: string): string {
     const normalized = value.trim().toLowerCase().replace(/\\/g, "/");
     const fileName = normalized.split("/").pop() ?? normalized;
+
     return fileName.split(/[?#]/)[0] ?? fileName;
 }
 
 /** Returns true when identifier looks like a script path/filename. */
 function isPathLikeIdentifier(value: string): boolean {
     const v = value.trim().toLowerCase();
+
     return v.includes("/") || v.includes("\\") || v.endsWith(".js") || v.endsWith(".mjs") || v.endsWith(".ts");
 }
 
@@ -487,6 +497,7 @@ function findConfig(
     if (byId !== undefined) return byId;
 
     const byName = configs.find((c) => c.name === configId);
+
     return byName ?? null;
 }
 

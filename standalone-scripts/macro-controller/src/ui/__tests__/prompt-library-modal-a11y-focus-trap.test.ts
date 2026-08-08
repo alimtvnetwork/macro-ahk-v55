@@ -54,6 +54,7 @@ function dispatchKey(key: string, opts: { shift?: boolean } = {}): void {
 function focusableInModal(): HTMLElement[] {
     const root = document.getElementById('macro-prompt-library-modal')!;
     const sel = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
     return Array.from(root.querySelectorAll<HTMLElement>(sel))
         .filter((n) => !n.hasAttribute('disabled') && n.tabIndex !== -1);
 }

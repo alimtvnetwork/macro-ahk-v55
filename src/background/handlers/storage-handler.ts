@@ -25,11 +25,13 @@ function getManager(): DbManager {
     if (isMissingDb) {
         throw new Error("[storage] DbManager not bound. Call bindStorageDbManager() first.");
     }
+
     return dbManager!;
 }
 
 function resolveDb(database: DatabaseType) {
     const mgr = getManager();
+
     return database === "errors" ? mgr.getErrorsDb() : mgr.getLogsDb();
 }
 
@@ -43,6 +45,7 @@ function collectRows(stmt: { step(): boolean; getAsObject(): SqlRow; free(): voi
         rows.push(stmt.getAsObject());
     }
     stmt.free();
+
     return rows;
 }
 
@@ -54,6 +57,7 @@ function countTable(db: ReturnType<typeof resolveDb>, table: string): number {
     }
     const result = db.exec(`SELECT COUNT(*) as cnt FROM ${table}`);
     const hasResult = result.length > 0 && result[0].values.length > 0;
+
     return hasResult ? (result[0].values[0][0] as number) : 0;
 }
 

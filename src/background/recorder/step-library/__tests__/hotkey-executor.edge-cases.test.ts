@@ -54,15 +54,19 @@ function makeRecordingEnv(querySelectorImpl?: (sel: string) => Element | null): 
                 shiftKey: ke.shiftKey,
                 metaKey: ke.metaKey,
             });
+
             return true;
         },
     };
     const env: HotkeyDispatchEnv & { captured: CapturedEvent[]; timeoutDelays: number[] } = {
         document: fakeDoc as unknown as Document,
-        setTimeout: ((cb: () => void, ms: number) => { timeoutDelays.push(ms); cb(); return 0; }) as typeof setTimeout,
+        setTimeout: ((cb: () => void, ms: number) => { timeoutDelays.push(ms); cb();
+
+ return 0; }) as typeof setTimeout,
         captured,
         timeoutDelays,
     };
+
     return env as RecordingEnv;
 }
 
@@ -245,14 +249,20 @@ describe("dispatchChord", () => {
         const targetEvents: string[] = [];
         const fakeDoc = {
             querySelector: () => null,
-            dispatchEvent: (e: Event) => { docEvents.push(e.type); return true; },
+            dispatchEvent: (e: Event) => { docEvents.push(e.type);
+
+ return true; },
         };
         const target = {
-            dispatchEvent: (e: Event) => { targetEvents.push(e.type); return true; },
+            dispatchEvent: (e: Event) => { targetEvents.push(e.type);
+
+ return true; },
         } as unknown as Element;
         const env: HotkeyDispatchEnv = {
             document: fakeDoc as unknown as Document,
-            setTimeout: ((cb: () => void) => { cb(); return 0; }) as typeof setTimeout,
+            setTimeout: ((cb: () => void) => { cb();
+
+ return 0; }) as typeof setTimeout,
         };
         dispatchChord(env, { Key: "A", Code: "KeyA", CtrlKey: false, AltKey: false, ShiftKey: false, MetaKey: false }, target);
         expect(targetEvents).toEqual(["keydown", "keyup"]);
@@ -326,7 +336,9 @@ describe("executeHotkeyStep, multi-chord sequencing", () => {
     it("dispatches to the matched selector target for every chord", async () => {
         const targetEvents: string[] = [];
         const target = {
-            dispatchEvent: (e: Event) => { targetEvents.push(`${e.type}:${(e as KeyboardEvent).key}`); return true; },
+            dispatchEvent: (e: Event) => { targetEvents.push(`${e.type}:${(e as KeyboardEvent).key}`);
+
+ return true; },
         } as unknown as Element;
         const env = makeRecordingEnv((sel) => sel === "#field" ? target : null);
         await executeHotkeyStep({ Keys: ["A", "B"], Selector: "#field" }, env);

@@ -61,11 +61,13 @@ function classifyDriftState(lastSuccess: unknown, firstDrift: unknown): DriftTim
     if (firstDrift === null && lastSuccess !== null) return "healthy";
     if (firstDrift !== null && lastSuccess === null) return "always-failing";
     if (firstDrift !== null && lastSuccess !== null) return "drifted";
+
     return "no-history";
 }
 
 function healthyWindowMs(lastSuccess: SelectorOutcomePoint | null, firstDrift: SelectorOutcomePoint | null): number | null {
     if (lastSuccess === null || firstDrift === null) return null;
+
     return Math.max(0, Date.parse(firstDrift.At) - Date.parse(lastSuccess.At));
 }
 
@@ -82,6 +84,7 @@ export function buildDriftTimeline(
     const firstDriftOutcome = findFirstDriftAfter(bucket.Outcomes, lastSuccessOutcome);
     const lastSuccess = lastSuccessOutcome !== null ? toPoint(lastSuccessOutcome, now) : null;
     const firstDrift = firstDriftOutcome !== null ? toPoint(firstDriftOutcome, now) : null;
+
     return {
         State: classifyDriftState(lastSuccess, firstDrift),
         LastSuccess: lastSuccess,
@@ -111,6 +114,7 @@ export function formatRelative(deltaMs: number): string {
     const mo = Math.floor(day / 30);
     if (mo < 12)               return `${mo}mo ago`;
     const yr = Math.floor(day / 365);
+
     return `${yr}y ago`;
 }
 
@@ -127,10 +131,12 @@ export function formatDuration(ms: number): string {
     const hr = Math.floor(min / 60);
     if (hr < 24) {
         const remMin = min - hr * 60;
+
         return remMin > 0 ? `${hr}h ${remMin}m` : `${hr}h`;
     }
     const day = Math.floor(hr / 24);
     const remHr = hr - day * 24;
+
     return remHr > 0 ? `${day}d ${remHr}h` : `${day}d`;
 }
 
@@ -142,6 +148,7 @@ function findLastSuccess(outcomes: ReadonlyArray<SelectorOutcomePoint>): Selecto
     for (let i = outcomes.length - 1; i >= 0; i--) {
         if (outcomes[i].IsOk) return outcomes[i];
     }
+
     return null;
 }
 
@@ -158,6 +165,7 @@ function findFirstDriftAfter(
         const isMissingIsOk = !outcomes[i].IsOk;
         if (isMissingIsOk) return outcomes[i];
     }
+
     return null;
 }
 
@@ -172,11 +180,13 @@ function countFailuresFrom(
         const isMissingIsOk = !outcomes[i].IsOk;
         if (isMissingIsOk) n += 1;
     }
+
     return n;
 }
 
 function toPoint(outcome: SelectorOutcomePoint, now: Date): DriftTimelinePoint {
     const delta = now.getTime() - Date.parse(outcome.At);
+
     return {
         RunId: outcome.RunId,
         At: outcome.At,

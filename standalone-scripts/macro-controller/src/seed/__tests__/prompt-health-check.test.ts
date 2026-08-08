@@ -19,6 +19,7 @@ vi.mock('../../toast', () => ({
 }));
 vi.mock('../../error-utils', async () => {
     const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+
     return { ...actual, logError: vi.fn(), logDiagnosticFromCode: vi.fn() };
 });
 
@@ -46,6 +47,7 @@ function healthyRow(role: PromptRowRoleType, overrides: Partial<DbShape> = {}): 
     const seed = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault);
     const isMissingSeed = !seed;
     if (isMissingSeed) throw new Error('seed row missing for role=' + role);
+
     return {
         Id: role === 'plan' ? 1 : 2,
         Slug: seed.slug,

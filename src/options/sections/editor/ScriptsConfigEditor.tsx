@@ -108,6 +108,7 @@ export function ScriptsConfigEditor({ projectScripts, onChange }: ScriptsConfigE
         setRows((prev) => {
             const updated = prev.map((r, i) => i === index ? { ...r, ...patch } : r);
             onChange(updated);
+
             return updated;
         });
     }, [onChange]);
@@ -116,6 +117,7 @@ export function ScriptsConfigEditor({ projectScripts, onChange }: ScriptsConfigE
         setRows((prev) => {
             const updated = prev.filter((_, i) => i !== index);
             onChange(updated);
+
             return updated;
         });
     }, [onChange]);
@@ -135,6 +137,7 @@ export function ScriptsConfigEditor({ projectScripts, onChange }: ScriptsConfigE
         setRows((prev) => {
             const updated = [...prev, newRow];
             onChange(updated);
+
             return updated;
         });
     }, [rows.length, onChange]);
@@ -162,6 +165,7 @@ export function ScriptsConfigEditor({ projectScripts, onChange }: ScriptsConfigE
         setRows((prev) => {
             const updated = [...prev, newRow];
             onChange(updated);
+
             return updated;
         });
     }, [allScripts, allConfigs, rows.length, onChange]);

@@ -70,6 +70,7 @@ const BUILTIN_DIST_MAP: Record<string, {
 /** Normalizes a path to its bare filename for matching. */
 function bareFilename(path: string): string {
     const normalized = path.trim().toLowerCase().replace(/\\/g, "/");
+
     return normalized.split("/").pop()?.split(/[?#]/)[0] ?? normalized;
 }
 
@@ -133,6 +134,7 @@ export async function ensureBuiltinScriptsExist(
                 "BUILTIN_GUARD_RESEED_COMPLETE",
                 `[builtin-guard] Reseed complete via manifest: ${seedResult.scripts} scripts, ${seedResult.configs} configs across ${seedResult.projects} projects`,
             );
+
             return true;
         }
 
@@ -166,6 +168,7 @@ export async function ensureBuiltinScriptsExist(
                 "BUILTIN_GUARD_DIRECT_SEED_COMPLETE",
                 `[builtin-guard] Direct instruction.json fallback seeded ${fallbackCount} script(s): [${missing.join(", ")}]`,
             );
+
             return true;
         }
 
@@ -175,6 +178,7 @@ export async function ensureBuiltinScriptsExist(
             `[builtin-guard] Direct instruction.json fallback seeded 0 scripts\n  Path: projects/scripts/<folder>/instruction.json\n  Missing: Seeded entries for [${missing.join(", ")}]\n  Reason: Both manifest and direct fallback failed to restore built-ins`,
             { contextDetail: "Both manifest and direct fallback failed to restore built-ins" },
         );
+
         return false;
     } catch (err) {
         logCaughtError(BgLogTag.BUILTIN_GUARD, `Direct fallback failed\n  Path: projects/scripts/<folder>/instruction.json\n  Missing: Seeded entries for [${missing.join(", ")}]\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
@@ -183,6 +187,7 @@ export async function ensureBuiltinScriptsExist(
             `[builtin-guard] Direct instruction.json fallback failed\n  Path: projects/scripts/<folder>/instruction.json\n  Missing: Built-in scripts [${missing.join(", ")}]\n  Reason: ${err instanceof Error ? err.message : String(err)}`,
             { contextDetail: `Missing built-ins: [${missing.join(", ")}]` },
         );
+
         return false;
     }
 }

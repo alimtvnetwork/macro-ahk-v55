@@ -9,6 +9,7 @@ export { _resetLibraryImportFailureDedupeForTests } from './prompt-library-error
 function focusableNodesIn(root: HTMLElement): HTMLElement[] {
   const sel = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
   const all = Array.from(root.querySelectorAll<HTMLElement>(sel));
+
   return all.filter((node) => !node.hasAttribute('disabled') && node.tabIndex !== -1);
 }
 
@@ -21,18 +22,23 @@ function handleModalKey(refs: ModalRefs, e: KeyboardEvent): void {
   const isMissingIsConnected = !refs.root.isConnected;
   if (isMissingIsConnected) {
     if (refs.keyHandler) document.removeEventListener('keydown', refs.keyHandler, true);
+
     return;
   }
   if (e.key === 'Escape') {
-    if (refs.activeEditor) { e.preventDefault(); refs.activeEditor.cancel(); return; }
+    if (refs.activeEditor) { e.preventDefault(); refs.activeEditor.cancel();
+
+ return; }
     e.preventDefault();
     closeExisting();
+
     return;
   }
   const saveCombo = (e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S');
   if (saveCombo && refs.activeEditor) {
     e.preventDefault();
     refs.activeEditor.save();
+
     return;
   }
   if (e.key === 'Tab') applyTabTrap(refs.root, e);
@@ -46,8 +52,12 @@ function applyTabTrap(root: HTMLElement, e: KeyboardEvent): void {
   const active = document.activeElement as HTMLElement | null;
   const insideModal = active !== null && root.contains(active);
   const isMissingInsideModal = !insideModal;
-  if (isMissingInsideModal) { e.preventDefault(); first.focus(); return; }
-  if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); return; }
+  if (isMissingInsideModal) { e.preventDefault(); first.focus();
+
+ return; }
+  if (e.shiftKey && active === first) { e.preventDefault(); last.focus();
+
+ return; }
   if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
 }
 

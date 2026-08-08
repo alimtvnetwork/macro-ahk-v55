@@ -151,6 +151,7 @@ export class AuthTokenUtils {
                 keys.push(key);
             }
         }
+
         return keys;
     }
 

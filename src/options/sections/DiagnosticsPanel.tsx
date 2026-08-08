@@ -109,6 +109,7 @@ export function DiagnosticsPanel() {
 
         if (!document.hidden) startPolling();
         document.addEventListener("visibilitychange", onVisChange);
+
         return () => {
             stopPolling();
             document.removeEventListener("visibilitychange", onVisChange);
@@ -228,6 +229,7 @@ export function DiagnosticsPanel() {
                                 const barWidth = data.totalBootMs > 0
                                     ? Math.round((t.durationMs / data.totalBootMs) * 100)
                                     : 0;
+
                                 return (
                                     <tr key={t.step}>
                                         <td className="diag-step-name">{t.step}</td>
@@ -270,6 +272,7 @@ export function DiagnosticsPanel() {
                             {messages.map((m, i) => {
                                 const time = new Date(m.timestamp);
                                 const timeStr = time.toLocaleTimeString("en-GB", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
                                 return (
                                     <tr key={i}>
                                         <td className="diag-msg-time">{timeStr}</td>
@@ -327,5 +330,6 @@ function buildReport(data: StatusData, messages: TrackedMessage[]): string {
         "",
         "=== End Report ===",
     ];
+
     return lines.join("\n");
 }

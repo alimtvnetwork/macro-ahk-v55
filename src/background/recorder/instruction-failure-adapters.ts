@@ -74,6 +74,7 @@ export function buildUrlTabClickFailureReport(
 ): FailureReport {
     const f = input.Failure;
     const isTimeout = f.Reason === "UrlTabClickTimeout";
+
     return buildFailureReport({
         Phase: "Replay",
         Error: new Error(`${f.Reason}: ${f.Detail}`),
@@ -103,6 +104,7 @@ function serializeUrlTabClickDetail(f: UrlTabClickFailure): string {
     if (f.Selector !== undefined) parts.push(`Selector=${f.Selector}`);
     if (f.SelectorKind !== undefined) parts.push(`SelectorKind=${f.SelectorKind}`);
     parts.push(`Detail=${f.Detail}`);
+
     return parts.join(" | ");
 }
 
@@ -136,6 +138,7 @@ export function buildConditionFailureReport(
 ): FailureReport {
     const o = input.Outcome;
     const isTimeout = o.Reason === "ConditionTimeout";
+
     return buildFailureReport({
         Phase: "Replay",
         Error: new Error(`${o.Reason}: ${o.Detail}`),
@@ -163,6 +166,7 @@ function serializeConditionDetail(
             (p.Detail !== undefined ? ` (${p.Detail})` : ""),
     );
     const condJson = JSON.stringify(input.Condition, null, 2);
+
     return [
         `Reason=${o.Reason}`,
         `Source=${input.Source}`,
@@ -179,6 +183,7 @@ function serializeConditionDetail(
 function sourceFileForSource(s: ConditionFailureSource): string {
     if (s === "Gate") return "src/background/recorder/condition-evaluator.ts";
     if (s === "ConditionStep") return "src/background/recorder/condition-step.ts";
+
     return "src/background/recorder/wait-for-element.ts";
 }
 
@@ -208,6 +213,7 @@ export interface BuildSelectorPredicateReportInput {
 function classifyPredicateReason(rawReason: string, kind: PredicateEvaluationKind): string {
     if (rawReason === "ConditionTimeout") return "Timeout";
     if (rawReason === "InvalidSelector") return kind === "XPath" ? "XPathSyntaxError" : "CssSyntaxError";
+
     return "ZeroMatches";
 }
 
@@ -227,6 +233,7 @@ export function buildSelectorPredicateFailureReport(
 ): FailureReport {
     const kind = resolveSelectorKind(input.SelectorKind ?? "Auto", input.Selector);
     const trace: PredicateEvaluation = { Selector: input.Selector, Kind: kind, Matcher: "Exists", Result: false, Detail: input.Detail };
+
     return buildFailureReport({
         Phase: "Replay",
         Error: new Error(`${input.Reason}: ${input.Detail}`),

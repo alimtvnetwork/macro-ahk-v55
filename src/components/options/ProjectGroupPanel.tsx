@@ -106,6 +106,7 @@ async function readProjectsDirectFromChromeStorage(): Promise<StoredProject[]> {
 
   const out = await readProjectStorageKey(storage);
   const raw = (out as { marco_projects?: unknown } | null)?.marco_projects;
+
   return Array.isArray(raw) ? (raw as StoredProject[]) : [];
 }
 
@@ -133,6 +134,7 @@ async function readProjectsViaMessage(): Promise<StoredProject[]> {
     .then((r) => r?.projects ?? [])
     .catch((err) => {
       logError("ProjectGroupPanel.loadProjects", "Failed to fetch project list for picker", err);
+
       return [] as StoredProject[];
     });
 }
@@ -171,6 +173,7 @@ async function loadRosterAfterDelay(
   if (isCancelled()) return true;
   if (projects.length === 0) return false;
   onLoaded(projects);
+
   return true;
 }
 
@@ -196,6 +199,7 @@ function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: GroupFormDi
   const handleSave = useCallback(async () => {
     if (!name.trim()) {
       toast.error("Group name is required");
+
       return;
     }
     setSaving(true);
@@ -330,6 +334,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
       timer = setTimeout(() => { void loadMembers(); }, 150);
     };
     runtime.onMessage.addListener(listener);
+
     return () => {
       if (timer) clearTimeout(timer);
       runtime.onMessage!.removeListener(listener);
@@ -353,6 +358,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
     };
     storageArea?.onChanged?.addListener(onChanged);
     void pollProjectRoster(() => cancelled, setAllProjects);
+
     return () => {
       cancelled = true;
       storageArea?.onChanged?.removeListener(onChanged);
@@ -363,6 +369,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
   const projectsById = useMemo(() => {
     const map = new Map<string, StoredProject>();
     for (const p of allProjects) map.set(p.id, p);
+
     return map;
   }, [allProjects]);
   const availableProjects = useMemo(
@@ -392,6 +399,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
   const handleAddMember = useCallback(async () => {
     if (!addProjectId) {
       toast.error("Select a project");
+
       return;
     }
     await addMemberById(addProjectId);
@@ -598,6 +606,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
                 {members.map(member => {
                   const project = projectsById.get(member.ProjectIdUuid);
                   const displayName = project?.name ?? "(unknown project)";
+
                   return (
                     <div
                       key={member.Id}

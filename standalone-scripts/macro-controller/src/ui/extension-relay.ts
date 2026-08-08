@@ -64,10 +64,12 @@ export function sendToExtension(type: string, payload: Record<string, unknown>):
           if (lastError) {
             log('Extension message error: ' + (lastError.message || ''), 'warn');
             resolve({ isOk: false, errorMessage: lastError.message || 'runtime error' });
+
             return;
           }
           resolve(resp);
         });
+
         return;
       } catch (e) {
         logError("AutoCatch", "Unhandled exception", e);

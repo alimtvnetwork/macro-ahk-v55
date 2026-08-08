@@ -354,6 +354,7 @@ function validateTableColumns(
             table: tableName,
             message: `Cannot introspect columns of '${tableName}': ${(e as Error).message}`,
         });
+
         return;
     }
 
@@ -419,6 +420,7 @@ export function formatValidationError(result: BundleValidationResult): string {
     const tail = result.errors.length > MAX
         ? [`  … and ${result.errors.length - MAX} more error(s).`]
         : [];
+
     return [
         `Bundle schema validation failed (${result.errors.length} error${result.errors.length === 1 ? "" : "s"}):`,
         ...head,

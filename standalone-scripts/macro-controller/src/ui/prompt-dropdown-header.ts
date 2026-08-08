@@ -47,6 +47,7 @@ export function buildDropdownHeader(
   right.appendChild(buildResetOrderButton(rerender));
   right.appendChild(buildLoadButton(rerender));
   header.appendChild(right);
+
   return header;
 }
 
@@ -59,8 +60,6 @@ function buildReadMemoryAdminButton(): HTMLElement {
     });
   });
 }
-
-
 
 /** PlanTierType-14 step 10 launcher: opens the DB-backed Prompt Library modal. */
 function buildLibraryButton(): HTMLElement {
@@ -84,6 +83,7 @@ function buildHiddenNextCompatibilityMarker(): HTMLElement {
   marker.setAttribute('aria-hidden', 'true');
   marker.textContent = 'Next';
   marker.style.cssText = 'display:none;';
+
   return marker;
 }
 
@@ -97,11 +97,9 @@ function buildPlanTabMarker(): HTMLElement {
   marker.setAttribute('data-tab-active', '1');
   marker.textContent = 'PlanTierType';
   marker.style.cssText = 'font-size:10px;color:' + cPrimaryLight + ';padding:2px 6px;';
+
   return marker;
 }
-
-
-
 
 /** Build the "↺ Reset to default order" pill that restores DEFAULT_PROMPT_ORDER. */
 function buildResetOrderButton(rerender: Rerender): HTMLElement {
@@ -138,6 +136,7 @@ function buildLoadButton(rerender: Rerender): HTMLElement {
     e.stopPropagation();
     handleLoadClick(btn, rerender);
   };
+
   return btn;
 }
 

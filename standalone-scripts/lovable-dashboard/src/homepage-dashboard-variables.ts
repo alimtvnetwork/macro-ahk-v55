@@ -53,6 +53,7 @@ export type HomepageDashboardVariableKey = keyof typeof HomepageDashboardVariabl
 
 export function resolveFullXPath(key: HomepageDashboardVariableKey, index?: number): string {
     const entry = HomepageDashboardVariables[key];
+
     return injectIndex(entry.full, index);
 }
 
@@ -60,12 +61,14 @@ function injectIndex(template: string, index?: number): string {
     if (index === undefined) {
         return template;
     }
+
     return template.replace(INDEX_TOKEN, String(index));
 }
 
 export function resolveElement(xpath: string): Element | null {
     try {
         const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+
         return result.singleNodeValue as Element | null;
     } catch {
         return null;

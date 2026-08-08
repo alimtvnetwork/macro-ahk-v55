@@ -137,6 +137,7 @@ function PrimaryActionButtons(props: LibraryToolbarProps): JSX.Element {
 
 function SelectionActionButtons(props: LibraryToolbarProps): JSX.Element {
     const disabled = props.selectedCount === 0;
+
     return (
         <>
             <Button variant="secondary" size="sm" disabled={disabled} onClick={() => props.setBatchOpen(true)}>

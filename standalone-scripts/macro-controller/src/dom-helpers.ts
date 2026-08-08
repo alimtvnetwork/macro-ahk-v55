@@ -90,6 +90,7 @@ export function isUserTypingInPrompt(): boolean {
     return isInPrompt;
   } catch (e) {
     logError('isPromptArea', 'Prompt area detection failed', e);
+
     return false;
   }
 }
@@ -145,6 +146,7 @@ export function pollForDialogReady(): Promise<void> {
 
   if (isNotConfigured) {
     log('MainProgressXPath not configured — falling back to fixed DialogWaitMs wait', 'warn');
+
     return new Promise<void>(function(resolve) {
       setTimeout(resolve, TIMING.DIALOG_WAIT || 2000);
     });
@@ -272,6 +274,7 @@ function tryClickVisibleButton(btn: Element, buttonIndex: number): boolean | nul
 
   if (isMissingIsVisible) {
     log('Button ' + buttonIndex + ' is not visible, skipping...', 'skip');
+
     return null;
   }
 
@@ -284,6 +287,7 @@ function tryClickVisibleButton(btn: Element, buttonIndex: number): boolean | nul
   const isExpanded = btn.getAttribute('aria-expanded') === 'true' || btn.getAttribute('data-state') === 'open';
   if (isExpanded) {
     log('Dialog is ALREADY OPEN (aria-expanded=true) — skipping click', 'success');
+
     return true;
   }
 
@@ -293,9 +297,11 @@ function tryClickVisibleButton(btn: Element, buttonIndex: number): boolean | nul
   try {
     reactClick(btn);
     log('Clicked Project Button successfully — dialog should now be opening', 'success');
+
     return true;
   } catch (e) {
     logError('unknown', 'Click failed on button ' + buttonIndex + ': ' + (e as Error).message);
+
     return null;
   }
 }

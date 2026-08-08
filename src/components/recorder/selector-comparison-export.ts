@@ -46,6 +46,7 @@ export function buildSelectorComparisonBundle(
     opts: BuildSelectorBundleOpts = {},
 ): SelectorComparisonBundle {
     const now = opts.Now ?? ((): Date => new Date());
+
     return {
         Generator: "marco-extension",
         Kind: "SelectorComparison",
@@ -75,5 +76,6 @@ export function buildSelectorComparisonFilename(
     const date = iso.slice(0, 10);
     const time = iso.slice(11, 16).replace(":", "");
     const stepFragment = stepId !== null ? `step${stepId}` : "step-na";
+
     return `marco-selector-comparison-${stepFragment}-${date}-${time}.json`;
 }

@@ -137,6 +137,7 @@ export function getMetaTables(db: SqlJsDatabase): Array<{
         });
     }
     stmt.free();
+
     return rows;
 }
 
@@ -186,6 +187,7 @@ export function getMetaColumns(db: SqlJsDatabase, tableName?: string): Array<{
         });
     }
     stmt.free();
+
     return rows;
 }
 
@@ -226,6 +228,7 @@ export function getMetaRelations(db: SqlJsDatabase, tableName?: string): Array<{
         });
     }
     stmt.free();
+
     return rows;
 }
 
@@ -236,12 +239,14 @@ export function getMetaRelations(db: SqlJsDatabase, tableName?: string): Array<{
 function getExistingSqliteTables(db: SqlJsDatabase): Set<string> {
     const result = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name");
     if (result.length === 0) return new Set();
+
     return new Set(result[0].values.map((row) => row[0] as string));
 }
 
 function getExistingColumns(db: SqlJsDatabase, tableName: string): Set<string> {
     const result = db.exec(`PRAGMA table_info("${tableName}")`);
     if (result.length === 0) return new Set();
+
     return new Set(result[0].values.map((row) => row[1] as string));
 }
 

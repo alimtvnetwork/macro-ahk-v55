@@ -37,6 +37,7 @@ import { handleFileGet } from "./file-storage-handler";
 /** AUTH_GET_TOKEN — returns the current session token. */
 export async function handleSdkAuthGetToken(): Promise<string | null> {
     const result = await handleGetToken();
+
     return result.token;
 }
 
@@ -54,18 +55,21 @@ export async function handleSdkAuthGetSource(): Promise<string> {
 /** AUTH_REFRESH — forces a token refresh. */
 export async function handleSdkAuthRefresh(): Promise<string | null> {
     const result = await handleRefreshToken();
+
     return result.authToken ?? null;
 }
 
 /** AUTH_IS_EXPIRED — checks if the current token appears expired. */
 export async function handleSdkAuthIsExpired(): Promise<boolean> {
     const result = await handleGetToken();
+
     return result.token === null;
 }
 
 /** AUTH_GET_JWT — returns the raw JWT/session ID string. */
 export async function handleSdkAuthGetJwt(): Promise<string | null> {
     const result = await handleGetToken();
+
     return result.token;
 }
 
@@ -79,6 +83,7 @@ export async function handleSdkCookiesGet(
 ): Promise<{ value: string | null }> {
     const { name, url } = payload as MessageRequest & { name: string; url?: string };
     const value = await readCookieValueFromCandidates(name, url);
+
     return { value };
 }
 
@@ -88,6 +93,7 @@ export async function handleSdkCookiesGetDetail(
 ): Promise<{ cookie: chrome.cookies.Cookie | null }> {
     const { name, url } = payload as MessageRequest & { name: string; url?: string };
     const cookie = await readCookieFromCandidates(name, url);
+
     return { cookie };
 }
 
@@ -101,6 +107,7 @@ export async function handleSdkCookiesGetAll(
         if (url) details.url = url;
         if (domain) details.domain = domain;
         const cookies = await chrome.cookies.getAll(details);
+
         return { cookies };
     } catch {
         return { cookies: [] };
@@ -136,6 +143,7 @@ export async function handleSdkConfigSet(
     if (isMissingKey) return { isOk: false };
     const storageKey = `marco_config_${key}`;
     await chrome.storage.local.set({ [storageKey]: value });
+
     return { isOk: true };
 }
 

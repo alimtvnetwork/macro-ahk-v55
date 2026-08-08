@@ -1,4 +1,3 @@
- 
 import { toErrorMessage , logError } from '../error-utils';
 /**
  * MacroLoop Controller — Auto-Attach File Automation
@@ -52,12 +51,17 @@ function autoAttachDelay(ms: number) {
 
 export function clickByXPath(xpath: string, label: string): boolean {
   const isMissingXpath = !xpath;
-  if (isMissingXpath) { log('Auto-Attach: No XPath for ' + label, 'warn'); return false; }
+  if (isMissingXpath) { log('Auto-Attach: No XPath for ' + label, 'warn');
+
+ return false; }
   const el = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
   const isMissingEl = !el;
-  if (isMissingEl) { log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn'); return false; }
+  if (isMissingEl) { log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn');
+
+ return false; }
   (el as HTMLElement).click();
   log('Auto-Attach: Clicked ' + label, 'info');
+
   return true;
 }
 
@@ -65,7 +69,9 @@ export function insertTextIntoElement(xpath: string, text: string, label: string
   if (!xpath || !text) return false;
   const el = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as HTMLElement;
   const isMissingEl = !el;
-  if (isMissingEl) { log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn'); return false; }
+  if (isMissingEl) { log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn');
+
+ return false; }
   el.focus();
   const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value') ||
                                 Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value');
@@ -81,6 +87,7 @@ export function insertTextIntoElement(xpath: string, text: string, label: string
   el.dispatchEvent(new Event('input', { bubbles: true }));
   el.dispatchEvent(new Event('change', { bubbles: true }));
   log('Auto-Attach: Inserted text into ' + label + ' (' + text.length + ' chars)', 'success');
+
   return true;
 }
 
@@ -97,6 +104,7 @@ export async function runAutoAttachGroup(
 
   if (autoAttachState.running) {
     showToast('Auto-Attach already running', 'warn');
+
     return;
   }
 

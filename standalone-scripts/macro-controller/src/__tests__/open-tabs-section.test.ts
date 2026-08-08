@@ -34,6 +34,7 @@ vi.mock('../ui/prompt-loader', () => buildPromptLoaderMock({
 vi.mock('../ui/extension-relay', () => ({
     sendToExtension: vi.fn(async (_channel, payload) => {
         captured.push({ method: payload.method, sql: payload.params.sql });
+
         return (typeof responsesQueue !== 'undefined' && responsesQueue.length) ? responsesQueue.shift() : (typeof nextResponse !== 'undefined' ? nextResponse : { isOk: true });
     }),
 }));

@@ -36,6 +36,7 @@ export function el<K extends keyof HTMLElementTagNameMap>(
 export function escHtml(text: string): string {
   const container = document.createElement('div');
   container.textContent = text;
+
   return container.innerHTML;
 }
 

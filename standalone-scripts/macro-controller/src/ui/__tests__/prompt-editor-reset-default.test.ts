@@ -36,6 +36,7 @@ function openWithPlanDefault(): { overlay: HTMLElement; textarea: HTMLTextAreaEl
   const saveBtn = Array.from(overlay.querySelectorAll('button')).find(
     (b) => b.textContent === '💾 Update',
   ) as HTMLButtonElement;
+
   return { overlay, textarea, resetBtn, saveBtn };
 }
 

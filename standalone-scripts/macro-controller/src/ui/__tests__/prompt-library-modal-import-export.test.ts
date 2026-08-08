@@ -43,6 +43,7 @@ const flush = async (): Promise<void> => {
 
 function makeFile(text: string, name = 'prompts.json'): File {
     const blob = new Blob([text], { type: 'application/json' });
+
     // jsdom's File constructor accepts BlobParts.
     return new File([blob], name, { type: 'application/json' });
 }

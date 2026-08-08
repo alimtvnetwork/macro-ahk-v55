@@ -30,6 +30,7 @@ const ATTR_ARIA_LABEL = 'aria-label';
 /** Format a number with thousands separators (en-US, no decimals). */
 export function formatCount(n: number): string {
   if (!Number.isFinite(n)) return '—';
+
   return n.toLocaleString('en-US', { maximumFractionDigits: 0 });
 }
 
@@ -42,6 +43,7 @@ export function formatLocalReset(iso: string): string {
   const weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()];
   const hh = String(d.getHours()).padStart(2, '0');
   const mm = String(d.getMinutes()).padStart(2, '0');
+
   return weekday + ' ' + hh + ':' + mm;
 }
 
@@ -61,6 +63,7 @@ export function generateCsv(workspaces: ReadonlyArray<WorkspaceCredit>): string 
     const dailyLimit = String(summary.dailyLimit);
     rows.push('"' + name + '","' + plan + '",' + projects + ',' + used + ',' + rem + ',' + total + ',' + daily + ',' + dailyLimit + ',' + summary.source);
   }
+
   return rows.join('\r\n');
 }
 
@@ -90,6 +93,7 @@ const TONE_COLOR: Record<CreditTone, string> = {
 };
 function toneColor(tone: CreditTone | undefined): string {
   if (tone && TONE_COLOR[tone]) return TONE_COLOR[tone];
+
   return '#e0e0e0';
 }
 
@@ -119,6 +123,7 @@ export function buildCard(heading: string, rows: ReadonlyArray<{ label: string; 
     row.appendChild(value);
     card.appendChild(row);
   }
+
   return card;
 }
 
@@ -158,8 +163,10 @@ export function sortWorkspaces(
     if (typeof av === 'number' && typeof bv === 'number') {
       return (av - bv) * mult;
     }
+
     return String(av).localeCompare(String(bv), 'en', { sensitivity: 'base' }) * mult;
   });
+
   return values;
 }
 
@@ -170,6 +177,7 @@ function pickSortValue(ws: WorkspaceCredit, key: SortKey): number | string {
   const summary = resolveCreditSummary(ws);
   if (key === 'used') return summary.totalUsed;
   if (key === 'rem') return summary.available;
+
   return summary.total;
 }
 
@@ -181,6 +189,7 @@ export function nextSortDir(key: SortKey, current: SortState): SortState {
   }
   if (current.dir === 'none') return { key, dir: isNumeric ? 'desc' : 'asc' };
   if (current.dir === (isNumeric ? 'desc' : 'asc')) return { key, dir: isNumeric ? 'asc' : 'desc' };
+
   return { key, dir: 'none' };
 }
 
@@ -200,6 +209,7 @@ export function reorderArray<T>(values: ReadonlyArray<T>, from: number, to: numb
   const next = values.slice();
   const [moved] = next.splice(from, 1);
   next.splice(to, 0, moved);
+
   return next;
 }
 
@@ -224,6 +234,7 @@ function wsMatchesQuery(ws: WorkspaceCredit, q: string): boolean {
     (ws.id || '') + ' ' +
     (ws.plan || '')
   ).toLowerCase();
+
   return hay.indexOf(needle) !== -1;
 }
 
@@ -235,6 +246,7 @@ export function applyFilters(
   const anyChipActive = filters.low || filters.empty || filters.free;
   const hasQuery = (filters.query || '').trim().length > 0;
   if (!anyChipActive && !hasQuery) return workspaces;
+
   return workspaces.filter((ws) => {
     if (hasQuery && !wsMatchesQuery(ws, filters.query)) return false;
     const isMissingAnyChipActive = !anyChipActive;
@@ -243,6 +255,7 @@ export function applyFilters(
     if (filters.low && rem < 100 && rem > 0) return true;
     if (filters.empty && rem <= 0) return true;
     if (filters.free && ws.hasFree) return true;
+
     return false;
   });
 }
@@ -272,6 +285,7 @@ function buildChip(
     if (isMissingActive) btn.style.background = 'transparent';
   };
   btn.onclick = function () { onToggle(); };
+
   return btn;
 }
 
@@ -302,6 +316,7 @@ function buildFilterBar(
   bar.appendChild(chipLow);
   bar.appendChild(chipEmpty);
   bar.appendChild(chipFree);
+
   return bar;
 }
 
@@ -336,6 +351,7 @@ function buildSearchBar(initialQuery: string, onChange: (q: string) => void): HT
     onChange(input.value);
   });
   wrap.appendChild(input);
+
   return wrap;
 }
 
@@ -426,12 +442,14 @@ function renderBodyRows(ctx: TableCtx): void {
   while (ctx.body.firstChild) ctx.body.removeChild(ctx.body.firstChild);
   if (ctx.order.length === 0) {
     appendEmptyState(ctx.body, 'No workspaces cached. Open the workspace panel to sync.');
+
     return;
   }
   const filtered = applyFilters(ctx.order, ctx.filters);
   const sorted = sortWorkspaces(filtered, ctx.sortState);
   if (sorted.length === 0) {
     appendEmptyState(ctx.body, 'No workspaces match the active filters.');
+
     return;
   }
   sorted.forEach((ws, idx) => {
@@ -485,6 +503,7 @@ export function buildBreakdownTable(workspaces: ReadonlyArray<WorkspaceCredit>):
   wrap.appendChild(ctx.filterBar);
   wrap.appendChild(header);
   wrap.appendChild(body);
+
   return wrap;
 }
 
@@ -536,6 +555,7 @@ function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
   row.appendChild(used);
   row.appendChild(rem);
   row.appendChild(total);
+
   return row;
 }
 
@@ -574,6 +594,7 @@ export function buildBody(totals: CreditTotals, workspaces: ReadonlyArray<Worksp
   }
 
   body.appendChild(buildBreakdownTable(workspaces));
+
   return body;
 }
 
@@ -617,6 +638,7 @@ function installA11yHandlers(panel: HTMLElement): void {
     if (e.key === 'Escape') {
       e.stopPropagation();
       removeCreditTotalsModal();
+
       return;
     }
     if (e.key !== 'Tab') return;
@@ -668,6 +690,7 @@ function buildTitleBar(): HTMLElement {
   closeBtn.onclick = function (): void { removeCreditTotalsModal(); };
   bar.appendChild(title);
   bar.appendChild(closeBtn);
+
   return bar;
 }
 
@@ -703,6 +726,7 @@ function buildFooter(totals: CreditTotals, workspaces: ReadonlyArray<WorkspaceCr
   right.appendChild(close);
   footer.appendChild(left);
   footer.appendChild(right);
+
   return footer;
 }
 
@@ -715,5 +739,6 @@ export function formatSnapshotAge(lastCheckedAt: number | null): string {
   const min = Math.floor(sec / 60);
   if (min < 60) return min + 'm ago';
   const hr = Math.floor(min / 60);
+
   return hr + 'h ago';
 }

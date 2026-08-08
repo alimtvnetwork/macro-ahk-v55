@@ -20,5 +20,6 @@ export function buildSettingsButton(): HTMLElement {
     e.stopPropagation();
     showSettingsModal();
   };
+
   return btn;
 }

@@ -69,6 +69,7 @@ describe('page-workspace-responder', () => {
 
   async function loadModule() {
     vi.resetModules();
+
     return import('../page-workspace-responder');
   }
 

@@ -31,6 +31,7 @@ export function useDebugPanel() {
         setEntries((prev) => {
             const next = new Map(prev);
             next.set(action, { action, error: null, timestamp: new Date() });
+
             return next;
         });
         setIsVisible(true);
@@ -40,6 +41,7 @@ export function useDebugPanel() {
         setEntries((prev) => {
             const next = new Map(prev);
             next.set(action, { action, error: errorMessage, timestamp: new Date() });
+
             return next;
         });
         setIsVisible(true);

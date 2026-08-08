@@ -52,6 +52,7 @@ function loadPosition(): DragPosition | null {
     } catch (err) {
         logError("AutoCatch", "Unhandled exception", err);
     } // allow-swallow: corrupt stored position falls back to default
+
     return null;
 }
 
@@ -73,6 +74,7 @@ function clamp(p: DragPosition, width: number, height: number): DragPosition {
     if (typeof window === "undefined") { return p; }
     const maxX = Math.max(EDGE_PADDING_PX, window.innerWidth - width - EDGE_PADDING_PX);
     const maxY = Math.max(EDGE_PADDING_PX, window.innerHeight - height - EDGE_PADDING_PX);
+
     return {
         x: Math.min(Math.max(EDGE_PADDING_PX, p.x), maxX),
         y: Math.min(Math.max(EDGE_PADDING_PX, p.y), maxY),
@@ -96,10 +98,12 @@ function useResizeReclamp(
                 const next = clamp(prev, rect.width, rect.height);
                 if (next.x === prev.x && next.y === prev.y) { return prev; }
                 savePosition(next);
+
                 return next;
             });
         };
         window.addEventListener("resize", onResize);
+
         return () => window.removeEventListener("resize", onResize);
     }, [containerRef, setPosition]);
 }
@@ -150,7 +154,9 @@ function usePointerDragHandlers(
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("pointerup", onPointerUp);
         window.removeEventListener("pointercancel", onPointerUp);
-        setPosition((p) => { if (p !== null) { savePosition(p); } return p; });
+        setPosition((p) => { if (p !== null) { savePosition(p); }
+
+ return p; });
     }, [activePointerRef, onPointerMove, setIsDragging, setPosition]);
 
     return useCallback((e: React.PointerEvent<HTMLElement>) => {

@@ -49,6 +49,7 @@ describe("waitForElement", () => {
         const spy = vi.spyOn(document, "querySelector").mockImplementation((sel: string) => {
             polls += 1;
             if (polls >= 3) { document.body.innerHTML = `<div id="late"></div>`; }
+
             return origQuerySelector(sel);
         });
 

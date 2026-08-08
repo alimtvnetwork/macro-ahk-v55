@@ -176,6 +176,7 @@ export function usePopupData() {
     setScripts((prev) =>
       prev.map((s) => {
         const isTarget = s.id === scriptId;
+
         return isTarget ? { ...s, isEnabled: !s.isEnabled } : s;
       }),
     );
@@ -250,6 +251,7 @@ async function hydrateBootFailureSnapshot(
         const id = `${statusRes.bootStep}|${(statusRes.bootError ?? "").slice(0, 80)}`;
         setFrozenTrail(freezeClickTrail(id));
       }
+
       return;
     }
 
@@ -260,6 +262,7 @@ async function hydrateBootFailureSnapshot(
     if (payload === undefined && liveFailed === false) {
       setPersistedFailure(null);
       setFrozenTrail(null);
+
       return;
     }
 
@@ -267,6 +270,7 @@ async function hydrateBootFailureSnapshot(
       setPersistedFailure(payload);
       const existing = readFrozenClickTrail(payload.failureId);
       setFrozenTrail(existing ?? freezeClickTrail(payload.failureId));
+
       return;
     }
 

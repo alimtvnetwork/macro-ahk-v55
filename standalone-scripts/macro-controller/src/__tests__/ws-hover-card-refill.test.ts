@@ -70,12 +70,14 @@ function extractRefillSection(html: string): string {
     const headerBlock = html.slice(headerStart, headerCloseIdx + 6);
     if (headerBlock.includes('>Refill</div>')) {
       const nextHeaderIdx = html.indexOf(HEADER_MARKER, headerCloseIdx);
+
       return nextHeaderIdx === -1
         ? html.slice(sectionOpen)
         : html.slice(sectionOpen, html.lastIndexOf('<div', nextHeaderIdx));
     }
     cursor = headerCloseIdx + 6;
   }
+
   return '';
 }
 

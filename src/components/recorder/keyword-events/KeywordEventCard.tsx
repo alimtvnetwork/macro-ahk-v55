@@ -144,7 +144,9 @@ function computeRunDisabledReason(event: KeywordEvent, issueCount: number): stri
     if (issueCount > 0) {
         const plural = issueCount === 1 ? "" : "s";
         const verb = issueCount === 1 ? "s" : "";
+
         return `${issueCount} step${plural} need${verb} fixing`;
     }
+
     return null;
 }

@@ -152,6 +152,7 @@ describe('Issue 118 integration — sort key (daysSince desc, available tiebreak
       const daysA = sa.daysSince || 0;
       const daysB = sb.daysSince || 0;
       if (daysB !== daysA) return daysB - daysA;
+
       return (b.available || 0) - (a.available || 0);
     });
   }

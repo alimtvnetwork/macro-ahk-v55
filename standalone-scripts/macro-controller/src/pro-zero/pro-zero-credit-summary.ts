@@ -47,7 +47,9 @@ function persistOnSuccess(workspace: WorkspaceInfoTyped, balance: CreditBalanceR
 
 export async function buildProZeroCreditSummary(workspace: WorkspaceInfoTyped): Promise<ProZeroSummaryOutcome> {
     const plan = mapWorkspacePlan(workspace.plan);
-    if (!isProZeroPlan(plan)) { logSkippedNonProZero(plan); return skippedFailure(plan); }
+    if (!isProZeroPlan(plan)) { logSkippedNonProZero(plan);
+
+ return skippedFailure(plan); }
     const result = await resolveBalance(workspace.id);
     if (result.status !== CreditBalanceFetchStatusType.SUCCESS) return { isOk: false, failure: result };
     persistOnSuccess(workspace, result.data);

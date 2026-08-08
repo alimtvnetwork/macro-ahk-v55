@@ -171,9 +171,11 @@ function createConcurrencyLock<T>(): ConcurrencyLock<T> {
             }
 
             inFlight = fn();
+
             return inFlight.then(function (value) {
                 inFlight = null;
                 resolveAllWaiters(value);
+
                 return { value, wasQueued: false };
             });
         },
@@ -208,6 +210,7 @@ export function _diagActivePolls(): Array<{ label: string; ageMs: number }> {
     _activePolls.forEach(function (entry) {
         out.push({ label: entry.label, ageMs: now - entry.startedAt });
     });
+
     return out;
 }
 
@@ -225,6 +228,7 @@ function pollUntil<T>(
         if (immediate) {
             if (options.onFound) { options.onFound(0); }
             resolve(immediate);
+
             return;
         }
 
@@ -247,6 +251,7 @@ function pollUntil<T>(
                 stop();
                 if (options.onFound) { options.onFound(elapsed); }
                 resolve(result);
+
                 return;
             }
 
@@ -274,8 +279,10 @@ function waitForElement(options: WaitForElementOptions): Promise<Element | null>
                 selector, root, null,
                 XPathResult.FIRST_ORDERED_NODE_TYPE, null,
             );
+
             return result.singleNodeValue as Element | null;
         }
+
         return root.querySelector(selector);
     }, { intervalMs, timeoutMs });
 }
@@ -286,6 +293,7 @@ function waitForElement(options: WaitForElementOptions): Promise<Element | null>
 
 function debounce<A extends unknown[]>(fn: (...args: A) => void, ms: number): (...args: A) => void {
     let timer: ReturnType<typeof setTimeout> | null = null;
+
     return function (...args: A) {
         if (timer !== null) { clearTimeout(timer); }
         timer = setTimeout(function () { timer = null; fn(...args); }, ms);
@@ -299,6 +307,7 @@ function debounce<A extends unknown[]>(fn: (...args: A) => void, ms: number): (.
 function throttle<A extends unknown[]>(fn: (...args: A) => void, ms: number): (...args: A) => void {
     let last = 0;
     let timer: ReturnType<typeof setTimeout> | null = null;
+
     return function (...args: A) {
         const now = Date.now();
         const remaining = ms - (now - last);
@@ -333,6 +342,7 @@ function formatDuration(ms: number): string {
     if (ms < 60000) { return (ms / 1000).toFixed(1) + "s"; }
     const mins = Math.floor(ms / 60000);
     const secs = Math.round((ms % 60000) / 1000);
+
     return mins + "m " + secs + "s";
 }
 
@@ -345,6 +355,7 @@ function deepClone<T>(value: T): T {
     if (typeof structuredClone === "function") {
         return structuredClone(value);
     }
+
     return JSON.parse(JSON.stringify(value)) as T;
 }
 

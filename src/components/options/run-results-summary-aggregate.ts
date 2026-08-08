@@ -64,10 +64,12 @@ export function countsFromTrace(trace: ReadonlyArray<RunStepTraceEntry>): {
         else if (t.Outcome === "Skipped") skip++;
         else if (t.Outcome === "EnteredGroup") ent++;
     }
+
     return { Executed: exec, Skipped: skip, Entered: ent };
 }
 
 export function formatDuration(ms: number): string {
     if (ms < 1000) return `${ms} ms`;
+
     return `${(ms / 1000).toFixed(2)} s`;
 }

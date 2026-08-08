@@ -137,7 +137,9 @@ function buildCustomCountRow(
     event.stopPropagation();
     const count = parseInt(input.value);
     const isInvalidCount = !count || count < 1 || count > 999;
-    if (isInvalidCount) { showPasteToast('⚠️ Enter 1–999', true); return; }
+    if (isInvalidCount) { showPasteToast('⚠️ Enter 1–999', true);
+
+ return; }
     dropdown.style.display = 'none';
     submenu.style.display = 'none';
     runTaskNextLoop(taskNextDeps, count);

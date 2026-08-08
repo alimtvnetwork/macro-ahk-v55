@@ -311,6 +311,7 @@ export function fetchLoopCredits(
     ? Promise.resolve(resolveToken())
     : getBearerToken({ force: true }).catch(function (err: unknown) {
         logError(LOG_SCOPE_CREDIT_FETCH, 'pre-flight getBearerToken({force}) failed', err);
+
         return resolveToken();
       });
 
@@ -324,7 +325,9 @@ export function fetchLoopCredits(
         if (isAuthFailure(resp.status) && !isRetry) {
           const recovered = await handleAuthRecovery(token, resp.status, '');
           const isMissingRecovered = !recovered;
-          if (isMissingRecovered) { mc().updateUI(); return undefined; }
+          if (isMissingRecovered) { mc().updateUI();
+
+ return undefined; }
           fetchLoopCredits(true, autoDetectFn);
 
           return undefined;
@@ -477,10 +480,12 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
   // independently wrapped so one failure does not block the other.
   const proZeroMutated = await applyProZeroEnrichment().catch(function (err: unknown): number {
     logError(CREDIT_FETCH_ASYNC_SCOPE, 'pro_0 enrichment failed', err);
+
     return 0;
   });
   const proOneMutated = await applyProOneEnrichment().catch(function (err: unknown): number {
     logError(CREDIT_FETCH_ASYNC_SCOPE, 'pro_1 enrichment failed', err);
+
     return 0;
   });
   if (proZeroMutated + proOneMutated > 0) { syncCreditStateFromApi(); mc().updateUI(); }

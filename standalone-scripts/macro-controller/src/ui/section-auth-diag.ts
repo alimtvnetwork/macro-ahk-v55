@@ -65,6 +65,7 @@ interface AuthDiagUpdateCtx {
 /** Check if a bridge error is due to normal MV3 service worker suspension. */
 function _isMv3Suspension(error: string): boolean {
   const lower = error.toLowerCase();
+
   return lower.includes('extension context invalidated') || lower.includes('receiving end does not exist');
 }
 
@@ -190,6 +191,7 @@ export function createAuthDiagRow(deps: AuthDiagDeps): AuthDiagResult {
       const isMissingIsConnected = !diagBody.isConnected;
       if (isMissingIsConnected) {
         trackedClearInterval(authDiagPollId);
+
         return;
       }
       const isVisible = diagBody.style.display !== 'none';

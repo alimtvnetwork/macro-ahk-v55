@@ -53,6 +53,7 @@ export function useLogViewer(limit = 200) {
                 if (levelFilter === "info") return lvl === "info" || lvl === "log" || lvl === "debug";
                 if (levelFilter === "warn") return lvl === "warn" || lvl === "warning";
                 if (levelFilter === "error") return lvl === "error" || lvl === "fatal";
+
                 return true;
             });
         }
@@ -66,6 +67,7 @@ export function useLogViewer(limit = 200) {
                 (e.category ?? "").toLowerCase().includes(q)
             );
         }
+
         return result;
     }, [entries, levelFilter, search, cleared]);
 

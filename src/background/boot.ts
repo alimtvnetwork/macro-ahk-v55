@@ -283,6 +283,7 @@ function createUnavailableDbManager(reason: string): DbManager {
 /** Formats a stable boot failure message for logs and surfaced errors. */
 function formatBootError(step: string, error: unknown): string {
     const reason = error instanceof Error ? error.message : String(error);
+
     return `Boot failed at step '${step}': ${reason}`;
 }
 
@@ -313,6 +314,7 @@ async function readCurrentBuildId(): Promise<string | null> {
             `fetch(${BUILD_META_URL}) failed — assuming no buildId (cache will use the in-memory token)`,
             metaErr instanceof Error ? metaErr : String(metaErr),
         );
+
         return null;
     }
 }

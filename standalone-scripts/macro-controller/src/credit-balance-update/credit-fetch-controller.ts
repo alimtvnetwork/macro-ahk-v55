@@ -28,6 +28,7 @@ const creditResolvedListeners = new Set<CreditResolvedListener>();
 
 export function onCreditResolved(listener: CreditResolvedListener): () => void {
     creditResolvedListeners.add(listener);
+
     return function unsubscribe(): void {
         creditResolvedListeners.delete(listener);
     };
@@ -61,6 +62,7 @@ function clampTimeoutMs(value: number): number {
     if (value > MAX_TIMEOUT_MS) {
         return MAX_TIMEOUT_MS;
     }
+
     return Math.floor(value);
 }
 
@@ -98,6 +100,7 @@ function isNonZeroGrantRow(row: object): boolean {
             return true;
         }
     }
+
     return false;
 }
 
@@ -117,6 +120,7 @@ export function isUnifiedBillingWorkspace(ws: WorkspaceCredit): boolean {
     const wireRaw = toWireWorkspaceRaw(ws.rawApi);
     const candidate: unknown = wireRaw?.experimental_features ?? ws.raw?.experimental_features;
     if (candidate === null || typeof candidate !== 'object') return false;
+
     return (candidate as Record<string, unknown>).unified_billing === true;
 }
 
@@ -135,6 +139,7 @@ export function hasInlineCredits(ws: WorkspaceCredit): boolean {
     if (Array.isArray(balances) && balances.some(isNonZeroGrantRow)) {
         return true;
     }
+
     return Number(ws.limit || 0) > 0;
 }
 
@@ -186,6 +191,7 @@ function cacheTtlFor(result: CreditFetchResult): number {
     if (result.balance) {
         return CREDIT_BALANCE_UPDATE_CACHE_TTL_MS;
     }
+
     return Math.max(MIN_TIMEOUT_MS, timeoutMs);
 }
 
@@ -194,6 +200,7 @@ async function fetchWithSingleAuthRetry(ws: WorkspaceCredit, plan: PlanTierType)
     if (first.outcome !== CreditFetchOutcomeType.AuthError) {
         return first;
     }
+
     return fetchWorkspaceCreditBalance({ workspaceId: ws.id, plan, timeoutMs, forceTokenRefresh: true });
 }
 
@@ -203,6 +210,7 @@ async function requestCreditsUncached(ws: WorkspaceCredit, plan: PlanTierType): 
     if (result.balance) {
         overlayCreditBalanceOnWorkspace(ws, result.balance);
     }
+
     return result;
 }
 
@@ -226,6 +234,7 @@ export async function requestCredits(ws: WorkspaceCredit): Promise<CreditFetchRe
         if (cached.balance) {
             overlayCreditBalanceOnWorkspace(ws, cached.balance);
         }
+
         return makeCachedResult(cached);
     }
 
@@ -242,6 +251,7 @@ export async function requestCredits(ws: WorkspaceCredit): Promise<CreditFetchRe
                 'Path: standalone-scripts/macro-controller/src/credit-balance-update/credit-fetch-controller.ts. Missing item: credit-balance result for workspace ' + ws.id + '. Reason: controller fetch failed without a structured result.',
                 caught,
             );
+
             return buildResult(CreditFetchOutcomeType.HttpError, null, detail);
         })
         .finally(function (): void {
@@ -251,9 +261,11 @@ export async function requestCredits(ws: WorkspaceCredit): Promise<CreditFetchRe
             // PlanTierType 01 / Step 7: notify subscribers AFTER cache is written and
             // inFlight is cleared, so the re-render reads the fresh value.
             emitCreditResolved(ws.id, settled);
+
             return settled;
         });
     inFlight.set(ws.id, promise);
+
     return promise;
 }
 

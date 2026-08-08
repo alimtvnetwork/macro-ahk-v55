@@ -41,6 +41,7 @@ function countVisible(matches: ReadonlyArray<ElementLike>): number {
         if (w > 0 || h > 0) { n += 1; continue; }
         if (typeof node.getClientRects === "function" && node.getClientRects().length > 0) { n += 1; }
     }
+
     return n;
 }
 
@@ -65,6 +66,7 @@ function hydrateFromExisting(stepId: number, setters: {
         setters.setCondition(DEFAULT_WAIT_CONFIG.Condition);
         setters.setTimeoutMs(DEFAULT_WAIT_CONFIG.TimeoutMs);
         setters.setHasExisting(false);
+
         return;
     }
     setters.setSelector(existing.Selector);
@@ -79,9 +81,11 @@ function runSelectorEvaluation(selector: string, kind: SelectorKind): TestResult
     try {
         const matches = evaluateSelector({ Selector: selector.trim(), Kind: kind });
         const elapsed = Math.max(0, Math.round(performance.now() - startedAt));
+
         return { Kind: kind, TotalCount: matches.length, VisibleCount: countVisible(matches), DurationMs: elapsed, Error: null };
     } catch (e) {
         const detail = e instanceof Error ? e.message : "Unknown evaluation error";
+
         return { Kind: kind, TotalCount: 0, VisibleCount: 0, DurationMs: Math.max(0, Math.round(performance.now() - startedAt)), Error: detail };
     }
 }
@@ -115,8 +119,12 @@ export function useStepWaitDialog(args: Args) {
 
     const handleSave = () => {
         if (stepId === null) return;
-        if (selector.trim().length === 0) { toast.error("Selector is required"); return; }
-        if (!validation.Ok) { toast.error(validation.Reason); return; }
+        if (selector.trim().length === 0) { toast.error("Selector is required");
+
+ return; }
+        if (!validation.Ok) { toast.error(validation.Reason);
+
+ return; }
         const next: WaitConfig = { Selector: selector.trim(), Kind: effectiveKind, Condition: condition, TimeoutMs: timeoutMs };
         try {
             writeStepWait(stepId, next);
@@ -130,9 +138,12 @@ export function useStepWaitDialog(args: Args) {
     };
 
     const handleTest = () => {
-        if (selector.trim().length === 0) { toast.error("Enter a selector first"); return; }
+        if (selector.trim().length === 0) { toast.error("Enter a selector first");
+
+ return; }
         if (!validation.Ok) {
             setTestResult({ Kind: effectiveKind, TotalCount: 0, VisibleCount: 0, DurationMs: 0, Error: validation.Reason });
+
             return;
         }
         setTestResult(runSelectorEvaluation(selector, effectiveKind));

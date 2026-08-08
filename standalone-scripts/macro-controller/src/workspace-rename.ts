@@ -15,8 +15,6 @@
 // rename-api.ts (see hasForbidden/addForbidden/removeForbidden imports
 // there). No external barrel consumer exists — re-exports removed.
 
-
-
 export { applyRenameTemplate } from './rename-template';
 
 export { renameWorkspace } from './rename-api';

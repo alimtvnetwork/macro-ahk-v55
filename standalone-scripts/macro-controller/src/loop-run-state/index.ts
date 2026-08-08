@@ -22,6 +22,7 @@ function safeEvaluate(xpath: string): Node | null {
             XPathResult.FIRST_ORDERED_NODE_TYPE,
             null,
         );
+
         return result.singleNodeValue;
     } catch {
         return null;
@@ -36,6 +37,7 @@ function submitButtonPresent(): boolean {
     if (byId !== null) {
         return true;
     }
+
     return safeEvaluate(SUBMIT_BUTTON_XPATH) !== null;
 }
 
@@ -43,6 +45,7 @@ function stopIconPresent(): boolean {
     if (typeof document === 'undefined') {
         return false;
     }
+
     return safeEvaluate(STOP_ICON_XPATH) !== null;
 }
 
@@ -69,9 +72,11 @@ export interface WaitForRunIdleOptions {
 export function waitForRunIdle(opts: WaitForRunIdleOptions = {}): Promise<void> {
     const timeoutMs = opts.timeoutMs ?? RUN_GATE_TIMEOUT_MS;
     const pollMs = opts.pollMs ?? RUN_GATE_POLL_MS;
+
     return new Promise<void>((resolve, reject) => {
         if (isRunIdle()) {
             resolve();
+
             return;
         }
         const startedAt = Date.now();
@@ -79,6 +84,7 @@ export function waitForRunIdle(opts: WaitForRunIdleOptions = {}): Promise<void> 
             if (isRunIdle()) {
                 clearInterval(handle);
                 resolve();
+
                 return;
             }
             if (Date.now() - startedAt >= timeoutMs) {

@@ -49,6 +49,7 @@ const tick = (): Promise<void> => new Promise((r) => setTimeout(r, 0));
 function makeFile(): File {
     const f = new File(['[]'], 'prompts.json', { type: 'application/json' });
     Object.defineProperty(f, 'size', { value: 42, configurable: true });
+
     return f;
 }
 function getFileInput(): HTMLInputElement {

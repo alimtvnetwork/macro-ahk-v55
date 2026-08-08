@@ -46,6 +46,7 @@ function freshDb(): { db: Database; lib: StepLibraryDb; projectId: number } {
         ExternalId: "00000000-0000-0000-0000-000000000001",
         Name: "Test Project",
     });
+
     return { db, lib, projectId };
 }
 

@@ -28,6 +28,7 @@ import {
 type MockSend = Mock<(type: string, payload: Record<string, unknown>) => Promise<Record<string, unknown>>>;
 function makeDeps(overrides: Partial<TaskNextDeps> = {}): TaskNextDeps & { sendToExtension: MockSend } {
     const send: MockSend = vi.fn();
+
     return {
         sendToExtension: send,
         getPromptsConfig: () => ({ entries: [] }) as unknown as ReturnType<TaskNextDeps['getPromptsConfig']>,
@@ -175,6 +176,7 @@ describe('saveTaskNextSettings', () => {
 function rejectedSilently(err: Error): Promise<never> {
     const p = new Promise<never>((_res, rej) => { setTimeout(() => rej(err), 0); });
     p.catch(() => { /* silence outer */ });
+
     return p;
 }
 
@@ -184,15 +186,14 @@ function rejectedSilently(err: Error): Promise<never> {
 function suppressUnhandledRejections(): () => void {
     const handler = () => { /* swallow */ };
     process.on('unhandledRejection', handler);
+
     return () => process.off('unhandledRejection', handler);
 }
-
 
 describe('loadTaskNextSettings, storage-throw cases', () => {
     let restore: () => void;
     beforeEach(() => { restore = suppressUnhandledRejections(); });
     afterEach(() => { restore(); });
-
 
     it('does not throw synchronously when KV_GET rejects', () => {
         const deps = makeDeps();
@@ -227,7 +228,6 @@ describe('saveTaskNextSettings, storage-throw cases', () => {
     let restore: () => void;
     beforeEach(() => { restore = suppressUnhandledRejections(); });
     afterEach(() => { restore(); });
-
 
     it('does not throw synchronously when KV_SET rejects', () => {
         const deps = makeDeps();

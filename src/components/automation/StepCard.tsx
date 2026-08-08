@@ -27,6 +27,7 @@ function StepStatusIndicator({ status }: { status?: StepStatus }) {
   if (status === "done") return <Check className="h-3 w-3 text-green-500" />;
   if (status === "error") return <AlertCircle className="h-3 w-3 text-destructive" />;
   if (status === "skipped") return <SkipForward className="h-3 w-3 text-muted-foreground" />;
+
   return null;
 }
 

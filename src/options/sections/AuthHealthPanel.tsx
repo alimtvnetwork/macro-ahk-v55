@@ -125,6 +125,7 @@ export function AuthHealthPanel() {
                                 const barWidth = data.totalMs > 0
                                     ? Math.min(100, Math.round((s.durationMs / data.totalMs) * 100))
                                     : 0;
+
                                 return (
                                     <tr key={s.tier} className={s.isSuccess ? "diag-auth-row-ok" : "diag-auth-row-fail"}>
                                         <td className="diag-auth-tier">T{s.tier}</td>

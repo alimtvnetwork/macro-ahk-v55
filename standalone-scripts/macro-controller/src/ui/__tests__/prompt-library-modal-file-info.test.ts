@@ -54,6 +54,7 @@ function getFileInput(): HTMLInputElement {
 function makeFile(name: string, size: number, content = '[]'): File {
     const f = new File([content], name, { type: 'application/json' });
     Object.defineProperty(f, 'size', { value: size, configurable: true });
+
     return f;
 }
 

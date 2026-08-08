@@ -42,6 +42,7 @@ function tryAppendStrategy(
 ): boolean {
     try {
         operation();
+
         return true;
     } catch (err) {
         logSampledDebug(
@@ -50,6 +51,7 @@ function tryAppendStrategy(
             `${label} failed — ${fallbackHint}`,
             err instanceof Error ? err : String(err),
         );
+
         return false;
     }
 }
@@ -75,7 +77,6 @@ function appendNodeToTarget(target: Element, node: Node): boolean {
         () => { Element.prototype.insertAdjacentElement.call(target, "beforeend", node as Element); },
     );
 }
-
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -124,6 +125,7 @@ export async function configureUserScriptWorld(): Promise<void> {
             // Stay silent: success path below logs ✅, failure path logs ❌.
             userScriptsWorldConfigured = true;
             userScriptsWorldIdEnabled = false;
+
             return;
         }
 
@@ -136,6 +138,7 @@ export async function configureUserScriptWorld(): Promise<void> {
             userScriptsWorldConfigured = true;
             userScriptsWorldIdEnabled = true;
             console.log("[injection:csp] ✅ userScripts world '%s' configured", USER_SCRIPT_WORLD_ID);
+
             return;
         } catch (namedWorldError) {
             logCaughtError(BgLogTag.INJECTION_CSP, `Named userScripts world configuration failed\n  Path: chrome.userScripts.configureWorld({ worldId: "${USER_SCRIPT_WORLD_ID}" })\n  Missing: Configured USER_SCRIPT world with custom CSP\n  Reason: ${namedWorldError instanceof Error ? namedWorldError.message : String(namedWorldError)} — retrying with default world`, namedWorldError);
@@ -171,6 +174,7 @@ export async function injectWithCspFallback(
 
     if (mainResult.isSuccess) {
         console.log("[injection:csp] ✅ %s world injection succeeded (target: %s)", preferredWorld, mainResult.domTarget);
+
         return buildResult(true, preferredWorld, false, undefined, mainResult.domTarget as CspInjectionResult["domTarget"]);
     }
 
@@ -188,6 +192,7 @@ export async function injectWithCspFallback(
                 ? "MAIN world injector interference detected"
                 : "MAIN world injection failed (generic)";
         logBgWarnError(BgLogTag.INJECTION_CSP, `${reason} — falling back to userScripts API`);
+
         return attemptUserScriptFallback(tabId, code, errorMessage);
     }
 
@@ -278,20 +283,24 @@ async function executeInMainWorld(code: string): Promise<string> {
         const appendNode = (node: Node): boolean => {
             try {
                 Node.prototype.appendChild.call(target, node);
+
                 return true;
             } catch {
                 try {
                     Node.prototype.insertBefore.call(target, node, null);
+
                     return true;
                 } catch {
                     if (node.nodeType === Node.ELEMENT_NODE) {
                         try {
                             Element.prototype.insertAdjacentElement.call(target, "beforeend", node as Element);
+
                             return true;
                         } catch {
                             return false;
                         }
                     }
+
                     return false;
                 }
             }
@@ -324,6 +333,7 @@ async function tryInjectViaScripting(
         });
 
         const domTarget = results?.[0]?.result as string | undefined;
+
         return { isSuccess: true, domTarget: domTarget ?? "unknown" };
     } catch (injectionError) {
         const errorMessage = injectionError instanceof Error
@@ -384,6 +394,7 @@ async function attemptUserScriptFallback(
                     console.log("[injection:csp] ✅ userScripts.execute() succeeded in tab %d (default USER_SCRIPT world)", tabId);
                 }
                 console.log("[injection:csp] 🏆 WINNER: userScripts in tab %d | MAIN: ❌ %s → USER_SCRIPT: ✅", tabId, mainErrorMessage ?? "unknown");
+
                 return buildResult(true, "USER_SCRIPT", true);
             } catch (userScriptError) {
                 userScriptTierError = userScriptError instanceof Error
@@ -410,6 +421,7 @@ async function attemptUserScriptFallback(
             mainErrorMessage ?? "unknown",
             userScriptTierLabel,
         );
+
         return blobResult;
     }
 
@@ -423,6 +435,7 @@ async function attemptUserScriptFallback(
             userScriptTierLabel,
             blobResult.errorMessage ?? "unknown",
         );
+
         return evalResult;
     }
 
@@ -432,6 +445,7 @@ async function attemptUserScriptFallback(
 
     const combinedError = `All injection tiers failed | MAIN: ${mainErrorMessage ?? "unknown"} | USER_SCRIPT: ${userScriptReason} | ISOLATED_BLOB: ${blobResult.errorMessage ?? "unknown"} | ISOLATED_EVAL: ${evalResult.errorMessage ?? "unknown"}`;
     logBgWarnError(BgLogTag.INJECTION_CSP, combinedError);
+
     return buildResult(false, "ISOLATED", true, combinedError);
 }
 
@@ -439,6 +453,7 @@ async function attemptUserScriptFallback(
 async function isLegacyInjectionForced(): Promise<boolean> {
     try {
         const { settings } = await handleGetSettings();
+
         return settings.forceLegacyInjection === true;
     } catch (settingsErr) {
         logSampledDebug(
@@ -447,6 +462,7 @@ async function isLegacyInjectionForced(): Promise<boolean> {
             "handleGetSettings unavailable — defaulting forceLegacyInjection=false",
             settingsErr instanceof Error ? settingsErr : String(settingsErr),
         );
+
         return false;
     }
 }
@@ -467,6 +483,7 @@ async function attemptBlobFallback(
         });
 
         const domTarget = results?.[0]?.result as string | undefined;
+
         return buildResult(true, "ISOLATED", true, undefined, domTarget as CspInjectionResult["domTarget"]);
     } catch (blobError) {
         const errorMessage = blobError instanceof Error
@@ -583,20 +600,24 @@ async function executeBlobInjection(code: string): Promise<string> {
         const appendNode = (node: Node): boolean => {
             try {
                 Node.prototype.appendChild.call(target, node);
+
                 return true;
             } catch {
                 try {
                     Node.prototype.insertBefore.call(target, node, null);
+
                     return true;
                 } catch {
                     if (node.nodeType === Node.ELEMENT_NODE) {
                         try {
                             Element.prototype.insertAdjacentElement.call(target, "beforeend", node as Element);
+
                             return true;
                         } catch {
                             return false;
                         }
                     }
+
                     return false;
                 }
             }

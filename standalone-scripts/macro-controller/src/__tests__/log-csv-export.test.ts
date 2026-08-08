@@ -75,6 +75,7 @@ beforeEach(() => {
     if (tag === 'a') {
       (el as HTMLAnchorElement).click = (): void => { /* swallow */ };
     }
+
     return el;
   });
 });
@@ -88,6 +89,7 @@ afterEach(() => {
 function exportAndRead(workspaces: WorkspaceCredit[]): string[] {
   loopCreditState.perWorkspace = workspaces;
   exportWorkspacesAsCsv();
+
   return capturedCsv.split('\n');
 }
 

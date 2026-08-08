@@ -64,6 +64,7 @@ function firstLine(text: string | null): string {
   const isMissingText = !text;
   if (isMissingText) return '(empty)';
   const line = text.split(/\r?\n/, 1)[0] ?? '';
+
   return line.length > 160 ? line.slice(0, 157) + '...' : line;
 }
 
@@ -75,6 +76,7 @@ function makeEl<K extends keyof HTMLElementTagNameMap>(
   const elem = document.createElement(tag);
   if (className) elem.className = className;
   if (textContent !== undefined) elem.textContent = textContent;
+
   return elem;
 }
 
@@ -122,6 +124,7 @@ function renderRow(
   item.appendChild(meta);
   item.appendChild(preview);
   item.appendChild(actions);
+
   return item;
 }
 
@@ -153,6 +156,7 @@ function buildPanelChrome(projectId: string): PanelChrome {
   root.appendChild(header);
   root.appendChild(list);
   root.appendChild(status);
+
   return { root, count, exportBtn, list, status };
 }
 
@@ -198,6 +202,7 @@ export function openProjectHistoryPanel(
       const isMissingIsDeleted = !result.isDeleted;
       if (isMissingIsDeleted) {
         setStatus(`Delete failed (row=${entry.id})`, true);
+
         return;
       }
       await refresh();

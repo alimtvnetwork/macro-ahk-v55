@@ -118,6 +118,7 @@ function buildMetaSets(patch: StepMetaPatch): { sets: string[]; params: Array<st
     pushIfDefinedBool(patch.IsDisabled, "IsDisabled", sets, params);
     pushIfDefined(patch.RetryCount, "RetryCount", sets, params);
     pushIfDefined(patch.TimeoutMs ?? undefined, "TimeoutMs", sets, params);
+
     return { sets, params };
 }
 
@@ -132,6 +133,7 @@ export function updateStepMetaRow(
     sets.push("UpdatedAt = datetime('now')");
     params.push(stepId);
     db.run(`UPDATE Step SET ${sets.join(", ")} WHERE StepId = ?`, params);
+
     return readStepRow(db, stepId);
 }
 
@@ -172,6 +174,7 @@ export function setStepTagsRow(
     for (const name of unique) {
         db.run("INSERT INTO StepTag (StepId, Name) VALUES (?, ?)", [stepId, name]);
     }
+
     return listStepTagsRow(db, stepId);
 }
 
@@ -185,6 +188,7 @@ function dedupeTags(names: ReadonlyArray<string>): string[] {
         seen.add(trimmed);
         out.push(trimmed);
     }
+
     return out;
 }
 
@@ -197,6 +201,7 @@ export function listStepTagsRow(
         [stepId],
     );
     const values = result[0]?.values ?? [];
+
     return values.map((row) => row[0] as string);
 }
 
@@ -215,6 +220,7 @@ export function setStepLinkRow(
         `UPDATE Step SET ${slot} = ?, UpdatedAt = datetime('now') WHERE StepId = ?`,
         [value, stepId],
     );
+
     return readStepRow(db, stepId);
 }
 
@@ -229,6 +235,7 @@ function normaliseProjectSlug(raw: string | null): string | null {
     if (!PROJECT_SLUG_PATTERN.test(trimmed)) {
         throw new Error(`Project slug contains invalid characters (allowed: A-Z a-z 0-9 _ - .): "${trimmed}"`);
     }
+
     return trimmed;
 }
 
@@ -244,6 +251,7 @@ export async function updateStepMeta(
     const mgr = await initProjectDb(projectSlug);
     const step = updateStepMetaRow(mgr.getDb(), stepId, patch);
     mgr.markDirty();
+
     return step;
 }
 
@@ -255,6 +263,7 @@ export async function setStepTags(
     const mgr = await initProjectDb(projectSlug);
     const tags = setStepTagsRow(mgr.getDb(), stepId, names);
     mgr.markDirty();
+
     return tags;
 }
 
@@ -263,6 +272,7 @@ export async function listStepTags(
     stepId: number,
 ): Promise<ReadonlyArray<string>> {
     const mgr = await initProjectDb(projectSlug);
+
     return listStepTagsRow(mgr.getDb(), stepId);
 }
 
@@ -275,5 +285,6 @@ export async function setStepLink(
     const mgr = await initProjectDb(projectSlug);
     const step = setStepLinkRow(mgr.getDb(), stepId, slot, targetProjectSlug);
     mgr.markDirty();
+
     return step;
 }

@@ -138,8 +138,10 @@ describe('buildBreakdownTable — header click sorting', () => {
 
   function rowIds(): string[] {
     const rows = table.querySelectorAll('[data-credit-totals-row]');
+
     return Array.from(rows).map((r) => {
       const name = r.querySelector('[data-cell="name"]');
+
       return (name?.textContent || '').toLowerCase();
     });
   }

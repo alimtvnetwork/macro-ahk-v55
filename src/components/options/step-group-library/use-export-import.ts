@@ -116,6 +116,7 @@ export function useStepGroupExportImport(
     ): Promise<void> => {
         if (!isLibraryReady(lib) || lib.Lib === null || lib.Project === null || lib.SqlJs === null) {
             toast.error("Library not ready");
+
             return;
         }
         const result = await runStepGroupExport({
@@ -129,6 +130,7 @@ export function useStepGroupExportImport(
         });
         if (result.Reason !== "Ok") {
             surfaceExportFailure(result, setExportError);
+
             return;
         }
         downloadZipBlob(result.ZipBytes, result.ZipFileName);
@@ -152,6 +154,7 @@ export function useStepGroupExportImport(
         });
         if (preview.Reason !== "Ok") {
             surfaceExportFailure(preview, setExportError);
+
             return;
         }
         setExportPreview({
@@ -167,11 +170,13 @@ export function useStepGroupExportImport(
     ): void => {
         if (!isLibraryReady(lib)) {
             toast.error("Library not ready");
+
             return;
         }
         const ids = resolveExportIds(idsOverride, selected);
         if (ids.length === 0) {
             toast.error("Select at least one group to export");
+
             return;
         }
         openExportPreview(ids, includeDescendants);

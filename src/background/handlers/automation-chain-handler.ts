@@ -97,6 +97,7 @@ async function getProjectChainDb(projectSlug: string) {
     }
     const db = getProjectDb(projectSlug);
     db.run(CHAIN_TABLE_DDL);
+
     return db;
 }
 
@@ -132,6 +133,7 @@ export async function handleGetAutomationChains(request?: MessageRequest): Promi
         chains.push(rowToChain(stmt.getAsObject() as SqlRow));
     }
     stmt.free();
+
     return { isOk: true, chains };
 }
 
@@ -174,6 +176,7 @@ export async function handleSaveAutomationChain(request: MessageRequest): Promis
     }
 
     await flushProjectDb(project);
+
     return { isOk: true };
 }
 
@@ -193,6 +196,7 @@ export async function handleDeleteAutomationChain(request: MessageRequest): Prom
     const db = await getProjectChainDb(project);
     db.run("DELETE FROM AutomationChains WHERE Id = ?", [Number(chainId)]);
     await flushProjectDb(project);
+
     return { isOk: true };
 }
 
@@ -215,6 +219,7 @@ export async function handleToggleAutomationChain(request: MessageRequest): Prom
         [Number(chainId)],
     );
     await flushProjectDb(project);
+
     return { isOk: true };
 }
 
@@ -251,5 +256,6 @@ export async function handleImportAutomationChains(request: MessageRequest): Pro
     }
 
     await flushProjectDb(project);
+
     return { isOk: true, imported };
 }

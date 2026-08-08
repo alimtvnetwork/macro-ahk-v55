@@ -96,7 +96,6 @@ const MIGRATED_MODULES: readonly {
   { path: 'async-utils.ts',                allowedAreas: ['ASYNC'] },
   { path: 'types/prompt-role.ts',          allowedAreas: ['TYPE'] },
 
-
 ];
 
 /**
@@ -141,6 +140,7 @@ function extractCodes(source: string): readonly string[] {
   while ((match = CODE_PATTERN.exec(source)) !== null) {
     if (match[1]) seen.add(match[1]);
   }
+
   return [...seen];
 }
 

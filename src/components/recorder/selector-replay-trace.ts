@@ -60,6 +60,7 @@ function classify(attempt: SelectorAttempt, stopped: boolean): TraceStepStatus {
     if (stopped) return "pending";
     if (attempt.Matched) return "matched";
     if (ERRORED_REASONS.has(attempt.FailureReason)) return "errored";
+
     return "missed";
 }
 
@@ -69,6 +70,7 @@ function noteFor(attempt: SelectorAttempt, status: TraceStepStatus, role: TraceS
             return `${role} resolved → ${attempt.MatchCount} match${attempt.MatchCount === 1 ? "" : "es"}; replay stopped here.`;
         case "errored": {
             const detailSuffix = attempt.FailureDetail !== null ? ` — ${attempt.FailureDetail}` : "";
+
             return `${role} threw ${attempt.FailureReason}${detailSuffix}.`;
         }
         case "missed":
@@ -89,6 +91,7 @@ export function buildReplayTrace(attempts: ReadonlyArray<SelectorAttempt>): Repl
     }
     const steps = buildTraceSteps(attempts);
     const summary = summarizeTraceSteps(attempts.length, steps);
+
     return {
         Steps: steps,
         Summary: summary,
@@ -104,6 +107,7 @@ function buildTraceSteps(attempts: ReadonlyArray<SelectorAttempt>): TraceStep[] 
     for (const attempt of attempts) {
         steps.push(buildTraceStep(attempt, steps));
     }
+
     return steps;
 }
 
@@ -111,6 +115,7 @@ function buildTraceStep(attempt: SelectorAttempt, previous: ReadonlyArray<TraceS
     const stopped = previous.some((step) => step.Status === "matched");
     const status = classify(attempt, stopped);
     const role = attempt.IsPrimary ? "Primary" : "Fallback";
+
     return createTraceStep(attempt, status, role, previous.length + 1);
 }
 
@@ -127,5 +132,6 @@ function createTraceStep(attempt: SelectorAttempt, status: TraceStepStatus, role
 function summarizeTraceSteps(total: number, steps: ReadonlyArray<TraceStep>): ReplayTraceSummary {
     const stoppedAt = steps.find((step) => step.Status === "matched")?.Order ?? null;
     const evaluated = stoppedAt ?? total;
+
     return { Total: total, Evaluated: evaluated, Skipped: total - evaluated, StoppedAt: stoppedAt, Outcome: stoppedAt !== null ? "matched" : "exhausted" };
 }

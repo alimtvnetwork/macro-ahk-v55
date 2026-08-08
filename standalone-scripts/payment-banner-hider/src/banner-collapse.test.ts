@@ -22,6 +22,7 @@ function buildPattern1(): { banner: HTMLElement; wrapper: HTMLElement } {
             </main>
         </div>
     `;
+
     return {
         banner: document.getElementById("banner")!,
         wrapper: document.getElementById("wrap")!,
@@ -43,6 +44,7 @@ function buildPattern2(): HTMLElement {
             </main>
         </div>
     `;
+
     return document.getElementById("inner")!;
 }
 

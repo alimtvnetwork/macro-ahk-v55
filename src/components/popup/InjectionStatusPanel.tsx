@@ -356,6 +356,7 @@ function VerificationBadge({
             <div className="space-y-0.5">
               {VERIFICATION_CHECKS.map((c) => {
                 const ok = verification[c.key] === true;
+
                 return (
                   <div key={c.key} className="flex items-center gap-1.5 text-xs">
                     {ok ? (

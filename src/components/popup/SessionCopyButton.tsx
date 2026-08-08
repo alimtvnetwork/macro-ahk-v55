@@ -63,6 +63,7 @@ function formatAge(iso: string): string {
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs}h ago`;
   const days = Math.floor(hrs / 24);
+
   return `${days}d ago`;
 }
 interface SessionLogsResponse {
@@ -70,7 +71,6 @@ interface SessionLogsResponse {
   logs: SessionLog[];
   errors: SessionLog[];
 }
-
 
 function formatLogEntry(entry: SessionLog): string {
   const ts = entry.timestamp ?? entry.Timestamp ?? "";
@@ -102,6 +102,7 @@ function formatErrorEntry(entry: SessionLog): string {
 function getExtensionVersion(): string {
   try {
     const g = globalThis as { chrome?: { runtime?: { getManifest?: () => { version?: string } } } };
+
     return g.chrome?.runtime?.getManifest?.().version ?? "?";
   } catch { return "?"; }
 }

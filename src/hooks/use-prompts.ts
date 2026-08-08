@@ -7,7 +7,6 @@ import { sendMessage } from "@/lib/message-client";
 import { useCrossTabSync } from "@/hooks/use-cross-tab-sync";
 import { StateReconciler } from "@/lib/state-reconciler";
 
-
 export interface PromptEntry {
     id: string;
     slug?: string;
@@ -75,7 +74,6 @@ export function usePrompts() {
 
     useCrossTabSync<PromptEntry[]>("marco-prompts-sync", prompts, onRemotePrompts);
 
-
     const refresh = useCallback(async () => {
         setLoading(true);
         setFatalError(null);
@@ -128,6 +126,7 @@ export function usePrompts() {
                 categorySet.add(prompt.category);
             }
         });
+
         return Array.from(categorySet).sort();
     }, [prompts]);
 
@@ -143,6 +142,7 @@ export function usePrompts() {
             if (aFavorite !== bFavorite) {
                 return bFavorite - aFavorite;
             }
+
             return a.order - b.order;
         });
     }, [prompts, categoryFilter]);

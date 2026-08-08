@@ -31,6 +31,7 @@ const BTN_PRIMARY = 'background:rgba(124,58,237,0.9);color:#fff;';
 
 export function confirmDialog(opts: ConfirmOptions): Promise<boolean> {
   if (typeof document === 'undefined') return Promise.resolve(false);
+
   return new Promise<boolean>((resolve) => {
     const overlay = document.createElement('div');
     overlay.setAttribute('data-marco-confirm', '1');
@@ -75,7 +76,9 @@ export function confirmDialog(opts: ConfirmOptions): Promise<boolean> {
       resolve(result);
     };
     const onKey = (ev: KeyboardEvent): void => {
-      if (ev.key === 'Escape') { ev.preventDefault(); cleanup(false); return; }
+      if (ev.key === 'Escape') { ev.preventDefault(); cleanup(false);
+
+ return; }
       if (ev.key === 'Enter' && document.activeElement === confirmBtn) {
         ev.preventDefault();
         cleanup(true);

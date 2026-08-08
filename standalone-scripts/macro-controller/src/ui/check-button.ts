@@ -51,6 +51,7 @@ function doRunCheck(ctx: CheckButtonCtx): void {
   } catch(syncErr) {
     logError('Manual Check sync error', '' + (syncErr as Error).message);
     resetCheckButtonState(ctx);
+
     return;
   }
 
@@ -98,12 +99,14 @@ function _handleCheckClick(ctx: CheckButtonCtx): void {
   const { checkBtn, updateAuthBadge } = ctx;
   if (ctx.checkInFlight) {
     log('Check cooldown: already in flight', 'warn');
+
     return;
   }
   if (state.isDelegating) {
     log('Check blocked: move/delegation in progress', 'warn');
     checkBtn.style.opacity = '0.5';
     setTimeout(function() { checkBtn.style.opacity = '1'; }, Timings.POLL_INTERVAL_NORMAL);
+
     return;
   }
 

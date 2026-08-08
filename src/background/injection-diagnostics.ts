@@ -99,10 +99,12 @@ export async function mirrorDiagnosticToTab(
             func: (detail: string, entryLevel: MirrorDiagnosticToTabLevel) => {
                 if (entryLevel === "error") {
                     console.error(detail);
+
                     return;
                 }
                 if (entryLevel === "warn") {
                     console.warn(detail);
+
                     return;
                 }
                 console.log(detail);

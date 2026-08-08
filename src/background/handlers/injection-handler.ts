@@ -78,6 +78,7 @@ export async function handleInjectScripts(
         const start = performance.now();
         const result = await operation();
         timings[label] = Math.round((performance.now() - start) * 10) / 10;
+
         return result;
     };
 
@@ -97,6 +98,7 @@ export async function handleInjectScripts(
         const tabUrl = tab.url ?? "";
         if (/^(chrome|edge|brave|opera|about|devtools|chrome-extension):\/\//i.test(tabUrl)) {
             console.warn("[injection] BLOCKED — cannot inject into restricted URL: %s (tabId=%d)", tabUrl, injectRequest.tabId);
+
             // v2.197.0: Field name corrected from `success` → `isSuccess` to
             // match the InjectionResult type used everywhere else in the
             // handler (see lines 181, 233, 491). The cast was masking the
@@ -113,6 +115,7 @@ export async function handleInjectScripts(
         }
     } catch (tabErr) {
         console.warn("[injection] BLOCKED — tab %d is inaccessible (closed or discarded): %s", injectRequest.tabId, (tabErr as Error).message);
+
         return { results: [], inlineSyntaxErrorDetected: false };
     }
 
@@ -169,6 +172,7 @@ export async function handleInjectScripts(
         if (cachedPayload && cacheMatchesRequest) {
             console.log("[injection] CACHE HIT — skipping Stages 0–3, using cached payload (%d chars, %d scripts) in %.1fms",
                 cachedPayload.code.length, cachedPayload.scriptMeta.length, timings["cache_gate"]);
+
             // Jump directly to Stage 2 (env prep) + Stage 4 (execute) with cached payload
             return await executeCachedPayload(injectRequest.tabId, cachedPayload, pipelineStart, timings, time);
         }
@@ -238,6 +242,7 @@ export async function handleInjectScripts(
                 level: "warn" as const,
             })),
         ], `⚠️ Marco Injection — 0 scripts (${totalMs}ms)`);
+
         return {
             results: preflightFailureResults,
             inlineSyntaxErrorDetected: hasInlineSyntaxError,
@@ -261,6 +266,7 @@ export async function handleInjectScripts(
     const [execResults] = await time("stage3_4_5_parallel", () => Promise.all([
         injectAllScripts(injectRequest.tabId, filteredPreparedScripts, launchSource, isForceRun).then(r => {
             timings["stage3_4_scripts"] = Math.round((performance.now() - scriptInjectStart) * 10) / 10;
+
             return r;
         }),
         injectSettingsNamespace(injectRequest.tabId, allProjects).then(() => {
@@ -377,7 +383,6 @@ export async function handleInjectScripts(
     return { results, inlineSyntaxErrorDetected: hasInlineSyntaxError };
 }
 
-
 /**
  * Executes a cached wrapped payload, skipping Stages 0–3.
  * Still runs Stage 2 (env prep) and Stage 5 (namespaces) since those
@@ -480,7 +485,6 @@ async function executeCachedPayload(
     return { results, inlineSyntaxErrorDetected: false };
 }
 
-
 // injectAllScripts / partitionBySyntax / injectSingleScript / logInjection* moved to ./injection-pipeline (PERF-R2b step 5).
 
 /** Mirrors skipped-script diagnostics into the active tab console. */
@@ -528,8 +532,6 @@ function recordInjection(tabId: number, scripts: InjectableScript[], injectionPa
 
 // buildSkipMessage moved to ./injection-result-builder (PERF-R2b step 3).
 
-
-
 /* ------------------------------------------------------------------ */
 /*  Relay Injection (safety net for content_scripts manifest entry)     */
 /* ------------------------------------------------------------------ */
@@ -574,6 +576,7 @@ async function ensureRelayInjected(tabId: number): Promise<void> {
 
                 // Sentinel exists but runtime is stale — clear sentinel for reinjection
                 delete (window as unknown as Record<string, unknown>).__marcoRelayActive;
+
                 return { status: "needs_injection" as const };
             },
         });
@@ -582,6 +585,7 @@ async function ensureRelayInjected(tabId: number): Promise<void> {
 
         if (status === "healthy") {
             relayInjectedTabs.add(tabId);
+
             return;
         }
 
@@ -599,7 +603,6 @@ async function ensureRelayInjected(tabId: number): Promise<void> {
     }
 }
 
-
 /*  GET_TAB_INJECTIONS                                                 */
 /* ------------------------------------------------------------------ */
 
@@ -613,13 +616,12 @@ export async function handleGetTabInjections(
 
     if (hasTabId) {
         const tabRecord = allInjections[injectionRequest.tabId] ?? null;
+
         return { injections: { [injectionRequest.tabId]: tabRecord } };
     }
 
     return { injections: allInjections };
 }
-
-
 
 /* ------------------------------------------------------------------ */
 /*  Post-injection verification                                        */

@@ -70,9 +70,11 @@ export function updateCookieRow(deps: AuthDiagDeps, cookieRow: DiagRowElements):
 function detectBindingsSource(): boolean {
   try {
     const root = (typeof window !== 'undefined' ? window.RiseupAsiaMacroExt : undefined);
+
     return root !== undefined && root.Projects !== undefined && Object.keys(root.Projects).length > 0;
   } catch (e: unknown) {
     logError('hasActiveProject', 'Failed to check active projects', e);
+
     return false;
   }
 }
@@ -85,6 +87,7 @@ export function updateBridgeRow(deps: AuthDiagDeps, bridgeRow: DiagRowElements):
     bridgeRow.iconEl.textContent = '⚪';
     bridgeRow.valEl.textContent = 'No bridge attempt yet';
     _removeHelpIcon(bridgeRow);
+
     return;
   }
 
@@ -124,6 +127,7 @@ export function updateBridgeRow(deps: AuthDiagDeps, bridgeRow: DiagRowElements):
 /** Check if the bridge error is due to normal MV3 service worker suspension. */
 function _isServiceWorkerSuspended(error: string): boolean {
   const lower = error.toLowerCase();
+
   return lower.includes('extension context invalidated') || lower.includes('receiving end does not exist');
 }
 
@@ -144,6 +148,7 @@ function _getBridgeErrorHelp(error: string): string {
     return 'Chrome could not reach the extension. It may be disabled, uninstalled, or crashed. ' +
       'Fix: Check chrome://extensions to verify the extension is enabled and reload it.';
   }
+
   return 'The extension bridge failed to communicate with the background service worker. ' +
     'Fix: Try refreshing the page or reloading the extension from chrome://extensions.';
 }
@@ -193,6 +198,7 @@ export function updateJwtRow(deps: AuthDiagDeps, jwtRow: DiagRowElements, jwtDet
     jwtRow.iconEl.textContent = '⚪';
     jwtRow.valEl.textContent = 'No token to validate';
     jwtDetailVal.textContent = '';
+
     return;
   }
 
@@ -218,6 +224,7 @@ export function updateRefreshRow(refreshRow: DiagRowElements): void {
   if (hasNoAttempt) {
     refreshRow.iconEl.textContent = '⚪';
     refreshRow.valEl.textContent = 'No refresh attempted yet';
+
     return;
   }
 

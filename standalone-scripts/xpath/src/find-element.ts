@@ -27,6 +27,7 @@ export function findElement(descriptor: ElementDescriptor): Element | null {
     const xpathResult = getByXPath(descriptor.xpath);
     if (xpathResult) {
       log("findElement", "  " + name + " FOUND via XPath");
+
       return xpathResult as Element;
     }
     warn("findElement", "  " + name + " XPath failed — trying fallbacks");
@@ -42,6 +43,7 @@ export function findElement(descriptor: ElementDescriptor): Element | null {
       for (let m = 0; m < texts.length; m++) {
         if (elText === texts[m] || elText.indexOf(texts[m]) !== -1) {
           log("findElement", "  " + name + ' FOUND via text: "' + elText.substring(0, 40) + '"');
+
           return allTags[t];
         }
       }
@@ -56,6 +58,7 @@ export function findElement(descriptor: ElementDescriptor): Element | null {
         const sResult = document.querySelector(selectors[s]);
         if (sResult) {
           log("findElement", "  FOUND via selector: " + selectors[s]);
+
           return sResult;
         }
       } catch (e: unknown) {
@@ -76,6 +79,7 @@ export function findElement(descriptor: ElementDescriptor): Element | null {
           );
           if (ariaResult) {
             log("findElement", "  " + name + " FOUND via ARIA: " + ariaLabels[a]);
+
             return ariaResult;
           }
         } catch (e: unknown) {
@@ -88,11 +92,13 @@ export function findElement(descriptor: ElementDescriptor): Element | null {
       const roleResult = document.querySelector('[role="' + descriptor.role + '"]');
       if (roleResult) {
         log("findElement", "  " + name + " FOUND via role: " + descriptor.role);
+
         return roleResult;
       }
     }
   }
 
   warn("findElement", '  All methods failed for "' + name + '"');
+
   return null;
 }

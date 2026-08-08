@@ -13,6 +13,7 @@ export function sanitizeBearerPrefix(token: string | null): string | null {
     if (isMissingToken) {
         return null;
     }
+
     return token.substring(0, 12) + '…REDACTED';
 }
 

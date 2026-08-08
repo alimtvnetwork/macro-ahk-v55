@@ -136,6 +136,7 @@ async function runWasmHeadAttempt(
         `durationMs=${durationMs} atOffsetMs=${atOffsetMs}` +
         (attemptError !== null ? ` error="${attemptError}"` : ""),
     );
+
     return response;
 }
 
@@ -360,9 +361,11 @@ async function tryOpfsInit(): Promise<boolean> {
         persistenceMode = "opfs";
 
         console.log("[db-manager] OPFS persistence active");
+
         return true;
     } catch (err) {
         console.error(`[db-manager] OPFS unavailable\n  Path: navigator.storage.getDirectory() → OPFS root\n  Missing: SQLite database files (logs + errors)\n  Reason: ${err instanceof Error ? err.message : String(err)} — OPFS may not be supported or quota exceeded`, err);
+
         return false;
     }
 }
@@ -375,9 +378,11 @@ async function tryStorageInit(): Promise<boolean> {
         persistenceMode = "storage";
 
         console.log("[db-manager] storage.local persistence active");
+
         return true;
     } catch (err) {
         console.error(`[db-manager] storage.local persistence failed\n  Path: chrome.storage.local → SQLite serialized blobs\n  Missing: Deserialized SQLite database instances\n  Reason: ${err instanceof Error ? err.message : String(err)}`, err);
+
         return false;
     }
 }
@@ -436,6 +441,7 @@ export async function initDatabases(): Promise<DbManager> {
     await migrateSchema(logsDb!, errorsDb!);
 
     isInitialized = true;
+
     return buildManager();
 }
 
@@ -522,6 +528,7 @@ function buildManager(): DbManager {
     // continue to operate on the raw instance.
     const wrappedLogs = wrapDatabaseWithBindSafety(logsDb!);
     const wrappedErrors = wrapDatabaseWithBindSafety(errorsDb!);
+
     return {
         getLogsDb: () => wrappedLogs,
         getErrorsDb: () => wrappedErrors,

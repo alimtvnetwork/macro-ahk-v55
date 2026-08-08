@@ -29,6 +29,7 @@ export type DisplayKindResolver = (ws: WorkspaceCredit) => WorkspaceDisplayKind;
 
 function num0(value: unknown): number {
     const n = typeof value === 'number' ? value : Number(value ?? 0);
+
     return Number.isFinite(n) ? n : 0;
 }
 
@@ -48,6 +49,7 @@ function isProPlan(plan: string | undefined): boolean {
     if (typeof plan !== 'string') {
         return false;
     }
+
     return plan.trim().toLowerCase().startsWith('pro_');
 }
 
@@ -160,6 +162,7 @@ export function computeSummaryDetails(
 
     const proAvail = Math.round(proCreditsAvailable);
     const freeAvail = Math.round(freeDaily);
+
     return {
         pro: {
             count: proCount,

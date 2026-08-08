@@ -25,6 +25,7 @@ interface FailureReportsPanelProps {
 
 export function FailureReportsPanel({ reports, onDownload, onCopy }: FailureReportsPanelProps) {
     const s = useFailureReportsPanel({ reports, onDownload, onCopy });
+
     return (
         <Card>
             <CardHeader className="flex flex-col gap-2 pb-2 sm:flex-row sm:items-center sm:justify-between">
@@ -59,6 +60,7 @@ export function FailureReportsPanel({ reports, onDownload, onCopy }: FailureRepo
                         <ul className="space-y-1.5">
                             {reports.map((r, i) => {
                                 const key = rowKey(r, i);
+
                                 return (
                                     <FailureReportRow
                                         key={key}

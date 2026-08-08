@@ -73,6 +73,7 @@ async function buildProjectScriptState(
 async function readStoredScripts(): Promise<StoredScript[]> {
     const result = await chrome.storage.local.get(STORAGE_KEY_ALL_SCRIPTS);
     const scripts = result[STORAGE_KEY_ALL_SCRIPTS];
+
     return Array.isArray(scripts) ? scripts : [];
 }
 
@@ -97,6 +98,7 @@ function findStoredScriptByProjectPath(
 function normalizeScriptKey(path: string): string {
     const normalized = path.trim().toLowerCase().replace(/\\/g, "/");
     const fileName = normalized.split("/").pop() ?? normalized;
+
     return fileName.split(/[?#]/)[0] ?? fileName;
 }
 
@@ -106,6 +108,7 @@ function sortProjectOptions(projects: StoredProject[]): StoredProject[] {
         const aGlobal = a.isGlobal === true ? 1 : 0;
         const bGlobal = b.isGlobal === true ? 1 : 0;
         if (aGlobal !== bGlobal) return aGlobal - bGlobal;
+
         return a.name.localeCompare(b.name);
     });
 }
@@ -190,6 +193,7 @@ export async function handleGetAllProjects(): Promise<{
 }> {
     await ensureDefaultProjectSingleScript();
     const projects = await readAllProjects();
+
     return { projects: sortProjectOptions(projects) };
 }
 
@@ -282,11 +286,13 @@ async function healProjectScriptBindings(project: StoredProject): Promise<Stored
                 `healProjectScriptBindings: project "${project.id}" references script path "${entry.path}" but no StoredScript.name matches — library names: [${storedScripts.map((s) => s.name).join(", ")}]`,
                 new Error("UnboundProjectScriptPath"),
             );
+
             return entry;
         }
         if (matched.name === entry.path) {
             return entry;
         }
+
         return { ...entry, path: matched.name };
     });
 
@@ -297,6 +303,7 @@ async function healProjectScriptBindings(project: StoredProject): Promise<Stored
 function ensureDerivedIdentifiers(project: StoredProject): StoredProject {
     const slug = project.slug || slugify(project.name);
     const codeName = project.codeName || toCodeName(slug);
+
     return { ...project, slug, codeName };
 }
 
@@ -313,6 +320,7 @@ function upsertProject(
     if (isExisting) {
         const updated = { ...enriched, updatedAt: now };
         projects[existingIndex] = updated;
+
         return updated;
     }
 
@@ -324,6 +332,7 @@ function upsertProject(
     };
 
     projects.push(created);
+
     return created;
 }
 
@@ -351,6 +360,7 @@ export async function handleGetAutoAttachDecisions(
     const { projectId } = message as { projectId: string };
     const result = await chrome.storage.local.get(STORAGE_KEY_AUTO_ATTACH_DECISIONS);
     const map = (result[STORAGE_KEY_AUTO_ATTACH_DECISIONS] as Record<string, PersistedAutoAttachRecord> | undefined) ?? {};
+
     return { record: map[projectId] ?? null };
 }
 

@@ -21,6 +21,7 @@ export function buildNavWrapper(): HTMLDivElement {
     w.appendChild(buildNavButton(NAV_UP_VALUE, "▲", "Previous workspace"));
     w.appendChild(buildNavButton(NAV_DOWN_VALUE, "▼", "Next workspace"));
     w.appendChild(buildStepInput());
+
     return w;
 }
 
@@ -30,6 +31,7 @@ function buildNavButton(marker: string, label: string, aria: string): HTMLButton
     b.setAttribute(NAV_ATTR, marker);
     b.setAttribute("aria-label", aria);
     b.textContent = label;
+
     return b;
 }
 
@@ -41,5 +43,6 @@ function buildStepInput(): HTMLInputElement {
     i.min = "1";
     i.value = "1";
     i.setAttribute("aria-label", "Step size");
+
     return i;
 }

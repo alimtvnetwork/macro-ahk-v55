@@ -62,6 +62,7 @@ export function renderBulkRenameDialog(): void {
   const checkedIds = Object.keys(getLoopWsCheckedIds());
   if (checkedIds.length === 0) {
     log('[Rename] No workspaces selected', 'warn');
+
     return;
   }
 
@@ -172,6 +173,7 @@ function _cloneActivePreset(
   const newName = rawName.trim();
   if (newName === sourceName) {
     showToast('Pick a different name to clone', 'warn');
+
     return;
   }
 
@@ -179,9 +181,11 @@ function _cloneActivePreset(
     const isMissingSrc = !src;
     if (isMissingSrc) {
       showToast('Source preset "' + sourceName + '" not found', 'warn');
+
       return;
     }
     const cloned: RenamePreset = { ...src, name: newName, createdAt: 0, updatedAt: Date.now() };
+
     return store.savePreset(newName, cloned).then(function () {
       _activePresetName = newName;
       store.setActivePresetName(newName);
@@ -301,6 +305,7 @@ function _createRenamePanel(): HTMLDivElement {
     'position:fixed;top:80px;right:40px;z-index:100002;background:' + cPanelBg +
     ';border:1px solid ' + cPrimary +
     ';border-radius:8px;padding:0;min-width:420px;max-width:520px;box-shadow:0 8px 32px rgba(0,0,0,.6);font-family:monospace;resize:both;overflow:hidden;';
+
   return panel;
 }
 
@@ -439,6 +444,7 @@ function _appendVarHintAndStartNums(body: HTMLElement): HTMLElement {
   startNumsContainer.id = 'rename-start-nums';
   startNumsContainer.style.cssText = 'margin-bottom:6px;';
   body.appendChild(startNumsContainer);
+
   return startNumsContainer;
 }
 
@@ -452,6 +458,7 @@ function _appendPreviewSection(body: HTMLElement): HTMLElement {
   previewList.id = 'rename-preview-list';
   previewList.style.cssText = 'max-height:150px;overflow-y:auto;border:1px solid ' + cPrimaryBorderA + ';border-radius:3px;background:rgba(0,0,0,.3);padding:4px;margin-bottom:8px;font-size:9px;';
   body.appendChild(previewList);
+
   return previewList;
 }
 
@@ -629,7 +636,9 @@ function _executeRenameApply(
   const prefix = prefixRow.checkbox!.checked ? prefixRow.input.value : '';
   const suffix = suffixRow.checkbox!.checked ? suffixRow.input.value : '';
   const starts = getStartNums();
-  if (!template && !prefix && !suffix) { log('[Rename] Nothing to rename — provide template, prefix, or suffix', 'warn'); return; }
+  if (!template && !prefix && !suffix) { log('[Rename] Nothing to rename — provide template, prefix, or suffix', 'warn');
+
+ return; }
   const entries: Array<{ wsId: string; oldName: string; newName: string }> = [];
   for (const [j, ws] of selected.entries()) {
     const origName = ws.fullName || ws.name || '';
@@ -637,7 +646,9 @@ function _executeRenameApply(
     if (!newName.trim()) { continue; }
     entries.push({ wsId: ws.id, oldName: origName, newName });
   }
-  if (entries.length === 0) { log('[Rename] All names empty — cancelled', 'warn'); return; }
+  if (entries.length === 0) { log('[Rename] All names empty — cancelled', 'warn');
+
+ return; }
   (applyBtn as HTMLButtonElement).disabled = true;
   applyBtn.textContent = 'Renaming... 0/' + entries.length;
   applyBtn.style.background = '#64748b';
@@ -646,7 +657,9 @@ function _executeRenameApply(
 
   const updateEta = function(completed: number, total: number): void {
     const remaining = total - completed;
-    if (remaining <= 0) { etaRow.style.display = 'none'; return; }
+    if (remaining <= 0) { etaRow.style.display = 'none';
+
+ return; }
     const perOpMs = getRenameAvgOpMs() > 0 ? getRenameAvgOpMs() : getRenameDelayMs();
     const etaMs = remaining * perOpMs;
     const avgLabel = getRenameAvgOpMs() > 0 ? ' (avg ' + getRenameAvgOpMs() + 'ms/op)' : ' (est. ' + getRenameDelayMs() + 'ms/op)';

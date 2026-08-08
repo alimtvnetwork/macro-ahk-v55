@@ -21,6 +21,7 @@ function installChromeStub(initial: FakeStore): FakeStore {
             },
         },
     };
+
     return store;
 }
 

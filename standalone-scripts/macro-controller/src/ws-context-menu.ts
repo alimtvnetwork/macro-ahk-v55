@@ -81,6 +81,7 @@ function buildCtxMenuItem(label: string, onClick: () => void): HTMLElement {
     (this as HTMLElement).style.background = 'transparent';
   };
   item.onclick = onClick;
+
   return item;
 }
 
@@ -148,6 +149,7 @@ function copyWorkspaceJson(wsId: string, wsName: string): void {
   if (!ws || !rawWire) {
     showToast('❌ No JSON data for "' + wsName + '"', 'error');
     log('[CopyJSON] No rawApi for wsId=' + wsId, 'warn');
+
     return;
   }
   buildCopyJsonPayload(ws)
@@ -189,16 +191,19 @@ function buildCreditRefreshItem(wsId: string, wsName: string): HTMLElement {
         if (outcome === 'fetched') {
           showToast('💰 Credit refreshed for "' + wsName + '"', 'success');
           fetchLoopCreditsWithDetect(false);
+
           return;
         }
         if (outcome === 'throttled') {
           showToast('💰 Credit refresh throttled for "' + wsName + '"', 'info');
+
           return;
         }
         if (outcome === 'skipped') {
           const reason = summary.results[0]?.reason;
           const suffix = reason === 'plan-not-eligible' ? ' (plan not eligible)' : '';
           showToast('💰 Credit refresh skipped for "' + wsName + '"' + suffix, 'info');
+
           return;
         }
         showToast('💰 Credit refresh failed for "' + wsName + '", kept last cached value', 'warn');
@@ -209,7 +214,6 @@ function buildCreditRefreshItem(wsId: string, wsName: string): HTMLElement {
       });
   });
 }
-
 
 function appendRemixAndGithubItems(menu: HTMLElement, wsId: string): void {
   const projectId = extractProjectIdFromUrl();
@@ -258,16 +262,19 @@ function buildDynamicGithubItem(wsId: string, projectId: string): HTMLElement {
       const hasCachedRepoUrl = isCachedFound && !!cached!.RepoUrl;
       if (hasCachedRepoUrl) {
         applyConnected(item, wsId, projectId, cached!.RepoUrl!);
+
         return;
       }
       const state = await resolveConnection(wsId, '', projectId);
       if (state.connected) {
         setGitsyncCache(wsId, projectId, 'found', state.repoUrl);
         applyConnected(item, wsId, projectId, state.repoUrl);
+
         return;
       }
       if (state.reason === 'deadline') {
         applySyncing(item);
+
         return;
       }
       applyConnect(item, wsId, projectId);
@@ -389,11 +396,13 @@ async function openGithubRepoFlow(
   const hasCachedRepoUrl = isCachedFound && !!cached!.RepoUrl;
   if (hasCachedRepoUrl) {
     window.open(cached!.RepoUrl!, '_blank', 'noopener,noreferrer');
+
     return;
   }
   const isCachedNotLinked = hasCachedEntry && cached!.Status === 'not_linked';
   if (isCachedNotLinked) {
     showToast('🐙 No GitHub repo linked (cached). Use Refresh gitsync to re-check.', 'warn');
+
     return;
   }
 
@@ -401,11 +410,13 @@ async function openGithubRepoFlow(
   if (outcome.status === 'found') {
     setGitsyncCache(wsId, pid, 'found', outcome.repoUrl);
     window.open(outcome.repoUrl, '_blank', 'noopener,noreferrer');
+
     return;
   }
   if (outcome.status === 'not_linked') {
     setGitsyncCache(wsId, pid, 'not_linked');
     showToast('🐙 No GitHub repo linked to this project.', 'warn');
+
     return;
   }
   setGitsyncCache(wsId, pid, 'error');
@@ -437,6 +448,7 @@ function buildIconButton(
     e.stopPropagation();
     onClick(e);
   };
+
   return btn;
 }
 
@@ -449,6 +461,7 @@ function buildRenameInput(currentName: string): HTMLInputElement {
     ';border-radius:2px;background:' + cPanelBg +
     ';color:' + cPanelFg +
     ';font-size:11px;outline:none;box-sizing:border-box;';
+
   return input;
 }
 
@@ -457,10 +470,12 @@ function commitRename(wsId: string, currentName: string, newName: string): void 
   if (isMissingNewName) {
     log('[Rename] Empty name — cancelled', 'warn');
     populateLoopWorkspaceDropdown();
+
     return;
   }
   if (newName === currentName) {
     populateLoopWorkspaceDropdown();
+
     return;
   }
   renameWorkspace(wsId, newName)
@@ -491,8 +506,10 @@ function findNameDiv(wsId: string): HTMLElement | null {
   const items = listEl.querySelectorAll(CSS_WS_ITEM);
   for (const item of Array.from(items)) {
     if (item.getAttribute(DataAttrType.WsId) !== wsId) continue;
+
     return item.querySelector(CSS_WS_NAME);
   }
+
   return null;
 }
 
@@ -527,6 +544,7 @@ export function startInlineRename(wsId: string, currentName: string): void {
       const isMissingOk = !ok;
       if (isMissingOk) {
         input.focus();
+
         return;
       }
     }

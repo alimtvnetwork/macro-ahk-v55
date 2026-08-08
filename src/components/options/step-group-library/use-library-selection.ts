@@ -32,12 +32,14 @@ export function useLibrarySelection(args: UseLibrarySelectionArgs) {
             for (const id of ids) {
                 if (on) next.add(id); else next.delete(id);
             }
+
             return next;
         });
         setSelectionOrder((prev) => {
             if (!on) return prev.filter((id) => !ids.includes(id));
             const seen = new Set(prev);
             const additions = ids.filter((id) => !seen.has(id));
+
             return additions.length === 0 ? prev : [...prev, ...additions];
         });
     };
@@ -61,6 +63,7 @@ export function useLibrarySelection(args: UseLibrarySelectionArgs) {
         setExpanded((prev) => {
             const next = new Set(prev);
             if (next.has(id)) next.delete(id); else next.add(id);
+
             return next;
         });
     };

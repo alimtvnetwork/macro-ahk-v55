@@ -1,4 +1,3 @@
- 
 /**
  * MacroLoop Controller — Shared State & Configuration
  * Step 2b: Extracted from macro-looping.ts IIFE scope
@@ -61,6 +60,7 @@ export function resolvePreset(key: string): ThemePreset {
   if (darkPreset) return darkPreset;
   if (themeRoot.presets && themeRoot.presets[key]) return themeRoot.presets[key];
   if (themeRoot.colors) return { colors: themeRoot.colors };
+
   return {} as ThemePreset;
 }
 

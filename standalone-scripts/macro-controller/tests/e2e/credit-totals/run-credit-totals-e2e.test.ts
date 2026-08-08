@@ -64,6 +64,7 @@ function visibleRowCount(): number {
 }
 function rowNames(): string[] {
   const rows = dialog()?.querySelectorAll<HTMLElement>('[data-credit-totals-row]') || [];
+
   return Array.from(rows).map((r) => (r.querySelector<HTMLElement>('[data-cell="name"]')?.textContent || '').trim());
 }
 

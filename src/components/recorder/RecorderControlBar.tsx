@@ -40,7 +40,9 @@ export function RecorderControlBar(props: RecorderControlBarProps): JSX.Element 
     const stopEnabled = isActive;
 
     const handlePlay = () => {
-        if (isPaused) { void resume(); return; }
+        if (isPaused) { void resume();
+
+ return; }
         if (!isActive) { void start(projectSlug); }
     };
 

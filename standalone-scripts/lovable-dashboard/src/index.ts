@@ -25,6 +25,7 @@ let state: MountState | null = null;
 export function activateHomeScreen(): void {
     if (shouldActivateHomeScreen()) {
         void mountHomeScreenFeatures();
+
         return;
     }
     unmountHomeScreenFeatures();
@@ -48,6 +49,7 @@ async function doMount(): Promise<MountState> {
     teardowns.push(mountNavControls(() => state?.dict ?? dict));
     teardowns.push(installRebuildObserver());
     runPostBuild(dict);
+
     return { dict, teardowns };
 }
 
@@ -65,6 +67,7 @@ function installRebuildObserver(): () => void {
     let timer: number | null = null;
     const obs = new MutationObserver(() => scheduleRebuild(timer, (t) => { timer = t; }));
     obs.observe(list, { childList: true, subtree: false });
+
     return () => obs.disconnect();
 }
 
@@ -90,5 +93,6 @@ export function unmountHomeScreenFeatures(): void {
 
 export function bootHomeScreen(): () => void {
     activateHomeScreen();
+
     return watchSpaNavigation(activateHomeScreen);
 }

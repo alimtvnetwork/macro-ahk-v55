@@ -138,6 +138,7 @@ export function resolveSelection(
     if (isMissingIncludeDescendants) {
         return { Ok: true, Ids: dedupeSorted(partitioned.SeedIds) };
     }
+
     return expandDescendants(partitioned.SeedIds, allInProject);
 }
 
@@ -184,6 +185,7 @@ function partitionSelection(
             OffendingIds: missing,
         };
     }
+
     return { SeedIds: seedIds };
 }
 
@@ -197,6 +199,7 @@ function buildChildrenIndex(
         items.push(g.StepGroupId);
         childrenOf.set(g.ParentStepGroupId, items);
     }
+
     return childrenOf;
 }
 
@@ -223,9 +226,9 @@ function expandDescendants(
         const kids = childrenOf.get(id);
         if (kids !== undefined) for (const k of kids) queue.push(k);
     }
+
     return { Ok: true, Ids: dedupeSorted(Array.from(visited)) };
 }
-
 
 function dedupeSorted(ids: ReadonlyArray<number>): ReadonlyArray<number> {
     return Array.from(new Set(ids)).sort((a, b) => a - b);
@@ -321,6 +324,7 @@ function buildGroupNameIndex(
     for (const g of src.listGroups(projectId)) {
         groupNameById.set(g.StepGroupId, g.Name);
     }
+
     return groupNameById;
 }
 
@@ -354,9 +358,9 @@ function scanStepsForPreview(
             });
         }
     }
+
     return { StepCount: stepCount, RunGroupRefs: runGroupRefs, Dangling: dangling };
 }
-
 
 /* ------------------------------------------------------------------ */
 /*  Filtered snapshot                                                  */
@@ -394,6 +398,7 @@ export function buildFilteredSnapshot(
     }
     const preflight = preflightSnapshotSteps(src, effectiveIds);
     if ("Reason" in preflight) return preflight;
+
     return writeSnapshot(sqlJs, src, projectId, projectRow, effectiveIds, preflight);
 }
 
@@ -430,6 +435,7 @@ function preflightSnapshotSteps(
             OffendingIds: danglingRunGroup,
         };
     }
+
     return { AllSteps: allSteps, RunGroupRefs: runGroupRefs };
 }
 
@@ -448,6 +454,7 @@ function writeSnapshot(
         try { dst.exec("ROLLBACK;"); } catch (err) {
             logError("AutoCatch", "Unhandled exception", err);
         }
+
         return {
             Reason: "InternalError",
             Detail: err instanceof Error ? err.message : "snapshot build failed",
@@ -483,6 +490,7 @@ function populateSnapshotDb(
     for (const s of preflight.AllSteps) insertStep(dst, s);
     dst.exec("COMMIT;");
     dst.exec("PRAGMA foreign_keys = ON;");
+
     return {
         DbBytes: dst.export(),
         Counts: {
@@ -493,13 +501,12 @@ function populateSnapshotDb(
     };
 }
 
-
-
 function requireRow(rows: ReadonlyArray<StepGroupRow>, id: number): StepGroupRow {
     const row = rows.find((r) => r.StepGroupId === id);
     if (row === undefined) {
         throw new Error(`buildFilteredSnapshot: StepGroupId ${id} disappeared mid-export`);
     }
+
     return row;
 }
 
@@ -528,6 +535,7 @@ function orderGroupsByAncestry(rows: ReadonlyArray<StepGroupRow>): StepGroupRow[
             break;
         }
     }
+
     return out;
 }
 
@@ -636,6 +644,7 @@ function sha256HexSync(bytes: Uint8Array): string {
     for (let offset = 0; offset < padded.length; offset += 64) {
         processSha256Block(padded, offset, words, hash);
     }
+
     return sha256WordsToHex(hash);
 }
 
@@ -649,6 +658,7 @@ function makeSha256PaddedMessage(bytes: Uint8Array): Uint8Array {
     const low = bitLength >>> 0;
     writeUint32Be(padded, paddedLength - 8, high);
     writeUint32Be(padded, paddedLength - 4, low);
+
     return padded;
 }
 
@@ -687,6 +697,7 @@ function runSha256Rounds(words: Uint32Array, hash: number[]): number[] {
         const temp2 = (s0 + maj) >>> 0;
         shiftSha256State(state, temp1, temp2);
     }
+
     return state;
 }
 
@@ -706,6 +717,7 @@ function sha256WordsToHex(words: number[]): string {
     for (let i = 0; i < words.length; i++) {
         out += words[i].toString(16).padStart(8, "0");
     }
+
     return out;
 }
 
@@ -780,6 +792,7 @@ export async function runStepGroupExport(
     const manifest = buildManifest(init, projectRow, resolved.Ids, snapshot, sha, nowIso());
     const packaged = await packageZip(init.JsZip, manifest, snapshot.DbBytes);
     if ("Reason" in packaged) return packaged;
+
     return {
         Reason: "Ok",
         ZipBytes: packaged.Bytes,
@@ -832,6 +845,7 @@ async function packageZip(
             compression: "DEFLATE",
             compressionOptions: { level: 6 },
         });
+
         return { Bytes: bytes };
     } catch (err) {
         return {
@@ -849,6 +863,7 @@ function buildZipFileName(
     const safeName = projectRow.Name.replace(/[^a-z0-9._-]+/gi, "-").replace(/^-+|-+$/g, "")
         || `project-${projectRow.ProjectId}`;
     const stamp = generatedAt.replace(/[:.]/g, "-");
+
     return `step-groups-${safeName}-${stamp}.zip`;
 }
 

@@ -81,9 +81,11 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
           const cfgBindings = bindingIds
             .map((id, i) => {
               const config = availableConfigs.find((c) => c.id === id);
+
               return config ? { configId: config.id, configName: config.name, json: typeof config.json === "string" ? config.json : "{}", order: i } : null;
             })
             .filter((x): x is { configId: string; configName: string; json: string; order: number } => x !== null);
+
           return {
             scriptId: matched?.id ?? "",
             scriptName: s.path,
@@ -111,6 +113,7 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
     const isNameEmpty = form.name.trim() === "";
     if (isNameEmpty) {
       toast.error("Project name is required");
+
       return;
     }
 
@@ -151,6 +154,7 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
 
     if (isMissingFolder) {
       toast.error("Please drop a folder containing marco-project.json");
+
       return;
     }
 
@@ -252,6 +256,7 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
                         setForm((f) => {
                           const urls = [...f.targetUrls];
                           urls[idx] = { ...urls[idx], matchType: e.target.value };
+
                           return { ...f, targetUrls: urls };
                         });
                       }}
@@ -269,6 +274,7 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
                         setForm((f) => {
                           const urls = [...f.targetUrls];
                           urls[idx] = { ...urls[idx], pattern: e.target.value };
+
                           return { ...f, targetUrls: urls };
                         });
                       }}
@@ -349,7 +355,9 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
                       placeholder='{ "key": "value" }'
                     />
                     {(() => {
-                      try { JSON.parse(form.variables); return null; } catch {
+                      try { JSON.parse(form.variables);
+
+ return null; } catch {
                         return (
                           <p className="text-[10px] text-destructive mt-1">Invalid JSON</p>
                         );

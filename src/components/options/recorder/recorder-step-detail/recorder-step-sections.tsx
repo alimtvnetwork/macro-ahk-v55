@@ -40,6 +40,7 @@ interface VariableSectionProps {
 
 export function VariableSection(props: VariableSectionProps): JSX.Element {
     const { step, draftName, setDraftName, isDirty, isSaving, renameError, onSave } = props;
+
     return (
         <section className="space-y-2">
             <SectionHeading>Variable</SectionHeading>
@@ -72,6 +73,7 @@ interface DescriptionSectionProps {
 
 export function DescriptionSection(props: DescriptionSectionProps): JSX.Element {
     const { draftDesc, setDraftDesc, isDescDirty, descSaving, descError, onSave } = props;
+
     return (
         <section className="space-y-2">
             <SectionHeading>Description</SectionHeading>
@@ -103,6 +105,7 @@ interface TagsSectionProps {
 
 export function TagsSection(props: TagsSectionProps): JSX.Element {
     const { tags, draftTag, setDraftTag, tagsError, onAdd, onRemove } = props;
+
     return (
         <section className="space-y-2">
             <SectionHeading>Tags ({tags.length})</SectionHeading>
@@ -152,6 +155,7 @@ export function LinkSlotEditor({ label, initialValue, onSave }: LinkSlotEditorPr
         setSaving(true);
         try { await onSave(draft); } finally { setSaving(false); }
     };
+
     return (
         <div className="space-y-1">
             <label className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</label>
@@ -203,6 +207,7 @@ function SelectorItem({ sel }: { sel: SelectorRow }): JSX.Element {
     const wrapClass = `rounded-md border px-2.5 py-2 text-xs space-y-1 ${
         sel.IsPrimary === 1 ? "border-primary/60 bg-primary/5" : "border-border bg-card"
     }`;
+
     return (
         <li className={wrapClass}>
             <div className="flex items-center gap-2">

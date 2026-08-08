@@ -73,6 +73,7 @@ export function usePopupActions() {
       if (tabId === null) {
         logError("handleRun", "No active tab found\n  Path: chrome.tabs.query(active)\n  Missing: active tab id\n  Reason: getActiveTabId() returned null");
         toast.error("No active tab found");
+
         return;
       }
 
@@ -86,6 +87,7 @@ export function usePopupActions() {
       if (!Array.isArray(scripts) || scripts.length === 0) {
         logError("handleRun", "No scripts found in active project\n  Path: GET_ACTIVE_PROJECT response.activeProject.scripts\n  Missing: at least one ScriptEntry\n  Reason: scripts array is empty or missing");
         toast.error("No scripts to run — check your active project");
+
         return;
       }
 
@@ -223,6 +225,7 @@ function formatSkipReason(reason?: string): string {
       if (zipRes.dataUrl) {
         triggerDownload(zipRes.dataUrl, zipRes.filename);
         toast.success(`Exported ${zipRes.filename}`);
+
         return;
       }
 

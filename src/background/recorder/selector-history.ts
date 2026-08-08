@@ -72,6 +72,7 @@ export function buildSelectorHistory(
     const byKey = groupOutcomesByResolvedKey(sorted);
     const buckets = summariseAllBuckets(byKey);
     sortBucketsByStatus(buckets);
+
     return buckets;
 }
 
@@ -85,6 +86,7 @@ function groupOutcomesByResolvedKey(
         list.push(toOutcomePoint(row));
         byKey.set(key, list);
     }
+
     return byKey;
 }
 
@@ -105,6 +107,7 @@ function summariseAllBuckets(
     for (const [key, outcomes] of byKey) {
         buckets.push(summarise(key === UNKNOWN_KEY ? null : key, outcomes));
     }
+
     return buckets;
 }
 
@@ -124,6 +127,7 @@ export function findHistoryForSelector(
     resolvedExpression: string | null,
 ): SelectorHistoryBucket | null {
     if (resolvedExpression === null) { return null; }
+
     return history.find((b) => b.ResolvedExpression === resolvedExpression) ?? null;
 }
 
@@ -132,6 +136,7 @@ function summarise(
 ): SelectorHistoryBucket {
     const { lastSuccessAt, lastSuccessIdx } = findLastSuccess(outcomes);
     const totals = countTotals(outcomes);
+
     return {
         ResolvedExpression: resolved, Outcomes: outcomes, LastSuccessAt: lastSuccessAt,
         FirstFailureAfterLastSuccessAt: findFirstFailureAfter(outcomes, lastSuccessIdx),
@@ -147,6 +152,7 @@ function findLastSuccess(
     for (let i = outcomes.length - 1; i >= 0; i--) {
         if (outcomes[i].IsOk) { return { lastSuccessAt: outcomes[i].At, lastSuccessIdx: i }; }
     }
+
     return { lastSuccessAt: null, lastSuccessIdx: -1 };
 }
 
@@ -160,6 +166,7 @@ function findFirstFailureAfter(
         const isMissingIsOk = !outcomes[i].IsOk;
         if (isMissingIsOk) { return outcomes[i].At; }
     }
+
     return null;
 }
 
@@ -177,6 +184,7 @@ function countTrailingFailures(outcomes: ReadonlyArray<SelectorOutcomePoint>): n
     for (let i = outcomes.length - 1; i >= 0 && !outcomes[i].IsOk; i--) {
         consecutive += 1;
     }
+
     return consecutive;
 }
 
@@ -189,5 +197,6 @@ function classifyStatus(
     if (totals.totalFailures === 0) { return "healthy"; }
     if (totals.totalFailures === totals.totalRuns) { return "always-failing"; }
     const last = outcomes[outcomes.length - 1];
+
     return last.IsOk ? "healthy" : "regressed";
 }

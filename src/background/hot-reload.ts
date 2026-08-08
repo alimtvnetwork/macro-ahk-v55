@@ -38,6 +38,7 @@ function isDevBuild(): boolean {
     try {
         const manifest = chrome.runtime.getManifest() as chrome.runtime.Manifest & { version_name?: string };
         const versionName = manifest.version_name ?? "";
+
         return versionName.toLowerCase().includes("dev");
     } catch {
         // If we cannot read the manifest, fail safe and treat as production.
@@ -53,6 +54,7 @@ export function startHotReload(): void {
 
     if (!isDevBuild()) {
         console.log("[hot-reload] Disabled (production build) — not polling build-meta.json");
+
         return;
     }
 
@@ -90,6 +92,7 @@ async function pollBuildMeta(): Promise<void> {
                 `Awaiting user instruction (reload extension after rebuild).`,
             );
             stopHotReload();
+
             return;
         }
 
@@ -108,6 +111,7 @@ async function pollBuildMeta(): Promise<void> {
         if (isFirstPoll) {
             lastKnownBuildId = currentBuildId;
             console.log("[hot-reload] Baseline buildId: %s", currentBuildId);
+
             return;
         }
 

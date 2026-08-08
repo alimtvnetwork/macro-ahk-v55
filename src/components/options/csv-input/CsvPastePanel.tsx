@@ -15,6 +15,7 @@ export interface CsvPastePanelProps {
 
 export function CsvPastePanel(props: CsvPastePanelProps): JSX.Element {
     const { pasted, onPastedChange, parseError, onParseClick } = props;
+
     return (
         <div className="space-y-2">
             <Textarea

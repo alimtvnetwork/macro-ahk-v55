@@ -47,6 +47,7 @@ interface ToastActionMessage {
 function isToastActionMessage(m: unknown): m is ToastActionMessage {
     if (m === null || typeof m !== "object") return false;
     const o = m as Record<string, unknown>;
+
     return o.type === MSG_TYPE
         && (o.action === "accept" || o.action === "dismiss-tab" || o.action === "dismiss-persist")
         && typeof o.url === "string";
@@ -61,7 +62,6 @@ function isToastActionMessage(m: unknown): m is ToastActionMessage {
  */
 // eslint-disable-next-line max-lines-per-function -- serialized page payload; must be self-contained (chrome.scripting.executeScript func-toString)
 function toastPagePayload(origin: string): void {
-
     const ID = "marco-first-attach-toast";
     if (document.getElementById(ID)) return;
 
@@ -78,6 +78,7 @@ function toastPagePayload(origin: string): void {
             "font-size:12px",
             "cursor:pointer",
         ].join(";");
+
         return b;
     }
 
@@ -108,6 +109,7 @@ function toastPagePayload(origin: string): void {
             btn("Don't ask for this site", "dismiss-persist", false),
         );
         r.append(title, body, row);
+
         return r;
     }
 
@@ -139,7 +141,6 @@ function toastPagePayload(origin: string): void {
     document.documentElement.appendChild(root);
     wire(root);
 }
-
 
 /**
  * Tiny shim that runs alongside the toast: listens for the
@@ -235,6 +236,7 @@ export function registerFirstAttachToastBridge(): void {
         console.log(
             `[first-attach-toast] action=${message.action} tab=${tabId} url=${url}`,
         );
+
         return false;
     });
 }

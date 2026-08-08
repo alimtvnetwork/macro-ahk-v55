@@ -25,6 +25,7 @@ export type ToastLevel = ToastLevelType;
 export function severityToToastLevel(severity: ErrorSeverity): ToastLevel {
   if (severity === 'fatal' || severity === 'error') return 'error';
   if (severity === 'warn') return 'warn';
+
   return 'info';
 }
 
@@ -80,6 +81,7 @@ export function showDiagnosticToast(
     title: toast.title,
     opts: opts,
   });
+
   return {
     level: level,
     message: message,
@@ -87,5 +89,4 @@ export function showDiagnosticToast(
     correlationId: evt.correlationId,
   };
 }
-
 

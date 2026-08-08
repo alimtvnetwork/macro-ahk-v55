@@ -22,11 +22,13 @@ const reasonForStatus = (status: number): string => {
     if (status === 429) return "Rate Limited — STOP all calls to this host immediately.";
     if (status >= 500 && status < 600) return `Server Error ${status} — do NOT retry; surface to user.`;
     if (status >= 400 && status < 500) return `Client Error ${status} — bad request shape or auth; do NOT retry.`;
+
     return `Unexpected HTTP status ${status}.`;
 };
 
 const truncateBody = (text: string): string => {
     if (text.length <= BODY_SNIPPET_MAX) return text;
+
     return text.slice(0, BODY_SNIPPET_MAX) + "…[truncated]";
 };
 
@@ -48,6 +50,7 @@ export class LovableApiError extends Error {
     /** HEFF report shape (spec §5). */
     public toReportString(): string {
         const body = this.BodyText.length === 0 ? "null" : truncateBody(this.BodyText);
+
         return [
             `HTTP ${this.Status} on ${this.Method} ${this.Endpoint}`,
             `Body: ${body}`,

@@ -13,7 +13,6 @@ import { verifyWorkspaceSessionAfterFailure } from '../workspace-management';
 import { getLastTokenSource, getBearerTokenFromCookie, getBearerTokenFromSessionBridge, invalidateSessionBridgeKey, markBearerTokenExpired, persistResolvedBearerToken, recoverAuthOnce, refreshBearerTokenFromBestSource, requestTokenFromExtension, resolveToken, setLastTokenSource, updateAuthBadge } from '../auth';
 
 export class AuthManager implements AuthManagerInterface {
-
   /** Synchronous token resolution — returns cached/localStorage/cookie token or '' */
   getToken(): string {
     return resolveToken();

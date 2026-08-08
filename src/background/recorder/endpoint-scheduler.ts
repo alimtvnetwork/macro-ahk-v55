@@ -41,7 +41,9 @@ function registerFetch(
 ): void {
     const capped = acc.active.length >= MAX_ACTIVE_TIMERS;
     const tooSmall = spec.IntervalMs < MIN_INTERVAL_MS;
-    if (capped || tooSmall) { acc.skipped.push(spec.DataSourceId); return; }
+    if (capped || tooSmall) { acc.skipped.push(spec.DataSourceId);
+
+ return; }
     acc.handles.push(setIntervalImpl(() => onTick(spec.DataSourceId), spec.IntervalMs));
     acc.active.push(spec.DataSourceId);
 }
@@ -58,5 +60,6 @@ export function startScheduler(
         for (const h of acc.handles) clearIntervalImpl(h);
         acc.handles.length = 0;
     };
+
     return { Teardown: teardown, Active: acc.active, Skipped: acc.skipped };
 }

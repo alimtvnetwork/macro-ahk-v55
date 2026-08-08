@@ -49,6 +49,7 @@ function emptyStore(): StoredShape {
 function isPanelToggles(v: unknown): v is PanelToggles {
     if (v === null || typeof v !== "object") { return false; }
     const r = v as Record<string, unknown>;
+
     return typeof r.Actions === "boolean"
         && typeof r.Tree === "boolean"
         && typeof r.Hotkey === "boolean";
@@ -72,6 +73,7 @@ function readStore(): StoredShape {
         const order = Array.isArray(shape.Order)
             ? (shape.Order as unknown[]).filter((x): x is string => typeof x === "string" && x in sessions)
             : Object.keys(sessions);
+
         return { Sessions: sessions, Order: order };
     } catch {
         return emptyStore();
@@ -92,6 +94,7 @@ function writeStore(store: StoredShape): void {
 export function loadPanelToggles(sessionId: string): PanelToggles {
     if (sessionId === "") { return DEFAULT_PANEL_TOGGLES; }
     const store = readStore();
+
     return store.Sessions[sessionId] ?? DEFAULT_PANEL_TOGGLES;
 }
 

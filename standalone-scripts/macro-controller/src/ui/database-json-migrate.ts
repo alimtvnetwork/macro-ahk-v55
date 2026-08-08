@@ -50,6 +50,7 @@ function validateSingleTable(t: NonNullable<JsonSchema['tables']>[number], logEl
   }
   if (!t.columns || t.columns.length === 0) {
     appendLog(logEl, 'err', `Table "${t.name}": needs at least one column`);
+
     return issues + 1;
   }
   for (const c of t.columns) {
@@ -60,6 +61,7 @@ function validateSingleTable(t: NonNullable<JsonSchema['tables']>[number], logEl
   }
   appendLog(logEl, 'info', `Table "${t.name}": ${t.columns?.length || 0} columns` +
     (t.foreignKeys ? `, ${t.foreignKeys.length} FKs` : ''));
+
   return issues;
 }
 
@@ -71,6 +73,7 @@ function validateTables(tables: JsonSchema['tables'], logEl: HTMLElement): numbe
   for (const t of tables) {
     issues += validateSingleTable(t, logEl);
   }
+
   return issues;
 }
 
@@ -95,6 +98,7 @@ function validateMigrations(migrations: JsonSchema['migrations'], logEl: HTMLEle
         (m.oldName ? ` (${m.oldName} → ${m.newName})` : ''));
     }
   }
+
   return issues;
 }
 
@@ -103,6 +107,7 @@ export function validateSchema(raw: string, logEl: HTMLElement): JsonSchema | nu
 
   if (!raw.trim()) {
     appendLog(logEl, 'err', 'Empty input — paste a JSON schema');
+
     return null;
   }
 
@@ -111,11 +116,13 @@ export function validateSchema(raw: string, logEl: HTMLElement): JsonSchema | nu
     schema = JSON.parse(raw);
   } catch (e) {
     appendLog(logEl, 'err', 'Invalid JSON: ' + (e as Error).message);
+
     return null;
   }
 
   if (!schema.tables && !schema.migrations) {
     appendLog(logEl, 'err', 'Schema must have "tables" and/or "migrations" array');
+
     return null;
   }
 
@@ -123,10 +130,12 @@ export function validateSchema(raw: string, logEl: HTMLElement): JsonSchema | nu
 
   if (issues > 0) {
     appendLog(logEl, 'err', `Validation failed: ${issues} issue(s)`);
+
     return null;
   }
 
   appendLog(logEl, 'ok', '✓ Schema is valid');
+
   return schema;
 }
 

@@ -78,6 +78,7 @@ function buildFieldsAndValues(
         fields.push(meta);
         if (verbose) values.push(readFieldValue(el, meta));
     }
+
     return { fields, values };
 }
 
@@ -93,6 +94,7 @@ export function captureFormSnapshot(
     const elements = collectFormFields(container);
     if (elements.length === 0) return null;
     const { fields, values } = buildFieldsAndValues(elements, verbose);
+
     return {
         Form: readFormHeader(container),
         Fields: fields,
@@ -112,12 +114,15 @@ export function isSubmitTarget(target: Element | null): boolean {
     const tag = target.tagName.toLowerCase();
     if (tag === "button") {
         const type = (target.getAttribute("type") ?? "submit").toLowerCase();
+
         return type === "submit";
     }
     if (tag === "input") {
         const type = (target.getAttribute("type") ?? "").toLowerCase();
+
         return type === "submit" || type === "image";
     }
+
     return false;
 }
 
@@ -141,6 +146,7 @@ function findFormContainer(target: Element): Element | null {
         node = node.parentElement;
         depth++;
     }
+
     return null;
 }
 
@@ -150,11 +156,13 @@ function collectFormFields(container: Element): Element[] {
     for (let i = 0; i < list.length; i++) {
         out.push(list[i]);
     }
+
     return out;
 }
 
 function readFormHeader(container: Element): FormSnapshot["Form"] {
     const isForm = container.tagName.toLowerCase() === "form";
+
     return {
         Tag: isForm ? "form" : "container",
         Id: nullableAttr(container, "id"),
@@ -188,6 +196,7 @@ function readFieldValue(el: Element, meta: FormFieldMeta): FormFieldValue {
     if (meta.Sensitive && raw.length > 0) {
         return { Name: meta.Name, Value: "*".repeat(raw.length), Masked: true };
     }
+
     return { Name: meta.Name, Value: raw, Masked: false };
 }
 
@@ -197,6 +206,7 @@ function readMultiSelectValue(el: Element): string {
     for (let i = 0; i < sel.options.length; i++) {
         if (sel.options[i].selected) picked.push(sel.options[i].value);
     }
+
     return JSON.stringify(picked);
 }
 
@@ -205,6 +215,7 @@ function readFileListValue(el: Element): string {
     if (files === null || files.length === 0) return "";
     const names: string[] = [];
     for (let i = 0; i < files.length; i++) names.push(files[i].name);
+
     return JSON.stringify(names);
 }
 
@@ -215,6 +226,7 @@ function readRawValue(el: Element, type: FormFieldType): string {
     if (type === "select-multiple") return readMultiSelectValue(el);
     if (type === "file") return readFileListValue(el);
     const v = (el as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
+
     return typeof v === "string" ? v : "";
 }
 
@@ -229,6 +241,7 @@ function inferFieldType(el: Element, tag: string): FormFieldType {
         "date", "datetime-local", "month", "week", "time", "color", "range",
         "file", "hidden", "checkbox", "radio", "submit", "button",
     ]);
+
     return known.has(raw as FormFieldType) ? (raw as FormFieldType) : "other";
 }
 
@@ -247,6 +260,7 @@ function classifySensitive(
     }
     if (nativeName !== null && SENSITIVE_NAME_RE.test(nativeName)) return true;
     if (id !== null && SENSITIVE_NAME_RE.test(id)) return true;
+
     return false;
 }
 
@@ -254,6 +268,7 @@ function nullableAttr(el: Element, name: string): string | null {
     const v = el.getAttribute(name);
     if (v === null) return null;
     const trimmed = v.trim();
+
     return trimmed.length === 0 ? null : trimmed;
 }
 

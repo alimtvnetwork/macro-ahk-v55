@@ -66,6 +66,7 @@ function undoBatchRename(outcome: ReturnType<BatchActions["applyBatchRename"]>):
     const undone = outcome.undo();
     if (undone.Error !== null && undone.Applied === 0) {
         toast.error("Undo failed", { description: undone.Error });
+
         return;
     }
     toast.success(`Reverted ${undone.Applied} rename${undone.Applied === 1 ? "" : "s"}`);
@@ -78,6 +79,7 @@ export function doBatchRenameApply(
     const outcome = deps.batchActions.applyBatchRename(changes);
     if (outcome.Error !== null && outcome.Applied === 0) {
         toast.error("Batch rename failed", { description: outcome.Error });
+
         return;
     }
     const verb = outcome.Error === null ? "Renamed" : "Partially renamed";
@@ -104,6 +106,7 @@ function deleteGroupsSequentially(
             break;
         }
     }
+
     return { deleted, firstError };
 }
 
@@ -112,6 +115,7 @@ export function doBatchDeleteConfirm(deps: MutationDeps, ids: ReadonlyArray<numb
     deps.setSelected((prev) => {
         const next = new Set(prev);
         for (const id of ids) next.delete(id);
+
         return next;
     });
     deps.setSelectionOrder((prev) => prev.filter((sid) => !ids.includes(sid)));
@@ -120,6 +124,7 @@ export function doBatchDeleteConfirm(deps: MutationDeps, ids: ReadonlyArray<numb
     }
     if (firstError !== null && deleted === 0) {
         toast.error("Batch delete failed", { description: firstError });
+
         return;
     }
     toast.success(`Deleted ${deleted} group${deleted === 1 ? "" : "s"}`, {
@@ -129,7 +134,9 @@ export function doBatchDeleteConfirm(deps: MutationDeps, ids: ReadonlyArray<numb
 
 export function doCreate(deps: MutationDeps): void {
     const name = deps.createDialog.name.trim();
-    if (name === "") { toast.error("Group name is required"); return; }
+    if (name === "") { toast.error("Group name is required");
+
+ return; }
     try {
         const newId = deps.lib.createGroup({ Name: name, ParentStepGroupId: deps.createDialog.parent });
         deps.setCreateDialog({ open: false, parent: null, name: "" });
@@ -146,7 +153,9 @@ export function doCreate(deps: MutationDeps): void {
 export function doRename(deps: MutationDeps): void {
     if (deps.renameDialog.group === null) return;
     const name = deps.renameDialog.name.trim();
-    if (name === "") { toast.error("Group name is required"); return; }
+    if (name === "") { toast.error("Group name is required");
+
+ return; }
     try {
         deps.lib.renameGroup(deps.renameDialog.group.StepGroupId, name);
         toast.success(`Renamed to “${name}”`);
@@ -164,6 +173,7 @@ export function doDelete(deps: MutationDeps): void {
         deps.setSelected((prev) => {
             const next = new Set(prev);
             next.delete(id);
+
             return next;
         });
         deps.setSelectionOrder((prev) => prev.filter((sid) => sid !== id));
@@ -272,6 +282,7 @@ function reorderList(
     const next = siblings.slice();
     next.splice(fromIdx, 1);
     next.splice(toIdx, 0, sourceId);
+
     return next;
 }
 
@@ -291,7 +302,9 @@ export function doDropReorder(
         deps.lib.reorderSiblings(parentId, next);
     } catch (caught) {
         deps.setPendingGroupOrder((prev) => {
-            const m = new Map(prev); m.delete(parentKey); return m;
+            const m = new Map(prev); m.delete(parentKey);
+
+ return m;
         });
         toast.error(caught instanceof Error ? caught.message : "Reorder failed");
     }
@@ -312,7 +325,9 @@ export function doStepDropReorder(
         deps.lib.reorderSteps(stepGroupId, next);
     } catch (caught) {
         deps.setPendingStepOrder((prev) => {
-            const m = new Map(prev); m.delete(stepGroupId); return m;
+            const m = new Map(prev); m.delete(stepGroupId);
+
+ return m;
         });
         toast.error(caught instanceof Error ? caught.message : "Reorder failed");
     }

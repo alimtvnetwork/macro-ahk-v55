@@ -15,6 +15,7 @@ import type { BatchRenameChange } from "../BatchRenameDialog";
 function announceUndo(undone: BatchRenameOutcome): void {
     if (undone.Error !== null && undone.Applied === 0) {
         toast.error("Undo failed", { description: undone.Error });
+
         return;
     }
     toast.success(`Reverted ${undone.Applied} rename${undone.Applied === 1 ? "" : "s"}`);
@@ -36,6 +37,7 @@ export function applyBatchRenameWithToast(
     const outcome: BatchRenameOutcome = batchActions.applyBatchRename(changes);
     if (outcome.Error !== null && outcome.Applied === 0) {
         toast.error("Batch rename failed", { description: outcome.Error });
+
         return;
     }
     announceBatchRename(outcome);
@@ -59,6 +61,7 @@ function deleteEach(ids: ReadonlyArray<number>, lib: UseStepLibraryApi): { delet
             firstError = err instanceof Error ? err.message : String(err);break;
         }
     }
+
     return { deleted, firstError };
 }
 
@@ -68,6 +71,7 @@ export function runBatchDelete(input: RunBatchDeleteInput): void {
     setSelected((prev) => {
         const next = new Set(prev);
         for (const id of ids) next.delete(id);
+
         return next;
     });
     if (activeGroupId !== null && ids.includes(activeGroupId)) setActiveGroupId(null);

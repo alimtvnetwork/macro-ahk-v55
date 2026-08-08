@@ -21,6 +21,7 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock('../ui/prompt-utils', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../ui/prompt-utils')>();
+
   return {
     ...actual,
     showPasteToast: mocks.pasteToast,

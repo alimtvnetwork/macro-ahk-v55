@@ -38,6 +38,7 @@ export interface ProjectIdentity {
 /** Pure-string variant. No DOM, no memoization. */
 export function extractProjectIdFromString(url: string): string | null {
   const match = url.match(LOVABLE_PROJECT_ID_REGEX);
+
   return match ? match[1] : null;
 }
 
@@ -50,6 +51,7 @@ export function resolveProjectIdentity(): ProjectIdentity {
     };
   } catch (e) {
     logError(SCOPE, 'resolveProjectIdentity failed', e);
+
     return { projectId: null, projectName: null };
   }
 }
@@ -63,6 +65,7 @@ const lastKnownName = new Map<string, string | null>();
 
 export function subscribeProjectNameChange(callback: ProjectNameChangeListener): () => void {
   listeners.add(callback);
+
   return () => { listeners.delete(callback); };
 }
 
@@ -72,7 +75,9 @@ export function notifyIfProjectRenamed(): void {
   const isMissingProjectId = !projectId;
   if (isMissingProjectId) return;
   const isFirstSeen = !lastKnownName.has(projectId);
-  if (isFirstSeen) { lastKnownName.set(projectId, projectName); return; }
+  if (isFirstSeen) { lastKnownName.set(projectId, projectName);
+
+ return; }
   const prev = lastKnownName.get(projectId) ?? null;
   if (prev === projectName) return;
   lastKnownName.set(projectId, projectName);

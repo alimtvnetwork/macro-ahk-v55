@@ -44,6 +44,7 @@ export function partitionByRole(entries: readonly CachedPromptEntry[]): Partitio
         if (isPromptRole(e.role)) dbEntries.push(e);
         else cacheEntries.push(e);
     }
+
     return { dbEntries, cacheEntries };
 }
 
@@ -58,6 +59,7 @@ function dbRowToCached(row: PromptRow): CachedPromptEntry {
         replaceKey: row.ReplaceKey,
     };
     if (Array.isArray(row.ReplaceValues)) out.replaceValues = [...row.ReplaceValues];
+
     return out;
 }
 
@@ -71,12 +73,14 @@ async function readAllDbRows(): Promise<PromptRow[]> {
         }
         for (const r of res.value) all.push(r);
     }
+
     return all;
 }
 
 /** Read every DB row and map it to a `CachedPromptEntry` for export. */
 export async function collectDbEntriesForExport(): Promise<CachedPromptEntry[]> {
     const rows = await readAllDbRows();
+
     return rows.map(dbRowToCached);
 }
 
@@ -90,12 +94,14 @@ export function mergeDbIntoExport(
 ): CachedPromptEntry[] {
     const dbSlugs = new Set(dbEntries.map((e) => e.slug).filter((s): s is string => !!s));
     const withoutDb = cacheEntries.filter((e) => !e.slug || !dbSlugs.has(e.slug));
+
     return [...dbEntries, ...withoutDb];
 }
 
 async function findExistingRow(role: PromptRole, slug: string): Promise<PromptRow | null> {
     const res = await listPromptsByRole(role);
     if (!res.ok || !res.value) return null;
+
     return res.value.find((r) => r.Slug === slug) ?? null;
 }
 
@@ -119,6 +125,7 @@ async function commitOneEntry(entry: CachedPromptEntry): Promise<CommitOutcome> 
         replaceValues: entry.replaceValues,
         previousReplaceKey: existing?.ReplaceKey,
     });
+
     return res.ok ? { status: 'ok' } : { status: 'error', reason: res.error ?? 'upsert failed' };
 }
 
@@ -136,5 +143,6 @@ export async function commitDbEntries(entries: readonly CachedPromptEntry[]): Pr
     log('PromptIoDbBridge: commitDbEntries upserted=' + upserted
         + ' defaultsProtected=' + defaultsProtected
         + ' errors=' + errors.length, 'info');
+
     return { upserted, errors, defaultsProtected };
 }

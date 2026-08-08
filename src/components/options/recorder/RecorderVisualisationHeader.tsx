@@ -31,6 +31,7 @@ export interface RecorderVisualisationHeaderProps {
 
 export function RecorderVisualisationHeader(props: RecorderVisualisationHeaderProps): JSX.Element {
     const { dataSources, stepCount, selfTestRunning, onSelfTest, onExport } = props;
+
     return (
         <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">

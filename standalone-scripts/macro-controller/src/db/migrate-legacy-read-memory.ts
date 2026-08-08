@@ -44,6 +44,7 @@ async function countLegacyRows(): Promise<number> {
   if (!resp?.isOk || !Array.isArray(resp.rows) || resp.rows.length === 0) return 0;
   const row = resp.rows[0] as { c?: unknown };
   const count = typeof row?.c === 'number' ? row.c : Number(row?.c);
+
   return Number.isFinite(count) ? count : 0;
 }
 

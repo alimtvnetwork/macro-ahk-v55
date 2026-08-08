@@ -119,6 +119,7 @@ const RUN_AT_OPTIONS = [
 
 function RunAtLabel({ value }: { value: string }) {
   const opt = RUN_AT_OPTIONS.find((o) => o.value === value);
+
   return <span>{opt?.label ?? "Idle"}</span>;
 }
 
@@ -388,6 +389,7 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
         jsEntries: [{ id: makeJsId(), name: "", code: "", order: 0, runAt: "document_idle" }],
         editorTab: "overview",
       });
+
       return;
     }
 
@@ -398,6 +400,7 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
     const configEntries: BundleConfigEntry[] = bindingIds
       .map((id, i) => {
         const config = configs.find((c) => c.id === id);
+
         return config
           ? { id: config.id, name: config.name, json: formatJson(config.json), order: i }
           : null;
@@ -424,10 +427,12 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
   const handleSave = async () => {
     if (!form.name.trim()) {
       toast.error("Bundle name is required");
+
       return;
     }
     if (form.jsEntries.length === 0) {
       toast.error("At least one JavaScript file is required");
+
       return;
     }
 
@@ -435,6 +440,7 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
     for (const config of form.configEntries) {
       if (!validateJson(config.json)) {
         toast.error(`Config "${config.name}" has invalid JSON`);
+
         return;
       }
       await onSaveConfig({ id: config.id.startsWith("cfg_") ? undefined : config.id, name: config.name, json: config.json });
@@ -513,6 +519,7 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
       const newIdx = idx + direction;
       if (newIdx < 0 || newIdx >= entries.length) return f;
       [entries[idx], entries[newIdx]] = [entries[newIdx], entries[idx]];
+
       return { ...f, jsEntries: entries.map((e, i) => ({ ...e, order: i })) };
     });
   };
@@ -537,6 +544,7 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
     if (configId === "__none__") return;
     if (form.configEntries.some((c) => c.id === configId)) {
       toast.info("Config already added");
+
       return;
     }
     const config = configs.find((c) => c.id === configId);
@@ -572,6 +580,7 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
       const newIdx = idx + direction;
       if (newIdx < 0 || newIdx >= entries.length) return f;
       [entries[idx], entries[newIdx]] = [entries[newIdx], entries[idx]];
+
       return { ...f, configEntries: entries.map((e, i) => ({ ...e, order: i })) };
     });
   };
@@ -597,6 +606,7 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
   const handleJsonFileDrop = (name: string, content: string) => {
     if (!validateJson(content)) {
       toast.error("Invalid JSON file");
+
       return;
     }
     if (!form.isOpen) {
@@ -738,7 +748,9 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
                     label="Drop JSON"
                     icon={Upload}
                     onFile={(name, content) => {
-                      if (!validateJson(content)) { toast.error("Invalid JSON"); return; }
+                      if (!validateJson(content)) { toast.error("Invalid JSON");
+
+ return; }
                       addConfigEntry(name, content);
                     }}
                     multiple
@@ -879,8 +891,10 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
                   if (typeof entry === "number") return String(entry);
                   if (typeof entry === "object" && entry !== null && "id" in entry) {
                     const idValue = entry.id;
+
                     return typeof idValue === "string" ? idValue.trim() : "";
                   }
+
                   return "";
                 })
                 .filter(Boolean)
@@ -969,7 +983,9 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
 /* ------------------------------------------------------------------ */
 
 function validateJson(raw: string): boolean {
-  try { JSON.parse(raw); return true; } catch { return false; }
+  try { JSON.parse(raw);
+
+ return true; } catch { return false; }
 }
 
 function formatJson(input: JsonValue): string {

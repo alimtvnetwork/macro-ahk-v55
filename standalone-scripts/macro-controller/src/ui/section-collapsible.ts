@@ -60,12 +60,14 @@ function buildSectionHeader(): HTMLElement {
   header.style.cssText = 'display:flex;align-items:center;cursor:pointer;user-select:none;padding:2px 4px;border-radius:3px;transition:background-color 150ms ease;';
   header.onmouseenter = function () { header.style.backgroundColor = 'rgba(255,255,255,0.06)'; };
   header.onmouseleave = function () { header.style.backgroundColor = ''; };
+
   return header;
 }
 
 function buildToggleIndicator(): HTMLElement {
   const toggle = document.createElement('span');
   toggle.style.cssText = 'font-size:10px;color:' + cSectionToggle + ';margin-right:4px;';
+
   return toggle;
 }
 
@@ -73,6 +75,7 @@ function buildTitleElement(title: string): HTMLElement {
   const titleEl = document.createElement('span');
   titleEl.style.cssText = 'font-size:10px;color:' + cSectionHeader + ';font-weight:bold;';
   titleEl.textContent = title;
+
   return titleEl;
 }
 
@@ -83,6 +86,7 @@ function readCollapsedState(storageKey: string): boolean {
     logDebug('readCollapsedState', 'localStorage read failed for ' + storageKey);
   }
   const hasSavedState = savedState !== null;
+
   return hasSavedState ? savedState === 'collapsed' : true;
 }
 

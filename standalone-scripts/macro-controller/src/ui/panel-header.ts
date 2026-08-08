@@ -86,6 +86,7 @@ function _buildTitleElements(deps: PanelBuilderDeps, plCtx: PanelLayoutCtx) {
     const projectId = extractProjectIdFromUrl();
     const wsId = loopCreditState.currentWs ? loopCreditState.currentWs.id : '';
     if (!projectId || !wsId) return null;
+
     return {
       projectId,
       workspaceId: wsId,
@@ -145,7 +146,6 @@ function _assembleTitleRow(titleRow: HTMLElement, els: Record<string, HTMLElemen
 // Project name badge builder (title bar)
 // Displays project name from API or DOM — click to re-detect workspace
 // ============================================
-
 
 function buildWorkspaceNameBadge(deps: PanelBuilderDeps): HTMLElement {
   const wsNameEl = document.createElement('div');
@@ -239,5 +239,6 @@ function buildAuthBadge(): HTMLElement {
     authBadge.textContent = '🟢';
     authBadge.title = 'Auth: token available (' + (getLastTokenSource() || 'cached') + ') — click to refresh';
   }
+
   return authBadge;
 }

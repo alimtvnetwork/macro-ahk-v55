@@ -59,6 +59,7 @@ interface KvBridge {
 
 function getKv(): KvBridge['kv'] | null {
   const sdk = (window as unknown as { marco?: KvBridge }).marco;
+
   return sdk && sdk.kv ? sdk.kv : null;
 }
 
@@ -69,6 +70,7 @@ function buildKey(wsId: string, pid: string): string {
 function ttlFor(status: GitsyncStatusType): number {
   if (status === 'found') return GITSYNC_TTL_FOUND_MS;
   if (status === 'not_linked') return GITSYNC_TTL_NOT_LINKED_MS;
+
   return GITSYNC_TTL_ERROR_MS;
 }
 
@@ -95,11 +97,14 @@ export async function getGitsyncCache(
       kv.delete(buildKey(wsId, pid)).catch(function (e: unknown): void {
         logError('GitsyncCache.read.delete', 'kv.delete failed for expired row', e);
       });
+
       return null;
     }
+
     return parsed as GitsyncCacheRow;
   } catch (err: unknown) {
     logError('GitsyncCache.read', 'kv.get failed for ws=' + wsId + ' pid=' + pid, err);
+
     return null;
   }
 }
@@ -119,6 +124,7 @@ export function setGitsyncCache(
   const isMissingKv = !kv;
   if (isMissingKv) {
     logError('GitsyncCache.write', 'marco.kv unavailable — skipping write for ws=' + wsId + ' pid=' + pid);
+
     return;
   }
   const now = Date.now();

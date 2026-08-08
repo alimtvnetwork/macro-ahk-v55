@@ -46,6 +46,7 @@ export function buildJsonExport(opts: ExportOptions): string {
         })),
         DataSources: opts.data.dataSources,
     };
+
     return JSON.stringify(payload, null, 2);
 }
 
@@ -78,6 +79,7 @@ function csvEscape(value: string | number | null): string {
     if (value === null || value === undefined) { return ""; }
     const s = String(value);
     if (/[",\r\n]/.test(s)) { return `"${s.replace(/"/g, '""')}"`; }
+
     return s;
 }
 
@@ -91,6 +93,7 @@ function bindingsForStep(
         .map((b) => {
             const src = sources.find((d) => d.DataSourceId === b.DataSourceId);
             const fileLabel = src?.FilePath ?? `ds#${b.DataSourceId}`;
+
             return `${fileLabel}.${b.ColumnName}`;
         })
         .join(" | ");
@@ -109,10 +112,12 @@ export function buildCsvExport(opts: ExportOptions): string {
             if (typeof v === "string" || typeof v === "number" || v === null) {
                 return csvEscape(v);
             }
+
             return csvEscape(String(v));
         });
         lines.push(row.join(","));
     }
+
     return lines.join("\r\n");
 }
 

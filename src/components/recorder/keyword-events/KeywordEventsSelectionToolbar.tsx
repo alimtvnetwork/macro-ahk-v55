@@ -13,6 +13,7 @@ export interface KeywordEventsSelectionToolbarProps {
 export function KeywordEventsSelectionToolbar(props: KeywordEventsSelectionToolbarProps): JSX.Element | null {
     const { count, onClear } = props;
     if (count === 0) { return null; }
+
     return (
         <div
             className="flex items-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-1.5 text-xs"

@@ -26,6 +26,7 @@ beforeAll(async () => {
 function freshDb(): { db: StepLibraryDb; projectId: number } {
     const db = new StepLibraryDb(new SQL.Database());
     const projectId = db.upsertProject({ ExternalId: "p", Name: "P" });
+
     return { db, projectId };
 }
 

@@ -36,6 +36,7 @@ export function buildPlanTaskPrompt(n: number): string {
 
 function adapterGetByXPath(xpath: string): Element | null {
   const node = getByXPath(xpath);
+
   return node instanceof Element ? node : null;
 }
 
@@ -51,12 +52,14 @@ async function resolvePlanBody(n: number): Promise<string> {
     const result = await mod.getDefaultPromptForRole('plan');
     if (result.ok && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
       const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
+
       return substituteToken(result.value.Body, key, n);
     }
     console.warn('[PlanTask] No plan-default row; falling back to hardcoded template');
   } catch (err) {
     logError('PlanTask', 'resolvePlanBody DB read failed; falling back to hardcoded template', err);
   }
+
   return buildPlanTaskPrompt(n);
 }
 
@@ -114,6 +117,7 @@ function buildGearAction(text: string, onClick: () => void): HTMLElement {
     try { onClick(); }
     catch (err) { logError('PlanTask', 'gear action "' + text + '" failed', err); }
   };
+
   return el;
 }
 
@@ -146,6 +150,7 @@ function buildShell(ctx: PromptContext): { item: HTMLElement; sub: HTMLElement }
   item.appendChild(row);
   item.appendChild(sub);
   wireShellToggle(row, arrow, sub, ctx.promptsDropdown);
+
   return { item, sub };
 }
 
@@ -238,7 +243,9 @@ function appendCustomStepRow(sub: HTMLElement, dropdown: HTMLElement): void {
   go.onclick = function(e: Event) {
     e.stopPropagation();
     const n = parseInt(inp.value, 10);
-    if (!n || n < 1 || n > 999) { showPasteToast('⚠️ Enter 1–999', true); return; }
+    if (!n || n < 1 || n > 999) { showPasteToast('⚠️ Enter 1–999', true);
+
+ return; }
     injectPlanPrompt(n);
     dropdown.style.display = 'none';
   };

@@ -83,6 +83,7 @@ function deriveErrorCode(message: string): string {
   if (lower.includes("schema")) return "SCHEMA_ERROR";
   if (lower.includes("timeout")) return "TIMEOUT";
   if (lower.includes("network")) return "NETWORK_ERROR";
+
   return "UNKNOWN_ERROR";
 }
 
@@ -131,5 +132,6 @@ function tryPrettyJson(value: string): string {
 
 function getResolvedStackTrace(error: Error): string | undefined {
   const resolvedStack = (error as unknown as { resolvedStack?: string }).resolvedStack;
+
   return typeof resolvedStack === "string" && resolvedStack.trim() ? resolvedStack : undefined;
 }

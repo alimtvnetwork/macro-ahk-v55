@@ -11,6 +11,7 @@ import { useDraggable, POSITION_STORAGE_KEY } from "../use-draggable";
 
 function Probe(): JSX.Element {
     const { position, isDragging, containerRef, handleProps } = useDraggable();
+
     return (
         <div
             ref={containerRef}
@@ -29,6 +30,7 @@ function pointer(type: string, init: PointerEventInit & { clientX: number; clien
     // jsdom lacks PointerEvent — synthesise via MouseEvent with a pointerId tag.
     const ev = new MouseEvent(type, { bubbles: true, cancelable: true, button: 0, clientX: init.clientX, clientY: init.clientY }) as MouseEvent & { pointerId: number };
     ev.pointerId = init.pointerId ?? 1;
+
     return ev as unknown as PointerEvent;
 }
 
@@ -40,6 +42,7 @@ beforeEach(() => {
     Element.prototype.getBoundingClientRect = function (): DOMRect {
         const x = Number((this as HTMLElement).dataset.x ?? 0) || 0;
         const y = Number((this as HTMLElement).dataset.y ?? 0) || 0;
+
         return { x, y, left: x, top: y, right: x + 200, bottom: y + 80, width: 200, height: 80, toJSON: () => ({}) };
     };
 });

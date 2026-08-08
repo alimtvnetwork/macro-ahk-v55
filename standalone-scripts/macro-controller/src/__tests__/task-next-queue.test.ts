@@ -98,7 +98,6 @@ describe('Task Next sequential queue (Issue 01)', () => {
   });
 });
 
-
 describe('Submenu wiring routes count > 1 to the queue (prompt-dropdown.ts)', () => {
   it('imports runTaskNextQueue alongside runTaskNextLoop', () => {
     expect(dropdownSrc).toMatch(/import\s*\{[^}]*runTaskNextQueue[^}]*\}\s*from\s*'\.\/task-next-ui'/);

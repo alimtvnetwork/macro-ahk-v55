@@ -63,12 +63,14 @@ export function pickRepoUrl(body: GitsyncApiResponse): string | null {
   if (body.github_repo && body.github_repo.indexOf('/') > 0) {
     return 'https://github.com/' + body.github_repo;
   }
+
   return null;
 }
 
 function getSdk(): SdkBridge | null {
   const sdk = (window as unknown as { marco?: SdkBridge }).marco;
   if (!sdk || !sdk.api || typeof sdk.api.call !== 'function') return null;
+
   return sdk;
 }
 
@@ -87,6 +89,7 @@ export async function fetchGitsyncConfig(
   const isMissingSdk = !sdk;
   if (isMissingSdk) {
     logError('GitsyncApi', 'marco.api.call unavailable (SDK not injected yet)');
+
     return { status: 'error', message: 'sdk_unavailable' };
   }
 
@@ -98,6 +101,7 @@ export async function fetchGitsyncConfig(
     });
   } catch (err: unknown) {
     logError('GitsyncApi', 'sdk.api.call threw for ws=' + wsId + ' pid=' + pid, err);
+
     return { status: 'error', message: 'network_error' };
   }
 
@@ -105,12 +109,14 @@ export async function fetchGitsyncConfig(
     // 404 = no gitsync row; 401/403 = caller lacks access. From the user's
     // perspective all three are "no repo we can open" → cache as not_linked.
     log('[GitsyncApi] HTTP ' + resp.status + ' ws=' + wsId + ' pid=' + pid + ' → not_linked', 'info');
+
     return { status: 'not_linked' };
   }
   const isMissingOk = !resp.ok;
   if (isMissingOk) {
     logError('GitsyncApi', 'HTTP ' + resp.status + ' for ws=' + wsId + ' pid=' + pid
       + ' bodyPreview=' + JSON.stringify(resp.data).substring(0, 200));
+
     return { status: 'error', message: 'http_' + resp.status, httpStatus: resp.status };
   }
 
@@ -122,7 +128,9 @@ export async function fetchGitsyncConfig(
   const isMissingRepo = !repo;
   if (isMissingRepo) {
     log('[GitsyncApi] ws=' + wsId + ' pid=' + pid + ' returned no repo fields → not_linked', 'info');
+
     return { status: 'not_linked' };
   }
+
   return { status: 'found', repoUrl: repo };
 }

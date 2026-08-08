@@ -44,6 +44,7 @@ function buildBtnRowLike(): HTMLDivElement {
     + 'align-items:center;justify-content:center;padding:8px 10px 10px;'
     + 'width:100%;max-width:100%;min-width:0;margin:0 auto;'
     + 'box-sizing:border-box;overflow:visible;';
+
   return el;
 }
 

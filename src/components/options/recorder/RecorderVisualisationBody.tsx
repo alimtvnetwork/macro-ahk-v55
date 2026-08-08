@@ -36,6 +36,7 @@ export interface RecorderVisualisationBodyProps {
 
 export function RecorderVisualisationBody(props: RecorderVisualisationBodyProps): JSX.Element {
     const selectedStep = props.steps.find((s) => s.StepId === props.selectedStepId) ?? null;
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(280px,1fr)_2fr] gap-4">
             <div className="space-y-2">

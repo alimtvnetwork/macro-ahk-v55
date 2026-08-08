@@ -77,7 +77,6 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
   optionsRow.appendChild(overwriteLabel);
   body.appendChild(optionsRow);
 
-
   // Export
   const exportBtn = document.createElement('button');
   exportBtn.textContent = '📤 Export to JSON';
@@ -117,7 +116,6 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
     const file = fileInput.files?.[0];
     if (file) void _handleFile(file, overwriteCheck.checked);
     fileInput.value = '';
-
   };
   body.appendChild(fileInput);
 
@@ -152,7 +150,6 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
     setActive(false);
     const file = e.dataTransfer?.files?.[0];
     if (file) void _handleFile(file, overwriteCheck.checked);
-
   });
   body.appendChild(dropZone);
 
@@ -178,7 +175,6 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
   panel.appendChild(body);
   document.body.appendChild(panel);
 
-
   _makeDraggable(panel, titleBar);
 }
 
@@ -192,6 +188,7 @@ async function _handleFile(file: File, overwrite: boolean): Promise<void> {
     }
     if (valid.length === 0) {
       showToast('No valid prompts in file', 'error');
+
       return;
     }
     const importOpts: Parameters<typeof performPromptImport>[1] = { overwrite };
@@ -212,7 +209,6 @@ async function _handleFile(file: File, overwrite: boolean): Promise<void> {
       showToast('Imported ' + results.total + ' prompts (' + results.added + ' added, ' + results.updated + ' updated)', 'success');
     }
     rerenderPromptsDropdown();
-
   } catch (err) {
     log('[PromptIO] Import failed: ' + String(err), 'error');
     showToast('Import failed: ' + (err instanceof Error ? err.message : String(err)), 'error');

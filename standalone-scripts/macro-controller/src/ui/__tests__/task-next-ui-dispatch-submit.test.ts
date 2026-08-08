@@ -33,6 +33,7 @@ function mountForm(): HTMLFormElement {
     btn.setAttribute('aria-label', 'Send message');
     form.appendChild(btn);
     document.body.appendChild(form);
+
     return form;
 }
 

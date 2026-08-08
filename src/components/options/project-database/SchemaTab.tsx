@@ -154,6 +154,7 @@ function SchemaToolbar({
 
 function ResultBanner({ result }: { result: { isOk: boolean; created?: number; migrated?: number; errorMessage?: string; errors?: string[] } | null }) {
   if (!result) return null;
+
   return (
     <div className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs ${
       result.isOk

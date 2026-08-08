@@ -42,6 +42,7 @@ function RowBadges({ report }: { readonly report: FailureReport }) {
 export function FailureReportRow(props: Props) {
     const { report, rowKey, index, checked, expanded, onToggle, onToggleExpanded } = props;
     const ChevronIcon = expanded ? ChevronDown : ChevronRight;
+
     return (
         <li className="rounded-md border border-border bg-card px-2.5 py-2 space-y-2">
             <div className="flex items-start gap-2">

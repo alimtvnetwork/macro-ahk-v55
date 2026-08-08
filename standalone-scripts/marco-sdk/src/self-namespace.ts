@@ -67,6 +67,7 @@ export function registerSdkSelfNamespace(marco: MarcoOpaque, version: string): v
             "registerSdkSelfNamespace",
             "RiseupAsiaMacroExt root missing — cannot register RiseupMacroSdk namespace",
         );
+
         return;
     }
     if (!root.Projects) root.Projects = {};
@@ -78,6 +79,7 @@ export function registerSdkSelfNamespace(marco: MarcoOpaque, version: string): v
         console.log(
             "[marco-sdk] Preserved existing RiseupAsiaMacroExt.Projects.RiseupMacroSdk runtime namespace",
         );
+
         return;
     }
 

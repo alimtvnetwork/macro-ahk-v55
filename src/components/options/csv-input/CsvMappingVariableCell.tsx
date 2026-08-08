@@ -23,6 +23,7 @@ export function CsvMappingVariableCell(props: CsvMappingVariableCellProps): JSX.
     const validation = !skipped && mapping.Variable !== null
         ? validateVariableName(mapping.Variable)
         : null;
+
     return (
         <div className="flex items-center gap-1">
             <Input

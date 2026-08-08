@@ -141,6 +141,7 @@ const renderActions = (actions: ReadonlyArray<RunSummaryAction>): string => {
     return actions
         .map((a) => {
             const detailSuffix = a.Detail === null ? "" : ` — ${a.Detail}`;
+
             return `    - [${a.Outcome}] ${a.Code}${detailSuffix}`;
         })
         .join("\n");

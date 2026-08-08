@@ -63,6 +63,7 @@ function formatRelative(iso: string): string {
     const hr = Math.round(min / 60);
     if (hr < 24) return `${hr}h ago`;
     const day = Math.round(hr / 24);
+
     return `${day}d ago`;
 }
 
@@ -70,6 +71,7 @@ function formatAbsolute(iso: string): string {
     if (!iso) return "—";
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return "—";
+
     return d.toLocaleTimeString("en-US", { hour12: false });
 }
 
@@ -147,6 +149,7 @@ export function SdkSelfTestPanel() {
                 <ul className="divide-y divide-border text-xs">
                     {ROWS.map((row) => {
                         const result = snapshot?.[row.key] ?? null;
+
                         return (
                             <li
                                 key={row.key}
@@ -192,5 +195,6 @@ function SelfTestIcon({ row }: { row: SdkSelfTestRow | null }) {
     if (row.pass) {
         return <CheckCircle2 className="h-3.5 w-3.5 text-[hsl(var(--success))] shrink-0" />;
     }
+
     return <XCircle className="h-3.5 w-3.5 text-destructive shrink-0" />;
 }

@@ -66,6 +66,7 @@ beforeEach(() => {
             local: {
                 get: vi.fn(async (key: string) => {
                     const v = storage.get(key);
+
                     return v === undefined ? {} : { [key]: v };
                 }),
                 set: vi.fn(async (record: Record<string, unknown>) => {

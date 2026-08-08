@@ -74,11 +74,13 @@ function pill(icon: string, ariaLabel: string): { el: HTMLElement; text: HTMLEle
     text.style.cssText = 'flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;';
     el.appendChild(ico);
     el.appendChild(text);
+
     return { el, text };
 }
 
 function fmtPro(s: DashboardSummary): string {
     const base = s.proCount + ' Pro';
+
     return s.proExpiringCount > 0 ? base + ' (' + s.proExpiringCount + ' exp)' : base;
 }
 
@@ -143,6 +145,7 @@ export function createSummaryBar(): SummaryBarHandle {
         if (!hydrated && looksEmpty) {
             renderLoading();
             lastDetails = details ?? ZERO_DETAILS;
+
             return;
         }
         hydrated = true;

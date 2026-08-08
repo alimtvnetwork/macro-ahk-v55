@@ -18,7 +18,6 @@ import {
 } from '../loop-engine';
 
 export class LoopEngine implements LoopEngineInterface {
-
   /** Start the automation loop in a direction (up/down) */
   start(direction?: string): void {
     startLoop(direction || 'down');

@@ -116,6 +116,7 @@ export async function seedTokensIntoTab(tabId: number): Promise<void> {
     if (existingJwt !== null) {
         console.log("[token-seeder] Found existing Supabase JWT in tab %d — seeding into marco keys", tabId);
         await injectJwtIntoTab(tabId, existingJwt);
+
         return;
     }
 
@@ -127,6 +128,7 @@ export async function seedTokensIntoTab(tabId: number): Promise<void> {
     if (sessionLookup.value !== null && sessionLookup.value.startsWith("eyJ") && sessionLookup.value.split(".").length === 3) {
         console.log("[token-seeder] Found JWT directly in session cookie — seeding into tab %d", tabId);
         await injectJwtIntoTab(tabId, sessionLookup.value);
+
         return;
     }
 
@@ -168,6 +170,7 @@ async function injectJwtIntoTab(tabId: number, jwt: string): Promise<void> {
                 reason,
                 classifyAccessDeniedError(reason),
             );
+
             return;
         }
 
@@ -205,6 +208,7 @@ async function readSupabaseJwtFromTab(tabId: number): Promise<string | null> {
         });
 
         const jwt = results?.[0]?.result;
+
         return typeof jwt === "string" && jwt.startsWith("eyJ") ? jwt : null;
     } catch (readError) {
         if (isTabAccessDeniedError(readError)) {
@@ -217,6 +221,7 @@ async function readSupabaseJwtFromTab(tabId: number): Promise<string | null> {
                 classifyAccessDeniedError(reason),
             );
         }
+
         return null;
     }
 }
@@ -263,6 +268,7 @@ function scanSupabaseLocalStorageForJwt(): string | null {
     } catch (err) {
         logError("AutoCatch", "Unhandled exception", err);
     }
+
     return null;
 }
 
@@ -280,6 +286,7 @@ function isSupportedTargetUrl(url: string): boolean {
 async function canAccessTabContents(tabId: number, tabUrl: string): Promise<boolean> {
     if (RESTRICTED_URL_RE.test(tabUrl)) {
         recordInaccessibleTarget(tabId, tabUrl, `Restricted browser scheme: ${tabUrl.split(":")[0]}://`, "RESTRICTED_SCHEME");
+
         return false;
     }
 
@@ -287,6 +294,7 @@ async function canAccessTabContents(tabId: number, tabUrl: string): Promise<bool
 
     if (originPattern === null) {
         warnInaccessibleTabOnce(tabId, tabUrl, "No valid origin pattern could be derived for host permission verification.", "NO_HOST_PATTERN");
+
         return false;
     }
 
@@ -301,6 +309,7 @@ async function canAccessTabContents(tabId: number, tabUrl: string): Promise<bool
 
         if (isMissingHasPermission) {
             warnInaccessibleTabOnce(tabId, tabUrl, `Host permission is not granted for ${originPattern}.`, "PERMISSION_NOT_GRANTED");
+
             return false;
         }
 
@@ -313,6 +322,7 @@ async function canAccessTabContents(tabId: number, tabUrl: string): Promise<bool
         }
 
         clearInaccessibleWarning(tabId, tabUrl);
+
         return true;
     } catch (permissionError) {
         logBgWarnError(
@@ -320,6 +330,7 @@ async function canAccessTabContents(tabId: number, tabUrl: string): Promise<bool
             `Permission preflight failed for tab ${tabId} (${tabUrl}) — proceeding with token seed attempt`,
             permissionError instanceof Error ? permissionError : undefined,
         );
+
         return true;
     }
 }
@@ -327,6 +338,7 @@ async function canAccessTabContents(tabId: number, tabUrl: string): Promise<bool
 function toOriginPermissionPattern(url: string): string | null {
     try {
         const parsedUrl = new URL(url);
+
         return `${parsedUrl.origin}/*`;
     } catch {
         return null;
@@ -340,11 +352,13 @@ async function probeTabScriptingAccess(tabId: number, tabUrl: string): Promise<b
             world: "MAIN",
             func: tokenSeederAccessProbe,
         });
+
         return true;
     } catch (probeError) {
         if (isTabAccessDeniedError(probeError)) {
             const reason = probeError instanceof Error ? probeError.message : String(probeError);
             warnInaccessibleTabOnce(tabId, tabUrl, reason, classifyAccessDeniedError(reason));
+
             return false;
         }
 
@@ -353,6 +367,7 @@ async function probeTabScriptingAccess(tabId: number, tabUrl: string): Promise<b
             `Scripting access probe failed for tab ${tabId} (${tabUrl}) — proceeding with token seed attempt`,
             probeError instanceof Error ? probeError : undefined,
         );
+
         return true;
     }
 }
@@ -392,6 +407,7 @@ function classifyAccessDeniedError(message: string): AccessDeniedCode {
     if (normalized.includes("cannot be scripted")) {
         return "GENERIC_CANNOT_SCRIPT";
     }
+
     return "UNKNOWN";
 }
 
@@ -417,6 +433,7 @@ function recordInaccessibleTarget(
     };
 
     inaccessibleSeedTargets.set(key, entry);
+
     return entry;
 }
 
@@ -461,12 +478,14 @@ function isKnownInaccessibleTarget(tabId: number, tabUrl: string): boolean {
 
     inaccessibleSeedTargets.delete(key);
     warnedInaccessibleTabs.delete(key);
+
     return false;
 }
 
 async function getTabUrl(tabId: number): Promise<string | null> {
     try {
         const tab = await chrome.tabs.get(tabId);
+
         return tab.url ?? null;
     } catch {
         return null;

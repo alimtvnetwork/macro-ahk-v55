@@ -45,6 +45,7 @@ function reasonBadge(reason: string, ok: boolean): { label: string; cls: string 
     return { label: "Already attached", cls: "bg-blue-500/10 text-blue-300 border-blue-500/30" };
   if (reason === "AUTOATTACH_SKIPPED_OPT_OUT")
     return { label: "Opted out", cls: "bg-muted/40 text-muted-foreground border-border" };
+
   return { label: reason.replace("AUTOATTACH_SKIPPED_", "").toLowerCase(), cls: "bg-red-500/10 text-red-300 border-red-500/30" };
 }
 
@@ -66,6 +67,7 @@ export function AutoAttachDiagnosticsPanel({ projectId, autoStart, refreshKey }:
       .finally(() => {
         if (alive) setLoading(false);
       });
+
     return () => {
       alive = false;
     };
@@ -81,6 +83,7 @@ export function AutoAttachDiagnosticsPanel({ projectId, autoStart, refreshKey }:
 
 function AutoAttachHeader(props: { autoStart: boolean; evaluatedAt: string | null }): JSX.Element {
   const { autoStart, evaluatedAt } = props;
+
   return (
     <div className="flex items-center justify-between mb-2">
       <h4 className="text-sm font-medium">Auto-Attach Diagnostics</h4>
@@ -105,6 +108,7 @@ function AutoAttachBody(props: { autoStart: boolean; loading: boolean; record: R
   if (loading) return <p className="text-xs text-muted-foreground">Loading...</p>;
   if (record === null) return <EmptyRecordMessage />;
   if (record.decisions.length === 0) return <NoDecisionsMessage />;
+
   return <DecisionList decisions={record.decisions} />;
 }
 
@@ -126,5 +130,6 @@ function DecisionList({ decisions }: { decisions: Decision[] }): JSX.Element {
 
 function DecisionRow({ decision }: { decision: Decision }): JSX.Element {
   const badge = reasonBadge(decision.reason, decision.isSuccess);
+
   return <li className="flex items-start gap-2 text-xs"><span className={`shrink-0 px-1.5 py-0.5 rounded border ${badge.cls}`}>{badge.label}</span><span className="font-mono">{decision.scriptName}</span><span className="text-muted-foreground truncate" title={decision.detail}>: {decision.detail}</span></li>;
 }

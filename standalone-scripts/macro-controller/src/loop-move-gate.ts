@@ -24,6 +24,7 @@ function pollForResumeButton(timeoutMs: number, intervalMs: number): Promise<boo
     return new Promise<boolean>((resolve) => {
         if (isQueueResumeVisible()) {
             resolve(true);
+
             return;
         }
         const startedAt = Date.now();
@@ -31,6 +32,7 @@ function pollForResumeButton(timeoutMs: number, intervalMs: number): Promise<boo
             if (isQueueResumeVisible()) {
                 clearInterval(handle);
                 resolve(true);
+
                 return;
             }
             if (Date.now() - startedAt >= timeoutMs) {
@@ -58,6 +60,7 @@ export async function gatedMoveToWorkspace(
 ): Promise<void> {
     if (!isFeatureFlagEnabled('Loop.RunStateGate.Enabled')) {
         await moveToWorkspace(targetWorkspaceId, targetWorkspaceName);
+
         return;
     }
 
@@ -75,6 +78,7 @@ export async function gatedMoveToWorkspace(
             caught,
         );
         showToast('Prompt still active after 2 min — move cancelled', 'warn', { noStop: true });
+
         return;
     }
 
@@ -96,6 +100,7 @@ export async function gatedMoveToWorkspace(
                 ' outcome=resume-missing (Resume button not visible after 15s)',
             'warn',
         );
+
         return;
     }
     const resumeResult = resumeQueue();

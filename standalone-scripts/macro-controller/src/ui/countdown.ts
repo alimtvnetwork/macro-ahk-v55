@@ -1,4 +1,3 @@
-
 /**
  * MacroLoop Controller — Countdown Timer & Start/Stop Button
  * Step 03c: Extracted from createUI() closure
@@ -39,6 +38,7 @@ export function createCountdownCtx(
 function countdownColor(secs: number): string {
   if (secs <= 10) return '#ef4444';
   if (secs <= 30) return '#f59e0b';
+
   return '#fbbf24';
 }
 
@@ -46,6 +46,7 @@ function countdownColor(secs: number): string {
 function progressColor(pct: number): string {
   if (pct > 80) return '#ef4444';
   if (pct > 50) return '#f59e0b';
+
   return '#10b981';
 }
 
@@ -88,7 +89,9 @@ export function startCountdownTick(ctx: CountdownCtx) {
   ctx.lastCountdownVal = -1;
   ctx.countdownTickId = trackedSetInterval('UI.countdownTick', function() {
     const isMissingRunning = !state.running;
-    if (isMissingRunning) { stopCountdownTick(ctx); return; }
+    if (isMissingRunning) { stopCountdownTick(ctx);
+
+ return; }
     const secs = state.countdown;
     if (secs === ctx.lastCountdownVal) return;
     ctx.lastCountdownVal = secs;

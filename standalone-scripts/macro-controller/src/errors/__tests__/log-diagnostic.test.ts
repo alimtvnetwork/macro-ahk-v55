@@ -32,6 +32,7 @@ function installLogger(): LoggerStub {
   (globalThis as unknown as { window: { RiseupAsiaMacroExt: { Logger: LoggerStub } } }).window = {
     RiseupAsiaMacroExt: { Logger: stub },
   };
+
   return stub;
 }
 

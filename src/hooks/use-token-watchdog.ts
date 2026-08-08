@@ -19,7 +19,6 @@ import { useVisibilityPausedInterval } from "@/hooks/use-visibility-paused-inter
 const REFRESH_THRESHOLD_SEC = 5 * 60; // 5 minutes
 const POLL_INTERVAL_MS = 10_000; // 10 seconds
 
-
 export interface TokenWatchdogState {
   /** Current token (masked for display) */
   maskedToken: string;
@@ -55,6 +54,7 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
     if (parts.length !== 3) return null;
     const payload = parts[1];
     const decoded = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+
     return JSON.parse(decoded);
   } catch {
     return null;
@@ -67,6 +67,7 @@ function extractToken(result: Record<string, unknown> | null): string | null {
     const tokenValue = result[key];
     if (typeof tokenValue === "string" && tokenValue.length > 0) return tokenValue;
   }
+
   return null;
 }
 
@@ -78,12 +79,14 @@ function formatTtl(sec: number | null): string {
   const s = sec % 60;
   if (h > 0) return `${h}h ${m}m`;
   if (m > 0) return `${m}m ${s}s`;
+
   return `${s}s`;
 }
 
 function maskToken(token: string | null): string {
   if (!token) return "No token";
   if (token.length < 20) return "•".repeat(token.length);
+
   return `${token.slice(0, 8)}…${token.slice(-6)}`;
 }
 
@@ -110,6 +113,7 @@ export function useTokenWatchdog(): TokenWatchdogState {
       setIssuedAt("");
       setExpiresAt("");
       expRef.current = null;
+
       return;
     }
 
@@ -117,6 +121,7 @@ export function useTokenWatchdog(): TokenWatchdogState {
     if (!payload) {
       setTtlSec(null);
       expRef.current = null;
+
       return;
     }
 

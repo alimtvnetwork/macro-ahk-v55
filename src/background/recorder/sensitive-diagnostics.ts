@@ -32,6 +32,7 @@ function diagnosticValueLength(value: JsonValue | undefined): number {
         return value.length;
     }
     const text = safeJsonStringify(value);
+
     return text.length;
 }
 

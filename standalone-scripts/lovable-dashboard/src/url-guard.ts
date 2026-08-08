@@ -14,6 +14,7 @@ export function shouldActivateHomeScreen(): boolean {
         return isHomeUrlAllowed(window.location.href);
     } catch (caught) {
         logError("UrlGuard", caught);
+
         return false;
     }
 }
@@ -23,6 +24,7 @@ export function watchSpaNavigation(onNavigate: () => void): () => void {
         return installNavWatchers(onNavigate);
     } catch (caught) {
         logError("UrlGuard.watch", caught);
+
         return () => undefined;
     }
 }
@@ -32,6 +34,7 @@ function installNavWatchers(onNavigate: () => void): () => void {
     window.addEventListener("popstate", handler);
     const restorePush = patchHistoryMethod("pushState", handler);
     const restoreReplace = patchHistoryMethod("replaceState", handler);
+
     return () => detach(handler, restorePush, restoreReplace);
 }
 
@@ -40,8 +43,10 @@ function patchHistoryMethod(name: "pushState" | "replaceState", handler: () => v
     history[name] = function patched(...args: Parameters<typeof history[typeof name]>) {
         const result = original.apply(history, args);
         handler();
+
         return result;
     } as typeof history[typeof name];
+
     return () => { history[name] = original; };
 }
 

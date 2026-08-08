@@ -45,6 +45,7 @@ export function hydrateCreditBalanceFromCache(): Promise<ReadonlyArray<CreditBal
                 'CreditBalance.hydrate: seeded ' + rows.length + ' workspace(s) from SQLite',
                 'info',
             );
+
             return rows;
         } catch (caught: unknown) {
             logError(
@@ -52,9 +53,11 @@ export function hydrateCreditBalanceFromCache(): Promise<ReadonlyArray<CreditBal
                 'failed to hydrate credit-balance cache from marco.kv',
                 caught,
             );
+
             return [];
         }
     })();
+
     return hydratePromise;
 }
 

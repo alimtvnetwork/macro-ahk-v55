@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../shared-state', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
+
   return {
     ...actual,
     state: { running: false, direction: 'up' },
@@ -208,7 +209,6 @@ function makeMockDeps(): PanelBuilderDeps {
     triggerLoopMoveFromSelection: vi.fn(),
   };
 }
-
  
 describe('panel-builder', () => {
   beforeEach(() => {
@@ -221,7 +221,6 @@ describe('panel-builder', () => {
     // namespace itself — they just need it to be present).
     (window as any).RiseupAsiaMacroExt = { Projects: {} };
   });
-
 
   it('creates the main UI container in document.body', () => {
     createUI(makeMockDeps());

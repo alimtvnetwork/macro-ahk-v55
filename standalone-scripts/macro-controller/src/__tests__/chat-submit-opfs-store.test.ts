@@ -12,6 +12,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 vi.mock('../error-utils', async () => {
   const actual = await vi.importActual<typeof import('../error-utils')>('../error-utils');
+
   return { ...actual, logError: vi.fn() };
 });
 
@@ -41,6 +42,7 @@ class FakeDir {
       child = new FakeDir(name);
       this.dirs.set(name, child);
     }
+
     return child;
   }
 
@@ -53,6 +55,7 @@ class FakeDir {
       this.files.set(name, file);
     }
     const capture = file;
+
     return {
       kind: 'file' as const,
       name,
@@ -87,6 +90,7 @@ function installFakeOpfs(): FakeDir {
     configurable: true,
     writable: true,
   });
+
   return root;
 }
 

@@ -69,6 +69,7 @@ export interface CreditTotals {
 function n(value: number | undefined | null): number {
   if (typeof value !== 'number') return 0;
   if (!Number.isFinite(value)) return 0;
+
   return value;
 }
 
@@ -76,6 +77,7 @@ function n(value: number | undefined | null): number {
 function isFreeTierWorkspace(ws: WorkspaceCredit): boolean {
   const plan = (ws.plan || '').toLowerCase().trim();
   const tier = (ws.tier || '').toUpperCase().trim();
+
   return plan === PLAN_FREE || tier === TIER_FREE;
 }
 
@@ -97,6 +99,7 @@ function readCreditTriple(ws: WorkspaceCredit): CreditTriple {
       granted: n(ws.totalCredits),
     };
   }
+
   // Issue 120 fix: paid non-pro_0 plans (pro_1, pro_3, lite, ktlo) use the
   // billing-period fields ONLY. Do NOT add daily / granted / topup / rollover
   // into the Total — that double-counts and inflates the user's plan grant.
@@ -119,11 +122,13 @@ function hasCreditData(ws: WorkspaceCredit): boolean {
     const hasUsed = typeof ws.totalCreditsUsed === 'number' && Number.isFinite(ws.totalCreditsUsed);
     const hasAvail = typeof ws.available === 'number' && Number.isFinite(ws.available);
     const hasGranted = typeof ws.totalCredits === 'number' && Number.isFinite(ws.totalCredits);
+
     return hasUsed || hasAvail || hasGranted;
   }
   const hasUsed = typeof ws.used === 'number' && Number.isFinite(ws.used);
   const hasAvail = typeof ws.billingAvailable === 'number' && Number.isFinite(ws.billingAvailable);
   const hasLimit = typeof ws.limit === 'number' && Number.isFinite(ws.limit);
+
   return hasUsed || hasAvail || hasLimit;
 }
 

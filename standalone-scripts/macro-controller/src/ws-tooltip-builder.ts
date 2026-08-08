@@ -21,6 +21,7 @@ function buildTooltipProfileLines(ws: WorkspaceCredit): string[] {
       const t = Date.parse(ws.subscriptionStatusChangedAt);
       if (!Number.isFinite(t)) return 0;
       const diff = Date.now() - t;
+
       return diff > 0 ? Math.floor(diff / 86_400_000) : 0;
     })();
     const suffix = days > 0 ? ' (' + days + 'd ago)' : '';
@@ -29,6 +30,7 @@ function buildTooltipProfileLines(ws: WorkspaceCredit): string[] {
   if (ws.nextRefillAt) lines.push('  Next Refill: ' + ws.nextRefillAt);
   if (ws.billingPeriodEndAt) lines.push('  Billing Period Ends: ' + ws.billingPeriodEndAt);
   if (ws.createdAt) lines.push('  Created: ' + ws.createdAt);
+
   return lines;
 }
 
@@ -40,6 +42,7 @@ function buildTooltipCalculatedLines(ws: WorkspaceCredit): string[] {
   lines.push('  📦 Billing Only: ' + (ws.billingAvailable || 0) + ' (' + ws.limit + ' - ' + ws.used + ')');
   const _tc = ws.totalCredits ?? calcTotalCredits(ws.freeGranted, ws.dailyLimit, ws.limit, ws.topupLimit, ws.rolloverLimit, ws.plan);
   lines.push('  ⚡ Total Credits: ' + _tc + ' (granted:' + (ws.freeGranted || 0) + ' + daily:' + (ws.dailyLimit || 0) + ' + billing:' + (ws.limit || 0) + ' + topup:' + (ws.topupLimit || 0) + ' + rollover:' + (ws.rolloverLimit || 0) + ')');
+
   return lines;
 }
 
@@ -65,6 +68,7 @@ function buildTooltipRawLines(ws: WorkspaceCredit): string[] {
     if (r.last_trial_credit_period) lines.push('  Trial Period: ' + r.last_trial_credit_period);
     if (r.subscription_status) lines.push('  Subscription: ' + r.subscription_status);
   }
+
   return lines;
 }
 
@@ -75,5 +79,6 @@ export function buildLoopTooltipText(ws: WorkspaceCredit): string {
   lines.push(...buildTooltipCalculatedLines(ws));
   lines.push('');
   lines.push(...buildTooltipRawLines(ws));
+
   return lines.join('\n');
 }

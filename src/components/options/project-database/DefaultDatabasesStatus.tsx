@@ -17,7 +17,6 @@ import { sendMessage } from "@/lib/message-client";
 import { DEFAULT_PROJECT_DATABASES } from "@/types/default-databases";
 import { KeyValueBrowser } from "./KeyValueBrowser";
 
-
 interface DefaultDatabasesStatusProps {
   projectSlug: string;
 }

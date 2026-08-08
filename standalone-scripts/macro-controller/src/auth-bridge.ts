@@ -25,8 +25,6 @@ import { LabelType } from './types';
 // Bridge Constants & Outcome Tracking
 // ============================================
 
-
-
 // CQ11: Encapsulate bridge outcome in singleton class
 class BridgeOutcomeState {
   private _hasAttempted = false;
@@ -97,6 +95,7 @@ function getVisibleCookieNames(): string[] {
       : [];
   } catch (e) {
     logError('listCookieNames', 'Failed to parse cookie names', e);
+
     return [];
   }
 }

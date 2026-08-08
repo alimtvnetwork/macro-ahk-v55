@@ -85,6 +85,7 @@ export function useStepGroupLibraryViewModel(
             ids.forEach((id, i) => m.set(id, i));
             positionByParent.set(parentKey, m);
         }
+
         return [...visibleGroups].sort((a, b) => {
             const aKey = (a.ParentStepGroupId ?? "root") as number | "root";
             const bKey = (b.ParentStepGroupId ?? "root") as number | "root";
@@ -94,6 +95,7 @@ export function useStepGroupLibraryViewModel(
             const ai = positions.get(a.StepGroupId);
             const bi = positions.get(b.StepGroupId);
             if (ai === undefined || bi === undefined) return 0;
+
             return ai - bi;
         });
     }, [visibleGroups, pendingGroupOrder]);
@@ -134,9 +136,11 @@ export function useStepGroupLibraryViewModel(
                     out.push({ Group: n.Group, Children: kids });
                 }
             }
+
             return out;
         };
         const filtered = filterNodes(tree);
+
         return { filteredTree: filtered, autoExpand: expandIds };
     }, [tree, trimmedQuery]);
 
@@ -144,6 +148,7 @@ export function useStepGroupLibraryViewModel(
         if (autoExpand === null) return expanded;
         const merged = new Set(expanded);
         for (const id of autoExpand) merged.add(id);
+
         return merged;
     }, [expanded, autoExpand]);
 
@@ -167,6 +172,7 @@ export function useStepGroupLibraryViewModel(
             }
         }
         for (const remaining of byId.values()) out.push(remaining);
+
         return out;
     }, [activeGroupId, lib.StepsByGroup, pendingStepOrder]);
 
@@ -186,6 +192,7 @@ export function useStepGroupLibraryViewModel(
     const groupsById = useMemo(() => {
         const m = new Map<number, StepGroupRow>();
         for (const g of lib.Groups) m.set(g.StepGroupId, g);
+
         return m;
     }, [lib.Groups]);
 

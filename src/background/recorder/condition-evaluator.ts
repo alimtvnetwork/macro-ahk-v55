@@ -103,13 +103,17 @@ function walkCondition(node: Condition, depth: number, path: string, state: Walk
     }
     if ("All" in node) {
         node.All.forEach((child, i) => walkCondition(child, depth + 1, joinPath(path, `All[${i}]`), state));
+
         return;
     }
     if ("Any" in node) {
         node.Any.forEach((child, i) => walkCondition(child, depth + 1, joinPath(path, `Any[${i}]`), state));
+
         return;
     }
-    if ("Not" in node) { walkCondition(node.Not, depth + 1, joinPath(path, "Not"), state); return; }
+    if ("Not" in node) { walkCondition(node.Not, depth + 1, joinPath(path, "Not"), state);
+
+ return; }
     state.count++;
     if (state.count > MAX_PREDICATE_COUNT) {
         throw new Error(`InvalidSelector: condition exceeds ${MAX_PREDICATE_COUNT} predicates at ${joinPath(path, node.Matcher.Kind)}`);
@@ -133,6 +137,7 @@ function validateMatcher(predicate: Predicate, path: string): void {
             const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
             throw new Error(`InvalidSelector: bad regex /${matcher.Pattern}/ at ${path} — ${message}`);
         }
+
         return;
     }
     if ((matcher.Kind === "AttrEquals" || matcher.Kind === "AttrContains") && matcher.Name.length === 0) {
@@ -152,17 +157,20 @@ export function evaluateCondition(condition: Condition, options: EvaluateOptions
         for (const child of condition.All) {
             if (evaluateCondition(child, options) === false) return false;
         }
+
         return true;
     }
     if ("Any" in condition) {
         for (const child of condition.Any) {
             if (evaluateCondition(child, options)) return true;
         }
+
         return false;
     }
     if ("Not" in condition) return evaluateCondition(condition.Not, options) === false;
 
     const result = evaluatePredicate(condition, options);
+
     return condition.Negate === true ? result === false : result;
 }
 
@@ -173,17 +181,20 @@ function evaluatePredicate(predicate: Predicate, options: EvaluateOptions): bool
         const count = locateAll(predicate.Selector, kind, options.Doc).length;
         const result = compareCount(count, predicate.Matcher.Op, predicate.Matcher.N);
         recordTrace(options, predicate, kind, result, `count=${count}`);
+
         return result;
     }
 
     const element = locateFirst(predicate.Selector, kind, options.Doc);
     if (element === null) {
         recordTrace(options, predicate, kind, predicate.Matcher.Kind === "Exists" ? false : false, "no match");
+
         return false;
     }
 
     const result = applyMatcher(element, predicate.Matcher);
     recordTrace(options, predicate, kind, result);
+
     return result;
 }
 
@@ -206,6 +217,7 @@ function recordTrace(
 
 function matchText(actual: string, expected: string, caseSensitive: boolean | undefined, compare: (a: string, b: string) => boolean): boolean {
     if (caseSensitive === false) return compare(actual.toLowerCase(), expected.toLowerCase());
+
     return compare(actual, expected);
 }
 
@@ -220,6 +232,7 @@ function matchTextContains(element: Element, matcher: Matcher & { Kind: "TextCon
 function matchAttr(element: Element, name: string, expected: string, mode: MatchAttrMode): boolean {
     const value = element.getAttribute(name);
     if (value === null) return false;
+
     return mode === "eq" ? value === expected : value.includes(expected);
 }
 
@@ -244,12 +257,14 @@ function isVisible(element: Element): boolean {
     const styles = windowObject.getComputedStyle(element);
     if (styles.display === "none") return false;
     if (styles.visibility === "hidden") return false;
+
     return true;
 }
 
 function compareCount(count: number, op: OpEnum, n: number): boolean {
     if (op === "eq") return count === n;
     if (op === "gte") return count >= n;
+
     return count <= n;
 }
 
@@ -261,6 +276,7 @@ export function resolveSelectorKind(kind: SelectorKind, expression: string): Pre
     if (kind === "XPath") return "XPath";
     if (kind === "Css") return "Css";
     const trimmed = expression.trimStart();
+
     return trimmed.startsWith("/") || trimmed.startsWith("(") ? "XPath" : "Css";
 }
 
@@ -268,8 +284,10 @@ function locateFirst(expression: string, kind: PredicateEvaluationKind, doc: Doc
     if (kind === "XPath") {
         const r = doc.evaluate(expression, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
         const node = r.singleNodeValue;
+
         return node instanceof Element ? node : null;
     }
+
     return doc.querySelector(expression);
 }
 
@@ -281,8 +299,10 @@ function locateAll(expression: string, kind: PredicateEvaluationKind, doc: Docum
             const node = r.snapshotItem(i);
             if (node instanceof Element) out.push(node);
         }
+
         return out;
     }
+
     return Array.from(doc.querySelectorAll(expression));
 }
 

@@ -88,6 +88,7 @@ export function KeywordEventsList(props: KeywordEventsListProps): JSX.Element {
                         const selectedForMenu = isSelected
                             ? allEvents.filter((candidate) => selection.isSelected(candidate.Id))
                             : [entry];
+
                         return (
                             <KeywordEventBulkContextMenu
                                 key={entry.Id}

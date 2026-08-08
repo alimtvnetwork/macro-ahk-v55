@@ -81,6 +81,7 @@ function getBootstrapData() {
       configs: StoredConfig[];
     }>({ type: "GET_OPTIONS_BOOTSTRAP" });
   }
+
   return bootstrapPromise;
 }
 

@@ -36,6 +36,7 @@ function ensureOverlay(): HTMLElement {
         "pointer-events:auto",
     ].join(";");
     document.body.appendChild(element);
+
     return element;
 }
 
@@ -45,6 +46,7 @@ export function renderDebugOverlay(match: BannerDebugMatch | null): void {
     const element = ensureOverlay();
     if (match === null) {
         element.textContent = "BannerHider: no match yet";
+
         return;
     }
 

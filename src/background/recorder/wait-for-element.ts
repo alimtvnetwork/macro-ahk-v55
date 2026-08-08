@@ -76,6 +76,7 @@ export async function waitForElement(
     if (result.Ok) {
         return { Ok: true, DurationMs: result.DurationMs, ResolvedKind: resolvedKind };
     }
+
     return mapFailure(result.Reason, result.Detail, result.DurationMs, spec);
 }
 
@@ -85,6 +86,7 @@ function synthesizeCondition(spec: WaitForSpec): Condition {
         SelectorKind: spec.Kind ?? "Auto",
         Matcher: { Kind: spec.Predicate === "Visible" ? "Visible" : "Exists" },
     };
+
     return predicate;
 }
 
@@ -97,6 +99,7 @@ function mapFailure(
     if (reason === "InvalidSelector") {
         return { Ok: false, DurationMs: durationMs, Reason: "InvalidSelector", Detail: detail };
     }
+
     return {
         Ok: false,
         DurationMs: durationMs,

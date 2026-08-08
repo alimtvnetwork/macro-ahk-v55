@@ -37,6 +37,7 @@ function installChromeStorageStub(): Map<string, unknown> {
             local: {
                 get: async (key: string) => {
                     const v = store.get(key);
+
                     return v === undefined ? {} : { [key]: v };
                 },
                 set: async (entries: Record<string, unknown>) => {
@@ -47,6 +48,7 @@ function installChromeStorageStub(): Map<string, unknown> {
             },
         },
     };
+
     return store;
 }
 

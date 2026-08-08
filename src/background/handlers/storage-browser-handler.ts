@@ -32,12 +32,14 @@ export function bindStorageBrowserDbManager(manager: DbManager): void {
 function getDb(): SqlJsDatabase {
     const isMissingDbManager = !dbManager;
     if (isMissingDbManager) throw new Error("[storage-browser] DbManager not bound");
+
     return dbManager.getLogsDb();
 }
 
 function getErrorsDb(): SqlJsDatabase {
     const isMissingDbManager = !dbManager;
     if (isMissingDbManager) throw new Error("[storage-browser] DbManager not bound");
+
     return dbManager.getErrorsDb();
 }
 
@@ -99,6 +101,7 @@ function assertValidTableOrView(name: string): void {
 
 function getDbForTable(table: string): SqlJsDatabase {
     const dbType = TABLE_DB_MAP[table] ?? "logs";
+
     return dbType === "errors" ? getErrorsDb() : getDb();
 }
 
@@ -126,6 +129,7 @@ function probeTableEntry(name: string, isView: boolean): TableEntry {
         const rowCount = result.length > 0 && result[0].values.length > 0
             ? (result[0].values[0][0] as number)
             : 0;
+
         return { name, rowCount, primaryKeys, isView };
     } catch (countErr) {
         const subject = isView ? "View" : "Table";
@@ -136,6 +140,7 @@ function probeTableEntry(name: string, isView: boolean): TableEntry {
             `${subject} introspection probe failed for "${name}" — reporting rowCount=0 (${subject.toLowerCase()} may not be created yet or DB not bound)`,
             countErr instanceof Error ? countErr : String(countErr),
         );
+
         return { name, rowCount: 0, primaryKeys, isView };
     }
 }
@@ -171,6 +176,7 @@ function computeDbSize(): number {
         // errors DB may not be open yet during boot.
         console.debug("[storage-browser] computeDbSize: errors DB export skipped:", errorsErr);
     }
+
     return totalBytes;
 }
 
@@ -346,6 +352,7 @@ export async function handleStorageClearAll(): Promise<{ isOk: true; cleared: st
     }
 
     markDirty();
+
     return { isOk: true, cleared };
 }
 

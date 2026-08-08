@@ -58,6 +58,7 @@ function cleanStackTrace(raw: string): string {
   const useful = lines.filter((line) => !CHUNK_STACK_PATTERN.test(line));
   // If all lines were chunks, keep original first line for minimal context
   if (useful.length === 0 && lines.length > 0) return lines[0];
+
   return useful.join("\n");
 }
 
@@ -82,6 +83,7 @@ function formatLog(l: SessionLog): string {
   const detail = l.action
     ? `[${l.category}] ${l.action}: ${l.detail ?? ""}`
     : l.message ?? "";
+
   return `  ${ts}  ${lvl}  ${src}  ${detail}`;
 }
 
@@ -117,6 +119,7 @@ function buildInjectionReport(
   // Prompt-loading diagnostics (filter logs for prompt/config/injection)
   const diagLogs = logs.filter((l) => {
     const text = `${l.source ?? ""} ${l.category ?? ""} ${l.action ?? ""} ${l.detail ?? ""} ${l.message ?? ""}`.toLowerCase();
+
     return (
       text.includes("prompt") ||
       text.includes("inject") ||
@@ -179,6 +182,7 @@ function buildInjectionReport(
   }
 
   sections.push("");
+
   return sections.join("\n");
 }
 
@@ -287,6 +291,7 @@ export function InjectionCopyButton() {
           if (!tab?.id) return null;
           const res = await sendMessage<{ injections: Record<number, unknown> }>({ type: "GET_TAB_INJECTIONS", tabId: tab.id });
           const record = res?.injections?.[tab.id] as { verification?: VerificationResult } | null;
+
           return record?.verification ?? null;
         })(),
       ]);

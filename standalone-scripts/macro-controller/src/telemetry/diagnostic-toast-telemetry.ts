@@ -79,7 +79,6 @@ export interface EmitDiagnosticToastInput {
   correlationId?: string;
 }
 
-
 function redactRequestDetail(rd: RequestDetail | undefined): RequestDetailSnapshot | undefined {
   const isMissingRd = !rd;
   if (isMissingRd) return undefined;
@@ -95,6 +94,7 @@ function redactRequestDetail(rd: RequestDetail | undefined): RequestDetailSnapsh
   if (typeof rd.correlationId === 'string' && rd.correlationId.length > 0) {
     snap.correlationId = rd.correlationId;
   }
+
   return snap;
 }
 
@@ -114,6 +114,7 @@ function resolveCorrelationId(input: EmitDiagnosticToastInput): string {
   }
   const rdId = input.opts?.requestDetail?.correlationId;
   if (typeof rdId === 'string' && rdId.length > 0) return rdId;
+
   return generateCorrelationId();
 }
 
@@ -133,13 +134,14 @@ function formatLine(evt: DiagnosticToastEvent): string {
     if (rd.url) parts.push('url=' + rd.url);
   }
   if (evt.detail) parts.push('detail=' + evt.detail);
+
   return '[DiagnosticToast] ' + parts.join(' ');
 }
-
 
 function levelToLogLevel(level: ToastLevel): StepNotifyLevel {
   if (level === 'error') return 'error';
   if (level === 'warn') return 'warning';
+
   return 'info';
 }
 
@@ -198,9 +200,9 @@ export function emitDiagnosticToastEvent(input: EmitDiagnosticToastInput): Diagn
   }
   appendToTraceBuffer(evt);
   dispatchWindowEvent(evt);
+
   return evt;
 }
-
 
 /** Read the trace ring buffer for tests / debug panels. */
 export function readDiagnosticToastTrace(): DiagnosticToastEvent[] {
@@ -209,9 +211,11 @@ export function readDiagnosticToastTrace(): DiagnosticToastEvent[] {
     const isMissingRaw = !raw;
     if (isMissingRaw) return [];
     const parsed = JSON.parse(raw) as unknown;
+
     return Array.isArray(parsed) ? (parsed as DiagnosticToastEvent[]) : [];
   } catch (err) {
     logError('DiagnosticToastTelemetry', 'readDiagnosticToastTrace failed', err);
+
     return [];
   }
 }

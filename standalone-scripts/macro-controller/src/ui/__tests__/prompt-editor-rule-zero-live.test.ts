@@ -31,6 +31,7 @@ function openPlanEditorWith(bodyText: string): {
   const saveBtn = Array.from(overlay.querySelectorAll('button')).find(
     (b) => b.textContent === '💾 Update',
   ) as HTMLButtonElement;
+
   return { badge, saveBtn, textarea };
 }
 

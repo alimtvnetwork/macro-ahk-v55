@@ -77,6 +77,7 @@ function isSqlWasmPath(path: string | URL): boolean {
   if (typeof path === "string") {
     return path.includes(SQL_WASM_FILE_NAME);
   }
+
   return path.href.includes(SQL_WASM_FILE_NAME) || path.pathname.includes(SQL_WASM_FILE_NAME);
 }
 
@@ -112,6 +113,7 @@ function installWasmFetchShim(): void {
     if (isSqlWasmPath(path)) {
       const callback = rest[rest.length - 1] as ReadFileCb;
       callback(null, wasmBytes);
+
       return;
     }
     (origReadFile as unknown as (...a: unknown[]) => void)(path, ...rest);
@@ -122,10 +124,10 @@ function installWasmFetchShim(): void {
     if (isSqlWasmPath(path)) {
       return wasmBytes;
     }
+
     return (origReadFileSync as unknown as (...a: unknown[]) => Buffer | string)(path, ...rest);
   };
 }
-
 
 /* ─── 3. URL.createObjectURL capture. ─── */
 const capturedBlobs: Blob[] = [];
@@ -134,6 +136,7 @@ function installObjectUrlCapture(): void {
   globalThis.URL.createObjectURL = (blob: Blob): string => {
     capturedBlobs.push(blob);
     counter += 1;
+
     return `blob:fixture-${counter}`;
   };
   globalThis.URL.revokeObjectURL = (): void => { /* noop in tests */ };
@@ -153,6 +156,7 @@ export function loadCachedBundle(): Promise<CachedBundle> {
   if (cachedPromise === null) {
     cachedPromise = buildCachedBundle();
   }
+
   return cachedPromise;
 }
 
@@ -209,6 +213,7 @@ function wasmFilePath(): string {
 export async function openCachedDb(): Promise<Database> {
   const { dbBytes } = await loadCachedBundle();
   const SQL = await initSqlJs({ locateFile: () => wasmFilePath() });
+
   return new SQL.Database(dbBytes);
 }
 
@@ -216,5 +221,6 @@ export async function openCachedDb(): Promise<Database> {
 export async function cloneCachedDbInMemory(): Promise<Database> {
   const { dbBytes } = await loadCachedBundle();
   const SQL = await initSqlJs({ locateFile: () => wasmFilePath() });
+
   return new SQL.Database(new Uint8Array(dbBytes));
 }

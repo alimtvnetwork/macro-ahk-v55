@@ -27,6 +27,7 @@ function startsWith(bytes: Uint8Array, magic: readonly number[]): boolean {
   for (let i = 0; i < magic.length; i++) {
     if (bytes[i] !== magic[i]) return false;
   }
+
   return true;
 }
 
@@ -35,13 +36,16 @@ function isJsonPrefix(bytes: Uint8Array): boolean {
     const b = bytes[i];
     const isWhitespace = b === 0x20 || b === 0x09 || b === 0x0a || b === 0x0d || b === 0xef || b === 0xbb || b === 0xbf;
     if (isWhitespace) continue;
+
     return b === 0x7b || b === 0x5b; // `{` or `[`
   }
+
   return false;
 }
 
 function hexDump(bytes: Uint8Array, count: number): string {
   const slice = bytes.subarray(0, Math.min(bytes.length, count));
+
   return Array.from(slice, (b) => b.toString(16).padStart(2, '0')).join(' ');
 }
 

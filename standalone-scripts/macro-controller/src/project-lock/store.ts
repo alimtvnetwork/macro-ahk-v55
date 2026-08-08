@@ -28,6 +28,7 @@ interface KvBridge {
 
 function getKv(): KvBridge['kv'] | null {
     const sdk = (window as unknown as { marco?: KvBridge }).marco;
+
     return sdk && sdk.kv ? sdk.kv : null;
 }
 
@@ -47,6 +48,7 @@ function parseRow(raw: string): ProjectLockEvent | null {
         ) {
             return parsed as ProjectLockEvent;
         }
+
         return null;
     } catch {
         return null;
@@ -66,6 +68,7 @@ export async function persistProjectLockEvent(ev: ProjectLockEvent): Promise<boo
             'LoopProjectLockEvent.persist',
             'marco.kv unavailable — cannot persist project-lock event for ws=' + ev.WorkspaceId,
         );
+
         return false;
     }
     try {
@@ -90,6 +93,7 @@ export async function persistProjectLockEvent(ev: ProjectLockEvent): Promise<boo
                 ' reason=' + ev.Reason,
             'info',
         );
+
         return true;
     } catch (caught: unknown) {
         logError(
@@ -97,6 +101,7 @@ export async function persistProjectLockEvent(ev: ProjectLockEvent): Promise<boo
             'kv write failed for ws=' + ev.WorkspaceId,
             caught,
         );
+
         return false;
     }
 }
@@ -119,9 +124,11 @@ export async function listProjectLockEvents(): Promise<ReadonlyArray<ProjectLock
         rows.sort(function (a, b): number {
             return a.DetectedAtMs - b.DetectedAtMs;
         });
+
         return rows;
     } catch (caught: unknown) {
         logError('LoopProjectLockEvent.list', 'kv.list failed', caught);
+
         return [];
     }
 }

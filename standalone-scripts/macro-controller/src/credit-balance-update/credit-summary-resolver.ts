@@ -38,6 +38,7 @@ function inlineTotal(ws: WorkspaceCredit): number {
     if (ws.enriched === true) {
         return Math.max(0, Math.round(ws.totalCredits || 0));
     }
+
     return Math.round(ws.totalCredits ?? calcTotalCredits(
         ws.freeGranted,
         ws.dailyLimit,
@@ -50,6 +51,7 @@ function inlineTotal(ws: WorkspaceCredit): number {
 
 function buildCachedSummary(ws: WorkspaceCredit, balance: NonNullable<ReturnType<typeof readCreditBalanceUpdateCacheSync>>['balance']): CreditSummary {
     const b = balance!;
+
     return {
         available: resolveDisplayAvailable(b),
         total: resolveDisplayTotal(b),
@@ -103,6 +105,7 @@ export function resolveCreditSummary(ws: WorkspaceCredit): CreditSummary {
         && shouldFetchCreditBalanceForPlan(plan) && !hasInlineCredits(ws)) {
         return zeroSummary('Pending', true);
     }
+
     return {
         available,
         total,

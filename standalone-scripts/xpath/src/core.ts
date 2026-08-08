@@ -7,6 +7,7 @@ import { getLogger } from "./logger";
 export function getByXPath(xpath: string): Node | null {
   if (!xpath) {
     getLogger().warn("getByXPath", "XPath is empty or undefined");
+
     return null;
   }
   try {
@@ -15,6 +16,7 @@ export function getByXPath(xpath: string): Node | null {
     const message = e instanceof Error ? e.message : String(e);
     getLogger().warn("getByXPath", "XPath evaluation error: " + message);
     getLogger().warn("getByXPath", "Problematic XPath: " + xpath);
+
     return null;
   }
 }
@@ -22,6 +24,7 @@ export function getByXPath(xpath: string): Node | null {
 export function getAllByXPath(xpath: string): Node[] {
   if (!xpath) {
     getLogger().warn("getAllByXPath", "XPath is empty or undefined");
+
     return [];
   }
   try {
@@ -31,11 +34,13 @@ export function getAllByXPath(xpath: string): Node[] {
       const item = result.snapshotItem(i);
       if (item) nodes.push(item);
     }
+
     return nodes;
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e);
     getLogger().warn("getAllByXPath", "XPath evaluation error: " + message);
     getLogger().warn("getAllByXPath", "Problematic XPath: " + xpath);
+
     return [];
   }
 }

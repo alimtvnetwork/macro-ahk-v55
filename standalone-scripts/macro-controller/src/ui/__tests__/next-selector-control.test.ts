@@ -27,6 +27,7 @@ vi.mock('../prompt-editor', () => ({
 
 vi.mock('../prompt-utils', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../prompt-utils')>();
+
   return {
     ...actual,
     showPasteToast: vi.fn(),
@@ -37,6 +38,7 @@ vi.mock('../../logging', () => ({ log: vi.fn() }));
 vi.mock('../../error-utils', () => ({ logError: vi.fn() }));
 vi.mock('../../shared-state', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../shared-state')>();
+
   return {
     ...actual,
     cPanelFg: '#fff',

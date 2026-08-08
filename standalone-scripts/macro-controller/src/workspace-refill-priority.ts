@@ -31,6 +31,7 @@ export function daysToRefillForWs(ws: WorkspaceCredit, nowMs?: number): number |
   const isMissingIso = !iso;
   if (isMissingIso) return null;
   const d = daysUntil(iso, nowMs);
+
   return d < 0 ? null : d;
 }
 
@@ -50,6 +51,7 @@ export function computeRefillScore(
   if (days === null) return 0;
   const urgency = Math.max(0, windowDays - days);
   const available = resolvedAvailable(ws);
+
   return urgency * available;
 }
 
@@ -75,7 +77,9 @@ export function sortByRefillPriority<T extends { ws: WorkspaceCredit }>(
     if (b.score !== a.score) return b.score - a.score;
     if (b.available !== a.available) return b.available - a.available;
     if (a.id !== b.id) return a.id < b.id ? -1 : 1;
+
     return a.idx - b.idx;
   });
+
   return decorated.map(function (d) { return d.row; });
 }

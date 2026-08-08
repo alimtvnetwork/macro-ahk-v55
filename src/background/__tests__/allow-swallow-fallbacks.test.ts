@@ -130,6 +130,7 @@ describe("logging-handler handleGetLogStats, Sessions schema missing", () => {
                 if (sql.includes("Sessions")) {
                     throw new Error("no such table: Sessions");
                 }
+
                 return [{ columns: ["c"], values: [[0]] }];
             },
         };

@@ -42,8 +42,10 @@ function buildTree(groups: ReadonlyArray<StepGroupRow>): TreeNode[] {
     const visit = (parentId: number | null): TreeNode[] => {
         const kids = byParent.get(parentId) ?? [];
         kids.sort((a, b) => a.OrderIndex - b.OrderIndex || a.Name.localeCompare(b.Name));
+
         return kids.map((g) => ({ Group: g, Children: visit(g.StepGroupId) }));
     };
+
     return visit(null);
 }
 

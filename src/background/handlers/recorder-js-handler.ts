@@ -56,6 +56,7 @@ export async function handleRecorderJsSnippetUpsert(
         );
     }
     const snippet = await upsertJsSnippet(req.projectSlug, req.draft);
+
     return { isOk: true, snippet };
 }
 
@@ -68,6 +69,7 @@ export async function handleRecorderJsSnippetList(
         throw new Error("RECORDER_JS_SNIPPET_LIST requires projectSlug");
     }
     const snippets = await listJsSnippets(req.projectSlug);
+
     return { snippets };
 }
 
@@ -81,6 +83,7 @@ export async function handleRecorderJsSnippetDelete(
         );
     }
     await deleteJsSnippet(req.projectSlug, req.jsSnippetId);
+
     return { isOk: true };
 }
 
@@ -94,5 +97,6 @@ export async function handleRecorderJsStepDryRun(
         );
     }
     const result = await executeJsBody(req.body, req.context);
+
     return { isOk: true, result };
 }

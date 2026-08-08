@@ -124,6 +124,7 @@ export function DependencyChainPanel() {
     const allOk = snap.chain.every(c => c.resolved && c.fetched && c.executed);
     lines.push(`  Status: ${allOk ? "✓ ALL OK" : "✗ ISSUES DETECTED"}`);
     lines.push(divider);
+
     return lines.join("\n");
   }, []);
 

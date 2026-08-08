@@ -40,7 +40,9 @@ const STATUS_COLOR: Record<SeedStageStatusType, string> = {
 
 export function openSeedDiagnosticsPanel(): void {
   const existing = document.getElementById('marco-seed-diag-panel');
-  if (existing) { existing.remove(); return; }
+  if (existing) { existing.remove();
+
+ return; }
   const backdrop = buildBackdrop();
   const modal = buildModal();
   backdrop.appendChild(modal);
@@ -53,6 +55,7 @@ function buildBackdrop(): HTMLDivElement {
   backdrop.style.cssText =
     'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:2147483000;display:flex;align-items:center;justify-content:center;';
   backdrop.onclick = (evt) => { if (evt.target === backdrop) backdrop.remove(); };
+
   return backdrop;
 }
 
@@ -68,6 +71,7 @@ function buildModal(): HTMLDivElement {
   modal.appendChild(buildErrorTraceSection('Recent PROMPT_LOAD_E001', 'PROMPT_LOAD_E001'));
   modal.appendChild(buildErrorTraceSection('Recent SEED_RESEED_E001', 'SEED_RESEED_E001'));
   modal.appendChild(buildTraceSection());
+
   return modal;
 }
 
@@ -90,9 +94,11 @@ function buildE005Section(): HTMLDivElement {
   const summaries = summarizeLatestByRole();
   if (summaries.length === 0) {
     wrap.appendChild(muted('No PROMPT_EDIT_E005 snapshots recorded. The editor has not hit that failure since boot.'));
+
     return wrap;
   }
   for (const summary of summaries) wrap.appendChild(renderE005Summary(summary));
+
   return wrap;
 }
 
@@ -121,6 +127,7 @@ function renderE005Summary(summary: PromptEditE005Summary): HTMLDivElement {
     reason.textContent = summary.reason;
     row.appendChild(reason);
   }
+
   return row;
 }
 
@@ -137,6 +144,7 @@ function buildE005SummaryText(summaries: PromptEditE005Summary[]): string {
     if (summary.reason) lines.push('    reason           : ' + summary.reason);
     lines.push('');
   }
+
   return lines.join('\n');
 }
 
@@ -200,6 +208,7 @@ function buildContractMarkdown(bridge: ReturnType<typeof getSqlBridgeState>): st
   const isMissingAny = !any;
   if (isMissingAny) lines.push('(none)');
   lines.push('');
+
   return lines.join('\n');
 }
 
@@ -210,9 +219,11 @@ function buildErrorTraceSection(title: string, code: string): HTMLDivElement {
   const events = readDiagnosticToastTrace().filter((e) => String(e.code) === code);
   if (events.length === 0) {
     wrap.appendChild(muted('No ' + code + ' events recorded.'));
+
     return wrap;
   }
   for (const evt of events.slice(-10).reverse()) wrap.appendChild(renderTraceRow(evt));
+
   return wrap;
 }
 
@@ -232,6 +243,7 @@ function buildBridgeSection(): HTMLDivElement {
   lines.push('rejections observed: ' + rejCount);
   grid.textContent = lines.join('\n');
   wrap.appendChild(grid);
+
   return wrap;
 }
 
@@ -247,6 +259,7 @@ function buildHeader(): HTMLDivElement {
   closeBtn.onclick = () => { document.getElementById('marco-seed-diag-panel')?.remove(); };
   header.appendChild(title);
   header.appendChild(closeBtn);
+
   return header;
 }
 
@@ -257,6 +270,7 @@ function buildSnapshotSection(): HTMLDivElement {
   if (isMissingSnap) {
     wrap.appendChild(sectionTitle('Last boot snapshot'));
     wrap.appendChild(muted('No seeding snapshot recorded yet. Reload the extension to capture one.'));
+
     return wrap;
   }
   wrap.appendChild(sectionTitle('Last boot snapshot'));
@@ -276,6 +290,7 @@ function buildSnapshotSection(): HTMLDivElement {
       wrap.appendChild(row);
     }
   }
+
   return wrap;
 }
 
@@ -292,6 +307,7 @@ function renderStageRow(stage: SeedStageReport): HTMLDivElement {
   detail.style.cssText = 'flex:1;color:#cbd5e1;';
   detail.textContent = buildStageDetail(stage);
   row.appendChild(dot); row.appendChild(name); row.appendChild(detail);
+
   return row;
 }
 
@@ -301,6 +317,7 @@ function buildStageDetail(stage: SeedStageReport): string {
   if (stage.metrics) {
     for (const [key, value] of Object.entries(stage.metrics)) parts.push(key + '=' + value);
   }
+
   return parts.join('  ');
 }
 
@@ -311,10 +328,12 @@ function buildTraceSection(): HTMLDivElement {
   const events = readDiagnosticToastTrace().filter((e) => RELEVANT_CODES.has(String(e.code)));
   if (events.length === 0) {
     wrap.appendChild(muted('No relevant diagnostic toasts in the trace.'));
+
     return wrap;
   }
   const recent = events.slice(-20).reverse();
   for (const evt of recent) wrap.appendChild(renderTraceRow(evt));
+
   return wrap;
 }
 
@@ -334,6 +353,7 @@ function renderTraceRow(evt: DiagnosticToastEvent): HTMLDivElement {
   body.style.cssText = 'color:#cbd5e1;margin-top:2px;white-space:pre-wrap;';
   body.textContent = evt.title + (evt.detail ? '\n' + evt.detail : '');
   row.appendChild(top); row.appendChild(body);
+
   return row;
 }
 
@@ -341,6 +361,7 @@ function toastColor(level: string): string {
   if (level === 'error') return '#ef4444';
   if (level === 'warn') return '#f59e0b';
   if (level === 'success') return '#22c55e';
+
   return '#93c5fd';
 }
 
@@ -348,6 +369,7 @@ function sectionTitle(text: string): HTMLDivElement {
   const node = document.createElement('div');
   node.textContent = text;
   node.style.cssText = 'font-size:12px;font-weight:600;color:#c4b5fd;margin:10px 0 4px;';
+
   return node;
 }
 
@@ -355,6 +377,7 @@ function muted(text: string): HTMLDivElement {
   const node = document.createElement('div');
   node.textContent = text;
   node.style.cssText = 'color:#94a3b8;padding:6px 0;';
+
   return node;
 }
 

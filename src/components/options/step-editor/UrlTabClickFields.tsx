@@ -16,6 +16,7 @@ export interface UrlTabClickFieldsProps {
 
 export function UrlTabClickFields(props: UrlTabClickFieldsProps): JSX.Element {
     const { value, onPatch } = props;
+
     return (
         <div className="space-y-3">
             <UrlTabClickPatternRow value={value} onPatch={onPatch} />

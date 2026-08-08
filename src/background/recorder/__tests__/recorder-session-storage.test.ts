@@ -23,6 +23,7 @@ function installFakeChrome(): FakeStore {
         remove: vi.fn(async (key: string) => { delete store.data[key]; }),
     };
     (globalThis as { chrome?: unknown }).chrome = { storage: { local } };
+
     return store;
 }
 

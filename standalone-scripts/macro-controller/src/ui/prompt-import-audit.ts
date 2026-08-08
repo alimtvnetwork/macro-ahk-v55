@@ -91,6 +91,7 @@ function readFile(): ImportAuditFile {
     raw = window.localStorage.getItem(STORAGE_KEY);
   } catch (err) {
     log('[ImportAudit] localStorage getItem failed: ' + String(err), 'warn');
+
     return emptyFile();
   }
   const isMissingRaw = !raw;
@@ -102,12 +103,15 @@ function readFile(): ImportAuditFile {
     if (file.schemaVersion !== CURRENT_SCHEMA) {
       log('[ImportAudit] schemaVersion mismatch (' + String(file.schemaVersion)
         + ' != ' + CURRENT_SCHEMA + '); resetting log', 'warn');
+
       return emptyFile();
     }
     if (!Array.isArray(file.entries)) throwDiagnostic('PROMPT_IO_AUDIT_E002', { actualType: file.entries === null ? 'null' : typeof file.entries });
+
     return { schemaVersion: CURRENT_SCHEMA, entries: file.entries as ImportAuditEntry[] };
   } catch (err) {
     log('[ImportAudit] Corrupt payload, resetting: ' + String(err), 'warn');
+
     return emptyFile();
   }
 }
@@ -128,6 +132,7 @@ function writeFile(file: ImportAuditFile): void {
 
 function makeId(timestamp: number): string {
   const rand = Math.floor(Math.random() * 0xffff).toString(16).padStart(4, '0');
+
   return new Date(timestamp).toISOString() + '-' + rand;
 }
 
@@ -157,6 +162,7 @@ export function beginImportAuditEntry(input: {
   writeFile(file);
   log('[ImportAudit] begin id=' + id + ' file=' + input.filename
     + ' format=' + input.format + ' actions=' + input.actions.length, 'info');
+
   return id;
 }
 
@@ -177,6 +183,7 @@ export function finalizeImportAuditEntry(
   if (isMissingEntry) {
     log('[ImportAudit] finalize: entry not found id=' + id
       + ' (evicted?) status=' + outcome.status, 'warn');
+
     return;
   }
   entry.status = outcome.status;

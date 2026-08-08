@@ -25,6 +25,7 @@ export interface ExportOptions {
 /** Returns the bundled guide section count (lazy). */
 export async function getGuideSectionCount(): Promise<number> {
   const mod = await import("./developer-guide-data.generated");
+
   return mod.GUIDE_SECTION_COUNT;
 }
 
@@ -61,6 +62,7 @@ function buildHeader(options: ExportOptions): string {
   }
 
   lines.push("", "---", "", "");
+
   return lines.join("\n");
 }
 

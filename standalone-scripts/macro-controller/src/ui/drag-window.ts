@@ -85,6 +85,7 @@ export function makeDraggable(
   }
 
   handle.addEventListener('mousedown', onMouseDown);
+
   return function detach(): void {
     handle.removeEventListener('mousedown', onMouseDown);
     handle.style.cursor = '';

@@ -102,6 +102,7 @@ function getTotalRows(): number {
     try {
         const logCount = countTable(getLogsDb(), "Logs");
         const errorCount = countTable(getErrorsDb(), "Errors");
+
         return logCount + errorCount;
     } catch {
         return 0;

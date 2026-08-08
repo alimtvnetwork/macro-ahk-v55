@@ -225,6 +225,7 @@ function StepKindDetail(props: { readonly step: KeywordEventStep; readonly hasIs
             </>
         );
     }
+
     return (
         <>
             <Clock className={cn("h-3.5 w-3.5", hasIssue ? CSS_TEXT_DESTRUCTIVE : "text-primary")} />

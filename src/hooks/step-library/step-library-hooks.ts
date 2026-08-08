@@ -115,6 +115,7 @@ async function runBootstrapSequence(
         if (isCancelled()) return;
         deps.resetSqlPromise();
         applyLoadError(deps.classifyLoadError(err, "sqljs"));
+
         return;
     }
     if (isCancelled()) return;
@@ -122,11 +123,14 @@ async function runBootstrapSequence(
     if (isCancelled()) return;
     if (readResult.Kind === "Error") {
         applyLoadError(deps.classifyLoadError(readResult.Error, "storage-read"));
+
         return;
     }
     const opened = await deps.openLibraryAndMaybeSeed(sqljs, readResult);
     if (isCancelled()) return;
-    if (opened.Kind === "Err") { applyLoadError(opened.Error); return; }
+    if (opened.Kind === "Err") { applyLoadError(opened.Error);
+
+ return; }
     applySuccess(opened, sqljs);
 }
 
@@ -146,11 +150,11 @@ export function useBootstrap(deps: BootstrapDeps): void {
         setters.setError(null);
         setters.setLoadError(null);
         void runBootstrapSequence(deps, applyLoadError, applySuccess, () => cancelled);
+
         return () => { cancelled = true; };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [bootstrapNonce, applyLoadError, applySuccess]);
 }
-
 
 /* ------------------------------------------------------------------ */
 /*  Remote (cross-tab) sync                                            */
@@ -228,6 +232,7 @@ function moveWithinArray(ids: readonly number[], id: number, direction: Directio
     if (swapWith < 0 || swapWith >= ids.length) return null;
     const next = ids.slice();
     [next[idx], next[swapWith]] = [next[swapWith], next[idx]];
+
     return next;
 }
 
@@ -235,6 +240,7 @@ function findOwningGroupId(stepsByGroup: ReadonlyMap<number, ReadonlyArray<StepR
     for (const [gid, steps] of stepsByGroup) {
         if (steps.some((s) => s.StepId === stepId)) return gid;
     }
+
     return null;
 }
 
@@ -265,6 +271,7 @@ function useGroupCrud(deps: MutationDeps, after: () => void) {
             Description: input.Description ?? null,
         });
         after();
+
         return id;
     }, [deps, after]);
     const renameGroup = useCallback<UseStepLibraryApi["renameGroup"]>((id, name) => {
@@ -279,6 +286,7 @@ function useGroupCrud(deps: MutationDeps, after: () => void) {
         if (deps.lib === null) return;
         deps.lib.setGroupArchived(id, archived); after();
     }, [deps, after]);
+
     return { createGroup, renameGroup, deleteGroup, setGroupArchived };
 }
 
@@ -302,6 +310,7 @@ function useGroupOrdering(deps: MutationDeps, after: () => void) {
         if (deps.lib === null || deps.project === null) return;
         deps.lib.reorderGroups(deps.project.ProjectId, parent, orderedIds); after();
     }, [deps, after]);
+
     return { moveGroupWithinParent, reorderSiblings };
 }
 
@@ -310,6 +319,7 @@ function useStepCrud(deps: MutationDeps, after: () => void) {
         if (deps.lib === null || deps.project === null) throw new Error("appendStep: library not initialised");
         const id = deps.lib.appendStep(input);
         after();
+
         return id;
     }, [deps, after]);
     const updateStep = useCallback<UseStepLibraryApi["updateStep"]>((input) => {
@@ -324,6 +334,7 @@ function useStepCrud(deps: MutationDeps, after: () => void) {
         if (deps.lib === null) return;
         deps.lib.setStepDisabled(stepId, disabled); after();
     }, [deps, after]);
+
     return { appendStep, updateStep, deleteStep, setStepDisabled };
 }
 
@@ -342,6 +353,7 @@ function useStepOrdering(deps: MutationDeps, after: () => void) {
         if (deps.lib === null) return;
         deps.lib.reorderSteps(stepGroupId, orderedStepIds); after();
     }, [deps, after]);
+
     return { moveStepWithinGroup, reorderSteps };
 }
 
@@ -356,6 +368,7 @@ export function useLibraryMutations(deps: MutationDeps): LibraryMutations {
     const groupOrdering = useGroupOrdering(deps, after);
     const stepCrud = useStepCrud(deps, after);
     const stepOrdering = useStepOrdering(deps, after);
+
     return { refresh, ...groupCrud, ...groupOrdering, ...stepCrud, ...stepOrdering };
 }
 
@@ -369,6 +382,7 @@ export function useGroupInputMutations(setGroupInputs: Dispatch<SetStateAction<G
         setGroupInputs((prev) => {
             const next = new Map(prev);
             next.set(id, bag);
+
             return next;
         });
     }, [setGroupInputs]);
@@ -378,9 +392,11 @@ export function useGroupInputMutations(setGroupInputs: Dispatch<SetStateAction<G
             if (!prev.has(id)) return prev;
             const next = new Map(prev);
             next.delete(id);
+
             return next;
         });
     }, [setGroupInputs]);
+
     return { setGroupInput, clearGroupInput };
 }
 
@@ -405,6 +421,7 @@ export function useResetAndRetry(deps: {
         deps.resetSqlPromise();
         deps.setBootstrapNonce((n) => n + 1);
     }, [deps]);
+
     return { resetAll, retryLoad };
 }
 

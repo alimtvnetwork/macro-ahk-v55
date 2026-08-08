@@ -138,6 +138,7 @@ export function ListPanelGroupsList(props: ListPanelGroupsListProps) {
                                 g.ParentStepGroupId === null
                                     ? null
                                     : (groupsById.get(g.ParentStepGroupId) ?? null);
+
                             return (
                                 <ListPanelGroupRow
                                     key={g.StepGroupId}

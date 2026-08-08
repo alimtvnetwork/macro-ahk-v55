@@ -338,7 +338,6 @@ function logCookieDiagnostics(
 // Token timestamp helpers (Phase A: Auth Bridge)
 // ============================================
 
-
 /** Read the timestamp when the token was last persisted. */
 export function getTokenSavedAt(): number {
   try {

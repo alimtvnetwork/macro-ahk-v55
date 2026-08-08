@@ -61,9 +61,11 @@ export function readSeedStatusSnapshot(): SeedStatusSnapshot | null {
     const parsed = JSON.parse(raw) as SeedStatusSnapshot;
     if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.stages)) return null;
     inMemorySnapshot = parsed;
+
     return parsed;
   } catch (err) {
     logError('SeedStatusStore', 'readSeedStatusSnapshot failed', err);
+
     return null;
   }
 }
@@ -80,5 +82,6 @@ export function clearSeedStatusSnapshot(): void {
 
 export function computeOverall(stages: readonly SeedStageReport[]): SeedStageStatusType {
   if (stages.some((s) => s.status === 'failed')) return 'failed';
+
   return 'ok';
 }

@@ -111,6 +111,7 @@ export function resolveFieldReferencesDetailed(
     const resolveOne = (match: string, name: string): string =>
         resolveTemplateToken(match, name, seen, failureRef, row, source, rowIndex, expected);
     const resolved = template.replace(TOKEN_PATTERN, resolveOne);
+
     return { Resolved: resolved, Variables: Array.from(seen.values()), FirstFailure: failureRef.first };
 }
 
@@ -133,6 +134,7 @@ function resolveTemplateToken(
     if (ctx.FailureReason !== "Resolved" && failureRef.first === null) {
         failureRef.first = ctx;
     }
+
     return valueToReplacement(ctx.ResolvedValue);
 }
 
@@ -168,6 +170,7 @@ function classifyMissingColumn(
     const detail = `Variable {{${name}}} is not a column in the active row `
         + `(source=${source}${rowSuffix}). `
         + `Available columns: [${columnList}].`;
+
     return {
         Name: name, Source: source, RowIndex: rowIndex, Column: name,
         ResolvedValue: null, ValueType: "undefined",
@@ -191,6 +194,7 @@ function classifyEmptyValue(
             `Variable {{${name}}} resolved to an empty string (source=${source}, column=${name}). ` +
             `If empty is valid for this step, ignore.`);
     }
+
     return null;
 }
 
@@ -202,6 +206,7 @@ function classifyTypeMismatch(
     if (isPrimitive || expected === "object" || expected === "array") return null;
     const redacted = sanitizeDiagnosticValue(name, raw);
     const display = safeStringify(redacted);
+
     return baseFailure(name, source, rowIndex, redacted, valueType, "TypeMismatch",
         `Variable {{${name}}} expected ${expected} but got ${valueType} ` +
         `(source=${source}, column=${name}, value=${display}).`);
@@ -226,14 +231,13 @@ function classifyVariable(
     const mismatch = classifyTypeMismatch(name, source, rowIndex, rawNarrowed, valueType, expected);
     if (mismatch) return mismatch;
     const resolved = sanitizeDiagnosticValue(name, rawNarrowed);
+
     return {
         Name: name, Source: source, RowIndex: rowIndex, Column: name,
         ResolvedValue: resolved, ValueType: valueType,
         FailureReason: "Resolved", FailureDetail: null,
     };
 }
-
-
 
 function baseFailure(
     name: string,
@@ -257,6 +261,7 @@ function classifyType(v: JsonValue | undefined): VariableValueType {
     if (Array.isArray(v)) { return "array"; }
     const t = typeof v;
     if (t === "string" || t === "number" || t === "boolean" || t === "object") { return t; }
+
     return "object";
 }
 
@@ -264,6 +269,7 @@ function sanitizeDiagnosticValue(name: string, value: JsonValue): JsonValue {
     if (isSensitiveDiagnosticName(name)) {
         return maskDiagnosticValue(value);
     }
+
     return value;
 }
 
@@ -274,5 +280,6 @@ function safeStringify(v: JsonValue): string {
 function valueToReplacement(value: JsonValue | null): string {
     if (value === null) { return ""; }
     if (typeof value === "string") { return value; }
+
     return safeStringify(value);
 }

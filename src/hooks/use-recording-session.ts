@@ -39,6 +39,7 @@ export interface UseRecordingSessionResult {
 function newSessionId(): string {
     const c = (globalThis as { crypto?: { randomUUID?: () => string } }).crypto;
     if (c?.randomUUID !== undefined) { return c.randomUUID(); }
+
     return `sess-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
@@ -53,6 +54,7 @@ function useSessionSubscription(
             setSession(next);
             setLoading(false);
         });
+
         return () => { cancelled = true; unsubscribe(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

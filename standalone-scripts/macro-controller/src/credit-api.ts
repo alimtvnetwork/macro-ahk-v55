@@ -45,11 +45,13 @@ export function assertNotLegacyCalcForProZero(plan: string | undefined, fnName: 
 
 export function calcTotalCredits(granted: number, dailyLimit: number, billingLimit: number, topupLimit: number, rolloverLimit: number, plan?: string): number {
   assertNotLegacyCalcForProZero(plan, 'calcTotalCredits');
+
   return Math.round((granted || 0) + (dailyLimit || 0) + (billingLimit || 0) + (topupLimit || 0) + (rolloverLimit || 0));
 }
 
 export function calcAvailableCredits(totalCredits: number, rolloverUsed: number, dailyUsed: number, billingUsed: number, freeUsed: number, plan?: string): number {
   assertNotLegacyCalcForProZero(plan, 'calcAvailableCredits');
+
   return Math.max(0, Math.round(totalCredits - (rolloverUsed || 0) - (dailyUsed || 0) - (billingUsed || 0) - (freeUsed || 0)));
 }
 
@@ -116,8 +118,6 @@ interface CreditBarOpts {
   maxTotalCredits?: number;
   marginTop?: string;
 }
-
-
  
 export function renderCreditBar(opts: CreditBarOpts): string {
   const tc = opts.totalCredits || 0;
@@ -177,6 +177,7 @@ export function renderCreditBar(opts: CreditBarOpts): string {
     h += '</span>';
   }
   h += '</div>';
+
   return h;
 }
 

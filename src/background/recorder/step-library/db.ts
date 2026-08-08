@@ -94,6 +94,7 @@ export class StepLibraryDb {
                 throw new Error("upsertProject: RETURNING returned no row");
             }
             const row = stmt.getAsObject();
+
             return row.ProjectId as number;
         } finally {
             stmt.free();
@@ -146,6 +147,7 @@ export class StepLibraryDb {
             if (!stmt.step()) {
                 throw new Error("createGroup: RETURNING returned no row");
             }
+
             return stmt.getAsObject().StepGroupId as number;
         } finally {
             stmt.free();
@@ -276,6 +278,7 @@ export class StepLibraryDb {
             `SELECT COALESCE(MAX(OrderIndex), -1) + 1 FROM Step WHERE StepGroupId = ?;`,
             [input.StepGroupId],
         );
+
         return this.insertStepRow(input, nextOrder);
     }
 
@@ -319,6 +322,7 @@ export class StepLibraryDb {
                 input.TargetStepGroupId ?? null,
             ]);
             if (!stmt.step()) { throw new Error("appendStep: RETURNING returned no row"); }
+
             return stmt.getAsObject().StepId as number;
         } finally {
             stmt.free();
@@ -444,6 +448,7 @@ export class StepLibraryDb {
             while (stmt.step()) {
                 rows.push(stmt.getAsObject() as unknown as T);
             }
+
             return rows;
         } finally {
             stmt.free();
@@ -456,6 +461,7 @@ export class StepLibraryDb {
             stmt.bind(params as Array<number | string | null>);
             if (!stmt.step()) return 0;
             const v = stmt.get()[0];
+
             return typeof v === "number" ? v : 0;
         } finally {
             stmt.free();

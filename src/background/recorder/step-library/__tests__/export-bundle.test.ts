@@ -117,6 +117,7 @@ function makeFixture(): Fixture {
         LabelType: "Type email",
         PayloadJson: JSON.stringify({ Selector: "#email", Value: "{{Email}}" }),
     });
+
     return {
         Lib: lib,
         ProjectId: projectId,
@@ -247,6 +248,7 @@ async function expectSuccess(
     if (r.Reason !== "Ok") {
         throw new Error(`export failed: ${r.Reason}, ${(r as ExportFailure).Detail}`);
     }
+
     return r;
 }
 

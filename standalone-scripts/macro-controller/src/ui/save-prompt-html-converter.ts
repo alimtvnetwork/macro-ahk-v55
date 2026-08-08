@@ -81,6 +81,7 @@ function convertPreBlock(element: HTMLElement, fallbackText: string): string {
   }
 
   const content = hasCodeElement ? codeElement.textContent : fallbackText;
+
   return '```' + language + '\n' + content + '\n```\n\n';
 }
 

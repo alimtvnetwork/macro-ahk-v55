@@ -30,6 +30,7 @@ export function detectWorkspaceViaProjectDialog(callerFn?: string, perWs?: Works
   // Guard: while manual Check runs, only runCheck may use dialog detection.
   if (state.isManualCheck && fn !== 'runCheck') {
     log(fn + ': ⛔ GUARD — manual Check owns dialog interaction; skipping', 'warn');
+
     return Promise.resolve(null);
   }
 
@@ -37,12 +38,14 @@ export function detectWorkspaceViaProjectDialog(callerFn?: string, perWs?: Works
   // runCheck uses keepDialogOpen=true and is an explicit user action.
   if (!state.running && !keepDialogOpen) {
     log(fn + ': ⛔ GUARD — loop stopped, dialog auto-open blocked (passive mode)', 'warn');
+
     return Promise.resolve(null);
   }
 
   // V2 Phase 01 Task 01.3: Never override an API-sourced workspace name with DOM detection.
   if (state.workspaceFromApi && state.workspaceName) {
     log(fn + ': ⛔ GUARD — API-sourced workspace "' + state.workspaceName + '" is authoritative — DOM detection skipped', 'success');
+
     return Promise.resolve(null);
   }
 
@@ -62,8 +65,10 @@ export function detectWorkspaceViaProjectDialog(callerFn?: string, perWs?: Works
     if (isMissingBtn) {
       logError('ws-dialog-detection', 'Project button NOT found after retries — cannot open dialog. XPath=' + CONFIG.PROJECT_BUTTON_XPATH);
       log(fn + LabelType.KeepingExistingWs + (state.workspaceName || '(none)'), 'warn');
+
       return Promise.resolve(null);
     }
+
     return openDialogAndPoll(fn, btn, perWs!, !!keepDialogOpen).then(function() {
       return btn as Element;
     });
@@ -123,6 +128,7 @@ function openDialogAndPoll(fn: string, btn: Element, perWs: WorkspaceCredit[], k
   if (isExpanded) {
     logSub('Dialog is already open — closing first for clean re-read', 1);
     reactClick(btn, CONFIG.PROJECT_BUTTON_XPATH);
+
     return new Promise(function(resolve) {
       setTimeout(function() {
         logSub('Re-opening dialog for fresh workspace read', 1);
@@ -174,8 +180,10 @@ function resolveChosenWorkspace(
 
   if (uniqueMatches.length === 0 && perWs.length === 1) {
     log(fn + ': XPath candidates not cleanly matchable, but only one workspace exists — selecting it', 'warn');
+
     return { matched: perWs[0], rawName: perWs[0].fullName || perWs[0].name, selected: false };
   }
+
   return null;
 }
 
@@ -188,6 +196,7 @@ function applyChosenWorkspace(
     state.workspaceName = chosen.matched.fullName || chosen.matched.name;
     loopCreditState.currentWs = chosen.matched;
     log(fn + ': ✅ Workspace detected from project dialog: "' + chosen.rawName + '" → ' + state.workspaceName + ' (id=' + chosen.matched.id + ')', 'success');
+
     return;
   }
   const firstRaw = (allNodes[0].textContent || '').trim();
@@ -200,12 +209,14 @@ function applyChosenWorkspace(
   if (!isEmptyWorkspaceList || !hasFirstRaw) {
     log(fn + ': XPath returned ' + allNodes.length + ' nodes but no unambiguous exact match. First node: "' + firstRaw + '" (checked ' + perWs.length + ' workspaces)', 'warn');
     log(fn + LabelType.KeepingExistingWs + (state.workspaceName || '(none)'), 'warn');
+
     return;
   }
 
   if (isValidRawWorkspace) {
     state.workspaceName = firstRaw;
     log(fn + ': ✅ No workspace list — using raw XPath text as workspace name: "' + firstRaw + '"', 'success');
+
     return;
   }
 
@@ -226,6 +237,7 @@ function handlePollTimeout(
     const isMissingKeepDialogOpen = !keepDialogOpen;
     if (isMissingKeepDialogOpen) closeProjectDialogSafe(btn);
     resolve();
+
     return;
   }
   log(fn + ': CSS fallback also failed — preserving existing workspace', 'warn');
@@ -262,6 +274,7 @@ function pollForWorkspaceName(fn: string, btn: Element, perWs: WorkspaceCredit[]
         logSub('keepDialogOpen=true — leaving dialog open for Step 3 (progress bar)', 1);
       }
       resolve();
+
       return;
     }
 
@@ -310,6 +323,7 @@ function findWorkspaceNameViaCss(_fn: string, perWs: WorkspaceCredit[]): { match
   }
 
   logSub('CSS fallback: no selectors matched a known workspace (' + selectors.length + ' selectors tried, ' + perWs.length + ' workspaces)', 2);
+
   return result;
 }
 

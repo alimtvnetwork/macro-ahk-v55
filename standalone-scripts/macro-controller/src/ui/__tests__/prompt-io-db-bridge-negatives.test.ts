@@ -85,6 +85,7 @@ describe('collectDbEntriesForExport — driver failure per role', () => {
                     CreatedAt: 0, UpdatedAt: 0,
                 }],
             };
+
             return new DbResult(true, []);
         });
 

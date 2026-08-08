@@ -16,6 +16,7 @@ const MAX_FILE_BYTES = 1024 * 1024; // 1 MB — input bags are tiny.
 export function formatBytes(bytes: number): string {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
@@ -55,6 +56,7 @@ export function useGroupInputsController(args: UseGroupInputsControllerArgs) {
                 title: "File too large",
                 description: `Input bag files must be <= 1 MB (got ${formatBytes(file.size)}).`,
             });
+
             return;
         }
         try {

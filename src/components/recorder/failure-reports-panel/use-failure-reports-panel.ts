@@ -35,6 +35,7 @@ export function defaultCopy(contents: string): Promise<void> {
     if (typeof navigator === "undefined" || !navigator.clipboard) {
         return Promise.reject(new Error("Clipboard API unavailable in this context"));
     }
+
     return navigator.clipboard.writeText(contents);
 }
 
@@ -76,6 +77,7 @@ interface ActionContext {
 function toggleInSet(prev: ReadonlySet<string>, key: string): Set<string> {
     const next = new Set(prev);
     if (next.has(key)) { next.delete(key); } else { next.add(key); }
+
     return next;
 }
 
@@ -113,6 +115,7 @@ function usePanelState(): PanelState {
     const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set());
     const [pickedStep, setPickedStep] = useState<string | null>(null);
     const [exportFormat, setExportFormat] = useState<ExportFormat>(DEFAULT_EXPORT_FORMAT);
+
     return { selected, setSelected, expanded, setExpanded, pickedStep, setPickedStep, exportFormat, setExportFormat };
 }
 
@@ -122,6 +125,7 @@ function useValidPickedStep(pickedStep: string | null, stepOptions: ReadonlyArra
         const exists = stepOptions.some(
             (o) => (o.StepId === null ? STEP_OPTION_NULL : String(o.StepId)) === pickedStep,
         );
+
         return exists ? pickedStep : null;
     }, [pickedStep, stepOptions]);
 }
@@ -129,6 +133,7 @@ function useValidPickedStep(pickedStep: string | null, stepOptions: ReadonlyArra
 function buildActions(context: ActionContext) {
     const toggle = (key: string) => context.state.setSelected((prev) => toggleInSet(prev, key));
     const toggleExpanded = (key: string) => context.state.setExpanded((prev) => toggleInSet(prev, key));
+
     return {
         toggle,
         toggleExpanded,
@@ -141,7 +146,9 @@ function buildActions(context: ActionContext) {
 
 function handleExport(context: ActionContext): void {
     const picked = context.reports.filter((report, index) => context.state.selected.has(rowKey(report, index)));
-    if (picked.length === 0) { toast.error("Select at least one failure to export"); return; }
+    if (picked.length === 0) { toast.error("Select at least one failure to export");
+
+ return; }
     const filename = buildFailureBundleFilename();
     const contents = serializeFailureBundle(buildFailureBundle(picked), context.state.exportFormat);
     context.download(filename, contents);
@@ -151,7 +158,9 @@ function handleExport(context: ActionContext): void {
 
 function handleExportLast(context: ActionContext): void {
     const last = pickLastFailureReport(context.reports);
-    if (last === null) { toast.error("No failures recorded yet"); return; }
+    if (last === null) { toast.error("No failures recorded yet");
+
+ return; }
     const filename = buildLastFailureFilename(last);
     const contents = serializeJson(last, context.state.exportFormat);
     context.download(filename, contents);
@@ -160,19 +169,27 @@ function handleExportLast(context: ActionContext): void {
 
 async function handleCopyLast(context: ActionContext): Promise<void> {
     const last = pickLastFailureReport(context.reports);
-    if (last === null) { toast.error("No failures recorded yet"); return; }
+    if (last === null) { toast.error("No failures recorded yet");
+
+ return; }
     const contents = serializeJson(last, context.state.exportFormat);
     try { await context.copy(contents); }
-    catch (error) { toast.error("Copy failed, clipboard unavailable", { description: (error as Error).message }); return; }
+    catch (error) { toast.error("Copy failed, clipboard unavailable", { description: (error as Error).message });
+
+ return; }
     const stepLabel = last.StepId !== null ? ` (Step #${last.StepId})` : "";
     warnOrSuccess("", contents, `Copied last failure${stepLabel} to clipboard`, `Copied last failure${stepLabel}, schema warning`);
 }
 
 function handleExportByStep(context: ActionContext): void {
-    if (context.validPickedStep === null) { toast.error("Pick a Step first"); return; }
+    if (context.validPickedStep === null) { toast.error("Pick a Step first");
+
+ return; }
     const stepId = context.validPickedStep === STEP_OPTION_NULL ? null : Number(context.validPickedStep);
     const report = pickFailureReportByStepId(context.reports, stepId);
-    if (report === null) { showMissingStepToast(stepId); return; }
+    if (report === null) { showMissingStepToast(stepId);
+
+ return; }
     const filename = buildLastFailureFilename(report);
     const contents = serializeJson(report, context.state.exportFormat);
     context.download(filename, contents);

@@ -32,6 +32,7 @@ function hasStringId(source: Record<string, unknown>): boolean {
 export function isWireWorkspace(candidate: unknown): candidate is WireWorkspace {
   if (candidate === null || typeof candidate !== 'object') return false;
   const source = candidate as Record<string, unknown>;
+
   return hasStringId(source);
 }
 
@@ -57,5 +58,6 @@ export function resolveWireSection(rawRow: Record<string, unknown>): Record<stri
   if (nested !== null && typeof nested === 'object') {
     return nested as Record<string, unknown>;
   }
+
   return rawRow;
 }

@@ -50,6 +50,7 @@ export function useRecorderVisualisationController(projectSlug: string): Recorde
     const mutations = useRecorderStepMutations(projectSlug, projectData);
     const selfTestExport = useRecorderSelfTestExport(projectSlug, reload, data, tagsByStep);
     useLoadErrorLogger(projectSlug, error);
+
     return { projectSlug, data, loading, error, reload, tagsByStep, ...selection, ...mutations, ...selfTestExport };
 }
 

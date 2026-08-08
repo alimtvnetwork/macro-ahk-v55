@@ -87,6 +87,7 @@ describe('downloadCsv', () => {
         appendedAnchor = el as HTMLAnchorElement;
         vi.spyOn(el, 'click').mockImplementation(clickSpy);
       }
+
       return el;
     });
   });

@@ -64,5 +64,6 @@ export async function enrichProOneWorkspaces(perWs: WorkspaceCredit[]): Promise<
     if (mutated > 0) {
         log('[ProOne] Overlaid ' + mutated + ' workspace(s) from /credit-balance cache', 'success');
     }
+
     return mutated;
 }

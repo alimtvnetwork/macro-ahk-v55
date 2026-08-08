@@ -90,8 +90,10 @@ export function restoreReinjectState(): { restored: boolean; loopWasRunning: boo
 
     if (age > 10000) {
       log('Re-inject: stale state (' + Math.round(age / 1000) + 's old) — ignoring', 'warn');
+
       return { restored: false, loopWasRunning: false };
     }
+
     // Keys already removed above, read before clear in real usage — 
     // but we saved them above so use the values before clearing
     // Actually we need to read THEN clear. Let me fix the flow:
@@ -99,6 +101,7 @@ export function restoreReinjectState(): { restored: boolean; loopWasRunning: boo
   } catch (e) {
     logError('tryRestoreV1', 'Hot-reload state restore v1 failed', e);
     showToast('❌ Hot-reload state restore v1 failed', 'error');
+
     return { restored: false, loopWasRunning: false };
   }
 }
@@ -128,6 +131,7 @@ export function checkAndRestoreReinjectState(): { restored: boolean; loopWasRunn
 
     if (age > 10000) {
       log('Re-inject: stale preserved state (' + Math.round(age / 1000) + 's) — discarded', 'warn');
+
       return { restored: false, loopWasRunning: false, wsName: '', wsId: '' };
     }
 
@@ -143,6 +147,7 @@ export function checkAndRestoreReinjectState(): { restored: boolean; loopWasRunn
   } catch (e) {
     logError('tryRestoreV2', 'Hot-reload state restore v2 failed', e);
     showToast('❌ Hot-reload state restore v2 failed', 'error');
+
     return { restored: false, loopWasRunning: false, wsName: '', wsId: '' };
   }
 }
@@ -231,6 +236,7 @@ function performVersionCheck(ctx: VersionCheckCtx): void {
   if (!resultPromise || typeof resultPromise.then !== 'function') {
     ctx.checkBtn.disabled = false;
     ctx.statusRow.textContent = '❌ Extension unavailable';
+
     return;
   }
   resultPromise.then(function(resp: ExtensionResponse) {
@@ -330,6 +336,7 @@ function _buildAvailRow(availVal: HTMLElement): HTMLElement {
   availLabel.textContent = 'Bundled';
   availRow.appendChild(availLabel);
   availRow.appendChild(availVal);
+
   return availRow;
 }
 
@@ -337,6 +344,7 @@ function _buildStatusRow(): HTMLElement {
   const statusRow = document.createElement('div');
   statusRow.style.cssText = CssFragmentType.FontSize + tFontMicro + ';color:' + cPanelFgDim + CssFragmentType.Padding2px0;
   statusRow.textContent = 'Not checked';
+
   return statusRow;
 }
 
@@ -358,6 +366,7 @@ function _buildActionButtons(): { actionRow: HTMLElement; checkBtn: HTMLElement;
 
   actionRow.appendChild(checkBtn);
   actionRow.appendChild(reinjectBtn);
+
   return { actionRow, checkBtn, reinjectBtn };
 }
 
@@ -365,6 +374,7 @@ function _handleReinject(reinjectBtn: HTMLElement, statusRow: HTMLElement): void
   const now = Date.now();
   if (now - reinjectState.lastAt < REINJECT_COOLDOWN_MS) {
     showToast('Re-inject cooldown — wait ' + Math.ceil((REINJECT_COOLDOWN_MS - (now - reinjectState.lastAt)) / 1000) + 's', 'warn');
+
     return;
   }
 
@@ -372,6 +382,7 @@ function _handleReinject(reinjectBtn: HTMLElement, statusRow: HTMLElement): void
 
   if (isMissing__marcoRelayActive) {
     showToast('Message relay inactive — cannot re-inject', 'error');
+
     return;
   }
 
@@ -385,6 +396,7 @@ function _handleReinject(reinjectBtn: HTMLElement, statusRow: HTMLElement): void
       reinjectBtn.textContent = '🔄 Re-Inject';
       statusRow.textContent = '❌ ' + (resp?.errorMessage || 'Fetch failed');
       showToast('Re-inject failed: ' + (resp?.errorMessage || 'unknown error'), 'error');
+
       return;
     }
 

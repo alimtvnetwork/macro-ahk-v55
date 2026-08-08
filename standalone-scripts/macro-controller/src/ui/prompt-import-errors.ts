@@ -50,6 +50,7 @@ function classifyCommitError(err: unknown, name: string, message: string): Class
       hint: 'CRITICAL: rollback itself failed. Your prompt library may be inconsistent. Export a backup NOW.',
     };
   }
+
   return {
     code: 'COMMIT_UNKNOWN', message, original: err,
     hint: 'Import failed for an unrecognised reason. Changes were rolled back.',
@@ -72,6 +73,7 @@ function classifyParseError(err: unknown, message: string): ClassifiedImportErro
   if (/schemaVersion/i.test(message)) {
     return { code: 'PARSE_SCHEMA_MISMATCH', message, hint: 'This bundle was made by a newer version. Update the extension and retry.', original: err };
   }
+
   return { code: 'PARSE_INVALID_JSON', message, hint: 'Failed to parse the file. Check the format and retry.', original: err };
 }
 
@@ -83,6 +85,7 @@ function classifyParseError(err: unknown, message: string): ClassifiedImportErro
 export function classifyImportError(err: unknown, phase: ImportErrorPhaseType): ClassifiedImportError {
   const message = err instanceof Error ? err.message : String(err);
   const name = err instanceof Error ? err.name : '';
+
   return phase === 'commit'
     ? classifyCommitError(err, name, message)
     : classifyParseError(err, message);

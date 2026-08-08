@@ -38,12 +38,14 @@ const flush = async (): Promise<void> => {
 
 function dispatchTab(shift = false): boolean {
     const evt = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: shift, bubbles: true, cancelable: true });
+
     return document.dispatchEvent(evt);
 }
 
 function focusableInModal(): HTMLElement[] {
     const root = document.getElementById('macro-prompt-library-modal')!;
     const sel = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
     return Array.from(root.querySelectorAll<HTMLElement>(sel))
         .filter((n) => !n.hasAttribute('disabled') && n.tabIndex !== -1);
 }

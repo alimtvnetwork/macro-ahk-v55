@@ -107,10 +107,16 @@ function _buildJsExecutorSection(deps: ToolsSectionsDeps): { section: HTMLElemen
   jsTextbox.spellcheck = false;
   jsTextbox.onkeydown = function(e: KeyboardEvent) {
     const isCtrlEnter = e.ctrlKey && e.key === 'Enter';
-    if (isCtrlEnter) { e.preventDefault(); executeJs(); return; }
+    if (isCtrlEnter) { e.preventDefault(); executeJs();
+
+ return; }
     const isSingleLine = (jsTextbox.value || '').indexOf('\n') === -1;
-    if (e.key === 'ArrowUp' && isSingleLine) { e.preventDefault(); navigateLoopJsHistory('up'); return; }
-    if (e.key === 'ArrowDown' && isSingleLine) { e.preventDefault(); navigateLoopJsHistory('down'); return; }
+    if (e.key === 'ArrowUp' && isSingleLine) { e.preventDefault(); navigateLoopJsHistory('up');
+
+ return; }
+    if (e.key === 'ArrowDown' && isSingleLine) { e.preventDefault(); navigateLoopJsHistory('down');
+
+ return; }
   };
 
   const jsBtn = document.createElement('button');
@@ -152,6 +158,7 @@ function _buildActivityLogSection(): HTMLElement {
     const logContent = activityContent.innerText || activityContent.textContent || '';
     if (!logContent || logContent.trim() === 'No activity logs yet') {
       showToast('No activity logs to download', 'warn');
+
       return;
     }
     const now = new Date();
@@ -328,12 +335,14 @@ function _renderRequestDetail(detail: { method?: string; url?: string; status?: 
   if (detail.url) { h += _escHtml(detail.url.substring(0, 80)); }
   if (detail.status != null) { h += ' → HTTP ' + detail.status; }
   h += '</div>';
+
   return h;
 }
 
 function _renderRecentErrorsList(container: HTMLElement): void {
   if (recentErrors.length === 0) {
     container.innerHTML = '<div style="color:#64748b;font-size:10px;padding:4px;">No recent errors</div>';
+
     return;
   }
   let html = '';

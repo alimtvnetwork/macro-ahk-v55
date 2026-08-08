@@ -83,6 +83,7 @@ export const parseOwnerSwitchCsv = (text: string): OwnerSwitchCsvParseResult => 
             Column: null,
             Message: `Too many rows: ${dataRowCount} (max ${MAX_ROWS}). Split the CSV into smaller batches.`,
         });
+
         return { Rows: [], Errors: errors, Warnings: header.Warnings };
     }
 

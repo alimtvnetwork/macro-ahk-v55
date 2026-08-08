@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../prompt-utils', async (importOriginal) => {
     const actual = await importOriginal<typeof import('../prompt-utils')>();
+
     return {
         ...actual,
         showPasteToast: mocks.showPasteToast,
@@ -19,6 +20,7 @@ vi.mock('../prompt-utils', async (importOriginal) => {
 });
 vi.mock('../../error-utils', async () => {
     const actual = await vi.importActual<Record<string, unknown>>('../../error-utils');
+
     return { ...actual, logDiagnosticFromCode: mocks.logDiagnosticFromCode };
 });
 vi.mock('../../logging', () => ({

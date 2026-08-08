@@ -17,6 +17,7 @@ export async function handleSetDefault(
     const isMissingOk = !ok;
     if (isMissingOk) {
       refs.status.textContent = 'Failed to set default.';
+
       return;
     }
     refs.status.textContent = 'Default updated.';
@@ -34,6 +35,7 @@ export async function handleDelete(
 ): Promise<void> {
   if (row.IsDefault) {
     alert('Cannot delete the default prompt for this role. Set another prompt as default first.');
+
     return;
   }
   const ok = window.confirm('Delete prompt "' + row.Name + '"?');
@@ -54,6 +56,7 @@ export async function handleDelete(
       try { window.alert(msgText); } catch (err) {
         logError("AutoCatch", "Unhandled exception", err);
       }
+
       return;
     }
     refs.status.textContent = 'Deleted.';
@@ -83,6 +86,7 @@ export function uniqueDupSlug(baseSlug: string, existing: readonly string[] = []
     const candidate = baseSlug + '-copy-' + i;
     if (!existing.includes(candidate)) return candidate;
   }
+
   return baseSlug + '-copy-' + Date.now();
 }
 
@@ -103,6 +107,7 @@ export async function handleDuplicate(
     const isMissingOk = !result.ok;
     if (isMissingOk) {
       refs.status.textContent = 'Failed to duplicate: ' + (result.error ?? 'unknown');
+
       return;
     }
     refs.status.textContent = 'Duplicated.';
@@ -122,10 +127,12 @@ export async function handleResetToDefault(
   if (seedBody === null) {
     logError(LOG_SCOPE, 'reset-to-default called for non-seeded slug=' + row.Slug, new Error('no seed body'));
     refs.status.textContent = 'Reset unavailable: ' + row.Slug + ' is not a seeded prompt.';
+
     return;
   }
   if (seedBody === row.Body) {
     refs.status.textContent = 'Already at default: ' + row.Slug;
+
     return;
   }
   const ok = window.confirm('Reset "' + row.Name + '" (' + row.Slug + ') to its shipped default body?\n\nThis discards the current edits to the body.');
@@ -144,6 +151,7 @@ export async function handleResetToDefault(
       logError(LOG_SCOPE, 'reset-to-default upsertPrompt failed for slug=' + row.Slug, new Error(result.error ?? 'unknown'));
       refs.status.textContent = 'Reset failed: ' + (result.error ?? 'unknown error');
       showToast('❌ Reset failed for ' + row.Slug, TOAST_ERROR);
+
       return;
     }
     log('PromptLibraryModal: reset-to-default slug=' + row.Slug, 'info');

@@ -162,6 +162,7 @@ function preflightRoot(
             CallStack: [], FailureReport: null, Trace: trace,
         } };
     }
+
     return { root, failure: null };
 }
 
@@ -256,7 +257,6 @@ function buildSkippedTraceEntry(step: StepRow, groupPath: ReadonlyArray<string>,
     };
 }
 
-
 async function processFrameStep(
     step: StepRow,
     frame: FrameContext,
@@ -265,12 +265,14 @@ async function processFrameStep(
 ): Promise<RunGroupFailure | null> {
     if (step.IsDisabled) {
         traceDisabledStep(frame, step, newStackNames);
+
         return null;
     }
     const childFrame: FrameContext = { ...frame, callStackIds: newStackIds, callStackNames: newStackNames };
     if (step.StepKindId === StepKindId.RunGroup) {
         return invokeRunGroupStep(step, childFrame);
     }
+
     return invokeLeafStep(step, childFrame);
 }
 
@@ -286,6 +288,7 @@ async function runOne(frame: FrameContext): Promise<RunGroupFailure | null> {
     }
 
     exitGroupTrace(frame, newStackNames);
+
     return null;
 }
 
@@ -301,11 +304,13 @@ function resolveRunGroupTarget(
     const resolvedTarget = target as StepGroupRow;
     const crossFail = failCrossProjectTarget(step, frame, resolvedTarget);
     if (crossFail !== null) return { target: null, failure: crossFail };
+
     return { target: resolvedTarget, failure: null };
 }
 
 function failNullTargetGroup(step: StepRow, frame: FrameContext): RunGroupFailure | null {
     if (step.TargetStepGroupId !== null) return null;
+
     return failure(frame, {
         Reason: "MissingTargetGroup",
         ReasonDetail:
@@ -322,6 +327,7 @@ function failMissingTargetGroup(
     target: StepGroupRow | null,
 ): RunGroupFailure | null {
     if (target !== null) return null;
+
     return failure(frame, {
         Reason: "MissingTargetGroup",
         ReasonDetail:
@@ -338,6 +344,7 @@ function failCrossProjectTarget(
     target: StepGroupRow,
 ): RunGroupFailure | null {
     if (target.ProjectId === frame.projectId) return null;
+
     return failure(frame, {
         Reason: "TargetNotInProject",
         ReasonDetail:
@@ -348,7 +355,6 @@ function failCrossProjectTarget(
     });
 }
 
-
 function checkFrameStackConstraints(
     step: StepRow,
     frame: FrameContext,
@@ -356,6 +362,7 @@ function checkFrameStackConstraints(
 ): RunGroupFailure | null {
     if (frame.callStackIds.includes(target.StepGroupId)) {
         const cycle = [...frame.callStackNames, target.Name].join(" → ");
+
         return failure(frame, {
             Reason: "RunGroupCycle",
             ReasonDetail:
@@ -375,6 +382,7 @@ function checkFrameStackConstraints(
             failedStepId: step.StepId, failedGroupId: frame.group.StepGroupId,
         });
     }
+
     return null;
 }
 
@@ -386,6 +394,7 @@ function validateRunGroupStepTarget(
     if (resolved.failure !== null) return resolved;
     const stackFailure = checkFrameStackConstraints(step, frame, resolved.target);
     if (stackFailure !== null) return { target: null, failure: stackFailure };
+
     return { target: resolved.target, failure: null };
 }
 
@@ -395,6 +404,7 @@ async function invokeRunGroupStep(
 ): Promise<RunGroupFailure | null> {
     const check = validateRunGroupStepTarget(step, frame);
     if (check.failure !== null) return check.failure;
+
     return runOne({ ...frame, group: check.target });
 }
 
@@ -440,7 +450,6 @@ function buildLeafOutcomeTraceEntry(
     };
 }
 
-
 async function invokeLeafStep(
     step: StepRow,
     frame: FrameContext,
@@ -450,6 +459,7 @@ async function invokeLeafStep(
     frame.counters.bumpExecuted();
     traceLeafOutcome(frame, step, startedAt, report);
     if (report === null) return null;
+
     return {
         Ok: false, Reason: "LeafStepFailed",
         ReasonDetail:
@@ -477,6 +487,7 @@ function findGroup(db: StepLibraryDb, stepGroupId: number): StepGroupRow | null 
         stmt.bind([stepGroupId]);
         if (!stmt.step()) return null;
         const r = stmt.getAsObject() as unknown as StepGroupRow;
+
         return { ...r, IsArchived: Boolean(r.IsArchived) };
     } finally {
         stmt.free();
@@ -527,6 +538,7 @@ function stepKindName(kind: StepKindId): string {
 function synthesizeFailureReport(step: StepRow, error: unknown, startedAt: Date): FailureReport {
     const message = error instanceof Error ? error.message : String(error);
     const stack = error instanceof Error ? (error.stack ?? null) : null;
+
     return buildSynthesizedFailureReport(step, message, stack, startedAt);
 }
 
@@ -559,7 +571,6 @@ function buildSynthesizedFailureReport(
         FormSnapshot: null,
     };
 }
-
 
 /* ================================================================== */
 /*  Static expansion (RunGroup → linear plan)                          */
@@ -659,6 +670,7 @@ function preflightExpansionRoot(
             CallStack: [], PartialSteps: plan,
         } };
     }
+
     return { root, failure: null };
 }
 
@@ -703,6 +715,7 @@ function walkForExpansion(frame: ExpansionFrame): ExpansionFailure | null {
         const result = processExpansionStep(step, frame, newStackIds, newStackNames);
         if (result !== null) return result;
     }
+
     return null;
 }
 
@@ -714,6 +727,7 @@ function processExpansionStep(
 ): ExpansionFailure | null {
     if (step.IsDisabled && frame.skipDisabled) {
         frame.onDisabledSkipped();
+
         return null;
     }
     if (step.StepKindId !== StepKindId.RunGroup) {
@@ -721,6 +735,7 @@ function processExpansionStep(
             Step: step, GroupPath: newStackNames,
             CallStackGroupIds: newStackIds, PlanIndex: frame.plan.length,
         });
+
         return null;
     }
     const guard = validateRunGroupTarget(frame, step, newStackIds, newStackNames);
@@ -731,6 +746,7 @@ function processExpansionStep(
             `Internal: target vanished between validation and recursion (StepId=${step.StepId})`,
             step.StepId, newStackNames);
     }
+
     return walkForExpansion({
         ...frame, group: target,
         callStackIds: newStackIds, callStackNames: newStackNames,
@@ -759,6 +775,7 @@ function checkTargetResolution(
             `expansion is bound to ProjectId=${frame.projectId}.`,
             step.StepId, stackNames) };
     }
+
     return { target, failure: null };
 }
 
@@ -771,6 +788,7 @@ function checkStackConstraints(
 ): ExpansionFailure | null {
     if (stackIds.includes(target.StepGroupId)) {
         const cycle = [...stackNames, target.Name].join(" → ");
+
         return expansionFailure(frame, "RunGroupCycle",
             `RunGroup cycle detected during expansion: ${cycle}`, step.StepId, stackNames);
     }
@@ -780,6 +798,7 @@ function checkStackConstraints(
             `MAX_RUN_GROUP_CALL_DEPTH=${MAX_RUN_GROUP_CALL_DEPTH}.`,
             step.StepId, stackNames);
     }
+
     return null;
 }
 
@@ -791,6 +810,7 @@ function validateRunGroupTarget(
 ): ExpansionFailure | null {
     const resolved = checkTargetResolution(frame, step, stackNames);
     if (resolved.failure !== null) return resolved.failure;
+
     return checkStackConstraints(frame, step, resolved.target, stackIds, stackNames);
 }
 
@@ -839,6 +859,7 @@ function buildRunnerLevelFailureReport(
     opts: RunGroupOptions,
 ): FailureReport {
     const now = (opts.now ?? defaultNow)();
+
     return {
         Phase: "Replay",
         Message: `RunGroup failed: ${failure.Reason}`,

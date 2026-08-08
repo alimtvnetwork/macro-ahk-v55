@@ -157,6 +157,7 @@ export function ProjectsSection() {
     // Show editor if editing
     if (editingProject !== null) {
         const project = editingProject === "new" ? null : editingProject;
+
         return <ProjectEditor project={project} onBack={handleEditorBack} />;
     }
 

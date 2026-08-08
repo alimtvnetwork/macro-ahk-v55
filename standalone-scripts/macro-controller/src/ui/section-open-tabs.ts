@@ -61,6 +61,7 @@ function createRefreshButton(onRefresh: () => void): HTMLButtonElement {
         e.stopPropagation();
         onRefresh();
     };
+
     return refreshBtn;
 }
 
@@ -95,6 +96,7 @@ export function createOpenTabsSection(): OpenTabsSectionResult {
             if (!resp || resp.isOk === false) {
                 const reason = resp?.errorMessage ?? 'no response';
                 panel.innerHTML = renderError(reason);
+
                 return;
             }
             const tabs = Array.isArray(resp.tabs) ? resp.tabs : [];
@@ -141,6 +143,7 @@ function renderList(tabs: ReadonlyArray<OpenLovableTabInfoView>, capturedAt: str
         + (capturedAt ? ' · ' + escapeHtml(formatTime(capturedAt)) : '')
         + '</div>';
     for (const t of tabs) html += renderRow(t);
+
     return html;
 }
 
@@ -149,18 +152,21 @@ function buildWorkspaceLabel(t: OpenLovableTabInfoView): string {
         const tag = t.bindingSource === 'probe'
             ? ' <span style="color:#9ca3af;font-size:8px;">(via probe)</span>'
             : '';
+
         return '<span style="color:#10b981;">' + escapeHtml(t.projectName) + '</span>' + tag;
     }
     if (t.detectedWorkspaceName) {
         const sourceTag = t.detectedWorkspaceSource
             ? ' <span style="color:#9ca3af;font-size:8px;">(' + escapeHtml(t.detectedWorkspaceSource) + ')</span>'
             : '';
+
         return '<span style="color:#fbbf24;">' + escapeHtml(t.detectedWorkspaceName) + '</span>' + sourceTag;
     }
     const reason = t.probeError
         ? 'no controller (' + t.probeError + ')'
         : (t.bindingSource === 'injection' ? 'unknown project' : 'not bound');
     const truncated = reason.length > 40 ? reason.slice(0, 40) + '…' : reason;
+
     return '<span style="color:#9ca3af;font-style:italic;" title="' + escapeHtml(reason) + '">'
         + escapeHtml(truncated)
         + '</span>';
@@ -269,9 +275,11 @@ function renderWhyLine(t: OpenLovableTabInfoView): string {
 function shortenUrl(url: string): string {
     try {
         const u = new URL(url);
+
         return u.host + u.pathname;
     } catch (e) {
         logSub('shortenUrl failed: ' + (e instanceof Error ? e.message : String(e)), 1);
+
         return url;
     }
 }

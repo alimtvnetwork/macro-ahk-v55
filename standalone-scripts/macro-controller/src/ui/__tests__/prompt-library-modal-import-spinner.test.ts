@@ -48,6 +48,7 @@ function defer(): Deferred {
     const promise = new Promise<{ added: number; updated: number; errors: unknown[] }>((res) => {
         resolveFn = () => res({ added: 1, updated: 0, errors: [] });
     });
+
     return { promise, resolve: resolveFn };
 }
 const importDeferred = defer();

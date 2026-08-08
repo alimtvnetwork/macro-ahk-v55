@@ -73,6 +73,7 @@ export function detectSelectorKind(raw: string): SelectorKind {
     if (s.length === 0) return "Css";
     if (XPATH_LEADING_RE.test(s)) return "XPath";
     if (s.includes("//")) return "XPath";
+
     return "Css";
 }
 
@@ -107,6 +108,7 @@ export function validateSelector(
     if (s.length === 0) return { Ok: false, Reason: "Selector is empty." };
     const doc = deps.doc ?? (typeof document !== "undefined" ? document : null);
     const useLive = doc !== null && deps.skipLiveCheck !== true;
+
     return kind === "Css"
         ? validateCssSelector(s, useLive ? doc : null)
         : validateXPathSelector(s, useLive ? doc : null);
@@ -117,11 +119,13 @@ function validateCssSelector(s: string, doc: Document | null): ValidationResult 
         try { doc.querySelector(s); }
         catch (e) {
             const detail = e instanceof Error ? e.message : "Unknown CSS parse error";
+
             return { Ok: false, Reason: `Invalid CSS selector: ${detail}` };
         }
     } else if (/[<>]{2,}/.test(s)) {
         return { Ok: false, Reason: "Invalid CSS selector (suspicious characters)." };
     }
+
     return { Ok: true, Kind: "Css" };
 }
 
@@ -136,12 +140,13 @@ function validateXPathSelector(s: string, doc: Document | null): ValidationResul
         try { doc.evaluate(s, doc, null, /* ANY_TYPE */ 0, null); }
         catch (e) {
             const detail = e instanceof Error ? e.message : "Unknown XPath parse error";
+
             return { Ok: false, Reason: `Invalid XPath: ${detail}` };
         }
     }
+
     return { Ok: true, Kind: "XPath" };
 }
-
 
 /* ------------------------------------------------------------------ */
 /*  Storage                                                            */
@@ -155,6 +160,7 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
 
 function clampTimeout(raw: unknown): number {
     const n = typeof raw === "number" && Number.isFinite(raw) ? raw : DEFAULT_TIMEOUT_MS;
+
     return Math.min(MAX_TIMEOUT_MS, Math.max(MIN_TIMEOUT_MS, Math.round(n)));
 }
 
@@ -167,6 +173,7 @@ function sanitiseRow(raw: unknown): WaitConfig | null {
         raw.Condition === "Disappears" ? "Disappears"
             : raw.Condition === "Visible" ? "Visible"
                 : "Appears";
+
     return {
         Selector: sel,
         Kind: kind,
@@ -189,6 +196,7 @@ function safeReadStore(): RawStore {
                 out[k] = sanitised;
             }
         }
+
         return out;
     } catch {
         return {};
@@ -211,12 +219,14 @@ export function readAllStepWaits(): ReadonlyMap<number, WaitConfig> {
         const id = Number(k);
         if (Number.isInteger(id) && id > 0) map.set(id, v);
     }
+
     return map;
 }
 
 export function readStepWait(stepId: number): WaitConfig | null {
     const store = safeReadStore();
     const v = store[String(stepId)];
+
     return v === undefined ? null : v;
 }
 
@@ -238,6 +248,7 @@ export function writeStepWait(stepId: number, config: WaitConfig): WaitConfig {
     const store = { ...safeReadStore() };
     store[String(stepId)] = sanitised;
     safeWriteStore(store);
+
     return sanitised;
 }
 
@@ -287,6 +298,7 @@ function evaluateXPath(
         const node = it.snapshotItem(i);
         if (node !== null) out.push(node as unknown as ElementLike);
     }
+
     return out;
 }
 
@@ -297,6 +309,7 @@ function evaluateCss(
     const list = root.querySelectorAll(expr);
     const out: ElementLike[] = [];
     list.forEach((el) => out.push(el as unknown as ElementLike));
+
     return out;
 }
 
@@ -309,6 +322,7 @@ export function evaluateSelector(
     const root = deps.root ?? doc;
     if (doc === null || root === null) return [];
     if (config.Kind === "XPath") return evaluateXPath(config.Selector, doc, root);
+
     return evaluateCss(config.Selector, root);
 }
 
@@ -324,6 +338,7 @@ function isElementVisible(el: ElementLike): boolean {
         const rects = el.getClientRects();
         if (rects.length > 0) return true;
     }
+
     return false;
 }
 
@@ -392,6 +407,7 @@ export async function waitForSelector(
     if (isMissingOk) {
         return { Ok: false, Reason: "InvalidSelector", DurationMs: 0, Detail: validation.Reason };
     }
+
     return pollUntilSatisfied(config, deps, now, sleep, pollMs);
 }
 
@@ -409,6 +425,7 @@ async function pollUntilSatisfied(
             matches = evaluateSelector(config, deps);
         } catch (e) {
             const detail = e instanceof Error ? e.message : "Unknown evaluation error";
+
             return { Ok: false, Reason: "InvalidSelector", DurationMs: now() - startedAt, Detail: detail };
         }
         if (isConditionSatisfied(config, matches)) {

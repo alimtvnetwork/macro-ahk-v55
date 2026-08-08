@@ -41,6 +41,7 @@ const emptyRecord = (): TaskQueueRecord => ({ items: [], updatedAt: Date.now() }
 
 const readOrEmpty = async (storage: QueueStorage, projectId: string): Promise<TaskQueueRecord> => {
     const record = await storage.read(projectId);
+
     return record ?? emptyRecord();
 };
 
@@ -75,11 +76,13 @@ export const createTaskQueue = (storage: QueueStorage) => {
         record.items.push(...accepted);
         record.updatedAt = Date.now();
         await storage.write(projectId, record);
+
         return accepted;
     };
 
     const peek = async (projectId: string): Promise<TaskQueueItem | null> => {
         const record = await readOrEmpty(storage, projectId);
+
         return record.items.find((item) => item.status === "pending") ?? null;
     };
 
@@ -92,6 +95,7 @@ export const createTaskQueue = (storage: QueueStorage) => {
         const [item] = record.items.splice(idx, 1);
         record.updatedAt = Date.now();
         await storage.write(projectId, record);
+
         return item;
     };
 
@@ -101,6 +105,7 @@ export const createTaskQueue = (storage: QueueStorage) => {
 
     const count = async (projectId: string): Promise<number> => {
         const record = await readOrEmpty(storage, projectId);
+
         return record.items.filter((item) => item.status === "pending").length;
     };
 

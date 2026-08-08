@@ -38,6 +38,7 @@ function makeContainer(): HTMLDivElement {
     const div = document.createElement("div");
     div.id = "test-toolbar";
     document.body.appendChild(div);
+
     return div;
 }
 
@@ -49,6 +50,7 @@ function makeMarcoWrapper(id: MarcoElementIdType): HTMLElement {
     const inner = document.createElement("button");
     inner.textContent = id === "marco-save-prompt-btn" ? "Save" : "Prompts";
     wrapper.appendChild(inner);
+
     return wrapper;
 }
 
@@ -57,6 +59,7 @@ function makeBareButton(label: string): HTMLButtonElement {
     const b = document.createElement("button");
     b.textContent = label;
     b.setAttribute("data-lovable", label.toLowerCase().replace(/\s+/g, "-"));
+
     return b;
 }
 
@@ -68,6 +71,7 @@ function makeWrappedButton(label: string): HTMLDivElement {
     const inner = document.createElement("button");
     inner.textContent = label;
     wrap.appendChild(inner);
+
     return wrap;
 }
 
@@ -85,6 +89,7 @@ function firstButtonByXPath(container: Element): Element | null {
         XPathResult.FIRST_ORDERED_NODE_TYPE,
         null,
     );
+
     return result.singleNodeValue as Element | null;
 }
 
@@ -97,6 +102,7 @@ function firstWrappedButtonByXPath(container: Element): Element | null {
         XPathResult.FIRST_ORDERED_NODE_TYPE,
         null,
     );
+
     return result.singleNodeValue as Element | null;
 }
 

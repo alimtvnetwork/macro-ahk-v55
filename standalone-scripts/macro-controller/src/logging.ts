@@ -1,4 +1,3 @@
- 
 import { toErrorMessage, logError, logDebug } from './error-utils';
 /**
  * MacroLoop Controller — Logging Module
@@ -112,6 +111,7 @@ function clearAndRetrySetItem(key: string, value: string): boolean {
     return true;
   } catch (e) {
     logError('safeGetItem', 'localStorage getItem failed', e);
+
     return false;
   }
 }
@@ -194,6 +194,7 @@ export function getDisplayProjectName(): string {
       'warn'
     );
   }
+
   return pid ? '⟳ ' + pid.substring(0, 8) + '…' : 'Unknown Project';
 }
 
@@ -302,6 +303,7 @@ export function getAllLogs(): PersistedLogEntry[] {
     return JSON.parse(localStorage.getItem(key) || '[]');
   } catch (e) {
     logError('getStoredLogs', 'Failed to read stored logs', e);
+
     return [];
   }
 }
@@ -321,9 +323,11 @@ function readSeedTelemetryBlock(): string[] {
     const raw = localStorage.getItem(StorageKeyType.LastSeedTelemetry);
     const isMissingRaw = !raw;
     if (isMissingRaw) return ['Seed Telemetry: (not run this session)', '---'];
+
     return ['=== Seed Telemetry ===', raw, '---'];
   } catch (e) {
     logError('formatLogsForExport', 'readSeedTelemetry failed', e);
+
     return ['Seed Telemetry: (unavailable)', '---'];
   }
 }

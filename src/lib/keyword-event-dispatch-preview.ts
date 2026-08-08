@@ -47,6 +47,7 @@ export function buildDispatchPreview(step: KeywordEventStep): DispatchPreview {
     if (parsed.Shift) { modifiers.push("Shift"); }
     if (parsed.Alt) { modifiers.push("Alt"); }
     if (parsed.Meta) { modifiers.push("Meta"); }
+
     return {
         Kind: "Key",
         Modifiers: modifiers,
@@ -65,6 +66,7 @@ function formatKeyLabel(raw: string): string {
     const k = raw.trim();
     if (k === "") { return ""; }
     if (k.length === 1) { return k.toUpperCase(); }
+
     // Capitalise the first letter for named keys ("enter" -> "Enter") so the
     // preview matches the editor's placeholder text style.
     return k.charAt(0).toUpperCase() + k.slice(1);
@@ -82,5 +84,6 @@ export function previewToString(preview: DispatchPreview): string {
     if (!preview.HasKey && preview.Modifiers.length === 0) {
         return "(empty combo)";
     }
+
     return [...preview.Modifiers, preview.Key].filter(Boolean).join(" + ");
 }

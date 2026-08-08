@@ -12,11 +12,13 @@ export function wsStatusEmoji(isCurrent: boolean, available: number, limitInt: n
   if (isCurrent) return '📍';
   if (available <= 0) return '🔴';
   if (available <= limitInt * 0.2) return '🟡';
+
   return '🟢';
 }
 
 export function wsRowBgStyle(isCurrent: boolean, isSel: boolean): string {
   if (isCurrent) return 'background:' + cPrimaryHL + ';border-left:3px solid #a78bfa;';
+
   return isSel ? 'border-left:3px solid #facc15;' : 'border-left:3px solid transparent;';
 }
 
@@ -37,6 +39,7 @@ export function buildWsRowInnerHtml(
   if (isCurrent) {
     html += '<span style="font-size:8px;color:' + cPrimaryLight + CSS_BG + cPrimaryBgAL + ';padding:1px 4px;border-radius:3px;font-weight:700;">NOW</span>';
   }
+
   return html;
 }
 
@@ -44,6 +47,7 @@ export function buildCreditPlaceholderBarHtml(isPending: boolean, dashTooltip: s
   if (isPending) {
     return '<span class="marco-skeleton" title="' + dashTooltip + '" style="display:inline-block;min-width:160px;height:8px;vertical-align:middle;"></span>';
   }
+
   return '<span title="' + dashTooltip + '" style="display:inline-block;min-width:160px;height:2px;background:' + cWarning + ';vertical-align:middle;border-radius:2px;opacity:0.85;"></span>';
 }
 
@@ -88,5 +92,6 @@ export function buildWsRow(
     });
 
   row.innerHTML = buildWsRowInnerHtml(ws, isCurrent, isChecked, emoji, creditBarHtml);
+
   return row;
 }

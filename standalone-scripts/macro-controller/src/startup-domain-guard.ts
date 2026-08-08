@@ -28,6 +28,7 @@ export function shouldInject(): boolean {
       '  cause: Preview iframe has no auth cookies; workspace detection would return false names.\n' +
       '  UI will NOT be injected here.'
     );
+
     return false;
   }
 
@@ -41,6 +42,7 @@ export function shouldInject(): boolean {
       '  bypass: Set window.__comboForceInject = true before pasting.\n' +
       '  UI will NOT be injected here.'
     );
+
     return false;
   }
 
@@ -61,6 +63,7 @@ export function shouldInject(): boolean {
       '  bypass: Set window.__comboForceInject = true before pasting.\n' +
       '  UI will NOT be injected here.'
     );
+
     return false;
   }
 

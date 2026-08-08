@@ -225,7 +225,9 @@ function _aboutFooterStyles(): string {
 export function showAboutModal(): void {
   // Remove existing if open
   const existing = document.getElementById('macroloop-about-modal');
-  if (existing) { existing.remove(); return; }
+  if (existing) { existing.remove();
+
+ return; }
 
   // Inject scoped styles
   injectAboutStyles();

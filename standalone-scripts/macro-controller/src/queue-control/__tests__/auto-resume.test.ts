@@ -30,9 +30,9 @@ function mountButton(ariaLabel: string): HTMLButtonElement {
     // mock offsetParent for visibility check
     Object.defineProperty(btn, 'offsetParent', { get: () => document.body });
     document.body.appendChild(btn);
+
     return btn;
 }
-
 
 afterEach(() => {
     document.body.innerHTML = '';
@@ -93,7 +93,6 @@ describe('autoResumeQueueIfNeeded — safety guards', () => {
             delete (document as unknown as Record<string, unknown>).hidden;
         }
     });
-
 
     it('never throws — wraps unexpected errors and returns reason=threw', () => {
         const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});

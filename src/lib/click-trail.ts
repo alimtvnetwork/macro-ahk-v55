@@ -39,6 +39,7 @@ export function readClickTrail(): ClickTrailEntry[] {
         if (raw === null) return [];
         const parsed = JSON.parse(raw) as ClickTrailEntry[];
         if (Array.isArray(parsed) === false) return [];
+
         return parsed;
     } catch {
         return [];
@@ -90,6 +91,7 @@ export function freezeClickTrail(failureId: string): ClickTrailEntry[] {
         const live = readClickTrail();
         sessionStorage.setItem(key, JSON.stringify(live));
         evictOldFrozenSnapshots(key);
+
         return live;
     } catch {
         return readClickTrail();
@@ -102,6 +104,7 @@ export function readFrozenClickTrail(failureId: string): ClickTrailEntry[] | nul
         const raw = sessionStorage.getItem(`${FROZEN_KEY_PREFIX}${failureId}`);
         if (raw === null) return null;
         const parsed = JSON.parse(raw) as ClickTrailEntry[];
+
         return Array.isArray(parsed) ? parsed : null;
     } catch {
         return null;
@@ -215,5 +218,6 @@ function describeElement(element: Element): string {
     const id = element.id !== "" ? `#${element.id}` : "";
     const classList = Array.from(element.classList).slice(0, 2).join(".");
     const cls = classList !== "" ? `.${classList}` : "";
+
     return `${tag}${id}${cls}`;
 }

@@ -87,6 +87,7 @@ function focusCurrentWorkspaceInList(): void {
   const isMissingCurrentName = !currentName;
   if (isMissingCurrentName) {
     log('Credits: no current workspace name to focus', 'warn');
+
     return;
   }
   const currentItem = listEl.querySelector('.loop-ws-item[data-ws-current="true"]');
@@ -260,6 +261,7 @@ function setCreditBtnLoading(btn: HTMLElement, loading: boolean): void {
 function logCreditTokenResult(token: string): void {
   if (token) {
     log('Credits: ✅ Token ready via getBearerToken() — proceeding', 'success');
+
     return;
   }
 
@@ -306,7 +308,6 @@ function executeCreditFetch(ctx: CreditFetchCtx): void {
   });
 }
 
-
 // ============================================
 // Credit button builder
 // ============================================
@@ -323,6 +324,7 @@ function buildCreditButton(deps: PanelBuilderDeps, btnStyle: string): HTMLElemen
   creditBtn.onclick = function() {
     if (creditInFlight) {
       log('Credits: already in flight — ignoring duplicate click', 'warn');
+
       return;
     }
     creditInFlight = true;
@@ -353,7 +355,6 @@ interface PromptsDropdownResult {
   promptCtx: PromptContext;
   taskNextDeps: TaskNextDeps;
 }
-
 
 function buildPromptsDropdown(_deps: PanelBuilderDeps, btnStyle: string): PromptsDropdownResult {
   const promptsContainer = document.createElement('div');
@@ -577,6 +578,7 @@ function buildErrorToggleButton(btnStyle: string): HTMLElement {
       const isMissingIsConnected = !badge.isConnected;
       if (isMissingIsConnected) {
         trackedClearInterval(badgePollId);
+
         return;
       }
       const count = getOverlayErrorCount();

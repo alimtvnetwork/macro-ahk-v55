@@ -29,6 +29,7 @@ function installSdkMock(handler: (path: string, params: Record<string, string>) 
             api: {
                 call: async (path: string, opts: { params: Record<string, string> }) => {
                     sdkCalls.push({ path, params: opts.params });
+
                     return handler(path, opts.params);
                 },
             },
@@ -77,12 +78,15 @@ describe('ensureGithubRepo', () => {
         installSdkMock((path) => {
             if (path === 'gitsync.progress' && phase === 0) {
                 phase = 1;
+
                 return { ok: false, status: 404, data: {} };
             }
             if (path === 'gitsync.syncProject') {
                 phase = 2;
+
                 return { ok: true, status: 200, data: { job_id: 'job-X' } };
             }
+
             return {
                 ok: true,
                 status: 200,
@@ -102,6 +106,7 @@ describe('ensureGithubRepo', () => {
     it('persists error when POST /sync fails (no retry)', async () => {
         installSdkMock((path) => {
             if (path === 'gitsync.progress') return { ok: false, status: 404, data: {} };
+
             return { ok: false, status: 500, data: { error: 'boom' } };
         });
         const { ensureGithubRepo } = await import('../gitsync/ensure-repo');

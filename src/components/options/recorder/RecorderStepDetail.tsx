@@ -40,6 +40,7 @@ export function RecorderStepDetail(props: Props): JSX.Element {
     const controller = useRecorderStepDetail(props);
     const binding = bindings.find((row) => row.StepId === step.StepId) ?? null;
     const boundDs = binding ? dataSources.find((row) => row.DataSourceId === binding.DataSourceId) ?? null : null;
+
     return (
         <div className="space-y-4">
             <VariableSection

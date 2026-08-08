@@ -103,6 +103,7 @@ function useStepRowDrag(
             );
         }
     };
+
     return { dragOver, dragging, onDragStart, onDragEnd, onDragOver, onDragLeave, onDrop };
 }
 
@@ -113,6 +114,7 @@ function StepRowLabel(props: {
     readonly waitTitle: string | null;
 }): JSX.Element {
     const { step, isDisabled, waitLabel, waitTitle } = props;
+
     return (
         <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
@@ -164,6 +166,7 @@ interface StepRowActionsProps {
 function StepRowActions(props: StepRowActionsProps): JSX.Element {
     const { step, index, total, isDisabled, waitLabel } = props;
     const { onMove, onToggleDisabled, onEdit, onEditWait, onDelete } = props;
+
     return (
         <div className="flex shrink-0 items-center gap-1">
             <Button variant="ghost" size="icon" className="h-7 w-7"
@@ -208,6 +211,7 @@ export function StepRowItem(props: StepRowItemProps): JSX.Element {
         drag.dragging ? "opacity-30" : "",
         drag.dragOver ? "bg-primary/10 outline outline-2 outline-primary" : "",
     ].join(" ").trim();
+
     return (
         <li draggable
             onDragStart={drag.onDragStart}

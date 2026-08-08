@@ -54,6 +54,7 @@ async function persistCaptureRow(
     const step = insertStepRow(db, buildStepDraftFromCapture(payload, anchorId));
     const selectors = listSelectorsForStep(db, step.StepId);
     mgr.markDirty();
+
     return { Step: step, Selectors: selectors };
 }
 
@@ -65,12 +66,14 @@ export async function captureAndPersistStep(
     const target: Element | null = typeof document !== "undefined" ? locateCaptureTarget(payload.XPathFull) : null;
     try {
         const { Step, Selectors } = await persistCaptureRow(projectSlug, payload);
+
         return { Ok: true, Step, Selectors, FailureReport: null };
     } catch (err) {
         const report = logFailure({
             Phase: "Record", Error: err, StepKind: payload.TagName,
             Target: target, SourceFile: SOURCE_FILE, Now: now,
         });
+
         return { Ok: false, Step: null, Selectors: [], FailureReport: report };
     }
 }
@@ -81,6 +84,7 @@ function locateCaptureTarget(xpathFull: string): Element | null {
             xpathFull, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null,
         );
         const node = r.singleNodeValue;
+
         return node instanceof Element ? node : null;
     } catch {
         return null;

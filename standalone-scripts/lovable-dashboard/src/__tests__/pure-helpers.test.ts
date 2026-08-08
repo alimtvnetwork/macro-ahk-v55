@@ -25,6 +25,7 @@ function rec(index: number, name: string, isSelected = false): WorkspaceRecord {
 function dictOf(records: WorkspaceRecord[]): WorkspaceDictionary {
     const byName = Object.fromEntries(records.map((r) => [r.name, r]));
     const selectedIndex = records.findIndex((r) => r.isSelected);
+
     return { byIndex: records, byName, selectedIndex: selectedIndex === -1 ? null : selectedIndex };
 }
 

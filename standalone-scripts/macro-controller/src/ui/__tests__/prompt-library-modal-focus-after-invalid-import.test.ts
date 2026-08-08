@@ -62,6 +62,7 @@ function getImportBtn(): HTMLButtonElement {
 function getModalRoot(): HTMLElement | null {
     // The modal renders a banner with data-testid; walk up to the modal root.
     const banner = document.querySelector<HTMLElement>('[data-testid="library-import-error"]');
+
     return banner ? banner.closest('[role="dialog"]') as HTMLElement | null
         ?? banner.parentElement : null;
 }

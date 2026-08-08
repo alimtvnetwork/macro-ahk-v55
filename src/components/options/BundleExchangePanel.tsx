@@ -104,6 +104,7 @@ function IncludeDescendantsField({ checked, onChange, disabled }: { checked: boo
 
 function LastExportLine({ summary }: { summary: LastExportSummary | null }) {
     if (summary === null) return null;
+
     return (
         <p className="mt-1 text-xs text-muted-foreground">
             Last: <span className="font-mono">{summary.FileName}</span> ·
@@ -115,6 +116,7 @@ function LastExportLine({ summary }: { summary: LastExportSummary | null }) {
 
 function ExportSection(props: ExportSectionProps) {
     const { selectedCount, disabled, includeDescendants, setIncludeDescendants, onExport, lastExport } = props;
+
     return (
         <section className="flex flex-col gap-2 rounded-md border p-3">
             <div className="flex items-center justify-between">
@@ -141,6 +143,7 @@ function ExportSection(props: ExportSectionProps) {
 
 function LastImportLine({ summary }: { summary: LastImportSummary | null }) {
     if (summary === null) return null;
+
     return (
         <p className="mt-1 text-xs text-muted-foreground">
             Last: {summary.GroupCount} group(s) · {summary.StepCount} step(s)
@@ -171,6 +174,7 @@ function useImportDropzone(onImportFile: (file: File) => void | Promise<void>) {
         if (file !== undefined) void onImportFile(file);
         event.target.value = "";
     };
+
     return { inputRef, dragOver, setDragOver, handleDrop, handlePicked };
 }
 
@@ -183,6 +187,7 @@ function ImportSection({ disabled, onImportFile, lastImport }: ImportSectionProp
             : "border-muted-foreground/30 text-muted-foreground hover:border-primary hover:text-primary",
         disabled ? "pointer-events-none opacity-50" : "",
     ].join(" ");
+
     return (
         <section className="flex flex-col gap-2 rounded-md border p-3">
             <div className="text-sm font-medium">Import a bundle</div>
@@ -211,6 +216,7 @@ export default function BundleExchangePanel(props: BundleExchangePanelProps) {
     const { selectedCount, onExport, onImportFile, lastExport, lastImport, disabled } = props;
     const [includeDescendants, setIncludeDescendants] = useState(true);
     const isDisabled = disabled === true;
+
     return (
         <Card className="flex flex-col gap-4 p-4">
             <header className="flex items-center gap-2">

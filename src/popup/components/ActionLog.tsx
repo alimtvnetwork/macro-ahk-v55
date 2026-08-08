@@ -13,6 +13,7 @@ import type { ActionLogEntry } from "../hooks/useActionLog";
 function getStatusIcon(status: ActionLogEntry["status"]): string {
     if (status === "success") return "✅";
     if (status === "error") return "❌";
+
     return "ℹ️";
 }
 

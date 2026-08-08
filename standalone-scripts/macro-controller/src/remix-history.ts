@@ -73,6 +73,7 @@ function escapeHtml(s: string): string {
     if (ch === '<') return '&lt;';
     if (ch === '>') return '&gt;';
     if (ch === '"') return '&quot;';
+
     return '&#39;';
   });
 }
@@ -88,6 +89,7 @@ function buildEntryRow(e: RemixHistoryEntry): HTMLElement {
       + '<span style="font-size:9px;color:#94a3b8;">' + formatTimestamp(e.timestamp) + '</span>'
     + '</div>'
     + '<div style="font-size:9px;color:#94a3b8;">from "' + escapeHtml(e.source) + '"</div>';
+
   return row;
 }
 

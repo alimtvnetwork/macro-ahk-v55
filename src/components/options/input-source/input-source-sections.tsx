@@ -50,6 +50,7 @@ export function InputSourceBody({ api }: SectionProps) {
 
 function EndpointSection({ api }: SectionProps) {
     const { draft, setDraft } = api;
+
     return (
         <section className="space-y-3 rounded-md border p-3">
             <div className="flex items-center justify-between">
@@ -125,6 +126,7 @@ function TimeoutField({ draft, setDraft }: FieldProps) {
 
 function HeadersSection({ api }: SectionProps) {
     const { draft, addHeader } = api;
+
     return (
         <section className="space-y-2 rounded-md border p-3">
             <div className="flex items-center justify-between">
@@ -147,6 +149,7 @@ function HeadersSection({ api }: SectionProps) {
 
 function HeaderRows({ api }: SectionProps) {
     const { draft, updateHeader, removeHeader } = api;
+
     return (
         <div className="space-y-2">
             {draft.Headers.map((h, i) => (
@@ -179,6 +182,7 @@ function HeaderRows({ api }: SectionProps) {
 
 function BodySection({ api }: SectionProps) {
     const { draft, setDraft } = api;
+
     return (
         <section className="space-y-2 rounded-md border p-3">
             <LabelType htmlFor="src-body" className="text-sm font-medium">Request body (JSON)</LabelType>
@@ -199,6 +203,7 @@ function BodySection({ api }: SectionProps) {
 
 function FailurePolicySection({ api }: SectionProps) {
     const { draft, setDraft } = api;
+
     return (
         <section className="space-y-2 rounded-md border p-3">
             <LabelType className="text-sm font-medium">If the endpoint fails</LabelType>
@@ -223,6 +228,7 @@ function FailurePolicySection({ api }: SectionProps) {
 
 function TestFetchSection({ api }: SectionProps) {
     const { busy, handleTest, lastResult } = api;
+
     return (
         <section className="space-y-2 rounded-md border p-3">
             <div className="flex items-center justify-between">
@@ -254,6 +260,7 @@ function TestFetchResultView({ result, previewKeys }: ResultViewProps) {
     if (result.Ok && result.Skipped) {
         return <p className="text-xs text-muted-foreground">Skipped: {result.SkipReason}</p>;
     }
+
     return (
         <div className="space-y-1 text-xs">
             <Badge variant="destructive">Fail</Badge>
@@ -264,6 +271,7 @@ function TestFetchResultView({ result, previewKeys }: ResultViewProps) {
 
 function TestFetchSuccess({ result, previewKeys }: ResultViewProps) {
     if (result === null || !result.Ok || result.Skipped) return null;
+
     return (
         <div className="space-y-2 text-xs">
             <div className="flex items-center gap-2">

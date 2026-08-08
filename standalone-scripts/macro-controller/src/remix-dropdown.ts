@@ -43,6 +43,7 @@ export function actionRemixManual(ctx: RemixActionContext): void {
 export async function actionRemixNext(ctx: RemixActionContext): Promise<void> {
   if (!ctx.projectId || !ctx.workspaceId) {
     showToast('Remix Next unavailable — missing project or workspace id', 'warn');
+
     return;
   }
   const config = getRemixConfig();
@@ -104,6 +105,7 @@ function buildDropdownItem(label: string, sublabel: string, onClick: () => void)
     removeHeaderDropdown();
     onClick();
   };
+
   return item;
 }
 
@@ -178,7 +180,9 @@ export function buildHeaderRemixSplitButton(getCtx: () => RemixActionContext | n
     e.stopPropagation();
     const ctx = getCtx();
     const isMissingCtx = !ctx;
-    if (isMissingCtx) { showToast('Remix unavailable — project/workspace not detected', 'warn'); return; }
+    if (isMissingCtx) { showToast('Remix unavailable — project/workspace not detected', 'warn');
+
+ return; }
     actionRemixManual(ctx);
   };
 
@@ -192,11 +196,14 @@ export function buildHeaderRemixSplitButton(getCtx: () => RemixActionContext | n
     e.stopPropagation();
     const ctx = getCtx();
     const isMissingCtx = !ctx;
-    if (isMissingCtx) { showToast('Remix unavailable — project/workspace not detected', 'warn'); return; }
+    if (isMissingCtx) { showToast('Remix unavailable — project/workspace not detected', 'warn');
+
+ return; }
     showHeaderRemixDropdown(arrow, ctx);
   };
 
   wrap.appendChild(main);
   wrap.appendChild(arrow);
+
   return wrap;
 }

@@ -44,6 +44,7 @@ interface BackgroundPingResponse {
 const chromeStorage: PlatformStorage = {
     async get<T = string | number | boolean | null | object>(key: string): Promise<T> {
         const result = await chrome.storage.local.get(key);
+
         return (result[key] ?? null) as T;
     },
 
@@ -72,6 +73,7 @@ const chromeTabs: PlatformTabs = {
         });
 
         const hasValidId = tab !== undefined && tab.id !== undefined;
+
         return hasValidId ? tab.id ?? null : null;
     },
 };
@@ -154,6 +156,7 @@ async function sendChromeMessage<T>(message: MessagePayload): Promise<T> {
     try {
         const response = await chrome.runtime.sendMessage(message);
         throwIfErrorResponse(response);
+
         return response as T;
     } catch (firstError) {
         const errorValue = firstError instanceof Error
@@ -169,6 +172,7 @@ async function sendChromeMessage<T>(message: MessagePayload): Promise<T> {
         await waitForReceiver();
         const response = await chrome.runtime.sendMessage(message);
         throwIfErrorResponse(response);
+
         return response as T;
     }
 }

@@ -17,11 +17,13 @@ export async function evaluateCondition(check: ConditionCheck): Promise<boolean>
 
     case "kv_equals": {
       const storedValue = await getKvValue(check.key ?? "");
+
       return storedValue === (check.value ?? "");
     }
 
     case "kv_exists": {
       const storedValue = await getKvValue(check.key ?? "");
+
       return storedValue !== null && storedValue !== undefined;
     }
 

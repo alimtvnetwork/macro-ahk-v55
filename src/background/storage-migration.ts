@@ -98,6 +98,7 @@ export async function readStorageSchemaVersion(): Promise<number> {
         const result = await chrome.storage.local.get(STORAGE_SCHEMA_VERSION_KEY);
         const version = result[STORAGE_SCHEMA_VERSION_KEY];
         const isNumber = typeof version === "number" && Number.isFinite(version);
+
         return isNumber ? version : 0;
     } catch (err) {
         logCaughtError(
@@ -105,6 +106,7 @@ export async function readStorageSchemaVersion(): Promise<number> {
             `Failed to read storage schema version\n  Path: chrome.storage.local["${STORAGE_SCHEMA_VERSION_KEY}"]\n  Missing: Persisted numeric version\n  Reason: ${err instanceof Error ? err.message : String(err)}`,
             err,
         );
+
         return 0;
     }
 }
@@ -131,12 +133,14 @@ async function applyMigration(
     try {
         await migration.up();
         await chrome.storage.local.set({ [STORAGE_SCHEMA_VERSION_KEY]: migration.version });
+
         return { ok: true };
     } catch (err) {
         logBgWarnError(
             BgLogTag.BOOT,
             `Storage migration v${migration.version} failed\n  Path: chrome.storage.local["${STORAGE_SCHEMA_VERSION_KEY}"]\n  Missing: Successful migration "${migration.description}"\n  Reason: ${err instanceof Error ? err.message : String(err)}`,
         );
+
         return { ok: false, err };
     }
 }
@@ -162,5 +166,6 @@ export async function runStorageMigrations(): Promise<StorageMigrationResult> {
         }
         lastApplied = migration.version;
     }
+
     return { fromVersion, toVersion: lastApplied, applied: pending.length, failed: false };
 }

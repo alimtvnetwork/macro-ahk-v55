@@ -85,6 +85,7 @@ async function ensureSqlJs(): Promise<SqlJs> {
     }
     const wasmBinary = await wasmResponse.arrayBuffer();
     SQL = await initSqlJs({ wasmBinary });
+
     return SQL;
 }
 
@@ -119,6 +120,7 @@ export async function initProjectDb(slug: string, extraSchema?: string): Promise
             applyChainColumnsMigration(existing);
             chainMigrationApplied.add(slug);
         }
+
         return buildProjectManager(slug);
     }
 
@@ -199,11 +201,13 @@ function buildCreateTableSql(
             if (isMissingNullable) col += " NOT NULL";
             if (c.Unique) col += " UNIQUE";
             if (c.Default !== undefined) col += ` DEFAULT ${c.Default}`;
+
             return col;
         }),
         "CreatedAt TEXT NOT NULL DEFAULT (datetime('now'))",
         "UpdatedAt TEXT NOT NULL DEFAULT (datetime('now'))",
     ];
+
     return `CREATE TABLE IF NOT EXISTS ${tableDef.TableName} (${cols.join(", ")});`;
 }
 
@@ -214,6 +218,7 @@ async function tryLoadDb(sql: SqlJs, slug: string, schema: string): Promise<SqlJ
         const db = await loadOrCreateFromOpfs(sql, root, dbFileName(slug), schema);
         persistenceMode = "opfs";
         console.log(`[project-db] OPFS: ${slug}`);
+
         return db;
     } catch (err) {
         logError("AutoCatch", "Unhandled exception", err);
@@ -224,6 +229,7 @@ async function tryLoadDb(sql: SqlJs, slug: string, schema: string): Promise<SqlJ
         const db = await loadFromStorage(sql, storageKey(slug), schema);
         persistenceMode = "storage";
         console.log(`[project-db] storage: ${slug}`);
+
         return db;
     } catch (err) {
         logError("AutoCatch", "Unhandled exception", err);
@@ -234,6 +240,7 @@ async function tryLoadDb(sql: SqlJs, slug: string, schema: string): Promise<SqlJ
     db.run(schema);
     persistenceMode = "memory";
     console.log(`[project-db] memory: ${slug}`);
+
     return db;
 }
 
@@ -245,6 +252,7 @@ export function getProjectDb(slug: string): SqlJsDatabase {
     const db = projectDbs.get(slug);
     const isMissingDb = !db;
     if (isMissingDb) throw new Error(`[project-db] Not initialized: ${slug}`);
+
     return wrapDatabaseWithBindSafety(db);
 }
 

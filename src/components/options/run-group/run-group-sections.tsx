@@ -76,6 +76,7 @@ export function FailureCard({ result, groupName }: FailureCardProps): JSX.Elemen
     const failedGroupName = result.FailedGroupId !== null
         ? (groupName?.(result.FailedGroupId) ?? `Group #${result.FailedGroupId}`)
         : null;
+
     return (
         <section className="rounded-md border border-destructive/40 bg-destructive/5 p-3" aria-label="Run failure details">
             <header className="mb-2 flex items-center gap-2">

@@ -70,8 +70,10 @@ async function executeImportParse(
     logLibraryImportFailure('parse', 'errors=' + String(parsed.errors.length) + ' name=' + file.name, parsed.errors);
     showToast(IMPORT_FAILED_PREFIX + friendly.headline, TOAST_ERROR);
     refs.lastImportFailed = true;
+
     return null;
   }
+
   return parsed;
 }
 
@@ -128,6 +130,7 @@ export async function handleImportFile(
       logError("AutoCatch", "Unhandled exception", err);
     }
     focusErrorBanner(refs);
+
     return;
   }
   
@@ -148,6 +151,7 @@ export async function handleImportFile(
     const isMissingParsed = !parsed;
     if (isMissingParsed) {
       focusAfter = 'banner';
+
       return;
     }
 

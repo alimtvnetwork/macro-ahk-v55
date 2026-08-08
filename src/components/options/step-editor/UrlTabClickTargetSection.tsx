@@ -24,6 +24,7 @@ export interface UrlTabClickTargetSectionProps {
 
 export function UrlTabClickTargetSection(props: UrlTabClickTargetSectionProps): JSX.Element {
     const { value, onPatch } = props;
+
     return (
         <>
             <div className="space-y-1">

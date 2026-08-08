@@ -68,6 +68,7 @@ export const MAX_TIMELINE_ENTRIES = 500;
 let entryCounter = 0;
 const nextEntryId = (): string => {
     entryCounter += 1;
+
     return `tl_${entryCounter.toString(36)}`;
 };
 
@@ -75,6 +76,7 @@ function append(state: TimelineState, entry: TimelineEntry): TimelineState {
     const next = state.Entries.length >= MAX_TIMELINE_ENTRIES
         ? [...state.Entries.slice(state.Entries.length - MAX_TIMELINE_ENTRIES + 1), entry]
         : [...state.Entries, entry];
+
     return { StartedAtMs: state.StartedAtMs, Entries: next };
 }
 
@@ -85,6 +87,7 @@ export function startTimeline(now: number = Date.now()): TimelineState {
 function offsetMs(state: TimelineState, now: number): number {
     if (state.StartedAtMs === null) { return 0; }
     const delta = now - state.StartedAtMs;
+
     return delta < 0 ? 0 : delta;
 }
 
@@ -109,8 +112,10 @@ export function recordEventStart(
 export function describeStep(step: KeywordEventStep): string {
     if (step.Kind === "Key") {
         const combo = step.Combo.trim();
+
         return combo.length === 0 ? "Key (empty)" : `Key ${combo}`;
     }
+
     return `Wait ${step.DurationMs}ms`;
 }
 

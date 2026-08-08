@@ -108,6 +108,7 @@ function buildOrderBy(orderBy?: OrderByClause): string {
     const parts = Object.entries(orderBy).map(
         ([col, dir]) => `"${col}" ${dir.toUpperCase()}`,
     );
+
     return ` ORDER BY ${parts.join(", ")}`;
 }
 
@@ -124,6 +125,7 @@ function collectRows(db: SqlJsDatabase, sql: string, params: SqlValue[]): Record
         rows.push(stmt.getAsObject() as Record<string, SqlValue>);
     }
     stmt.free();
+
     return rows;
 }
 
@@ -163,6 +165,7 @@ export function queryFindMany(
     const offset = args?.skip ? ` OFFSET ${Number(args.skip)}` : "";
 
     const sql = `SELECT * FROM "${table}"${clause}${orderBy}${limit}${offset}`;
+
     return collectRows(db, sql, params);
 }
 
@@ -175,6 +178,7 @@ export function queryFindUnique(
     const { clause, params } = buildWhere(args.where);
     const sql = `SELECT * FROM "${table}"${clause} LIMIT 1`;
     const rows = collectRows(db, sql, params);
+
     return rows.length > 0 ? rows[0] : null;
 }
 
@@ -194,6 +198,7 @@ export function queryUpdate(
 
     const changes = db.exec("SELECT changes() AS Count");
     const count = changes.length > 0 ? (changes[0].values[0][0] as number) : 0;
+
     return { count };
 }
 
@@ -209,6 +214,7 @@ export function queryDelete(
 
     const changes = db.exec("SELECT changes() AS Count");
     const count = changes.length > 0 ? (changes[0].values[0][0] as number) : 0;
+
     return { count };
 }
 
@@ -221,6 +227,7 @@ export function queryCount(
     const { clause, params } = buildWhere(args?.where);
     const sql = `SELECT COUNT(*) AS Count FROM "${table}"${clause}`;
     const rows = collectRows(db, sql, params);
+
     return rows.length > 0 ? (rows[0].Count as number) : 0;
 }
 
@@ -242,6 +249,7 @@ export function createUserTable(db: SqlJsDatabase, tableName: string, columns: C
         const type = col.Type === "BOOLEAN" ? "INTEGER" : col.Type;
         const nullable = col.Nullable ? "" : " NOT NULL";
         const def = col.Default !== undefined ? ` DEFAULT ${col.Default}` : "";
+
         return `"${col.Name}" ${type}${nullable}${def}`;
     });
 
@@ -302,5 +310,6 @@ export function listUserTables(db: SqlJsDatabase): Array<{ TableName: string; Co
         });
     }
     stmt.free();
+
     return rows;
 }

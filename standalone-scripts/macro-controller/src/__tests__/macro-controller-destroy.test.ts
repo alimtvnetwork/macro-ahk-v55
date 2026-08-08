@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../shared-state', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
+
   return {
     ...actual,
     state: { running: false, direction: 'up', cycleCount: 0 },

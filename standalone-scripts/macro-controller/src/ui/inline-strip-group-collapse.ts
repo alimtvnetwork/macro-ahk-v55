@@ -109,6 +109,7 @@ export function setInlineStripGroupRemoved(removed: boolean): void {
 
 export function subscribeInlineStripGroupCollapse(subscriber: () => void): () => void {
   state.subscribers.add(subscriber);
+
   return function unsubscribe(): void { state.subscribers.delete(subscriber); };
 }
 

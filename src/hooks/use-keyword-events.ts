@@ -134,11 +134,13 @@ function load(): KeywordEvent[] {
         if (!raw) return [];
         const parsed: unknown = JSON.parse(raw);
         if (!Array.isArray(parsed)) return [];
+
         return parsed.filter((e): e is KeywordEvent =>
             !!e && typeof e === "object" && typeof (e as KeywordEvent).Id === "string",
         );
     } catch (caught) {
         logError("useKeywordEvents.load", `localStorage read/parse failed for key "${STORAGE_KEY}" — returning empty event list`, caught);
+
         return [];
     }
 }
@@ -168,6 +170,7 @@ export function useKeywordEvents(): UseKeywordEventsApi {
             Target: DEFAULT_KEYWORD_EVENT_TARGET,
         };
         setEvents(prev => [...prev, next]);
+
         return id;
     }, []);
 
@@ -202,6 +205,7 @@ export function useKeywordEvents(): UseKeywordEventsApi {
             const copy = [...e.Steps];
             const [moved] = copy.splice(idx, 1);
             copy.splice(target, 0, moved);
+
             return { ...e, Steps: copy };
         }));
     }, []);
@@ -220,6 +224,7 @@ export function useKeywordEvents(): UseKeywordEventsApi {
             const target = new Set(stepIds);
             setEvents(prev => prev.map(e => {
                 if (e.Id !== eventId) return e;
+
                 return {
                     ...e,
                     Steps: e.Steps.map(s => {
@@ -229,8 +234,10 @@ export function useKeywordEvents(): UseKeywordEventsApi {
                         if (enabled) {
                             const { Enabled: _drop, ...rest } = s as KeywordEventStep & { Enabled?: boolean };
                             void _drop;
+
                             return rest as KeywordEventStep;
                         }
+
                         return { ...s, Enabled: false } as KeywordEventStep;
                     }),
                 };
@@ -246,6 +253,7 @@ export function useKeywordEvents(): UseKeywordEventsApi {
             stepIds.forEach((id, i) => { labelById.set(id, labels[i] ?? ""); });
             setEvents(prev => prev.map(e => {
                 if (e.Id !== eventId) return e;
+
                 return {
                     ...e,
                     Steps: e.Steps.map(s => {
@@ -255,8 +263,10 @@ export function useKeywordEvents(): UseKeywordEventsApi {
                         if (trimmed.length === 0) {
                             const { LabelType: _drop, ...rest } = s as KeywordEventStep & { LabelType?: string };
                             void _drop;
+
                             return rest as KeywordEventStep;
                         }
+
                         return { ...s, LabelType: trimmed } as KeywordEventStep;
                     }),
                 };
@@ -274,6 +284,7 @@ export function useKeywordEvents(): UseKeywordEventsApi {
             const next = [...prev];
             const [moved] = next.splice(fromIdx, 1);
             next.splice(toIdx, 0, moved);
+
             return next;
         });
     }, []);

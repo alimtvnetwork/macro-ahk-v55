@@ -135,6 +135,7 @@ function buildValueInput(filter: FilterState | null | undefined): HTMLInputEleme
   input.className = 'marco-db-filter-input';
   input.placeholder = 'Filter value…';
   input.value = filter?.value || '';
+
   return input;
 }
 
@@ -212,5 +213,6 @@ function buildActiveFilterBadge(
   };
 
   badge.appendChild(clearButton);
+
   return badge;
 }

@@ -15,6 +15,7 @@ interface PromptBundle {
 function readBundle(path: string): PromptBundleEntry[] {
   const text = readFileSync(path, 'utf8');
   const parsed = JSON.parse(text) as PromptBundle;
+
   return Array.isArray(parsed.prompts) ? parsed.prompts : [];
 }
 

@@ -42,6 +42,7 @@ async function loadChains(project: string): Promise<AutomationChain[]> {
       type: "GET_AUTOMATION_CHAINS",
       project,
     });
+
     return result.isOk && result.chains ? result.chains : [];
   } catch {
     return [];
@@ -54,6 +55,7 @@ async function saveChainToDb(chain: Partial<AutomationChain>, project: string): 
     project,
     chain,
   } as any);
+
   return result.isOk;
 }
 
@@ -63,6 +65,7 @@ async function deleteChainFromDb(chainId: string, project: string): Promise<bool
     project,
     chainId,
   } as any);
+
   return result.isOk;
 }
 
@@ -72,6 +75,7 @@ async function toggleChainInDb(chainId: string, project: string): Promise<boolea
     project,
     chainId,
   } as any);
+
   return result.isOk;
 }
 
@@ -81,6 +85,7 @@ async function importChainsToDb(chains: AutomationChain[], project: string): Pro
     project,
     chains,
   } as any);
+
   return result.imported ?? 0;
 }
 
@@ -96,6 +101,7 @@ async function loadProjects(): Promise<Array<{ id: string; name: string; slug: s
         slug: p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       }));
     }
+
     return [];
   } catch {
     return [];
@@ -151,6 +157,7 @@ export function AutomationView() {
       notify(detail.message);
     };
     window.addEventListener("automation-notify", handler);
+
     return () => window.removeEventListener("automation-notify", handler);
   }, []);
 
@@ -362,6 +369,7 @@ export function AutomationView() {
               ) : null}
               {!loading && chains.map((chain) => {
                 const flat = flattenSteps(chain.steps);
+
                 return (
                   <Card key={chain.id} className={!chain.enabled ? "opacity-60" : ""}>
                     <CardContent className="p-4 space-y-3">
@@ -407,6 +415,7 @@ export function AutomationView() {
                       <div className="flex flex-wrap gap-1.5">
                         {flat.map((fs, i) => {
                           const meta = STEP_TYPE_META[fs.step.type];
+
                           return (
                             <Badge key={i} variant="outline" className="text-[9px] gap-1" style={{ marginLeft: fs.depth * 8 }}>
                               {meta.icon} {meta.label}

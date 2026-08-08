@@ -63,5 +63,6 @@ export function buildRelativeXPath(
     }
 
     const tail = fullFromDocument.slice(fullFromAnchor.length + 1);
+
     return "./" + tail;
 }

@@ -45,6 +45,7 @@ export function ChainSettingsRow(props: ChainSettingsRowProps): JSX.Element {
         settings, onChange, enabledCount, running, progress, autoRunActive,
         runShortcutLabel, stopShortcutLabel, onRun, onCancel,
     } = props;
+
     return (
         <div
             className={cn(
@@ -93,6 +94,7 @@ function ChainToggleHeader(props: ChainToggleHeaderProps): JSX.Element {
         settings, onChange, enabledCount, running, progress, autoRunActive,
         runShortcutLabel, stopShortcutLabel, onRun, onCancel,
     } = props;
+
     return (
         <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-2">
@@ -176,6 +178,7 @@ function ChainRunControls(props: ChainRunControlsProps): JSX.Element {
             </Button>
         );
     }
+
     return (
         <Button
             size="sm"
@@ -217,6 +220,7 @@ interface ChainPauseRowProps {
 function ChainPauseRow(props: ChainPauseRowProps): JSX.Element {
     const { settings, onChange, running } = props;
     const pauseDraft = String(settings.PauseMs);
+
     return (
         <div className="flex items-center gap-3">
             <LabelType htmlFor="kev-chain-pause" className="text-xs text-muted-foreground shrink-0">
@@ -260,6 +264,7 @@ interface ChainAfterRecordingRowProps {
 
 function ChainAfterRecordingRow(props: ChainAfterRecordingRowProps): JSX.Element {
     const { settings, onChange } = props;
+
     return (
         <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">

@@ -28,12 +28,14 @@ export function createMenuItem(ctx: MenuCtx, icon: string, label: string, title:
     ctx.menuDropdown.style.display = 'none';
     onclick();
   };
+
   return item;
 }
 
 export function createMenuSep(): HTMLElement {
   const sep = document.createElement('div');
   sep.style.cssText = 'height:1px;background:' + cSeparator + ';margin:3px 8px;opacity:0.4;';
+
   return sep;
 }
 

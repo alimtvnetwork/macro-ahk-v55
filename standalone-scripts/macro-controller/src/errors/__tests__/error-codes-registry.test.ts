@@ -60,6 +60,7 @@ function synthContext(entry: ErrorCodeEntry): Record<string, string | number | b
       context[key] = 'test-' + key;
     }
   }
+
   return context;
 }
 
@@ -75,7 +76,6 @@ describe('ERROR_CODES registry — frozen object invariants', () => {
     'use strict';
     expect(() => {
       (ERROR_CODES as unknown as Record<string, unknown>).INJECTED_E001 = { code: 'INJECTED_E001' };
-
     }).toThrow();
   });
 

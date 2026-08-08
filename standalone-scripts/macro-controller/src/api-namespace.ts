@@ -47,7 +47,6 @@ export type {
   NsPathMap,
 } from './api-namespace-types';
 
-
 /* ------------------------------------------------------------------ */
 /*  Namespace resolution                                               */
 /* ------------------------------------------------------------------ */
@@ -124,6 +123,7 @@ function ensureMutableBranch<T extends object>(node: T): T {
         n[key] = { ...(child as Record<string, unknown>) };
       }
     }
+
     return node;
   }
   // Whole node frozen — shallow clone, then heal children.
@@ -134,6 +134,7 @@ function ensureMutableBranch<T extends object>(node: T): T {
       clone[key] = { ...(child as Record<string, unknown>) };
     }
   }
+
   return clone as unknown as T;
 }
 
@@ -158,6 +159,7 @@ export function getNamespace(): MacroControllerNamespace | null {
       calledBy: 'getNamespace() @ api-namespace.ts',
       reason: 'SDK script (marco-sdk.js) has not executed yet in this MAIN-world context',
     }));
+
     return null;
   }
   const isMissingProjects = !root.Projects;
@@ -168,6 +170,7 @@ export function getNamespace(): MacroControllerNamespace | null {
       calledBy: 'getNamespace() @ api-namespace.ts',
       reason: 'SDK initialized but Projects container missing — likely a partial SDK build',
     }));
+
     return null;
   }
 
@@ -206,6 +209,7 @@ export function getNamespace(): MacroControllerNamespace | null {
     mc.meta.displayName = 'Macro Controller';
 
     nsCache.ns = mc;
+
     return nsCache.ns;
   } catch (e) {
     const diag = buildNamespaceDiagnostic({
@@ -218,6 +222,7 @@ export function getNamespace(): MacroControllerNamespace | null {
     logError('getNamespace', diag, e);
     // Single toast — short user-visible summary, full diagnostic stays in the log.
     showToast('❌ [MacroController v' + VERSION + '] Namespace blocked at Projects.MacroController — see console for full diagnostic.', 'error');
+
     return null;
   }
 }
@@ -277,6 +282,7 @@ export function nsReadTyped<P extends keyof NsPathMap>(path: P): NsPathMap[P] | 
     if (section === '_internal') {
       return ns._internal[key as keyof MacroControllerInternal] as NsPathMap[P] | undefined;
     }
+
     return ns.api[key as keyof MacroControllerApi] as NsPathMap[P] | undefined;
   }
 
@@ -286,6 +292,7 @@ export function nsReadTyped<P extends keyof NsPathMap>(path: P): NsPathMap[P] | 
   if (target && typeof target === 'object') {
     return (target as Record<string, unknown>)[key] as NsPathMap[P] | undefined;
   }
+
   return undefined;
 }
 
@@ -302,6 +309,7 @@ export function nsCallTyped<P extends keyof NsPathMap>(
   if (typeof fn === 'function') {
     return (fn as (...a: unknown[]) => unknown)(...args) as NsPathMap[P] extends (...a: never[]) => infer R ? R | undefined : undefined;
   }
+
   return undefined as NsPathMap[P] extends (...a: never[]) => infer R ? R | undefined : undefined;
 }
 

@@ -37,6 +37,7 @@ function copyToClipboard(value: string, label: string): void {
   const isMissingValue = !value;
   if (isMissingValue) {
     showToast('⚠️ Nothing to copy', 'info');
+
     return;
   }
   const preview = value.length > 40 ? value.slice(0, 37) + '…' : value;
@@ -47,6 +48,7 @@ function copyToClipboard(value: string, label: string): void {
     nav.clipboard.writeText(value).then(onOk).catch(function (err: unknown) {
       onFail(err instanceof Error ? err.message : String(err));
     });
+
     return;
   }
   try {
@@ -68,6 +70,7 @@ function copyToClipboard(value: string, label: string): void {
 function csvField(value: string | number): string {
   const s = value == null ? '' : String(value);
   if (/[",\r\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+
   return s;
 }
 
@@ -81,6 +84,7 @@ function exportMembersCsv(wsName: string, members: WorkspaceMember[]): void {
   const isMissingLength = !members.length;
   if (isMissingLength) {
     showToast('⚠️ No members to export', 'info');
+
     return;
   }
   const headers = [
@@ -141,6 +145,7 @@ function escHtml(s: string): string {
 function fmtNumber(n: number): string {
   if (!Number.isFinite(n)) return '0';
   if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+
   // Show up to 2 decimals only when fractional part is non-trivial.
   return n % 1 === 0 ? String(Math.round(n)) : n.toFixed(1);
 }
@@ -159,6 +164,7 @@ function roleBadge(role: string): string {
     color = '#cbd5e1';
     bg = 'rgba(71,85,105,0.30)';
   }
+
   return '<span style="font-size:9px;color:' + color
     + ';background:' + bg
     + ';padding:1px 5px;border-radius:3px;font-weight:700;letter-spacing:0.3px;text-transform:uppercase;">'
@@ -171,6 +177,7 @@ function initialsFor(m: WorkspaceMember): string {
   const parts = src.split(/[\s@._-]+/).filter(Boolean);
   if (parts.length === 0) return '?';
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+
   return (parts[0][0] + parts[1][0]).toUpperCase();
 }
 
@@ -180,6 +187,7 @@ function avatarBgFor(m: WorkspaceMember): string {
   let h = 0;
   for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
   const hue = h % 360;
+
   return 'hsl(' + hue + ',45%,32%)';
 }
 
@@ -209,6 +217,7 @@ function shareBarHtml(pct: number): string {
   if (clamped >= 40) fill = '#f59e0b';
   else if (clamped >= 20) fill = '#10b981';
   else if (clamped >= 5) fill = '#0ea5e9';
+
   return '<div title="Share of loaded members\u2019 total credits: ' + label + '" '
     + 'style="display:flex;align-items:center;gap:6px;padding-left:42px;margin-top:2px;">'
     +   '<div style="flex:1;height:4px;background:rgba(148,163,184,0.15);border-radius:2px;overflow:hidden;">'
@@ -275,6 +284,7 @@ function buildBodyHtml(state: PanelState): string {
     return acc + (Number.isFinite(m.total_credits_used) ? m.total_credits_used : 0);
   }, 0);
   const rows = state.members.map(function (m, i) { return memberRowHtml(m, i, sumLoaded); }).join('');
+
   return '<div style="max-height:380px;overflow-y:auto;">' + rows + loadMoreRowHtml(state) + '</div>';
 }
 
@@ -283,6 +293,7 @@ function loadMoreRowHtml(state: PanelStateSuccess): string {
   if (nextLimit === null) return '';
   if (state.members.length >= state.total) return '';
   const label = 'Load more (top ' + nextLimit + ' of ' + state.total + ')';
+
   return '<button type="button" data-marco-action="load-more" '
     + 'style="display:block;width:calc(100% - 16px);margin:8px;padding:6px 10px;'
     + 'background:rgba(0,122,204,0.18);color:#bae6fd;border:1px dashed ' + cPrimary + ';'
@@ -295,6 +306,7 @@ function nextPageLimit(current: number): number | null {
   for (const step of MEMBERS_PAGE_LIMIT_STEPS) {
     if (step > current) return step;
   }
+
   return null;
 }
 
@@ -309,6 +321,7 @@ function headerHtml(wsName: string, state: PanelState): string {
   } else {
     countText = 'error';
   }
+
   // v3.4.3 (task 11) — Rename-style popup chrome: compact header "Members — <ws>" + ×
   return '<div data-marco-drag-handle="1" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid ' + cPanelBorder + ';background:rgba(0,0,0,0.25);cursor:move;user-select:none;">'
     + '<div style="min-width:0;">'
@@ -406,6 +419,7 @@ function ensurePanelEl(): HTMLDivElement {
     'transition:opacity 120ms ease-out, transform 120ms ease-out',
   ].join(';') + ';';
   document.body.appendChild(el);
+
   return el;
 }
 
@@ -506,6 +520,7 @@ function buildMenuItem(label: string, color: string, onClick: () => void): HTMLB
     closeMemberActionMenu();
     onClick();
   };
+
   return btn;
 }
 
@@ -550,6 +565,7 @@ function performPromoteDemote(panelEl: HTMLElement, wsId: string, wsName: string
 function cssEscape(value: string): string {
   const css = (window as unknown as { CSS?: { escape?: (s: string) => string } }).CSS;
   if (css && typeof css.escape === 'function') return css.escape(value);
+
   return value.replace(/[^a-zA-Z0-9_-]/g, function (ch) { return '\\' + ch; });
 }
 
@@ -625,6 +641,7 @@ function submitInvite(el: HTMLElement, wsId: string, wsName: string, form: HTMLF
   
   if (validEmails.length === 0) {
     showToast('⚠️ No valid emails to invite', 'info');
+
     return;
   }
 
@@ -655,7 +672,6 @@ function submitInvite(el: HTMLElement, wsId: string, wsName: string, form: HTMLF
   })();
 }
 
-
 // eslint-disable-next-line max-lines-per-function
 function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): void {
   el.onclick = function (e: MouseEvent): void {
@@ -684,6 +700,7 @@ function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): vo
       const latest = store._marcoMembersLatest;
       if (!latest || latest.members.length === 0) {
         showToast('⏳ Members not loaded yet', 'info');
+
         return;
       }
       exportMembersCsv(latest.wsName, latest.members);
@@ -794,7 +811,6 @@ function loadAndRender(el: HTMLElement, wsId: string, wsName: string): void {
     });
 }
 
-
 /** Silent refetch — used by the credit-poll subscription. Skips loading state. */
 function silentRefresh(el: HTMLElement, wsId: string, wsName: string): void {
   const store = el as HTMLElement & PanelHandlerStore;
@@ -810,7 +826,6 @@ function silentRefresh(el: HTMLElement, wsId: string, wsName: string): void {
       render(el, wsName, { kind: 'success', members: entry.members, total: entry.total, limit: limit });
     })
     .catch(function (err: unknown) {
-
       const msg = err instanceof Error ? err.message : String(err);
       logError('WsMembersPanel', 'Auto-refresh failed for ' + wsId + ': ' + msg);
     })

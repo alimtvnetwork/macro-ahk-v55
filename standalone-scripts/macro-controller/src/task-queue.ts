@@ -45,6 +45,7 @@ export async function loadTaskQueue(): Promise<TaskQueueState> {
     const isMissingHistory = !stateData.history;
     if (isMissingHistory) stateData.history = [];
     log(`[TaskQueue] Loaded ${stateData.tasks.length} tasks and ${stateData.history.length} history items for project ${projectId}`, 'info');
+
     return stateData;
   }
 
@@ -90,6 +91,7 @@ export async function addTaskToQueue(prompt: string, projectName: string): Promi
   await saveTaskQueue(queueState);
 
   log(`[TaskQueue] Added task to queue: ${prompt.substring(0, 30)}...`, 'success');
+
   return newTask;
 }
 
@@ -241,8 +243,6 @@ export async function bulkRetryTasks(taskIds: string[]): Promise<void> {
     log(`[TaskQueue] Bulk re-queued ${count} tasks`, 'info');
   }
 }
-
-
 
 /**
  * Shared queue delay countdown state.

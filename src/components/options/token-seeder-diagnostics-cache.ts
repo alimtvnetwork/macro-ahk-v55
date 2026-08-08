@@ -37,6 +37,7 @@ const MAX_STALE_GRACE_MS = 5 * 60_000; // 5 minutes
 function getStorage(): Storage | null {
     try {
         if (typeof window === "undefined") return null;
+
         return window.localStorage;
     } catch {
         return null;
@@ -64,6 +65,7 @@ export function loadDiagnosticsCache(): TokenSeederDiagnosticsCache | null {
             now - maxLastFailure > cooldown + MAX_STALE_GRACE_MS
         ) {
             storage.removeItem(STORAGE_KEY);
+
             return null;
         }
 
@@ -79,6 +81,7 @@ export function saveDiagnosticsCache(snapshot: TokenSeederDiagnosticsCache | nul
     try {
         if (!snapshot || snapshot.targets.length === 0) {
             storage.removeItem(STORAGE_KEY);
+
             return;
         }
         storage.setItem(STORAGE_KEY, JSON.stringify(snapshot));

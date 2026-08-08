@@ -12,5 +12,6 @@
 export function escapeHtml(text: string): string {
   const container = document.createElement('div');
   container.textContent = text;
+
   return container.innerHTML;
 }

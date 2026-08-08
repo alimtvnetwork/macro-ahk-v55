@@ -119,6 +119,7 @@ export function clearTabDecision(tabId: number): void {
  */
 export function isSameDecisionFingerprint(tabId: number, urlFp: string): boolean {
     const cached = tabDecisionCache.get(tabId);
+
     return cached !== undefined && cached.urlFp === urlFp;
 }
 

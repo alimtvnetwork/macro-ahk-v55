@@ -34,6 +34,7 @@ function getResultIcon(result: InjectionResultEntry): string {
     if (result.skipReason === "disabled") return "⏸️";
     if (result.skipReason === "missing") return "🔍";
     if (result.skipReason === "resolver_mismatch") return "⚠️";
+
     return "❌";
 }
 
@@ -46,6 +47,7 @@ const SKIP_LABELS: Record<string, string> = {
 function getRowClass(result: InjectionResultEntry): string {
     if (result.isSuccess) return "injection-result-row";
     if (result.skipReason) return "injection-result-row injection-result-row--skipped";
+
     return "injection-result-row injection-result-row--failed";
 }
 

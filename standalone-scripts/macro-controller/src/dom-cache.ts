@@ -13,7 +13,6 @@ import { logError } from './error-utils';
  * See: spec/04-macro-controller/ts-migration-v2/04-performance-logging.md
  */
 
-
 interface CacheEntry {
   element: Node | null;
   timestamp: number;
@@ -45,6 +44,7 @@ class DomCache {
       // Verify element is still in DOM
       if (cached.element === null || (cached.element instanceof Element && document.contains(cached.element))) {
         this._hits++;
+
         return cached.element;
       }
       // Element was removed from DOM — invalidate this entry
@@ -55,9 +55,11 @@ class DomCache {
     try {
       const el = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
       this._cache.set(xpath, { element: el, timestamp: Date.now() });
+
       return el;
     } catch (e: unknown) {
       logError('DomCache.getOne', 'XPath evaluation failed', e);
+
       return null;
     }
   }
@@ -70,6 +72,7 @@ class DomCache {
     const cached = this._cacheMulti.get(xpath);
     if (cached && Date.now() - cached.timestamp < this._ttlMs) {
       this._hits++;
+
       return cached.elements;
     }
 
@@ -86,9 +89,11 @@ class DomCache {
         }
       }
       this._cacheMulti.set(xpath, { elements: nodes, timestamp: Date.now() });
+
       return nodes;
     } catch (e: unknown) {
       logError('DomCache.getAll', 'XPath multi-evaluation failed', e);
+
       return [];
     }
   }
@@ -100,6 +105,7 @@ class DomCache {
     if (cached && Date.now() - cached.timestamp < this._ttlMs) {
       if (cached.element === null || (cached.element instanceof Element && document.contains(cached.element))) {
         this._hits++;
+
         return cached.element as Element | null;
       }
       this._cache.delete(key);
@@ -108,6 +114,7 @@ class DomCache {
     this._misses++;
     const el = document.querySelector(selector);
     this._cache.set(key, { element: el, timestamp: Date.now() });
+
     return el;
   }
 
@@ -118,6 +125,7 @@ class DomCache {
     if (cached && Date.now() - cached.timestamp < this._ttlMs) {
       if (cached.element === null || (cached.element instanceof Element && document.contains(cached.element))) {
         this._hits++;
+
         return cached.element as HTMLElement | null;
       }
       this._cache.delete(key);
@@ -126,6 +134,7 @@ class DomCache {
     this._misses++;
     const el = document.getElementById(id);
     this._cache.set(key, { element: el, timestamp: Date.now() });
+
     return el;
   }
 
@@ -149,6 +158,7 @@ class DomCache {
   /** Get cache hit/miss stats */
   stats(): { hits: number; misses: number; ratio: string; size: number; ttlMs: number } {
     const total = this._hits + this._misses;
+
     return {
       hits: this._hits,
       misses: this._misses,

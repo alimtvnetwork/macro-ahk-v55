@@ -28,6 +28,7 @@ function tryPrimaryXPath(): HTMLElement | null {
             XPathResult.FIRST_ORDERED_NODE_TYPE,
             null,
         ).singleNodeValue;
+
         return node instanceof HTMLElement ? node : null;
     } catch {
         return null;
@@ -50,6 +51,7 @@ function tryHeaderWalk(): HTMLElement | null {
             return inner;
         }
     }
+
     return null;
 }
 
@@ -70,6 +72,7 @@ function tryAriaWalk(): HTMLElement | null {
     if (header === null) {
         return null;
     }
+
     return header.querySelector<HTMLElement>('span');
 }
 
@@ -86,6 +89,7 @@ function resolveCountSpan(): CountSpanResult {
     if (ariaWalk !== null) {
         return { element: ariaWalk, strategy: 'fallback-aria-walk' };
     }
+
     return { element: null, strategy: 'none' };
 }
 
@@ -124,6 +128,7 @@ export function readQueueCountDetailed(): QueueCountReadResult {
     if (parsed < 0) {
         return { count: null, strategy: resolved.strategy, rawText, parseWarning: 'negative' };
     }
+
     return { count: parsed, strategy: resolved.strategy, rawText, parseWarning: null };
 }
 

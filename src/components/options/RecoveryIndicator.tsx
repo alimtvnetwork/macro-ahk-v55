@@ -18,6 +18,7 @@ export function RecoveryIndicator() {
       if (timerRef.current !== null) clearTimeout(timerRef.current);
       timerRef.current = window.setTimeout(() => setStatus("synced"), 800);
     };
+
     return () => {
       channel.close();
       if (timerRef.current !== null) clearTimeout(timerRef.current);

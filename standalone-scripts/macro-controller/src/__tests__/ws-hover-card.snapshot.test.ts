@@ -69,6 +69,7 @@ function extractSubscriptionSection(html: string): string {
   // Find the next section header div (font-size:9px ... uppercase) or end.
   const NEXT_HEADER_MARKER = 'font-size:9px;font-weight:700';
   const nextHeaderIdx = html.indexOf(NEXT_HEADER_MARKER, headerIdx + headerToken.length);
+
   return nextHeaderIdx === -1
     ? html.slice(sectionOpen)
     : html.slice(sectionOpen, html.lastIndexOf('<div', nextHeaderIdx));

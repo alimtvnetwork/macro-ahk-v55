@@ -161,6 +161,7 @@ interface StepRowItemProps {
 
 function StepRowItem(props: StepRowItemProps): JSX.Element {
     const { step: s, ordinal, onToggle } = props;
+
     return (
         <li
             className={`flex items-start gap-3 px-4 py-3 transition-opacity ${

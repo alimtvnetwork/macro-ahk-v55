@@ -24,6 +24,7 @@ function installKv(): void {
             kv: {
                 get: async (key: string) => {
                     calls.push({ op: 'get', key });
+
                     return store.get(key) ?? null;
                 },
                 set: async (key: string, value: string) => {

@@ -43,6 +43,7 @@ export function readSentinel(): SentinelSnapshot | null {
         const projectIds = projectsCsv.length > 0
             ? projectsCsv.split(",").filter((s) => s.length > 0)
             : [];
+
         return {
             fingerprint,
             projectIds,

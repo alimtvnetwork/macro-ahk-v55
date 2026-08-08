@@ -37,11 +37,13 @@ export async function enforceSingleDefaultPerRole(role: PromptRole, keepId: numb
     if (!isPromptRole(role)) {
         const err = 'enforceSingleDefaultPerRole: invalid role ' + String(role);
         logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role: String(role), keepId, stage: 'validate-role', reason: 'invalid role' });
+
         return new ServiceResult(false, undefined, err);
     }
     if (!Number.isInteger(keepId) || keepId <= 0) {
         const err = 'enforceSingleDefaultPerRole: keepId must be a positive integer, got ' + String(keepId);
         logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role, keepId: String(keepId), stage: 'validate-keepId', reason: 'keepId must be a positive integer' });
+
         return new ServiceResult(false, undefined, err);
     }
 
@@ -59,6 +61,7 @@ export async function enforceSingleDefaultPerRole(role: PromptRole, keepId: numb
         const reason = resp?.errorMessage || 'unknown error';
         const message = 'enforceSingleDefaultPerRole failed: ' + reason;
         logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role, keepId, stage: 'rawSql', reason });
+
         return new ServiceResult(false, undefined, message);
     } catch (err) {
         logError("AutoCatch", "Unhandled exception", err);

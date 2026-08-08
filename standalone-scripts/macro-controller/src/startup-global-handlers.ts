@@ -64,6 +64,7 @@ export function setupGlobalErrorHandlers(): void {
       if (isMissingRunning) {
         log('Hotkey: Loop is not running — cannot resume queue', 'warn');
         showToast('Loop must be ON to resume queue', 'warn');
+
         return;
       }
 
@@ -71,6 +72,7 @@ export function setupGlobalErrorHandlers(): void {
       if (hasReturnButton) {
         log('Hotkey: Cannot resume while "Return to Extension" button is present', 'warn');
         showToast('Close the extension overlay first', 'warn');
+
         return;
       }
 

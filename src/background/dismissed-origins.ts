@@ -100,6 +100,7 @@ export function isOriginDismissedForTab(tabId: number, url: string): boolean {
     if (origin === "") return false;
     if (dismissedPersistent.has(origin)) return true;
     const set = dismissedByTab.get(tabId);
+
     return set !== undefined && set.has(origin);
 }
 
@@ -146,6 +147,7 @@ export async function unpersistDismissOrigin(url: string): Promise<void> {
 /** Read-only snapshot of persisted origins (for Options UI listings). */
 export async function listPersistedDismissedOrigins(): Promise<string[]> {
     await hydratePersistent();
+
     return Array.from(dismissedPersistent).sort();
 }
 
@@ -170,5 +172,6 @@ export function _debugDumpDismissed(): {
     for (const [tabId, set] of dismissedByTab.entries()) {
         perTab[tabId] = Array.from(set);
     }
+
     return { perTab, persistent: Array.from(dismissedPersistent) };
 }

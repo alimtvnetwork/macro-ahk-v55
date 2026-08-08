@@ -16,6 +16,7 @@ vi.mock('../credit-balance-update/credit-balance-fetcher', () => ({
 vi.mock('../settings-store', () => ({
     onSettingsChange: (fn: (overrides: { creditFetchDelayMs?: number }) => void) => {
         settingsListeners.push(fn);
+
         return () => {
             const idx = settingsListeners.indexOf(fn);
             if (idx >= 0) settingsListeners.splice(idx, 1);

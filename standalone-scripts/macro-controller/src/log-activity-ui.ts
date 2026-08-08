@@ -61,6 +61,7 @@ function _buildLogEntryHtml(entry: ActivityLogEntry): string {
   }
   html += entry.message;
   html += '</div>';
+
   return html;
 }
 
@@ -73,6 +74,7 @@ export function updateActivityLogUI(didTrim: boolean): void {
   if (total === 0) {
     logContainer.innerHTML = '<div style="color:' + cLogTimestamp + ';font-size:' + tFontSm + ';padding:8px;">No activity logs yet</div>';
     logRenderState.count = 0;
+
     return;
   }
 
@@ -83,6 +85,7 @@ export function updateActivityLogUI(didTrim: boolean): void {
     }
     logContainer.innerHTML = html;
     logRenderState.count = total;
+
     return;
   }
 

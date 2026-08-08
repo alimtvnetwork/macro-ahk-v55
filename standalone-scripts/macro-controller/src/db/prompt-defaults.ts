@@ -32,6 +32,7 @@ export const REPLACE_KEY_RE = /^[A-Za-z_][A-Za-z0-9_]{0,31}$/;
 export function validateReplaceKey(key: string): string | null {
     if (typeof key !== 'string') return 'replaceKey must be a string';
     if (!REPLACE_KEY_RE.test(key)) return 'replaceKey must match ' + REPLACE_KEY_RE.source;
+
     return null;
 }
 
@@ -50,6 +51,7 @@ export function normalizeReplaceValues(input: readonly unknown[]): string[] | nu
         seen.add(trimmed);
         out.push(trimmed);
     }
+
     return out.length > 0 ? out : null;
 }
 
@@ -64,6 +66,7 @@ export function decodeReplaceValues(raw: unknown): string[] {
     try {
         const parsed = JSON.parse(raw);
         const normalized = normalizeReplaceValues(Array.isArray(parsed) ? parsed : []);
+
         return normalized ?? [...REPLACE_VALUES_DEFAULT];
     } catch {
         return [...REPLACE_VALUES_DEFAULT];

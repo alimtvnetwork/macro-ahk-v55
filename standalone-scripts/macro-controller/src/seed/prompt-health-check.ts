@@ -57,6 +57,7 @@ function inspectRow(role: PromptRole, slug: string, row: PromptRow | undefined, 
   const isMissingRow = !row;
   if (isMissingRow) {
     issues.push({ role, slug, code: 'row-missing', detail: 'no default row for role=' + role });
+
     return;
   }
   if (row.IsDefault !== 1) {
@@ -67,6 +68,7 @@ function inspectRow(role: PromptRole, slug: string, row: PromptRow | undefined, 
   }
   if (typeof row.Body !== 'string' || row.Body.trim().length === 0) {
     issues.push({ role, slug: row.Slug, code: 'body-empty', detail: 'Body is empty on row id=' + row.Id });
+
     return; // no point checking token drift on empty body
   }
   const required = getRequiredTokensForRole(role);
@@ -122,6 +124,7 @@ export async function runPromptHealthCheck(opts: RunHealthCheckOptions = {}): Pr
   }
   const report: PromptHealthReport = { ok: issues.length === 0, checkedAt: Date.now(), issues };
   publishReport(report, opts.silent === true);
+
   return report;
 }
 
@@ -140,6 +143,7 @@ function publishReport(report: PromptHealthReport, silent: boolean): void {
 
   if (report.ok) {
     emitPromptSeedEvent({ event: 'health.default.ok', role: 'generic', outcome: 'ok', detail: 'all defaults healthy' });
+
     return;
   }
 

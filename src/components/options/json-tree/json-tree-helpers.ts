@@ -23,6 +23,7 @@ export function isObject(jsonValue: JsonValue): jsonValue is JsonObject {
 export function isPrimitive(jsonValue: JsonValue): jsonValue is string | number | boolean | null {
   const isObj = isObject(jsonValue);
   const isArr = Array.isArray(jsonValue);
+
   return !isObj && !isArr;
 }
 
@@ -34,6 +35,7 @@ export function formatPrimitive(jsonValue: JsonValue): string {
   const isString = typeof jsonValue === "string";
   if (isString) {
     const isEmpty = jsonValue === "";
+
     return isEmpty ? '""' : `"${jsonValue}"`;
   }
 
@@ -125,6 +127,7 @@ function setArrayChild(
 
   if (isDirectChild) {
     newArr[idx] = value;
+
     return newArr;
   }
 
@@ -147,6 +150,7 @@ export function deleteNestedKey(
 
   if (isTopLevel) {
     const { [path[0]]: _, ...rest } = root;
+
     return rest;
   }
 
@@ -230,6 +234,7 @@ function renameTopLevelKey(
 ): JsonObject {
   const entries = Object.entries(root).map(([k, v]) => {
     const isTarget = k === oldKey;
+
     return isTarget
       ? [newKey, v] as [string, JsonValue]
       : [k, v] as [string, JsonValue];

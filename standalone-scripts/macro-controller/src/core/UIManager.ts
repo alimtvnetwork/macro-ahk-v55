@@ -15,7 +15,6 @@ import { log } from '../logger';
 import { logError } from '../error-utils';
 
 export class UIManager implements UIManagerInterface {
-
   private _createFn: (() => void) | null = null;
 
   /**

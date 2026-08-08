@@ -43,6 +43,7 @@ function findEditorByXPath(xpath: string): HTMLElement | null {
             }
             el = el.parentElement as HTMLElement;
         }
+
         return null;
     } catch {
         return null;
@@ -70,6 +71,7 @@ function findTiptapEditor(chatBoxXPath?: string): HTMLElement | null {
         const el = document.querySelector<HTMLElement>(sel);
         if (el) return el;
     }
+
     return null;
 }
 
@@ -134,6 +136,7 @@ function appendToEditor(editor: HTMLElement, text: string): boolean {
             appendToContentEditable(editor, text);
         }
         console.log(`[Marco] Prompt appended (${text.length} chars)`);
+
         return true;
     } catch (err) {
         logError(
@@ -141,6 +144,7 @@ function appendToEditor(editor: HTMLElement, text: string): boolean {
             `Prompt append failed\n  Path: DOM target element (contenteditable/textarea/ProseMirror)\n  Missing: Successful text insertion of ${text.length} chars\n  Reason: ${err instanceof Error ? err.message : String(err)} - DOM element may not be found or not editable`,
             err,
         );
+
         return false;
     }
 }
@@ -186,6 +190,7 @@ function triggerSubmit(): boolean {
     if (btn) {
         console.log("[Marco] Auto-submit: clicking send button");
         btn.click();
+
         return true;
     }
 
@@ -200,6 +205,7 @@ function triggerSubmit(): boolean {
             bubbles: true,
             cancelable: true,
         }));
+
         return true;
     }
 
@@ -288,6 +294,7 @@ async function bootstrap(): Promise<void> {
             `Failed to read session storage\n  Path: chrome.storage.session.${PROMPT_ARGS_KEY}\n  Missing: pending args object\n  Reason: ${err instanceof Error ? err.message : String(err)}`,
             err,
         );
+
         return;
     }
 

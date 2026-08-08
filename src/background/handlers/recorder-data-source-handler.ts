@@ -84,5 +84,6 @@ export async function handleRecorderDataSourceList(
     }
 
     const dataSources = await listDataSources(req.projectSlug);
+
     return { dataSources };
 }

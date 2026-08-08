@@ -182,5 +182,6 @@ export function flattenSteps(steps: ChainStep[], depth = 0): FlattenedStep[] {
       for (const s of step.else) result.push({ step: s, depth: depth + 1, branchLabel: "else" });
     }
   }
+
   return result;
 }

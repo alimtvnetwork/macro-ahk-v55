@@ -63,6 +63,7 @@ function readLegacyOrder(): string[] {
       logError("AutoCatch", "Unhandled exception", err);
     }
   }
+
   return [];
 }
 
@@ -90,9 +91,9 @@ export function migrateSavedOrder(saved: readonly string[]): string[] {
   for (const slug of defaults.slice(0, defaults.length - terminalCount)) {
     if (!seen.has(slug)) { kept.push(slug); seen.add(slug); }
   }
+
   return [...kept, ...terminal];
 }
-
 
 /**
  * Canonical default ordering for built-in prompts.
@@ -141,6 +142,7 @@ export function loadPromptOrder(): string[] {
     const isMissingRaw = !raw;
     if (isMissingRaw) return [];
     const parsed: unknown = JSON.parse(raw);
+
     return Array.isArray(parsed) ? parsed.filter((v): v is string => typeof v === 'string') : [];
   } catch {
     return [];
@@ -164,6 +166,7 @@ export function resetPromptOrderToDefault(): string[] {
   const copy = DEFAULT_PROMPT_ORDER.slice();
   savePromptOrder(copy);
   clearDragTouched();
+
   return copy;
 }
 
@@ -176,6 +179,7 @@ function loadDragTouched(): Set<string> {
     if (isMissingRaw) return new Set();
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return new Set();
+
     return new Set(parsed.filter((v): v is string => typeof v === 'string'));
   } catch {
     return new Set();
@@ -232,6 +236,7 @@ export function getSlugPositionSource(slug: string): SlugPositionInfo {
   if (saved.length === 0 || index < 0) source = 'default';
   else if (touched.has(slug)) source = 'drag';
   else source = 'migrated';
+
   return { source, storageKey: STORAGE_KEY, migrationRev, currentRev: CURRENT_MIGRATION_REV, index };
 }
 
@@ -242,6 +247,7 @@ export function getSlugPositionSource(slug: string): SlugPositionInfo {
  */
 export function getEffectivePromptOrder(): string[] {
   const saved = loadPromptOrder();
+
   return saved.length > 0 ? saved : DEFAULT_PROMPT_ORDER.slice();
 }
 
@@ -265,6 +271,7 @@ export function getPromptOrderSource(): PromptOrderSource {
     logError("AutoCatch", "Unhandled exception", err);
   }
   const usingSaved = saved.length > 0;
+
   return {
     source: usingSaved ? 'localStorage' : 'default',
     storageKey: STORAGE_KEY,
@@ -285,6 +292,7 @@ export function sortEntriesByOrder<T extends PromptEntry>(entries: T[]): T[] {
   order.forEach((slug, idx) => rank.set(slug, idx));
   const tagged = entries.map((entry, idx) => ({ entry, idx, r: rank.get(entryKey(entry)) }));
   tagged.sort(compareOrderedEntries);
+
   return tagged.map(t => t.entry);
 }
 
@@ -295,6 +303,7 @@ function compareOrderedEntries<T extends PromptEntry>(
   if (a.r === undefined && b.r === undefined) return a.idx - b.idx;
   if (a.r === undefined) return 1;
   if (b.r === undefined) return -1;
+
   return a.r - b.r;
 }
 
@@ -345,6 +354,7 @@ function handleDragOver(event: DragEvent, item: HTMLElement): void {
 
 function shouldInsertBefore(event: DragEvent, item: HTMLElement): boolean {
   const rect = item.getBoundingClientRect();
+
   return (event.clientY - rect.top) < rect.height / 2;
 }
 
@@ -412,6 +422,7 @@ function persistDomOrder(root: HTMLElement): void {
 
 function mergeOrder(existing: string[], domSlugs: string[], seenInDom: Set<string>): string[] {
   const tail = existing.filter(slug => !seenInDom.has(slug));
+
   return [...domSlugs, ...tail];
 }
 

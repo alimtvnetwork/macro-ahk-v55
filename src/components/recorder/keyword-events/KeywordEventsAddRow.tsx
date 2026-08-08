@@ -15,6 +15,7 @@ export interface KeywordEventsAddRowProps {
 
 export function KeywordEventsAddRow(props: KeywordEventsAddRowProps): JSX.Element {
     const { value, onChange, onAdd } = props;
+
     return (
         <div className="flex items-center gap-2">
             <Input

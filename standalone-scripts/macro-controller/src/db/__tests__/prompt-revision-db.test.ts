@@ -13,17 +13,20 @@ let fallback: Record<string, unknown> = { isOk: true, rows: [], lastInsertId: 1 
 vi.mock('../extension-bridge', () => ({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
+
         return responsesQueue.shift() ?? fallback;
     }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
+
         return responsesQueue.shift() ?? fallback;
     }),
 }));
 vi.mock('../../error-utils', async () => {
     const actual = await vi.importActual<typeof import('../../error-utils')>('../../error-utils');
+
     return { ...actual, logError: vi.fn(), logDiagnosticFromCode: vi.fn() };
 });
 vi.mock('../../logging', () => ({ log: vi.fn() }));

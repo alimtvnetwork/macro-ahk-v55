@@ -52,7 +52,6 @@ export interface BatchRefreshOptions {
     readonly source?: BatchRefreshSourceType;
 }
 
-
 /** Per-workspace iteration result, surfaced to callers/tests. */
 export interface BatchRefreshIterationResult {
     readonly workspaceId: string;
@@ -60,7 +59,6 @@ export interface BatchRefreshIterationResult {
     /** Present only when `outcome === 'skipped'`. */
     readonly reason?: BatchSkipReason;
 }
-
 
 export interface BatchRefreshSummary {
     readonly total: number;

@@ -51,15 +51,18 @@ export function toCreditPair(wc: WorkspaceCredit): CreditPair {
 export async function loadCreditMap(): Promise<CreditMap> {
     try {
         triggerRefresh();
+
         return readMap();
     } catch (caught) {
         logError("CreditSourceType.load", caught);
+
         return new Map();
     }
 }
 
 function getCreditsApi(): CreditsApiShape | null {
     const w = window as unknown as BridgeWindow;
+
     return w.RiseupAsiaMacroExt?.Projects?.MacroController?.api?.credits ?? null;
 }
 
@@ -74,5 +77,6 @@ function readMap(): CreditMap {
     for (const wc of credits) {
         map.set(wc.name, toCreditPair(wc));
     }
+
     return map;
 }
