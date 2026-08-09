@@ -36,17 +36,27 @@ export interface PromptStore {
 }
 `,
   "07-editor-adapters.ts": `
-export type PasteMode = "replace" | "append" | "at-cursor";
+export enum PasteModeType {
+  Replace = "replace",
+  Append = "append",
+  AtCursor = "at-cursor"
+}
 export interface EditorAdapter {
   kind: string;
   match(el: Element): el is HTMLElement;
-  paste(el: Element, text: string, mode?: PasteMode): Promise<boolean>;
+  paste(el: Element, text: string, mode?: PasteModeType): Promise<boolean>;
 }
 `,
   "10-queue-model.ts": `
-export type TaskStatus = "pending" | "processing" | "hold" | "completed" | "failed";
+export enum TaskStatusType {
+  Pending = "pending",
+  Processing = "processing",
+  Hold = "hold",
+  Completed = "completed",
+  Failed = "failed"
+}
 export interface QueuedTask {
-  id: string; kind: string; body: string; status: TaskStatus;
+  id: string; kind: string; body: string; status: TaskStatusType;
   retryCount: number; holdUntil?: string; createdAt: string;
 }
 export interface QueueStore {

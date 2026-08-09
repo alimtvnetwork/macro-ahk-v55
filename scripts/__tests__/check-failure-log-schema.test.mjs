@@ -51,8 +51,14 @@ function writeFile(root, rel, content) {
 
 /** A `failure-logger.ts` that satisfies the schema contract. */
 const VALID_LOGGER = `
-export type FailurePhase = "Record" | "Replay";
-export type FailureReasonCode = "ZeroMatches" | "Unknown";
+export enum FailurePhaseType {
+    Record = "Record",
+    Replay = "Replay"
+}
+export enum FailureReasonCodeType {
+    ZeroMatches = "ZeroMatches",
+    Unknown = "Unknown"
+}
 
 export interface SelectorAttempt {
     readonly Strategy: string;
@@ -72,8 +78,8 @@ export interface DomContext {
 }
 
 export interface FailureReport {
-    readonly Phase: FailurePhase;
-    readonly Reason: FailureReasonCode;
+    readonly Phase: FailurePhaseType;
+    readonly Reason: FailureReasonCodeType;
     readonly ReasonDetail: string;
     readonly StackTrace: string | null;
     readonly StepId: number | null;
@@ -89,7 +95,7 @@ export interface FailureReport {
 }
 
 export interface BuildFailureReportInput {
-    readonly Phase: FailurePhase;
+    readonly Phase: FailurePhaseType;
     readonly Error: unknown;
     readonly Selectors?: ReadonlyArray<SelectorAttempt>;
     readonly Variables?: ReadonlyArray<VariableContext>;
@@ -107,13 +113,13 @@ export function logFailure(input: BuildFailureReportInput): FailureReport {
 `;
 
 const VALID_CALLER = `
-import { logFailure } from "./failure-logger";
+import { logFailure, FailurePhaseType } from "./failure-logger";
 const SOURCE_FILE = "src/recorder/replay.ts";
 export function run(): void {
     try { /* ... */ }
     catch (e) {
         logFailure({
-            Phase: "Replay",
+            Phase: FailurePhaseType.Replay,
             Error: e,
             SourceFile: SOURCE_FILE,
         });
@@ -213,9 +219,9 @@ test("fails when a call site omits SourceFile", () => {
     try {
         setupValidTree(root);
         writeFile(root, "src/recorder/bad-caller.ts", `
-            import { logFailure } from "./failure-logger";
+            import { logFailure, FailurePhaseType } from "./failure-logger";
             export function run(e: unknown) {
-                logFailure({ Phase: "Replay", Error: e });
+                logFailure({ Phase: FailurePhaseType.Replay, Error: e });
             }
         `);
         const r = runCheck(root);
@@ -250,10 +256,10 @@ test("fails on `as FailureReport` object-literal bypass in production code", () 
     try {
         setupValidTree(root);
         writeFile(root, "src/recorder/bypass.ts", `
-            import type { FailureReport } from "./failure-logger";
+            import { type FailureReport, FailurePhaseType } from "./failure-logger";
             export function fake(): FailureReport {
                 return {
-                    Phase: "Replay",
+                    Phase: FailurePhaseType.Replay,
                 } as FailureReport;
             }
         `);
