@@ -14,11 +14,11 @@
  * required asset is missing or smaller than its size floor.
  *
  * Env:
- *   RELEASE_TAG       required, for example v5.26.0
+ *   RELEASE_TAG       required, for example v5.27.0
  *   GITHUB_REPOSITORY required, owner/repo
  *   GITHUB_TOKEN      optional, raises the API rate limit
  *
- * Run: RELEASE_TAG=v5.26.0 node scripts/check-release-assets.mjs
+ * Run: RELEASE_TAG=v5.27.0 node scripts/check-release-assets.mjs
  */
 
 import { appendFileSync } from "node:fs";
@@ -78,7 +78,7 @@ async function main() {
     const tag = process.env.RELEASE_TAG;
     const slug = process.env.GITHUB_REPOSITORY;
     if (!tag) {
-        console.error("[FATAL] RELEASE_TAG is not set. Expected the published tag, for example v5.26.0.");
+        console.error("[FATAL] RELEASE_TAG is not set. Expected the published tag, for example v5.27.0.");
         process.exit(1);
     }
     if (!slug) {

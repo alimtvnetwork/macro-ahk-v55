@@ -1,5 +1,11 @@
 # Changelog
 
+## [v5.27.0] 2026-08-09 DomainConstants Circular Dependency Fix
+
+### Fixed
+- Fixed an accidental circular dependency in `src/constants/domain.ts` that caused all domain strings to evaluate to `undefined`. This resolves silent failures during `auto-start` attachment and `Ctrl+Shift+Down` (`run-scripts`) shortcut execution.
+- Fixed `check-pascalcase-instruction-migration.mjs` path comparison for Windows environments by enforcing POSIX slashes, allowing the CI pipeline to pass.
+
 ## [v5.26.0] 2026-08-08 CI Pipeline Fixes
 
 ### Added
