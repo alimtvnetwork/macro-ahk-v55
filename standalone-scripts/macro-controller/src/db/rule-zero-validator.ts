@@ -1,4 +1,4 @@
-import { RuleZeroCodeCategory } from "../types/enums";
+import { RuleZeroCodeCategoryType } from "../types/enums";
 
 /**
  * Rule-0 validator — "Step count is law".
