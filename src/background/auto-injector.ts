@@ -178,8 +178,14 @@ export async function handleTabActivated(tabId: number): Promise<void> {
     let tab: chrome.tabs.Tab;
     try {
         tab = await chrome.tabs.get(tabId);
-    } catch {
-        return; // tab gone between event and lookup
+    } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        if (message.includes("No tab with id")) {
+            console.debug(`[auto-injector] tab ${tabId} closed before get`);
+            return;
+        }
+        logCaughtError(BgLogTag.MARCO, "tabs.onActivated: tabs.get failed", err);
+        return;
     }
     const url = tab.url ?? "";
     if (!url || isNewTabOrBlankUrl(url)) return;

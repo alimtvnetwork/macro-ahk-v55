@@ -119,11 +119,7 @@ async function handleActivated(
     try {
         tab = await chrome.tabs.get(info.tabId);
     } catch (err) {
-        // "No tab with id: N" is an expected race condition — the tab was closed
-        // between onActivated firing and the async tabs.get call.
-        // Log at warn level only (not persisted to DB) since this is non-fatal.
-        logBgWarnError(BgLogTag.MARCO, "tabs.onActivated: tabs.get failed (tab closed before get)", err);
-
+        handleTabsGetError(info.tabId, err);
         return;
     }
     const url = tab.url ?? "";
@@ -133,6 +129,15 @@ async function handleActivated(
         return;
     }
     await runGate(info.tabId, url, "activate");
+}
+
+function handleTabsGetError(tabId: number, err: unknown): void {
+    const message = err instanceof Error ? err.message : String(err);
+    if (matchedRefusalMarker(message) !== null) {
+        console.debug(`[url-trigger] tab ${tabId} closed before get (expected)`);
+        return;
+    }
+    logCaughtError(BgLogTag.MARCO, "tabs.onActivated: tabs.get failed", err);
 }
 
 /* ------------------------------------------------------------------ */
