@@ -94,7 +94,8 @@ function readDeclaredCsp(): string | null {
         const csp = (manifest as { content_security_policy?: { extension_pages?: string } }).content_security_policy;
 
         return csp?.extension_pages ?? null;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
         return null;
     }
 }
@@ -279,7 +280,6 @@ export function WasmStatusBanner() {
             if (copyTimerRef.current !== null) clearTimeout(copyTimerRef.current);
             copyTimerRef.current = window.setTimeout(() => setCopied(false), 2000);
         } catch (clipboardError) {
-
             const message = clipboardError instanceof Error ? clipboardError.message : String(clipboardError);
             toast({ title: "Copy failed", description: message, variant: "destructive" });
         }

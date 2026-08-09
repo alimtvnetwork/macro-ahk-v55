@@ -14,7 +14,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
  */
 
 import { log } from '../logger';
-import { logDiagnosticFromCode } from '../error-utils';
+import { logDiagnosticFromCode, logError } from '../error-utils';
 import { runSql as runSqlBridge } from '../db/sql-bridge';
 
 const CANONICAL_SLUG = 'read-memory-enhanced';
@@ -58,7 +58,7 @@ async function invalidateJsonCopy(): Promise<void> {
     const { clearPromptCache } = await import('./prompt-cache');
     await clearPromptCache();
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'read-memory-admin-cache',
       reason: err instanceof Error ? err.message : String(err),

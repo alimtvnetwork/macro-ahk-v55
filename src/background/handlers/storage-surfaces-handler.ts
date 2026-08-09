@@ -9,6 +9,7 @@
 
 import type { JsonValue } from "./handler-types";
 import type { MessageRequest } from "../../shared/messages";
+import { logBgError } from "@/background/bg-logger";
 
 interface SessionEntry {
     key: string;
@@ -33,7 +34,8 @@ interface CookieEntry {
 function estimateBytes(value: JsonValue): number {
     try {
         return new TextEncoder().encode(JSON.stringify(value)).length;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return 0;
     }
 }

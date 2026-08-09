@@ -1,4 +1,5 @@
 import { PredicateEvaluationKindType, WaitConditionType, EvaluateSelectorConfigType, WaitForOutcomeReasonType } from "../../../types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 /**
  * Marco Extension — Post-Step Wait-For-Selector
@@ -198,7 +199,8 @@ function safeReadStore(): RawStore {
         }
 
         return out;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return {};
     }
 }

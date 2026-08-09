@@ -41,6 +41,7 @@ export function buildTree(files: ProjectFile[]): FileNode[] {
       if (hasDifferentType) {
         return a.isDir ? -1 : 1;
       }
+
       return a.name.localeCompare(b.name);
     });
     nodes.forEach((n) => {
@@ -77,16 +78,19 @@ const BINARY_EXTS = new Set([
 
 export function isBinaryFile(filename: string): boolean {
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
+
   return BINARY_EXTS.has(ext);
 }
 
 export function isImageFile(filename: string): boolean {
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
+
   return IMAGE_EXTS.has(ext);
 }
 
 export function isPdfFile(filename: string): boolean {
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
+
   return PDF_EXTS.has(ext);
 }
 

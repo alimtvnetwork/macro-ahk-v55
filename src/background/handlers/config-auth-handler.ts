@@ -54,6 +54,7 @@ const REFRESH_COOKIE_NAME_CANDIDATES = [
 
 import { LOVABLE_TAB_PATTERNS } from "../../shared/lovable-tab-patterns";
 import { SourceType } from "../../types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 // Extends the shared platform list with localhost for dev-mode auth probing.
 const PLATFORM_TAB_PATTERNS: readonly string[] = [
@@ -590,7 +591,7 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
                                     if (typeof token === "string" && token.startsWith("eyJ") && token.split(".").length === 3) {
                                         return token;
                                     }
-                                } catch (err) { console.error("Automatically logged error:", err);
+                                } catch (err) { logBgError("Automatically logged error:", err);
                                     if (raw.startsWith("eyJ") && raw.split(".").length === 3) {
                                         return raw;
                                     }

@@ -14,6 +14,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
 
 import type { PromptEntry } from '../types';
 import { SlugPositionSourceType, PromptOrderSourceType } from "../types/enums";
+import { logError } from "../error-utils";
 
 const STORAGE_KEY = 'marco.promptOrder.v2';
 const DRAG_TOUCHED_KEY = 'marco.promptOrder.dragTouched.v2';
@@ -46,7 +47,7 @@ function runPromptOrderMigrations(): void {
     for (const key of LEGACY_STORAGE_KEYS) localStorage.removeItem(key);
     localStorage.setItem(MIGRATION_REV_KEY, String(CURRENT_MIGRATION_REV));
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   }
 }
 
@@ -61,7 +62,7 @@ function readLegacyOrder(): string[] {
         return parsed.filter((v): v is string => typeof v === 'string');
       }
     } catch (err) {
-      console.error();
+      logError('MacroController', 'Unknown error');
     }
   }
 
@@ -154,7 +155,7 @@ export function savePromptOrder(order: string[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   }
 }
 
@@ -192,7 +193,7 @@ function saveDragTouched(set: Set<string>): void {
     if (typeof localStorage === 'undefined') return;
     localStorage.setItem(DRAG_TOUCHED_KEY, JSON.stringify([...set]));
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   }
 }
 
@@ -200,7 +201,7 @@ function clearDragTouched(): void {
   try {
     if (typeof localStorage !== 'undefined') localStorage.removeItem(DRAG_TOUCHED_KEY);
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   }
 }
 
@@ -229,7 +230,7 @@ export function getSlugPositionSource(slug: string): SlugPositionInfo {
       migrationRev = Number(localStorage.getItem(MIGRATION_REV_KEY) ?? '0') || 0;
     }
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   }
   const effective = saved.length > 0 ? saved : DEFAULT_PROMPT_ORDER.slice();
   const index = effective.indexOf(slug);
@@ -269,7 +270,7 @@ export function getPromptOrderSource(): PromptOrderSource {
       migrationRev = Number(localStorage.getItem(MIGRATION_REV_KEY) ?? '0') || 0;
     }
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   }
   const usingSaved = saved.length > 0;
 

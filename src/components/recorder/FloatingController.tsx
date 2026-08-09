@@ -399,7 +399,6 @@ function HotkeyQuickAdd(props: { onClose: () => void }): JSX.Element {
             setWaitMs("");
             setLabel("");
         } catch (err) {
-
             setError(err instanceof Error ? err.message : String(err));
         }
     };

@@ -56,7 +56,8 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
     const decoded = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
 
     return JSON.parse(decoded);
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { void 0;
+
     return null;
   }
 }

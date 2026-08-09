@@ -101,7 +101,8 @@ function loadPersistedSequence(): SequenceRenameInput {
                 : 2,
             Separator: typeof parsed.Separator === "string" ? parsed.Separator : " ",
         };
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
         return { ...DEFAULT_SEQUENCE_RENAME, Base: "Step {n}" };
     }
 }

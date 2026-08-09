@@ -13,6 +13,7 @@ import {
     QUEUE_RESUME_ARIA_LABEL,
 } from './selectors';
 import { AutoResumeReasonType } from "../types/enums";
+import { logError } from "../error-utils";
 
 export interface AutoResumeResult {
     readonly acted: boolean;
@@ -91,8 +92,7 @@ export function autoResumeQueueIfNeeded(deps: AutoResumeDeps): AutoResumeResult 
 
         return { acted: true, reason: 'ok', count };
     } catch (caught) {
-        // eslint-disable-next-line no-restricted-syntax -- caught error surfaced before Logger available in this scope
-        console.error('[AutoResume] Unexpected failure', caught);
+        logError('MacroController', '[AutoResume] Unexpected failure', caught);
 
         return { acted: false, reason: 'threw' };
     }

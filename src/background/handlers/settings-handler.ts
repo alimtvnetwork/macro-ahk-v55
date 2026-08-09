@@ -15,6 +15,7 @@ import { setVerboseLogging } from "../recorder/verbose-logging";
 import { ScriptRunAtType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 import { ThemeType } from "../../types/enums";
 import { logCaughtError, BgLogTag } from "../bg-logger";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -190,7 +191,8 @@ async function loadPromptVariables(): Promise<Record<string, string>> {
         const result = await chrome.storage.local.get(VARIABLES_KEY);
 
         return (result[VARIABLES_KEY] as Record<string, string>) ?? {};
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return {};
     }
 }
@@ -204,7 +206,8 @@ async function loadSettings(): Promise<Partial<ExtensionSettings>> {
         const result = await chrome.storage.local.get(STORAGE_KEY);
 
         return (result[STORAGE_KEY] as Partial<ExtensionSettings>) ?? {};
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return {};
     }
 }

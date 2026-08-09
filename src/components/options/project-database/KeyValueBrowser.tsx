@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { sendMessage } from "@/lib/message-client";
+import { logError } from "@/components/options/options-logger";
 
 interface KeyValueBrowserProps {
   projectSlug: string;
@@ -71,7 +72,7 @@ export function KeyValueBrowser({ projectSlug }: KeyValueBrowserProps) {
         const uniqueNs = [...new Set(result.rows.map((r) => r.Namespace))].sort();
         setNamespaces(uniqueNs);
       }
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
       setEntries([]);
     } finally {

@@ -14,6 +14,7 @@
  */
 
 import { logCaughtError, BgLogTag } from "./bg-logger";
+import { logBgError } from "@/background/bg-logger";
 
 export const STORAGE_KEY_SEEN_ORIGINS = "marco_seen_origins";
 
@@ -23,7 +24,8 @@ let hydrated = false;
 function safeOrigin(url: string): string {
     try {
         return new URL(url).origin;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return "";
     }
 }

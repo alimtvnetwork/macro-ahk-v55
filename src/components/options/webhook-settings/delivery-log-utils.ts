@@ -20,6 +20,7 @@ import {
 } from "@/background/recorder/step-library/result-webhook";
 import { VariantType } from "../../../types/enums";
 import { MimeKindType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
+import { logError } from "@/components/options/options-logger";
 
 /**
  * A delivery-log entry is a "corrupt placeholder" when the loader could not
@@ -37,7 +38,8 @@ export function isCorruptPlaceholder(entry: WebhookDeliveryResult): boolean {
 export function formatTime(iso: string): string {
     try {
         return new Date(iso).toLocaleTimeString();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
         return iso;
     }
 }

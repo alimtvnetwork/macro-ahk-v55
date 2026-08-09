@@ -44,6 +44,7 @@ import type { StoredScript, StoredConfig } from "@/hooks/use-projects-scripts";
 import { MonacoCodeEditor } from "./LazyMonacoCodeEditor";
 import { toast } from "sonner";
 import { ScriptRunAtType } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -985,14 +986,20 @@ export function ScriptsList({ scripts, configs, loading, onSave, onDelete, onSav
 function validateJson(raw: string): boolean {
   try { JSON.parse(raw);
 
- return true; } catch (err) { console.error("Automatically logged error:", err); return false; }
+ return true; } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
+ return false; }
 }
 
 function formatJson(input: JsonValue): string {
   if (typeof input === "string") {
-    try { return JSON.stringify(JSON.parse(input), null, 2); } catch (err) { console.error("Automatically logged error:", err); return input; }
+    try { return JSON.stringify(JSON.parse(input), null, 2); } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
+ return input; }
   }
-  try { return JSON.stringify(input ?? {}, null, 2); } catch (err) { console.error("Automatically logged error:", err); return "{}"; }
+  try { return JSON.stringify(input ?? {}, null, 2); } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
+ return "{}"; }
 }
 
 export { RunAtSelect, RunAtLabel, RUN_AT_OPTIONS, FileDropZone };

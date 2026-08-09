@@ -13,6 +13,7 @@ import { Timings } from "../../constants/timing";
 import { logCaughtError, BgLogTag } from "../bg-logger";
 import { EXTENSION_VERSION } from "../../shared/constants";
 import { handleGetSettings } from "./settings-handler";
+import { logBgError } from "@/background/bg-logger";
 
 const TOAST_EXIT_TRANSFORM = "translateY(8px) scale(0.96)";
 
@@ -22,7 +23,8 @@ export async function isInjectionToastEnabled(): Promise<boolean> {
         const { settings } = await handleGetSettings();
 
         return settings.showInjectionToast !== false;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return true; // default on
     }
 }

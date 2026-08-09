@@ -14,6 +14,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { logError } from "@/components/options/options-logger";
 
 const REPRO_COMMAND = "pnpm run repro:build";
 const RESULT_WEBHOOK_ALIAS_IMPORT =
@@ -35,7 +36,7 @@ export function ReproBuildErrorPanel() {
       setCopied(true);
       if (timerRef.current !== null) clearTimeout(timerRef.current);
       timerRef.current = window.setTimeout(() => setCopied(false), 2000);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
       setCopied(false);
     }

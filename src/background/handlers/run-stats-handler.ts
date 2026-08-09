@@ -1,4 +1,5 @@
 import { MessageRequestStatusType } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 /**
  * Marco Extension — Run Statistics Handler (Spec 15 T-7)
@@ -45,7 +46,8 @@ async function loadMetrics(): Promise<CycleMetric[]> {
         const result = await chrome.storage.local.get(STORAGE_KEY);
 
         return (result[STORAGE_KEY] as CycleMetric[]) ?? [];
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return [];
     }
 }

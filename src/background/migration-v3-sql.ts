@@ -9,6 +9,7 @@
  */
 
 import type { Database as SqlJsDatabase } from "sql.js";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Sessions TEXT→INTEGER PK (logs.db)                                 */
@@ -34,7 +35,8 @@ export function sessionsHasTextPk(db: SqlJsDatabase): boolean {
         }
 
         return false;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return false;
     }
 }

@@ -61,6 +61,7 @@ import {
 } from "lucide-react";
 import { MonacoCodeEditor } from "./LazyMonacoCodeEditor";
 import { toast } from "sonner";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -480,7 +481,7 @@ export function PromptManagerPanel() {
                     await save({ name, text, category: typeof entry.category === "string" ? entry.category : undefined });
                     created++;
                 }
-            } catch (err) { console.error("Automatically logged error:", err);
+            } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
                 toast.error(`Failed to parse ${file.name} as JSON`);
             }
         }
@@ -492,7 +493,7 @@ export function PromptManagerPanel() {
                 const name = file.name.replace(/\.(txt|md|prompt)$/i, "").replace(/[-_]+/g, " ").trim() || "Untitled";
                 await save({ name, text });
                 created++;
-            } catch (err) { console.error("Automatically logged error:", err);
+            } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
                 toast.error(`Failed to read ${file.name}`);
             }
         }

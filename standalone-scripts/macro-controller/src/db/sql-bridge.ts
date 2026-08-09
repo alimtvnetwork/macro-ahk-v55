@@ -157,6 +157,7 @@ async function sendOnce(method: string, sql: string, project: string): Promise<S
     }) as any;
 
     const obj = raw ?? { ok: false, errorMessage: 'no response' };
+
     return new SqlBridgeResp(obj.ok, obj.rows, obj.errorMessage, obj.lastInsertId);
 }
 

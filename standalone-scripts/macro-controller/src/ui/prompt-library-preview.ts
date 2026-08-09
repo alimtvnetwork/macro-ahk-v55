@@ -7,6 +7,7 @@ import {
 } from './prompt-library-types';
 import { logLibraryImportFailure, extractImportErrorReason, renderImportErrorBanner } from './prompt-library-error';
 import { PreviewTriggerType } from "../types/enums";
+import { logError } from "../error-utils";
 
 export function validateImportFile(file: File): { headline: string; hint: string } | null {
   const IMPORT_MAX_BYTES = 5 * 1024 * 1024;
@@ -121,7 +122,7 @@ export async function computeAndRenderPreview(
     renderImportErrorBanner(refs, invalid.headline, invalid.hint);
     showToast(PREVIEW_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
     try { previewFileInput.value = ''; } catch (err) {
-      console.error();
+      logError('MacroController', 'Unknown error');
     }
 
     return;
@@ -147,19 +148,19 @@ export async function computeAndRenderPreview(
     renderPreviewPanel(refs, panel, preview, file, parsed.errors.length, () => {
       hidePreviewPanel(panel);
       try { previewFileInput.value = ''; } catch (err) {
-        console.error();
+        logError('MacroController', 'Unknown error');
       }
       void handleImportFile(refs, file, fileInput, importBtn, 'click');
     }, () => {
       hidePreviewPanel(panel);
       try { previewFileInput.value = ''; } catch (err) {
-        console.error();
+        logError('MacroController', 'Unknown error');
       }
       refs.status.textContent = 'Preview cancelled.';
     });
     refs.status.textContent = 'Preview ready for ' + file.name + '.';
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     logLibraryImportFailure('preview', 'threw during read/parse for name=' + file.name, err);
     const reason = extractImportErrorReason(err);
     refs.status.textContent = PREVIEW_FAILED_PREFIX + reason;

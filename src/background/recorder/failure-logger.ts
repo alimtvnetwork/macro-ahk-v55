@@ -47,6 +47,7 @@ import {
     type FormSnapshot,
 } from "./form-snapshot";
 import { FailurePhaseType, FailureReasonCodeType, Semantic3f9bType } from "../../types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 export type { VariableContext } from "./field-reference-resolver";
 export type { FormSnapshot } from "./form-snapshot";
@@ -550,7 +551,9 @@ export function logFailure(input: BuildFailureReportInput): FailureReport {
 function extractMessage(err: unknown): string {
     if (err instanceof Error) return err.message;
     if (typeof err === "string") return err;
-    try { return JSON.stringify(err); } catch (err) { console.error("Automatically logged error:", err); return String(err); }
+    try { return JSON.stringify(err); } catch (err) { logBgError("Automatically logged error:", err);
+
+ return String(err); }
 }
 
 function extractStack(err: unknown): string | null {

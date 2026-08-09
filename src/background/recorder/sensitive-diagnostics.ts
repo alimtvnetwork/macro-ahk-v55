@@ -1,4 +1,5 @@
 import type { JsonValue } from "../handlers/handler-types";
+import { logBgError } from "@/background/bg-logger";
 
 export const SENSITIVE_VARIABLE_PATTERNS: ReadonlyArray<RegExp> = [
     /password/i,
@@ -39,7 +40,8 @@ function diagnosticValueLength(value: JsonValue | undefined): number {
 function safeJsonStringify(value: JsonValue): string {
     try {
         return JSON.stringify(value) ?? "null";
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return "[unserializable]";
     }
 }

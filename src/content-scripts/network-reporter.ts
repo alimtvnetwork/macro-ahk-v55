@@ -76,7 +76,7 @@ function sendNetworkEntry(entry: CapturedEntry): void {
             entry,
         });
     } catch (err) {
-    console.error("Automatically caught swallowed error", err); 
+    void 0; 
 }
 }
 
@@ -252,7 +252,7 @@ function reportNetworkStatus(isOnline: boolean): void {
             isOnline,
         });
     } catch (err) {
-    console.error("Automatically caught swallowed error", err); 
+    void 0; 
 }
 }
 
@@ -292,7 +292,8 @@ function truncateUrl(url: string): string {
 function extractInitiator(): string {
     try {
         return window.location.href;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { void 0;
+
         return "";
     }
 }
@@ -306,7 +307,7 @@ let flushTimerId: ReturnType<typeof setInterval> | null = null;
 function onPageHide(): void {
     // Final best-effort flush before tearing down.
     try { flushBuffer(); } catch (err) {
-    console.error("Automatically caught swallowed error", err);
+    void 0;
     } // allow-swallow: pagehide flush is best-effort
     stopNetworkReporter();
 }

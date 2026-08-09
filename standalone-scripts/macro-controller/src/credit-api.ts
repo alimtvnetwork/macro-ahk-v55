@@ -1,6 +1,7 @@
 import { cCbAvail, cCbBilling, cCbBonus, cCbDaily, cCbEmpty, cCbRollover, cLogInfo, cPrimaryLight, creditBarWidthPx, tFont, tFontSm, trSlow } from './shared-state';
 import { CssFragmentType } from './types';
 import { throwDiagnostic } from './errors/diagnostic-error';
+import { logError } from "./error-utils";
 
 /**
  * MacroLoop Controller — Credit Calculation & Rendering Module
@@ -34,13 +35,11 @@ export function assertNotLegacyCalcForProZero(plan: string | undefined, fnName: 
   }
   // In prod: CODE-RED log per file-path-error-logging memory (exact path + missing item + reason),
   // but do not throw — credit rendering must degrade gracefully rather than crash the loop.
-  console.error(
-    '[CODE RED] ' + fnName + '() called for plan=pro_0. '
-      + 'Path: standalone-scripts/macro-controller/src/credit-api.ts. '
-      + 'Missing item: enriched MacroCreditSummary from pro-zero-credit-calculator. '
-      + 'Reason: legacy aggregator double-counts daily_limit and rollover for pro_0 — '
-      + 'use calculateProZeroCreditSummary(balance) and read enriched WorkspaceCredit fields instead.'
-  );
+  logError('MacroController', '[CODE RED] ' + fnName + '() called for plan=pro_0. '
+              + 'Path: standalone-scripts/macro-controller/src/credit-api.ts. '
+              + 'Missing item: enriched MacroCreditSummary from pro-zero-credit-calculator. '
+              + 'Reason: legacy aggregator double-counts daily_limit and rollover for pro_0 — '
+              + 'use calculateProZeroCreditSummary(balance) and read enriched WorkspaceCredit fields instead.');
 }
 
 export function calcTotalCredits(granted: number, dailyLimit: number, billingLimit: number, topupLimit: number, rolloverLimit: number, plan?: string): number {

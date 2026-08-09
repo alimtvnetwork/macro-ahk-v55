@@ -15,7 +15,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
  */
 
 import { log } from '../logger';
-import { logDiagnosticFromCode } from '../error-utils';
+import { logDiagnosticFromCode, logError } from '../error-utils';
 import { runLoggedQuery } from './sql-bridge';
 
 /**
@@ -68,7 +68,7 @@ async function invalidateJsonCopy(): Promise<void> {
     const { clearPromptCache } = await import('../ui/prompt-cache');
     await clearPromptCache();
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'legacy-read-memory-cache',
       reason: err instanceof Error ? err.message : String(err),
@@ -92,7 +92,7 @@ export async function migrateRemoveLegacyReadMemoryDuplicates(): Promise<void> {
       'success',
     );
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'legacy-read-memory',
       reason: err instanceof Error ? err.message : String(err),

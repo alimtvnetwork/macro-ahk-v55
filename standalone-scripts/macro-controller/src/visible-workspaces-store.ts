@@ -13,6 +13,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
  */
 
 import type { WorkspaceCredit } from './types/credit-types';
+import { logError } from "./error-utils";
 
 type Listener = (rows: ReadonlyArray<WorkspaceCredit>) => void;
 
@@ -25,7 +26,7 @@ export function publishVisibleWorkspaces(rows: ReadonlyArray<WorkspaceCredit>): 
         try {
             cb(rows);
         } catch (_e: unknown) {
-            console.error();
+            logError('MacroController', 'Unknown error');
         }
     }
 }
@@ -35,7 +36,7 @@ export function subscribeVisibleWorkspaces(cb: Listener): () => void {
     // Push the current snapshot immediately so late subscribers stay in sync.
     if (lastRows.length > 0) {
         try { cb(lastRows); } catch (_e: unknown) {
-            console.error();
+            logError('MacroController', 'Unknown error');
         }
     }
 

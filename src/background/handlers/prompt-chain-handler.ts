@@ -10,6 +10,7 @@
 import type { MessageRequest } from "../../shared/messages";
 import { getChatBoxXPath, applyTemplateVariables } from "./settings-handler";
 import { logBgWarnError, logCaughtError, BgLogTag} from "../bg-logger";
+import { logBgError } from "@/background/bg-logger";
 
 const STORAGE_KEY = "marco_prompt_chains";
 
@@ -56,7 +57,8 @@ async function loadChains(): Promise<PromptChain[]> {
         const result = await chrome.storage.sync.get(STORAGE_KEY);
 
         return (result[STORAGE_KEY] as PromptChain[] | undefined) ?? [];
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return [];
     }
 }

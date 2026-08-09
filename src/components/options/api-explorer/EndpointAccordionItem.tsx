@@ -12,6 +12,7 @@ import {
   toPascalCaseKeys,
   toPrettyJson,
 } from "./types";
+import { logError } from "@/components/options/options-logger";
 
 function generateCurl(type: string, payload: Record<string, unknown>): string {
   const body = JSON.stringify({ Type: type, ...toPascalCaseKeys(payload) });
@@ -58,7 +59,7 @@ export function EndpointAccordionItem({ endpoint }: Props) {
     let parsed: unknown;
     try {
       parsed = requestJson.trim() ? JSON.parse(requestJson) : {};
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Invalid JSON in request body");
 
       return;
@@ -78,7 +79,6 @@ export function EndpointAccordionItem({ endpoint }: Props) {
       const response = await sendMessage<unknown>(message as any);
       setResponseJson(toPrettyJson(response));
     } catch (error) {
-
       setResponseJson(toPrettyJson({
         IsOk: false,
         ErrorMessage: error instanceof Error ? error.message : "Request failed",

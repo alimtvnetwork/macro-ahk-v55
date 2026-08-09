@@ -120,6 +120,7 @@ async function handleActivated(
         tab = await chrome.tabs.get(info.tabId);
     } catch (err) {
         handleTabsGetError(info.tabId, err);
+
         return;
     }
     const url = tab.url ?? "";
@@ -135,6 +136,7 @@ function handleTabsGetError(tabId: number, err: unknown): void {
     const message = err instanceof Error ? err.message : String(err);
     if (matchedRefusalMarker(message) !== null) {
         console.debug(`[url-trigger] tab ${tabId} closed before get (expected)`);
+
         return;
     }
     logCaughtError(BgLogTag.MARCO, "tabs.onActivated: tabs.get failed", err);

@@ -42,7 +42,8 @@ export function readClickTrail(): ClickTrailEntry[] {
         if (Array.isArray(parsed) === false) return [];
 
         return parsed;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { void 0;
+
         return [];
     }
 }
@@ -60,7 +61,7 @@ export function recordTrail(entry: Omit<ClickTrailEntry, "at">): void {
             : next;
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
     } catch (err) {
-    console.error("Automatically caught swallowed error", err); 
+    void 0; 
 }
 }
 
@@ -69,7 +70,7 @@ export function clearClickTrail(): void {
     try {
         sessionStorage.removeItem(STORAGE_KEY);
     } catch (err) {
-    console.error("Automatically caught swallowed error", err); 
+    void 0; 
 }
 }
 
@@ -94,7 +95,8 @@ export function freezeClickTrail(failureId: string): ClickTrailEntry[] {
         evictOldFrozenSnapshots(key);
 
         return live;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { void 0;
+
         return readClickTrail();
     }
 }
@@ -107,7 +109,8 @@ export function readFrozenClickTrail(failureId: string): ClickTrailEntry[] | nul
         const parsed = JSON.parse(raw) as ClickTrailEntry[];
 
         return Array.isArray(parsed) ? parsed : null;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { void 0;
+
         return null;
     }
 }
@@ -124,7 +127,7 @@ export function clearFrozenClickTrails(): void {
         }
         keysToRemove.forEach((k) => sessionStorage.removeItem(k));
     } catch (err) {
-    console.error("Automatically caught swallowed error", err); 
+    void 0; 
 }
 }
 
@@ -144,7 +147,7 @@ function evictOldFrozenSnapshots(keepKey: string): void {
             .slice(0, frozenKeys.length - MAX_FROZEN_SNAPSHOTS);
         toRemove.forEach((k) => sessionStorage.removeItem(k));
     } catch (err) {
-    console.error("Automatically caught swallowed error", err); 
+    void 0; 
 }
 }
 

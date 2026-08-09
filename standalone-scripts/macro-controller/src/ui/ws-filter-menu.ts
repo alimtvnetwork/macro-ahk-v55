@@ -18,7 +18,7 @@ import {
   cPrimaryLighter,
 } from '../shared-state';
 import { logSub } from '../logger';
-import { logError } from '../error-utils';
+import { logError, logError } from '../error-utils';
 import { DataAttrType } from '../types';
 import {
   getLoopWsCreditSortMode,
@@ -177,7 +177,7 @@ function persistCompactMode(active: boolean): void {
   try {
     localStorage.setItem('ml_compact_mode', active ? 'true' : 'false');
   } catch (ex: unknown) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     logSub('Failed to persist compact mode: ' + (ex instanceof Error ? ex.message : String(ex)), 1);
   }
 }

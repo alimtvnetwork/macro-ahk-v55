@@ -58,7 +58,9 @@ function isPanelToggles(v: unknown): v is PanelToggles {
 function readStore(): StoredShape {
     if (typeof window === "undefined") { return emptyStore(); }
     let raw: string | null = null;
-    try { raw = window.localStorage.getItem(STORAGE_KEY); } catch (err) { console.error("Automatically logged error:", err); return emptyStore(); }
+    try { raw = window.localStorage.getItem(STORAGE_KEY); } catch (err) { void 0;
+
+ return emptyStore(); }
     if (raw === null) { return emptyStore(); }
     try {
         const parsed: unknown = JSON.parse(raw);
@@ -75,7 +77,8 @@ function readStore(): StoredShape {
             : Object.keys(sessions);
 
         return { Sessions: sessions, Order: order };
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { void 0;
+
         return emptyStore();
     }
 }

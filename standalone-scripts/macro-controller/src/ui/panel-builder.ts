@@ -63,6 +63,7 @@ import { nsWrite } from '../api-namespace';
 import type { RenameHistoryEntry, UndoRenameResults } from '../types';
 import type { TaskNextDeps } from './task-next-ui';
 import type { PanelLayoutCtx } from './panel-sections';
+import { logError } from "../error-utils";
 
 // ============================================
 // Dependencies interface — injected by macro-looping.ts
@@ -129,7 +130,7 @@ function wireSummaryBarSubscription(summaryBar: SummaryBarHandle): void {
   subscribeVisibleWorkspaces(function (rows) {
     let config: ReturnType<typeof getWorkspaceLifecycleConfig> | null = null;
     try { config = getWorkspaceLifecycleConfig(); } catch (_e: unknown) {
-      console.error();
+      logError('MacroController', 'Unknown error');
       config = null;
     }
     const resolver: DisplayKindResolver = function (ws) {

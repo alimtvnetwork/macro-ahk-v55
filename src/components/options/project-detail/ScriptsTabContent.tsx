@@ -23,13 +23,15 @@ function formatJson(input: string | number | boolean | null | undefined): string
   if (typeof input === "string") {
     try {
       return JSON.stringify(JSON.parse(input), null, 2);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
       return input;
     }
   }
   try {
     return JSON.stringify(input ?? {}, null, 2);
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return "{}";
   }
 }

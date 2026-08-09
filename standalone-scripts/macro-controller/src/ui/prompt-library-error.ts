@@ -97,6 +97,6 @@ export function focusErrorBanner(refs: ModalRefs): void {
   const banner = refs.errorBanner;
   if (!banner || banner.hidden) return;
   try { banner.focus(); } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   }
 }

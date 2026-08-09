@@ -7,6 +7,7 @@
 
 import type { Database as SqlJsDatabase } from "sql.js";
 import { logCaughtError, BgLogTag } from "./bg-logger";
+import { logBgError } from "@/background/bg-logger";
 
 type SqlJs = import("sql.js").SqlJsStatic;
 
@@ -84,7 +85,8 @@ async function readOpfsFile(
         const hasContent = buffer.byteLength > 0;
 
         return hasContent ? buffer : null;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return null;
     }
 }

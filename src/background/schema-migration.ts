@@ -30,6 +30,7 @@ import { getV7Statements } from "./migration-v7-sql";
 import { getV8Statements } from "./migration-v8-sql";
 import { getV9Statements } from "./migration-v9-sql";
 import { logCaughtError, BgLogTag } from "./bg-logger";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -490,7 +491,8 @@ function getExistingTables(db: SqlJsDatabase): Set<string> {
         }
 
         return new Set(result[0].values.map((row) => String(row[0])));
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return new Set<string>();
     }
 }
@@ -509,7 +511,8 @@ function getTableColumns(db: SqlJsDatabase, tableName: string): Set<string> {
         }
 
         return new Set(result[0].values.map((row) => String(row[nameIndex])));
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return new Set<string>();
     }
 }

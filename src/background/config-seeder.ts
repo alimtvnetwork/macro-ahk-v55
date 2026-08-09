@@ -23,6 +23,7 @@
 import type { JsonValue } from "./handlers/handler-types";
 import type { ProjectDbManager } from "./project-db-manager";
 import { logCaughtError, BgLogTag} from "./bg-logger";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Schema                                                             */
@@ -220,7 +221,8 @@ export function readConfigFromDb(manager: ProjectDbManager): StoredConfigRow[] {
             valueType: String(row[4]),
             updatedAt: String(row[5]),
         }));
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return [];
     }
 }
@@ -294,7 +296,9 @@ function deserializeValue(value: string, valueType: string): JsonValue {
         case "null": return null;
         case "array":
         case "object":
-            try { return JSON.parse(value); } catch (err) { console.error("Automatically logged error:", err); return value; }
+            try { return JSON.parse(value); } catch (err) { logBgError("Automatically logged error:", err);
+
+ return value; }
         default: return value;
     }
 }

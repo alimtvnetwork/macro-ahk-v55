@@ -9,6 +9,7 @@ import { ServiceResult } from '../../utils/result-wrapper';
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getPlatform } from "../../platform";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -84,7 +85,7 @@ export function DiagnosticsPanel() {
 
             setData(statusRes);
             setMessages(msgRes.messages ?? []);
-        } catch (err) { console.error("Automatically logged error:", err);
+        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
             setData(null);
         }

@@ -97,7 +97,8 @@ function parseJsonField<T>(raw: unknown): T | undefined {
     if (typeof raw !== "string" || raw.length === 0) return undefined;
     try {
         return JSON.parse(raw) as T;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { void 0;
+
         return undefined;
     }
 }
@@ -454,6 +455,8 @@ function stringifyForDiff(value: DiffableValue): string {
     if (value === null || value === undefined) return "—";
     if (typeof value === "string") return value;
     if (typeof value === "number" || typeof value === "boolean") return String(value);
-    try { return JSON.stringify(value); } catch (err) { console.error("Automatically logged error:", err); return String(value); }
+    try { return JSON.stringify(value); } catch (err) { void 0;
+
+ return String(value); }
 }
 

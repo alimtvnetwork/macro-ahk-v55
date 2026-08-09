@@ -16,6 +16,7 @@ import { KeyRound, Settings2, ChevronDown, ChevronRight, RefreshCw, Loader2, Che
 import { sendMessage } from "@/lib/message-client";
 import { DEFAULT_PROJECT_DATABASES } from "@/types/default-databases";
 import { KeyValueBrowser } from "./KeyValueBrowser";
+import { logError } from "@/components/options/options-logger";
 
 interface DefaultDatabasesStatusProps {
   projectSlug: string;
@@ -70,7 +71,7 @@ export function DefaultDatabasesStatus({ projectSlug }: DefaultDatabasesStatusPr
           rowCount: result.total ?? 0,
           loading: false,
         });
-      } catch (err) { console.error("Automatically logged error:", err);
+      } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
         updated.push({ name: def.databaseName, exists: false, rowCount: 0, loading: false });
       }

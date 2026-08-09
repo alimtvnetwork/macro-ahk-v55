@@ -9,6 +9,7 @@ import { Timings } from "../../constants/timing";
 import { useState, useCallback } from "react";
 import { getPlatform } from "../../platform";
 import type { AuthHealthResponse } from "../../background/auth-health-handler";
+import { logError } from "@/components/options/options-logger";
 
 const STATUS_ICONS: Record<string, string> = {
     authenticated: "🟢",
@@ -34,7 +35,7 @@ export function AuthHealthPanel() {
         try {
             const res = await platform.sendMessage<AuthHealthResponse>({ type: "GET_AUTH_HEALTH" });
             setData(res);
-        } catch (err) { console.error("Automatically logged error:", err);
+        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
             setData(null);
         } finally {

@@ -13,6 +13,7 @@
 import type { MessageRequest, OkResponse } from "../../shared/messages";
 import { getLogsDb, getErrorsDb, getCurrentSessionId, markLoggingDirty, startSession } from "./logging-handler";
 import { bindOpt, bindReq } from "./handler-guards";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -193,7 +194,8 @@ function redactSensitiveMetadata(metadata: string | null): string | null {
         const redacted = redactObject(parsed);
 
         return JSON.stringify(redacted);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return metadata;
     }
 }

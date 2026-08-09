@@ -19,6 +19,7 @@ import {
   XCircle,
   Activity,
 } from "lucide-react";
+import { logError } from "@/hooks/popup-logger";
 
 interface LogEntry {
   Timestamp?: string;
@@ -54,7 +55,7 @@ export function InjectionDiagnosticsPanel() {
         (l: LogEntry) => l.Category === "INJECTION",
       );
       setEvents(injectionLogs.slice(0, 30));
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
       setEvents([]);
     } finally {

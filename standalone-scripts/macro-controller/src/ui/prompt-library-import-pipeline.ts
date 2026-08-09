@@ -7,7 +7,7 @@ import { renderImportErrorBanner, clearImportErrorBanner, logLibraryImportFailur
 import { renderPartialImportErrors, clearPartialImportErrors, showImportProgress, hideImportProgress, updateImportProgress } from './prompt-library-progress';
 import { validateImportFile } from './prompt-library-preview';
 import { ModalRefs, LOG_SCOPE, IMPORT_FAILED_PREFIX, TOAST_ERROR } from './prompt-library-types';
-import { logError } from '../error-utils';
+import { logError, logError } from '../error-utils';
 import { PreviewTriggerType } from "../types/enums";
 
 export function ensureSpinnerStyle(doc: Document): void {
@@ -120,7 +120,7 @@ function _handleImportValidationError(
   showToast(IMPORT_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
   refs.lastImportFailed = true;
   try { fileInput.value = ''; } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   }
   focusErrorBanner(refs);
 }
@@ -174,7 +174,7 @@ export async function handleImportFile(
     renderPartialImportErrors(refs, results.errors, parsed.errors);
     if (origin === 'drop') focusAfter = 'import';
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     logLibraryImportFailure('thrown', 'threw during read/parse for name=' + file.name, err);
     const reason = extractImportErrorReason(err);
     refs.status.textContent = IMPORT_FAILED_PREFIX + reason;

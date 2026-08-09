@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { sendMessage } from "@/lib/message-client";
 import { DevGuideSection } from "../DevGuideSection";
 import { SemanticSemantic4fd41a } from "../../../types/enums";
+import { logError } from "@/components/options/options-logger";
 
 interface DocsTabProps {
   namespace: string;
@@ -39,7 +40,7 @@ export function DocsTab({ namespace, slug, targetUrls }: DocsTabProps) {
       } else {
         toast.error(resp.errorMessage ?? "Failed to generate docs");
       }
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to generate docs");
     } finally {
       setGenerating(false);

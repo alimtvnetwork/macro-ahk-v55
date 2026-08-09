@@ -14,6 +14,7 @@ export function wrapQuery<T>(
         return fn();
     } catch (error) {
         logCaughtError(tag, message, error);
+
         return fallback;
     }
 }
@@ -28,6 +29,7 @@ export async function wrapQueryAsync<T>(
         return await fn();
     } catch (error) {
         logCaughtError(tag, message, error);
+
         return fallback;
     }
 }

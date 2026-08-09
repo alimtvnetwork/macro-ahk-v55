@@ -11,6 +11,7 @@ import { createErrorModel, type ErrorModel } from "@/types/error-model";
 import type { ColumnDefinition } from "./ColumnEditor";
 import type { ForeignKeyDefinition, OnDeleteAction } from "./ForeignKeyEditor";
 import type { ValidationRule } from "./ValidationRuleEditor";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -163,7 +164,7 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
         }));
         setTables(imported);
         toast.success(`Imported ${imported.length} table(s)`);
-      } catch (err) { console.error("Automatically logged error:", err);
+      } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
         toast.error("Failed to parse schema file");
       }
     };

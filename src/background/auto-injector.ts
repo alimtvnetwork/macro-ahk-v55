@@ -44,6 +44,7 @@ import { readAllProjects } from "./handlers/project-helpers";
 import type { StoredScript } from "../shared/script-config-types";
 import type { MatchResult, ScriptBindingResolved } from "../shared/types";
 import { TriggerType } from "../types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 /** Dedup TTL — absorb burst/double-fires from listener overlap (audit U-1). */
 const DEDUP_TTL_MS = 5_000;
@@ -89,7 +90,8 @@ function isProjectPageUrl(url: string): boolean {
 
         // Only allow /projects/* paths on lovable.dev
         return path.startsWith("/projects/");
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return false;
     }
 }
@@ -182,9 +184,11 @@ export async function handleTabActivated(tabId: number): Promise<void> {
         const message = err instanceof Error ? err.message : String(err);
         if (message.includes("No tab with id")) {
             console.debug(`[auto-injector] tab ${tabId} closed before get`);
+
             return;
         }
         logCaughtError(BgLogTag.MARCO, "tabs.onActivated: tabs.get failed", err);
+
         return;
     }
     const url = tab.url ?? "";

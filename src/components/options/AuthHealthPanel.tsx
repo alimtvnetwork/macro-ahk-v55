@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Shield, Play, Copy, Check, Loader2 } from "lucide-react";
 import { sendMessage } from "@/lib/message-client";
 import { Status, VariantEnum } from "../../types/enums";
+import { logError } from "@/components/options/options-logger";
 
 interface AuthStrategyResult {
     name: string;
@@ -52,7 +53,7 @@ export function AuthHealthPanel() {
         try {
             const res = await sendMessage<AuthHealthData>({ type: "GET_AUTH_HEALTH" });
             setData(res);
-        } catch (err) { console.error("Automatically logged error:", err);
+        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
             setData(null);
         } finally {

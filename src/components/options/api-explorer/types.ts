@@ -1,3 +1,5 @@
+import { logError } from "@/components/options/options-logger";
+
 /**
  * API Explorer Types & Helpers
  * See: spec/05-chrome-extension/64-api-explorer-swagger.md
@@ -70,7 +72,8 @@ export function toPascalCaseKeys(source: Record<string, unknown>): Record<string
 export function toPrettyJson(value: unknown): string {
   try {
     return JSON.stringify(value, null, 2);
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return String(value);
   }
 }

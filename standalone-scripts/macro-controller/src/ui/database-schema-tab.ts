@@ -10,7 +10,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
  */
 
 import { log } from '../logger';
-import { logDebug } from '../error-utils';
+import { logDebug, logError } from '../error-utils';
 import { sendToExtension } from './prompt-manager';
 import type { ExtensionCallbackResponse } from '../types';
 import { injectSchemaStyles } from './database-schema-styles';
@@ -446,7 +446,7 @@ function buildTableEntry(
         columns.map(column => column.Name + ' (' + column.Type + ')').join(', '));
       info.appendChild(colInfo);
     } catch (_e) {
-      console.error();
+      logError('MacroController', 'Unknown error');
       logDebug('database-schema-tab', 'Column JSON parse failed: ' + (_e instanceof Error ? _e.message : String(_e)));
     }
   }

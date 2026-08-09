@@ -14,7 +14,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
  */
 
 import { log } from './logger';
-import { logDebug } from './error-utils';
+import { logDebug, logError } from './error-utils';
 import { getLastSessionBridgeSource } from './shared-state';
 import {
   getBearerTokenFromSessionBridge,
@@ -180,7 +180,7 @@ function resolveTokenTtlMs(): number {
       return overrides.tokenTtlMs;
     }
   } catch (_e) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     logDebug('getTokenTtlMs', 'Config override read failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 
@@ -192,7 +192,7 @@ function resolveTokenTtlMs(): number {
       return config.authBridge.tokenTtlMs;
     }
   } catch (_e) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     logDebug('getTokenTtlMs', '__MARCO_CONFIG__ read failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 

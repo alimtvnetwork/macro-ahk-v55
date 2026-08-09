@@ -198,7 +198,7 @@ function findViaAriaLabel(desc: ElementDescriptor): Element | null {
         return result;
       }
     } catch (_e) {
-      console.error();
+      logError('MacroController', 'Unknown error');
       logSub('ARIA label query skipped for "' + label + '": ' + toErrorMessage(_e), 1);
     }
   }

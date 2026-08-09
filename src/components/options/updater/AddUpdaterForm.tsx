@@ -55,6 +55,7 @@ export function AddUpdaterForm({ onAdd, onCancel }: AddUpdaterFormProps) {
   const handleAdd = async () => {
     if (!newName.trim() || !newScriptUrl.trim()) {
       toast.error("Name and Script URL are required");
+
       return;
     }
     

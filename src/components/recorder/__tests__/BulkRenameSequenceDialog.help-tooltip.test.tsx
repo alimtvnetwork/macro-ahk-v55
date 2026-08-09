@@ -12,11 +12,12 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 
 import { BulkRenameSequenceDialog } from "@/components/recorder/KeywordEventBulkContextMenu";
+import { logError } from "@/components/recorder/recorder-logger";
 
 describe("BulkRenameSequenceDialog help tooltip", () => {
     beforeEach(() => {
         try { localStorage.clear(); } catch (err) {
-        console.error("Automatically caught swallowed error", err); }
+        logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err); }
     });
 
     function renderOpen(): void {

@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { getPlatform } from "../../platform";
 import { Toast } from "../shared/Toast";
 import { AlertVariantType } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { logError } from "@/components/options/options-logger";
 
 interface StoredScript {
     id: string;
@@ -30,7 +31,7 @@ export function ScriptsLibrary() {
                 type: "GET_ALL_SCRIPTS",
             });
             setScripts(response.scripts ?? []);
-        } catch (err) { console.error("Automatically logged error:", err);
+        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
             setScripts([]);
         } finally {

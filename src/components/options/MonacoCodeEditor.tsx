@@ -570,7 +570,9 @@ export function MonacoCodeEditor({ value, onChange, language, height = "240px", 
   const jsonValid = language === "json" ? (() => {
     try { JSON.parse(safeValue);
 
- return true; } catch (err) { console.error("Automatically logged error:", err); return false; }
+ return true; } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
+ return false; }
   })() : true;
 
   return (

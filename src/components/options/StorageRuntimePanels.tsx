@@ -25,6 +25,7 @@ import {
   Eraser,
 } from "lucide-react";
 import { SemanticSemantic162dadd } from "../../types/enums";
+import { logError } from "@/components/options/options-logger";
 
 type RuntimeStorageSurface = SemanticSemantic162dadd;
 
@@ -74,7 +75,8 @@ interface StorageRuntimePanelsProps {
 function toPrettyJson(value: JsonValue): string {
   try {
     return JSON.stringify(value, null, 2);
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return String(value ?? "");
   }
 }
@@ -84,7 +86,8 @@ function parseEditorValue(raw: string): string | number | boolean | null | objec
   if (!trimmed) return "";
   try {
     return JSON.parse(trimmed);
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return raw;
   }
 }
@@ -277,7 +280,7 @@ function SessionPanel() {
         prefix: prefix.trim() || undefined,
       });
       setEntries(response.entries ?? []);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to load session storage");
       setEntries([]);
     } finally {
@@ -310,7 +313,7 @@ function SessionPanel() {
       toast.success("Session entry saved");
       setEditorOpen(false);
       void loadEntries();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to save session entry");
     }
   };
@@ -321,7 +324,7 @@ function SessionPanel() {
       await platform.sendMessage({ type: "STORAGE_SESSION_DELETE", key });
       toast.success("Session entry deleted");
       void loadEntries();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to delete session entry");
     }
   };
@@ -340,7 +343,7 @@ function SessionPanel() {
       });
       toast.success(`Cleared ${response.cleared ?? 0} session keys`);
       void loadEntries();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to clear session storage");
     }
   };
@@ -496,7 +499,7 @@ function CookiesPanel() {
         nameContains: nameFilter.trim() || undefined,
       });
       setCookies(response.cookies ?? []);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to load cookies");
       setCookies([]);
     } finally {
@@ -540,7 +543,7 @@ function CookiesPanel() {
       toast.success("Cookie saved");
       setEditorOpen(false);
       void loadCookies();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to save cookie");
     }
   };
@@ -559,7 +562,7 @@ function CookiesPanel() {
       });
       toast.success("Cookie deleted");
       void loadCookies();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to delete cookie");
     }
   };
@@ -577,7 +580,7 @@ function CookiesPanel() {
       });
       toast.success(`Cleared ${response.cleared ?? 0} cookie(s)`);
       void loadCookies();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to clear cookies");
     }
   };
@@ -759,7 +762,7 @@ function IndexedDbPanel() {
         ? selectedDatabase
         : (items[0]?.name ?? "");
       setSelectedDatabase(nextDb);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to inspect IndexedDB databases");
       setDatabases([]);
       setSelectedDatabase("");
@@ -784,7 +787,7 @@ function IndexedDbPanel() {
         ? selectedStore
         : (view.stores[0]?.name ?? "");
       setSelectedStore(nextStore);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to inspect IndexedDB records");
       setDatabaseView(null);
       setSelectedStore("");
@@ -819,7 +822,7 @@ function IndexedDbPanel() {
       toast.success("IndexedDB record updated");
       setEditorOpen(false);
       void loadSelectedDatabase();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to update IndexedDB record");
     }
   };
@@ -831,7 +834,7 @@ function IndexedDbPanel() {
       await deleteIndexedRecord(selectedDatabase, selectedStore, record.key);
       toast.success("IndexedDB record deleted");
       void loadSelectedDatabase();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to delete IndexedDB record");
     }
   };
@@ -844,7 +847,7 @@ function IndexedDbPanel() {
       await clearIndexedStore(selectedDatabase, selectedStore);
       toast.success("IndexedDB store cleared");
       void loadSelectedDatabase();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to clear IndexedDB store");
     }
   };
@@ -859,7 +862,7 @@ function IndexedDbPanel() {
       setSelectedStore("");
       setSelectedDatabase("");
       void loadDatabases();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to delete IndexedDB database");
     }
   };

@@ -19,6 +19,7 @@
 import type { JsonValue } from "../handlers/handler-types";
 import { isSensitiveDiagnosticName, maskDiagnosticValue } from "./sensitive-diagnostics";
 import { VariableValueType, VariableFailureReasonType } from "../../types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 const TOKEN_PATTERN = /\\?\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/g;
 
@@ -274,7 +275,9 @@ function sanitizeDiagnosticValue(name: string, value: JsonValue): JsonValue {
 }
 
 function safeStringify(v: JsonValue): string {
-    try { return JSON.stringify(v) ?? "undefined"; } catch (err) { console.error("Automatically logged error:", err); return String(v); }
+    try { return JSON.stringify(v) ?? "undefined"; } catch (err) { logBgError("Automatically logged error:", err);
+
+ return String(v); }
 }
 
 function valueToReplacement(value: JsonValue | null): string {

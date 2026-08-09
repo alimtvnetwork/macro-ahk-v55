@@ -11,7 +11,7 @@ import { log, logSub } from '../logger';
 import { LabelType, type PromptEntry, type ResolvedPromptsConfig } from '../types';
 import { showPasteToast, pasteIntoEditor } from './prompt-utils';
 
-import { logError } from '../error-utils';
+import { logError, logError } from '../error-utils';
 import { getPersistentTaskQueue, resolveTaskQueueProjectId } from '../queue-control/task-queue-project-store';
 import { REPLACE_KEY_DEFAULT } from '../db/prompt-defaults';
 import { substituteToken } from '../utils/token-substitute';
@@ -185,7 +185,7 @@ function findButtonBySelectors(): HTMLElement | null {
 
       return btn as HTMLElement;
     } catch (e) {
-      console.error();
+      logError('MacroController', 'Unknown error');
       logSub('Task Next: querySelector failed for "' + selector + '": ' + (e instanceof Error ? e.message : String(e)), 1);
     }
   }

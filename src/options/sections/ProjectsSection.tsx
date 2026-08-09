@@ -10,6 +10,7 @@ import { getPlatform } from "../../platform";
 import { ProjectEditor } from "./ProjectEditor";
 import { Toast } from "../shared/Toast";
 import { CookieBindingRoleType, ToastVariantType, PopupActionsModeType } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -50,7 +51,7 @@ export function ProjectsSection() {
                 type: "GET_ALL_PROJECTS",
             });
             setProjects(response.projects ?? []);
-        } catch (err) { console.error("Automatically logged error:", err);
+        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
             setProjects([]);
         } finally {
@@ -80,7 +81,6 @@ export function ProjectsSection() {
             });
             downloadFile(response.json, response.filename, "application/json");
         } catch (err) {
-
             const msg = err instanceof Error ? err.message : String(err);
             setToast({ message: `Export failed: ${msg}`, variant: "error" });
         }
@@ -99,7 +99,6 @@ export function ProjectsSection() {
                 await loadProjects();
                 setToast({ message: "Project imported successfully", variant: "success" });
             } catch (err) {
-
                 const msg = err instanceof Error ? err.message : String(err);
                 setToast({ message: `Import failed: ${msg}`, variant: "error" });
             }
@@ -112,7 +111,6 @@ export function ProjectsSection() {
             await platform.sendMessage({ type: "EXPORT_SQLITE_BUNDLE" });
             setToast({ message: "SQLite bundle exported", variant: "success" });
         } catch (err) {
-
             const msg = err instanceof Error ? err.message : String(err);
             setToast({ message: `Export failed: ${msg}`, variant: "error" });
         }
@@ -134,7 +132,6 @@ export function ProjectsSection() {
             await loadProjects();
             setToast({ message: `SQLite bundle imported (${importMode})`, variant: "success" });
         } catch (err) {
-
             const msg = err instanceof Error ? err.message : String(err);
             setToast({ message: `Import failed: ${msg}`, variant: "error" });
         }

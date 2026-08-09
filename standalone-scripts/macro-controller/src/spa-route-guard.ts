@@ -28,7 +28,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
  */
 
 import { log } from './logger';
-import { logError } from './error-utils';
+import { logError, logError } from './error-utils';
 import {
   extractProjectIdFromUrl,
   invalidateProjectIdCache,
@@ -154,7 +154,7 @@ function evaluateRouteChange(source: RouteChangeSourceType): void {
     try {
       showToast('Project route changed — loop stopped', 'info', { noStop: true });
     } catch (_e: unknown) {
-      console.error();
+      logError('MacroController', 'Unknown error');
     }
 
     // Re-resolve the workspace name from the REST API for the new project.

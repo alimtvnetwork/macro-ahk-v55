@@ -43,7 +43,7 @@ export function InjectionModeToggle() {
         type: "SAVE_SETTINGS",
         settings: { forceLegacyInjection: checked },
       });
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
       setForceLegacy(!checked);
     }

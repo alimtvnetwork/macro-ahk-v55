@@ -16,6 +16,7 @@ import {
   ChevronDown, ChevronRight,
 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { logError } from "@/components/options/options-logger";
 
 interface SchemaSnapshot {
   id: string;
@@ -55,14 +56,14 @@ export function SchemaVersionHistory({
         try {
           const parsed = JSON.parse(resp.value);
           setVersions(Array.isArray(parsed) ? parsed : []);
-        } catch (err) { console.error("Automatically logged error:", err);
+        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
           setVersions([]);
         }
       } else {
         setVersions([]);
       }
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
       setVersions([]);
     } finally {
@@ -116,7 +117,7 @@ export function SchemaVersionHistory({
       });
       setVersions(updated);
       toast.success("Version deleted");
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to delete version");
     }
   };

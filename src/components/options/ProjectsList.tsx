@@ -29,6 +29,7 @@ import { JsonTreeEditor } from "./JsonTreeEditor";
 import { hasFolderEntry, parseDroppedFolder } from "@/lib/folder-parser";
 import { toast } from "sonner";
 import { exportProjectAsSqliteZip } from "@/lib/sqlite-bundle";
+import { logError } from "@/components/options/options-logger";
 
 interface UrlRule {
   pattern: string;
@@ -327,7 +328,9 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
                 Injection Variables
                 {form.variables !== "{}" && (
                   <Badge variant="secondary" className="text-[9px] ml-1 px-1 py-0">
-                    {(() => { try { return Object.keys(JSON.parse(form.variables)).length; } catch (err) { console.error("Automatically logged error:", err); return 0; } })()}
+                    {(() => { try { return Object.keys(JSON.parse(form.variables)).length; } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
+ return 0; } })()}
                   </Badge>
                 )}
               </CollapsibleTrigger>
@@ -357,7 +360,8 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
                     {(() => {
                       try { JSON.parse(form.variables);
 
- return null; } catch (err) { console.error("Automatically logged error:", err);
+ return null; } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
                         return (
                           <p className="text-[10px] text-destructive mt-1">Invalid JSON</p>
                         );
@@ -493,7 +497,8 @@ function VariablesBadge({ variables }: { variables?: string }) {
         {count} var{count !== 1 ? "s" : ""}
       </Badge>
     );
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return null;
   }
 }

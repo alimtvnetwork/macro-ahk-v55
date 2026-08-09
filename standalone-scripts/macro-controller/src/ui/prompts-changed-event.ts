@@ -1,3 +1,5 @@
+import { logError } from "../error-utils";
+
 const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Cross-module notification that the Prompt table changed on disk.
@@ -26,10 +28,10 @@ export function dispatchPromptsChanged(detail: PromptsChangedDetail = {}): void 
   try {
     document.dispatchEvent(new CustomEvent(PROMPTS_CHANGED_EVENT, { detail }));
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     // Older jsdom environments without CustomEvent fall back to a plain Event.
     try { document.dispatchEvent(new Event(PROMPTS_CHANGED_EVENT)); } catch (err) {
-      console.error();
+      logError('MacroController', 'Unknown error');
     }
   }
 }

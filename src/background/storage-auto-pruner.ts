@@ -7,6 +7,7 @@
 
 import { countTable, getLogsDb, getErrorsDb, markLoggingDirty } from "./handlers/logging-handler";
 import { transitionHealth, recoverHealth } from "./health-handler";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -104,7 +105,8 @@ function getTotalRows(): number {
         const errorCount = countTable(getErrorsDb(), "Errors");
 
         return logCount + errorCount;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return 0;
     }
 }

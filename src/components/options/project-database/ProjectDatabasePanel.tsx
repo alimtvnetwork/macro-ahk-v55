@@ -29,6 +29,7 @@ import { DEFAULT_PROJECT_DATABASES, DATABASE_KINDS, MAX_USER_DATABASES, validate
 import { CreateDatabaseForm } from "./CreateDatabaseForm";
 import { DefaultDatabasesStatus } from "./DefaultDatabasesStatus";
 import { Type, JsonSchemaTabFormat } from "../../../types/enums";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -100,7 +101,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
         const userCreated = result.rows.filter((r) => r.IsDefault !== 1).length;
         setUserDbCount(userCreated);
       }
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
       // ProjectDatabases table may not exist yet — default to 0
       setUserDbCount(0);
@@ -127,7 +128,6 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
         setTables(result.tables);
       }
     } catch (err) {
-
       showError(err, "RefreshTables", { type: "PROJECT_API", project: projectSlug });
       setTables([]);
     } finally {
@@ -391,7 +391,9 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
               <TableBody>
                 {tables.map((t) => {
                   const cols: ColumnDef[] = (() => {
-                    try { return JSON.parse(t.ColumnDefs); } catch (err) { console.error("Automatically logged error:", err); return []; }
+                    try { return JSON.parse(t.ColumnDefs); } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
+ return []; }
                   })();
 
                   return (

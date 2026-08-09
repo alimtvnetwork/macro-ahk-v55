@@ -31,6 +31,7 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import { toast } from "sonner";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -185,7 +186,7 @@ export function ErrorDrawer({ open, onOpenChange }: ErrorDrawerProps) {
       await sendMessage({ type: "CLEAR_ERRORS" });
       toast.success("All errors cleared");
       await refresh();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to clear errors");
     }
   }, [refresh]);

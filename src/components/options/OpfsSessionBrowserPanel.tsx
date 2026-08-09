@@ -23,6 +23,7 @@ import {
     Check,
 } from "lucide-react";
 import { toast } from "sonner";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -64,7 +65,8 @@ function formatTimestamp(iso: string): string {
         const d = new Date(iso);
 
         return d.toLocaleString();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
         return iso;
     }
 }
@@ -160,7 +162,6 @@ export function OpfsSessionBrowserPanel() {
             });
             setData(result);
         } catch (err) {
-
             const msg = err instanceof Error ? err.message : "Failed to browse OPFS sessions";
             setError(msg);
         } finally {

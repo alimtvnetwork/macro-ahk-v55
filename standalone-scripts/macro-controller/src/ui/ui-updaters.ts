@@ -27,6 +27,7 @@ import { domCache } from '../dom-cache';
 // Re-export status renderer symbols
 export { updateStatus, updateRecordIndicator, statusRenderStats, updateQueueBadge } from './ui-status-renderer';
 import { updateStatus, updateRecordIndicator } from './ui-status-renderer';
+import { logError } from "../error-utils";
 
 /**
  * Master UI refresh — calls all sub-updaters and repopulates workspace dropdown.
@@ -224,7 +225,7 @@ export function destroyPanel(): void {
   try {
     if (typeof domCache.invalidate === 'function') domCache.invalidate();
   } catch (_e) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   }
 
   // v3.60.0: drop stale UI factories so the next IIFE installs fresh closures
@@ -234,7 +235,7 @@ export function destroyPanel(): void {
     nsWrite('_internal.createUIWrapper', undefined as unknown as () => void);
     nsWrite('_internal.createUIManager', undefined as unknown as () => object);
   } catch (_e) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   }
 
   // Tear down the singleton so the next injection bootstraps a fresh one

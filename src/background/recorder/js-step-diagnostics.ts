@@ -63,6 +63,7 @@ import {
 } from "./js-step-sandbox";
 import { isSensitiveDiagnosticName, maskDiagnosticValue } from "./sensitive-diagnostics";
 import { BuildVarEntrySourceType } from "../../types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -197,7 +198,8 @@ function jsStepReasonDetail(err: unknown, body: string): string {
     }
     try {
         return `Runtime: ${JSON.stringify(err)}`;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return `Runtime: ${String(err)}`;
     }
 }

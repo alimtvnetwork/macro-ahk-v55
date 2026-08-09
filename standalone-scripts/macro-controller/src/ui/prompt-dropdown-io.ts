@@ -24,6 +24,7 @@ import {
 import { clearUISnapshot } from './prompt-cache';
 import { showPasteToast } from './prompt-utils';
 import { dispatchPromptsChanged } from './prompts-changed-event';
+import { logError } from "../error-utils";
 
 export type Rerender = () => void;
 
@@ -232,7 +233,7 @@ function makeIoOptionRow(pop: HTMLElement, label: string, run: () => Promise<voi
         });
       }
     } catch (err) {
-      console.error();
+      logError('MacroController', 'Unknown error');
       showPasteToast('❌ ' + label + ' failed: ' + String(err), true);
     }
   };
@@ -346,7 +347,7 @@ async function runPromptImport(text: string, rerender: Rerender): Promise<void> 
     await loadPromptsFromJson();
     rerender();
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     showPasteToast('❌ Import failed: ' + String(err), true);
   }
 }
@@ -366,7 +367,7 @@ export async function dispatchImportFile(file: File, rerender: Rerender): Promis
     const text = new TextDecoder('utf-8').decode(bytes);
     await runPromptImport(text, rerender);
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     showPasteToast('❌ Import failed: ' + String(err), true);
   }
 }

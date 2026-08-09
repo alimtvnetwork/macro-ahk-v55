@@ -16,6 +16,7 @@ import {
 
 import { type MessageRequest } from "../../shared/messages";
 import type { SqlRow } from "./handler-types";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Schema                                                             */
@@ -111,9 +112,13 @@ function rowToChain(r: SqlRow): ChainOutput {
         projectId: (r.ProjectId as string) || "default",
         name: r.Name as string,
         slug: r.Slug as string,
-        steps: (() => { try { return JSON.parse(r.StepsJson as string) as JsonValue[]; } catch (err) { console.error("Automatically logged error:", err); return []; } })(),
+        steps: (() => { try { return JSON.parse(r.StepsJson as string) as JsonValue[]; } catch (err) { logBgError("Automatically logged error:", err);
+
+ return []; } })(),
         triggerType: (r.TriggerType as string) || "manual",
-        triggerConfig: (() => { try { return JSON.parse((r.TriggerConfigJson as string) || "{}") as JsonValue; } catch (err) { console.error("Automatically logged error:", err); return {}; } })(),
+        triggerConfig: (() => { try { return JSON.parse((r.TriggerConfigJson as string) || "{}") as JsonValue; } catch (err) { logBgError("Automatically logged error:", err);
+
+ return {}; } })(),
         enabled: !!(r.Enabled as number),
         createdAt: r.CreatedAt as string,
         updatedAt: r.UpdatedAt as string,

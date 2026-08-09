@@ -13,6 +13,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
 
 import { trackedSetInterval, trackedClearInterval } from './interval-registry';
 import { throwDiagnostic } from './errors/diagnostic-error';
+import { logError } from "./error-utils";
 
 // ============================================
 // Types (re-exported for consumers)
@@ -69,7 +70,7 @@ function getSdkUtils(): SdkUtils | null {
       return w.marco.utils;
     }
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   } // allow-swallow: SDK probe — absence is the expected case in unit/isolated contexts; caller handles null.
 
   return null;

@@ -13,6 +13,8 @@ import { readCookieFromCandidates, type ChromeCookie } from "./cookie-helpers";
 import { logCaughtError, BgLogTag} from "./bg-logger";
 
 import { getChromeRef } from "./chrome-ref";
+import { logBgError } from "@/background/bg-logger";
+
 const _chr = getChromeRef();
 
 /** Builds the full status response aggregated from all subsystems. */
@@ -152,7 +154,8 @@ async function resolveConfigStatus(): Promise<StatusResponse["config"]> {
         }
 
         return { status: "defaults", source: "hardcoded" };
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return { status: "defaults", source: "hardcoded" };
     }
 }

@@ -25,6 +25,7 @@ import {
   RefreshCw,
   Shield,
 } from "lucide-react";
+import { logError } from "@/hooks/popup-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -82,7 +83,7 @@ export function InjectionErrorPanel() {
         type: "GET_ACTIVE_ERRORS",
       });
       setErrors(res.errors ?? []);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
       setErrors([]);
     }
@@ -361,7 +362,7 @@ function ClearAllButton({ onCleared }: { onCleared: () => void }) {
       onCleared();
     } catch (err) { 
       // ignore
-      console.error("Automatically caught swallowed error", err);
+      logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err);
     }
     setClearing(false);
   };
@@ -409,7 +410,8 @@ function formatTime(timestamp: string): string {
       minute: "2-digit",
       second: "2-digit",
     });
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return timestamp;
   }
 }

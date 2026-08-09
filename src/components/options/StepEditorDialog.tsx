@@ -56,6 +56,7 @@ import {
     type UrlTabClickFormState,
 } from "./step-editor/payload-builders";
 import { StepEditorKindBody } from "./step-editor/StepEditorKindBody";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Public surface                                                     */
@@ -119,7 +120,8 @@ function hydrateHotkeyForm(
         const waitMs = typeof parsed.WaitMs === "number" ? String(parsed.WaitMs) : "";
 
         return { chords, waitMs };
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
         return { chords: [], waitMs: "" };
     }
 }

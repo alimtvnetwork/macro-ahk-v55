@@ -29,6 +29,7 @@ function installSdkMock(handler: () => { ok: boolean; status: number; data: unkn
                     sdkCalls.push({ path, method: opts.method, params: opts.params });
 
                     const res = await handler();
+
                     return {
                         ...res,
                         isFail: !res.ok,

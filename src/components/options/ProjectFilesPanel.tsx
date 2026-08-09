@@ -44,6 +44,7 @@ import {
 import { MonacoCodeEditor } from "./LazyMonacoCodeEditor";
 import { toast } from "sonner";
 import { LanguageEnum } from "../../types/enums";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -366,7 +367,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
       const fileList = Array.isArray(result.files) ? result.files : [];
       setFiles(fileList);
       setTree(buildTree(fileList));
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
       setFiles([]);
       setTree([]);

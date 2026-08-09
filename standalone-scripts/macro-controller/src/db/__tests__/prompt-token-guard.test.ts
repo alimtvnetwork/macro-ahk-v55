@@ -8,6 +8,7 @@ import {
     extractParamTokens,
     ParamTokenMismatch,
 } from '../prompt-token-guard';
+import { logError } from "../../error-utils";
 
 describe('extractParamTokens', () => {
     it('extracts every {{token}} in order, allowing dots/colons/hyphens/underscores/digits', () => {
@@ -41,7 +42,7 @@ describe('assertParamTokensUnchanged', () => {
             assertParamTokensUnchanged('hi {{count}}', 'hi {{n}}');
             throw new Error('should have thrown');
         } catch (e) {
-            console.error();
+            logError('MacroController', 'Unknown error');
             expect(e).toBeInstanceOf(ParamTokenMismatch);
             const err = e as ParamTokenMismatch;
             expect(err.added).toEqual(['n']);

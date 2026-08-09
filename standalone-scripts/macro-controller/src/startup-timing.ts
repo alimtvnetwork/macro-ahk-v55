@@ -1,5 +1,6 @@
 const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { TimingEntryStatusType } from "./types/enums";
+import { logError } from "./error-utils";
 
 /**
  * Startup Timing Waterfall — records elapsed time per bootstrap phase.
@@ -115,7 +116,7 @@ export function logTimingSummary(): void {
     const ver = ext?.version || '?';
     lines.push('│  Version: v' + ver + '                                                    │'.substring(0, 55) + '│');
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   }
 
   lines.push('└─────────────────────────────────────────────────────────────────┘');

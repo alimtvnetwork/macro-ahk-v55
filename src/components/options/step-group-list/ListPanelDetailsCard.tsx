@@ -22,6 +22,7 @@ import { Switch } from "@/components/ui/switch";
 
 import type { StepGroupRow, StepRow } from "@/background/recorder/step-library/db";
 import { stepKindLabel } from "@/hooks/use-step-library";
+import { logError } from "@/components/options/options-logger";
 
 /**
  * Locale-aware timestamp formatter. Falls back to the raw ISO string
@@ -30,7 +31,8 @@ import { stepKindLabel } from "@/hooks/use-step-library";
 function formatDate(iso: string): string {
     try {
         return new Date(iso).toLocaleString();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
         return iso;
     }
 }

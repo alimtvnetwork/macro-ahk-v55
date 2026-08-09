@@ -16,6 +16,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import 'fake-indexeddb/auto';
 import type { WorkspaceCredit } from '../types';
+import { logError } from "../error-utils";
 
 const hoisted = vi.hoisted(() => ({ fetchSpy: vi.fn() }));
 
@@ -84,7 +85,7 @@ beforeEach(async () => {
     cache.clearCreditBalanceUpdateMemoryCache();
     for (const id of ['ws_newfree_1', 'ws_pro_inline_1']) {
         try { await cache.invalidateCreditBalanceUpdateCache(id); } catch (_e) {
-            console.error();
+            logError('MacroController', 'Unknown error');
         }
     }
 });

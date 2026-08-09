@@ -30,6 +30,7 @@ import type { PromptEntry } from '../types/ui-types';
 import type { PromptsBundleV1 } from './prompt-bundle-types';
 import { buildPromptsBundle } from './prompt-bundle-types';
 import { sanitizeSlug } from './prompt-slug-utils';
+import { logError } from "../error-utils";
 
 /* ------------------------------------------------------------------ */
 /*  CRC32 (same polynomial as prompt-io-zip.ts)                        */
@@ -225,7 +226,7 @@ export function buildPromptsZipStream(
         controller.enqueue(buildEocd(centralStart, centralSize, central.length));
         controller.close();
       } catch (err) {
-        console.error();
+        logError('MacroController', 'Unknown error');
         controller.error(err);
       }
     },

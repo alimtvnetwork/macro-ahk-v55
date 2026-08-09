@@ -106,7 +106,6 @@ export function XPathValidationPanel() {
             });
             setResult(res);
         } catch (err) {
-
             // In preview mode, generate mock results
             const mockResults: ValidationEntry[] = Object.entries(DEFAULT_XPATHS).map(([name, { xpath, selector }], i) => ({
                 name,

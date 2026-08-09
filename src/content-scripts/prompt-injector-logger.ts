@@ -28,7 +28,8 @@ function getLogger(): NamespaceLogger | null {
         const w = window as unknown as MaybeNamespaceWindow;
 
         return w.RiseupAsiaMacroExt?.Logger ?? null;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { void 0;
+
         return null;
     }
 }

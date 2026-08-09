@@ -30,7 +30,7 @@ import {
   cPrimaryBorderA,
 } from '../shared-state';
 import { log } from '../logger';
-import { logError } from '../error-utils';
+import { logError, logError } from '../error-utils';
 import { showToast } from '../toast';
 import {
   applyRenameTemplate,
@@ -155,7 +155,7 @@ async function _autoSave(inputs: RenameInputsResult): Promise<void> {
     const preset = _readUiToPreset(inputs);
     await store.savePreset(_activePresetName, preset);
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   }
 }
 

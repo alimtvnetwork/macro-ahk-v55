@@ -29,6 +29,7 @@
 import { SelectorKindId } from "../recorder-db-schema";
 import type { PersistedSelector } from "./step-persistence";
 import { AttemptFailureReasonType, AttemptStrategyType } from "../../types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 /**
  * Per-attempt outcome enum. Short, machine-readable codes — keep values
@@ -271,5 +272,7 @@ function failure(
 function extractMessage(err: unknown): string {
     if (err instanceof Error) { return err.message; }
     if (typeof err === "string") { return err; }
-    try { return JSON.stringify(err); } catch (err) { console.error("Automatically logged error:", err); return String(err); }
+    try { return JSON.stringify(err); } catch (err) { logBgError("Automatically logged error:", err);
+
+ return String(err); }
 }

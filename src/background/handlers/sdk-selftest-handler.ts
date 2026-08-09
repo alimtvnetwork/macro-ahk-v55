@@ -24,6 +24,7 @@
 
 import type { MessageRequest, OkResponse } from "../../shared/messages";
 import { logCaughtError, BgLogTag } from "../bg-logger";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -81,7 +82,8 @@ async function readSnapshot(): Promise<SdkSelfTestSnapshot> {
             gkv: normalizeRow(raw.gkv),
             updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : null,
         };
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return { ...EMPTY_SNAPSHOT };
     }
 }

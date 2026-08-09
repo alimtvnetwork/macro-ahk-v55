@@ -1,6 +1,7 @@
 import { ScriptBundlesListView } from "./ScriptBundlesListView";
 import type { StoredConfig, StoredScript } from "@/hooks/use-projects-scripts";
 import { toast } from "sonner";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -45,7 +46,7 @@ export function GlobalScriptsView({
             name: file.name.replace(/\.[^.]+$/, ""),
             json: content,
           });
-        } catch (err) { console.error("Automatically logged error:", err);
+        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
           toast.error(`Invalid JSON: ${file.name}`);
           continue;
         }

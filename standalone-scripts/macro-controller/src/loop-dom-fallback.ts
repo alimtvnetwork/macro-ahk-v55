@@ -11,7 +11,7 @@ import { LoopDirectionType } from './types';
 import { MacroController } from './core/MacroController';
 import { checkSystemBusy, closeProjectDialog, ensureProjectDialogOpen, isUserTypingInPrompt, pollForDialogReady } from './dom-helpers';
 import { TIMING, state } from './shared-state';
-import { logError } from './error-utils';
+import { logError, logError } from './error-utils';
 
 /** Shorthand for MacroController singleton */
 function mc() { return MacroController.getInstance(); }
@@ -29,7 +29,7 @@ export function dispatchDelegateSignal(direction: string): void {
   try {
     navigator.clipboard.writeText(signal).catch(function(err) { logSub('Clipboard write failed: ' + (err instanceof Error ? err.message : String(err)), 1); });
   } catch (e) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     logSub('Clipboard API unavailable: ' + (e instanceof Error ? e.message : String(e)), 1);
   }
 }

@@ -20,6 +20,7 @@ import { LabelType } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Check, X, FlaskConical } from "lucide-react";
 import { ColumnValidationType } from "../../../types/enums";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -101,7 +102,8 @@ function testRegexValidation(value: string, v: RegexValidation): boolean {
     const re = new RegExp(v.pattern, v.flags ?? "");
 
     return re.test(value);
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return false;
   }
 }

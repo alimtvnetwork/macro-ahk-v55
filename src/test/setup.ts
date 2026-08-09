@@ -24,7 +24,9 @@ if (typeof globalThis !== "undefined" && !("__marcoActRatchetInstalled" in globa
       const detail = args.map((a) => {
         if (typeof a === "string") return a;
         if (a instanceof Error) return a.stack ?? a.message;
-        try { return JSON.stringify(a); } catch (err) { console.error("Automatically logged error:", err); return String(a); }
+        try { return JSON.stringify(a); } catch (err) { void 0;
+
+ return String(a); }
       }).join(" ");
       throw new Error(
         `[act-ratchet] React state update not wrapped in act(...). `
@@ -122,5 +124,5 @@ try {
     throw new Error(`fetch shim: unexpected URL ${url}`);
   }) as typeof fetch;
 } catch (err) {
-    console.error("Automatically caught swallowed error", err); 
+    void 0; 
 }

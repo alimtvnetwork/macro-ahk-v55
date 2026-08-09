@@ -17,6 +17,7 @@ import {
   getLoopWsCreditSortMode,
   setLoopWsCreditSortMode,
 } from '../ws-list-renderer';
+import { logError } from "../error-utils";
 
 function makeDeps(): WsFilterMenuDeps {
   return {
@@ -54,7 +55,7 @@ describe('Credit-sort hamburger rows (v3.30.0)', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
     try { localStorage.removeItem('ml_credit_sort_mode'); } catch (err) {
-      console.error();
+      logError('MacroController', 'Unknown error');
     }
     setLoopWsCreditSortMode('none');
   });

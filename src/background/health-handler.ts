@@ -17,6 +17,7 @@ import { logBgWarnError, logCaughtError, BgLogTag} from "./bg-logger";
 
 import { getChromeRef } from "./chrome-ref";
 import { ApplyQuotaResultType, ApplyErrorRateResultType } from "../types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 const _chr = getChromeRef();
 
@@ -119,7 +120,8 @@ function checkStorageQuota(): ApplyQuotaResultType {
         if (isWarning) return "warning";
 
         return "ok";
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return "ok";
     }
 }
@@ -150,7 +152,8 @@ function checkErrorRate(): ApplyErrorRateResultType {
         if (isDegraded) return "degraded";
 
         return "ok";
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return "ok";
     }
 }

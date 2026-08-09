@@ -133,7 +133,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       setTimeout(() => setCopied(false), Timings.TIMEOUT_NORMAL);
     } catch (err) { 
  // allow-swallow: clipboard denied; textarea fallback stays visible
-      console.error("Automatically caught swallowed error", err);
+      logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err);
     }
   };
 
@@ -145,7 +145,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       setTimeout(() => setSqlCopied(false), Timings.TIMEOUT_NORMAL);
     } catch (err) { 
  // allow-swallow: clipboard denied; snippet stays visible for manual copy
-      console.error("Automatically caught swallowed error", err);
+      logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err);
     }
   };
 
@@ -175,7 +175,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       setTimeout(() => setDownloaded(false), Timings.TIMEOUT_NORMAL);
     } catch (err) { 
  // allow-swallow: Blob/URL unavailable in sandbox; Copy report still works
-      console.error("Automatically caught swallowed error", err);
+      logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err);
     }
   };
 
@@ -672,7 +672,8 @@ function formatTime(iso: string): string {
     const date = new Date(iso);
 
     return date.toLocaleTimeString("en-GB", { hour12: false });
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return iso;
   }
 }

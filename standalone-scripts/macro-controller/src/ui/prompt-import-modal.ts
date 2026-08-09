@@ -26,6 +26,7 @@ import { log } from '../logger';
 import { makeUniqueSlug, slugKey } from './prompt-slug-utils';
 import { throwDiagnostic } from '../errors/diagnostic-error';
 import { ImportStageType, ImportAuditRowActionType, ImportConflictType, ButtonVariantType } from "../types/enums";
+import { logError } from "../error-utils";
 
 type Stage = ImportStageType;
 
@@ -572,7 +573,7 @@ async function performImportCommit(
     await deps.onCommitted();
     setTimeout(close, 1200);
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     await handleCommitError(err, state);
     transition('error');
   }
@@ -692,7 +693,7 @@ async function startParse(
     state.rows = await diffAgainstCache(bundle.entries);
     transition('preview');
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     const errors = await import('./prompt-import-errors');
     const classified = errors.classifyImportError(err, 'parse');
     state.errorMessage = 'Failed to parse file';

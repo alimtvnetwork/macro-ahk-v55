@@ -16,6 +16,7 @@ import { bindOpt, missingFieldError, requireField, type HandlerErrorResponse } f
 import { logBgWarnError, logSampledDebug, BgLogTag } from "../utils/logger";
 import { AssetType, ActionType } from "../../types/enums";
 import { LinkStateType } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Message Interfaces                                                 */
@@ -587,7 +588,7 @@ function cascadeSettingsToMembers(db: ReturnType<typeof getDb>, groupId: number,
     let parsed: Record<string, unknown>;
     try {
         parsed = JSON.parse(settingsJson);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
         console.warn(`[library] Cannot parse SharedSettingsJson for group ${groupId} — skipping cascade`);
 
         return 0;

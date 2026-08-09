@@ -11,6 +11,7 @@ import { useState, useCallback, useMemo } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { MonacoCodeEditor } from "@/components/options/LazyMonacoCodeEditor";
 import { EditorMode } from "../../../types/enums";
+import { logError } from "@/components/options/options-logger";
 
 interface VariablesEditorProps {
     json: string;
@@ -90,7 +91,8 @@ export function VariablesEditor({ json, onChange }: VariablesEditorProps) {
     const parsedJson = useMemo(() => {
         try {
             return JSON.parse(json || "{}");
-        } catch (err) { console.error("Automatically logged error:", err);
+        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
             return null;
         }
     }, [json]);

@@ -53,7 +53,7 @@ vi.mock('../../error-utils', async () => {
 vi.mock('../../logging', () => ({ log: vi.fn() }));
 
 import { seedPlanNextPrompts } from '../seed-plan-next';
-import { logDiagnosticFromCode } from '../../error-utils';
+import { logDiagnosticFromCode, logError } from '../../error-utils';
 import {
     REPLACE_KEY_DEFAULT,
     REPLACE_VALUES_DEFAULT,
@@ -66,7 +66,7 @@ beforeEach(() => {
     sendImpl = null;
     (logDiagnosticFromCode as unknown as Mock).mockClear();
     try { localStorage.removeItem('marco_last_seed_telemetry'); } catch (err) {
-        console.error();
+        logError('MacroController', 'Unknown error');
     }
 });
 

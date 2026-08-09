@@ -41,6 +41,7 @@ import {
     requireSlug,
 } from "./handler-guards";
 import { RawSqlKindType } from "../../types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -433,7 +434,8 @@ function readLastInsertId(db: ProjectDb): number | undefined {
         const n = typeof value === "number" ? value : Number(value);
 
         return Number.isFinite(n) ? n : undefined;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return undefined;
     }
 }
@@ -445,7 +447,8 @@ function getRowsModified(db: ProjectDb): number | undefined {
         const n = reader.call(db);
 
         return Number.isFinite(n) ? n : undefined;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return undefined;
     }
 }

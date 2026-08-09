@@ -68,7 +68,9 @@ function isSettings(v: unknown): v is { Enabled: unknown; PauseMs: unknown; RunA
 export function loadChainSettings(): KeywordEventChainSettings {
     if (typeof window === "undefined") { return DEFAULT_CHAIN_SETTINGS; }
     let raw: string | null = null;
-    try { raw = window.localStorage.getItem(STORAGE_KEY); } catch (err) { console.error("Automatically logged error:", err); return DEFAULT_CHAIN_SETTINGS; }
+    try { raw = window.localStorage.getItem(STORAGE_KEY); } catch (err) { void 0;
+
+ return DEFAULT_CHAIN_SETTINGS; }
     if (raw === null) { return DEFAULT_CHAIN_SETTINGS; }
     try {
         const parsed: unknown = JSON.parse(raw);
@@ -81,7 +83,8 @@ export function loadChainSettings(): KeywordEventChainSettings {
                 ? parsed.RunAfterRecording
                 : DEFAULT_CHAIN_SETTINGS.RunAfterRecording,
         };
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { void 0;
+
         return DEFAULT_CHAIN_SETTINGS;
     }
 }

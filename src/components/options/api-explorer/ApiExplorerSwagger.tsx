@@ -17,6 +17,7 @@ import {
   normalizeEndpoint,
 } from "./types";
 import { EndpointAccordionItem } from "./EndpointAccordionItem";
+import { logError } from "@/components/options/options-logger";
 
 // eslint-disable-next-line max-lines-per-function
 export function ApiExplorerSwagger() {
@@ -36,7 +37,7 @@ export function ApiExplorerSwagger() {
         endpointCount: result.endpointCount,
         persistenceMode: result.persistenceMode,
       });
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to load API status");
     }
   };
@@ -46,7 +47,7 @@ export function ApiExplorerSwagger() {
       const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" as any });
       const raw = result.endpoints ?? [];
       setEndpoints(raw.map((e) => normalizeEndpoint(e as unknown as Record<string, unknown>)));
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to load API endpoint docs");
     }
   };

@@ -53,9 +53,8 @@ export function safeSetItem(key: string, value: string): boolean {
     if (purged > 0) {
       return retrySetItemAfterPurge(key, value, purged);
     }
-
-    // eslint-disable-next-line no-restricted-syntax -- storage-quota fallback before Logger is available
-    console.error('[MacroLoop] Quota exceeded but no bloated keys found, clearing all localStorage');
+     
+    logError('MacroController', '[MacroLoop] Quota exceeded but no bloated keys found, clearing all localStorage');
 
     return clearAndRetrySetItem(key, value);
   }
@@ -96,8 +95,7 @@ function retrySetItemAfterPurge(key: string, value: string, purged: number): boo
 
     return true;
   } catch (_e2) {
-    // eslint-disable-next-line no-restricted-syntax -- storage-quota fallback before Logger is available
-    console.error('[MacroLoop] Retry failed even after purging, clearing all localStorage');
+    logError('MacroController', '[MacroLoop] Retry failed even after purging, clearing all localStorage');
 
     return clearAndRetrySetItem(key, value);
   }
@@ -314,7 +312,7 @@ export function clearAllLogs(): void {
     const key = getLogStorageKey();
     localStorage.removeItem(key);
   } catch (_e) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     logDebug('clearAllLogs', 'localStorage.removeItem failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 }

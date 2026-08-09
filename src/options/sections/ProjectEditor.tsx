@@ -12,6 +12,7 @@ import { CookieBindingsEditor } from "./editor/CookieBindingsEditor";
 import { VariablesEditor } from "./editor/VariablesEditor";
 import { Toast } from "../shared/Toast";
 import { CookieBindingRoleType, AlertVariantType } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -55,7 +56,9 @@ export function ProjectEditor({ project, onBack }: ProjectEditorProps) {
         if (!project?.settings) return "{}";
         const vars = (project.settings as Record<string, unknown>).variables;
         if (vars === undefined) return "{}";
-        try { return JSON.stringify(vars, null, 2); } catch (err) { console.error("Automatically logged error:", err); return "{}"; }
+        try { return JSON.stringify(vars, null, 2); } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
+ return "{}"; }
     });
     const [isSaving, setIsSaving] = useState(false);
     const [toast, setToast] = useState<{ message: string; variant: AlertVariantType } | null>(null);
@@ -107,7 +110,6 @@ export function ProjectEditor({ project, onBack }: ProjectEditorProps) {
             setToast({ message: "Project saved and persisted.", variant: "success" });
             setTimeout(onBack, 800);
         } catch (err) {
-
             const msg = err instanceof Error ? err.message : String(err);
             setToast({ message: `Save failed: ${msg}`, variant: "error" });
         } finally {

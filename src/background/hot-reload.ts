@@ -19,6 +19,7 @@
 
 import { syncCacheWithBuildId } from "./injection-cache";
 import { logCaughtError, BgLogTag } from "./bg-logger";
+import { logBgError } from "@/background/bg-logger";
 
 const HOT_RELOAD_INTERVAL_MS = 1000;
 const BUILD_META_URL = "build-meta.json";
@@ -41,7 +42,8 @@ function isDevBuild(): boolean {
         const versionName = manifest.version_name ?? "";
 
         return versionName.toLowerCase().includes("dev");
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         // If we cannot read the manifest, fail safe and treat as production.
         return false;
     }

@@ -57,6 +57,7 @@ vi.mock('../async-utils', () => ({ delay: vi.fn().mockResolvedValue(undefined) }
 
 import { DiagnosticError } from '../errors/diagnostic-error';
 import { renameWorkspace } from '../rename-api';
+import { logError } from "../error-utils";
 
 beforeEach(() => {
     showDiagnosticToastMock.mockReset();
@@ -142,7 +143,7 @@ describe('rename-api remaining toast migrations', () => {
         try {
             await renameWorkspace('ws-500', 'renamed');
         } catch (e) {
-            console.error();
+            logError('MacroController', 'Unknown error');
             thrown = e;
         }
         expect(thrown).toBeInstanceOf(DiagnosticError);

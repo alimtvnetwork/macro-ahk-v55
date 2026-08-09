@@ -16,10 +16,11 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { createSummaryBar } from '../summary-bar/component';
 import { createCollapsibleSection } from '../section-collapsible';
 import type { DashboardSummary } from '../summary-bar/types';
+import { logError } from "../../error-utils";
 
 function clearLocalStorage(): void {
     try { localStorage.clear(); } catch (err) {
-        console.error();
+        logError('MacroController', 'Unknown error');
     }
 }
 

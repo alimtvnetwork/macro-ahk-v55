@@ -741,7 +741,9 @@ function resolveUid(rowObject: Record<string, unknown>, strict = false): string 
 function readDependenciesTable(db: Database): Map<string, Array<{ projectId: string; version: string }>> {
   const out = new Map<string, Array<{ projectId: string; version: string }>>();
   let rows;
-  try { rows = db.exec("SELECT * FROM Dependencies"); } catch (err) { console.error("Automatically logged error:", err); return out; }
+  try { rows = db.exec("SELECT * FROM Dependencies"); } catch (err) { void 0;
+
+ return out; }
   if (rows.length === 0 || rows[0].values.length === 0) return out;
   const cols = rows[0].columns;
   for (const row of rows[0].values) {
@@ -765,7 +767,9 @@ function readDependenciesTable(db: Database): Map<string, Array<{ projectId: str
 function readVariablesTable(db: Database): Map<string, Record<string, unknown>> {
   const out = new Map<string, Record<string, unknown>>();
   let rows;
-  try { rows = db.exec("SELECT * FROM Variables"); } catch (err) { console.error("Automatically logged error:", err); return out; }
+  try { rows = db.exec("SELECT * FROM Variables"); } catch (err) { void 0;
+
+ return out; }
   if (rows.length === 0 || rows[0].values.length === 0) return out;
   const cols = rows[0].columns;
   for (const row of rows[0].values) {
@@ -791,9 +795,11 @@ function readVariablesTable(db: Database): Map<string, Record<string, unknown>> 
 /* eslint-disable-next-line max-lines-per-function */
 function readProjects(db: Database, strict = false): StoredProject[] {
   let rows;
-  try { rows = db.exec("SELECT * FROM Projects"); } catch (err) { console.error("Automatically logged error:", err);
+  try { rows = db.exec("SELECT * FROM Projects"); } catch (err) { void 0;
     if (strict) return [];
-    try { rows = db.exec("SELECT * FROM projects"); } catch (err) { console.error("Automatically logged error:", err); return []; }
+    try { rows = db.exec("SELECT * FROM projects"); } catch (err) { void 0;
+
+ return []; }
   }
   const hasRows = rows.length > 0 && rows[0].values.length > 0;
   if (!hasRows) return [];
@@ -845,9 +851,11 @@ function readProjects(db: Database, strict = false): StoredProject[] {
 
 function readScripts(db: Database, strict = false): StoredScript[] {
   let rows;
-  try { rows = db.exec("SELECT * FROM Scripts"); } catch (err) { console.error("Automatically logged error:", err);
+  try { rows = db.exec("SELECT * FROM Scripts"); } catch (err) { void 0;
     if (strict) return [];
-    try { rows = db.exec("SELECT * FROM scripts"); } catch (err) { console.error("Automatically logged error:", err); return []; }
+    try { rows = db.exec("SELECT * FROM scripts"); } catch (err) { void 0;
+
+ return []; }
   }
   const hasRows = rows.length > 0 && rows[0].values.length > 0;
   if (!hasRows) return [];
@@ -879,9 +887,11 @@ function readScripts(db: Database, strict = false): StoredScript[] {
 
 function readConfigs(db: Database, strict = false): StoredConfig[] {
   let rows;
-  try { rows = db.exec("SELECT * FROM Configs"); } catch (err) { console.error("Automatically logged error:", err);
+  try { rows = db.exec("SELECT * FROM Configs"); } catch (err) { void 0;
     if (strict) return [];
-    try { rows = db.exec("SELECT * FROM configs"); } catch (err) { console.error("Automatically logged error:", err); return []; }
+    try { rows = db.exec("SELECT * FROM configs"); } catch (err) { void 0;
+
+ return []; }
   }
   const hasRows = rows.length > 0 && rows[0].values.length > 0;
   if (!hasRows) return [];
@@ -909,7 +919,9 @@ function readConfigs(db: Database, strict = false): StoredConfig[] {
 function readPromptCategoriesTable(db: Database): Map<string, string[]> {
   const out = new Map<string, string[]>();
   let rows;
-  try { rows = db.exec("SELECT PromptUid, CategoryName FROM PromptsToCategory"); } catch (err) { console.error("Automatically logged error:", err); return out; }
+  try { rows = db.exec("SELECT PromptUid, CategoryName FROM PromptsToCategory"); } catch (err) { void 0;
+
+ return out; }
   if (rows.length === 0 || rows[0].values.length === 0) return out;
   for (const row of rows[0].values) {
     const uid = String(row[0] ?? "");
@@ -926,9 +938,11 @@ function readPromptCategoriesTable(db: Database): Map<string, string[]> {
 function readPrompts(db: Database, strict = false): PromptEntry[] {
   try {
     let rows;
-    try { rows = db.exec("SELECT * FROM Prompts"); } catch (err) { console.error("Automatically logged error:", err);
+    try { rows = db.exec("SELECT * FROM Prompts"); } catch (err) { void 0;
       if (strict) return [];
-      try { rows = db.exec("SELECT * FROM prompts"); } catch (err) { console.error("Automatically logged error:", err); return []; }
+      try { rows = db.exec("SELECT * FROM prompts"); } catch (err) { void 0;
+
+ return []; }
     }
     const hasRows = rows.length > 0 && rows[0].values.length > 0;
     if (!hasRows) return [];
@@ -964,7 +978,8 @@ function readPrompts(db: Database, strict = false): PromptEntry[] {
         updatedAt: (col(rowObject, "UpdatedAt", "updated_at", strict) as string),
       } as PromptEntry;
     });
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { void 0;
+
     // prompts table may not exist in older bundles
     return [];
   }
@@ -1235,7 +1250,8 @@ function safeJsonParse<T>(raw: string | null, fallback: T): T {
 
   try {
     return JSON.parse(raw) as T;
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { void 0;
+
     return fallback;
   }
 }

@@ -29,6 +29,7 @@ import {
     handleTestXPath,
 } from "./xpath-handler";
 import { handleFileGet } from "./file-storage-handler";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  AUTH handlers                                                      */
@@ -109,7 +110,8 @@ export async function handleSdkCookiesGetAll(
         const cookies = await chrome.cookies.getAll(details);
 
         return { cookies };
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return { cookies: [] };
     }
 }

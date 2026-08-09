@@ -14,6 +14,7 @@
 import { MessageType } from "../shared/messages";
 import { handleMessage } from "./message-router";
 import { logCaughtError, BgLogTag} from "./bg-logger";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Menu IDs                                                           */
@@ -414,7 +415,7 @@ async function handleCopyLogs(tabId: number): Promise<void> {
                 },
                 args: [logText],
             });
-        } catch (err) { console.error("Automatically logged error:", err);
+        } catch (err) { logBgError("Automatically logged error:", err);
             logCaughtError(BgLogTag.MARCO, "Could not inject clipboard script", new Error("injection failed"));
         }
     }
@@ -438,7 +439,7 @@ async function handleShowStatus(tabId: number): Promise<void> {
                 },
                 args: [statusText],
             });
-        } catch (err) { console.error("Automatically logged error:", err);
+        } catch (err) { logBgError("Automatically logged error:", err);
             logCaughtError(BgLogTag.MARCO, "Could not show status", new Error("injection failed"));
         }
     }

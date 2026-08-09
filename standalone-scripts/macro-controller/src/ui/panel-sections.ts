@@ -64,6 +64,7 @@ import type { TaskNextDeps } from './task-next-ui';
 import type { SettingsDeps } from './settings-ui';
 import type { PanelLayoutCtx } from './panel-layout';
 import { buildTaskQueueSection } from './macro-ui';
+import { logError } from "../error-utils";
 
 // ============================================
 // Return types
@@ -194,7 +195,7 @@ function _buildVersionBadge(
       toolsMasterBody.style.display = '';
       toolsCol.toggle.textContent = '[-]';
       try { localStorage.setItem('ml_collapse_tools_master', 'expanded'); } catch (_e) {
-        console.error();
+        logError('MacroController', 'Unknown error');
         logSub('Failed to persist tools collapse state: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
       }
     }

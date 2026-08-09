@@ -27,6 +27,7 @@ import {
     type PersistedStep,
 } from "./step-persistence";
 import { logFailure, type FailureReport } from "./failure-logger";
+import { logBgError } from "@/background/bg-logger";
 
 const SOURCE_FILE = "src/background/recorder/capture-step-recorder.ts";
 
@@ -86,7 +87,8 @@ function locateCaptureTarget(xpathFull: string): Element | null {
         const node = r.singleNodeValue;
 
         return node instanceof Element ? node : null;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return null;
     }
 }

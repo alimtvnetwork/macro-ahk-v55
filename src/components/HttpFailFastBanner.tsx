@@ -41,7 +41,7 @@ function useCopyReport(detail: HttpFailFastEventDetail | null): { copied: boolea
         // allow-swallow: clipboard denied; user can select text manually
         } catch (err) { 
  /* intentionally empty */
-        console.error("Automatically caught swallowed error", err); }
+        void 0; }
     }, [detail]);
 
     return { copied, handleCopy };

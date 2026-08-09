@@ -15,7 +15,7 @@ import { ServiceResult } from '../utils/result-wrapper';
  */
 
 import { log } from '../logger';
-import { logError } from '../error-utils';
+import { logError, logError } from '../error-utils';
 import { showPasteToast, pasteIntoEditor, findPasteTarget } from './prompt-utils';
 import { DEFAULT_PROMPTS, getPromptsConfig } from './prompt-manager';
 import { getByXPath } from '../xpath-utils';
@@ -746,7 +746,7 @@ function restoreActionOverflowPositions(original: Map<HTMLElement, OriginalActio
   for (const [actionElement, position] of original) {
     const next = position.next && position.next.parentNode === position.parent ? position.next : null;
     try { position.parent.insertBefore(actionElement, next); } catch (err) {
-      console.error();
+      logError('MacroController', 'Unknown error');
     }
   }
   original.clear();

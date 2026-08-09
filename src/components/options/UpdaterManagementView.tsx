@@ -157,7 +157,7 @@ export function UpdaterManagementView() {
     try {
       const res = await sendMessage<{ updaters: UpdaterEntry[] }>({ type: "LIST_UPDATERS" });
       setUpdaters(res.updaters ?? []);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
       setUpdaters([]);
     } finally {

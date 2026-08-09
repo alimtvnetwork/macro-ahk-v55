@@ -21,6 +21,7 @@ import { logCaughtError, logBgWarnError, BgLogTag } from "./bg-logger";
 import { urlFingerprint } from "./url-fingerprint";
 import { handleNavigationCompleted } from "./auto-injector";
 import type { ResolvedScript } from "./script-resolver";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -196,7 +197,8 @@ async function checkMarkersExist(tabId: number): Promise<boolean> {
         });
 
         return results[0]?.result === true;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return true;
     }
 }

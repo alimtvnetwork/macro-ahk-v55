@@ -1,3 +1,5 @@
+import { logBgError } from "@/background/bg-logger";
+
 /**
  * Marco Extension — Per-Group Input Data Bag
  *
@@ -136,7 +138,8 @@ function safeReadStore(): RawStore {
         }
 
         return out;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return {};
     }
 }

@@ -2,6 +2,7 @@
 import { Timings } from "../constants/timing";
 import { ServiceResult } from '../utils/result-wrapper';
 import { logCaughtError, BgLogTag } from "./bg-logger";
+import { logBgError } from "@/background/bg-logger";
 
 /**
  * Marco Extension — Session Log File Writer
@@ -457,7 +458,7 @@ export async function getOpfsSessionStatus(): Promise<OpfsStatusData> {
         const allExist = files.every((f) => f.exists);
 
         return { sessionId: sid, dirExists: true, files, healthy: allExist };
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
         const files = expectedFiles.map((f) => ({ name: f, absolutePath: `${absBase}/${f}`, sizeBytes: 0, exists: false }));
 
         return { sessionId: sid, dirExists: false, files, healthy: false };
@@ -513,7 +514,8 @@ export async function listSessionsWithTimestamps(): Promise<SessionInfo[]> {
         }
 
         return results.sort((a, b) => Number(b.id) - Number(a.id));
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return [];
     }
 }

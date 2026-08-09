@@ -1,3 +1,5 @@
+import { logError } from "./error-utils";
+
 const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * Selected-workspaces store — pub/sub for multi-workspace bulk operations.
@@ -17,7 +19,7 @@ function notify(): void {
     try {
       cb(new Set(selectedIds));
     } catch (_e: unknown) {
-      console.error();
+      logError('MacroController', 'Unknown error');
     }
   }
 }

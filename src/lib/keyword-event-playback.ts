@@ -94,7 +94,8 @@ export function resolveEventTarget(
                 const node = d.querySelector(sel);
 
                 return node ?? fallback;
-            } catch (err) { console.error("Automatically logged error:", err);
+            } catch (err) { void 0;
+
                 // Invalid CSS selector — surface a fallback rather than throw
                 // so a typo in the panel doesn't crash playback.
                 return fallback;

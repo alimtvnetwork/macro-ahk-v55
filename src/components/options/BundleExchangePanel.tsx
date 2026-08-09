@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { LabelType } from "@/components/ui/label";
+import { logError } from "@/components/options/options-logger";
 
 export interface LastExportSummary {
     readonly FileName: string;
@@ -60,7 +61,8 @@ const ZIP_MIME = "application/zip";
 function formatTime(iso: string): string {
     try {
         return new Date(iso).toLocaleTimeString();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
         return iso;
     }
 }

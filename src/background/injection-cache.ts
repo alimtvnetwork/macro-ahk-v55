@@ -18,6 +18,7 @@
 import { EXTENSION_VERSION, STORAGE_KEY_LAST_BUILD_ID } from "../shared/constants";
 import { logCaughtError, BgLogTag} from "./bg-logger";
 import { CacheCategoryType } from "../types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -113,7 +114,8 @@ export async function cacheGet<T>(category: CacheCategory, subKey = ""): Promise
                 resolve(null);
             };
         });
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return null;
     }
 }
@@ -192,7 +194,8 @@ export async function cacheClearAll(): Promise<{ cleared: number }> {
             };
             countReq.onerror = () => resolve({ cleared: 0 });
         });
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return { cleared: 0 };
     }
 }
@@ -221,7 +224,8 @@ export async function cacheStats(): Promise<{ entryCount: number; categories: Re
 
             request.onerror = () => resolve({ entryCount: 0, categories: {} });
         });
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return { entryCount: 0, categories: {} };
     }
 }
@@ -323,7 +327,8 @@ export async function purgeStaleEntries(): Promise<number> {
 
             request.onerror = () => resolve(0);
         });
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return 0;
     }
 }

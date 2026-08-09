@@ -80,7 +80,7 @@ export function useOnboarding() {
         });
         setIsComplete(isDone);
       }
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { void 0;
       // In preview/sandbox, chrome storage can exist as a shim but never resolve.
       // Fall back to localStorage and always unblock UI.
       const isDone = localStorage.getItem(ONBOARDING_KEY) !== "false";
@@ -157,7 +157,7 @@ export function usePermissions() {
         setLoading(false);
 
         return isGranted;
-      } catch (err) { console.error("Automatically logged error:", err);
+      } catch (err) { void 0;
         setLoading(false);
 
         return false;

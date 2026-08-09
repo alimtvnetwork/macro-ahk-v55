@@ -19,7 +19,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
 import type { AutoRepairResult } from '../seed/prompt-health-auto-repair';
 import type { PromptHealthIssue } from '../seed/prompt-health-check';
 import { log } from '../logger';
-import { logDiagnosticFromCode, toErrorMessage } from '../error-utils';
+import { logDiagnosticFromCode, toErrorMessage, logError } from '../error-utils';
 import { cPanelBg, cPanelText, cPrimary, cSuccess, lModalRadius, lModalShadow, tFont } from '../shared-state';
 
 export interface RepairReportSummary {
@@ -110,7 +110,7 @@ export function stashRepairReport(report: RepairReportSummary): void {
   try {
     if (typeof window !== 'undefined') window.__marcoLastRepairReport = report;
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   }
   const text = formatRepairReportText(report);
   if (report.reseedAttempted && !report.reseedOk) {
@@ -191,7 +191,7 @@ export function showRepairReportModal(report: RepairReportSummary): HTMLElement 
       void navigator.clipboard.writeText(formatRepairReportText(report));
       copyBtn.textContent = '✓ Copied';
     } catch (caught) {
-      console.error();
+      logError('MacroController', 'Unknown error');
       const reason = toErrorMessage(caught);
       logDiagnosticFromCode('REPAIR_COPY_E001', { reason }, caught);
       copyBtn.textContent = 'Copy failed';

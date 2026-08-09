@@ -35,6 +35,7 @@ import type {
     JsonValue,
 } from "./group-inputs";
 import { InputSourceMethodType, InputSourceFailurePolicyType } from "../../../types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 const STORAGE_KEY = "marco.input-source.config.v1";
 const DEFAULT_TIMEOUT_MS = 8_000;
@@ -168,7 +169,8 @@ export function loadInputSourceConfig(): InputSourceConfig {
             OnFailure: sanitiseFailurePolicy(parsed.OnFailure),
             TimeoutMs: clampTimeout(parsed.TimeoutMs),
         };
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return DEFAULT_INPUT_SOURCE_CONFIG;
     }
 }

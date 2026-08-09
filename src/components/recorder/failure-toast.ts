@@ -17,6 +17,7 @@ import {
     formatFailureReport,
     type FailureReport,
 } from "@/background/recorder/failure-logger";
+import { logError } from "@/components/recorder/recorder-logger";
 
 interface CopyOpts {
     readonly Clipboard?: Pick<Clipboard, "writeText">;
@@ -34,7 +35,8 @@ export async function copyFailureReportToClipboard(
         await target.writeText(blob);
 
         return true;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
         return false;
     }
 }

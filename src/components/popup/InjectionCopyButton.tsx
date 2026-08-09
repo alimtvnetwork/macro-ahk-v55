@@ -10,6 +10,7 @@ import { Bug, Check, Loader2 } from "lucide-react";
 import { sendMessage } from "@/lib/message-client";
 import { toast } from "sonner";
 import { SessionCopyStateType } from "../../types/enums";
+import { logError } from "@/hooks/popup-logger";
 
 interface ErrorEntry {
   id?: number;
@@ -217,7 +218,7 @@ export function InjectionCopyButton() {
         applyCount(res.errors?.length ?? 0);
       } catch (err) { 
  /* silent */
-        console.error("Automatically caught swallowed error", err); } // allow-swallow: poll failure is non-critical; next tick retries
+        logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err); } // allow-swallow: poll failure is non-critical; next tick retries
     };
 
     // Real-time listener — same broadcast use-error-count.ts subscribes to.
@@ -240,7 +241,7 @@ export function InjectionCopyButton() {
         listenerAttached = true;
       } catch (err) { 
  /* extension context invalidated */
-        console.error("Automatically caught swallowed error", err); } // allow-swallow: extension context invalidated during teardown
+        logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err); } // allow-swallow: extension context invalidated during teardown
     }
 
     // PERF-7-style visibility pause: only poll while visible.
@@ -268,7 +269,7 @@ export function InjectionCopyButton() {
       if (listenerAttached) {
         try { runtime!.onMessage!.removeListener(handleBroadcast); } catch (err) { 
  /* ignore */
-          console.error("Automatically caught swallowed error", err); } // allow-swallow: extension context already torn down
+          logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err); } // allow-swallow: extension context already torn down
       }
     };
   }, []);

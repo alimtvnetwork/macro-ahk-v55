@@ -34,6 +34,7 @@ import {
     persistDismissOrigin,
 } from "./dismissed-origins";
 import { ToastActionType } from "../types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 const MSG_TYPE = "MARCO_FIRST_ATTACH_ACTION";
 
@@ -187,7 +188,9 @@ export async function maybeShowFirstAttachToast(
     if (isOriginSeen(url)) return;
 
     let origin = "";
-    try { origin = new URL(url).origin; } catch (err) { console.error("Automatically logged error:", err); return; }
+    try { origin = new URL(url).origin; } catch (err) { logBgError("Automatically logged error:", err);
+
+ return; }
     if (origin === "") return;
 
     try {

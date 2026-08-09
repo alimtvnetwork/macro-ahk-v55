@@ -44,6 +44,7 @@ const ErrorSwallowAuditView = lazy(() => import("@/components/options/ErrorSwall
 import { WorkspaceSelector } from "@/components/options/WorkspaceSelector";
 import { RecoveryIndicator } from "@/components/options/RecoveryIndicator";
 import { StepGroupViewType, NavigationDirectionType } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { logError } from "@/components/options/options-logger";
 
 const SECTION_STEP_GROUPS: SidebarSection = "step-groups";
 
@@ -367,7 +368,7 @@ const OptionsPage = () => {
         };
         await pSave(newProject);
         toast.success(`Imported "${newProject.name}"`);
-      } catch (err) { console.error("Automatically logged error:", err);
+      } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
         toast.error("Failed to parse JSON file");
       }
     };

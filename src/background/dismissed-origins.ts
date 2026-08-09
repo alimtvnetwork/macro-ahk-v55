@@ -26,6 +26,7 @@
  */
 
 import { logCaughtError, BgLogTag } from "./bg-logger";
+import { logBgError } from "@/background/bg-logger";
 
 /** chrome.storage.local key — stable contract. */
 export const STORAGE_KEY_DISMISSED_ORIGINS = "marco_dismissed_origins";
@@ -41,7 +42,8 @@ let persistentHydrated = false;
 function safeOrigin(url: string): string {
     try {
         return new URL(url).origin;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return "";
     }
 }

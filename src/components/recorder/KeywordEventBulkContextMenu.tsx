@@ -447,7 +447,8 @@ function loadPersistedSequence(): SequenceRenameInput {
         }
 
         return DEFAULT_SEQUENCE_RENAME;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
         return DEFAULT_SEQUENCE_RENAME;
     }
 }
@@ -855,7 +856,6 @@ function BulkImportDialog(props: BulkImportDialogProps): JSX.Element {
             setBundle(result);
             setFilename(file.name);
         } catch (err) {
-
             setBundle(null);
             setError(err instanceof Error ? err.message : "Failed to read ZIP");
         } finally {

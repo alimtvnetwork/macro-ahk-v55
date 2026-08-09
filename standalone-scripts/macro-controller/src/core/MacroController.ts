@@ -29,7 +29,7 @@ import { wsRenderStats } from '../ws-render-stats';
 // closed cycles #12-20/37/40/42-45. `ui-status-renderer` is a leaf that
 // does not transitively reach `MacroController`.
 import { statusRenderStats } from '../ui/ui-status-renderer';
-import { logError } from '../error-utils';
+import { logError, logError } from '../error-utils';
 
 // ============================================
 // Sub-manager interfaces (moved to controller-state.ts per PlanTierType-17 step 4)
@@ -265,8 +265,8 @@ export class MacroController {
       `  Select all text above and share with the developer for debugging.`;
     const err = new Error(msg);
     err.name = 'ManagerNotRegistered';
-    // eslint-disable-next-line no-restricted-syntax -- CODE RED bootstrap diagnostic; logger may not be registered yet
-    console.error('[MacroController] ❌ ' + managerName + ' not registered. Full diagnostic:\n' + msg + '\n\nStack trace:', err.stack);
+     
+    logError('MacroController', '[MacroController] ❌ ' + managerName + ' not registered. Full diagnostic:\n' + msg + '\n\nStack trace:', err.stack);
 
     return err;
   }

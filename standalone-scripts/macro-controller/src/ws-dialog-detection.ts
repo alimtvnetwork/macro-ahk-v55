@@ -318,7 +318,7 @@ function findWorkspaceNameViaCss(_fn: string, perWs: WorkspaceCredit[]): { match
         }
       }
     } catch (e: unknown) {
-      console.error();
+      logError('MacroController', 'Unknown error');
       logSub('CSS fallback [' + (si + 1) + '/' + selectors.length + ']: "' + sel + '" → ERROR: ' + toErrorMessage(e), 2);
     }
   }
@@ -350,7 +350,7 @@ export function closeProjectDialogSafe(btn: Element): void {
       reactClick(btn, CONFIG.PROJECT_BUTTON_XPATH);
     }
   } catch (e: unknown) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     logSub('Error closing dialog: ' + toErrorMessage(e), 1);
   }
 }

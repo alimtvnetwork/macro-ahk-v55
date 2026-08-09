@@ -20,6 +20,7 @@ import {
     saveDiagnosticsCache,
 } from "./token-seeder-diagnostics-cache";
 import { AccessDeniedCodeEnum } from "../../types/enums";
+import { logError } from "@/components/options/options-logger";
 
 type AccessDeniedCode =
     AccessDeniedCodeEnum;
@@ -116,7 +117,7 @@ export function TokenSeederDiagnosticsPanel() {
             setData(res);
             saveDiagnosticsCache(res);
             setNow(Date.now());
-        } catch (err) { console.error("Automatically logged error:", err);
+        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
             setData(null);
         } finally {

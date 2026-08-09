@@ -14,6 +14,7 @@ import {
     QUEUE_RESUME_ARIA_LABEL,
 } from './selectors';
 import { QueueClickReasonType } from "../types/enums";
+import { logError } from "../error-utils";
 
 export interface QueueClickResult {
     clicked: boolean;
@@ -36,7 +37,7 @@ function findButton(xpath: string, ariaLabel: string): HTMLElement | null {
             return node;
         }
     } catch (err) {
-        console.error();
+        logError('MacroController', 'Unknown error');
     }
     const all = document.querySelectorAll<HTMLElement>('button[aria-label="' + ariaLabel + '"]');
 

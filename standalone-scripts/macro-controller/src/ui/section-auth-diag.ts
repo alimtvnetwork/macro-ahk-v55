@@ -28,7 +28,7 @@ import {
 
 import { buildWaterfallSection } from './auth-diag-waterfall';
 import { buildHeaderControls } from './auth-diag-clipboard';
-import { logError } from '../error-utils';
+import { logError, logError } from '../error-utils';
 import { showToast } from '../toast';
 
 // Re-export for backward compatibility
@@ -130,7 +130,7 @@ export function createAuthDiagRow(deps: AuthDiagDeps): AuthDiagResult {
     diagBody.style.display = isHidden ? 'flex' : 'none';
     col.toggle.textContent = isHidden ? '[-]' : '[+]';
     try { localStorage.setItem('ml_collapse_auth_diag', isHidden ? 'expanded' : 'collapsed'); } catch (_e: unknown) {
-      console.error();
+      logError('MacroController', 'Unknown error');
       logSub('Failed to persist auth diag collapse state: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
     }
   };

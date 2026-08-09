@@ -44,7 +44,6 @@ export function BulkExportDialog(props: BulkExportDialogProps): JSX.Element {
             });
             onOpenChange(false);
         } catch (err) {
-
             setError(err instanceof Error ? err.message : "Export failed");
         } finally {
             setBusy(false);

@@ -1,4 +1,5 @@
 import { logCaughtError, BgLogTag } from "../../bg-logger";
+import { logBgError } from "@/background/bg-logger";
 
 // @ts-nocheck
 /**
@@ -136,7 +137,8 @@ function safeLocalStorage(): Storage | null {
         if (typeof localStorage === "undefined") return null;
 
         return localStorage;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return null;
     }
 }
@@ -202,7 +204,8 @@ export function loadWebhookConfig(): WebhookConfig {
             Events: events,
             SecretToken: asString(parsed.SecretToken, ""),
         };
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return { ...DEFAULT_WEBHOOK_CONFIG };
     }
 }
@@ -331,7 +334,8 @@ function readLogRaw(): unknown[] {
         const parsed: unknown = JSON.parse(raw);
 
         return Array.isArray(parsed) ? parsed : [];
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return [];
     }
 }

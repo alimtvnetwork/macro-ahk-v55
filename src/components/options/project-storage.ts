@@ -33,7 +33,7 @@ async function readProjectStorageKey(storage: ProjectStorageLocal): Promise<Reco
     const out = await storage.get("marco_projects");
     if (out && typeof out === "object") return out;
   } catch (err) {
-    console.error("Automatically caught swallowed error", err); 
+    logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err); 
 }
 
   return new Promise((resolve) => {
@@ -59,6 +59,7 @@ export async function readProjectsDirectFromChromeStorage(): Promise<StoredProje
   if (isArray) {
     return raw as StoredProject[];
   }
+
   return [];
 }
 
@@ -67,6 +68,7 @@ async function readProjectsViaMessage(): Promise<StoredProject[]> {
     .then((r) => r?.projects ?? [])
     .catch((err) => {
       logError("ProjectGroupPanel.loadProjects", "Failed to fetch project list for picker", err);
+
       return [] as StoredProject[];
     });
 }
@@ -107,6 +109,7 @@ async function loadRosterAfterDelay(
     return false;
   }
   onLoaded(projects);
+
   return true;
 }
 

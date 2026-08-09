@@ -34,6 +34,7 @@ export function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: Grou
     const isInvalidName = !name.trim();
     if (isInvalidName) {
       toast.error("Group name is required");
+
       return;
     }
     setSaving(true);

@@ -8,6 +8,7 @@
 
 import type { UrlRule } from "../shared/project-types";
 import { logBgWarnError, BgLogTag} from "./bg-logger";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Public API                                                         */
@@ -66,7 +67,8 @@ function isGlobMatch(url: string, pattern: string): boolean {
         const regex = new RegExp(regexPattern);
 
         return regex.test(url);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return false;
     }
 }
@@ -77,7 +79,8 @@ function isRegexMatch(url: string, pattern: string): boolean {
         const regex = new RegExp(pattern);
 
         return regex.test(url);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return false;
     }
 }
@@ -140,7 +143,7 @@ function checkExcludePattern(
         const regex = new RegExp(excludePattern!);
 
         return regex.test(pathname);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
         logBgWarnError(BgLogTag.URL_MATCHER, `Invalid excludePattern: ${excludePattern}`);
 
         return false;
@@ -151,7 +154,8 @@ function checkExcludePattern(
 function extractPathname(url: string): string {
     try {
         return new URL(url).pathname;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return url;
     }
 }

@@ -8,6 +8,7 @@ import { DomainConstants } from "../constants/domain";
  */
 
 import type { InjectionConditions } from "../shared/types";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Public API                                                         */
@@ -90,7 +91,8 @@ async function checkCookieCondition(
         });
 
         return cookie !== null;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return false;
     }
 }
@@ -121,7 +123,8 @@ async function checkElementCondition(
         const hasResult = results.length > 0;
 
         return hasResult ? (results[0].result as boolean) : false;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return false;
     }
 }
@@ -144,7 +147,8 @@ async function checkOnlineCondition(): Promise<boolean> {
         const status = result["marco_network_status"];
 
         return status === "offline";
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return false;
     }
 }

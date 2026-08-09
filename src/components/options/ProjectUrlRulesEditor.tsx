@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { UrlRuleAction, UrlSubTabEnum, AccentEnum } from "../../types/enums";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -531,7 +532,8 @@ function extractLabelFromUrl(url: string): string {
     const u = new URL(url);
 
     return u.hostname.replace(/^www\./, "").split(".")[0] || url;
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return url.substring(0, 30);
   }
 }

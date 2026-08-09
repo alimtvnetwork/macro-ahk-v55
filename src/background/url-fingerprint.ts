@@ -1,3 +1,5 @@
+import { logBgError } from "@/background/bg-logger";
+
 /**
  * Marco Extension — URL Fingerprinting
  *
@@ -27,7 +29,8 @@ export function urlFingerprint(rawUrl: string): string {
         const sortedSearch = sortSearchParams(parsed.searchParams);
 
         return `${parsed.origin}${parsed.pathname}${sortedSearch}`;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return rawUrl;
     }
 }

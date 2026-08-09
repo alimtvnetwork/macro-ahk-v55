@@ -16,6 +16,7 @@ import { CheckCircle2, XCircle, Activity, RefreshCw } from "lucide-react";
 import { sendMessage } from "@/lib/message-client";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { StorageSurfaceType } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { logError } from "@/hooks/popup-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -90,7 +91,7 @@ export function SdkSelfTestPanel() {
                 type: "GET_SDK_SELFTEST",
             });
             setSnapshot(res?.snapshot ?? null);
-        } catch (err) { console.error("Automatically logged error:", err);
+        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
             setSnapshot(null);
         } finally {

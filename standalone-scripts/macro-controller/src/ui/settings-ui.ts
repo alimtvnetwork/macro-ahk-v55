@@ -47,6 +47,8 @@ import {
   buildHistoryPanel,
 } from './settings-tab-panels';
 import { CssFragmentType } from '../types';
+import { logError } from "../error-utils";
+
 // ============================================
 // Dependencies injected from createUI closure
 // ============================================
@@ -416,7 +418,7 @@ function _saveGeneralSettings(genResult: GeneralPanelResult, deps: SettingsDeps)
       localStorage.removeItem('marco_custom_display_name');
     }
   } catch (err) {
-    console.error();
+    logError('MacroController', 'Unknown error');
   } // allow-swallow: localStorage throws in private browsing or when disabled; custom display name is non-critical.
 
   const newChatXPath = genResult.inputs.pasteTargetXPath.value;

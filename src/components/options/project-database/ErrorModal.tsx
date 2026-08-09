@@ -24,6 +24,7 @@ import {
 import type { ErrorModel } from "@/types/error-model";
 import { formatErrorForClipboard } from "@/types/error-model";
 import { toast } from "sonner";
+import { logError } from "@/components/options/options-logger";
 
 interface ErrorModalProps {
   error: ErrorModel | null;
@@ -45,7 +46,7 @@ export function ErrorModal({ error, open, onOpenChange }: ErrorModalProps) {
       setCopied(true);
       toast.success("Error details copied to clipboard");
       setTimeout(() => setCopied(false), Timings.TIMEOUT_NORMAL);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to copy to clipboard");
     }
   };
@@ -185,7 +186,8 @@ function formatTimestamp(iso: string): string {
     return new Date(iso).toLocaleString(undefined, {
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return iso;
   }
 }
@@ -193,7 +195,8 @@ function formatTimestamp(iso: string): string {
 function tryFormatJson(raw: string): string {
   try {
     return JSON.stringify(JSON.parse(raw), null, 2);
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return raw;
   }
 }

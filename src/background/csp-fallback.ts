@@ -10,6 +10,7 @@ import { transitionHealth } from "./health-handler";
 import { handleGetSettings } from "./handlers/settings-handler";
 import { logBgWarnError, logCaughtError, logSampledDebug, BgLogTag} from "./bg-logger";
 import { DomTargetType } from "../types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -286,18 +287,19 @@ async function executeInMainWorld(code: string): Promise<string> {
                 Node.prototype.appendChild.call(target, node);
 
                 return true;
-            } catch (err) { console.error("Automatically logged error:", err);
+            } catch (err) { logBgError("Automatically logged error:", err);
                 try {
                     Node.prototype.insertBefore.call(target, node, null);
 
                     return true;
-                } catch (err) { console.error("Automatically logged error:", err);
+                } catch (err) { logBgError("Automatically logged error:", err);
                     if (node.nodeType === Node.ELEMENT_NODE) {
                         try {
                             Element.prototype.insertAdjacentElement.call(target, "beforeend", node as Element);
 
                             return true;
-                        } catch (err) { console.error("Automatically logged error:", err);
+                        } catch (err) { logBgError("Automatically logged error:", err);
+
                             return false;
                         }
                     }
@@ -604,18 +606,19 @@ async function executeBlobInjection(code: string): Promise<string> {
                 Node.prototype.appendChild.call(target, node);
 
                 return true;
-            } catch (err) { console.error("Automatically logged error:", err);
+            } catch (err) { logBgError("Automatically logged error:", err);
                 try {
                     Node.prototype.insertBefore.call(target, node, null);
 
                     return true;
-                } catch (err) { console.error("Automatically logged error:", err);
+                } catch (err) { logBgError("Automatically logged error:", err);
                     if (node.nodeType === Node.ELEMENT_NODE) {
                         try {
                             Element.prototype.insertAdjacentElement.call(target, "beforeend", node as Element);
 
                             return true;
-                        } catch (err) { console.error("Automatically logged error:", err);
+                        } catch (err) { logBgError("Automatically logged error:", err);
+
                             return false;
                         }
                     }

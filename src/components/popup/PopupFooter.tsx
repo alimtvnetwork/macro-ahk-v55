@@ -12,6 +12,7 @@ import { sendMessage } from "@/lib/message-client";
 import React, { useState, useEffect } from "react";
 import { useErrorCount } from "@/hooks/use-error-count";
 import { PopupActionsModeType } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { logError } from "@/hooks/popup-logger";
 
 interface Props {
   loggingMode: string;
@@ -190,7 +191,7 @@ export function PopupFooter({
       const result = await sendMessage<{ isOk: boolean; cleared?: number }>({ type: "INVALIDATE_CACHE" });
       setCacheCleared(result.cleared ?? 0);
       setTimeout(() => setCacheCleared(null), 3000);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
 
       setCacheCleared(-1);
       setTimeout(() => setCacheCleared(null), 3000);

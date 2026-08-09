@@ -1,3 +1,5 @@
+import { logError } from "./error-utils";
+
 /**
  * User-gesture guard for Macro Controller auto-execution.
  *
@@ -32,15 +34,12 @@ export function requireUserGesture(callerId: string): boolean {
   if (_userGestureAt === 0 || age > GESTURE_TTL_MS) {
     // CODE RED: programmatic start attempted without gesture.
     // Use console directly (logger may not be loaded in all callers).
-    // eslint-disable-next-line no-restricted-syntax -- CODE RED gesture guard; logger may not be loaded in all callers
-    console.error(
-
-      '[MacroController] [CODE RED] ' + callerId + ' rejected: no recent user gesture.\n' +
-      '  Path: standalone-scripts/macro-controller/src/user-gesture-guard.ts\n' +
-      '  Missing item: markUserGesture() call within last ' + GESTURE_TTL_MS + 'ms\n' +
-      '  Last gesture source: ' + (_userGestureSource || '(never)') + '\n' +
-      '  Reason: Macro Controller auto-execution is forbidden; only explicit user clicks/keys may start the loop.'
-    );
+     
+    logError('MacroController', '[MacroController] [CODE RED] ' + callerId + ' rejected: no recent user gesture.\n' +
+                '  Path: standalone-scripts/macro-controller/src/user-gesture-guard.ts\n' +
+                '  Missing item: markUserGesture() call within last ' + GESTURE_TTL_MS + 'ms\n' +
+                '  Last gesture source: ' + (_userGestureSource || '(never)') + '\n' +
+                '  Reason: Macro Controller auto-execution is forbidden; only explicit user clicks/keys may start the loop.');
 
     return false;
   }

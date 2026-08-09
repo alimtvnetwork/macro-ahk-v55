@@ -37,6 +37,7 @@ import {
   GitCommit,
 } from "lucide-react";
 import { toast } from "sonner";
+import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -173,7 +174,8 @@ function VersionRow({ version, isCurrent, isFirst, isLast, prevHash, onRollback 
 function formatContent(json: string): string {
   try {
     return JSON.stringify(JSON.parse(json), null, 2);
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return json;
   }
 }

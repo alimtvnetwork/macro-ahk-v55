@@ -22,6 +22,7 @@ import { MonacoCodeEditor } from "./LazyMonacoCodeEditor";
 import type { StoredConfig } from "@/hooks/use-projects-scripts";
 import { toast } from "sonner";
 import { EditorMode } from "../../types/enums";
+import { logError } from "@/components/options/options-logger";
 
 interface Props {
   configs: StoredConfig[];
@@ -230,7 +231,8 @@ function validateJson(json: string): boolean {
     JSON.parse(json);
 
     return true;
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return false;
   }
 }
@@ -239,14 +241,16 @@ function formatJson(input: JsonValue): string {
   if (typeof input === "string") {
     try {
       return JSON.stringify(JSON.parse(input), null, 2);
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
       return input;
     }
   }
 
   try {
     return JSON.stringify(input ?? {}, null, 2);
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return "{}";
   }
 }

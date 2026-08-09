@@ -123,6 +123,7 @@ interface ProjectGroup {
 import { SyncBadge } from "./SyncBadge";
 import { AssetType, ActionEnum, SemanticSemantic48fffa } from "../../types/enums";
 import { LinkStateType } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { logError } from "@/components/options/options-logger";
 
 export { SyncBadge };
 
@@ -591,7 +592,9 @@ function AssetDetailPanel({ asset, links, onBack, onSync, onDelete, onLinkStateC
           <ScrollArea className="h-[200px]">
             <pre className="text-xs font-mono whitespace-pre-wrap text-muted-foreground p-2 bg-muted/30 rounded-md">
               {(() => {
-                try { return JSON.stringify(JSON.parse(asset.ContentJson), null, 2); } catch (err) { console.error("Automatically logged error:", err); return asset.ContentJson; }
+                try { return JSON.stringify(JSON.parse(asset.ContentJson), null, 2); } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
+ return asset.ContentJson; }
               })()}
             </pre>
           </ScrollArea>

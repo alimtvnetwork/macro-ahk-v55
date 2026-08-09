@@ -62,7 +62,7 @@ function copyToClipboard(value: string, label: string): void {
     document.body.removeChild(ta);
     if (ok) onOk(); else onFail('execCommand returned false');
   } catch (err: unknown) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     onFail(err instanceof Error ? err.message : String(err));
   }
 }
@@ -125,7 +125,7 @@ function exportMembersCsv(wsName: string, members: WorkspaceMember[]): void {
     setTimeout(function () { URL.revokeObjectURL(url); }, Timings.TIMEOUT_SHORT);
     showToast('📄 Exported ' + members.length + ' members → ' + filename, 'success');
   } catch (err: unknown) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     const msg = err instanceof Error ? err.message : String(err);
     showToast('❌ CSV export failed: ' + msg, 'error');
   }
@@ -658,7 +658,7 @@ function submitInvite(el: HTMLElement, wsId: string, wsName: string, form: HTMLF
         await inviteMember(wsId, email, role);
         results.success++;
       } catch (e: unknown) {
-        console.error();
+        logError('MacroController', 'Unknown error');
         results.fail++;
       }
     }

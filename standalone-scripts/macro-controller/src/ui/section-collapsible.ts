@@ -9,7 +9,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
  */
 
 import { cPanelBorder, cSectionBg, cSectionHeader, cSectionToggle } from '../shared-state';
-import { logDebug } from '../error-utils';
+import { logDebug, logError } from '../error-utils';
 import type { CollapsibleSectionOpts } from '../types';
 
 export interface CollapsibleResult {
@@ -83,7 +83,7 @@ function buildTitleElement(title: string): HTMLElement {
 function readCollapsedState(storageKey: string): boolean {
   let savedState: string | null = null;
   try { savedState = localStorage.getItem(storageKey); } catch (_e: unknown) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     logDebug('readCollapsedState', 'localStorage read failed for ' + storageKey);
   }
   const hasSavedState = savedState !== null;
@@ -93,7 +93,7 @@ function readCollapsedState(storageKey: string): boolean {
 
 function persistCollapsedState(storageKey: string, isExpanding: boolean): void {
   try { localStorage.setItem(storageKey, isExpanding ? 'expanded' : 'collapsed'); } catch (_e: unknown) {
-    console.error();
+    logError('MacroController', 'Unknown error');
     logDebug('persistCollapsedState', 'localStorage write failed for ' + storageKey);
   }
 }

@@ -151,7 +151,7 @@ export function SettingsView() {
     try {
       await sendMessage({ type: "SAVE_SETTINGS", settings });
       toast.success("Settings saved");
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to save settings");
     } finally {
       setSaving(false);

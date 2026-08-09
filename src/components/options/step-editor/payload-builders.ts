@@ -10,6 +10,7 @@ import { ServiceResult } from '../../../utils/result-wrapper';
 
 import { StepKindId } from "@/background/recorder/step-library/schema";
 import { UrlMatchType, UrlTabClickFailureModeType, SelectorKindType } from "../../../types/enums";
+import { logError } from "@/components/options/options-logger";
 
 export interface SubmitInput {
     StepKindId: StepKindId;
@@ -63,7 +64,8 @@ export function hydrateUrlTabClickForm(payloadJson: string | null): UrlTabClickF
             DirectOpen:   parsed.DirectOpen === true,
             Url:          typeof parsed.Url === "string" ? parsed.Url : "",
         };
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
         return { ...URL_TAB_CLICK_DEFAULTS };
     }
 }

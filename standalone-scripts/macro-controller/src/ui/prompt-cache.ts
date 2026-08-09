@@ -8,7 +8,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
  */
 
 import { log } from '../logger';
-import { logError } from '../error-utils';
+import { logError, logError } from '../error-utils';
 import { showToast } from '../toast';
 import { DB_PROMPTS_CACHE_VERSION as DB_VERSION } from '../constants';
 import { PromptCacheKeyType } from '../types';
@@ -154,7 +154,7 @@ function writeRecord(storeName: string, record: Record<string, unknown>): Promis
         tx.oncomplete = function() { db.close(); resolve(); };
         tx.onerror = function() { db.close(); resolve(); };
       } catch (e) {
-        console.error();
+        logError('MacroController', 'Unknown error');
         logWriteError(storeName, e);
         resolve();
       }

@@ -138,7 +138,7 @@ export function parseWithRecovery(content: string): unknown {
       try {
         return JSON.parse(repaired);
       } catch (_repairErr) {
-        console.error();
+        logError('MacroController', 'Unknown error');
         logSub('JSON repair also failed: ' + (_repairErr instanceof Error ? _repairErr.message : String(_repairErr)), 1);
       }
     }

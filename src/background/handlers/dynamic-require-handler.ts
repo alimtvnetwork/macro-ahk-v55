@@ -23,6 +23,7 @@ import { getLogsDb, markLoggingDirty } from "./logging-handler";
 import { getFilesByProject } from "./file-storage-handler";
 import { logCaughtError, BgLogTag} from "../bg-logger";
 import { RequireStatusType } from "../../types/enums";
+import { logBgError } from "@/background/bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -194,7 +195,8 @@ async function loadScriptCode(projectId: string, script: ScriptEntry): Promise<s
         const file = files.find((f: { path: string; content: string }) => f.path === script.path);
 
         return file?.content ?? null;
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logBgError("Automatically logged error:", err);
+
         return null;
     }
 }

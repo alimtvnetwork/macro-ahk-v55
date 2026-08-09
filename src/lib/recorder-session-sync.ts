@@ -124,7 +124,9 @@ export async function readSession(): Promise<RecordingSession | null> {
             if (raw === null) { return null; }
 
             return parseSession(JSON.parse(raw));
-        } catch (err) { console.error("Automatically logged error:", err); return null; }
+        } catch (err) { void 0;
+
+ return null; }
     }
 
     return memoryStore.current;

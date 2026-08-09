@@ -52,7 +52,7 @@ vi.mock('../../logging', () => ({ log: vi.fn() }));
 
 import { seedPlanNextPrompts } from '../seed-plan-next';
 import { PLAN_DEFAULT_LEGACY_BODIES, PLAN_DEFAULT_BODY, NEXT_DEFAULT_BODY } from '../plan-next-prompts';
-import { logDiagnosticFromCode } from '../../error-utils';
+import { logDiagnosticFromCode, logError } from '../../error-utils';
 
 const ALL_SLUGS = [
     'plan-default', 'plan-concise', 'plan-with-evidence', 'plan-risk-annotated',
@@ -82,7 +82,7 @@ beforeEach(() => {
     responsesQueue = [];
     (logDiagnosticFromCode as unknown as Mock).mockClear();
     try { localStorage.removeItem('marco_last_seed_telemetry'); } catch (err) {
-        console.error();
+        logError('MacroController', 'Unknown error');
     }
 });
 

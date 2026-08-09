@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { logError } from "@/components/options/options-logger";
 
 type EndpointDoc = {
   type: string;
@@ -40,7 +41,8 @@ type ApiStatus = {
 function toPrettyJson(value: JsonValue): string {
   try {
     return JSON.stringify(value, null, 2);
-  } catch (err) { console.error("Automatically logged error:", err);
+  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
     return String(value);
   }
 }
@@ -77,7 +79,7 @@ export function ApiExplorerCard() {
         endpointCount: result.endpointCount,
         persistenceMode: result.persistenceMode,
       });
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to load API status");
     }
   };
@@ -94,7 +96,7 @@ export function ApiExplorerCard() {
         setSelectedType(initialType);
         applyEndpointRequestTemplate(initialType, docs);
       }
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Failed to load API endpoint docs");
     }
   };
@@ -107,7 +109,7 @@ export function ApiExplorerCard() {
     let parsedBody: JsonValue = {};
     try {
       parsedBody = requestJson.trim() ? JSON.parse(requestJson) : {};
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
       toast.error("Request JSON is invalid");
 
       return;

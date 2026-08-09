@@ -42,6 +42,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AuditSeverityEnum, BadgeEnum, ToneEnum } from "../../types/enums";
+import { logError } from "@/components/options/options-logger";
 
 const AUDIT_CLI_COMMAND = "node scripts/audit-error-swallow.mjs";
 
@@ -147,7 +148,8 @@ function buildEditorLink(file: string, line: number): string {
 function formatTimestamp(iso: string): string {
     try {
         return new Date(iso).toLocaleString();
-    } catch (err) { console.error("Automatically logged error:", err);
+    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+
         return iso;
     }
 }
