@@ -599,7 +599,7 @@ describe("UrlTabClick optional fields, schema conformance", () => {
 
             // 3. Required (always-present) segments.
             expect(report.ReasonDetail).toContain("Reason=TabNotFound");
-            expect(report.ReasonDetail).toContain("OperationModeType=OpenOrFocus");
+            expect(report.ReasonDetail).toContain("Mode=OpenOrFocus");
             expect(report.ReasonDetail).toContain("UrlMatch=Glob");
             expect(report.ReasonDetail).toContain("Pattern=https://x.test/*");
             expect(report.ReasonDetail).toContain("TimeoutMs=1000");

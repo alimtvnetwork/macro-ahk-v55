@@ -284,7 +284,7 @@ function postResponseToPage(
     if (isSdkResponse) {
         // SDK bridge expects { source: "marco-sdk-response", requestId, result/error }
         const sdkPayload = payload as Record<string, unknown> | null;
-        const hasError = sdkPayload && sdkPayload.isOk === false;
+        const hasError = sdkPayload && sdkPayload.ok === false;
         window.postMessage(
             {
                 source: "marco-sdk-response",

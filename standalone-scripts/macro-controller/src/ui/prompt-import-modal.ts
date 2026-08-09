@@ -572,7 +572,7 @@ async function performImportCommit(
     await deps.onCommitted();
     setTimeout(close, 1200);
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     await handleCommitError(err, state);
     transition('error');
   }
@@ -692,7 +692,7 @@ async function startParse(
     state.rows = await diffAgainstCache(bundle.entries);
     transition('preview');
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     const errors = await import('./prompt-import-errors');
     const classified = errors.classifyImportError(err, 'parse');
     state.errorMessage = 'Failed to parse file';

@@ -108,8 +108,7 @@ function buildResetOrderButton(rerender: Rerender): HTMLElement {
     const ok = typeof window !== 'undefined' && typeof window.confirm === 'function'
       ? window.confirm('Reset prompt ordering to the built-in default? Your saved drag order will be cleared.')
       : true;
-    const isMissingOk = !ok;
-    if (isMissingOk) return;
+    if (!ok) return;
     try {
       const restored = resetPromptOrderToDefault();
       log('[PromptDropdown] Prompt order reset to DEFAULT_PROMPT_ORDER (' + restored.length + ' slugs)', 'success');

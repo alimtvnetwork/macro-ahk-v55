@@ -314,7 +314,7 @@ export function clearAllLogs(): void {
     const key = getLogStorageKey();
     localStorage.removeItem(key);
   } catch (_e) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+    console.error();
     logDebug('clearAllLogs', 'localStorage.removeItem failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 }

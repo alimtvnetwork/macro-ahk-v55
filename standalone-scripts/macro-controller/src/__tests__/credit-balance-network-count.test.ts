@@ -56,10 +56,10 @@ beforeEach(async () => {
     const cache = await import('../credit-balance-update/credit-balance-cache');
     cache.clearCreditBalanceUpdateMemoryCache();
     try { await cache.invalidateCreditBalanceUpdateCache('ws_net_1'); } catch (_e) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+        console.error();
     }
     try { await cache.invalidateCreditBalanceUpdateCache('ws_net_2'); } catch (_e) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+        console.error();
     }
 });
 

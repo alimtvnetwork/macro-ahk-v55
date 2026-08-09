@@ -142,7 +142,7 @@ function publishReport(report: PromptHealthReport, silent: boolean): void {
   }
 
   if (report.ok) {
-    emitPromptSeedEvent({ event: any, role: 'generic', outcome: 'ok', detail: 'all defaults healthy' });
+    emitPromptSeedEvent({ event: 'health.default.ok', role: 'generic', outcome: 'ok', detail: 'all defaults healthy' });
 
     return;
   }

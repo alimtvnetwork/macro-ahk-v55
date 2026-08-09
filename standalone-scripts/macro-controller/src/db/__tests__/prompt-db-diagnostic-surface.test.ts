@@ -15,7 +15,7 @@ import type { Mock } from 'vitest';
 import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-mock';
 
 const captured: { method: string; sql: string }[] = [];
-let nextResp: Record<string, unknown> = { isOk: true, rows: [], lastInsertId: 1 };
+let nextResp: Record<string, unknown> = { ok: true, rows: [], lastInsertId: 1 };
 
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
@@ -45,7 +45,7 @@ import { upsertPrompt, deletePromptById } from '../prompt-db';
 beforeEach(() => {
     captured.length = 0;
     logDiagnosticMock.mockReset();
-    nextResp = { isOk: true, rows: [], lastInsertId: 1 };
+    nextResp = { ok: true, rows: [], lastInsertId: 1 };
 });
 
 function pickWhere(): string | undefined {
@@ -68,7 +68,7 @@ describe('prompt-db diagnostic surface (PlanTierType 22 gap #2)', () => {
             // @ts-expect-error - invalid role by contract
             slug: 's', name: 'n', role: 'garbage', body: 'x',
         });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(pickCode()).toBe('DB_PROMPT_E001');
         expect(pickWhere()).toBe('upsertPrompt');
     });
@@ -78,16 +78,16 @@ describe('prompt-db diagnostic surface (PlanTierType 22 gap #2)', () => {
             slug: 'plan-default', name: 'PlanTierType', role: 'plan',
             previousBody: 'do {{n}} steps', body: 'no tokens',
         });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(pickCode()).toBe('DB_PROMPT_E001');
         expect(pickWhere()).toBe('upsertPrompt');
         expect(captured).toHaveLength(0);
     });
 
     it('D3: upsertPrompt SQL failure surfaces DB errorMessage in reason', async () => {
-        nextResp = { isOk: false, errorMessage: 'disk I/O failure' };
+        nextResp = { ok: false, errorMessage: 'disk I/O failure' };
         const r = await upsertPrompt({ slug: 's', name: 'n', role: 'generic', body: 'x' });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(pickCode()).toBe('DB_PROMPT_E001');
         const context = logDiagnosticMock.mock.calls[0][1] as { where?: string; reason?: string };
         expect(context.where).toBe('upsertPrompt');
@@ -96,16 +96,16 @@ describe('prompt-db diagnostic surface (PlanTierType 22 gap #2)', () => {
 
     it('D4: deletePromptById non-integer id emits DB_PROMPT_E001 with where=deletePromptById', async () => {
         const r = await deletePromptById(0);
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(pickCode()).toBe('DB_PROMPT_E001');
         expect(pickWhere()).toBe('deletePromptById');
         expect(captured).toHaveLength(0);
     });
 
     it('D5: successful upsert emits NO diagnostic (positive baseline: no false-positive logs)', async () => {
-        nextResp = { isOk: true, rows: [], lastInsertId: 42 };
+        nextResp = { ok: true, rows: [], lastInsertId: 42 };
         const r = await upsertPrompt({ slug: 's', name: 'n', role: 'generic', body: 'x' });
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(logDiagnosticMock).not.toHaveBeenCalled();
     });
 });

@@ -318,7 +318,7 @@ export function fetchLoopCredits(
 
     apiFetchWorkspaces()
       .then(async function (resp: SdkApiResponse): Promise<Record<string, unknown> | undefined> {
-      const isMissingOk = resp.isFail;
+      const isMissingOk = !resp.ok;
       if (isMissingOk) {
         if (isAuthFailure(resp.status) && !isRetry) {
           const recovered = await handleAuthRecovery(token, resp.status, '');
@@ -449,7 +449,7 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
 
   const resp = await apiFetchWorkspaces();
 
-  const isMissingOk = resp.isFail;
+  const isMissingOk = !resp.ok;
 
   if (isMissingOk) {
     if (isAuthFailure(resp.status) && !isRetry) {

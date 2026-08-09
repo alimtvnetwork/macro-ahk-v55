@@ -31,7 +31,7 @@ import { logError } from '../error-utils';
 import { ServiceResult } from '../utils/result-wrapper';
 
 export interface SqlBridgeResp {
-    isOk: boolean;
+    ok: boolean;
     rows?: unknown[];
     errorMessage?: string;
     lastInsertId?: number;
@@ -146,7 +146,7 @@ async function sendOnce(method: string, sql: string, project: string): Promise<S
         project, method, endpoint: 'rawSql', params: { sql },
     });
 
-    return (resp as SqlBridgeResp) ?? { isOk: false, errorMessage: 'no response' };
+    return (resp as SqlBridgeResp) ?? { ok: false, errorMessage: 'no response' };
 }
 
 /**
@@ -158,16 +158,16 @@ export async function runSql(legacy: LegacyMethod, sql: string, project: string 
     const cached = winning[bucket];
     if (typeof cached === 'string') {
         const resp = await sendOnce(cached, sql, project);
-        if (resp.isOk || !isContractError(resp.errorMessage)) return resp;
+        if (resp.ok || !isContractError(resp.errorMessage)) return resp;
         // Cached name went stale (backend rolled forward): invalidate + reprobe.
         recordRejection(bucket, cached, resp.errorMessage ?? 'unknown');
         delete winning[bucket];
     }
 
-    let lastResp: SqlBridgeResp = { isOk: false, errorMessage: 'no candidate methods tried' };
+    let lastResp: SqlBridgeResp = { ok: false, errorMessage: 'no candidate methods tried' };
     for (const method of CANDIDATES[bucket]) {
         const resp = await sendOnce(method, sql, project);
-        if (resp.isOk) {
+        if (resp.ok) {
             winning[bucket] = method;
 
             return resp;
@@ -181,7 +181,7 @@ export async function runSql(legacy: LegacyMethod, sql: string, project: string 
     }
 
     return {
-        isOk: false,
+        ok: false,
         errorMessage:
             'sql-bridge: no accepted method for ' + bucket
             + ' (last: ' + (lastResp.errorMessage ?? 'unknown') + ')',
@@ -197,15 +197,15 @@ export async function runLoggedQuery(
     sql: string,
     contextInfo: string,
     project: string = DB_NAME
-): Promise<ServiceResult<SqlBridgeResp, Error>> {
+): Promise<SqlBridgeResp> {
     const resp = await runSql(legacy, sql, project);
-    if (resp.isFail || !resp.isOk) {
+    if (!resp.ok) {
         logError('runLoggedQuery', contextInfo + ': ' + (resp.errorMessage || 'unknown error'), new Error(resp.errorMessage || 'unknown error'));
 
-        return new ServiceResult<SqlBridgeResp, Error>(false, resp, new Error(resp.errorMessage || 'unknown error'));
+        return resp;
     }
 
-    return new ServiceResult<SqlBridgeResp, Error>(true, resp);
+    return resp;
 }
 
 /** Test-only: reset the winning-method cache between cases. */

@@ -26,10 +26,10 @@ vi.mock('../../error-utils', async () => {
 
 let responsesQueue: unknown[] = [];
 vi.mock('../../db/extension-bridge', () => ({
-    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { isOk: true, rows: [] }),
+    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { ok: true, rows: [] }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
-    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { isOk: true, rows: [] }),
+    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { ok: true, rows: [] }),
 }));
 
 const reseedCalls: Array<{ force?: boolean }> = [];
@@ -62,8 +62,8 @@ function healthyRow(role: PromptRowRoleType, overrides: Partial<Row> = {}): Row 
         ...overrides,
     };
 }
-const ok = (row: Row): unknown => ({ isOk: true, rows: [row] });
-const empty = (): unknown => ({ isOk: true, rows: [] });
+const ok = (row: Row): unknown => ({ ok: true, rows: [row] });
+const empty = (): unknown => ({ ok: true, rows: [] });
 
 beforeEach(() => {
     toastCalls.length = 0;

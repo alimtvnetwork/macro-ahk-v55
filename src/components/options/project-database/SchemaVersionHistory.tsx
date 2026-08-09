@@ -51,7 +51,7 @@ export function SchemaVersionHistory({
         project: projectSlug,
         key: KV_KEY,
       });
-      if (resp.isOk && resp.value) {
+      if (resp.ok && resp.value) {
         try {
           const parsed = JSON.parse(resp.value);
           setVersions(Array.isArray(parsed) ? parsed : []);

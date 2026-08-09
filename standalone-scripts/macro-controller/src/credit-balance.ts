@@ -113,7 +113,7 @@ export async function resolveWorkspaceId(): Promise<string | null> {
   try {
     const resp = await window.marco!.api!.workspace.resolveByProject(projectId, { baseUrl: CREDIT_API_BASE });
 
-    const isMissingOk = resp.isFail;
+    const isMissingOk = !resp.ok;
 
     if (isMissingOk) {
       if (isAuthFailure(resp.status)) {
@@ -220,7 +220,7 @@ export async function fetchCreditBalance(
   try {
     const resp = await window.marco!.api!.credits.fetchBalance(wsId, { baseUrl: CREDIT_API_BASE });
 
-    const isMissingOk = resp.isFail;
+    const isMissingOk = !resp.ok;
 
     if (isMissingOk) {
       if (isAuthFailure(resp.status) && !isRetry) {

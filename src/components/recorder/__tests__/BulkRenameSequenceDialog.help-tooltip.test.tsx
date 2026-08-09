@@ -16,7 +16,7 @@ import { BulkRenameSequenceDialog } from "@/components/recorder/KeywordEventBulk
 describe("BulkRenameSequenceDialog help tooltip", () => {
     beforeEach(() => {
         try { localStorage.clear(); } catch (err) {
-        RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); }
+        console.error("Automatically caught swallowed error", err); }
     });
 
     function renderOpen(): void {

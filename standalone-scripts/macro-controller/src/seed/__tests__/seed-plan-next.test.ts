@@ -18,14 +18,14 @@ vi.mock('../../db/extension-bridge', () => ({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { isOk: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, rows: [] };
     }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { isOk: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, rows: [] };
     }),
 }));
 vi.mock('../../error-utils', async () => {
@@ -42,7 +42,7 @@ import { seedPlanNextPrompts } from '../seed-plan-next';
 beforeEach(() => {
     captured.length = 0; responsesQueue = []; logCalls.length = 0;
     try { localStorage.removeItem('marco_last_seed_telemetry'); } catch (err) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+        console.error();
     }
 });
 
@@ -53,18 +53,18 @@ describe('seedPlanNextPrompts', () => {
         // [4] hasDefault plan, [5] promote plan, [6] hasDefault next, [7] promote next,
         // [8] audit-log INSERT (because inserts+promotes occurred).
         responsesQueue = [
-            { isOk: true, rows: [] },                 // pre-select existing slugs -> none
-            { isOk: true },                            // INSERT OR IGNORE
-            { isOk: true, rows: [] },                 // legacy read plan-default (row-missing -> skip)
-            { isOk: true, rows: [] },                 // legacy read next-default (row-missing -> skip)
-            { isOk: true, rows: [] },                 // hasDefault plan -> none
-            { isOk: true },                            // promote plan-default
-            { isOk: true, rows: [] },                 // hasDefault next -> none
-            { isOk: true },                            // promote next-default
-            { isOk: true },                            // audit-log INSERT
+            { ok: true, rows: [] },                 // pre-select existing slugs -> none
+            { ok: true },                            // INSERT OR IGNORE
+            { ok: true, rows: [] },                 // legacy read plan-default (row-missing -> skip)
+            { ok: true, rows: [] },                 // legacy read next-default (row-missing -> skip)
+            { ok: true, rows: [] },                 // hasDefault plan -> none
+            { ok: true },                            // promote plan-default
+            { ok: true, rows: [] },                 // hasDefault next -> none
+            { ok: true },                            // promote next-default
+            { ok: true },                            // audit-log INSERT
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(captured).toHaveLength(9);
         expect(captured[0].sql).toMatch(/^SELECT Slug FROM Prompt WHERE Slug IN/);
         expect(captured[1].sql).toMatch(/^INSERT OR IGNORE INTO Prompt/);
@@ -84,15 +84,15 @@ describe('seedPlanNextPrompts', () => {
             'next-default', 'next-concise', 'next-with-time', 'next-with-risk',
         ].map(s => ({ Slug: s }));
         responsesQueue = [
-            { isOk: true, rows: allSlugs },           // pre-select -> all present
-            { isOk: true },                            // INSERT OR IGNORE (driver no-op)
-            { isOk: true, rows: [] },                 // legacy read plan-default (skip)
-            { isOk: true, rows: [] },                 // legacy read next-default (skip)
-            { isOk: true, rows: [{ '1': 1 }] },       // hasDefault plan
-            { isOk: true, rows: [{ '1': 1 }] },       // hasDefault next
+            { ok: true, rows: allSlugs },           // pre-select -> all present
+            { ok: true },                            // INSERT OR IGNORE (driver no-op)
+            { ok: true, rows: [] },                 // legacy read plan-default (skip)
+            { ok: true, rows: [] },                 // legacy read next-default (skip)
+            { ok: true, rows: [{ '1': 1 }] },       // hasDefault plan
+            { ok: true, rows: [{ '1': 1 }] },       // hasDefault next
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(captured).toHaveLength(6);
         expect(captured.some(c => c.sql.startsWith('UPDATE Prompt SET IsDefault = 1'))).toBe(false);
         expect(captured.some(c => c.sql.startsWith('INSERT INTO PromptSeedAudit'))).toBe(false);
@@ -102,17 +102,17 @@ describe('seedPlanNextPrompts', () => {
 
     it('mixed: plan default already set, next default missing -> promotes only next + writes audit row', async () => {
         responsesQueue = [
-            { isOk: true, rows: [] },
-            { isOk: true },
-            { isOk: true, rows: [] },                 // legacy read plan-default (skip)
-            { isOk: true, rows: [] },                 // legacy read next-default (skip)
-            { isOk: true, rows: [{ '1': 1 }] },       // plan has default
-            { isOk: true, rows: [] },                 // next missing
-            { isOk: true },                            // promote next
-            { isOk: true },                            // audit-log INSERT
+            { ok: true, rows: [] },
+            { ok: true },
+            { ok: true, rows: [] },                 // legacy read plan-default (skip)
+            { ok: true, rows: [] },                 // legacy read next-default (skip)
+            { ok: true, rows: [{ '1': 1 }] },       // plan has default
+            { ok: true, rows: [] },                 // next missing
+            { ok: true },                            // promote next
+            { ok: true },                            // audit-log INSERT
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(captured).toHaveLength(8);
         expect(captured[6].sql).toContain("Slug = 'next-default'");
         expect(captured[7].sql).toMatch(/^INSERT INTO PromptSeedAudit/);
@@ -122,22 +122,22 @@ describe('seedPlanNextPrompts', () => {
 
     it('surfaces INSERT failure instead of swallowing it', async () => {
         responsesQueue = [
-            { isOk: true, rows: [] },                 // pre-select
-            { isOk: false, errorMessage: 'disk full' },
+            { ok: true, rows: [] },                 // pre-select
+            { ok: false, errorMessage: 'disk full' },
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/disk full/);
     });
 
     it('INSERT SQL includes all 8 seed rows', async () => {
         responsesQueue = [
-            { isOk: true, rows: [] },
-            { isOk: true },
-            { isOk: true, rows: [] },                 // legacy read plan-default
-            { isOk: true, rows: [] },                 // legacy read next-default
-            { isOk: true, rows: [{ '1': 1 }] },
-            { isOk: true, rows: [{ '1': 1 }] },
+            { ok: true, rows: [] },
+            { ok: true },
+            { ok: true, rows: [] },                 // legacy read plan-default
+            { ok: true, rows: [] },                 // legacy read next-default
+            { ok: true, rows: [{ '1': 1 }] },
+            { ok: true, rows: [{ '1': 1 }] },
         ];
         await seedPlanNextPrompts();
         const sql = captured[1].sql;
@@ -151,15 +151,15 @@ describe('seedPlanNextPrompts', () => {
 
     it('persists telemetry to localStorage under marco_last_seed_telemetry', async () => {
         responsesQueue = [
-            { isOk: true, rows: [] },
-            { isOk: true },
-            { isOk: true, rows: [] },                 // legacy read plan-default
-            { isOk: true, rows: [] },                 // legacy read next-default
-            { isOk: true, rows: [] },
-            { isOk: true },
-            { isOk: true, rows: [] },
-            { isOk: true },
-            { isOk: true },                            // audit-log INSERT
+            { ok: true, rows: [] },
+            { ok: true },
+            { ok: true, rows: [] },                 // legacy read plan-default
+            { ok: true, rows: [] },                 // legacy read next-default
+            { ok: true, rows: [] },
+            { ok: true },
+            { ok: true, rows: [] },
+            { ok: true },
+            { ok: true },                            // audit-log INSERT
         ];
         await seedPlanNextPrompts();
         const raw = localStorage.getItem('marco_last_seed_telemetry');

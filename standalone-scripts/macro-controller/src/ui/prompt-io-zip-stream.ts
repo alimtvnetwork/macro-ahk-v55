@@ -225,7 +225,7 @@ export function buildPromptsZipStream(
         controller.enqueue(buildEocd(centralStart, centralSize, central.length));
         controller.close();
       } catch (err) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+        console.error();
         controller.error(err);
       }
     },

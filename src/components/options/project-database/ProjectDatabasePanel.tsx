@@ -96,7 +96,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
         endpoint: "ProjectDatabases",
         params: { limit: 100, offset: 0 },
       });
-      if (result.isOk && result.rows) {
+      if (result.ok && result.rows) {
         const userCreated = result.rows.filter((r) => r.IsDefault !== 1).length;
         setUserDbCount(userCreated);
       }
@@ -123,7 +123,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
         endpoint: "listTables",
         params: {},
       });
-      if (result.isOk && result.tables) {
+      if (result.ok && result.tables) {
         setTables(result.tables);
       }
     } catch (err) {
@@ -166,7 +166,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
           columns: validColumns,
         },
       });
-      if (result.isOk) {
+      if (result.ok) {
         toast.success(`Table "${trimmedName}" created`);
         setShowCreateForm(false);
         setNewTableName("");
@@ -218,7 +218,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
         format,
       });
 
-      if (!result.isOk) {
+      if (!result.ok) {
         toast.error(result.errorMessage || "Failed to generate docs");
 
         return;

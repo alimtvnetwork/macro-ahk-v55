@@ -33,7 +33,7 @@ function schemaResp(
   onErr: (message: string) => void,
 ): (resp: SqlBridgeResp) => void {
   return (resp: SqlBridgeResp): void => {
-    if (resp?.isOk) onOk(resp);
+    if (resp?.ok) onOk(resp);
     else onErr(resp?.errorMessage || 'unknown');
   };
 }
@@ -183,7 +183,7 @@ export function applySchema(raw: string, logEl: HTMLElement, statusBar: HTMLElem
         tableName: t.name,
         columns: colDefs,
       }).then((resp: ExtensionCallbackResponse) => {
-        if (resp?.isOk) {
+        if (resp?.ok) {
           appendLog(logEl, 'ok', `Created table "${t.name}"`);
           completed++;
         } else {

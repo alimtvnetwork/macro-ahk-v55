@@ -30,14 +30,14 @@ vi.mock('../../db/extension-bridge', () => ({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { isOk: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, rows: [] };
     }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { isOk: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, rows: [] };
     }),
 }));
 vi.mock('../../error-utils', async () => {
@@ -89,15 +89,15 @@ describe('seedPlanNextPrompts: audit-skip on no-observable-change boot', () => {
         //  6. hasDefault next -> already true (kept)
         // -> upgradedTotal=0, promoted=0, inserted=0 -> audit must SKIP.
         responsesQueue = [
-            { isOk: true, rows: ALL_SLUGS },
-            { isOk: true },
-            { isOk: true, rows: [{ Body: '# my own hand-authored plan body\n\n1. do work' }] },
-            { isOk: true, rows: [{ Body: '# my own hand-authored next body\n\n1. pick task' }] },
-            { isOk: true, rows: [{ '1': 1 }] },
-            { isOk: true, rows: [{ '1': 1 }] },
+            { ok: true, rows: ALL_SLUGS },
+            { ok: true },
+            { ok: true, rows: [{ Body: '# my own hand-authored plan body\n\n1. do work' }] },
+            { ok: true, rows: [{ Body: '# my own hand-authored next body\n\n1. pick task' }] },
+            { ok: true, rows: [{ '1': 1 }] },
+            { ok: true, rows: [{ '1': 1 }] },
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
 
         const auditWrites = captured.filter(c => c.sql.startsWith('INSERT INTO PromptSeedAudit'));
         expect(auditWrites, 'no audit row on idempotent boot').toHaveLength(0);

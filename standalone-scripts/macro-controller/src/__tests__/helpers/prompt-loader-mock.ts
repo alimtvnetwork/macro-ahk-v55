@@ -15,14 +15,14 @@
  *         getPromptsConfig: () => ({ editorXPath: '//div' }),
  *     }));
  *
- * The default `sendToExtension` returns `{ isOk: true, rows: [] }` so
+ * The default `sendToExtension` returns `{ ok: true, rows: [] }` so
  * downstream `runSql` consumers see an "empty result" and take their
  * fallback branch. Override it via `overrides.sendToExtension` when a
  * test needs to script SQL responses.
  */
 
 export interface PromptLoaderMockShape {
-    sendToExtension: (channel: string, payload: unknown) => Promise<{ isOk: boolean; rows?: unknown[]; errorMessage?: string }>;
+    sendToExtension: (channel: string, payload: unknown) => Promise<{ ok: boolean; rows?: unknown[]; errorMessage?: string }>;
     getPromptsConfig?: () => { editorXPath: string };
     // Free-form overrides: additional named exports the code under test
     // may look up on the prompt-loader module.
@@ -31,7 +31,7 @@ export interface PromptLoaderMockShape {
 
 export function buildPromptLoaderMock(overrides: Partial<PromptLoaderMockShape> = {}): PromptLoaderMockShape {
     const defaults: PromptLoaderMockShape = {
-        sendToExtension: async () => ({ isOk: true, rows: [] }),
+        sendToExtension: async () => ({ ok: true, rows: [] }),
         getPromptsConfig: () => ({ editorXPath: '//div' }),
     };
 

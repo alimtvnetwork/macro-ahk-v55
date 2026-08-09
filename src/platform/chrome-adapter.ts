@@ -102,7 +102,7 @@ function throwIfErrorResponse(response: string | number | boolean | null | objec
 
     const envelope = response as BackgroundErrorEnvelope;
 
-    const hasErrorFlag = envelope.isOk === false;
+    const hasErrorFlag = envelope.ok === false;
     const hasErrorMessage = typeof envelope.errorMessage === "string";
 
     if (hasErrorFlag && hasErrorMessage) {
@@ -130,7 +130,7 @@ async function waitForReceiver(): Promise<void> {
             // Accept both legacy `{ isOk: true }` and current `{ type: '__PONG__' }`
             // reply shapes so the readiness probe survives router contract changes.
             const isReady = ping !== null
-                && (ping.isOk === true || ping.type === "__PONG__");
+                && (ping.ok === true || ping.type === "__PONG__");
 
             if (isReady) {
                 return;

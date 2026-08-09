@@ -16,7 +16,7 @@ import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-moc
 
 interface CapturedCall { method: string; sql: string }
 const captured: CapturedCall[] = [];
-let nextResponse: Record<string, unknown> = { isOk: true, rows: [], lastInsertId: 42 };
+let nextResponse: Record<string, unknown> = { ok: true, rows: [], lastInsertId: 42 };
 
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
@@ -43,7 +43,7 @@ import { upsertPrompt } from '../prompt-db';
 
 beforeEach(() => {
     captured.length = 0;
-    nextResponse = { isOk: true, rows: [], lastInsertId: 42 };
+    nextResponse = { ok: true, rows: [], lastInsertId: 42 };
 });
 
 describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => {
@@ -53,7 +53,7 @@ describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => 
             previousBody: 'Task {{n}} of {{n}}',
             body: 'Task of', // both tokens dropped
         });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/token/i);
         // No SQL round-trip; the guard fires before runSql.
         expect(captured).toHaveLength(0);
@@ -65,7 +65,7 @@ describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => 
             previousBody: '{{n}} more',
             body: 'no token here',
         });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/token/i);
         expect(captured).toHaveLength(0);
     });
@@ -78,7 +78,7 @@ describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => 
         });
         // Generic prompts do not carry the required-token contract; guard
         // MUST NOT block them. Write proceeds and hits the DB.
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(captured.length).toBeGreaterThan(0);
     });
 
@@ -90,7 +90,7 @@ describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => 
             replaceKey: 'count',
             body: 'iterate {{count}} times',
         });
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
     });
 
     it('G5: no previousBody => guard is skipped (new-row create path)', async () => {
@@ -100,7 +100,7 @@ describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => 
             slug: 'brand-new', name: 'New', role: 'plan',
             body: 'anything without tokens',
         });
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
     });
 
     it('G6: unchanged tokens pass through cleanly (positive baseline)', async () => {
@@ -109,6 +109,6 @@ describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => 
             previousBody: 'do {{n}} steps',
             body: 'please do {{n}} steps carefully',
         });
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
     });
 });

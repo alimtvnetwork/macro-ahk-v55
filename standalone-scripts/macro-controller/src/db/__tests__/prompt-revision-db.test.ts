@@ -8,7 +8,7 @@ import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-moc
 interface CapturedCall { method: string; sql: string }
 const captured: CapturedCall[] = [];
 let responsesQueue: Record<string, unknown>[] = [];
-let fallback: Record<string, unknown> = { isOk: true, rows: [], lastInsertId: 1 };
+let fallback: Record<string, unknown> = { ok: true, rows: [], lastInsertId: 1 };
 
 vi.mock('../extension-bridge', () => ({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
@@ -56,13 +56,13 @@ const samplePrompt = (over: Partial<PromptRow> = {}): PromptRow => ({
 beforeEach(() => {
     captured.length = 0;
     responsesQueue = [];
-    fallback = { isOk: true, rows: [], lastInsertId: 42 };
+    fallback = { ok: true, rows: [], lastInsertId: 42 };
 });
 
 describe('recordPromptRevision', () => {
     it('inserts the pre-image row and issues a trim DELETE afterwards', async () => {
         const r = await recordPromptRevision({ previous: samplePrompt(), reason: 'upsert' });
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(r.value).toBe(42);
         expect(captured).toHaveLength(2);
         expect(captured[0].sql).toMatch(/^INSERT INTO PromptRevision/);
@@ -76,7 +76,7 @@ describe('recordPromptRevision', () => {
 
     it('rejects a pre-image with invalid Id, no SQL emitted', async () => {
         const r = await recordPromptRevision({ previous: samplePrompt({ Id: 0 }), reason: 'upsert' });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(captured).toHaveLength(0);
     });
 
@@ -85,7 +85,7 @@ describe('recordPromptRevision', () => {
             previous: samplePrompt({ Role: 'garbage' as never }),
             reason: 'upsert',
         });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(captured).toHaveLength(0);
     });
 
@@ -94,7 +94,7 @@ describe('recordPromptRevision', () => {
             previous: samplePrompt({ Body: "it's fine" }),
             reason: 'manual',
         });
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(captured[0].sql).toContain("'it''s fine'");
     });
 });
@@ -102,14 +102,14 @@ describe('recordPromptRevision', () => {
 describe('listPromptRevisions', () => {
     it('emits SELECT ordered newest first, mapping rows to typed shape', async () => {
         responsesQueue = [{
-            isOk: true,
+            ok: true,
             rows: [
                 { Id: 9, PromptId: 7, Slug: 'plan-default', Name: 'x', Body: 'old', Role: 'plan',
                   ReplaceKey: 'n', ReplaceValues: '["1"]', CreatedAt: 500, Reason: 'upsert' },
             ],
         }];
         const r = await listPromptRevisions('plan-default');
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(r.value).toHaveLength(1);
         expect(r.value?.[0].Id).toBe(9);
         expect(r.value?.[0].Body).toBe('old');
@@ -118,22 +118,22 @@ describe('listPromptRevisions', () => {
 
     it('rejects empty slug without touching DB', async () => {
         const r = await listPromptRevisions('');
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(captured).toHaveLength(0);
     });
 });
 
 describe('getPromptRevisionById', () => {
     it('returns undefined when the id has no row', async () => {
-        responsesQueue = [{ isOk: true, rows: [] }];
+        responsesQueue = [{ ok: true, rows: [] }];
         const r = await getPromptRevisionById(999);
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(r.value).toBeUndefined();
     });
 
     it('rejects non-positive ids without touching DB', async () => {
         const r = await getPromptRevisionById(0);
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(captured).toHaveLength(0);
     });
 });

@@ -139,7 +139,7 @@ describe('logDiagnosticFromCode — rejected logger shapes fall back cleanly', (
         try {
           logDiagnosticFromCode('PROMPT_EDIT_E001', CTX);
         } catch (e) {
-          logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
+          console.error();
           threw = e;
         }
 

@@ -15,7 +15,7 @@ interface CapturedCall {
   sql: string;
 }
 const captured: CapturedCall[] = [];
-let nextResponse: Record<string, unknown> = { isOk: true, rows: [] };
+let nextResponse: Record<string, unknown> = { ok: true, rows: [] };
 
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
   sendToExtension: vi.fn(async (_channel: string, payload: {
@@ -56,7 +56,7 @@ import {
 
 beforeEach(() => {
   captured.length = 0;
-  nextResponse = { isOk: true, rows: [] };
+  nextResponse = { ok: true, rows: [] };
 });
 
 describe('insertChatSubmit', () => {
@@ -98,7 +98,7 @@ describe('insertChatSubmit', () => {
 
 describe('countChatSubmits', () => {
   it('returns the numeric count from row 0', async () => {
-    nextResponse = { isOk: true, rows: [{ n: 7 }] };
+    nextResponse = { ok: true, rows: [{ n: 7 }] };
     const n = await countChatSubmits('proj-1');
     expect(n).toBe(7);
     expect(captured[0].method).toBe('QUERY');
@@ -106,7 +106,7 @@ describe('countChatSubmits', () => {
   });
 
   it('returns 0 when no rows come back', async () => {
-    nextResponse = { isOk: true, rows: [] };
+    nextResponse = { ok: true, rows: [] };
     expect(await countChatSubmits('nope')).toBe(0);
   });
 });
@@ -146,7 +146,7 @@ describe('deleteAllChatSubmitsForProject', () => {
 
 describe('error surfacing', () => {
   it('returns false / [] when isOk is false — never silently succeeds', async () => {
-    nextResponse = { isOk: false, errorMessage: 'boom' };
+    nextResponse = { ok: false, errorMessage: 'boom' };
     expect(await insertChatSubmit({
       projectId: 'p', projectName: null, source: 'paste',
       fileId: 'f', charCount: 1, createdAt: 1, metaJson: null,

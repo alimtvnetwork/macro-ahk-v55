@@ -120,7 +120,7 @@ function expectMissingFieldError(
 ): asserts result is ErrorShape {
     expect(result, `${op}: handler must return an object`).toBeTypeOf("object");
     const r = result as Partial<ErrorShape>;
-    expect(r.isOk, `${op}: isOk must be false`).toBe(false);
+    expect(r.ok, `${op}: isOk must be false`).toBe(false);
     expect(r.errorMessage, `${op}: errorMessage must be a string`).toBeTypeOf("string");
     expect(r.errorMessage).toContain(`[${op}]`);
     expect(r.errorMessage).toContain(`'${field}'`);
@@ -339,7 +339,7 @@ describe("handler-guards, project-api-handler missing-field contract", () => {
             endpoint: "Users",
         } as unknown as Parameters<typeof handleProjectApi>[0]);
         const r = result as Partial<ErrorShape>;
-        expect(r.isOk).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.errorMessage).toBeTypeOf("string");
         expect(r.errorMessage).toContain("[projectApi]");
         expect(r.errorMessage).toContain("'project'");
@@ -352,7 +352,7 @@ describe("handler-guards, project-api-handler missing-field contract", () => {
             method: "GET",
         } as unknown as Parameters<typeof handleProjectApi>[0]);
         const r = result as Partial<ErrorShape>;
-        expect(r.isOk).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.errorMessage).toBeTypeOf("string");
         expect(r.errorMessage).toContain("[projectApi]");
         expect(r.errorMessage).toContain("'endpoint'");
@@ -366,7 +366,7 @@ describe("handler-guards, project-api-handler missing-field contract", () => {
             endpoint: "Users",
         } as unknown as Parameters<typeof handleProjectApi>[0]);
         const r = result as Partial<ErrorShape>;
-        expect(r.isOk).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.errorMessage).toContain("'project'");
     });
 
@@ -378,7 +378,7 @@ describe("handler-guards, project-api-handler missing-field contract", () => {
             endpoint: "",
         } as unknown as Parameters<typeof handleProjectApi>[0]);
         const r = result as Partial<ErrorShape>;
-        expect(r.isOk).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.errorMessage).toContain("'endpoint'");
     });
 });

@@ -28,7 +28,7 @@ function resolveProjectId(): string {
     const altMatch = href.match(/id-preview--([a-f0-9-]{36})/i);
     if (altMatch) return altMatch[1];
   } catch (_e) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+    console.error();
     logDebug('resolveProjectId', 'URL parse failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 
@@ -107,7 +107,7 @@ export function invalidateCacheOnProjectSwitch(): void {
       localStorage.setItem(StorageKeyType.WsLastProject, currentPid);
     }
   } catch (_e) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+    console.error();
     logWarn('invalidateCacheOnProjectSwitch', 'localStorage write failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 }
@@ -133,7 +133,7 @@ export function migrateLegacyCache(): void {
       }
     }
   } catch (_e) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+    console.error();
     logWarn('migrateLegacyCache', 'localStorage read/write failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 }

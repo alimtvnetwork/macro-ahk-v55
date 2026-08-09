@@ -12,7 +12,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-mock';
 
 interface CapturedCall { method: string; sql: string }
-interface QueuedResponse { isOk: boolean; rows?: unknown[]; errorMessage?: string }
+interface QueuedResponse { ok: boolean; rows?: unknown[]; errorMessage?: string }
 
 const captured: CapturedCall[] = [];
 let responsesQueue: QueuedResponse[] = [];
@@ -22,14 +22,14 @@ vi.mock('../extension-bridge', () => ({
     sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
         captured.push({ method: payload.method, sql: payload.params.sql });
 
-        return responsesQueue.shift() ?? { isOk: true };
+        return responsesQueue.shift() ?? { ok: true };
     }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
         captured.push({ method: payload.method, sql: payload.params.sql });
 
-        return responsesQueue.shift() ?? { isOk: true };
+        return responsesQueue.shift() ?? { ok: true };
     }),
 }));
 vi.mock('../../ui/prompt-cache', () => ({
@@ -56,7 +56,7 @@ beforeEach(() => {
 
 describe('validateAndDisableReadMemoryDuplicates', () => {
     it('is a no-op when no duplicate rows are found', async () => {
-        responsesQueue = [{ isOk: true, rows: [] }];
+        responsesQueue = [{ ok: true, rows: [] }];
         const report = await validateAndDisableReadMemoryDuplicates();
         expect(report).toEqual({ detected: 0, disabled: 0, slugs: [] });
         expect(captured).toHaveLength(1);
@@ -67,13 +67,13 @@ describe('validateAndDisableReadMemoryDuplicates', () => {
     it('demotes duplicates, prefixes Name, and clears the cache', async () => {
         responsesQueue = [
             {
-                isOk: true,
+                ok: true,
                 rows: [
                     { Id: 11, Slug: 'read-memory-v2', Name: 'Read Memory v2' },
                     { Id: 22, Slug: 'rejog-the-memory-v1', Name: 'Rejog the Memory v1' },
                 ],
             },
-            { isOk: true },
+            { ok: true },
         ];
         const report = await validateAndDisableReadMemoryDuplicates();
         expect(report.detected).toBe(2);
@@ -90,7 +90,7 @@ describe('validateAndDisableReadMemoryDuplicates', () => {
     });
 
     it('excludes the canonical slug and already-prefixed rows from the match', async () => {
-        responsesQueue = [{ isOk: true, rows: [] }];
+        responsesQueue = [{ ok: true, rows: [] }];
         await validateAndDisableReadMemoryDuplicates();
         const querySql = captured[0]?.sql ?? '';
         expect(querySql).toContain("Slug <> '" + READ_MEMORY_CANONICAL_SLUG_FOR_TEST + "'");
@@ -99,8 +99,8 @@ describe('validateAndDisableReadMemoryDuplicates', () => {
 
     it('reports partial disable when the UPDATE fails', async () => {
         responsesQueue = [
-            { isOk: true, rows: [{ Id: 5, Slug: 'read-memory-old', Name: 'Read Memory Old' }] },
-            { isOk: false, errorMessage: 'boom' },
+            { ok: true, rows: [{ Id: 5, Slug: 'read-memory-old', Name: 'Read Memory Old' }] },
+            { ok: false, errorMessage: 'boom' },
         ];
         const report = await validateAndDisableReadMemoryDuplicates();
         expect(report.detected).toBe(1);

@@ -746,7 +746,7 @@ function restoreActionOverflowPositions(original: Map<HTMLElement, OriginalActio
   for (const [actionElement, position] of original) {
     const next = position.next && position.next.parentNode === position.parent ? position.next : null;
     try { position.parent.insertBefore(actionElement, next); } catch (err) {
-      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+      console.error();
     }
   }
   original.clear();

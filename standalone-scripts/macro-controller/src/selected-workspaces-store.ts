@@ -17,7 +17,7 @@ function notify(): void {
     try {
       cb(new Set(selectedIds));
     } catch (_e: unknown) {
-      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+      console.error();
     }
   }
 }

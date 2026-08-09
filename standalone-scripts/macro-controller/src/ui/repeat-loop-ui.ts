@@ -326,8 +326,7 @@ async function runRepeatLoopAsync(): Promise<void> {
   for (let i = repeatLoopState.completed; i < repeatLoopState.count; i++) {
     if (repeatLoopState.cancelled) break;
     const ok = await submitOneIteration();
-    const isMissingOk = !ok;
-    if (isMissingOk) break;
+    if (!ok) break;
     if (repeatLoopState.completed >= repeatLoopState.count) break;
     await waitBetweenIterations();
   }

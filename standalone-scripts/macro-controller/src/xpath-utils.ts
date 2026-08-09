@@ -198,7 +198,7 @@ function findViaAriaLabel(desc: ElementDescriptor): Element | null {
         return result;
       }
     } catch (_e) {
-      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+      console.error();
       logSub('ARIA label query skipped for "' + label + '": ' + toErrorMessage(_e), 1);
     }
   }

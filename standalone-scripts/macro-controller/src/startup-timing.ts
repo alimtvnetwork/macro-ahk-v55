@@ -115,7 +115,7 @@ export function logTimingSummary(): void {
     const ver = ext?.version || '?';
     lines.push('│  Version: v' + ver + '                                                    │'.substring(0, 55) + '│');
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
   }
 
   lines.push('└─────────────────────────────────────────────────────────────────┘');

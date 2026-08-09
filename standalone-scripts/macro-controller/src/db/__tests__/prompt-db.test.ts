@@ -7,7 +7,7 @@ import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-moc
 
 interface CapturedCall { method: string; sql: string }
 const captured: CapturedCall[] = [];
-let nextResponse: Record<string, unknown> = { isOk: true, rows: [] };
+let nextResponse: Record<string, unknown> = { ok: true, rows: [] };
 let responsesQueue: Record<string, unknown>[] | null = null;
 
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
@@ -40,18 +40,18 @@ import {
 
 beforeEach(() => {
     captured.length = 0;
-    nextResponse = { isOk: true, rows: [] };
+    nextResponse = { ok: true, rows: [] };
     responsesQueue = null;
 });
 
 describe('listPromptsByRole', () => {
     it('emits SELECT scoped by Role with correct ORDER BY', async () => {
-        nextResponse = { isOk: true, rows: [
+        nextResponse = { ok: true, rows: [
             { Id: 1, Slug: 'plan-default', Name: 'PlanTierType default', Body: '# PlanTierType {{n}}', Role: 'plan', IsDefault: 1, CreatedAt: 10, UpdatedAt: 20 },
         ]};
         const r = await listPromptsByRole('plan');
         const isMissingOk = r.isFail;
-        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.isSuccess).toBe(true);
+        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.ok).toBe(true);
         expect(r.value).toHaveLength(1);
         expect(r.value?.[0].Slug).toBe('plan-default');
         expect(captured[0].sql).toBe(
@@ -61,28 +61,28 @@ describe('listPromptsByRole', () => {
 
     it('rejects invalid role without touching DB', async () => {
         const r = await listPromptsByRole('bogus' as never);
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(captured).toHaveLength(0);
     });
 });
 
 describe('getDefaultPromptForRole', () => {
     it('returns the single IsDefault=1 row', async () => {
-        nextResponse = { isOk: true, rows: [
+        nextResponse = { ok: true, rows: [
             { Id: 3, Slug: 'next-default', Name: 'Next', Body: 'go', Role: 'next', IsDefault: 1, CreatedAt: 1, UpdatedAt: 2 },
         ]};
         const r = await getDefaultPromptForRole('next');
         const isMissingOk = r.isFail;
-        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.isSuccess).toBe(true);
+        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.ok).toBe(true);
         expect(r.value?.Id).toBe(3);
         expect(captured[0].sql).toBe("SELECT * FROM Prompt WHERE Role = 'next' AND IsDefault = 1 LIMIT 1");
     });
 
     it('returns undefined when no default set (ok=true, value=undefined)', async () => {
-        nextResponse = { isOk: true, rows: [] };
+        nextResponse = { ok: true, rows: [] };
         const r = await getDefaultPromptForRole('plan');
         const isMissingOk = r.isFail;
-        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.isSuccess).toBe(true);
+        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.ok).toBe(true);
         expect(r.value).toBeUndefined();
     });
 });
@@ -91,7 +91,7 @@ describe('setDefaultPromptForRole', () => {
     it('delegates to enforceSingleDefaultPerRole (transactional flip)', async () => {
         const r = await setDefaultPromptForRole(5, 'plan');
         const isMissingOk = r.isFail;
-        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.isSuccess).toBe(true);
+        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.ok).toBe(true);
         expect(captured[0].sql).toMatch(/BEGIN TRANSACTION/);
         expect(captured[0].sql).toMatch(/UPDATE Prompt SET IsDefault = 1 WHERE Id = 5 AND Role = 'plan'/);
     });
@@ -99,10 +99,10 @@ describe('setDefaultPromptForRole', () => {
 
 describe('upsertPrompt', () => {
     it('INSERTs a new row when id is omitted', async () => {
-        nextResponse = { isOk: true, lastInsertId: 42 };
+        nextResponse = { ok: true, lastInsertId: 42 };
         const r = await upsertPrompt({ slug: 's', name: 'n', body: 'b', role: 'generic' });
         const isMissingOk = r.isFail;
-        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.isSuccess).toBe(true);
+        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.ok).toBe(true);
         expect(r.value).toBe(42);
         expect(captured[0].sql).toMatch(/^INSERT INTO Prompt/);
         expect(captured[0].sql).toContain("'generic'");
@@ -110,12 +110,12 @@ describe('upsertPrompt', () => {
 
     it('resolves the inserted row id by slug when rawSql omits lastInsertId', async () => {
         responsesQueue = [
-            { isOk: true, rows: [] },
-            { isOk: true, rows: [{ Id: 88 }] },
+            { ok: true, rows: [] },
+            { ok: true, rows: [{ Id: 88 }] },
         ];
         const r = await upsertPrompt({ slug: 'plan-default', name: 'PlanTierType', body: 'body {{n}}', role: 'plan' });
         const isMissingOk = r.isFail;
-        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.isSuccess).toBe(true);
+        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.ok).toBe(true);
         expect(r.value).toBe(88);
         expect(captured[0].sql).toMatch(/^INSERT INTO Prompt/);
         expect(captured[1].sql).toBe("SELECT Id FROM Prompt WHERE Slug = 'plan-default' AND Role = 'plan' LIMIT 1");
@@ -124,7 +124,7 @@ describe('upsertPrompt', () => {
     it('UPDATEs when id is provided', async () => {
         const r = await upsertPrompt({ id: 7, slug: 's', name: 'n', body: 'b', role: 'plan' });
         const isMissingOk = r.isFail;
-        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.isSuccess).toBe(true);
+        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.ok).toBe(true);
         expect(r.value).toBe(7);
         // v4.173.0: upsertPrompt now reads the pre-image row before writing so
         // it can snapshot the previous body into PromptRevision for rollback.
@@ -136,14 +136,14 @@ describe('upsertPrompt', () => {
 
     it('rejects empty required fields with a specific error and no DB write', async () => {
         const r = await upsertPrompt({ slug: '', name: 'n', body: 'b', role: 'plan' });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/slug/);
         expect(captured).toHaveLength(0);
     });
 
     it('rejects invalid role', async () => {
         const r = await upsertPrompt({ slug: 's', name: 'n', body: 'b', role: 'nope' as never });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/invalid role/);
     });
 
@@ -153,7 +153,7 @@ describe('upsertPrompt', () => {
             previousBody: 'hi {{count}}',
             body: 'hi {{n}}',
         });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/ParamTokenMismatch/);
         expect(captured).toHaveLength(0);
     });
@@ -165,7 +165,7 @@ describe('upsertPrompt', () => {
             body: 'b {{y}} a {{x}}',
         });
         const isMissingOk = r.isFail;
-        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.isSuccess).toBe(true);
+        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.ok).toBe(true);
         expect(captured.some(c => c.sql.startsWith('UPDATE Prompt'))).toBe(true);
     });
 
@@ -176,26 +176,26 @@ describe('upsertPrompt', () => {
             body: 'no tokens',
         });
         const isMissingOk = r.isFail;
-        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.isSuccess).toBe(true);
+        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.ok).toBe(true);
     });
 
     it('persists default ReplaceKey and ReplaceValues on insert when not overridden', async () => {
-        nextResponse = { isOk: true, lastInsertId: 1 };
+        nextResponse = { ok: true, lastInsertId: 1 };
         const r = await upsertPrompt({ slug: 's', name: 'n', body: 'b', role: 'plan' });
         const isMissingOk = r.isFail;
-        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.isSuccess).toBe(true);
+        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.ok).toBe(true);
         expect(captured[0].sql).toContain("'n'"); // ReplaceKey literal
         expect(captured[0].sql).toContain('["1","2","3","5","8"]');
     });
 
     it('honors caller-provided replaceKey and replaceValues on insert', async () => {
-        nextResponse = { isOk: true, lastInsertId: 2 };
+        nextResponse = { ok: true, lastInsertId: 2 };
         const r = await upsertPrompt({
             slug: 's', name: 'n', body: 'b {{count}}', role: 'plan',
             replaceKey: 'count', replaceValues: ['3', '7', '3', ' 9 '],
         });
         const isMissingOk = r.isFail;
-        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.isSuccess).toBe(true);
+        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.ok).toBe(true);
         expect(captured[0].sql).toContain("'count'");
         // Deduped + trimmed, order preserved.
         expect(captured[0].sql).toContain('["3","7","9"]');
@@ -207,7 +207,7 @@ describe('upsertPrompt', () => {
             replaceKey: 'k', replaceValues: ['a'],
         });
         const isMissingOk = r.isFail;
-        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.isSuccess).toBe(true);
+        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.ok).toBe(true);
         const updateCall = captured.find(c => c.sql.startsWith('UPDATE Prompt SET'));
         expect(updateCall).toBeDefined();
         expect(updateCall?.sql).toMatch(/ReplaceKey = 'k'/);
@@ -219,7 +219,7 @@ describe('upsertPrompt', () => {
             slug: 's', name: 'n', body: 'b', role: 'plan',
             replaceKey: '9bad',
         });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/replaceKey/);
         expect(captured).toHaveLength(0);
     });
@@ -229,7 +229,7 @@ describe('upsertPrompt', () => {
             slug: 's', name: 'n', body: 'b', role: 'plan',
             replaceValues: ['', '  '],
         });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/replaceValues/);
         expect(captured).toHaveLength(0);
     });
@@ -237,7 +237,7 @@ describe('upsertPrompt', () => {
 
 describe('rowToPrompt (via listPromptsByRole)', () => {
     it('decodes ReplaceKey and ReplaceValues from SELECT rows', async () => {
-        nextResponse = { isOk: true, rows: [{
+        nextResponse = { ok: true, rows: [{
             Id: 1, Slug: 'plan-default', Name: 'PlanTierType', Body: '# {{count}}',
             Role: 'plan', IsDefault: 1,
             ReplaceKey: 'count', ReplaceValues: '["2","4","8"]',
@@ -245,14 +245,14 @@ describe('rowToPrompt (via listPromptsByRole)', () => {
         }] };
         const r = await listPromptsByRole('plan');
         const isMissingOk = r.isFail;
-        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.isSuccess).toBe(true);
+        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.ok).toBe(true);
         const row = r.value?.[0];
         expect(row?.ReplaceKey).toBe('count');
         expect(row?.ReplaceValues).toEqual(['2', '4', '8']);
     });
 
     it('falls back to defaults when legacy rows lack the new columns', async () => {
-        nextResponse = { isOk: true, rows: [{
+        nextResponse = { ok: true, rows: [{
             Id: 1, Slug: 'legacy', Name: 'L', Body: 'b', Role: 'plan', IsDefault: 0,
             CreatedAt: 1, UpdatedAt: 2,
         }] };
@@ -266,17 +266,17 @@ describe('rowToPrompt (via listPromptsByRole)', () => {
 describe('deletePromptById', () => {
     it('rejects non-positive ids without DB round-trip', async () => {
         const r = await deletePromptById(0);
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(captured).toHaveLength(0);
     });
 
     it('refuses to delete the last row for its role', async () => {
         responsesQueue = [
-            { isOk: true, rows: [{ Id: 1, Slug: 's', Name: 'n', Body: 'b', Role: 'plan', IsDefault: 1, CreatedAt: 1, UpdatedAt: 1 }] }, // readPromptRow
-            { isOk: true, rows: [{ c: 1 }] }, // countRowsForRole
+            { ok: true, rows: [{ Id: 1, Slug: 's', Name: 'n', Body: 'b', Role: 'plan', IsDefault: 1, CreatedAt: 1, UpdatedAt: 1 }] }, // readPromptRow
+            { ok: true, rows: [{ c: 1 }] }, // countRowsForRole
         ];
         const r = await deletePromptById(1);
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/last row for role plan/);
         // 2 queries fired, no DELETE
         expect(captured.map(c => c.method)).toEqual(['QUERY', 'QUERY']);
@@ -284,20 +284,20 @@ describe('deletePromptById', () => {
 
     it('deletes when >1 rows exist for the role', async () => {
         responsesQueue = [
-            { isOk: true, rows: [{ Id: 2, Slug: 's', Name: 'n', Body: 'b', Role: 'next', IsDefault: 0, CreatedAt: 1, UpdatedAt: 1 }] },
-            { isOk: true, rows: [{ c: 3 }] },
-            { isOk: true },
+            { ok: true, rows: [{ Id: 2, Slug: 's', Name: 'n', Body: 'b', Role: 'next', IsDefault: 0, CreatedAt: 1, UpdatedAt: 1 }] },
+            { ok: true, rows: [{ c: 3 }] },
+            { ok: true },
         ];
         const r = await deletePromptById(2);
         const isMissingOk = r.isFail;
-        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.isSuccess).toBe(true);
+        if (isMissingOk) console.warn('UPSERT ERROR:', r.error);expect(r.ok).toBe(true);
         expect(captured[2].sql).toBe('DELETE FROM Prompt WHERE Id = 2');
     });
 
     it('surfaces "row not found" when the id does not exist', async () => {
-        responsesQueue = [{ isOk: true, rows: [] }];
+        responsesQueue = [{ ok: true, rows: [] }];
         const r = await deletePromptById(99);
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/not found/);
     });
 });

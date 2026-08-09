@@ -69,7 +69,7 @@ async function forceResetDefaultBodies(): Promise<{ forced: number; error?: stri
       + ', UpdatedAt = ' + String(now)
       + ' WHERE Slug = ' + sqlLit(row.slug);
     const resp = await rawSql('SCHEMA', updateSql);
-    const isMissingIsOk = !resp.isOk;
+    const isMissingIsOk = !resp.ok;
     if (isMissingIsOk) {
       const message = 'force update failed for ' + row.slug + ': ' + (resp.errorMessage ?? '?');
       logError('ReseedCommand', message);

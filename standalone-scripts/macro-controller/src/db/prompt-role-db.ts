@@ -58,7 +58,7 @@ export async function enforceSingleDefaultPerRole(role: PromptRole, keepId: numb
     try {
         void DB_NAME;
         const resp = await runLoggedQuery('SCHEMA', sql, 'context');
-        if (resp && resp.isOk) return new ServiceResult(true);
+        if (resp && resp.ok) return new ServiceResult(true);
         const reason = resp?.errorMessage || 'unknown error';
         const message = 'enforceSingleDefaultPerRole failed: ' + reason;
         logDiagnosticFromCode('DB_ROLE_ENFORCE_E001', { role, keepId, stage: 'rawSql', reason });

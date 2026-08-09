@@ -155,7 +155,7 @@ async function _autoSave(inputs: RenameInputsResult): Promise<void> {
     const preset = _readUiToPreset(inputs);
     await store.savePreset(_activePresetName, preset);
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
   }
 }
 

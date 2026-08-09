@@ -212,7 +212,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
         format: "meta",
       });
 
-      if (!result.isOk || !result.tables?.length) {
+      if (!result.ok || !result.tables?.length) {
         toast.info("No tables found in MetaTables. Apply a schema first.");
 
         return;
@@ -294,7 +294,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
         format: "meta",
       });
 
-      if (!result.isOk || !result.tables?.length) {
+      if (!result.ok || !result.tables?.length) {
         setDbSchemaJson(JSON.stringify({ version: "1.0.0", tables: [] }, null, 2));
         setDiffMode(true);
         toast.info("No existing tables in DB — showing empty baseline");
@@ -400,7 +400,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
         schema: validation.schema,
       });
 
-      if (result.isOk && result.result) {
+      if (result.ok && result.result) {
         setLastResult(result.result);
         toast.success(
           `Migration complete: ${result.result.tablesCreated} table(s), ${result.result.columnsAdded} column(s), ${result.result.relationsCreated} relation(s)`,
@@ -433,7 +433,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
         format,
       });
 
-      if (result.isOk) {
+      if (result.ok) {
         setDocsOutput({ markdown: result.markdown, prisma: result.prisma });
         toast.success("Docs generated");
       } else {

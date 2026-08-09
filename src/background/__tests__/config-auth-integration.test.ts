@@ -132,7 +132,7 @@ async function setupTest(options: {
         for (const [pattern, response] of fetchResponses) {
             if (url.includes(pattern)) {
                 return {
-                    ok: response.isSuccess,
+                    ok: response.ok,
                     status: response.status,
                     json: async () => response.json,
                     text: async () => JSON.stringify(response.json),

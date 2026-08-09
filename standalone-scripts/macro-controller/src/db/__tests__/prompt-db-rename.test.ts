@@ -29,7 +29,7 @@ import { upsertPrompt } from '../prompt-db';
 beforeEach(() => {
     sendMock.mockReset();
     // Default: every rawSql call succeeds and returns lastInsertId=42.
-    sendMock.mockImplementation(async () => ({ isOk: true, rows: [], lastInsertId: 42 }));
+    sendMock.mockImplementation(async () => ({ ok: true, rows: [], lastInsertId: 42 }));
 });
 
 describe('upsertPrompt: token rename acceptance', () => {
@@ -43,7 +43,7 @@ describe('upsertPrompt: token rename acceptance', () => {
             replaceKey: 'count',
             replaceValues: ['3', '5', '8'],
         });
-        expect(res.isSuccess).toBe(true);
+        expect(res.ok).toBe(true);
         expect(res.error).toBeUndefined();
         // The write actually ran (SCHEMA call issued).
         const schemaCalls = sendMock.mock.calls.filter(([, p]) => (p as { method: string }).method === 'SCHEMA');
@@ -60,7 +60,7 @@ describe('upsertPrompt: token rename acceptance', () => {
             role: 'plan',
             previousBody: 'Give me the next {{n}} steps',
         });
-        expect(res.isSuccess).toBe(false);
+        expect(res.ok).toBe(false);
         expect(res.error).toContain('ParamTokenMismatch');
         expect(res.error).toContain('removed');
         // No SCHEMA call should have fired.
@@ -77,7 +77,7 @@ describe('upsertPrompt: token rename acceptance', () => {
             previousReplaceKey: 'n',
             replaceKey: 'count',
         });
-        expect(res.isSuccess).toBe(false);
+        expect(res.ok).toBe(false);
         expect(res.error).toContain('ParamTokenMismatch');
     });
 
@@ -88,7 +88,7 @@ describe('upsertPrompt: token rename acceptance', () => {
             role: 'generic',
             previousBody: 'previously had {{n}} tokens',
         });
-        expect(res.isSuccess).toBe(true);
+        expect(res.ok).toBe(true);
     });
 
     it('skips the token guard when previousBody is missing (fresh insert path)', async () => {
@@ -97,6 +97,6 @@ describe('upsertPrompt: token rename acceptance', () => {
             body: 'Body with {{n}}',
             role: 'plan',
         });
-        expect(res.isSuccess).toBe(true);
+        expect(res.ok).toBe(true);
     });
 });

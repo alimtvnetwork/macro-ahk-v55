@@ -629,7 +629,7 @@ export function showCreditTotalsModal(): void {
   // Focus the panel so ESC works immediately.
   // allow-swallow: panel may not be focusable in headless test contexts; ESC still works via document-level listener
   try { panel.focus(); } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
   }
 }
 

@@ -107,9 +107,9 @@ describe('fanOutCreditEnrichment', () => {
             },
         });
 
-        expect(fanOut.resultsByWorkspaceId.isSuccess_1?.outcome).toBe(CreditFetchOutcomeType.ApiHit);
+        expect(fanOut.resultsByWorkspaceId.ok_1?.outcome).toBe(CreditFetchOutcomeType.ApiHit);
         expect(fanOut.resultsByWorkspaceId.bad_1).toBeNull();
-        expect(fanOut.resultsByWorkspaceId.isSuccess_2?.outcome).toBe(CreditFetchOutcomeType.ApiHit);
+        expect(fanOut.resultsByWorkspaceId.ok_2?.outcome).toBe(CreditFetchOutcomeType.ApiHit);
         expect(logErrorSpy).toHaveBeenCalledWith(
             'CreditBalanceUpdate.fanOut',
             expect.stringContaining('WorkspaceId=bad_1'),

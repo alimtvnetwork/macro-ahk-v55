@@ -6,7 +6,7 @@
  * login → promote → sign-out flow via the shared `LovableApiClient`.
  *
  * No retry logic (mem://constraints/no-retry-policy). All errors are
- * routed through `RiseupAsiaMacroExt.Logger.error()`.
+ * routed through `console.error()`.
  */
 
 const PROJECT_NAMESPACE = "LovableOwnerSwitch";

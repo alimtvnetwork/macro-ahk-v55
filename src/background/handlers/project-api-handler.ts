@@ -90,10 +90,10 @@ export async function handleProjectApi(payload: ProjectApiMessage): Promise<Reco
     try {
         const result = await dispatchMethod(db, slug, method, endpoint, params);
 
-        return { isOk: true, ...result };
+        return { ok: true, ...result };
     } catch (err) {
         return {
-            isOk: false,
+            ok: false,
             errorMessage: err instanceof Error ? err.message : String(err),
         };
     }

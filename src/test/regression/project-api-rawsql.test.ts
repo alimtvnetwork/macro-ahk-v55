@@ -48,7 +48,7 @@ describe("PROJECT_API rawSql contract", () => {
             params: { sql: "SELECT Id, Slug FROM Prompt" },
         });
 
-        expect(result.isOk).toBe(true);
+        expect(result.ok).toBe(true);
         expect(result.rows).toEqual([{ Id: 1, Slug: "plan-default" }]);
         expect(execMock).toHaveBeenCalledWith("SELECT Id, Slug FROM Prompt");
         expect(markDirtyMock).not.toHaveBeenCalled();
@@ -64,7 +64,7 @@ describe("PROJECT_API rawSql contract", () => {
         });
         await Promise.resolve();
 
-        expect(result.isOk).toBe(true);
+        expect(result.ok).toBe(true);
         expect(result.executed).toBe(true);
         expect(result.lastInsertId).toBe(42);
         expect(result.changes).toBe(3);
@@ -84,7 +84,7 @@ describe("PROJECT_API rawSql contract", () => {
         });
         await Promise.resolve();
 
-        expect(result.isOk).toBe(true);
+        expect(result.ok).toBe(true);
         expect(result.executed).toBe(true);
         expect(markDirtyMock).toHaveBeenCalledOnce();
     });
@@ -98,7 +98,7 @@ describe("PROJECT_API rawSql contract", () => {
             params: { sql: "DROP TABLE Prompt" },
         });
 
-        expect(result.isOk).toBe(false);
+        expect(result.ok).toBe(false);
         expect(String(result.errorMessage)).toContain("rawSql: unsupported statement");
         expect(execMock).not.toHaveBeenCalled();
     });

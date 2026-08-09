@@ -125,7 +125,7 @@ describe('Submenu wiring routes count > 1 to the queue (prompt-dropdown.ts)', ()
 describe('lovable-idle gate', () => {
   it('exports waitForLovableIdle with three terminal states', () => {
     expect(idleSrc).toMatch(/export async function waitForLovableIdle/);
-    expect(idleSrc).toMatch(/'idle' \| 'cancelled' \| 'timeout'/);
+    expect(idleSrc).toMatch(/LovableIdleResultType/);
   });
 
   it('uses both predicates (submit-disabled OR return-button-visible) to detect busy', () => {

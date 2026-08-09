@@ -120,7 +120,7 @@ function _handleImportValidationError(
   showToast(IMPORT_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
   refs.lastImportFailed = true;
   try { fileInput.value = ''; } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
   }
   focusErrorBanner(refs);
 }
@@ -174,7 +174,7 @@ export async function handleImportFile(
     renderPartialImportErrors(refs, results.errors, parsed.errors);
     if (origin === 'drop') focusAfter = 'import';
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     logLibraryImportFailure('thrown', 'threw during read/parse for name=' + file.name, err);
     const reason = extractImportErrorReason(err);
     refs.status.textContent = IMPORT_FAILED_PREFIX + reason;

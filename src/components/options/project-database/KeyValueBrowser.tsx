@@ -66,7 +66,7 @@ export function KeyValueBrowser({ projectSlug }: KeyValueBrowserProps) {
         params: { limit: 200, offset: 0 },
       });
 
-      if (result.isOk && result.rows) {
+      if (result.ok && result.rows) {
         setEntries(result.rows);
         const uniqueNs = [...new Set(result.rows.map((r) => r.Namespace))].sort();
         setNamespaces(uniqueNs);

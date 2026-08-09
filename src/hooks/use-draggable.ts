@@ -50,7 +50,7 @@ function loadPosition(): DragPosition | null {
             return { x: (parsed as DragPosition).x, y: (parsed as DragPosition).y };
         }
     } catch (err) {
-    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err);
+    console.error("Automatically caught swallowed error", err);
     } // allow-swallow: corrupt stored position falls back to default
 
     return null;
@@ -59,14 +59,14 @@ function loadPosition(): DragPosition | null {
 function savePosition(p: DragPosition): void {
     if (typeof window === "undefined") { return; }
     try { window.localStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(p)); } catch (err) {
-    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err);
+    console.error("Automatically caught swallowed error", err);
     } // allow-swallow: localStorage quota/denied; position is convenience-only
 }
 
 function clearStoredPosition(): void {
     if (typeof window === "undefined") { return; }
     try { window.localStorage.removeItem(POSITION_STORAGE_KEY); } catch (err) {
-    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err);
+    console.error("Automatically caught swallowed error", err);
     } // allow-swallow: localStorage denied; reset is best-effort
 }
 

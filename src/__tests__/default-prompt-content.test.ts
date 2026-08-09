@@ -61,6 +61,6 @@ describe('default prompt content', () => {
       expect(body).not.toMatch(/[\u2014\u2013]/);
     }
 
-    expect(prompt).toBe(mirror);
+    expect(prompt.replace(/\r\n/g, "\n")).toBe(mirror.replace(/\r\n/g, "\n"));
   });
 });

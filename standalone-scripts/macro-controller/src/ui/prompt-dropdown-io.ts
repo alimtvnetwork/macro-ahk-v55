@@ -232,7 +232,7 @@ function makeIoOptionRow(pop: HTMLElement, label: string, run: () => Promise<voi
         });
       }
     } catch (err) {
-      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+      console.error();
       showPasteToast('❌ ' + label + ' failed: ' + String(err), true);
     }
   };
@@ -346,7 +346,7 @@ async function runPromptImport(text: string, rerender: Rerender): Promise<void> 
     await loadPromptsFromJson();
     rerender();
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     showPasteToast('❌ Import failed: ' + String(err), true);
   }
 }
@@ -366,7 +366,7 @@ export async function dispatchImportFile(file: File, rerender: Rerender): Promis
     const text = new TextDecoder('utf-8').decode(bytes);
     await runPromptImport(text, rerender);
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     showPasteToast('❌ Import failed: ' + String(err), true);
   }
 }

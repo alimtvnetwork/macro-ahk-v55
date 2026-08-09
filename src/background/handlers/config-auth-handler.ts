@@ -725,11 +725,11 @@ async function fetchAuthTokenFromSessionExchange(
     // and propagated as null (unified-auth-contract handles re-auth elsewhere).
     const url = `${AUTH_API_BASE}/projects/${projectId}/auth-token`;
     try {
-        const response = ServiceResult.wrapFetch(await fetch(url, {
+        const response = await fetch(url, {
             method: "GET",
             credentials: "include",
-        }));
-        if (response.isFail) {
+        });
+        if (!response.ok) {
             logBgWarnError(
                 BgLogTag.CONFIG_AUTH,
                 `HEFF: HTTP ${response.status} on GET ${url} — auth-token exchange failed; ` +

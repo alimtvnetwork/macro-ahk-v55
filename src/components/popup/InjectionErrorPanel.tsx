@@ -361,7 +361,7 @@ function ClearAllButton({ onCleared }: { onCleared: () => void }) {
       onCleared();
     } catch (err) { 
       // ignore
-      RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err);
+      console.error("Automatically caught swallowed error", err);
     }
     setClearing(false);
   };

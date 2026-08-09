@@ -180,7 +180,7 @@ function resolveTokenTtlMs(): number {
       return overrides.tokenTtlMs;
     }
   } catch (_e) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+    console.error();
     logDebug('getTokenTtlMs', 'Config override read failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 
@@ -192,7 +192,7 @@ function resolveTokenTtlMs(): number {
       return config.authBridge.tokenTtlMs;
     }
   } catch (_e) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+    console.error();
     logDebug('getTokenTtlMs', '__MARCO_CONFIG__ read failed: ' + (_e instanceof Error ? _e.message : String(_e)));
   }
 

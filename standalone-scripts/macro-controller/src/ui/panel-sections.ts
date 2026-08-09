@@ -194,7 +194,7 @@ function _buildVersionBadge(
       toolsMasterBody.style.display = '';
       toolsCol.toggle.textContent = '[-]';
       try { localStorage.setItem('ml_collapse_tools_master', 'expanded'); } catch (_e) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+        console.error();
         logSub('Failed to persist tools collapse state: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
       }
     }

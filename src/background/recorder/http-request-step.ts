@@ -184,7 +184,7 @@ async function processHttpResponse(
     response: Response, context: HttpRequestContext, params: HttpRequestParams,
 ): Promise<HttpStepResult> {
     const snippet = await safeReadSnippet(response);
-    if (response.isSuccess === false) {
+    if (!response.ok) {
         return httpErrorResult(response.status, snippet, context);
     }
     const captureOutcome = tryCaptureJson(snippet, params.CaptureAs);

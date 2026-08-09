@@ -76,7 +76,7 @@ function sendNetworkEntry(entry: CapturedEntry): void {
             entry,
         });
     } catch (err) {
-    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); 
+    console.error("Automatically caught swallowed error", err); 
 }
 }
 
@@ -252,7 +252,7 @@ function reportNetworkStatus(isOnline: boolean): void {
             isOnline,
         });
     } catch (err) {
-    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); 
+    console.error("Automatically caught swallowed error", err); 
 }
 }
 
@@ -306,7 +306,7 @@ let flushTimerId: ReturnType<typeof setInterval> | null = null;
 function onPageHide(): void {
     // Final best-effort flush before tearing down.
     try { flushBuffer(); } catch (err) {
-    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err);
+    console.error("Automatically caught swallowed error", err);
     } // allow-swallow: pagehide flush is best-effort
     stopNetworkReporter();
 }

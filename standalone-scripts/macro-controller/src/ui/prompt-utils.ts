@@ -138,7 +138,7 @@ export function parseWithRecovery(content: string): unknown {
       try {
         return JSON.parse(repaired);
       } catch (_repairErr) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _repairErr);
+        console.error();
         logSub('JSON repair also failed: ' + (_repairErr instanceof Error ? _repairErr.message : String(_repairErr)), 1);
       }
     }
@@ -646,8 +646,7 @@ export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, g
       pasteIntoTextarea(target, text);
     } else {
       const ok = pasteIntoContentEditable(target, text);
-      const isMissingOk = !ok;
-      if (isMissingOk) return 'failed';
+      if (!ok) return 'failed';
     }
 
     log('Prompt injected: "' + text.substring(0, 80) + '..." (' + text.length + ' total chars)', 'success');

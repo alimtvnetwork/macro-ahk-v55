@@ -291,7 +291,7 @@ function handleCreateTable(
     tableName,
     columns: columnDefinitions,
   }).then((response: ExtensionCallbackResponse) => {
-    const isSuccess = response?.isOk === true;
+    const isSuccess = response?.ok === true;
 
     if (isSuccess) {
       showMsg(msgArea, 'ok', `✓ Table "${tableName}" created`);
@@ -446,7 +446,7 @@ function buildTableEntry(
         columns.map(column => column.Name + ' (' + column.Type + ')').join(', '));
       info.appendChild(colInfo);
     } catch (_e) {
-      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+      console.error();
       logDebug('database-schema-tab', 'Column JSON parse failed: ' + (_e instanceof Error ? _e.message : String(_e)));
     }
   }
@@ -462,7 +462,7 @@ function buildTableEntry(
         project: MACRO_CONTROLLER_NS,
         tableName,
       }).then((response: ExtensionCallbackResponse) => {
-        const isSuccess = response?.isOk === true;
+        const isSuccess = response?.ok === true;
 
         if (isSuccess) {
           refreshTableList(container, existingTables, statusBar);

@@ -19,7 +19,7 @@ import type { DashboardSummary } from '../summary-bar/types';
 
 function clearLocalStorage(): void {
     try { localStorage.clear(); } catch (err) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+        console.error();
     }
 }
 

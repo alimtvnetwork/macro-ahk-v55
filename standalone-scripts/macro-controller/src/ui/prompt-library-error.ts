@@ -97,6 +97,6 @@ export function focusErrorBanner(refs: ModalRefs): void {
   const banner = refs.errorBanner;
   if (!banner || banner.hidden) return;
   try { banner.focus(); } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
   }
 }

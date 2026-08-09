@@ -62,7 +62,7 @@ function quoteOrNull(value: string | null): string {
 async function runSchemaSql(sql: string, scope: string): Promise<boolean> {
   try {
     const resp = await runLoggedQuery('SCHEMA', sql, 'context');
-    if (resp?.isOk) return true;
+    if (resp?.ok) return true;
     logDiagnosticFromCode('DB_CHAT_SUBMIT_E001', { op: scope, kind: 'schema-failure', reason: resp?.errorMessage || 'unknown error' });
 
     return false;
@@ -76,7 +76,7 @@ async function runSchemaSql(sql: string, scope: string): Promise<boolean> {
 async function runQuerySql<T>(sql: string, scope: string): Promise<T[]> {
   try {
     const resp = await runLoggedQuery('QUERY', sql, 'context');
-    if (resp?.isOk && Array.isArray(resp.rows)) return resp.rows as T[];
+    if (resp?.ok && Array.isArray(resp.rows)) return resp.rows as T[];
     logDiagnosticFromCode('DB_CHAT_SUBMIT_E001', { op: scope, kind: 'query-failure', reason: resp?.errorMessage || 'no rows' });
 
     return [];

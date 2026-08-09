@@ -157,13 +157,13 @@ function ResultBanner({ result }: { result: { isOk: boolean; created?: number; m
 
   return (
     <div className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs ${
-      result.isOk
+      result.ok
         ? "bg-green-500/10 text-green-700 border border-green-500/20"
         : "bg-destructive/10 text-destructive border border-destructive/20"
     }`}>
-      {result.isOk ? <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> : <AlertCircle className="h-3.5 w-3.5 shrink-0" />}
+      {result.ok ? <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> : <AlertCircle className="h-3.5 w-3.5 shrink-0" />}
       <span>
-        {result.isOk
+        {result.ok
           ? `${result.created ?? 0} created, ${result.migrated ?? 0} migrated`
           : result.errorMessage}
       </span>

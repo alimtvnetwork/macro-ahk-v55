@@ -121,7 +121,7 @@ export async function computeAndRenderPreview(
     renderImportErrorBanner(refs, invalid.headline, invalid.hint);
     showToast(PREVIEW_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
     try { previewFileInput.value = ''; } catch (err) {
-      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+      console.error();
     }
 
     return;
@@ -147,19 +147,19 @@ export async function computeAndRenderPreview(
     renderPreviewPanel(refs, panel, preview, file, parsed.errors.length, () => {
       hidePreviewPanel(panel);
       try { previewFileInput.value = ''; } catch (err) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+        console.error();
       }
       void handleImportFile(refs, file, fileInput, importBtn, 'click');
     }, () => {
       hidePreviewPanel(panel);
       try { previewFileInput.value = ''; } catch (err) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+        console.error();
       }
       refs.status.textContent = 'Preview cancelled.';
     });
     refs.status.textContent = 'Preview ready for ' + file.name + '.';
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     logLibraryImportFailure('preview', 'threw during read/parse for name=' + file.name, err);
     const reason = extractImportErrorReason(err);
     refs.status.textContent = PREVIEW_FAILED_PREFIX + reason;

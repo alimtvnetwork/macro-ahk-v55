@@ -48,17 +48,17 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
     it('recovers when backend rejects QUERY and accepts SELECT', async () => {
         sendMock.mockImplementation((_t: string, p: Record<string, unknown>) => {
             if (p.method === 'QUERY') {
-                return Promise.resolve({ isOk: false, errorMessage: 'Unsupported method: QUERY' });
+                return Promise.resolve({ ok: false, errorMessage: 'Unsupported method: QUERY' });
             }
             if (p.method === 'SELECT') {
-                return Promise.resolve({ isOk: true, rows: [fakePlanRow()] });
+                return Promise.resolve({ ok: true, rows: [fakePlanRow()] });
             }
 
-            return Promise.resolve({ isOk: false, errorMessage: 'unexpected: ' + String(p.method) });
+            return Promise.resolve({ ok: false, errorMessage: 'unexpected: ' + String(p.method) });
         });
 
         const res = await listPromptsByRole('plan');
-        expect(res.isSuccess).toBe(true);
+        expect(res.ok).toBe(true);
         expect(res.value?.[0]?.Role).toBe('plan');
 
         // Bridge should have recorded the QUERY rejection and cached SELECT.
@@ -69,9 +69,9 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
     });
 
     it('surfaces PROMPT_LOAD_E001-shaped reason when every SELECT candidate is rejected', async () => {
-        sendMock.mockResolvedValue({ isOk: false, errorMessage: 'Unsupported method: QUERY' });
+        sendMock.mockResolvedValue({ ok: false, errorMessage: 'Unsupported method: QUERY' });
         const res = await listPromptsByRole('plan');
-        expect(res.isSuccess).toBe(false);
+        expect(res.ok).toBe(false);
         expect(isSqlBridgeContractError(res.error) || /no accepted method/.test(res.error ?? ''))
             .toBe(true);
     });
@@ -79,26 +79,26 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
     it('recovers on retry-once after a poisoned cache goes stale', async () => {
         // First call: SELECT accepted -> cached.
         sendMock.mockImplementationOnce(() =>
-            Promise.resolve({ isOk: true, rows: [fakePlanRow()] }));
+            Promise.resolve({ ok: true, rows: [fakePlanRow()] }));
         const first = await listPromptsByRole('plan');
-        expect(first.isSuccess).toBe(true);
+        expect(first.ok).toBe(true);
 
         // Backend then rolls forward and rejects the cached method with a
         // contract-shape error. The bridge should invalidate the cache and
         // re-probe on the very next call.
         sendMock.mockImplementation((_t: string, p: Record<string, unknown>) => {
             if (p.method === 'QUERY') {
-                return Promise.resolve({ isOk: false, errorMessage: 'Unsupported method: QUERY' });
+                return Promise.resolve({ ok: false, errorMessage: 'Unsupported method: QUERY' });
             }
             if (p.method === 'SELECT') {
-                return Promise.resolve({ isOk: true, rows: [fakePlanRow()] });
+                return Promise.resolve({ ok: true, rows: [fakePlanRow()] });
             }
 
-            return Promise.resolve({ isOk: false, errorMessage: 'unexpected' });
+            return Promise.resolve({ ok: false, errorMessage: 'unexpected' });
         });
 
         const second = await listPromptsByRole('plan');
-        expect(second.isSuccess).toBe(true);
+        expect(second.ok).toBe(true);
     });
 
     it('manual resetSqlBridgeCache clears winning state for one bucket', () => {

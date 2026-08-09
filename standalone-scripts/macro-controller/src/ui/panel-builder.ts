@@ -129,7 +129,7 @@ function wireSummaryBarSubscription(summaryBar: SummaryBarHandle): void {
   subscribeVisibleWorkspaces(function (rows) {
     let config: ReturnType<typeof getWorkspaceLifecycleConfig> | null = null;
     try { config = getWorkspaceLifecycleConfig(); } catch (_e: unknown) {
-      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+      console.error();
       config = null;
     }
     const resolver: DisplayKindResolver = function (ws) {

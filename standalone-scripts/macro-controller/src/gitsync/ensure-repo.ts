@@ -135,7 +135,7 @@ async function postSync(
         return { ok: false, jobId: null, httpStatus: 0, reason: 'network_error' };
     }
 
-    const isMissingOk = resp.isFail;
+    const isMissingOk = !resp.ok;
 
     if (isMissingOk) {
         const preview = JSON.stringify(resp.data).substring(0, 200);

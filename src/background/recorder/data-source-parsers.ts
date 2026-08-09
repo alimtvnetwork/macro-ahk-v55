@@ -277,7 +277,7 @@ async function readEndpointPayload(response: Response): Promise<unknown> {
 }
 
 async function assertResponseOk(response: Response): Promise<void> {
-    if (response.isSuccess) {
+    if (response.ok) {
         return;
     }
 

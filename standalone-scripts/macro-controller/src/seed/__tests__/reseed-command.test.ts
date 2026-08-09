@@ -18,14 +18,14 @@ vi.mock('../../db/extension-bridge', () => ({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { isOk: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, rows: [] };
     }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { isOk: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, rows: [] };
     }),
 }));
 vi.mock('../../error-utils', async () => {
@@ -38,8 +38,8 @@ vi.mock('../../logging', () => ({ log: vi.fn() }));
 import { reseedPromptsOnDemand, installReseedCommandGlobal } from '../reseed-command';
 import { PLAN_NEXT_SEED_ROWS } from '../plan-next-prompts';
 
-const OK = (): unknown => ({ isOk: true, rows: [] });
-const OK_ROW = (): unknown => ({ isOk: true, rows: [{ '1': 1 }] });
+const OK = (): unknown => ({ ok: true, rows: [] });
+const OK_ROW = (): unknown => ({ ok: true, rows: [{ '1': 1 }] });
 
 function queueHappySeed(): void {
     // Matches seedPlanNextPrompts happy-path shape used elsewhere in tests.
@@ -61,7 +61,7 @@ describe('reseedPromptsOnDemand', () => {
     it('R1: idempotent path completes and returns ok', async () => {
         queueHappySeed();
         const r = await reseedPromptsOnDemand();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(r.mode).toBe('idempotent');
         expect(r.forcedUpdates).toBeUndefined();
     });
@@ -71,7 +71,7 @@ describe('reseedPromptsOnDemand', () => {
         const defaults = PLAN_NEXT_SEED_ROWS.filter(r => r.isDefault);
         for (let i = 0; i < defaults.length; i++) responsesQueue.push(OK());
         const r = await reseedPromptsOnDemand({ force: true });
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         expect(r.mode).toBe('force');
         expect(r.forcedUpdates).toBe(defaults.length);
         // Verify at least one UPDATE was issued mentioning a canonical slug.
@@ -84,13 +84,13 @@ describe('reseedPromptsOnDemand', () => {
         (sendToExtension as unknown as { mockImplementation: (impl: (c: string, p: { params: { sql: string } }) => Promise<unknown>) => void })
             .mockImplementation(async (_c: string, p: { params: { sql: string } }) => {
                 if (p.params.sql.startsWith('UPDATE Prompt SET Body')) {
-                    return { isOk: false, errorMessage: 'disk full' };
+                    return { ok: false, errorMessage: 'disk full' };
                 }
 
-                return { isOk: true, rows: [] };
+                return { ok: true, rows: [] };
             });
         const r = await reseedPromptsOnDemand({ force: true });
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toContain('disk full');
     });
 

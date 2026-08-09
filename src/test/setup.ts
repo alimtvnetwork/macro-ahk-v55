@@ -122,5 +122,5 @@ try {
     throw new Error(`fetch shim: unexpected URL ${url}`);
   }) as typeof fetch;
 } catch (err) {
-    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); 
+    console.error("Automatically caught swallowed error", err); 
 }

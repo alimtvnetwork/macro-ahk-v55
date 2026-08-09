@@ -133,7 +133,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       setTimeout(() => setCopied(false), Timings.TIMEOUT_NORMAL);
     } catch (err) { 
  // allow-swallow: clipboard denied; textarea fallback stays visible
-      RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err);
+      console.error("Automatically caught swallowed error", err);
     }
   };
 
@@ -145,7 +145,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       setTimeout(() => setSqlCopied(false), Timings.TIMEOUT_NORMAL);
     } catch (err) { 
  // allow-swallow: clipboard denied; snippet stays visible for manual copy
-      RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err);
+      console.error("Automatically caught swallowed error", err);
     }
   };
 
@@ -175,7 +175,7 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       setTimeout(() => setDownloaded(false), Timings.TIMEOUT_NORMAL);
     } catch (err) { 
  // allow-swallow: Blob/URL unavailable in sandbox; Copy report still works
-      RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err);
+      console.error("Automatically caught swallowed error", err);
     }
   };
 

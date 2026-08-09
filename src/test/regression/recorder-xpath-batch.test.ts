@@ -219,7 +219,7 @@ describe("recorder-capture-handler, batch protocol", () => {
             ]),
         );
 
-        expect(res.isOk).toBe(true);
+        expect(res.ok).toBe(true);
         expect(res.results).toHaveLength(3);
         expect(loadSession).toHaveBeenCalledTimes(1); // resolved ONCE per batch
         expect(insertStep).toHaveBeenCalledTimes(3);
@@ -279,7 +279,7 @@ describe("recorder-capture-handler, batch protocol", () => {
                 AnchorXPath: null,
             },
         } as never);
-        expect(res.isOk).toBe(true);
+        expect(res.ok).toBe(true);
         expect((insertStep as ReturnType<typeof vi.fn>).mock.calls[0][0]).toBe(
             "proj-1",
         );

@@ -34,7 +34,7 @@ vi.mock('../../db/extension-bridge', () => ({
         captured.push({ method: p.method, sql: p.params.sql });
         if (sendImpl) return sendImpl(p.params.sql);
 
-        return responsesQueue.shift() ?? { isOk: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, rows: [] };
     }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
@@ -42,7 +42,7 @@ vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
         captured.push({ method: p.method, sql: p.params.sql });
         if (sendImpl) return sendImpl(p.params.sql);
 
-        return responsesQueue.shift() ?? { isOk: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, rows: [] };
     }),
 }));
 vi.mock('../../error-utils', async () => {
@@ -66,20 +66,20 @@ beforeEach(() => {
     sendImpl = null;
     (logDiagnosticFromCode as unknown as Mock).mockClear();
     try { localStorage.removeItem('marco_last_seed_telemetry'); } catch (err) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+        console.error();
     }
 });
 
 describe('seedPlanNextPrompts — negative + idempotency edges', () => {
     it('E1: pre-select failure degrades to empty set; seed still completes', async () => {
         responsesQueue = [
-            { isOk: false, errorMessage: 'pre-select boom' }, // pre-select fails
-            { isOk: true },                                    // INSERT OR IGNORE ok
-            { isOk: true, rows: [{ '1': 1 }] },                // plan default present
-            { isOk: true, rows: [{ '1': 1 }] },                // next default present
+            { ok: false, errorMessage: 'pre-select boom' }, // pre-select fails
+            { ok: true },                                    // INSERT OR IGNORE ok
+            { ok: true, rows: [{ '1': 1 }] },                // plan default present
+            { ok: true, rows: [{ '1': 1 }] },                // next default present
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         // With no pre-select data, every seed row is counted as "inserted"
         // (defensive, not misleading: the OR IGNORE below is still safe).
         const plan = r.data?.telemetry?.find(t => t.role === 'plan');
@@ -90,17 +90,17 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
     it('E2: promote UPDATE failure logs via SeedPlanNext but overall seed still ok', async () => {
         // v4.187.0: two legacy-body SELECTs (plan + next) run before promotion.
         responsesQueue = [
-            { isOk: true, rows: [] },                          // pre-select empty
-            { isOk: true },                                    // INSERT ok
-            { isOk: true, rows: [] },                          // legacy-body SELECT plan-default (skip)
-            { isOk: true, rows: [] },                          // legacy-body SELECT next-default (skip)
-            { isOk: true, rows: [] },                          // plan hasDefault -> false
-            { isOk: false, errorMessage: 'update denied' },    // plan promote fails
-            { isOk: true, rows: [] },                          // next hasDefault -> false
-            { isOk: true },                                    // next promote ok
+            { ok: true, rows: [] },                          // pre-select empty
+            { ok: true },                                    // INSERT ok
+            { ok: true, rows: [] },                          // legacy-body SELECT plan-default (skip)
+            { ok: true, rows: [] },                          // legacy-body SELECT next-default (skip)
+            { ok: true, rows: [] },                          // plan hasDefault -> false
+            { ok: false, errorMessage: 'update denied' },    // plan promote fails
+            { ok: true, rows: [] },                          // next hasDefault -> false
+            { ok: true },                                    // next promote ok
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         const plan = r.data?.telemetry?.find(t => t.role === 'plan');
         const next = r.data?.telemetry?.find(t => t.role === 'next');
         expect(plan?.promotedDefault).toBe(0);
@@ -113,15 +113,15 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
 
     it('E3: localStorage.setItem throwing logs but does not flip ok=false', async () => {
         responsesQueue = [
-            { isOk: true, rows: [] }, { isOk: true },
-            { isOk: true, rows: [{ '1': 1 }] }, { isOk: true, rows: [{ '1': 1 }] },
+            { ok: true, rows: [] }, { ok: true },
+            { ok: true, rows: [{ '1': 1 }] }, { ok: true, rows: [{ '1': 1 }] },
         ];
         const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
             throw new Error('quota exceeded');
         });
         try {
             const r = await seedPlanNextPrompts();
-            expect(r.isSuccess).toBe(true);
+            expect(r.ok).toBe(true);
             expect(logDiagnosticFromCode).toHaveBeenCalledWith(
                 'SEED_TELEMETRY_E001',
                 expect.objectContaining({ reason: expect.stringContaining('quota') }),
@@ -134,8 +134,8 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
 
     it('E4: INSERT SQL carries the PlanTierType-15 default ReplaceKey and ReplaceValues literals', async () => {
         responsesQueue = [
-            { isOk: true, rows: [] }, { isOk: true },
-            { isOk: true, rows: [{ '1': 1 }] }, { isOk: true, rows: [{ '1': 1 }] },
+            { ok: true, rows: [] }, { ok: true },
+            { ok: true, rows: [{ '1': 1 }] }, { ok: true, rows: [{ '1': 1 }] },
         ];
         await seedPlanNextPrompts();
         const sql = captured[1].sql;
@@ -148,11 +148,11 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
 
     it('E5: telemetry rows include replaceKey and replaceValueCount', async () => {
         responsesQueue = [
-            { isOk: true, rows: [] }, { isOk: true },
-            { isOk: true, rows: [{ '1': 1 }] }, { isOk: true, rows: [{ '1': 1 }] },
+            { ok: true, rows: [] }, { ok: true },
+            { ok: true, rows: [{ '1': 1 }] }, { ok: true, rows: [{ '1': 1 }] },
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(true);
+        expect(r.ok).toBe(true);
         for (const bucket of r.data?.telemetry ?? []) {
             expect(bucket.replaceKey).toBe(REPLACE_KEY_DEFAULT);
             expect(bucket.replaceValueCount).toBe(REPLACE_VALUES_DEFAULT.length);
@@ -162,7 +162,7 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
     it('E6: an outer rawSql throw surfaces via ok:false + coded diagnostic, never swallowed', async () => {
         sendImpl = async () => { throw new Error('driver offline'); };
         const r = await seedPlanNextPrompts();
-        expect(r.isSuccess).toBe(false);
+        expect(r.ok).toBe(false);
         expect(r.error).toMatch(/driver offline/);
         expect(logDiagnosticFromCode).toHaveBeenCalledWith(
             'SEED_INSERT_E001',

@@ -93,7 +93,7 @@ export function createOpenTabsSection(): OpenTabsSectionResult {
         panel.innerHTML = renderEmpty('Loading…');
         try {
             const resp = await sendToExtension('GET_OPEN_LOVABLE_TABS', {}) as unknown as OpenLovableTabsResponseView;
-            if (!resp || resp.isOk === false) {
+            if (!resp || resp.ok === false) {
                 const reason = resp?.errorMessage ?? 'no response';
                 panel.innerHTML = renderError(reason);
 
@@ -218,8 +218,7 @@ async function copyToClipboard(url: string, btn: HTMLElement): Promise<void> {
             ta.select();
             const ok = document.execCommand('copy');
             document.body.removeChild(ta);
-            const isMissingOk = !ok;
-            if (isMissingOk) throwDiagnostic('UI_COPY_E001', { reason: 'execCommand("copy") returned false', strategy: 'execCommand' });
+            if (!ok) throwDiagnostic('UI_COPY_E001', { reason: 'execCommand("copy") returned false', strategy: 'execCommand' });
         }
         btn.textContent = '✓ Copied';
         btn.style.background = '#065f46';

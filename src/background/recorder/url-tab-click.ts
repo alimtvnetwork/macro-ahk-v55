@@ -93,7 +93,7 @@ export interface ValidationError {
 function validateDirectOpen(params: UrlTabClickParams): ValidationError | null {
     if (params.DirectOpen !== true) return null;
     if (params.OperationModeType !== "OpenNew") {
-        return { Reason: "BadParams", Detail: "DirectOpen requires OperationModeType='OpenNew'" };
+        return { Reason: "BadParams", Detail: "DirectOpen requires Mode='OpenNew'" };
     }
     if (params.Url === undefined || params.Url === "") {
         return { Reason: "InvalidUrlPattern", Detail: "DirectOpen requires a literal Url" };
@@ -111,8 +111,7 @@ export function validateUrlTabClickParams(
         return { Reason: "BadParams", Detail: "TimeoutMs must be ≥ 0" };
     }
     const compiled = compileUrlPattern(params.UrlPattern, params.UrlMatch);
-    const isMissingOk = !compiled.Ok;
-    if (isMissingOk) return { Reason: "InvalidUrlPattern", Detail: compiled.Detail };
+    if (!compiled.Ok) return { Reason: "InvalidUrlPattern", Detail: compiled.Detail };
 
     return null;
 }

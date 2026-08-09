@@ -142,7 +142,7 @@ describe('rename-api remaining toast migrations', () => {
         try {
             await renameWorkspace('ws-500', 'renamed');
         } catch (e) {
-            logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
+            console.error();
             thrown = e;
         }
         expect(thrown).toBeInstanceOf(DiagnosticError);

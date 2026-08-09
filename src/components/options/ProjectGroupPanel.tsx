@@ -116,7 +116,7 @@ async function readProjectStorageKey(storage: ProjectStorageLocal): Promise<Reco
     if (out && typeof out === "object") return out;
   } catch (err) { 
  /* fall through to callback storage API */
-    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); }
+    console.error("Automatically caught swallowed error", err); }
 
   return new Promise((resolve) => {
     try {

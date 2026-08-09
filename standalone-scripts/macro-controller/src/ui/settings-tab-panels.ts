@@ -379,7 +379,7 @@ export function buildConfigDbPanel(
   sendToExtension('PROJECT_CONFIG_READ', { project: 'macro-controller' }).then(function(resp: ExtensionResponse) {
     loading.remove();
     const rows = resp.rows as Array<{ section: string; key: string; value: string; valueType: string }> | undefined;
-    if (!resp || !resp.isOk || !rows || rows.length === 0) {
+    if (!resp || !resp.ok || !rows || rows.length === 0) {
       const empty = document.createElement('div');
       empty.style.cssText = 'color:#64748b;font-size:11px;padding:12px 0;';
       empty.textContent = 'No config found in database. Config will be seeded on next injection.';

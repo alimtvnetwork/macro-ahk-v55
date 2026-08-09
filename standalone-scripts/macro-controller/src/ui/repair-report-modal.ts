@@ -110,7 +110,7 @@ export function stashRepairReport(report: RepairReportSummary): void {
   try {
     if (typeof window !== 'undefined') window.__marcoLastRepairReport = report;
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
   }
   const text = formatRepairReportText(report);
   if (report.reseedAttempted && !report.reseedOk) {
@@ -191,7 +191,7 @@ export function showRepairReportModal(report: RepairReportSummary): HTMLElement 
       void navigator.clipboard.writeText(formatRepairReportText(report));
       copyBtn.textContent = '✓ Copied';
     } catch (caught) {
-      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, caught);
+      console.error();
       const reason = toErrorMessage(caught);
       logDiagnosticFromCode('REPAIR_COPY_E001', { reason }, caught);
       copyBtn.textContent = 'Copy failed';

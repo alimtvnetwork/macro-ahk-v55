@@ -154,7 +154,7 @@ function evaluateRouteChange(source: RouteChangeSourceType): void {
     try {
       showToast('Project route changed — loop stopped', 'info', { noStop: true });
     } catch (_e: unknown) {
-      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+      console.error();
     }
 
     // Re-resolve the workspace name from the REST API for the new project.

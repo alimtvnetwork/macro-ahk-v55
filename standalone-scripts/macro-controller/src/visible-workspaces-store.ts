@@ -25,7 +25,7 @@ export function publishVisibleWorkspaces(rows: ReadonlyArray<WorkspaceCredit>): 
         try {
             cb(rows);
         } catch (_e: unknown) {
-            logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+            console.error();
         }
     }
 }
@@ -35,7 +35,7 @@ export function subscribeVisibleWorkspaces(cb: Listener): () => void {
     // Push the current snapshot immediately so late subscribers stay in sync.
     if (lastRows.length > 0) {
         try { cb(lastRows); } catch (_e: unknown) {
-            logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+            console.error();
         }
     }
 

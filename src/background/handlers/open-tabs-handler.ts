@@ -261,7 +261,7 @@ async function probeTabWorkspace(tabId: number | null): Promise<ProbeResult> {
             return emitProbeFailure(tabId, "EmptyResponse", "relay returned no payload (controller may be loading)");
         }
         const r = response as { isOk?: boolean; payload?: ProbePayload | null; errorMessage?: string };
-        if (r.isOk === false) {
+        if (r.ok === false) {
             return emitProbeFailure(tabId, "ProbeFailed", r.errorMessage ?? "probe failed (no errorMessage from controller)");
         }
 

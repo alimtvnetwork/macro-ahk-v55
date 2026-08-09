@@ -172,7 +172,7 @@ describe("executeInTab", () => {
     });
 
     it("throws when CSP fallback reports failure", async () => {
-        mockedInject.mockResolvedValueOnce({ isSuccess: false, errorMessage: "CSP blocked" });
+        mockedInject.mockResolvedValueOnce({ isSuccess: false, isFail: true, errorMessage: "CSP blocked" });
         await expect(executeInTab(1, "code")).rejects.toThrow(/CSP blocked/);
     });
 
@@ -224,7 +224,7 @@ describe("injectAllScripts", () => {
 
     it("falls back to sequential when batch executeInTab throws", async () => {
         mockedInject
-            .mockResolvedValueOnce({ isSuccess: false, errorMessage: "batch boom" }) // batch attempt throws
+            .mockResolvedValueOnce({ isSuccess: false, isFail: true, errorMessage: "batch boom" }) // batch attempt throws
             .mockResolvedValue({ isSuccess: true, world: "MAIN", isFallback: false, domTarget: "doc" });
         const results = await injectAllScripts(1, [prep("a"), prep("b")]);
         // 1 batch + 2 sequential = 3 calls

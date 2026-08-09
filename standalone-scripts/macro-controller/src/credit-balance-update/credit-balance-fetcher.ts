@@ -88,7 +88,7 @@ export async function fetchWithTimeout(
 
     try {
         // no-bare-fetch-allow: caller performs the required immediate response.isSuccess classification and logs Reason/ReasonDetail.
-        return ServiceResult.wrapFetch(await fetch(url, { ...init, signal: controller.signal }));
+        return await fetch(url, { ...init, signal: controller.signal });
     } finally {
         clearTimeout(timer);
     }
@@ -119,6 +119,9 @@ async function handleNonOkResponse(
 ): Promise<CreditFetchResult> {
     const bodyPreview = await readBodyPreview(response);
     const status = response.status;
+console.log("RESPONSE IN HANDLENONOK:", response);
+console.log("RESPONSE KEYS:", Object.keys(response));
+
     const detail = 'HTTP ' + status + ' from /workspaces/{id}/credit-balance';
     const reasonStr = status === HttpCodes.UNAUTHORIZED || status === HttpCodes.FORBIDDEN ? 'AuthError' : status >= HttpCodes.INTERNAL_SERVER_ERROR ? 'Http5xx' : 'HttpError';
     if (reasonStr === 'AuthError') {
@@ -195,7 +198,7 @@ export async function fetchWorkspaceCreditBalance(
             },
         }, timeoutMs);
 
-        if (response.isFail) {
+        if (!response.ok) {
             return await handleNonOkResponse(response, options, url, token, startMs);
         }
 

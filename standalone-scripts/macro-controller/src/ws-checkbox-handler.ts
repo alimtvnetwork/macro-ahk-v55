@@ -201,9 +201,9 @@ export function triggerLoopMoveFromSelection(): void {
     if (fallback) { wsId = fallback.wsId; wsName = fallback.wsName; }
   }
 
-  const isMissingWsId = !wsId;
+  const isMissingWsIdAfterFallback = !wsId;
 
-  if (isMissingWsId) {
+  if (isMissingWsIdAfterFallback) {
     log('No workspace selected for move', 'warn');
     updateLoopMoveStatus('error', 'Select a workspace first');
     showToast('Select a different workspace first, then press Move', 'warn', { noStop: true });

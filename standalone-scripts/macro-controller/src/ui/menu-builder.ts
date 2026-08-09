@@ -194,7 +194,7 @@ async function fetchBundledMacroControllerSource(): Promise<ExtensionResponse> {
 async function fetchBundleSource(): Promise<string | null> {
   const response = await fetchBundledMacroControllerSource();
   const scriptSource = typeof response?.scriptSource === 'string' ? response.scriptSource : '';
-  if (!response?.isOk || scriptSource.length < 100) {
+  if (!response?.ok || scriptSource.length < 100) {
     const reason = response?.errorMessage || 'Bundled macro controller source is unavailable';
     logError('Export', reason);
     showToast('❌ ' + reason, 'error');

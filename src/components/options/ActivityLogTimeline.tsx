@@ -497,7 +497,7 @@ export function ActivityLogTimeline() {
     setExportLoading(true);
     try {
       const result = await sendMessage<{ isOk: boolean }>({ type: "EXPORT_ZIP" });
-      if (result.isOk) {
+      if (result.ok) {
         toast.success("ZIP bundle downloaded");
       }
     } catch (err) { console.error("Automatically logged error:", err);

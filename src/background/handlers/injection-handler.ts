@@ -569,7 +569,7 @@ async function ensureRelayInjected(tabId: number): Promise<void> {
                         ? ping as { isOk?: boolean; type?: string }
                         : null;
                     const isHealthy = pingObj !== null
-                        && (pingObj.isOk === true || pingObj.type === "__PONG__");
+                        && (pingObj.ok === true || pingObj.type === "__PONG__");
                     if (isHealthy) return { status: "healthy" as const };
                 } catch (pingErr) {
                     // Runtime stale — fall through to needs_injection. Breadcrumb only;

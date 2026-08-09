@@ -86,7 +86,7 @@ async function selectExistingSlugs(): Promise<Set<string>> {
     const sql = 'SELECT Slug FROM Prompt WHERE Slug IN (' + list + ')';
     const resp = await rawSql('QUERY', sql);
     const out = new Set<string>();
-    if (!resp.isOk || !Array.isArray(resp.rows)) return out;
+    if (!resp.ok || !Array.isArray(resp.rows)) return out;
     for (const row of resp.rows) {
         const slug = (row as { Slug?: unknown }).Slug;
         if (typeof slug === 'string') out.add(slug);
@@ -99,7 +99,7 @@ async function hasDefaultForRole(role: PromptRole): Promise<boolean> {
     const sql = 'SELECT 1 FROM Prompt WHERE Role = ' + sqlLit(role)
         + ' AND IsDefault = 1 LIMIT 1';
     const resp = await rawSql('QUERY', sql);
-    const isMissingIsOk = !resp.isOk;
+    const isMissingIsOk = !resp.ok;
     if (isMissingIsOk) return false;
 
     return Array.isArray(resp.rows) && resp.rows.length > 0;
@@ -109,7 +109,7 @@ async function promoteSeedDefault(role: PromptRole, slug: string): Promise<boole
     const sql = 'UPDATE Prompt SET IsDefault = 1 WHERE Slug = '
         + sqlLit(slug) + ' AND Role = ' + sqlLit(role);
     const resp = await rawSql('SCHEMA', sql);
-    const isMissingIsOk = !resp.isOk;
+    const isMissingIsOk = !resp.ok;
     if (isMissingIsOk) {
         const message = resp.errorMessage ?? '?';
         logDiagnosticFromCode('SEED_PROMOTE_E001', { role, slug, reason: message });
@@ -281,7 +281,7 @@ function resolveUpgradeMatch(row: typeof PLAN_NEXT_SEED_ROWS[number], currentBod
 async function readCurrentBody(slug: string): Promise<string | null> {
     const readSql = 'SELECT Body FROM Prompt WHERE Slug = ' + sqlLit(slug) + ' LIMIT 1';
     const readResp = await rawSql('QUERY', readSql);
-    if (!readResp.isOk || !Array.isArray(readResp.rows) || readResp.rows.length === 0) return null;
+    if (!readResp.ok || !Array.isArray(readResp.rows) || readResp.rows.length === 0) return null;
     const body = (readResp.rows[0] as { Body?: unknown }).Body;
 
     return typeof body === 'string' ? body : null;
@@ -327,7 +327,7 @@ async function applyLegacyBodyUpgrade(
     match: UpgradeMatch,
 ): Promise<boolean> {
     const updateResp = await rawSql('SCHEMA', buildBodyUpdateSql(row));
-    const isMissingIsOk = !updateResp.isOk;
+    const isMissingIsOk = !updateResp.ok;
     if (isMissingIsOk) {
         emitLegacyUpgradeFailure(row, match, updateResp.errorMessage ?? '?');
 
@@ -415,7 +415,7 @@ async function writeSeedAuditRow(params: {
             sqlLit(JSON.stringify(params.telemetry)),
         ].join(', ') + ')';
     const resp = await rawSql('SCHEMA', sql);
-    const isMissingIsOk = !resp.isOk;
+    const isMissingIsOk = !resp.ok;
     if (isMissingIsOk) {
         const message = resp.errorMessage ?? '?';
         logDiagnosticFromCode('SEED_AUDIT_E001', { reason: message });
@@ -440,7 +440,7 @@ export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> 
         const existing = await selectExistingSlugs();
         tallyInsertCounts(existing, tel);
         const insertResp = await rawSql('SCHEMA', buildInsertOrIgnoreSql(Date.now()));
-        const isMissingIsOk = !insertResp.isOk;
+        const isMissingIsOk = !insertResp.ok;
         if (isMissingIsOk) {
             const message = 'insert-or-ignore failed: ' + (insertResp.errorMessage ?? 'unknown');
             logDiagnosticFromCode('SEED_INSERT_E001', {

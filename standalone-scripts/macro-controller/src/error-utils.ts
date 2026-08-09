@@ -116,7 +116,7 @@ function prefix(scope: string): string {
   return '[RiseupAsia] [' + scope + '] ';
 }
 
-/** Structured error logging, delegates to RiseupAsiaMacroExt.Logger.error(). */
+/** Structured error logging, delegates to console.error(). */
 export function logError(scope: string, message: string, error?: CaughtError): void {
   const logger = getLogger();
   if (logger) { logger.error(scope, message, error);

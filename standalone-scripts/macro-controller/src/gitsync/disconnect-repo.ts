@@ -94,7 +94,7 @@ export async function disconnectGithubRepo(
 
     return { status: 'not_linked' };
   }
-  const isMissingOk = resp.isFail;
+  const isMissingOk = !resp.ok;
   if (isMissingOk) {
     logError('GitsyncDisconnect',
       'HTTP ' + resp.status + ' for ws=' + wsId + ' pid=' + pid

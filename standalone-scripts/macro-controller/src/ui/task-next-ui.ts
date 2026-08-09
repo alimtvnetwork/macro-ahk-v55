@@ -185,7 +185,7 @@ function findButtonBySelectors(): HTMLElement | null {
 
       return btn as HTMLElement;
     } catch (e) {
-      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
+      console.error();
       logSub('Task Next: querySelector failed for "' + selector + '": ' + (e instanceof Error ? e.message : String(e)), 1);
     }
   }

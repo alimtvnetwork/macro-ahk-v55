@@ -29,7 +29,7 @@ export function dispatchDelegateSignal(direction: string): void {
   try {
     navigator.clipboard.writeText(signal).catch(function(err) { logSub('Clipboard write failed: ' + (err instanceof Error ? err.message : String(err)), 1); });
   } catch (e) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
+    console.error();
     logSub('Clipboard API unavailable: ' + (e instanceof Error ? e.message : String(e)), 1);
   }
 }

@@ -94,7 +94,7 @@ export function buildUrlTabClickFailureReport(
 function serializeUrlTabClickDetail(f: UrlTabClickFailure): string {
     const parts: string[] = [
         `Reason=${f.Reason}`,
-        `OperationModeType=${f.OperationModeType}`,
+        `Mode=${f.OperationModeType}`,
         `UrlMatch=${f.UrlMatch}`,
         `Pattern=${f.UrlPattern}`,
         `TimeoutMs=${f.TimeoutMs}`,

@@ -217,7 +217,7 @@ export function InjectionCopyButton() {
         applyCount(res.errors?.length ?? 0);
       } catch (err) { 
  /* silent */
-        RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); } // allow-swallow: poll failure is non-critical; next tick retries
+        console.error("Automatically caught swallowed error", err); } // allow-swallow: poll failure is non-critical; next tick retries
     };
 
     // Real-time listener — same broadcast use-error-count.ts subscribes to.
@@ -240,7 +240,7 @@ export function InjectionCopyButton() {
         listenerAttached = true;
       } catch (err) { 
  /* extension context invalidated */
-        RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); } // allow-swallow: extension context invalidated during teardown
+        console.error("Automatically caught swallowed error", err); } // allow-swallow: extension context invalidated during teardown
     }
 
     // PERF-7-style visibility pause: only poll while visible.
@@ -268,7 +268,7 @@ export function InjectionCopyButton() {
       if (listenerAttached) {
         try { runtime!.onMessage!.removeListener(handleBroadcast); } catch (err) { 
  /* ignore */
-          RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); } // allow-swallow: extension context already torn down
+          console.error("Automatically caught swallowed error", err); } // allow-swallow: extension context already torn down
       }
     };
   }, []);

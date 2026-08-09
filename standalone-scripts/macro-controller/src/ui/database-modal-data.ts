@@ -50,7 +50,7 @@ export function loadTables(
     method: 'SCHEMA',
     endpoint: 'listTables',
   }).then((response: ExtensionCallbackResponse) => {
-    const isFailure = !response || !response.isOk;
+    const isFailure = !response || !response.ok;
 
     if (isFailure) {
       renderTableListError(tableList, statusBar, response);
@@ -194,7 +194,7 @@ export function loadTableData(
       ...(whereClause ? { where: whereClause } : {}),
     },
   }).then((response: ExtensionCallbackResponse) => {
-    const isFailure = !response || !response.isOk;
+    const isFailure = !response || !response.ok;
 
     if (isFailure) {
       renderDataError(content, response);
@@ -272,7 +272,7 @@ function fetchCountAndRender(
     endpoint: tableName,
     params: { count: true, ...(whereClause ? { where: whereClause } : {}) },
   }).then((countResponse: ExtensionCallbackResponse) => {
-    const isCountSuccess = countResponse?.isOk === true;
+    const isCountSuccess = countResponse?.ok === true;
     const totalCount = isCountSuccess ? (countResponse.count || 0) : rows.length;
     renderDataTable(tableName, rows, page, totalCount, content, statusBar);
   });

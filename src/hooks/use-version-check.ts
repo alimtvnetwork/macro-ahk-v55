@@ -136,7 +136,7 @@ export function useVersionCheck(): VersionCheckResult {
         scriptName: "macroController",
       } as any);
 
-      if (!info.isOk || !info.bundledVersion) {
+      if (!info.ok || !info.bundledVersion) {
         setResult({
           loading: false,
           hasMismatch: false,

@@ -54,7 +54,7 @@ describe('Credit-sort hamburger rows (v3.30.0)', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
     try { localStorage.removeItem('ml_credit_sort_mode'); } catch (err) {
-      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+      console.error();
     }
     setLoopWsCreditSortMode('none');
   });

@@ -83,7 +83,7 @@ function buildTitleElement(title: string): HTMLElement {
 function readCollapsedState(storageKey: string): boolean {
   let savedState: string | null = null;
   try { savedState = localStorage.getItem(storageKey); } catch (_e: unknown) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+    console.error();
     logDebug('readCollapsedState', 'localStorage read failed for ' + storageKey);
   }
   const hasSavedState = savedState !== null;
@@ -93,7 +93,7 @@ function readCollapsedState(storageKey: string): boolean {
 
 function persistCollapsedState(storageKey: string, isExpanding: boolean): void {
   try { localStorage.setItem(storageKey, isExpanding ? 'expanded' : 'collapsed'); } catch (_e: unknown) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+    console.error();
     logDebug('persistCollapsedState', 'localStorage write failed for ' + storageKey);
   }
 }

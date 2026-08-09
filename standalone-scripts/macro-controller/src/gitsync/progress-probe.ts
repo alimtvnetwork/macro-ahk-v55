@@ -148,7 +148,7 @@ export async function probeProgress(
 
         return null;
     }
-    const isMissingOk = resp.isFail;
+    const isMissingOk = !resp.ok;
     if (isMissingOk) {
         const preview = JSON.stringify(resp.data).substring(0, 200);
         logError('GitsyncProbe', 'probeProgress HTTP ' + resp.status

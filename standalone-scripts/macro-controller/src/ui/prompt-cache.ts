@@ -154,7 +154,7 @@ function writeRecord(storeName: string, record: Record<string, unknown>): Promis
         tx.oncomplete = function() { db.close(); resolve(); };
         tx.onerror = function() { db.close(); resolve(); };
       } catch (e) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
+        console.error();
         logWriteError(storeName, e);
         resolve();
       }

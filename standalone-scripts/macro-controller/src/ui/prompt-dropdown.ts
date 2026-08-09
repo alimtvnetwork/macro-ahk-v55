@@ -673,7 +673,7 @@ function _rebindActionIcons(
         e.stopPropagation();
         if (!confirm('Delete prompt "' + p.name + '"?')) return;
         sendToExtension('DELETE_PROMPT', { promptId: p.id }).then(function(resp: Record<string, unknown>) {
-          if (resp && resp.isOk) {
+          if (resp && resp.ok) {
             clearLoadedPrompts();
             clearUISnapshot();
             loadPromptsFromJson().then(function() { renderPromptsDropdown(ctx, taskNextDeps); });
@@ -1147,7 +1147,7 @@ function _openInlinePromptEditor(item: HTMLElement, p: LoaderPromptEntry, ctx: P
     if (!updated.name || !updated.text) return;
     
     sendToExtension('SAVE_PROMPT', { prompt: updated }).then(function(resp: Record<string, unknown>) {
-      if (resp && resp.isOk) {
+      if (resp && resp.ok) {
         log('Prompt updated inline: ' + updated.name, 'success');
         showPasteToast('✏️ Prompt updated: ' + updated.name, false);
         clearLoadedPrompts();
@@ -1184,7 +1184,7 @@ function _buildFavoriteIcon(p: LoaderPromptEntry, _dropdown: HTMLElement, ctx: P
     e.stopPropagation();
     const updated = { ...p, isFavorite: !isFav };
     sendToExtension('SAVE_PROMPT', { prompt: updated }).then(function(resp: Record<string, unknown>) {
-      if (resp && resp.isOk) {
+      if (resp && resp.ok) {
         log((!isFav ? 'Added to' : 'Removed from') + ' favorites: ' + p.name, 'success');
         showPasteToast((!isFav ? '⭐ Favorited: ' : '☆ Unfavorited: ') + p.name, false);
         clearLoadedPrompts();
@@ -1236,7 +1236,7 @@ function _buildDeleteIcon(p: PromptEntry, dropdown: HTMLElement, ctx: PromptCont
 /** Execute prompt deletion via extension message. */
 function _executeDeletePrompt(p: PromptEntry, _dropdown: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): void {
   sendToExtension('DELETE_PROMPT', { promptId: p.id }).then(function(resp: ExtensionResponse) {
-    if (resp && resp.isOk) {
+    if (resp && resp.ok) {
       handlePromptDeleteSuccess(p, ctx, taskNextDeps);
 
       return;

@@ -50,7 +50,7 @@ export async function inviteMember(wsId: string, email: string, role: MemberRole
     if (isMissingEmail) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'invite', argument: 'email' });
     log('[Members] POST invite ' + email + ' (' + role + ') → ' + wsId, 'delegate');
     const resp = await getMemberships('invite').invite(wsId, email, role, { baseUrl: CREDIT_API_BASE });
-    const isMissingOk = resp.isFail;
+    const isMissingOk = !resp.ok;
     if (isMissingOk) {
       const body = previewBody(resp.data);
       logError('Members', 'invite HTTP ' + resp.status + ': ' + body);
@@ -68,7 +68,7 @@ export async function removeMember(wsId: string, userId: string): Promise<void> 
     if (isMissingUserId) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'remove', argument: 'userId' });
     log('[Members] DELETE ' + userId + ' ← ' + wsId, 'delegate');
     const resp = await getMemberships('remove').remove(wsId, userId, { baseUrl: CREDIT_API_BASE });
-    const isMissingOk = resp.isFail;
+    const isMissingOk = !resp.ok;
     if (isMissingOk) {
       const body = previewBody(resp.data);
       logError('Members', 'remove HTTP ' + resp.status + ': ' + body);
@@ -86,7 +86,7 @@ export async function updateMemberRole(wsId: string, userId: string, role: Membe
     if (isMissingUserId) throwDiagnostic('WS_MEMBERS_MUTATE_E001', { mutation: 'updateRole', argument: 'userId' });
     log('[Members] PATCH role=' + role + ' ' + userId + ' @ ' + wsId, 'delegate');
     const resp = await getMemberships('updateRole').updateRole(wsId, userId, role, { baseUrl: CREDIT_API_BASE });
-    const isMissingOk = resp.isFail;
+    const isMissingOk = !resp.ok;
     if (isMissingOk) {
       const body = previewBody(resp.data);
       logError('Members', 'updateRole HTTP ' + resp.status + ': ' + body);

@@ -145,7 +145,7 @@ const PROMPT_COLUMN_MIGRATIONS: readonly PromptColumnMigration[] = [
 
 async function readPromptColumnNames(): Promise<Set<string>> {
   const resp = await runLoggedQuery('QUERY', 'PRAGMA table_info(Prompt)', 'context');
-  const isOk = Boolean(resp?.isOk) && Array.isArray(resp?.rows);
+  const isOk = Boolean(resp?.ok) && Array.isArray(resp?.rows);
   const rows = isOk ? (resp.rows as PragmaColumnRow[]) : [];
 
   return new Set(rows.map((row) => row?.name).filter((name): name is string => typeof name === 'string'));
@@ -153,7 +153,7 @@ async function readPromptColumnNames(): Promise<Set<string>> {
 
 async function applyPromptColumnMigration(migration: PromptColumnMigration): Promise<void> {
   const resp = await runLoggedQuery('SCHEMA', migration.ddl, 'context');
-  if (!resp?.isOk) {
+  if (!resp?.ok) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', { column: migration.column, reason: resp?.errorMessage ?? UNKNOWN_ERROR });
 
     return;
@@ -163,7 +163,7 @@ async function applyPromptColumnMigration(migration: PromptColumnMigration): Pro
 
 async function ensurePromptRoleDefaultIndex(): Promise<void> {
   const resp = await runLoggedQuery('SCHEMA', `CREATE INDEX IF NOT EXISTS ${PROMPT_ROLE_DEFAULT_INDEX} ON Prompt (${PROMPT_ROLE_COLUMN}, ${PROMPT_IS_DEFAULT_COLUMN}, 'context')`);
-  if (resp?.isOk) return;
+  if (resp?.ok) return;
   logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', { column: PROMPT_ROLE_DEFAULT_INDEX, reason: resp?.errorMessage ?? UNKNOWN_ERROR });
 }
 
@@ -183,7 +183,7 @@ export async function migratePromptReplaceColumns(): Promise<void> {
     }
     await ensurePromptRoleDefaultIndex();
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', { column: 'batch', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -217,8 +217,7 @@ async function runOrphanRepairStage(stages: Stage[]): Promise<OrphanRepairReport
 async function runSeedPlanNextStage(stages: Stage[]): Promise<void> {
   const { seedPlanNextPrompts } = await import('../seed/seed-plan-next');
   const seedResult = await seedPlanNextPrompts();
-  const isMissingOk = seedResult.isFail;
-  if (isMissingOk) {
+  if (!seedResult.ok) {
     const reason = seedResult.error ?? UNKNOWN_ERROR;
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'seed-plan-next', reason });
     stages.push({ stage: 'seed-plan-next', status: 'failed', reason });
@@ -285,7 +284,7 @@ export async function initMacroDb(): Promise<void> {
   let orphanReportRef: OrphanRepairReport | undefined;
   try {
     const resp = await runLoggedQuery('SCHEMA', SCHEMA_SQL, 'context');
-    if (resp && resp.isOk) {
+    if (resp && resp.ok) {
       log('Macro DB initialized: ' + DB_NAME, 'success');
       stages.push({ stage: STAGE_SCHEMA_INIT, status: 'ok' });
       orphanReportRef = await runPostSchemaStages(stages);
@@ -295,7 +294,7 @@ export async function initMacroDb(): Promise<void> {
       stages.push({ stage: STAGE_SCHEMA_INIT, status: 'failed', reason });
     }
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     const reason = err instanceof Error ? err.message : String(err);
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'send-schema-init', reason }, err);
     stages.push({ stage: STAGE_SCHEMA_INIT, status: 'failed', reason });
@@ -322,7 +321,7 @@ export async function saveProjectMetadata(projectId: string, name: string, url: 
   try {
     await runLoggedQuery('SCHEMA', sql, 'context');
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'saveProjectMetadata', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -345,7 +344,7 @@ export async function saveCommunication(projectId: string, prompt: string, respo
     await runLoggedQuery('SCHEMA', sql, 'context');
     log('Communication saved to Macro DB', 'info');
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'saveCommunication', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -371,7 +370,7 @@ export async function syncTaskQueueToDb(projectId: string, tasks: DbTask[]): Pro
   try {
     await runLoggedQuery('SCHEMA', sql, 'context');
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'syncTaskQueueToDb', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -406,7 +405,7 @@ export async function purgeOldCommunications(days: number = 30): Promise<void> {
     await runLoggedQuery('SCHEMA', sql, 'context');
     log(`[MacroDb] Purged communications older than ${days} days`, 'info');
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'purgeOldCommunications', reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }
@@ -419,7 +418,7 @@ export async function getCommunicationHistory(projectId: string, limit: number =
   try {
     const resp = await runLoggedQuery('QUERY', sql, 'context');
 
-    return resp?.isOk ? (Array.isArray(resp.rows) ? (resp.rows as unknown[]) : []) : [];
+    return resp?.ok ? (Array.isArray(resp.rows) ? (resp.rows as unknown[]) : []) : [];
   } catch (err) {
     logDiagnosticFromCode('DB_MACRO_READ_E001', { op: 'getCommunicationHistory', reason: err instanceof Error ? err.message : String(err) }, err);
 
@@ -438,7 +437,7 @@ export async function exportDatabaseDump(): Promise<void> {
       endpoint: 'dump'
     });
     
-    if (resp && resp.isOk && resp.dump) {
+    if (resp && resp.ok && resp.dump) {
       const blob = new Blob([resp.dump as string], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -454,7 +453,7 @@ export async function exportDatabaseDump(): Promise<void> {
       logDiagnosticFromCode('DB_MACRO_EXPORT_E001', { reason: resp?.errorMessage || 'no dump data' });
     }
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     logDiagnosticFromCode('DB_MACRO_EXPORT_E001', { reason: err instanceof Error ? err.message : String(err) }, err);
   }
 }

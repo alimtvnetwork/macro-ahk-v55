@@ -9,7 +9,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 interface CapturedCall { method: string; sql: string }
-interface QueuedResponse { isOk: boolean; rows?: unknown[]; errorMessage?: string }
+interface QueuedResponse { ok: boolean; rows?: unknown[]; errorMessage?: string }
 
 const captured: CapturedCall[] = [];
 let responsesQueue: QueuedResponse[] = [];
@@ -19,7 +19,7 @@ vi.mock('../extension-bridge', () => ({
     sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
         captured.push({ method: payload.method, sql: payload.params.sql });
 
-        return responsesQueue.shift() ?? { isOk: true };
+        return responsesQueue.shift() ?? { ok: true };
     }),
 }));
 vi.mock('../../ui/prompt-cache', () => ({
@@ -42,7 +42,7 @@ beforeEach(() => {
 
 describe('migrateRemoveLegacyReadMemoryDuplicates', () => {
     it('is a no-op when no legacy rows exist', async () => {
-        responsesQueue = [{ isOk: true, rows: [{ c: 0 }] }];
+        responsesQueue = [{ ok: true, rows: [{ c: 0 }] }];
         await migrateRemoveLegacyReadMemoryDuplicates();
         expect(captured).toHaveLength(1);
         expect(captured[0]?.method).toBe('QUERY');
@@ -51,8 +51,8 @@ describe('migrateRemoveLegacyReadMemoryDuplicates', () => {
 
     it('deletes legacy Prompt + PromptRevision rows and clears cache', async () => {
         responsesQueue = [
-            { isOk: true, rows: [{ c: 2 }] },
-            { isOk: true },
+            { ok: true, rows: [{ c: 2 }] },
+            { ok: true },
         ];
         await migrateRemoveLegacyReadMemoryDuplicates();
         expect(captured).toHaveLength(2);
@@ -70,7 +70,7 @@ describe('migrateRemoveLegacyReadMemoryDuplicates', () => {
     });
 
     it('does not throw when the count query fails', async () => {
-        responsesQueue = [{ isOk: false, errorMessage: 'boom' }];
+        responsesQueue = [{ ok: false, errorMessage: 'boom' }];
         await expect(migrateRemoveLegacyReadMemoryDuplicates()).resolves.toBeUndefined();
     });
 });

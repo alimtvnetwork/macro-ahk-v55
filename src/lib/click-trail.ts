@@ -60,7 +60,7 @@ export function recordTrail(entry: Omit<ClickTrailEntry, "at">): void {
             : next;
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
     } catch (err) {
-    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); 
+    console.error("Automatically caught swallowed error", err); 
 }
 }
 
@@ -69,7 +69,7 @@ export function clearClickTrail(): void {
     try {
         sessionStorage.removeItem(STORAGE_KEY);
     } catch (err) {
-    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); 
+    console.error("Automatically caught swallowed error", err); 
 }
 }
 
@@ -124,7 +124,7 @@ export function clearFrozenClickTrails(): void {
         }
         keysToRemove.forEach((k) => sessionStorage.removeItem(k));
     } catch (err) {
-    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); 
+    console.error("Automatically caught swallowed error", err); 
 }
 }
 
@@ -144,7 +144,7 @@ function evictOldFrozenSnapshots(keepKey: string): void {
             .slice(0, frozenKeys.length - MAX_FROZEN_SNAPSHOTS);
         toRemove.forEach((k) => sessionStorage.removeItem(k));
     } catch (err) {
-    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); 
+    console.error("Automatically caught swallowed error", err); 
 }
 }
 

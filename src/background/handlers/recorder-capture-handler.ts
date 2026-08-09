@@ -84,7 +84,7 @@ export async function handleRecorderCapturePersist(
 export async function handleRecorderCapturePersistBatch(
     message: MessageRequest,
 ): Promise<{
-    isOk: true;
+    ok: true;
     results: ReadonlyArray<PersistedCaptureResult>;
 }> {
     const req = message as unknown as CaptureBatchRequest;
@@ -109,7 +109,7 @@ export async function handleRecorderCapturePersistBatch(
         results.push(result);
     }
 
-    return { isOk: true, results };
+    return { ok: true, results };
 }
 
 /* ------------------------------------------------------------------ */
