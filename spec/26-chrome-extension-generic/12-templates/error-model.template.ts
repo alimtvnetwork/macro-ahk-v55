@@ -14,7 +14,12 @@
  * shape — use `AppError.fromFsFailure(...)` to guarantee compliance.
  */
 
-export type ErrorSeverity = "info" | "warn" | "error" | "fatal";
+export enum ErrorSeverityType {
+    Info = "info",
+    Warn = "warn",
+    Error = "error",
+    Fatal = "fatal"
+}
 
 export interface AppErrorContext {
     /** Free-form key/value diagnostics (no PII, no secrets). */
@@ -24,7 +29,7 @@ export interface AppErrorContext {
 export interface AppErrorJSON {
     readonly name: "AppError";
     readonly code: string;
-    readonly severity: ErrorSeverity;
+    readonly severity: ErrorSeverityType;
     readonly message: string;
     readonly reason: string;
     readonly path: string | null;
@@ -37,7 +42,7 @@ export interface AppErrorJSON {
 export class AppError extends Error {
     public readonly name = "AppError" as const;
     public readonly code: string;
-    public readonly severity: ErrorSeverity;
+    public readonly severity: ErrorSeverityType;
     public readonly reason: string;
     public readonly path: string | null;
     public readonly missing: string | null;
@@ -47,7 +52,7 @@ export class AppError extends Error {
     constructor(input: {
         code: string;
         reason: string;
-        severity?: ErrorSeverity;
+        severity?: ErrorSeverityType;
         path?: string | null;
         missing?: string | null;
         context?: AppErrorContext | null;
@@ -55,7 +60,7 @@ export class AppError extends Error {
     }) {
         super(`[${input.code}] ${input.reason}`);
         this.code = input.code;
-        this.severity = input.severity ?? "error";
+        this.severity = input.severity ?? ErrorSeverityType.Error;
         this.reason = input.reason;
         this.path = input.path ?? null;
         this.missing = input.missing ?? null;
@@ -70,11 +75,11 @@ export class AppError extends Error {
         path: string;
         missing: string;
         reason: string;
-        severity?: ErrorSeverity;
+        severity?: ErrorSeverityType;
         context?: AppErrorContext;
         cause?: unknown;
     }): AppError {
-        return new AppError({ ...input, severity: input.severity ?? "error" });
+        return new AppError({ ...input, severity: input.severity ?? ErrorSeverityType.Error });
     }
 
     /** Filter chunk-*.js / assets/*.js noise from the stack — useless frames. */
