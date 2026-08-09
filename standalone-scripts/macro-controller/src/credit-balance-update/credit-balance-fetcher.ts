@@ -1,4 +1,5 @@
 import { HttpCodes } from "../constants/http";
+import { ServiceResult } from '../utils/result-wrapper';
 import { getBearerToken, markBearerTokenExpired } from '../auth';
 import { CREDIT_API_BASE } from '../shared-state';
 import { CreditFetchOutcomeType } from './credit-fetch-outcome';
