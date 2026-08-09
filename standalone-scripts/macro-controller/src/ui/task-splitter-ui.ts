@@ -1,6 +1,5 @@
 const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { Timings } from "../constants/timing";
-import { ServiceResult } from '../utils/result-wrapper';
 /**
  * Task Splitter UI — paste one long instruction, break it into N steps,
  * then walk through them (manual Next ▶ or timed auto-run).

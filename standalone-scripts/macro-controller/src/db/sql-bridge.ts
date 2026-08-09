@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * db/sql-bridge.ts - adaptive SQLite bridge.
  *
@@ -202,8 +201,6 @@ export async function runLoggedQuery(
     const resp = await runSql(legacy, sql, project);
     const isMissingIsOk = !resp.isOk;
     if (isMissingIsOk) {
-        
-
         return new ServiceResult<SqlBridgeResp, Error>(false, resp, new Error(resp.errorMessage || 'unknown error'));
     }
 

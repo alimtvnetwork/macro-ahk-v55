@@ -985,45 +985,25 @@ const EXPORT_HEADERS: ReadonlyArray<keyof ExportRow> = [
  * the `projects.list` response (which the dashboard itself renders from).
  * Missing fields become blank cells; no per-project errors.
  */
-function exportCsv(statusEl: HTMLElement): void {
-    if (state.exporting) return;
+interface ExportRowsResult {
+    rows: ExportRow[];
+    fallbackCount: number;
+    normalizedLastCommunicationCount: number;
+    filename: string;
+}
 
-    const blocks = state.blocks;
-    const tabIndex = state.tabIndex;
-    if (blocks.length === 0 || !tabIndex) {
-        statusEl.style.color = '#fca5a5';
-        statusEl.textContent = '⚠ No workspaces loaded yet — wait for the list to populate.';
-
-        return;
-    }
-
+function _buildExportRows(
+    blocks: typeof state.blocks,
+    tabIndex: OpenTabIndex,
+    exportedAt: string,
+): ExportRowsResult {
     const tasks: Array<{ ws: WorkspaceCredit; project: ProjectEntry }> = [];
     for (const b of blocks) {
         const isMissingProjects = !b.projects;
         if (isMissingProjects) continue;
         for (const p of b.projects) tasks.push({ ws: b.ws, project: p });
     }
-
-    if (tasks.length === 0) {
-        statusEl.style.color = '#fca5a5';
-        statusEl.textContent = '⚠ No projects to export.';
-
-        return;
-    }
-
-    state.exporting = true;
-    setExportButtonDisabled(true);
-    statusEl.style.color = '#94a3b8';
-    statusEl.textContent = 'Building CSV…';
-
-    const exportedAt = new Date().toISOString();
-    const fallbackCount = tasks.filter(function (task) {
-        return isCsvProjectNameFallback(task.project, tabIndex);
-    }).length;
-    const normalizedLastCommunicationCount = tasks.filter(function (task) {
-        return !hasCsvLastCommunication(task.project.lastMessageAt);
-    }).length;
-    const rows: ExportRow[] = tasks.map(function (task) {
+    const rows: ExportRow[] = tasks.map(function(task) {
         return {
             workspaceId: task.ws.id,
             workspaceName: task.ws.fullName || task.ws.name || task.ws.id,
@@ -1039,11 +1019,38 @@ function exportCsv(statusEl: HTMLElement): void {
             exportedAt,
         };
     });
-
-    const csv = buildCsv(rows);
+    const fallbackCount = tasks.filter(function(t) { return isCsvProjectNameFallback(t.project, tabIndex); }).length;
+    const normalizedLastCommunicationCount = tasks.filter(function(t) { return !hasCsvLastCommunication(t.project.lastMessageAt); }).length;
     const filename = 'marco-projects-' + exportedAt.replace(/[:.]/g, '-') + '.csv';
-    downloadCsv(filename, csv);
 
+    return { rows, fallbackCount, normalizedLastCommunicationCount, filename };
+}
+
+function exportCsv(statusEl: HTMLElement): void {
+    if (state.exporting) return;
+    const blocks = state.blocks;
+    const tabIndex = state.tabIndex;
+    if (blocks.length === 0 || !tabIndex) {
+        statusEl.style.color = '#fca5a5';
+        statusEl.textContent = '⚠ No workspaces loaded yet — wait for the list to populate.';
+
+        return;
+    }
+    const exportedAt = new Date().toISOString();
+    const { rows, fallbackCount, normalizedLastCommunicationCount, filename } =
+        _buildExportRows(blocks, tabIndex, exportedAt);
+    if (rows.length === 0) {
+        statusEl.style.color = '#fca5a5';
+        statusEl.textContent = '⚠ No projects to export.';
+
+        return;
+    }
+    state.exporting = true;
+    setExportButtonDisabled(true);
+    statusEl.style.color = '#94a3b8';
+    statusEl.textContent = 'Building CSV…';
+    const csv = buildCsv(rows);
+    downloadCsv(filename, csv);
     state.exporting = false;
     setExportButtonDisabled(false);
     statusEl.style.color = '#10b981';

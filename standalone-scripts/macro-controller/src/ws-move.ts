@@ -1,4 +1,3 @@
-import { ServiceResult } from './utils/result-wrapper';
 /**
  * Workspace Move — API-based project move and session verification.
  *
@@ -107,7 +106,7 @@ async function probeSessionWithToken(context: string, token: string): Promise<vo
   try {
     const resp = await window.marco!.api!.workspace.probe({ baseUrl: CREDIT_API_BASE });
 
-    const isMissingOk = !resp.isSuccess;
+    const isMissingOk = !resp.ok;
 
     if (isMissingOk) {
       logError('unknown', LabelType.LogSessionCheck + context + '] ❌ Session probe failed: HTTP ' + resp.status + ' (auth: ' + authLabel + ')');
@@ -345,7 +344,7 @@ async function handleMoveResponse(
 
     return;
   }
-  if (resp.isSuccess) {
+  if (resp.ok) {
     log('Move response: ' + resp.status + label, 'success');
     handleMoveSuccess(targetWorkspaceName, label);
 
@@ -491,7 +490,7 @@ async function executeSwitchContext(
       return;
     }
 
-    if (resp.isSuccess) {
+    if (resp.ok) {
       log('Switch context response: ' + resp.status + label, 'success');
     } else {
       const bodyPreview = JSON.stringify(resp.data).substring(0, 500);

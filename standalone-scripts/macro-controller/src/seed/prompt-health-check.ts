@@ -1,4 +1,3 @@
-// @ts-nocheck
 const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 import { ServiceResult } from '../utils/result-wrapper';
 /**
@@ -138,7 +137,9 @@ export async function runPromptHealthCheck(opts: RunHealthCheckOptions = {}): Pr
 function publishReport(report: PromptHealthReport, silent: boolean): void {
   try {
     window.__marcoPromptHealthReport = report;
-  }catch {}
+  }catch (_e) {
+    // Intentionally silent: setting window property is best-effort
+  }
 
   if (report.ok) {
     emitPromptSeedEvent({ event: any, role: 'generic', outcome: 'ok', detail: 'all defaults healthy' });

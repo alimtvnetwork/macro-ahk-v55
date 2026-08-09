@@ -231,50 +231,7 @@ function buildDropZone(importBtn: HTMLButtonElement, fileInput: HTMLInputElement
   return dropZone;
 }
 
-export function buildShell(): ShellEls {
-  const root = document.createElement('div');
-  root.style.cssText = [
-    'position:fixed', 'inset:0', 'z-index:2147483000',
-    'background:rgba(0,0,0,0.55)',
-    'display:flex', 'align-items:center', 'justify-content:center',
-    'font-family:system-ui,-apple-system,sans-serif',
-  ].join(';');
-
-  const panel = document.createElement('div');
-  panel.style.cssText = [
-    'width:min(720px,92vw)', 'max-height:85vh', 'overflow:auto',
-    'background:#121826', 'color:#e6edf7',
-    CSS_BORDER_DEFAULT, 'border-radius:10px',
-    'box-shadow:0 20px 60px rgba(0,0,0,0.6)',
-    'padding:16px 18px',
-  ].join(';');
-
-  const header = document.createElement('div');
-  header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;';
-  const title = document.createElement('div');
-  title.textContent = '≡ƒùé Prompt Library';
-  title.style.cssText = 'font-size:15px;font-weight:600;color:#c9b7ff;';
-
-  const actionWrap = document.createElement('div');
-  actionWrap.style.cssText = 'display:flex;align-items:center;gap:12px;';
-
-  const { previewGroup, previewBtn, previewFileInput } = buildHeaderPreviewGroup();
-  const { importGroup, importRoleSelect, importBtn, fileInput } = buildHeaderImportGroup();
-  const { exportGroup, includeRevisionsCb, exportBtn } = buildHeaderExportGroup();
-  const { closeBtn, sampleBtn } = buildHeaderMiscButtons();
-
-  actionWrap.appendChild(previewGroup);
-  actionWrap.appendChild(importGroup);
-  actionWrap.appendChild(exportGroup);
-  actionWrap.appendChild(sampleBtn);
-  actionWrap.appendChild(closeBtn);
-  actionWrap.appendChild(previewFileInput);
-  actionWrap.appendChild(fileInput);
-  header.appendChild(title);
-  header.appendChild(actionWrap);
-
-  const scrollWrap = document.createElement('div');
-  scrollWrap.style.cssText = 'flex:1;overflow-y:auto;padding:16px 20px;';
+function _buildStatusPanels() {
   const errorBanner = document.createElement('div');
   errorBanner.dataset.testid = 'library-import-error';
   errorBanner.tabIndex = -1;
@@ -299,6 +256,70 @@ export function buildShell(): ShellEls {
   partialErrorsPanel.dataset.testid = 'library-import-partial-errors';
   partialErrorsPanel.hidden = true;
   partialErrorsPanel.style.cssText = [CSS_DISPLAY_NONE, CSS_MARGIN_BOTTOM_10, CSS_PADDING_10_12, 'background:#2d1b22', 'border:1px solid #5a2431', CSS_BORDER_RADIUS_6, CSS_FONT_SIZE_12, 'color:#e8b5b5'].join(';');
+
+  return { errorBanner, fileInfo, previewPanel, partialErrorsPanel };
+}
+
+function _buildActionWrap() {
+  const actionWrap = document.createElement('div');
+  actionWrap.style.cssText = 'display:flex;align-items:center;gap:12px;';
+
+  const { previewGroup, previewBtn, previewFileInput } = buildHeaderPreviewGroup();
+  const { importGroup, importRoleSelect, importBtn, fileInput } = buildHeaderImportGroup();
+  const { exportGroup, includeRevisionsCb, exportBtn } = buildHeaderExportGroup();
+  const { closeBtn, sampleBtn } = buildHeaderMiscButtons();
+
+  actionWrap.appendChild(previewGroup);
+  actionWrap.appendChild(importGroup);
+  actionWrap.appendChild(exportGroup);
+  actionWrap.appendChild(sampleBtn);
+  actionWrap.appendChild(closeBtn);
+  actionWrap.appendChild(previewFileInput);
+  actionWrap.appendChild(fileInput);
+
+  return {
+    actionWrap,
+    refs: { previewBtn, previewFileInput, importRoleSelect, importBtn, fileInput, includeRevisionsCb, exportBtn, closeBtn, sampleBtn }
+  };
+}
+
+function _buildHeader(actionWrap: HTMLElement): HTMLElement {
+  const header = document.createElement('div');
+  header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;';
+  const title = document.createElement('div');
+  title.textContent = '≡ƒùé Prompt Library';
+  title.style.cssText = 'font-size:15px;font-weight:600;color:#c9b7ff;';
+  header.appendChild(title);
+  header.appendChild(actionWrap);
+
+  return header;
+}
+
+export function buildShell(): ShellEls {
+  const root = document.createElement('div');
+  root.style.cssText = [
+    'position:fixed', 'inset:0', 'z-index:2147483000',
+    'background:rgba(0,0,0,0.55)',
+    'display:flex', 'align-items:center', 'justify-content:center',
+    'font-family:system-ui,-apple-system,sans-serif',
+  ].join(';');
+
+  const panel = document.createElement('div');
+  panel.style.cssText = [
+    'width:min(720px,92vw)', 'max-height:85vh', 'overflow:auto',
+    'background:#121826', 'color:#e6edf7',
+    CSS_BORDER_DEFAULT, 'border-radius:10px',
+    'box-shadow:0 20px 60px rgba(0,0,0,0.6)',
+    'padding:16px 18px',
+  ].join(';');
+
+  const { actionWrap, refs } = _buildActionWrap();
+  const { previewBtn, previewFileInput, importRoleSelect, importBtn, fileInput, includeRevisionsCb, exportBtn, closeBtn, sampleBtn } = refs;
+
+  const header = _buildHeader(actionWrap);
+  const scrollWrap = document.createElement('div');
+  scrollWrap.style.cssText = 'flex:1;overflow-y:auto;padding:16px 20px;';
+  const { errorBanner, fileInfo, previewPanel, partialErrorsPanel } = _buildStatusPanels();
 
   const dropZone = buildDropZone(importBtn, fileInput);
 

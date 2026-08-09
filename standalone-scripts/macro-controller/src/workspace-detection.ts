@@ -1,5 +1,4 @@
 import { HttpCodes } from "./constants/http";
-import { ServiceResult } from './utils/result-wrapper';
 
 /**
  * MacroLoop Controller — Workspace Detection Module (barrel)
@@ -233,7 +232,7 @@ async function processTier1Response(
     return;
   }
 
-  const isMissingOk = !resp.isSuccess;
+  const isMissingOk = !resp.ok;
 
   if (isMissingOk) {
     log(fn + ': Tier 1 FAILED — HTTP ' + resp.status + ' — falling to passive fallback', 'warn');

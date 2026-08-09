@@ -1,5 +1,6 @@
 import { logError } from './error-utils';
 import { CreditSortModeType } from "./types/enums";
+export type { CreditSortModeType };
 
 class WsListViewState {
   private static instance: WsListViewState | null = null;

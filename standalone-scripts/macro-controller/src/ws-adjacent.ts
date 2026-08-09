@@ -1,5 +1,4 @@
 import { HttpCodes } from "./constants/http";
-import { ServiceResult } from './utils/result-wrapper';
 /**
  * Workspace Adjacent Navigation — Move to adjacent workspace with fresh fetch and skip logic.
  *
@@ -254,7 +253,7 @@ async function doFetchWorkspacesForMove(
     return;
   }
 
-  const isMissingOk = !resp.isSuccess;
+  const isMissingOk = !resp.ok;
 
   if (isMissingOk) {
     throwDiagnostic('WS_CONTEXT_ADJACENT_E001', { status: resp.status, op: 'fetchWorkspaces' });

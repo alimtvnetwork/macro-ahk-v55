@@ -788,7 +788,9 @@ function bridgeErrorToExtension(message: string, stack?: string, source?: string
       stack: stack || '',
       scriptCode: source || 'overlay',
     });
-  }catch {}
+  }catch (_e) {
+    // best-effort: extension relay may be unavailable
+  }
 }
 
 /** Get current overlay error count (for badge integrations). */

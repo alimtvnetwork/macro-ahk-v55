@@ -107,6 +107,24 @@ async function executeImportDb(
   return { summary, results };
 }
 
+function _handleImportValidationError(
+  refs: ModalRefs,
+  invalid: { headline: string, hint: string },
+  file: File,
+  fileInput: HTMLInputElement,
+  retrying: boolean,
+): void {
+  refs.status.textContent = (retrying ? 'Retry rejected: ' : 'Import rejected: ') + invalid.headline;
+  renderImportErrorBanner(refs, invalid.headline, invalid.hint);
+  logLibraryImportFailure('validation', 'name=' + file.name + ' size=' + String(file.size) + ' type=' + file.type + ' headline=' + invalid.headline);
+  showToast(IMPORT_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
+  refs.lastImportFailed = true;
+  try { fileInput.value = ''; } catch (err) {
+    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+  }
+  focusErrorBanner(refs);
+}
+
 export async function handleImportFile(
   refs: ModalRefs,
   file: File,
@@ -122,15 +140,7 @@ export async function handleImportFile(
   
   const invalid = validateImportFile(file);
   if (invalid) {
-    refs.status.textContent = (retrying ? 'Retry rejected: ' : 'Import rejected: ') + invalid.headline;
-    renderImportErrorBanner(refs, invalid.headline, invalid.hint);
-    logLibraryImportFailure('validation', 'name=' + file.name + ' size=' + String(file.size) + ' type=' + file.type + ' headline=' + invalid.headline);
-    showToast(IMPORT_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
-    refs.lastImportFailed = true;
-    try { fileInput.value = ''; } catch (err) {
-      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
-    }
-    focusErrorBanner(refs);
+    _handleImportValidationError(refs, invalid, file, fileInput, retrying);
 
     return;
   }

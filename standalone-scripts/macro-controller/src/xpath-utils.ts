@@ -128,7 +128,7 @@ function findViaXPath(desc: ElementDescriptor): Element | null {
   const isMissingXpath = !desc.xpath;
   if (isMissingXpath) return null;
   log('  Method 1 (XPath) for ' + desc.name + ': ' + desc.xpath, 'check');
-  const result = getByXPath(desc.xpath);
+  const result = getByXPath(desc.xpath!);
   if (result) {
     log('  ' + desc.name + ' FOUND via XPath: ' + desc.xpath, 'success');
 
@@ -149,7 +149,7 @@ function findViaTextScan(desc: ElementDescriptor): Element | null {
   for (const tagEl of document.querySelectorAll(tag)) {
     const elText = (tagEl.textContent || '').trim();
     for (const text of texts) {
-      if (elText === text || elText.indexOf(text) !== -1) {
+      if (elText === text || elText.indexOf(text!) !== -1) {
         log('  ' + desc.name + ' FOUND via text: "' + elText.substring(0, 40) + '"', 'success');
 
         return tagEl;
@@ -169,7 +169,7 @@ function findViaCssSelector(desc: ElementDescriptor): Element | null {
   for (const [sIdx, sel] of selectors.entries()) {
     try {
       log('    [' + (sIdx + 1) + '/' + selectors.length + '] querySelector("' + sel + '")', 'check');
-      const result = document.querySelector(sel);
+      const result = document.querySelector(sel!);
       if (result) {
         log('    ✅ FOUND via selector [' + (sIdx + 1) + ']: ' + sel + ' → <' + result.tagName.toLowerCase() + '>', 'success');
 

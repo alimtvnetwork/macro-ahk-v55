@@ -330,7 +330,7 @@ function buildCreditSortRows(populate: () => void): HTMLElement[] {
 function buildPopover(deps: WsFilterMenuDeps): HTMLElement {
   const popover = document.createElement('div');
   popover.id = ID_FILTER_MENU_POPOVER;
-  popover.style.cssText =
+  popover!.style.cssText =
     'position:absolute;top:100%;right:0;margin-top:4px;z-index:100002;display:none;' +
     'min-width:220px;background:' + cPanelBg + ';border:1px solid ' + cPrimary +
     ';border-radius:5px;padding:4px;box-shadow:0 6px 20px rgba(0,0,0,.55);';
@@ -370,7 +370,7 @@ export function buildWsFilterMenuButton(deps: WsFilterMenuDeps): HTMLElement {
   let outsideHandler: ((e: MouseEvent) => void) | null = null;
 
   function close(): void {
-    if (popover) popover.style.display = 'none';
+    if (popover) popover!.style.display = 'none';
     if (outsideHandler) {
       document.removeEventListener('mousedown', outsideHandler, true);
       outsideHandler = null;
@@ -386,13 +386,13 @@ export function buildWsFilterMenuButton(deps: WsFilterMenuDeps): HTMLElement {
         popover = buildPopover(deps);
         wrap.appendChild(popover);
       }
-      const isOpen = popover.style.display !== 'none';
+      const isOpen = popover!.style.display !== 'none';
       if (isOpen) {
         close();
 
         return;
       }
-      popover.style.display = 'block';
+      popover!.style.display = 'block';
       outsideHandler = function (ev: MouseEvent) {
         const target = ev.target as Node | null;
         if (popover && target && !popover.contains(target) && target !== btn) {

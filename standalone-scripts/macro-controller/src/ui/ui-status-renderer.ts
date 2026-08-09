@@ -44,6 +44,70 @@ export const statusRenderStats = statusRenderState.stats;
  * Update the status panel with current loop state, credit bars, and workspace info.
  * Uses a dirty-flag guard to skip innerHTML rebuilds when nothing changed.
  */
+function _updateQueueStatusEl(): void {
+  const queueStatusEl = document.getElementById('marco-queue-status');
+  if (queueStatusEl) {
+    import('../task-queue').then(m => {
+      m.loadTaskQueue().then(queue => {
+        const pending = queue.tasks.filter(t => t.status === 'pending').length;
+        (state as unknown as Record<string, unknown>).__queue_count = pending;
+        const isProcessing = TaskQueueManager.getInstance().isProcessing();
+        const isPaused = TaskQueueManager.getInstance().isPaused();
+        
+        let statusDotColor = cLogSuccess;
+        let statusText = 'Synced';
+        
+        if (isPaused) {
+          statusDotColor = '#f97316'; // orange
+          statusText = 'Paused';
+        } else if (isProcessing) {
+          statusDotColor = '#3b82f6'; // blue
+          statusText = 'Active';
+        }
+
+        queueStatusEl.innerHTML = `
+          <span style="color:#64748b;display:flex;align-items:center;gap:4px;">
+            <span style="color:${statusDotColor}; transition: opacity 0.5s; ${isProcessing ? 'animation: marco-blink 1s infinite;' : ''}">●</span> Queue (${statusText}):
+          </span>
+          <span style="${pending > 0 ? `color:${cPrimaryLight};font-weight:700;` : 'color:#64748b;'}">${pending} Tasks</span>
+        `;
+      });
+    });
+  }
+}
+
+function _ensureStatusElements(el: HTMLElement): { statusLine: HTMLElement, progressContainer: HTMLElement, creditContainer: HTMLElement } {
+  let statusLine = document.getElementById('marco-status-line');
+  let progressContainer = document.getElementById('marco-progress-container');
+  let creditContainer = document.getElementById('marco-credit-container');
+  if (!statusLine || !progressContainer || !creditContainer) {
+    el.innerHTML = '';
+    statusLine = document.createElement('div');
+    statusLine.id = 'marco-status-line';
+    statusLine.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;';
+    progressContainer = document.createElement('div');
+    progressContainer.id = 'marco-progress-container';
+    creditContainer = document.createElement('div');
+    creditContainer.id = 'marco-credit-container';
+    
+    const queueStatus = document.createElement('div');
+    queueStatus.id = 'marco-queue-status';
+    queueStatus.style.cssText = 'font-size:9px;margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;align-items:center;';
+
+    el.appendChild(statusLine);
+    el.appendChild(progressContainer);
+    el.appendChild(creditContainer);
+    el.appendChild(queueStatus);
+
+    const badge = document.createElement('div');
+    badge.id = 'loop-queue-badge';
+    badge.style.cssText = 'position:fixed;top:10px;right:10px;background:#ef4444;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;display:none;z-index:1000000;pointer-events:none;box-shadow:0 2px 4px rgba(0,0,0,0.3);';
+    document.body.appendChild(badge);
+  }
+
+  return { statusLine, progressContainer, creditContainer };
+}
+
 export function updateStatus(): void {
   const el = document.getElementById(IDS.STATUS);
   const isMissingEl = !el;
@@ -79,66 +143,9 @@ export function updateStatus(): void {
 
   const creditBarsHtml = buildCreditBarsHtml();
 
-  // Ensure persistent sub-elements exist
-  let statusLine = document.getElementById('marco-status-line');
-  let progressContainer = document.getElementById('marco-progress-container');
-  let creditContainer = document.getElementById('marco-credit-container');
-  if (!statusLine || !progressContainer || !creditContainer) {
-    el.innerHTML = '';
-    statusLine = document.createElement('div');
-    statusLine.id = 'marco-status-line';
-    statusLine.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;';
-    progressContainer = document.createElement('div');
-    progressContainer.id = 'marco-progress-container';
-    creditContainer = document.createElement('div');
-    creditContainer.id = 'marco-credit-container';
-    
-    const queueStatus = document.createElement('div');
-    queueStatus.id = 'marco-queue-status';
-    queueStatus.style.cssText = 'font-size:9px;margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;align-items:center;';
+  const { statusLine, progressContainer, creditContainer } = _ensureStatusElements(el);
 
-    el.appendChild(statusLine);
-    el.appendChild(progressContainer);
-    el.appendChild(creditContainer);
-    el.appendChild(queueStatus);
-
-    // Create a global badge element for the main UI
-    const badge = document.createElement('div');
-    badge.id = 'loop-queue-badge';
-    badge.style.cssText = 'position:fixed;top:10px;right:10px;background:#ef4444;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;display:none;z-index:1000000;pointer-events:none;box-shadow:0 2px 4px rgba(0,0,0,0.3);';
-    document.body.appendChild(badge);
-  }
-
-  // Update Queue Status
-  const queueStatusEl = document.getElementById('marco-queue-status');
-  if (queueStatusEl) {
-    import('../task-queue').then(m => {
-      m.loadTaskQueue().then(queue => {
-        const pending = queue.tasks.filter(t => t.status === 'pending').length;
-        (state as unknown as Record<string, unknown>).__queue_count = pending;
-        const isProcessing = TaskQueueManager.getInstance().isProcessing();
-        const isPaused = TaskQueueManager.getInstance().isPaused();
-        
-        let statusDotColor = cLogSuccess;
-        let statusText = 'Synced';
-        
-        if (isPaused) {
-          statusDotColor = '#f97316'; // orange
-          statusText = 'Paused';
-        } else if (isProcessing) {
-          statusDotColor = '#3b82f6'; // blue
-          statusText = 'Active';
-        }
-
-        queueStatusEl.innerHTML = `
-          <span style="color:#64748b;display:flex;align-items:center;gap:4px;">
-            <span style="color:${statusDotColor}; transition: opacity 0.5s; ${isProcessing ? 'animation: marco-blink 1s infinite;' : ''}">●</span> Queue (${statusText}):
-          </span>
-          <span style="${pending > 0 ? `color:${cPrimaryLight};font-weight:700;` : 'color:#64748b;'}">${pending} Tasks</span>
-        `;
-      });
-    });
-  }
+  _updateQueueStatusEl();
 
   // Credit bars (innerHTML OK — cached via MC-03, changes rarely)
   if (creditContainer.dataset.cacheKey !== (window._creditBarCache?.key || '')) {

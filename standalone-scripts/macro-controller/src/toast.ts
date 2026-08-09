@@ -86,7 +86,9 @@ function getNotify(): MarcoNotify | null {
     if (hasToast) {
       return notify!;
     }
-  }catch {}
+  }catch (_e) {
+    // best-effort: SDK not yet available
+  }
 
   return null;
 }
@@ -186,7 +188,6 @@ class ToastManager {
       try {
         listener();
       } catch (_e) {
-        
         logDebug('ToastManager', 'Error change listener threw: ' + (_e instanceof Error ? _e.message : String(_e)));
       }
     }

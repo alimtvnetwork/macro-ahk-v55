@@ -1,5 +1,4 @@
 const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
-import { ServiceResult } from './utils/result-wrapper';
 /**
  * Workspace Members Fetcher — v3.4.3
  *
@@ -57,7 +56,7 @@ export async function fetchWorkspaceMembers(wsId: string, limit = DEFAULT_MEMBER
 
   log('[Members] GET list wsId=' + wsId + ' limit=' + limit, 'delegate');
   const resp = await getMemberships('list').list(wsId, { limit, baseUrl: CREDIT_API_BASE });
-  const isMissingOk = !resp.isSuccess;
+  const isMissingOk = !resp.ok;
   if (isMissingOk) {
     throwDiagnostic('WS_MEMBERS_FETCH_E002', {
       status: resp.status,

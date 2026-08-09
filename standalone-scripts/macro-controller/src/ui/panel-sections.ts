@@ -180,6 +180,33 @@ function _buildWsDropdown(deps: PanelBuilderDeps): { wsDropSection: HTMLElement 
   });
 }
 
+/** Builds the version-badge element that highlights when a new script version is available. */
+function _buildVersionBadge(
+  toolsMasterBody: HTMLElement,
+  toolsCol: ReturnType<typeof createCollapsibleSection>,
+  getReinjectSection: () => HTMLElement | null,
+): HTMLSpanElement {
+  const badge = document.createElement('span');
+  badge.style.cssText = 'display:none;font-size:9px;background:#e94560;color:#fff;padding:1px 5px;border-radius:8px;margin-left:6px;font-weight:700;line-height:1.2;animation:pulse 2s ease-in-out infinite;cursor:pointer;';
+  badge.onclick = function(e: Event) {
+    e.stopPropagation();
+    if (toolsMasterBody.style.display === 'none') {
+      toolsMasterBody.style.display = '';
+      toolsCol.toggle.textContent = '[-]';
+      try { localStorage.setItem('ml_collapse_tools_master', 'expanded'); } catch (_e) {
+        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+        logSub('Failed to persist tools collapse state: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
+      }
+    }
+    const target = getReinjectSection();
+    if (target) {
+      setTimeout(function() { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
+    }
+  };
+
+  return badge;
+}
+
 function _buildToolsCollapsible(
   _deps: PanelBuilderDeps, btnStyle: string, taskNextDeps: TaskNextDeps,
   toolsSections: ReturnType<typeof buildToolsSections>,
@@ -204,22 +231,7 @@ function _buildToolsCollapsible(
   toolsCol.header.appendChild(settingsGearBtn);
 
   let _reinjectSection: HTMLElement | null = null;
-  const versionBadge = document.createElement('span');
-  versionBadge.style.cssText = 'display:none;font-size:9px;background:#e94560;color:#fff;padding:1px 5px;border-radius:8px;margin-left:6px;font-weight:700;line-height:1.2;animation:pulse 2s ease-in-out infinite;cursor:pointer;';
-  versionBadge.onclick = function(e: Event) {
-    e.stopPropagation();
-    if (toolsMasterBody.style.display === 'none') {
-      toolsMasterBody.style.display = '';
-      toolsCol.toggle.textContent = '[-]';
-      try { localStorage.setItem('ml_collapse_tools_master', 'expanded'); } catch (_e) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
-        logSub('Failed to persist tools collapse state: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
-      }
-    }
-    if (_reinjectSection) {
-      setTimeout(function() { _reinjectSection!.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
-    }
-  };
+  const versionBadge = _buildVersionBadge(toolsMasterBody, toolsCol, function() { return _reinjectSection; });
   toolsCol.header.insertBefore(versionBadge, settingsGearBtn);
 
   toolsMasterBody.appendChild(wsHistoryResult.section);

@@ -41,8 +41,8 @@ export function aggregateMembers(perWs: PerWsMembers[]): {
         };
         unionMap.set(userId, agg);
       }
-      agg.presenceCount++;
-      agg.workspaces.push(wsResult.wsName);
+      agg!.presenceCount++;
+      agg!.workspaces.push(wsResult.wsName);
     }
   }
 

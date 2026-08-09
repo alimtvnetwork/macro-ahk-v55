@@ -18,6 +18,7 @@ import { StorageKeyType } from '../types/storage-keys';
 import { logError } from '../error-utils';
 import type { OrphanRepairReport } from './repair-plan-next-orphans';
 import { SeedStageStatusType, SeedReportStageType } from "../types/enums";
+export type { SeedStageStatusType };
 
 export interface SeedStageReport {
   readonly stage:

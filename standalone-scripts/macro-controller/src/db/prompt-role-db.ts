@@ -1,4 +1,3 @@
-// @ts-nocheck
 const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * prompt-role-db.ts - role-scoped Prompt table helpers (plan-14, step 4).

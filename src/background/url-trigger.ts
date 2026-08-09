@@ -36,7 +36,7 @@ import {
     type TabDecision,
 } from "./state-manager";
 import { urlFingerprint } from "./url-fingerprint";
-import { logCaughtError, BgLogTag } from "./bg-logger";
+import { logCaughtError, logBgWarnError, BgLogTag } from "./bg-logger";
 import { BranchEnum } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
@@ -119,8 +119,10 @@ async function handleActivated(
     try {
         tab = await chrome.tabs.get(info.tabId);
     } catch (err) {
-        // Tab disappeared between activate and get — non-fatal.
-        logCaughtError(BgLogTag.MARCO, "tabs.onActivated: tabs.get failed", err);
+        // "No tab with id: N" is an expected race condition — the tab was closed
+        // between onActivated firing and the async tabs.get call.
+        // Log at warn level only (not persisted to DB) since this is non-fatal.
+        logBgWarnError(BgLogTag.MARCO, "tabs.onActivated: tabs.get failed (tab closed before get)", err);
 
         return;
     }

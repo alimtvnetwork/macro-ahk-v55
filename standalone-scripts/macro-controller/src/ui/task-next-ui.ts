@@ -1,5 +1,4 @@
 const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
-import { ServiceResult } from '../utils/result-wrapper';
 
 /**
  * MacroLoop Controller — Task Next Automation UI

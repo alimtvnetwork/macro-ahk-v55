@@ -1,4 +1,3 @@
-// @ts-nocheck
 const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
 /**
  * seed-plan-next.ts - idempotent seeder for the PlanTierType/Next prompt library
@@ -400,7 +399,9 @@ async function writeSeedAuditRow(params: {
     try {
         const mod = await import('../shared-state');
         version = typeof mod.VERSION === 'string' ? mod.VERSION : '';
-    }catch {}
+    }catch (_e) {
+        // best-effort: version unavailable, seed proceeds without it
+    }
     const sql = 'INSERT INTO PromptSeedAudit '
         + '(SeededAt, AppVersion, InsertedTotal, SkippedTotal, PromotedTotal, UpgradedTotal, Reason, TelemetryJson) VALUES ('
         + [
