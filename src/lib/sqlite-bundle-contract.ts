@@ -1,5 +1,5 @@
 import { ServiceResult } from '../utils/result-wrapper';
-import { BundleMode, CodeEnum } from "../types/enums";
+import { BundleModeType, CodeType } from "../types/enums";
 
 /**
  * Marco Extension — Bundle SQLite PascalCase Contract
@@ -166,7 +166,7 @@ export interface BundleValidationResult {
 export interface BundleValidationError {
     /** Stable machine-readable code (lets callers branch on category). */
     code:
-        CodeEnum;
+        CodeType;
     /** Human-readable, actionable error message (always present). */
     message: string;
     /** Affected table name, when applicable. */
@@ -218,7 +218,7 @@ export interface SqlExecCapable {
 /* eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity */
 export function validateBundleSchema(
     db: SqlExecCapable,
-    mode: BundleMode = "full",
+    mode: BundleModeType = "full",
 ): BundleValidationResult {
     const errors: BundleValidationError[] = [];
 

@@ -29,10 +29,10 @@ import {
     type RecordingSession,
 } from "@/background/recorder/recorder-session-types";
 import { logError } from "./lib-logger";
-import { RecorderSyncTransportEnum } from "../types/enums";
+import { RecorderSyncTransportType } from "../types/enums";
 
 export type RecorderSessionListener = (session: RecordingSession | null) => void;
-export type RecorderSyncTransport = RecorderSyncTransportEnum;
+export type RecorderSyncTransport = RecorderSyncTransportType;
 
 /* ------------------------------------------------------------------ */
 /*  Transport detection                                                */

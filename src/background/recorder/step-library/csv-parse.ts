@@ -1,4 +1,4 @@
-import { CsvFailureBranchEnum, DelimiterEnum } from "../../../types/enums";
+import { CsvFailureBranchType, DelimiterType } from "../../../types/enums";
 
 /**
  * Marco Extension — Minimal CSV Parser
@@ -41,11 +41,11 @@ export interface CsvParseContext {
 
 /** Branch identifier for the parser stage that produced a failure. */
 export type CsvFailureBranch =
-    CsvFailureBranchEnum;
+    CsvFailureBranchType;
 
 export interface CsvParseSuccess {
     readonly Ok: true;
-    readonly Delimiter: DelimiterEnum;
+    readonly Delimiter: DelimiterType;
     readonly Headers: ReadonlyArray<string>;
     /** One row per data line, aligned with `Headers`. Missing trailing cells are coerced to "". */
     readonly Rows: ReadonlyArray<ReadonlyArray<string>>;
@@ -188,7 +188,7 @@ function stepUnquoted(source: string, i: number, ch: string, delimiter: string, 
     return i;
 }
 
-function tokenize(source: string, delimiter: DelimiterEnum, sourceLabel: string | null): {
+function tokenize(source: string, delimiter: DelimiterType, sourceLabel: string | null): {
     records: string[][];
     warnings: string[];
     error: CsvParseFailure | null;
@@ -268,7 +268,7 @@ function alignRowsToHeaders(dataRows: string[][], width: number, warnings: strin
     return aligned;
 }
 
-function detectDelimiter(source: string): DelimiterEnum {
+function detectDelimiter(source: string): DelimiterType {
     // Inspect the first line, ignoring quoted regions.
     let inQuotes = false;
     let commas = 0;

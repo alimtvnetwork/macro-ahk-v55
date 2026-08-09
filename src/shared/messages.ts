@@ -8,8 +8,8 @@
 
 import type { JsonValue } from "../background/handlers/handler-types";
 import type { InjectionLaunchSource } from "./injection-types";
-import { TokenStatusStatus, ConfigStatusStatus, ConnectionStateType, LoggingModeType, RequestType, DatabaseType, MimeKindType, StepLinkSlotType, MessageRequestStatusType, DocFormatType, StorageSurfaceType } from "../../standalone-scripts/macro-controller/src/types/enums";
-import { SourceEnum, BootPersistenceMode, HealthState } from "../types/enums";
+import { TokenStatusStatusType, ConfigStatusStatusType, ConnectionStateType, LoggingModeType, RequestType, DatabaseType, MimeKindType, StepLinkSlotType, MessageRequestStatusType, DocFormatType, StorageSurfaceType } from "../../standalone-scripts/macro-controller/src/types/enums";
+import { SourceType, BootPersistenceModeType, HealthStateType } from "../types/enums";
 
 export enum MessageType {
     // ─── Config & Auth (from Spec 05) ───
@@ -302,13 +302,13 @@ export enum MessageType {
 /* ------------------------------------------------------------------ */
 
 export interface TokenStatus {
-    status: TokenStatusStatus;
+    status: TokenStatusStatusType;
     expiresIn: string | null;
 }
 
 export interface ConfigStatus {
-    status: ConfigStatusStatus;
-    source: SourceEnum;
+    status: ConfigStatusStatusType;
+    source: SourceType;
 }
 
 export interface BootTiming {
@@ -350,7 +350,7 @@ export interface StatusResponse {
     loggingMode: LoggingModeType;
     version: string;
     bootStep: string;
-    persistenceMode: BootPersistenceMode;
+    persistenceMode: BootPersistenceModeType;
     bootTimings: BootTiming[];
     totalBootMs: number;
     /** Underlying error message if boot failed; null when boot succeeded. */
@@ -364,7 +364,7 @@ export interface StatusResponse {
 }
 
 export interface HealthStatusResponse {
-    state: HealthState;
+    state: HealthStateType;
     details: string[];
 }
 

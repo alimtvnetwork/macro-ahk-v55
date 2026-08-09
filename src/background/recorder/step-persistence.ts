@@ -30,7 +30,7 @@ import {
     StepStatusId,
     type StepKindId,
 } from "../recorder-db-schema";
-import { SemanticSemantic50213bfa } from "../../types/enums";
+import { DescriptionInlinejsType } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -338,7 +338,7 @@ function readSelector(db: SqlJsDatabase, selectorId: number): PersistedSelector 
     return rowToSelector(row);
 }
 
-function rowToStepIdentity(row: ReadonlyArray<unknown>): Pick<PersistedStep, SemanticSemantic50213bfa> {
+function rowToStepIdentity(row: ReadonlyArray<unknown>): Pick<PersistedStep, DescriptionInlinejsType> {
     return {
         StepId: row[0] as number, StepKindId: row[1] as number, StepStatusId: row[2] as number,
         OrderIndex: row[3] as number, VariableName: row[4] as string, LabelType: row[5] as string,

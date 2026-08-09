@@ -28,16 +28,16 @@
 
 import { SelectorKindId } from "../recorder-db-schema";
 import type { PersistedSelector } from "./step-persistence";
-import { AttemptFailureReasonEnum, AttemptStrategyEnum } from "../../types/enums";
+import { AttemptFailureReasonType, AttemptStrategyType } from "../../types/enums";
 
 /**
  * Per-attempt outcome enum. Short, machine-readable codes — keep values
  * stable, downstream UI groups by string equality.
  */
 export type AttemptFailureReason =
-    AttemptFailureReasonEnum;      // Catch-all for unexpected DOM exceptions.
+    AttemptFailureReasonType;      // Catch-all for unexpected DOM exceptions.
 
-export type AttemptStrategy = AttemptStrategyEnum;
+export type AttemptStrategy = AttemptStrategyType;
 
 export interface EvaluatedAttempt {
     readonly SelectorId: number;

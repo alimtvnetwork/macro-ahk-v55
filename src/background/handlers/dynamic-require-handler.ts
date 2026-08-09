@@ -22,7 +22,7 @@ import { wrapWithIsolation } from "./injection-wrapper";
 import { getLogsDb, markLoggingDirty } from "./logging-handler";
 import { getFilesByProject } from "./file-storage-handler";
 import { logCaughtError, BgLogTag} from "../bg-logger";
-import { RequireStatus } from "../../types/enums";
+import { RequireStatusType } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -207,7 +207,7 @@ async function loadScriptCode(projectId: string, script: ScriptEntry): Promise<s
 function logDynamicLoad(
     requester: string,
     target: string,
-    status: RequireStatus,
+    status: RequireStatusType,
     detail: string,
 ): void {
     try {

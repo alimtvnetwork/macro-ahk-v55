@@ -11,13 +11,13 @@
  */
 
 import type { FormSnapshot } from "./form-snapshot";
-import { PhaseEnum, RecordedStepKindEnum, SelectorStrategyEnum } from "../../types/enums";
+import { PhaseType, RecordedStepKindType, SelectorStrategyType } from "../../types/enums";
 
-export type RecordingPhase = PhaseEnum;
+export type RecordingPhase = PhaseType;
 
-export type RecordedStepKind = RecordedStepKindEnum;
+export type RecordedStepKind = RecordedStepKindType;
 
-export type SelectorStrategy = SelectorStrategyEnum;
+export type SelectorStrategy = SelectorStrategyType;
 
 export interface StepSelector {
     readonly XPathFull: string;

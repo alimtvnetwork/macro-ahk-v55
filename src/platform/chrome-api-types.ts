@@ -1,4 +1,4 @@
-import { WorldEnum } from "../types/enums";
+import { WorldType } from "../types/enums";
 import { PromptOriginType, UserScriptWorldType, ScriptRunAtType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /**
@@ -41,7 +41,7 @@ declare global {
             function query(queryInfo: Record<string, any>): Promise<Array<{ id?: number; url?: string }>>;
         }
         namespace scripting {
-            type ExecutionWorld = WorldEnum;
+            type ExecutionWorld = WorldType;
             interface InjectionTarget { tabId: number; frameIds?: number[]; allFrames?: boolean }
             interface ScriptInjection {
                 target: InjectionTarget;

@@ -13,7 +13,7 @@ import { ensureMetaTables, META_TABLES_SCHEMA } from "./schema-meta-engine";
 import { DEFAULT_PROJECT_DATABASES, type DefaultDatabaseDef } from "../types/default-databases";
 import { wrapDatabaseWithBindSafety } from "./sqlite-bind-safety";
 import { RECORDER_DB_SCHEMA, applyParamsJsonMigration, applyChainColumnsMigration } from "./recorder-db-schema";
-import { BootPersistenceMode } from "../types/enums";
+import { BootPersistenceModeType } from "../types/enums";
 import { logCaughtError, BgLogTag } from "./bg-logger";
 
 /* ------------------------------------------------------------------ */
@@ -21,7 +21,7 @@ import { logCaughtError, BgLogTag } from "./bg-logger";
 /* ------------------------------------------------------------------ */
 
 type SqlJs = import("sql.js").SqlJsStatic;
-type PersistenceMode = BootPersistenceMode;
+type PersistenceMode = BootPersistenceModeType;
 
 export interface ProjectDbManager {
     getDb(): SqlJsDatabase;

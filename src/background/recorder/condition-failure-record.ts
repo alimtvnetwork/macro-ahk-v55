@@ -21,10 +21,10 @@ import type {
     PredicateEvaluation,
 } from "./condition-evaluator";
 import { flattenConditionSelectors } from "./condition-failure-flatten";
-import { ConditionFailureReasonEnum } from "../../types/enums";
+import { ConditionFailureReasonType } from "../../types/enums";
 
 export type ConditionFailureReason =
-    ConditionFailureReasonEnum;
+    ConditionFailureReasonType;
 
 export interface ConditionFailureRecord {
     readonly Reason: ConditionFailureReason;

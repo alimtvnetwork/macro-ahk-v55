@@ -33,7 +33,7 @@ import { sqlLit } from '../db/prompt-role-db';
 import { PLAN_NEXT_SEED_ROWS } from './plan-next-prompts';
 import { seedPlanNextPrompts } from './seed-plan-next';
 import { emitPromptSeedEvent } from '../telemetry/prompt-seed-telemetry';
-import { ReseedModeType, RunSqlMethod } from "../types/enums";
+import { ReseedModeType, RunSqlMethodType } from "../types/enums";
 
 export interface ReseedOptions {
   /** When true, overwrite existing default rows (destructive). */
@@ -52,7 +52,7 @@ type RawSqlResp = SqlBridgeResp;
 
 const EV_RESEED_COMPLETE = 'reseed.complete' as const;
 
-async function rawSql(method: RunSqlMethod, sql: string): Promise<RawSqlResp> {
+async function rawSql(method: RunSqlMethodType, sql: string): Promise<RawSqlResp> {
   void DB_NAME;
 
   return runSqlBridge(method, sql);

@@ -1,4 +1,4 @@
-import { ChainShortcutActionEnum } from "../types/enums";
+import { ChainShortcutActionType } from "../types/enums";
 
 /**
  * Marco Extension — Keyword Event Chain shortcut matcher
@@ -17,7 +17,7 @@ import { ChainShortcutActionEnum } from "../types/enums";
  * requires the chain to be idle; Stop requires it to be running.
  */
 
-export type ChainShortcutAction = ChainShortcutActionEnum;
+export type ChainShortcutAction = ChainShortcutActionType;
 
 export interface ChainShortcutEvent {
     readonly key: string;

@@ -1,11 +1,11 @@
-import { HealthState, WorldEnum } from "../types/enums";
+import { HealthStateType, WorldType } from "../types/enums";
 import { MatchRuleType, InjectionMethodType, ScriptRunAtType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /** URL matching modes for project rules. */
 export type MatchMode = MatchRuleType;
 
 /** Script execution world. */
-export type ExecutionWorld = WorldEnum;
+export type ExecutionWorld = WorldType;
 
 /** Config injection methods (Method 3 deprecated). */
 export type InjectionMethod = InjectionMethodType;

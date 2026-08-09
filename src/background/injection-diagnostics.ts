@@ -7,7 +7,7 @@
 
 import { MessageType, type MessageRequest } from "../shared/messages";
 import { handleLogEntry, handleLogError } from "./handlers/logging-handler";
-import { LevelEnum, MirrorDiagnosticToTabLevel, PipelineLineLevel } from "../types/enums";
+import { LevelType, MirrorDiagnosticToTabLevelType, PipelineLineLevelType } from "../types/enums";
 import { logCaughtError, BgLogTag } from "./bg-logger";
 
 export interface InjectionDiagnosticContext {
@@ -35,7 +35,7 @@ export async function persistInjectionWarn(
 }
 
 async function persistLogEntry(
-    level: LevelEnum,
+    level: LevelType,
     action: string,
     detail: string,
     context: InjectionDiagnosticContext,
@@ -91,13 +91,13 @@ export async function persistInjectionError(
 export async function mirrorDiagnosticToTab(
     tabId: number,
     message: string,
-    level: MirrorDiagnosticToTabLevel = "warn",
+    level: MirrorDiagnosticToTabLevelType = "warn",
 ): Promise<void> {
     try {
         await chrome.scripting.executeScript({
             target: { tabId },
             world: "MAIN",
-            func: (detail: string, entryLevel: MirrorDiagnosticToTabLevel) => {
+            func: (detail: string, entryLevel: MirrorDiagnosticToTabLevelType) => {
                 if (entryLevel === "error") {
                     console.error(detail);
 
@@ -126,7 +126,7 @@ export async function mirrorDiagnosticToTab(
 // eslint-disable-next-line max-lines-per-function
 export async function mirrorPipelineLogsToTab(
     tabId: number,
-    lines: Array<{ "msg": string; level: PipelineLineLevel }>,
+    lines: Array<{ "msg": string; level: PipelineLineLevelType }>,
     groupTitle?: string,
 ): Promise<void> {
     if (lines.length === 0) return;

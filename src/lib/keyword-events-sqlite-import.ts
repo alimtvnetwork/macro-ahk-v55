@@ -30,7 +30,7 @@ import type {
 import {
     KEYWORD_EVENTS_BUNDLE_KIND,
 } from "@/lib/keyword-events-sqlite-export";
-import { MatchedByEnum } from "../types/enums";
+import { MatchedByType } from "../types/enums";
 
 const DB_FILENAME = "keyword-events.db";
 const WASM_URL = "https://sql.js.org/dist/sql-wasm.wasm";
@@ -304,7 +304,7 @@ export interface ImportMatchPlan {
     readonly matches: ReadonlyArray<{
         readonly target: KeywordEvent;
         readonly source: ImportedKeywordEvent;
-        readonly matchedBy: MatchedByEnum;
+        readonly matchedBy: MatchedByType;
     }>;
     /** Imported rows with no corresponding selected event. */
     readonly unmatchedImports: readonly ImportedKeywordEvent[];
@@ -348,12 +348,12 @@ export function planImportMatches(
     const matchesMutable: Array<{
         readonly target: KeywordEvent;
         readonly source: ImportedKeywordEvent;
-        readonly matchedBy: MatchedByEnum;
+        readonly matchedBy: MatchedByType;
     }> = [];
 
     for (const src of imported) {
         let target = byUid.get(src.Uid);
-        let matchedBy: MatchedByEnum = "uid";
+        let matchedBy: MatchedByType = "uid";
         if (!target || consumedSelectedIds.has(target.Id)) {
             if (strictUidOnly) {
                 target = undefined;

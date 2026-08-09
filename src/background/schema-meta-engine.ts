@@ -11,7 +11,7 @@
  */
 
 import type { Database as SqlJsDatabase } from "sql.js";
-import { ColumnValidationType, Type, OnDeleteEnum } from "../types/enums";
+import { ColumnValidationType, Type, OnDeleteType } from "../types/enums";
 import { logCaughtError, BgLogTag } from "./bg-logger";
 
 /* ------------------------------------------------------------------ */
@@ -93,8 +93,8 @@ export interface JsonRelationDef {
     SourceColumn: string;
     TargetTable: string;
     TargetColumn?: string;
-    OnDelete?: OnDeleteEnum;
-    OnUpdate?: OnDeleteEnum;
+    OnDelete?: OnDeleteType;
+    OnUpdate?: OnDeleteType;
     Description?: string;
 }
 

@@ -48,7 +48,7 @@
 import type { FailureReport } from "../failure-logger";
 import type { StepLibraryDb, StepGroupRow, StepRow } from "./db";
 import { StepKindId, MAX_RUN_GROUP_CALL_DEPTH } from "./schema";
-import { RunStepTraceEntryOutcome, RunGroupFailureReasonEnum, ExpansionFailureFrame } from "../../../types/enums";
+import { RunStepTraceEntryOutcomeType, RunGroupFailureReasonType, ExpansionFailureFrameType } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -63,7 +63,7 @@ export interface RunStepTraceEntry {
     readonly OrderIndex: number;
     /** Names of every group from the root down to this step's group. */
     readonly GroupPath: ReadonlyArray<string>;
-    readonly Outcome: RunStepTraceEntryOutcome;
+    readonly Outcome: RunStepTraceEntryOutcomeType;
     /** ISO-8601 timestamp captured at entry (UTC). */
     readonly StartedAt: string;
     readonly DurationMs: number;
@@ -77,7 +77,7 @@ export interface RunStepTraceEntry {
  * no live DOM evaluation occurred — the runner aborted statically.
  */
 export type RunGroupFailureReason =
-    RunGroupFailureReasonEnum;   // target group lives in a different ProjectId.
+    RunGroupFailureReasonType;   // target group lives in a different ProjectId.
 
 export interface RunGroupFailure {
     readonly Ok: false;
@@ -630,7 +630,7 @@ export interface ExpandOptions {
  * preview cannot show a plan that the runner would refuse to execute.
  */
 function expansionFailure(
-    frame: Pick<ExpansionFrame, ExpansionFailureFrame>,
+    frame: Pick<ExpansionFrame, ExpansionFailureFrameType>,
     reason: Exclude<RunGroupFailureReason, "LeafStepFailed">,
     detail: string,
     stepId: number | null,

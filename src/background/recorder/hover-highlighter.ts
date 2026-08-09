@@ -1,10 +1,10 @@
 import { Events } from "@/constants/events";
-import { HighlighterMode } from "../../types/enums";
+import { HighlighterModeType } from "../../types/enums";
 
 export interface HoverHighlighterHandle {
     readonly Host: HTMLElement;
-    SetMode(mode: HighlighterMode): void;
-    GetMode(): HighlighterMode;
+    SetMode(mode: HighlighterModeType): void;
+    GetMode(): HighlighterModeType;
     /** Manually outline an element (used by replay listeners). */
     Outline(target: Element | null): void;
     Destroy(): void;
@@ -91,7 +91,7 @@ export function nthAncestor(el: Element, depth: number): Element {
 /* ------------------------------------------------------------------ */
 
 interface InternalState {
-    OperationModeType: HighlighterMode;
+    OperationModeType: HighlighterModeType;
     HoverTarget: Element | null;
     AncestorOffset: number;
     AltHeld: boolean;

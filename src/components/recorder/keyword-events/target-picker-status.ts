@@ -1,6 +1,6 @@
-import { SelectorStatus } from "../../../types/enums";
+import { SelectorStatusType } from "../../../types/enums";
 
-export function classifySelector(kind: string, selectorText: string): SelectorStatus {
+export function classifySelector(kind: string, selectorText: string): SelectorStatusType {
     if (kind !== "Selector") { return "empty"; }
     const trimmed = selectorText.trim();
     if (trimmed === "") { return "empty"; }

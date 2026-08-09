@@ -18,7 +18,7 @@
  */
 
 import type { SelectorHistoryBucket, SelectorOutcomePoint } from "./selector-history";
-import { DriftTimelineState } from "../../types/enums";
+import { DriftTimelineStateType } from "../../types/enums";
 
 export interface DriftTimelinePoint {
     readonly RunId: number;
@@ -28,7 +28,7 @@ export interface DriftTimelinePoint {
 }
 
 export interface DriftTimeline {
-    readonly State: DriftTimelineState;
+    readonly State: DriftTimelineStateType;
     readonly LastSuccess: DriftTimelinePoint | null;
     readonly FirstDrift: DriftTimelinePoint | null;
     /**
@@ -57,7 +57,7 @@ const EMPTY_TIMELINE: DriftTimeline = {
     FailuresSinceDrift: 0,
 };
 
-function classifyDriftState(lastSuccess: unknown, firstDrift: unknown): DriftTimelineState {
+function classifyDriftState(lastSuccess: unknown, firstDrift: unknown): DriftTimelineStateType {
     if (firstDrift === null && lastSuccess !== null) return "healthy";
     if (firstDrift !== null && lastSuccess === null) return "always-failing";
     if (firstDrift !== null && lastSuccess !== null) return "drifted";

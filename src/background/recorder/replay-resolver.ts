@@ -22,10 +22,10 @@
 
 import { SelectorKindId } from "../recorder-db-schema";
 import type { PersistedSelector } from "./step-persistence";
-import { ResolvedSelectorKind } from "../../types/enums";
+import { ResolvedSelectorKindType } from "../../types/enums";
 
 export interface ResolvedSelector {
-    readonly Kind: ResolvedSelectorKind;
+    readonly Kind: ResolvedSelectorKindType;
     readonly Expression: string;
     readonly AnchorChain: ReadonlyArray<number>;
 }

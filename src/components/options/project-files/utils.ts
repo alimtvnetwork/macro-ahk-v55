@@ -1,4 +1,4 @@
-import { LanguageEnum } from "../../../types/enums";
+import { LanguageType } from "../../../types/enums";
 import { ProjectFile, FileNode } from "./types";
 
 export function buildTree(files: ProjectFile[]): FileNode[] {
@@ -54,7 +54,7 @@ export function buildTree(files: ProjectFile[]): FileNode[] {
   return root.children;
 }
 
-export function getLanguage(filename: string): LanguageEnum {
+export function getLanguage(filename: string): LanguageType {
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
   const isJson = ext === "json";
   if (isJson) return "json";

@@ -8,7 +8,7 @@
  */
 
 import type { WasmChecksumOutcome } from "./wasm-integrity";
-import { BootPersistenceMode } from "../types/enums";
+import { BootPersistenceModeType } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -97,7 +97,7 @@ export interface WasmProbeResult {
 /* ------------------------------------------------------------------ */
 
 let bootStep = "pre-init";
-let bootPersistenceMode: BootPersistenceMode = "memory";
+let bootPersistenceMode: BootPersistenceModeType = "memory";
 const bootTimings: BootTiming[] = [];
 let stepStartTime = performance.now();
 let totalBootMs = 0;
@@ -145,12 +145,12 @@ export function finalizeBoot(): void {
 /* ------------------------------------------------------------------ */
 
 /** Returns the persistence mode resolved during boot. */
-export function getBootPersistenceMode(): BootPersistenceMode {
+export function getBootPersistenceMode(): BootPersistenceModeType {
     return bootPersistenceMode;
 }
 
 /** Updates the persistence mode resolved during boot. */
-export function setBootPersistenceMode(mode: BootPersistenceMode): void {
+export function setBootPersistenceMode(mode: BootPersistenceModeType): void {
     bootPersistenceMode = mode;
 }
 

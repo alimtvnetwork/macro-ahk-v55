@@ -14,7 +14,7 @@ import { bumpMinor } from "./library-version-manager";
 import { collectTypedRows, type JsonValue } from "./handler-types";
 import { bindOpt, missingFieldError, requireField, type HandlerErrorResponse } from "./handler-guards";
 import { logBgWarnError, logSampledDebug, BgLogTag } from "../utils/logger";
-import { AssetType, ActionEnum } from "../../types/enums";
+import { AssetType, ActionType } from "../../types/enums";
 import { LinkStateType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 
 /* ------------------------------------------------------------------ */
@@ -383,7 +383,7 @@ export async function handleSyncLibraryAsset(payload: AssetIdMsg): Promise<{ syn
  * Per spec §6.2: compares content hash, returns action needed.
  */
 export async function handlePromoteAsset(payload: PromoteMsg): Promise<{
-    action: ActionEnum;
+    action: ActionType;
     assetId?: number;
     existingVersion?: string;
 }> {

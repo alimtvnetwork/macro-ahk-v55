@@ -20,10 +20,10 @@
  */
 
 import type { PersistedSelector } from "./step-persistence";
-import { PromotionErrorCodeEnum } from "../../types/enums";
+import { PromotionErrorCodeType } from "../../types/enums";
 
 export type PromotionErrorCode =
-    PromotionErrorCodeEnum;        // The selector list is empty.
+    PromotionErrorCodeType;        // The selector list is empty.
 
 export interface PromotionError {
     readonly Code: PromotionErrorCode;

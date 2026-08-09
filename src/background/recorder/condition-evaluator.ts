@@ -1,4 +1,4 @@
-import { SelectorKindEnum, OpEnum, ReasonEnum, PredicateEvaluationKind, MatchAttrMode } from "../../types/enums";
+import { SelectorKindType, OpType, ReasonType, PredicateEvaluationKindType, MatchAttrModeType } from "../../types/enums";
 
 /**
  * Marco Extension — Condition Evaluator (Spec 18)
@@ -19,7 +19,7 @@ import { SelectorKindEnum, OpEnum, ReasonEnum, PredicateEvaluationKind, MatchAtt
 /*  Public types                                                       */
 /* ------------------------------------------------------------------ */
 
-export type SelectorKind = SelectorKindEnum;
+export type SelectorKind = SelectorKindType;
 
 export type Matcher =
     | { readonly Kind: "Exists" }
@@ -29,7 +29,7 @@ export type Matcher =
     | { readonly Kind: "TextRegex";    readonly Pattern: string; readonly Flags?: string }
     | { readonly Kind: "AttrEquals";   readonly Name: string; readonly Value: string }
     | { readonly Kind: "AttrContains"; readonly Name: string; readonly Value: string }
-    | { readonly Kind: "Count";        readonly Op: OpEnum; readonly N: number };
+    | { readonly Kind: "Count";        readonly Op: OpType; readonly N: number };
 
 export interface Predicate {
     readonly Selector: string;
@@ -50,13 +50,13 @@ export const MAX_PREDICATE_COUNT = 32;
 export type ConditionWaitOutcome =
     | { readonly Ok: true;  readonly DurationMs: number; readonly Polls: number }
     | { readonly Ok: false; readonly DurationMs: number; readonly Polls: number;
-        readonly Reason: ReasonEnum;
+        readonly Reason: ReasonType;
         readonly Detail: string;
         readonly LastEvaluation: PredicateEvaluation[] };
 
 export interface PredicateEvaluation {
     readonly Selector: string;
-    readonly Kind: PredicateEvaluationKind;
+    readonly Kind: PredicateEvaluationKindType;
     readonly Matcher: string;
     readonly Result: boolean;
     readonly Detail?: string;
@@ -201,7 +201,7 @@ function evaluatePredicate(predicate: Predicate, options: EvaluateOptions): bool
 function recordTrace(
     options: EvaluateOptions,
     predicate: Predicate,
-    kind: PredicateEvaluationKind,
+    kind: PredicateEvaluationKindType,
     result: boolean,
     detail?: string,
 ): void {
@@ -229,7 +229,7 @@ function matchTextContains(element: Element, matcher: Matcher & { Kind: "TextCon
     return matchText(element.textContent ?? "", matcher.Value, matcher.CaseSensitive, (a, b) => a.includes(b));
 }
 
-function matchAttr(element: Element, name: string, expected: string, mode: MatchAttrMode): boolean {
+function matchAttr(element: Element, name: string, expected: string, mode: MatchAttrModeType): boolean {
     const value = element.getAttribute(name);
     if (value === null) return false;
 
@@ -261,7 +261,7 @@ function isVisible(element: Element): boolean {
     return true;
 }
 
-function compareCount(count: number, op: OpEnum, n: number): boolean {
+function compareCount(count: number, op: OpType, n: number): boolean {
     if (op === "eq") return count === n;
     if (op === "gte") return count >= n;
 
@@ -272,7 +272,7 @@ function compareCount(count: number, op: OpEnum, n: number): boolean {
 /*  Selector locators                                                  */
 /* ------------------------------------------------------------------ */
 
-export function resolveSelectorKind(kind: SelectorKind, expression: string): PredicateEvaluationKind {
+export function resolveSelectorKind(kind: SelectorKind, expression: string): PredicateEvaluationKindType {
     if (kind === "XPath") return "XPath";
     if (kind === "Css") return "Css";
     const trimmed = expression.trimStart();
@@ -280,7 +280,7 @@ export function resolveSelectorKind(kind: SelectorKind, expression: string): Pre
     return trimmed.startsWith("/") || trimmed.startsWith("(") ? "XPath" : "Css";
 }
 
-function locateFirst(expression: string, kind: PredicateEvaluationKind, doc: Document): Element | null {
+function locateFirst(expression: string, kind: PredicateEvaluationKindType, doc: Document): Element | null {
     if (kind === "XPath") {
         const r = doc.evaluate(expression, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
         const node = r.singleNodeValue;
@@ -291,7 +291,7 @@ function locateFirst(expression: string, kind: PredicateEvaluationKind, doc: Doc
     return doc.querySelector(expression);
 }
 
-function locateAll(expression: string, kind: PredicateEvaluationKind, doc: Document): Element[] {
+function locateAll(expression: string, kind: PredicateEvaluationKindType, doc: Document): Element[] {
     if (kind === "XPath") {
         const r = doc.evaluate(expression, doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
         const out: Element[] = [];

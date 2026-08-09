@@ -23,7 +23,7 @@ import { resolveCreditSummary } from '../credit-balance-update/credit-summary-re
 import { formatPlanDisplayLabel } from '../credit-balance-update/plan-mapper';
 import { makeDraggable } from './drag-window';
 import { CreditToneType, WorkspaceSortKeyType, SortDirectionType } from "../types/enums";
-import { SemanticSemanticSideEnum } from "../../../../src/types/enums";
+import { LeftRightType } from "../../../../src/types/enums";
 
 const DIALOG_ID = 'marco-credit-totals-modal';
 const ATTR_ARIA_LABEL = 'aria-label';
@@ -194,7 +194,7 @@ export function nextSortDir(key: SortKey, current: SortState): SortState {
   return { key, dir: 'none' };
 }
 
-const COLUMNS: ReadonlyArray<{ key: SortKey; label: string; align: SemanticSemanticSideEnum }> = [
+const COLUMNS: ReadonlyArray<{ key: SortKey; label: string; align: LeftRightType }> = [
   { key: 'name', label: 'Workspace', align: 'left' },
   { key: 'plan', label: 'PlanTierType', align: 'left' },
   { key: 'projects', label: 'Prj', align: 'right' },

@@ -16,7 +16,7 @@
  */
 
 import type { KeywordEvent } from "@/hooks/use-keyword-events";
-import { SequencePreviewIssueEnum } from "../types/enums";
+import { SequencePreviewIssueType } from "../types/enums";
 
 export interface SequenceRenameInput {
     readonly Base: string;
@@ -54,7 +54,7 @@ export function renderSequenceName(input: SequenceRenameInput, index: number): s
 /* ------------------------------------------------------------------ */
 
 export type SequencePreviewIssue =
-    SequencePreviewIssueEnum;      // collides with an existing event NOT in the selection
+    SequencePreviewIssueType;      // collides with an existing event NOT in the selection
 
 export interface SequencePreviewRow {
     readonly Id: string;

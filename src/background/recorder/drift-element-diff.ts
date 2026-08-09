@@ -21,12 +21,12 @@
  */
 
 import type { DomContext } from "./failure-logger";
-import { DriftFieldNameEnum, DriftChangeKindEnum, DriftVerdictEnum } from "../../types/enums";
+import { DriftFieldNameType, DriftChangeKindType, DriftVerdictType } from "../../types/enums";
 
 export type DriftFieldName =
-    DriftFieldNameEnum;
+    DriftFieldNameType;
 
-export type DriftChangeKind = DriftChangeKindEnum;
+export type DriftChangeKind = DriftChangeKindType;
 
 export interface DriftFieldDiff {
     readonly Field: DriftFieldName;
@@ -45,7 +45,7 @@ export interface DriftClassListDiff {
 }
 
 export type DriftVerdict =
-    DriftVerdictEnum;      // Fallback side absent (nothing matched at all).
+    DriftVerdictType;      // Fallback side absent (nothing matched at all).
 
 export interface DriftElementDiff {
     readonly Verdict: DriftVerdict;

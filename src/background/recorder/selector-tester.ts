@@ -15,21 +15,21 @@
  */
 
 import type { DomContext } from "./failure-logger";
-import { SelectorKindEnum, PredicateEvaluationKind } from "../../types/enums";
+import { SelectorKindType, PredicateEvaluationKindType } from "../../types/enums";
 
-export type SelectorTestKind = SelectorKindEnum;
+export type SelectorTestKind = SelectorKindType;
 
 export interface SelectorTestResult {
     readonly Expression: string;
     /** Detected or supplied kind actually used for the lookup. */
-    readonly Kind: PredicateEvaluationKind;
+    readonly Kind: PredicateEvaluationKindType;
     readonly MatchCount: number;
     readonly FirstMatch: DomContext | null;
     readonly Error: string | null;
 }
 
 /** Detect the selector kind from the expression's leading character. */
-export function detectSelectorKind(expression: string): PredicateEvaluationKind {
+export function detectSelectorKind(expression: string): PredicateEvaluationKindType {
     const trimmed = expression.trimStart();
     if (trimmed.startsWith("/") || trimmed.startsWith("(") || trimmed.startsWith("./")) {
         return "XPath";
@@ -51,7 +51,7 @@ export function testSelector(
     catch (err) { return selectorErrorResult(trimmed, useKind, err); }
 }
 
-function resolveKind(kind: SelectorTestKind, trimmed: string): PredicateEvaluationKind {
+function resolveKind(kind: SelectorTestKind, trimmed: string): PredicateEvaluationKindType {
     return kind === "Auto" ? detectSelectorKind(trimmed) : kind;
 }
 
@@ -66,7 +66,7 @@ function emptyExpressionResult(expression: string, kind: SelectorTestKind): Sele
 }
 
 function runSelectorLookup(
-    trimmed: string, doc: Document, useKind: PredicateEvaluationKind,
+    trimmed: string, doc: Document, useKind: PredicateEvaluationKindType,
 ): SelectorTestResult {
     if (useKind === "XPath") { return runXPathLookup(trimmed, doc); }
 
@@ -102,7 +102,7 @@ function runCssLookup(trimmed: string, doc: Document): SelectorTestResult {
 }
 
 function selectorErrorResult(
-    trimmed: string, useKind: PredicateEvaluationKind, err: unknown,
+    trimmed: string, useKind: PredicateEvaluationKindType, err: unknown,
 ): SelectorTestResult {
     return {
         Expression: trimmed,

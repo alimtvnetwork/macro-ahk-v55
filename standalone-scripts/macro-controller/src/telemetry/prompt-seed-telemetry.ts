@@ -28,7 +28,7 @@ import { logError } from '../error-utils';
 import { StorageKeyType } from '../types/storage-keys';
 import type { PromptRole } from '../types/prompt-role';
 import { PromptSeedEventType, SeedStageStatusType } from "../types/enums";
-import { StepNotifyLevel } from "../../../../src/types/enums";
+import { StepNotifyLevelType } from "../../../../src/types/enums";
 
 export const PROMPT_SEED_TRACE_MAX = 50;
 
@@ -59,7 +59,7 @@ interface EmitInput {
   detail?: string;
 }
 
-function levelFor(outcome: PromptSeedOutcome): StepNotifyLevel {
+function levelFor(outcome: PromptSeedOutcome): StepNotifyLevelType {
   if (outcome === 'failed') return 'error';
   if (outcome === 'skipped') return 'warning';
 

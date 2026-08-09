@@ -12,7 +12,7 @@
  */
 
 import type { KeywordEvent, KeywordEventStep } from "@/hooks/use-keyword-events";
-import { ComboInvalidReasonEnum, WaitInvalidReasonEnum } from "../types/enums";
+import { ComboInvalidReasonType, WaitInvalidReasonType } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Known-key vocabulary                                               */
@@ -70,7 +70,7 @@ export type ComboValidation =
     | { readonly Valid: false; readonly Reason: ComboInvalidReason; readonly Message: string };
 
 export type ComboInvalidReason =
-    ComboInvalidReasonEnum;
+    ComboInvalidReasonType;
 
 /**
  * Validate a key combo string the user typed in the editor.
@@ -126,7 +126,7 @@ export type WaitValidation =
     | { readonly Valid: false; readonly Reason: WaitInvalidReason; readonly Message: string };
 
 export type WaitInvalidReason =
-    WaitInvalidReasonEnum;
+    WaitInvalidReasonType;
 
 const MAX_WAIT_MS = 600_000; // 10 minutes — generous upper bound
 

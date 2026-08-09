@@ -23,10 +23,10 @@ import {
     type Condition,
     type Predicate,
 } from "./condition-evaluator";
-import { SelectorKindEnum, WaitForPredicateEnum, PredicateEvaluationKind, WaitForOutcomeReason, ReasonEnum } from "../../types/enums";
+import { SelectorKindType, WaitForPredicateType, PredicateEvaluationKindType, WaitForOutcomeReasonType, ReasonType } from "../../types/enums";
 
-export type WaitForKind = SelectorKindEnum;
-export type WaitForPredicate = WaitForPredicateEnum;
+export type WaitForKind = SelectorKindType;
+export type WaitForPredicate = WaitForPredicateType;
 
 export interface WaitForSpec {
     /** Selector expression — XPath or CSS. */
@@ -45,8 +45,8 @@ export interface WaitForSpec {
 }
 
 export type WaitForOutcome =
-    | { readonly Ok: true;  readonly DurationMs: number; readonly ResolvedKind: PredicateEvaluationKind }
-    | { readonly Ok: false; readonly DurationMs: number; readonly Reason: WaitForOutcomeReason; readonly Detail: string };
+    | { readonly Ok: true;  readonly DurationMs: number; readonly ResolvedKind: PredicateEvaluationKindType }
+    | { readonly Ok: false; readonly DurationMs: number; readonly Reason: WaitForOutcomeReasonType; readonly Detail: string };
 
 export interface WaitForOptions {
     readonly Doc: Document;
@@ -91,7 +91,7 @@ function synthesizeCondition(spec: WaitForSpec): Condition {
 }
 
 function mapFailure(
-    reason: ReasonEnum,
+    reason: ReasonType,
     detail: string,
     durationMs: number,
     spec: WaitForSpec,

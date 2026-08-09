@@ -34,7 +34,7 @@ import type {
     JsonObject,
     JsonValue,
 } from "./group-inputs";
-import { InputSourceMethodEnum, InputSourceFailurePolicyEnum } from "../../../types/enums";
+import { InputSourceMethodType, InputSourceFailurePolicyType } from "../../../types/enums";
 
 const STORAGE_KEY = "marco.input-source.config.v1";
 const DEFAULT_TIMEOUT_MS = 8_000;
@@ -43,10 +43,10 @@ const DEFAULT_TIMEOUT_MS = 8_000;
 /*  Public types                                                       */
 /* ------------------------------------------------------------------ */
 
-export type InputSourceMethod = InputSourceMethodEnum;
+export type InputSourceMethod = InputSourceMethodType;
 
 export type InputSourceFailurePolicy =
-    InputSourceFailurePolicyEnum;  // swallow the failure, use only persisted bags.
+    InputSourceFailurePolicyType;  // swallow the failure, use only persisted bags.
 
 /** A single header pair (preserved order so the dialog round-trips cleanly). */
 export interface InputSourceHeader {

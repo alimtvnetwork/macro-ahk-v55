@@ -1,4 +1,4 @@
-import { HotkeyDispatchEnvDocument } from "../../../types/enums";
+import { HotkeyDispatchEnvDocumentType } from "../../../types/enums";
 
 /**
  * Marco Extension — Hotkey Step Executor
@@ -162,7 +162,7 @@ export function parseHotkeyPayload(json: string | null): HotkeyPayload {
 /* ------------------------------------------------------------------ */
 
 export interface HotkeyDispatchEnv {
-    readonly document: Pick<Document, HotkeyDispatchEnvDocument>;
+    readonly document: Pick<Document, HotkeyDispatchEnvDocumentType>;
     readonly setTimeout: (cb: () => void, ms: number) => ReturnType<typeof setTimeout>;
     readonly clearTimeout: (timerId: ReturnType<typeof setTimeout>) => void;
 }

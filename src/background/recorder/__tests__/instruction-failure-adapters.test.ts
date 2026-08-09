@@ -42,7 +42,7 @@ import {
     type Condition,
     type PredicateEvaluation,
 } from "../condition-evaluator";
-import { SelectorKindEnum, BuildSelectorPredicateReportInputReason, PredicateEvaluationKind } from "../../../types/enums";
+import { SelectorKindType, BuildSelectorPredicateReportInputReasonType, PredicateEvaluationKindType } from "../../../types/enums";
 
 /** Stable clock so timestamps are deterministic across runs. */
 const FIXED_NOW = (): Date => new Date("2026-04-26T10:00:00.000Z");
@@ -360,10 +360,10 @@ const SELECTOR_PREDICATE_SOURCE_FILE = "src/background/recorder/condition-evalua
 interface SelectorPredicateMappingCase {
     readonly LabelType: string;
     readonly Selector: string;
-    readonly SelectorKind?: SelectorKindEnum;
-    readonly Reason: BuildSelectorPredicateReportInputReason;
+    readonly SelectorKind?: SelectorKindType;
+    readonly Reason: BuildSelectorPredicateReportInputReasonType;
     readonly ExpectedReason: string;        // FailureReport.Reason
-    readonly ExpectedDetailKind: PredicateEvaluationKind;
+    readonly ExpectedDetailKind: PredicateEvaluationKindType;
 }
 
 const SELECTOR_PREDICATE_MATRIX: ReadonlyArray<SelectorPredicateMappingCase> = [
@@ -546,7 +546,7 @@ interface OptionalCase {
     readonly LabelType: string;
     readonly ObservedUrl?: string;
     readonly Selector?: string;
-    readonly SelectorKind?: SelectorKindEnum;
+    readonly SelectorKind?: SelectorKindType;
 }
 
 const OPTIONAL_CASES: ReadonlyArray<OptionalCase> = [

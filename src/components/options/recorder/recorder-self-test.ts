@@ -11,14 +11,14 @@
 
 import { sendMessage } from "@/lib/message-client";
 import { logError } from "../options-logger";
-import { SelfTestPhaseEnum } from "../../../types/enums";
+import { SelfTestPhaseType } from "../../../types/enums";
 
 /** SelectorKindId.Css per src/background/recorder-db-schema.ts */
 const SELECTOR_KIND_CSS = 3;
 /** StepKindId.Wait — chosen because it requires no action params. */
 const STEP_KIND_WAIT = 5;
 
-export type SelfTestPhase = SelfTestPhaseEnum;
+export type SelfTestPhase = SelfTestPhaseType;
 
 export class RecorderSelfTestError extends Error {
     public readonly Phase: SelfTestPhase;

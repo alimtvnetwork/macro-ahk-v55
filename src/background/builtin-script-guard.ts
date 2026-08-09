@@ -20,7 +20,7 @@ import {
     persistInjectionWarn,
 } from "./injection-diagnostics";
 import { logBgWarnError, logCaughtError, BgLogTag} from "./bg-logger";
-import { RunAtEnum } from "../types/enums";
+import { RunAtType } from "../types/enums";
 
 /** Known built-in script filenames that must always exist in the store. */
 const BUILTIN_SCRIPT_NAMES = new Set([
@@ -40,7 +40,7 @@ const BUILTIN_DIST_MAP: Record<string, {
     filePath: string;
     loadOrder: number;
     isGlobal: boolean;
-    runAt?: RunAtEnum;
+    runAt?: RunAtType;
 }> = {
     "marco-sdk.js": {
         folder: "marco-sdk",

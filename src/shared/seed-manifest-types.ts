@@ -1,4 +1,4 @@
-import { WorldEnum } from "../types/enums";
+import { WorldType } from "../types/enums";
 import { ScriptRunAtType, UrlRuleMatchType, SeedCookieRoleType, LogLevelType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /**
@@ -54,7 +54,7 @@ export interface SeedProjectEntry {
     /** Whether this project seeds on first install */
     SeedOnInstall: boolean;
     /** Chrome execution world */
-    World: WorldEnum;
+    World: WorldType;
     /** Global load order (lower = first) */
     LoadOrder: number;
     /** Whether this is a global utility */

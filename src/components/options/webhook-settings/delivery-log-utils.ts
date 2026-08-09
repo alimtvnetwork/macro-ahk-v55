@@ -18,7 +18,7 @@ import {
     type WebhookDeliverySkipped,
     type WebhookDeliverySuccess,
 } from "@/background/recorder/step-library/result-webhook";
-import { VariantEnum } from "../../../types/enums";
+import { VariantType } from "../../../types/enums";
 import { MimeKindType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
 /**
@@ -65,7 +65,7 @@ function describeFailure(entry: WebhookDeliveryFailure): string {
     return `Status: Failed${httpPart}\nError: ${entry.Error}`;
 }
 
-type VariantBadgeVariant = VariantEnum;
+type VariantBadgeVariant = VariantType;
 
 export interface VariantPresentation {
     readonly badgeLabel: string;

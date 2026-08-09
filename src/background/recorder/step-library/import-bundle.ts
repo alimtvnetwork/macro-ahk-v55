@@ -37,14 +37,14 @@ import {
     STEP_GROUP_BUNDLE_FORMAT_VERSION,
     type StepGroupExportManifest,
 } from "./export-bundle";
-import { ConflictPolicyEnum, ImportReasonEnum, RootOutcomeKind } from "../../../types/enums";
+import { ConflictPolicyType, ImportReasonType, RootOutcomeKindType } from "../../../types/enums";
 import { logCaughtError, BgLogTag } from "../../bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
 /* ------------------------------------------------------------------ */
 
-export type ConflictPolicy = ConflictPolicyEnum;
+export type ConflictPolicy = ConflictPolicyType;
 
 export interface RunStepGroupImportInit {
     /** Raw ZIP bytes (e.g. from `await file.arrayBuffer()` then `new Uint8Array(buf)`). */
@@ -69,7 +69,7 @@ export interface RunStepGroupImportInit {
 }
 
 export type ImportReason =
-    ImportReasonEnum;
+    ImportReasonType;
 
 export interface ImportFailure {
     readonly Reason: Exclude<ImportReason, "Ok">;
@@ -565,7 +565,7 @@ function resolveNameConflicts(input: ResolveNameConflictsInput): NameConflictPla
 }
 
 type RootOutcome =
-    | { Kind: RootOutcomeKind; Name: string }
+    | { Kind: RootOutcomeKindType; Name: string }
     | { Kind: "Rename"; OldName: string; NewName: string }
     | ImportFailure;
 
@@ -594,7 +594,7 @@ function resolveRootNameConflict(
 }
 
 function applyRootOutcome(
-    outcome: { Kind: RootOutcomeKind; Name: string } | { Kind: "Rename"; OldName: string; NewName: string },
+    outcome: { Kind: RootOutcomeKindType; Name: string } | { Kind: "Rename"; OldName: string; NewName: string },
     g: StepGroupRow,
     effectiveName: Map<number, string>,
     destSiblingNamesLower: Set<string>,

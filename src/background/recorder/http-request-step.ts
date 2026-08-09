@@ -1,5 +1,5 @@
 import { ServiceResult } from '../../utils/result-wrapper';
-import { MethodEnum, HttpStepReasonEnum } from "../../types/enums";
+import { MethodType, HttpStepReasonType } from "../../types/enums";
 
 /**
  * Marco Extension — HttpRequest Step (Spec 17 §3)
@@ -18,7 +18,7 @@ import { MethodEnum, HttpStepReasonEnum } from "../../types/enums";
 
 export interface HttpRequestParams {
     readonly Url: string;
-    readonly Method: MethodEnum;
+    readonly Method: MethodType;
     readonly HeadersJson?: string;
     readonly BodyJson?: string;
     readonly CaptureAs?: string;
@@ -26,7 +26,7 @@ export interface HttpRequestParams {
 }
 
 export type HttpStepReason =
-    HttpStepReasonEnum;
+    HttpStepReasonType;
 
 export interface HttpStepResult {
     readonly Reason: HttpStepReason;

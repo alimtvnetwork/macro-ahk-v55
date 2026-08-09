@@ -46,12 +46,12 @@ import {
     captureFormSnapshot,
     type FormSnapshot,
 } from "./form-snapshot";
-import { FailurePhaseEnum, FailureReasonCodeEnum, SemanticSemantic3f9b } from "../../types/enums";
+import { FailurePhaseType, FailureReasonCodeType, Semantic3f9bType } from "../../types/enums";
 
 export type { VariableContext } from "./field-reference-resolver";
 export type { FormSnapshot } from "./form-snapshot";
 
-export type FailurePhase = FailurePhaseEnum;
+export type FailurePhase = FailurePhaseType;
 
 /**
  * Top-level short-code classifying the failure for AI grouping.
@@ -60,7 +60,7 @@ export type FailurePhase = FailurePhaseEnum;
 export type FailureReasonCode =
     // ---- Variable / data-row failures (highest priority — explain WHY the
     //      step had bad inputs before any selector was even tried). --------
-    FailureReasonCodeEnum;               // Caller did not classify — last resort.
+    FailureReasonCodeType;               // Caller did not classify — last resort.
 
 export interface SelectorAttempt {
     readonly SelectorId: number | null;
@@ -225,7 +225,7 @@ interface FailureReportContext {
 function buildContextCore(
     input: BuildFailureReportInput,
     now: () => Date,
-): Pick<FailureReportContext, SemanticSemantic3f9b> {
+): Pick<FailureReportContext, Semantic3f9bType> {
     const message = extractMessage(input.Error);
     const attempts = resolveAttempts(input);
     const variables: ReadonlyArray<VariableContext> = input.Variables ?? [];

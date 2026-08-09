@@ -1,5 +1,5 @@
-import { UrlMatchEnum } from "../../types/enums";
-export type UrlMatchDialect = UrlMatchEnum;
+import { UrlMatchType } from "../../types/enums";
+export type UrlMatchDialect = UrlMatchType;
 
 export interface CompiledPattern {
     readonly Ok: true;

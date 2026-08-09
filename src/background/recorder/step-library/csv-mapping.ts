@@ -25,9 +25,9 @@
  */
 
 import type { GroupInputBag, JsonValue } from "./group-inputs";
-import { CoercionKindEnum } from "../../../types/enums";
+import { CoercionKindType } from "../../../types/enums";
 
-export type CoercionKind = CoercionKindEnum;
+export type CoercionKind = CoercionKindType;
 
 export interface ColumnMapping {
     /** Source CSV column header (verbatim, case-sensitive). */

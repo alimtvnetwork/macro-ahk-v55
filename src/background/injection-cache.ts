@@ -17,7 +17,7 @@
 
 import { EXTENSION_VERSION, STORAGE_KEY_LAST_BUILD_ID } from "../shared/constants";
 import { logCaughtError, BgLogTag} from "./bg-logger";
-import { CacheCategoryEnum } from "../types/enums";
+import { CacheCategoryType } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -40,7 +40,7 @@ export interface CacheEntry<T = unknown> {
 }
 
 export type CacheCategory =
-    CacheCategoryEnum;    // Extension settings
+    CacheCategoryType;    // Extension settings
 
 /* ------------------------------------------------------------------ */
 /*  IndexedDB Lifecycle                                                */

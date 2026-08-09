@@ -31,7 +31,7 @@ import type JSZipType from "jszip";
 
 import { applySchema, StepKindId } from "./schema";
 import { StepLibraryDb, type StepGroupRow, type StepRow } from "./db";
-import { ExportReasonEnum } from "../../../types/enums";
+import { ExportReasonType } from "../../../types/enums";
 import { logCaughtError, BgLogTag } from "../../bg-logger";
 
 /* ------------------------------------------------------------------ */
@@ -56,7 +56,7 @@ export interface StepGroupExportInput {
 }
 
 export type ExportReason =
-    ExportReasonEnum;
+    ExportReasonType;
 
 export interface ExportFailure {
     readonly Reason: Exclude<ExportReason, "Ok">;

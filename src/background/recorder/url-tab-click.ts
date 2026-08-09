@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { UrlMatchEnum, UrlTabClickFailureMode, SelectorKindEnum, SemanticSemanticUrlTabClickReasonEnum, PredicateEvaluationKind, ValidationErrorReason } from "../../types/enums";
+import { UrlMatchType, UrlTabClickFailureModeType, SelectorKindType, OkTabnotfoundType, PredicateEvaluationKindType, ValidationErrorReasonType } from "../../types/enums";
 import { compileUrlPattern, CompileResult } from "./url-tab-click-patterns";
 
 /**
@@ -25,9 +25,9 @@ import { compileUrlPattern, CompileResult } from "./url-tab-click-patterns";
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-export type UrlMatchDialect = UrlMatchEnum;
-export type UrlTabClickMode = UrlTabClickFailureMode;
-export type SelectorKindOption = SelectorKindEnum;
+export type UrlMatchDialect = UrlMatchType;
+export type UrlTabClickMode = UrlTabClickFailureModeType;
+export type SelectorKindOption = SelectorKindType;
 
 export interface UrlTabClickParams {
     readonly UrlPattern: string;
@@ -41,7 +41,7 @@ export interface UrlTabClickParams {
 }
 
 export type UrlTabClickReason =
-    SemanticSemanticUrlTabClickReasonEnum;
+    OkTabnotfoundType;
 
 export interface UrlTabClickResult {
     readonly Reason: UrlTabClickReason;
@@ -65,7 +65,7 @@ export interface TabsAdapter {
     focusTab(id: number): Promise<void>;
     createTab(url: string): Promise<TabRef>;
     /** Dispatch the captured click; returns the URL of the resulting tab. */
-    dispatchClick?(selector: string, kind: PredicateEvaluationKind): Promise<TabRef>;
+    dispatchClick?(selector: string, kind: PredicateEvaluationKindType): Promise<TabRef>;
     /** Wait for an updated tab whose URL matches `predicate` within deadline. */
     waitForMatchingTab(
         predicate: (url: string) => boolean,
@@ -86,7 +86,7 @@ const DEFAULT_TIMEOUT_MS = 15_000;
 /* ------------------------------------------------------------------ */
 
 export interface ValidationError {
-    readonly Reason: ValidationErrorReason;
+    readonly Reason: ValidationErrorReasonType;
     readonly Detail: string;
 }
 
@@ -184,7 +184,7 @@ function hasCrossOriginAnchorHref(context: CaptureClickContext): boolean {
 /*  Replay                                                              */
 /* ------------------------------------------------------------------ */
 
-function selectorKind(params: UrlTabClickParams): PredicateEvaluationKind {
+function selectorKind(params: UrlTabClickParams): PredicateEvaluationKindType {
     const kind = params.SelectorKind ?? "Auto";
     if (kind === "XPath") return "XPath";
     if (kind === "Css") return "Css";

@@ -13,7 +13,7 @@ import { DEFAULT_CHATBOX_XPATH } from "../../shared/defaults";
 import { invalidateSettingsNsCache } from "../settings-ns-cache";
 import { setVerboseLogging } from "../recorder/verbose-logging";
 import { ScriptRunAtType } from "../../../standalone-scripts/macro-controller/src/types/enums";
-import { ThemeEnum } from "../../types/enums";
+import { ThemeType } from "../../types/enums";
 import { logCaughtError, BgLogTag } from "../bg-logger";
 
 /* ------------------------------------------------------------------ */
@@ -33,7 +33,7 @@ export interface ExtensionSettings {
     debugMode: boolean;
     maxCycleCount: number;
     idleTimeout: number;
-    theme: ThemeEnum;
+    theme: ThemeType;
     chatBoxXPath: string;
     /** When true, skips chrome.userScripts and forces Blob URL injection for debugging. */
     forceLegacyInjection: boolean;

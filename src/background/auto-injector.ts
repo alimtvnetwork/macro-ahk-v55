@@ -43,7 +43,7 @@ import { persistInjectionError, persistInjectionWarn } from "./injection-diagnos
 import { readAllProjects } from "./handlers/project-helpers";
 import type { StoredScript } from "../shared/script-config-types";
 import type { MatchResult, ScriptBindingResolved } from "../shared/types";
-import { TriggerEnum } from "../types/enums";
+import { TriggerType } from "../types/enums";
 
 /** Dedup TTL — absorb burst/double-fires from listener overlap (audit U-1). */
 const DEDUP_TTL_MS = 5_000;
@@ -266,7 +266,7 @@ export async function handleNavigationCompleted(
 async function processPageNavigation(
     tabId: number,
     url: string,
-    trigger: TriggerEnum,
+    trigger: TriggerType,
 ): Promise<void> {
     const matches = await evaluateUrlMatches(url);
 

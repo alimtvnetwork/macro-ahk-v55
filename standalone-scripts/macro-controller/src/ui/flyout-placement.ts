@@ -1,4 +1,4 @@
-import { SemanticSemanticSideEnum } from "../../../../src/types/enums";
+import { LeftRightType } from "../../../../src/types/enums";
 import { DirectionType } from "../types/enums";
 
 /**
@@ -34,7 +34,7 @@ export interface ViewportLike {
   readonly innerHeight: number;
 }
 
-export type HorizontalPlacement = SemanticSemanticSideEnum;
+export type HorizontalPlacement = LeftRightType;
 export type VerticalPlacement = DirectionType;
 
 export interface PlacementResult {

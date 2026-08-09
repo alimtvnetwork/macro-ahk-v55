@@ -35,7 +35,7 @@ export interface AuthStrategyResult {
 
 export interface AuthHealthResponse {
     /** Overall auth status */
-    status: Status;
+    status: StatusType;
     /** Which strategy ultimately provided the token (null if none) */
     resolvedVia: string | null;
     /** Total time for the full waterfall */
@@ -55,7 +55,7 @@ const AUTH_API_BASE = DomainConstants.API_URL;
 import { LOVABLE_TAB_PATTERNS as PLATFORM_TAB_PATTERNS } from "../shared/lovable-tab-patterns";
 
 import { getChromeRef } from "./chrome-ref";
-import { Status } from "../types/enums";
+import { StatusType } from "../types/enums";
 
 // Chrome extension APIs — typed via shared ChromeRef
 const _chrome = getChromeRef();

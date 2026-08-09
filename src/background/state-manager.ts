@@ -6,7 +6,7 @@
  */
 
 import type { MatchResult, ScriptBindingResolved } from "../shared/types";
-import { HealthState, BootPersistenceMode, TriggerEnum } from "../types/enums";
+import { HealthStateType, BootPersistenceModeType, TriggerType } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -44,9 +44,9 @@ export interface TabInjectionRecord {
 export interface TransientState {
     activeProjectId: string | null;
     tabInjections: Record<number, TabInjectionRecord>;
-    healthState: HealthState;
+    healthState: HealthStateType;
     currentSessionId: string;
-    persistenceMode: BootPersistenceMode;
+    persistenceMode: BootPersistenceModeType;
     lastFlushTimestamp: string;
 }
 
@@ -89,7 +89,7 @@ export interface TabDecision {
     /** Resolved matches (may be empty array — empty IS a valid decision). */
     matches: MatchResult[];
     /** Trigger that produced this decision. */
-    trigger: TriggerEnum;
+    trigger: TriggerType;
     /** Decision wall-clock timestamp (ms since epoch). */
     decidedAt: number;
 }

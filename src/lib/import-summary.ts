@@ -8,7 +8,7 @@
 
 import type { BundlePreview, DiffItem } from "@/lib/sqlite-bundle";
 import { PopupActionsModeType } from "../../standalone-scripts/macro-controller/src/types/enums";
-import { LabelEnum } from "../types/enums";
+import { LabelType } from "../types/enums";
 
 export interface CategoryCounts {
   readonly matched: number;
@@ -48,7 +48,7 @@ export function formatCategoryLine(label: string, c: CategoryCounts): string {
  * output and will fail the round-trip toast tests.
  */
 export const SUMMARY_CATEGORY_ORDER: ReadonlyArray<{
-  readonly label: LabelEnum;
+  readonly label: LabelType;
   readonly pick: (preview: BundlePreview) => { items: DiffItem[]; existing: number };
 }> = [
   { label: "Projects", pick: (p) => ({ items: p.projectItems, existing: p.existingProjectCount }) },

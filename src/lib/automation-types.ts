@@ -1,4 +1,4 @@
-import { StepNotifyLevel, ConditionCheckType, TriggerType, ChainRunnerStatus, BranchLabelEnum } from "../types/enums";
+import { StepNotifyLevelType, ConditionCheckType, TriggerType, ChainRunnerStatusType, BranchLabelType } from "../types/enums";
 import { ChainStepStatusType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /**
@@ -55,7 +55,7 @@ export interface StepSetKv {
 export interface StepNotify {
   type: "notify";
   message: string;
-  level?: StepNotifyLevel;
+  level?: StepNotifyLevelType;
 }
 
 export interface ConditionCheck {
@@ -126,13 +126,13 @@ export type StepStatus = ChainStepStatusType;
 export interface FlattenedStep {
   step: ChainStep;
   depth: number;
-  branchLabel?: BranchLabelEnum;
+  branchLabel?: BranchLabelType;
 }
 
 export interface ChainExecutionState {
   chainId: string;
   chainName: string;
-  status: ChainRunnerStatus;
+  status: ChainRunnerStatusType;
   flatSteps: FlattenedStep[];
   stepStatuses: StepStatus[];
   currentStepIndex: number;

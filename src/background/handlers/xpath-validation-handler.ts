@@ -10,7 +10,7 @@
  */
 
 import type { MessageRequest } from "../../shared/messages";
-import { XPathValidationEntryStatus } from "../../types/enums";
+import { XPathValidationEntryStatusType } from "../../types/enums";
 import { logCaughtError, BgLogTag } from "../bg-logger";
 
 /* ------------------------------------------------------------------ */
@@ -22,7 +22,7 @@ export interface XPathValidationEntry {
     xpath: string;
     selector?: string;
     found: number;
-    status: XPathValidationEntryStatus;
+    status: XPathValidationEntryStatusType;
     error?: string;
     fallbackUsed?: boolean;
 }

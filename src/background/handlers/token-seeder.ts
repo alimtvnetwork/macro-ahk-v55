@@ -17,7 +17,7 @@ import { readCookieValueFromCandidates } from "../cookie-helpers";
 import { readAllProjects } from "./project-helpers";
 import type { CookieBinding } from "../../shared/project-types";
 import { logBgWarnError, logCaughtError, BgLogTag} from "../bg-logger";
-import { AccessDeniedCodeEnum } from "../../types/enums";
+import { AccessDeniedCodeType } from "../../types/enums";
 
 const SESSION_COOKIE_NAME_FALLBACKS = [
     "lovable-session-id-v2",
@@ -35,7 +35,7 @@ const warnedInaccessibleTabs = new Set<string>();
 
 /** Reason taxonomy for a seed-access failure. Surfaced in diagnostics UI. */
 export type AccessDeniedCode =
-    AccessDeniedCodeEnum;
+    AccessDeniedCodeType;
 
 /** Per-tab structured failure record for the diagnostics panel. */
 export interface InaccessibleSeedTarget {

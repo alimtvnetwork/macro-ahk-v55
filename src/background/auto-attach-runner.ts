@@ -29,7 +29,7 @@ import {
 } from "./auto-attach";
 import { logBgWarnError, BgLogTag, logCaughtError } from "./bg-logger";
 import { STORAGE_KEY_AUTO_ATTACH_DECISIONS } from "../shared/constants";
-import { WorldEnum } from "../types/enums";
+import { WorldType } from "../types/enums";
 
 export interface PersistedAutoAttachDecision {
     scriptId: string;
@@ -52,7 +52,7 @@ const TAG = BgLogTag.SCRIPT_RESOLVER;
 interface ScriptAttachExtras {
     urlMatches?: string[];
     autoAttach?: boolean;
-    world?: WorldEnum;
+    world?: WorldType;
     requiredCookies?: string[];
     injectionConditions?: LibraryScriptForAttach["instruction"]["InjectionConditions"];
 }

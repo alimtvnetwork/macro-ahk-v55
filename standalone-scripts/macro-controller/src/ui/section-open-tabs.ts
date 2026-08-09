@@ -14,7 +14,7 @@ import { sendToExtension } from './prompt-loader';
 import { log, logSub } from '../logger';
 import { throwDiagnostic } from '../errors/diagnostic-error';
 import { MatchRuleType } from "../types/enums";
-import { MatchedRuleInfoOrigin, BindingSourceEnum } from "../../../../src/types/enums";
+import { MatchedRuleInfoOriginType, BindingSourceType } from "../../../../src/types/enums";
 
 export interface OpenTabsSectionResult {
     section: HTMLElement;
@@ -24,7 +24,7 @@ export interface OpenTabsSectionResult {
 interface MatchedRuleInfoView {
     readonly pattern: string;
     readonly matchType: MatchRuleType;
-    readonly origin: MatchedRuleInfoOrigin;
+    readonly origin: MatchedRuleInfoOriginType;
 }
 
 interface OpenLovableTabInfoView {
@@ -35,7 +35,7 @@ interface OpenLovableTabInfoView {
     readonly windowFocused: boolean;
     readonly projectId: string | null;
     readonly projectName: string | null;
-    readonly bindingSource: BindingSourceEnum;
+    readonly bindingSource: BindingSourceType;
     readonly detectedWorkspaceName: string | null;
     readonly detectedWorkspaceId: string | null;
     readonly detectedWorkspaceSource: 'api' | 'cache' | 'dom' | 'none' | null;

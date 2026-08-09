@@ -26,7 +26,7 @@
 // call site having to add a second `vi.mock('../ui/extension-relay', ...)`.
 import { sendToExtension } from './extension-bridge';
 import { DB_NAME } from './db-name';
-import { RunSqlMethod, SqlBucketType } from "../types/enums";
+import { RunSqlMethodType, SqlBucketType } from "../types/enums";
 import { logError } from '../error-utils';
 import { ServiceResult } from '../utils/result-wrapper';
 

@@ -14,14 +14,14 @@ import { STORAGE_KEY_ALL_SCRIPTS, STORAGE_KEY_ALL_CONFIGS } from "../shared/cons
 import { getCachedScriptCode, cacheScriptCode } from "./injection-cache";
 import { persistInjectionWarn, persistInjectionError } from "./injection-diagnostics";
 import { logCaughtError, logBgError, logBgWarnError, logBgWarnSampled, BgLogTag} from "./bg-logger";
-import { ScriptCodeSourceEnum, WorldEnum } from "../types/enums";
+import { ScriptCodeSourceType, WorldType } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  File-path code loading                                             */
 /* ------------------------------------------------------------------ */
 
 /** Source of the resolved script code — used for injection diagnostics. */
-export type ScriptCodeSource = ScriptCodeSourceEnum;
+export type ScriptCodeSource = ScriptCodeSourceType;
 
 interface ResolvedCode {
     code: string;
@@ -148,7 +148,7 @@ async function resolveScriptCode(script: StoredScript): Promise<ResolvedCode> {
 /** Resolved script with code, optional config JSON, and optional theme JSON. */
 export interface ResolvedScript {
     injectable: InjectableScript;
-    world: WorldEnum;
+    world: WorldType;
     configJson: string | null;
     themeJson: string | null;
     /** Where the script code came from — for injection diagnostics. */

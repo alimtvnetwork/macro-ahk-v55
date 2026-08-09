@@ -18,7 +18,7 @@
 
 import type { JsonValue } from "../handlers/handler-types";
 import { isSensitiveDiagnosticName, maskDiagnosticValue } from "./sensitive-diagnostics";
-import { VariableValueType, VariableFailureReasonEnum } from "../../types/enums";
+import { VariableValueType, VariableFailureReasonType } from "../../types/enums";
 
 const TOKEN_PATTERN = /\\?\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/g;
 
@@ -32,7 +32,7 @@ export type FieldRow = Readonly<Record<string, string>>;
  */
 export type LooseFieldRow = Readonly<Record<string, JsonValue | undefined>>;
 export type VariableFailureReason =
-    VariableFailureReasonEnum;      // Value present but not the type the step expected.
+    VariableFailureReasonType;      // Value present but not the type the step expected.
 
 export interface VariableContext {
     readonly Name: string;                 // e.g. "Email"

@@ -27,7 +27,7 @@ import { runLoggedQuery } from './sql-bridge';
 import { sqlLit } from './prompt-role-db';
 import type { PromptRow } from './prompt-db';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
-import { RunSqlMethod } from "../types/enums";
+import { RunSqlMethodType } from "../types/enums";
 
 /** Maximum revisions retained per Slug. Older revisions are trimmed on write. */
 export const PROMPT_REVISION_LIMIT_PER_SLUG = 20;
@@ -53,7 +53,7 @@ export interface DbResult<T> {
 
 type RawSqlOk = SqlBridgeResp;
 
-async function runSql(method: RunSqlMethod, sql: string): Promise<RawSqlOk> {
+async function runSql(method: RunSqlMethodType, sql: string): Promise<RawSqlOk> {
     void DB_NAME;
 
     return runLoggedQuery(method, sql, 'context');

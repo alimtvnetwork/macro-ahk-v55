@@ -23,14 +23,14 @@ import {
 import { wrapDatabaseWithBindSafety } from "./sqlite-bind-safety";
 import { setWasmProbeResult, setWasmChecksumOutcome, type WasmProbeResult } from "./boot-diagnostics";
 import { verifyWasmChecksum, summarizeChecksumOutcome } from "./wasm-integrity";
-import { BootPersistenceMode } from "../types/enums";
+import { BootPersistenceModeType } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
 type SqlJs = import("sql.js").SqlJsStatic;
-type PersistenceMode = BootPersistenceMode;
+type PersistenceMode = BootPersistenceModeType;
 
 export interface DbManager {
     getLogsDb(): SqlJsDatabase;

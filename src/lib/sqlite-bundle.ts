@@ -35,7 +35,7 @@ import {
   formatValidationError,
   CURRENT_FORMAT_VERSION,
 } from "@/lib/sqlite-bundle-contract";
-import { DiffItemStatus } from "../types/enums";
+import { DiffItemStatusType } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -1069,7 +1069,7 @@ export async function previewSqliteZip(
 
 export interface DiffItem {
   name: string;
-  status: DiffItemStatus;
+  status: DiffItemStatusType;
 }
 
 export interface BundlePreview {

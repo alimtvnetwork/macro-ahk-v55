@@ -12,7 +12,7 @@ import { sendMessage } from "@/lib/message-client";
 
 import { logError } from "../../options-logger";
 import { StepLinkSlotType } from "../../../../../standalone-scripts/macro-controller/src/types/enums";
-import { UseRecorderStepMutationsApi } from "../../../../types/enums";
+import { UseRecorderStepMutationsApiType } from "../../../../types/enums";
 
 type ProjectDataApi = ReturnType<typeof useRecorderProjectData>;
 type LinkSlot = StepLinkSlotType;
@@ -27,7 +27,7 @@ export interface RecorderStepMutations {
 
 export function useRecorderStepMutations(
     projectSlug: string,
-    api: Pick<ProjectDataApi, UseRecorderStepMutationsApi>,
+    api: Pick<ProjectDataApi, UseRecorderStepMutationsApiType>,
 ): RecorderStepMutations {
     return {
         handleRename: useRenameHandler(projectSlug, api.reload),

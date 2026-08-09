@@ -22,9 +22,9 @@
  */
 
 import type { ExportFailure, ExportReason } from "./export-bundle";
-import { ExportErrorSeverityEnum } from "../../../types/enums";
+import { ExportErrorSeverityType } from "../../../types/enums";
 
-export type ExportErrorSeverity = ExportErrorSeverityEnum;
+export type ExportErrorSeverity = ExportErrorSeverityType;
 
 export interface ExportErrorExplanation {
     readonly Title: string;

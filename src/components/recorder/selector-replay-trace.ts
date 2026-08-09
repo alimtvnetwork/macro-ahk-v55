@@ -19,17 +19,17 @@
  */
 
 import type { SelectorAttempt } from "@/background/recorder/failure-logger";
-import { TraceStepStatus, TraceStepRole, ReplayTraceSummaryOutcome } from "../../types/enums";
+import { TraceStepStatusType, TraceStepRoleType, ReplayTraceSummaryOutcomeType } from "../../types/enums";
 
 export interface TraceStep {
     readonly Order: number;                  // 1-based position in the walk.
-    readonly Role: TraceStepRole;
+    readonly Role: TraceStepRoleType;
     readonly Strategy: string;
     readonly Expression: string;
     readonly ResolvedExpression: string;
     readonly Matched: boolean;
     readonly MatchCount: number;
-    readonly Status: TraceStepStatus;
+    readonly Status: TraceStepStatusType;
     readonly FailureReason: SelectorAttempt["FailureReason"];
     readonly FailureDetail: string | null;
     readonly Note: string;                    // Human sentence for the row.
@@ -40,7 +40,7 @@ export interface ReplayTraceSummary {
     readonly Evaluated: number;
     readonly Skipped: number;
     readonly StoppedAt: number | null;        // 1-based Order of the matched step.
-    readonly Outcome: ReplayTraceSummaryOutcome;
+    readonly Outcome: ReplayTraceSummaryOutcomeType;
 }
 
 export interface ReplayTrace {
@@ -56,7 +56,7 @@ const ERRORED_REASONS: ReadonlySet<SelectorAttempt["FailureReason"]> = new Set([
     "EvaluationThrew",
 ]);
 
-function classify(attempt: SelectorAttempt, stopped: boolean): TraceStepStatus {
+function classify(attempt: SelectorAttempt, stopped: boolean): TraceStepStatusType {
     if (stopped) return "pending";
     if (attempt.Matched) return "matched";
     if (ERRORED_REASONS.has(attempt.FailureReason)) return "errored";
@@ -64,7 +64,7 @@ function classify(attempt: SelectorAttempt, stopped: boolean): TraceStepStatus {
     return "missed";
 }
 
-function noteFor(attempt: SelectorAttempt, status: TraceStepStatus, role: TraceStepRole): string {
+function noteFor(attempt: SelectorAttempt, status: TraceStepStatusType, role: TraceStepRoleType): string {
     switch (status) {
         case "matched":
             return `${role} resolved → ${attempt.MatchCount} match${attempt.MatchCount === 1 ? "" : "es"}; replay stopped here.`;
@@ -119,7 +119,7 @@ function buildTraceStep(attempt: SelectorAttempt, previous: ReadonlyArray<TraceS
     return createTraceStep(attempt, status, role, previous.length + 1);
 }
 
-function createTraceStep(attempt: SelectorAttempt, status: TraceStepStatus, role: TraceStepRole, order: number): TraceStep {
+function createTraceStep(attempt: SelectorAttempt, status: TraceStepStatusType, role: TraceStepRoleType, order: number): TraceStep {
     return {
         Order: order, Role: role, Strategy: attempt.Strategy, Expression: attempt.Expression,
         ResolvedExpression: attempt.ResolvedExpression.length > 0 ? attempt.ResolvedExpression : attempt.Expression,

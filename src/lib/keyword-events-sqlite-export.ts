@@ -34,7 +34,7 @@ import {
     buildExportFilename,
     buildExportPayload,
 } from "@/lib/keyword-event-bulk-actions";
-import { KeywordEventsExportStageEnum } from "../types/enums";
+import { KeywordEventsExportStageType } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -154,7 +154,7 @@ function insertMeta(db: Database, count: number, now: string): void {
  *   5. done          — final terminal stage; UI can dismiss
  */
 export type KeywordEventsExportStage =
-    KeywordEventsExportStageEnum;
+    KeywordEventsExportStageType;
 
 export interface KeywordEventsExportProgress {
     readonly stage: KeywordEventsExportStage;

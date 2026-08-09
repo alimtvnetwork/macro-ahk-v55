@@ -8,10 +8,10 @@
 /* eslint-disable sonarjs/no-duplicate-string -- theme data has naturally repeated color tokens */
 
 import type { EditorThemeName } from "@/hooks/use-editor-theme";
-import { BaseEnum } from "../types/enums";
+import { BaseType } from "../types/enums";
 
 interface MonacoThemeData {
-  base: BaseEnum;
+  base: BaseType;
   inherit: boolean;
   rules: Array<{ token: string; foreground?: string; fontStyle?: string }>;
   colors: Record<string, string>;

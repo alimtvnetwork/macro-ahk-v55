@@ -1,4 +1,4 @@
-import { FormFieldType, TagEnum } from "../../types/enums";
+import { FormFieldType, TagType } from "../../types/enums";
 
 export interface FormFieldMeta {
     /** First non-empty of: name, id, aria-label, placeholder, fallback `field#N`. */
@@ -26,7 +26,7 @@ export interface FormFieldValue {
 export interface FormSnapshot {
     /** Identifying info about the form element. */
     readonly Form: {
-        readonly Tag: TagEnum;
+        readonly Tag: TagType;
         readonly Id: string | null;
         readonly Name: string | null;
         readonly Action: string | null;

@@ -15,7 +15,7 @@
 
 import type { StoredProject, ScriptEntry } from "../shared/project-types";
 import { isUrlMatch } from "./url-matcher";
-import { WorldEnum, SkipReasonEnum } from "../types/enums";
+import { WorldType, SkipReasonType } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -30,7 +30,7 @@ export interface LibraryScriptForAttach {
         UrlMatches?: string[];
         AutoAttach?: boolean;
         RunAt?: ScriptEntry["runAt"];
-        World?: WorldEnum;
+        World?: WorldType;
         RequiredCookies?: string[];
         Dependencies?: string[];
         InjectionConditions?: {
@@ -43,7 +43,7 @@ export interface LibraryScriptForAttach {
 }
 
 export type SkipReason =
-    SkipReasonEnum;          // C3
+    SkipReasonType;          // C3
 
 export interface AttachDecision {
     ok: boolean;

@@ -28,7 +28,7 @@ import { showUndoToast } from './prompt-utils';
 import { writePendingRestoreUndo, clearPendingRestoreUndo } from './pending-restore-undo';
 import { PLAN_NEXT_SEED_ROWS } from '../seed/plan-next-prompts';
 import { ToastVariantType, HistorySortKeyType, HistoryImportedFilterType } from "../types/enums";
-import { SortOrder } from "../../../../src/types/enums";
+import { SortOrderType } from "../../../../src/types/enums";
 
 export interface OpenPromptHistoryInput {
     role: PromptRole;
@@ -465,7 +465,7 @@ function buildSubtitleText(total: number, visible: number): string {
 
 /** Sortable columns exposed in the history toolbar (v4.192.0). */
 export type HistorySortKey = HistorySortKeyType;
-export type HistorySortDir = SortOrder;
+export type HistorySortDir = SortOrderType;
 /**
  * Imported-provenance filter cycle:
  * - `all`: show both native and imported rows.

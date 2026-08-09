@@ -57,7 +57,7 @@ import {
     injectAllScripts,
     executeInTab,
 } from "./injection-pipeline";
-import { PipelineLineLevel, MirrorDiagnosticToTabLevel } from "../../types/enums";
+import { PipelineLineLevelType, MirrorDiagnosticToTabLevelType } from "../../types/enums";
 import { logCaughtError, BgLogTag } from "../bg-logger";
 
 // Pipeline cache types/helpers + Stage 3/4 machinery moved to ./injection-pipeline (PERF-R2b step 5).
@@ -297,7 +297,7 @@ export async function handleInjectScripts(
     );
 
     // ── Mirror full pipeline summary to tab console (visible in DevTools) ──
-    type PipelineLine = { "msg": string; level: PipelineLineLevel };
+    type PipelineLine = { "msg": string; level: PipelineLineLevelType };
     const pipelineLines: PipelineLine[] = [
         // ── Stage Summary sub-group ──
         { "msg": `📊 Stage Summary (${totalMs}ms)`, level: "__group__" },
@@ -442,7 +442,7 @@ async function executeCachedPayload(
         successCount, results.length, totalMs, JSON.stringify(timings));
 
     // Post-pipeline: mirror, budget, verification, toast
-    type PipelineLine = { "msg": string; level: PipelineLineLevel };
+    type PipelineLine = { "msg": string; level: PipelineLineLevelType };
     const pipelineLines: PipelineLine[] = [
         { "msg": `📊 Cached Pipeline (${totalMs}ms)`, level: "__group__" },
         { "msg": `CACHE HIT — skipped Stages 0–3`, level: "log" },
@@ -679,7 +679,7 @@ async function verifyPostInjectionGlobals(tabId: number): Promise<void> {
         const allOk = r.marcoSdk && r.extRoot && r.mcClass && r.mcInstance && r.uiContainer;
         const status = allOk ? "✅ VERIFIED" : "⚠️ INCOMPLETE";
 
-        const lines: Array<{ "msg": string; level: MirrorDiagnosticToTabLevel }> = [
+        const lines: Array<{ "msg": string; level: MirrorDiagnosticToTabLevelType }> = [
             { "msg": `window.marco (SDK)           : ${r.marcoSdk ? "✅" : "❌"}`, level: r.marcoSdk ? "log" : "error" },
             { "msg": `window.RiseupAsiaMacroExt     : ${r.extRoot ? "✅" : "❌"}`, level: r.extRoot ? "log" : "error" },
             { "msg": `window.MacroController (class): ${r.mcClass ? "✅" : "❌"}`, level: r.mcClass ? "log" : "error" },
