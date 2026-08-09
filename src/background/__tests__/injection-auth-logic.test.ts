@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { logCaughtError, BgLogTag } from "../bg-logger";
 
 /**
  * Tests for the global project injection policy and auth token
@@ -260,7 +261,8 @@ describe("Auth: extractProjectIdFromUrl", () => {
 
             const bareUuidMatch = firstLabel.match(/^([a-f0-9-]{36})$/i);
             if (bareUuidMatch) return bareUuidMatch[1];
-        } catch {
+        } catch (err) {
+        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
         return null;

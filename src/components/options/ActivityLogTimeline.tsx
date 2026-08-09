@@ -265,7 +265,7 @@ function SessionHistoryPicker({
         type: "GET_SESSION_REPORT",
       });
       setSessions(result.sessions ?? []);
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
 
       setSessions([]);
     } finally {
@@ -285,7 +285,7 @@ function SessionHistoryPicker({
       });
       await navigator.clipboard.writeText(result.report);
       toast.success(`Session #${sid} report copied`);
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Failed to copy session report");
     }
   };
@@ -450,7 +450,7 @@ export function ActivityLogTimeline() {
           type: "GET_SESSION_REPORT",
         });
         report = result.report;
-      } catch {
+      } catch (err) { console.error("Automatically logged error:", err);
         // Fallback: build from in-memory entries
         const lines = entries.map((e) => {
           const ts = e.timestamp;
@@ -468,7 +468,7 @@ export function ActivityLogTimeline() {
             const g = globalThis as { chrome?: { runtime?: { getManifest?: () => { version?: string } } } };
 
             return g.chrome?.runtime?.getManifest?.().version ?? "?";
-          } catch { return "?"; }
+          } catch (err) { console.error("Automatically logged error:", err); return "?"; }
         })();
 
         report = [
@@ -486,7 +486,7 @@ export function ActivityLogTimeline() {
 
       await navigator.clipboard.writeText(report);
       toast.success("Full session report copied to clipboard");
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Failed to copy");
     } finally {
       setCopyLoading(false);
@@ -500,7 +500,7 @@ export function ActivityLogTimeline() {
       if (result.isOk) {
         toast.success("ZIP bundle downloaded");
       }
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Export failed");
     } finally {
       setExportLoading(false);
@@ -540,7 +540,7 @@ export function ActivityLogTimeline() {
                 ]);
                 toast.success("All logs and errors cleared");
                 refresh();
-              } catch {
+              } catch (err) { console.error("Automatically logged error:", err);
                 toast.error("Failed to clear logs");
               }
             }}

@@ -131,8 +131,9 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       await navigator.clipboard.writeText(buildCurrentReport());
       setCopied(true);
       setTimeout(() => setCopied(false), Timings.TIMEOUT_NORMAL);
-    } catch {
+    } catch (err) { 
  // allow-swallow: clipboard denied; textarea fallback stays visible
+      RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err);
     }
   };
 
@@ -142,8 +143,9 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       await navigator.clipboard.writeText(ctx.sql);
       setSqlCopied(true);
       setTimeout(() => setSqlCopied(false), Timings.TIMEOUT_NORMAL);
-    } catch {
+    } catch (err) { 
  // allow-swallow: clipboard denied; snippet stays visible for manual copy
+      RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err);
     }
   };
 
@@ -171,8 +173,9 @@ export function BootFailureBanner({ bootStep, bootError, bootErrorStack, bootErr
       setTimeout(() => URL.revokeObjectURL(url), Timings.TIMEOUT_SHORT);
       setDownloaded(true);
       setTimeout(() => setDownloaded(false), Timings.TIMEOUT_NORMAL);
-    } catch {
+    } catch (err) { 
  // allow-swallow: Blob/URL unavailable in sandbox; Copy report still works
+      RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err);
     }
   };
 
@@ -669,7 +672,7 @@ function formatTime(iso: string): string {
     const date = new Date(iso);
 
     return date.toLocaleTimeString("en-GB", { hour12: false });
-  } catch {
+  } catch (err) { console.error("Automatically logged error:", err);
     return iso;
   }
 }

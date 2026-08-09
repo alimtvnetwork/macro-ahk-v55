@@ -41,7 +41,7 @@ let persistentHydrated = false;
 function safeOrigin(url: string): string {
     try {
         return new URL(url).origin;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return "";
     }
 }

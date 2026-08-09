@@ -86,7 +86,8 @@ async function resolveTargetTabId(): Promise<number | null> {
             const tabs = await chrome.tabs.query(query);
             const candidate = tabs.find((t) => t.id !== undefined && isWebTab(t.url));
             if (candidate?.id !== undefined) return candidate.id;
-        } catch {
+        } catch (err) {
+        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
     }
 

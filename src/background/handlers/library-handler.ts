@@ -587,7 +587,7 @@ function cascadeSettingsToMembers(db: ReturnType<typeof getDb>, groupId: number,
     let parsed: Record<string, unknown>;
     try {
         parsed = JSON.parse(settingsJson);
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         console.warn(`[library] Cannot parse SharedSettingsJson for group ${groupId} — skipping cascade`);
 
         return 0;

@@ -23,6 +23,7 @@
  */
 
 import type { MessageRequest, OkResponse } from "../../shared/messages";
+import { logCaughtError, BgLogTag } from "../bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -80,7 +81,7 @@ async function readSnapshot(): Promise<SdkSelfTestSnapshot> {
             gkv: normalizeRow(raw.gkv),
             updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : null,
         };
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return { ...EMPTY_SNAPSHOT };
     }
 }
@@ -182,6 +183,7 @@ export async function handleGetSdkSelfTest(): Promise<{ snapshot: SdkSelfTestSna
 export async function __resetSdkSelfTestForTests(): Promise<void> {
     try {
         await chrome.storage.local.remove(STORAGE_KEY);
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 }

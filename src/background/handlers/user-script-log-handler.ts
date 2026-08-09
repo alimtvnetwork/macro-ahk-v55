@@ -193,7 +193,7 @@ function redactSensitiveMetadata(metadata: string | null): string | null {
         const redacted = redactObject(parsed);
 
         return JSON.stringify(redacted);
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return metadata;
     }
 }

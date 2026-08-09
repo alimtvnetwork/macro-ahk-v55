@@ -196,7 +196,7 @@ async function checkMarkersExist(tabId: number): Promise<boolean> {
         });
 
         return results[0]?.result === true;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return true;
     }
 }

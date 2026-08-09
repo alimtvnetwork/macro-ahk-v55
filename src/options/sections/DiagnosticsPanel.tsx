@@ -84,7 +84,7 @@ export function DiagnosticsPanel() {
 
             setData(statusRes);
             setMessages(msgRes.messages ?? []);
-        } catch {
+        } catch (err) { console.error("Automatically logged error:", err);
 
             setData(null);
         }

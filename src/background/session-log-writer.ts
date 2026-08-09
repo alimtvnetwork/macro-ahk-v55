@@ -1,6 +1,8 @@
 // @ts-nocheck
 import { Timings } from "../constants/timing";
 import { ServiceResult } from '../utils/result-wrapper';
+import { logCaughtError, BgLogTag } from "./bg-logger";
+
 /**
  * Marco Extension — Session Log File Writer
  *
@@ -455,7 +457,7 @@ export async function getOpfsSessionStatus(): Promise<OpfsStatusData> {
         const allExist = files.every((f) => f.exists);
 
         return { sessionId: sid, dirExists: true, files, healthy: allExist };
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         const files = expectedFiles.map((f) => ({ name: f, absolutePath: `${absBase}/${f}`, sizeBytes: 0, exists: false }));
 
         return { sessionId: sid, dirExists: false, files, healthy: false };
@@ -496,10 +498,12 @@ export async function listSessionsWithTimestamps(): Promise<SessionInfo[]> {
                         const fh = await dir.getFileHandle(fname);
                         const file = await fh.getFile();
                         if (file.lastModified > latestMs) latestMs = file.lastModified;
-                    }catch {}
+                    }catch (err) {
+                    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); }
  // allow-swallow: missing log file is expected
                 }
-            }catch {}
+            }catch (err) {
+            logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); }
  // allow-swallow: unreadable session dir is skipped
 
             results.push({
@@ -509,7 +513,7 @@ export async function listSessionsWithTimestamps(): Promise<SessionInfo[]> {
         }
 
         return results.sort((a, b) => Number(b.id) - Number(a.id));
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return [];
     }
 }
@@ -580,12 +584,14 @@ export async function browseOpfsSessions(): Promise<{
                         });
                     }
                 }
-            } catch {
+            } catch (err) {
+            logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
             sessions.push({ sessionId: sid, absolutePath: absoluteDirPath, files, totalSizeBytes });
         }
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
     sessions.sort((a, b) => Number(b.sessionId) - Number(a.sessionId));

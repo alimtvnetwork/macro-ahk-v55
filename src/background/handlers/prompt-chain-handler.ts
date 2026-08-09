@@ -56,7 +56,7 @@ async function loadChains(): Promise<PromptChain[]> {
         const result = await chrome.storage.sync.get(STORAGE_KEY);
 
         return (result[STORAGE_KEY] as PromptChain[] | undefined) ?? [];
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return [];
     }
 }
@@ -156,7 +156,8 @@ async function clearPendingArg(correlationId: string): Promise<void> {
         } else {
             await chrome.storage.session.set({ [PROMPT_ARGS_KEY]: map });
         }
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 }
 

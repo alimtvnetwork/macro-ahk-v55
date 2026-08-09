@@ -221,7 +221,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
 
     // Determine overall status
     const anySuccess = strategies.some(s => s.isSuccess);
-    const allFailed = strategies.every(s => !s.isSuccess);
+    const allFailed = strategies.every(s => s.isFail);
     const status: AuthHealthResponse["status"] = allFailed
         ? "unauthenticated"
         : (resolvedVia ? "authenticated" : "degraded");

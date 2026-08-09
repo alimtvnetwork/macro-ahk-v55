@@ -64,7 +64,7 @@ function formatTimestamp(iso: string): string {
         const d = new Date(iso);
 
         return d.toLocaleString();
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return iso;
     }
 }

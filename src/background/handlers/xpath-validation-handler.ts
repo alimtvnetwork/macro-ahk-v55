@@ -11,6 +11,7 @@
 
 import type { MessageRequest } from "../../shared/messages";
 import { XPathValidationEntryStatus } from "../../types/enums";
+import { logCaughtError, BgLogTag } from "../bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -155,7 +156,8 @@ function evaluateXPathAndSelector(
         if (selector) {
             selectorFound = document.querySelectorAll(selector).length;
         }
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
     return { xpathFound, selectorFound };

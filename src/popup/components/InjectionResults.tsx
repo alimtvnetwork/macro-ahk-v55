@@ -69,7 +69,7 @@ export function InjectionResults({ results, isVisible }: InjectionResultsProps) 
                 const durationText = result.durationMs != null && result.durationMs > 0
                     ? ` (${result.durationMs}ms)`
                     : "";
-                const hasError = !result.isSuccess && result.errorMessage;
+                const hasError = result.isFail && result.errorMessage;
                 const skipLabel = result.skipReason
                     ? SKIP_LABELS[result.skipReason] ?? "SKIPPED"
                     : null;

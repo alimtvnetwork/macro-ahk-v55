@@ -414,7 +414,7 @@ async function handleCopyLogs(tabId: number): Promise<void> {
                 },
                 args: [logText],
             });
-        } catch {
+        } catch (err) { console.error("Automatically logged error:", err);
             logCaughtError(BgLogTag.MARCO, "Could not inject clipboard script", new Error("injection failed"));
         }
     }
@@ -438,7 +438,7 @@ async function handleShowStatus(tabId: number): Promise<void> {
                 },
                 args: [statusText],
             });
-        } catch {
+        } catch (err) { console.error("Automatically logged error:", err);
             logCaughtError(BgLogTag.MARCO, "Could not show status", new Error("injection failed"));
         }
     }

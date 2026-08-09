@@ -545,12 +545,12 @@ export function ProjectScriptSelector({ availableScripts, availableConfigs, sele
 function validateJson(raw: string): boolean {
   try { JSON.parse(raw);
 
- return true; } catch { return false; }
+ return true; } catch (err) { console.error("Automatically logged error:", err); return false; }
 }
 
 function formatJson(input: JsonValue): string {
   if (typeof input === "string") {
-    try { return JSON.stringify(JSON.parse(input), null, 2); } catch { return input; }
+    try { return JSON.stringify(JSON.parse(input), null, 2); } catch (err) { console.error("Automatically logged error:", err); return input; }
   }
-  try { return JSON.stringify(input ?? {}, null, 2); } catch { return "{}"; }
+  try { return JSON.stringify(input ?? {}, null, 2); } catch (err) { console.error("Automatically logged error:", err); return "{}"; }
 }

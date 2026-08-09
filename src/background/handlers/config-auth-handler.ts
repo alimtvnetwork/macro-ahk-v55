@@ -596,7 +596,7 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
                                     if (typeof token === "string" && token.startsWith("eyJ") && token.split(".").length === 3) {
                                         return token;
                                     }
-                                } catch {
+                                } catch (err) { console.error("Automatically logged error:", err);
                                     if (raw.startsWith("eyJ") && raw.split(".").length === 3) {
                                         return raw;
                                     }
@@ -729,7 +729,7 @@ async function fetchAuthTokenFromSessionExchange(
             method: "GET",
             credentials: "include",
         }));
-        if (!response.isSuccess) {
+        if (response.isFail) {
             logBgWarnError(
                 BgLogTag.CONFIG_AUTH,
                 `HEFF: HTTP ${response.status} on GET ${url} — auth-token exchange failed; ` +

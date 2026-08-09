@@ -116,7 +116,7 @@ export function TokenSeederDiagnosticsPanel() {
             setData(res);
             saveDiagnosticsCache(res);
             setNow(Date.now());
-        } catch {
+        } catch (err) { console.error("Automatically logged error:", err);
 
             setData(null);
         } finally {

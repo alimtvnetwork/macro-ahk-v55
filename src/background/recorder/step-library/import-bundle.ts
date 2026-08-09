@@ -38,6 +38,7 @@ import {
     type StepGroupExportManifest,
 } from "./export-bundle";
 import { ConflictPolicyEnum, ImportReasonEnum, RootOutcomeKind } from "../../../types/enums";
+import { logCaughtError, BgLogTag } from "../../bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -657,7 +658,8 @@ function performAtomicMerge(ctx: AtomicMergeInput): StepGroupImportResult {
     } catch (err) {
         try {
             rawDest.exec("ROLLBACK;");
-        } catch {
+        } catch (err) {
+        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
         return {

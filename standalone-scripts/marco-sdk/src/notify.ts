@@ -1,24 +1,9 @@
-/**
- * Riseup Macro SDK — Notify Module
- *
- * Non-blocking, dismissible toast notification system available to all
- * injected scripts via `marco.notify`.
- *
- * Features:
- * - Stacking (max 3 visible), oldest auto-dismissed on overflow
- * - 5s deduplication window prevents toast storms
- * - Copy button with version + timestamp
- * - Error toasts: 30s; normal: 12s auto-dismiss
- * - Recent-errors store for diagnostic panels
- *
- * See: spec/22-app-issues/85-sdk-notifier-config-seeding-database-overhaul.md
- */
-
-/* ------------------------------------------------------------------ */
-/*  Types                                                              */
-/* ------------------------------------------------------------------ */
-
-export type ToastLevel = "info" | "warn" | "error" | "success";
+export enum ToastLevelType {
+    Info = "info",
+    Warn = "warn",
+    Error = "error",
+    Success = "success"
+}
 
 export interface RequestDetail {
     method?: string;
@@ -53,7 +38,7 @@ type ErrorCallback = (error: RecentError) => void;
 type StopLoopCallback = () => void;
 
 export interface NotifyApi {
-    toast(message: string, level?: ToastLevel, opts?: ToastOpts): void;
+    toast(message: string, level?: ToastLevelType, opts?: ToastOpts): void;
     /** Convenience: show info toast */
     info(message: string, opts?: ToastOpts): void;
     /** Convenience: show success toast */
@@ -234,7 +219,7 @@ function dismissAll(): void {
 /* ------------------------------------------------------------------ */
 
 // eslint-disable-next-line max-lines-per-function
-function showToast(message: string, level: ToastLevel = "error", opts: ToastOpts = {}): void {
+function showToast(message: string, level: ToastLevelType = "error", opts: ToastOpts = {}): void {
     // Guard: defer if DOM not ready yet
     if (!document.body && !document.documentElement) {
         setTimeout(() => showToast(message, level, opts), 50);

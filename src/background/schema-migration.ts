@@ -29,6 +29,7 @@ import { getV6Statements } from "./migration-v6-sql";
 import { getV7Statements } from "./migration-v7-sql";
 import { getV8Statements } from "./migration-v8-sql";
 import { getV9Statements } from "./migration-v9-sql";
+import { logCaughtError, BgLogTag } from "./bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -197,7 +198,8 @@ function applyV6Up(logsDb: SqlJsDatabase, _errorsDb: SqlJsDatabase): void {
         if (existing.length > 0 && (existing[0].values[0][0] as number) === 0) {
             logsDb.run("INSERT INTO UpdateSettings (AutoCheckIntervalMinutes, HasUserConfirmBeforeUpdate, HasChangelogFromVersionInfo, CacheExpiryMinutes) VALUES (1440, 0, 1, 10080)");
         }
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
     console.log("[migration] v6: Added updater settings, caching, and changelog columns");
 }
@@ -488,7 +490,7 @@ function getExistingTables(db: SqlJsDatabase): Set<string> {
         }
 
         return new Set(result[0].values.map((row) => String(row[0])));
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return new Set<string>();
     }
 }
@@ -507,7 +509,7 @@ function getTableColumns(db: SqlJsDatabase, tableName: string): Set<string> {
         }
 
         return new Set(result[0].values.map((row) => String(row[nameIndex])));
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return new Set<string>();
     }
 }

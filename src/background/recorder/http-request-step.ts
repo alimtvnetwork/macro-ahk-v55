@@ -76,7 +76,7 @@ function interpolateHeaders(
     let parsed: unknown;
     try {
         parsed = JSON.parse(interpolated);
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         throw new Error("BadParams: HeadersJson is not valid JSON after interpolation");
     }
     if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
@@ -268,7 +268,7 @@ async function safeReadSnippet(response: Response): Promise<string> {
         const text = await response.text();
 
         return text.slice(0, SNIPPET_LIMIT);
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return "";
     }
 }

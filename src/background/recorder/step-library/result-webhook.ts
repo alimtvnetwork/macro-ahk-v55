@@ -1,3 +1,5 @@
+import { logCaughtError, BgLogTag } from "../../bg-logger";
+
 // @ts-nocheck
 /**
  * Marco Extension — Result Webhook
@@ -134,7 +136,7 @@ function safeLocalStorage(): Storage | null {
         if (typeof localStorage === "undefined") return null;
 
         return localStorage;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return null;
     }
 }
@@ -200,7 +202,7 @@ export function loadWebhookConfig(): WebhookConfig {
             Events: events,
             SecretToken: asString(parsed.SecretToken, ""),
         };
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return { ...DEFAULT_WEBHOOK_CONFIG };
     }
 }
@@ -216,7 +218,8 @@ export function saveWebhookConfig(config: WebhookConfig): WebhookConfig {
         SecretToken: typeof config.SecretToken === "string" ? config.SecretToken : "",
     };
     if (ls) {
-        try { ls.setItem(CONFIG_STORAGE_KEY, JSON.stringify(normalized)); }catch {}
+        try { ls.setItem(CONFIG_STORAGE_KEY, JSON.stringify(normalized)); }catch (err) {
+        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); }
  // allow-swallow: localStorage quota / unavailable — config in-memory is authoritative this session
     }
 
@@ -328,7 +331,7 @@ function readLogRaw(): unknown[] {
         const parsed: unknown = JSON.parse(raw);
 
         return Array.isArray(parsed) ? parsed : [];
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return [];
     }
 }
@@ -339,7 +342,8 @@ function writeLog(entries: ReadonlyArray<WebhookDeliveryResult>): void {
     if (isMissingLs) return;
     try {
         ls.setItem(LOG_STORAGE_KEY, JSON.stringify(entries.slice(0, LOG_MAX_ENTRIES)));
-    }catch {}
+    }catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); }
  // allow-swallow: delivery-log write is best-effort; loss of one log entry must not break the run
 }
 
@@ -351,7 +355,8 @@ export function clearDeliveryLog(): void {
     const ls = safeLocalStorage();
     const isMissingLs = !ls;
     if (isMissingLs) return;
-    try { ls.removeItem(LOG_STORAGE_KEY); }catch {}
+    try { ls.removeItem(LOG_STORAGE_KEY); }catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); }
  // allow-swallow: clearing the delivery log is best-effort cleanup
 }
 

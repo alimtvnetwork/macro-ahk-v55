@@ -75,7 +75,7 @@ async function warmOneScript(script: StoredScript): Promise<boolean> {
         const url = script.isAbsolute ? filePath : chrome.runtime.getURL(filePath);
         const response = ServiceResult.wrapFetch(await fetch(url));
 
-        if (!response.isSuccess) {
+        if (response.isFail) {
             logCaughtError(BgLogTag.CACHE_WARMER, `Fetch failed for script file\n  Path: ${url}\n  Missing: Script code for "${filePath}" (HTTP ${response.status})\n  Reason: Server returned non-OK status ${response.status} — file may not exist in web_accessible_resources or dist/`, new Error(`HTTP ${response.status}`));
 
             return false;

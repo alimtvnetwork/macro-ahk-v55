@@ -34,7 +34,7 @@ export async function copyFailureReportToClipboard(
         await target.writeText(blob);
 
         return true;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return false;
     }
 }

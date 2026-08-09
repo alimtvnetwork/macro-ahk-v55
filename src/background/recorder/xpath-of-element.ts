@@ -1,3 +1,5 @@
+import { logCaughtError, BgLogTag } from "../bg-logger";
+
 /**
  * Marco Extension — Absolute XPath Builder
  *
@@ -38,7 +40,8 @@ function tryIdShortcut(el: Element, id: string): string | null {
         if (matches.length === 1 && matches[0] === el) {
             return `//*[@id='${escapeXPathLiteral(id)}']`;
         }
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
     return null;

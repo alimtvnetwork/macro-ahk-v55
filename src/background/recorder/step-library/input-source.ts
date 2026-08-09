@@ -168,7 +168,7 @@ export function loadInputSourceConfig(): InputSourceConfig {
             OnFailure: sanitiseFailurePolicy(parsed.OnFailure),
             TimeoutMs: clampTimeout(parsed.TimeoutMs),
         };
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return DEFAULT_INPUT_SOURCE_CONFIG;
     }
 }

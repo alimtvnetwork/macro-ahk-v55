@@ -14,6 +14,7 @@ import { invalidateSettingsNsCache } from "../settings-ns-cache";
 import { setVerboseLogging } from "../recorder/verbose-logging";
 import { ScriptRunAtType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 import { ThemeEnum } from "../../types/enums";
+import { logCaughtError, BgLogTag } from "../bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -120,6 +121,7 @@ export async function getChatBoxXPath(): Promise<string> {
             }
         }
     } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err);
     } // allow-swallow: per-project chatBoxXPath lookup failed; fall through to global settings
     const stored = await loadSettings();
 
@@ -188,7 +190,7 @@ async function loadPromptVariables(): Promise<Record<string, string>> {
         const result = await chrome.storage.local.get(VARIABLES_KEY);
 
         return (result[VARIABLES_KEY] as Record<string, string>) ?? {};
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return {};
     }
 }
@@ -202,7 +204,7 @@ async function loadSettings(): Promise<Partial<ExtensionSettings>> {
         const result = await chrome.storage.local.get(STORAGE_KEY);
 
         return (result[STORAGE_KEY] as Partial<ExtensionSettings>) ?? {};
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return {};
     }
 }

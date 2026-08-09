@@ -33,7 +33,7 @@ function safeMessage(caught: unknown): string {
     if (caught instanceof Error) { return caught.message; }
     if (typeof caught === "string") { return caught; }
     if (caught === undefined || caught === null) { return ""; }
-    try { return JSON.stringify(caught); } catch { return String(caught); }
+    try { return JSON.stringify(caught); } catch (err) { console.error("Automatically logged error:", err); return String(caught); }
 }
 
 /**

@@ -100,7 +100,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
         const userCreated = result.rows.filter((r) => r.IsDefault !== 1).length;
         setUserDbCount(userCreated);
       }
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
 
       // ProjectDatabases table may not exist yet — default to 0
       setUserDbCount(0);
@@ -391,7 +391,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
               <TableBody>
                 {tables.map((t) => {
                   const cols: ColumnDef[] = (() => {
-                    try { return JSON.parse(t.ColumnDefs); } catch { return []; }
+                    try { return JSON.parse(t.ColumnDefs); } catch (err) { console.error("Automatically logged error:", err); return []; }
                   })();
 
                   return (

@@ -39,7 +39,7 @@ export function DocsTab({ namespace, slug, targetUrls }: DocsTabProps) {
       } else {
         toast.error(resp.errorMessage ?? "Failed to generate docs");
       }
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Failed to generate docs");
     } finally {
       setGenerating(false);

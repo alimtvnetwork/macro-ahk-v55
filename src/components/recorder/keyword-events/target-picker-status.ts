@@ -9,7 +9,7 @@ export function classifySelector(kind: string, selectorText: string): SelectorSt
         const node = document.querySelector(trimmed);
 
         return node === null ? "no-match" : "match";
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return "invalid";
     }
 }

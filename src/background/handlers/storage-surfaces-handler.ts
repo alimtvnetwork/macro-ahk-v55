@@ -33,7 +33,7 @@ interface CookieEntry {
 function estimateBytes(value: JsonValue): number {
     try {
         return new TextEncoder().encode(JSON.stringify(value)).length;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return 0;
     }
 }

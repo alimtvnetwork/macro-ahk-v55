@@ -125,7 +125,7 @@ export function formatErrorForClipboard(error: ErrorModel): string {
 function tryPrettyJson(value: string): string {
   try {
     return JSON.stringify(JSON.parse(value), null, 2);
-  } catch {
+  } catch (err) { console.error("Automatically logged error:", err);
     return value;
   }
 }

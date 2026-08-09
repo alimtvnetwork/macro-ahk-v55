@@ -189,7 +189,8 @@ function writeJwtToLocalStorage(
         localStorage.setItem(sessionKey, jwt);
         localStorage.setItem(sessionCookieKey, jwt);
         localStorage.setItem(marcoBearerKey, jwt);
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 }
 
@@ -257,14 +258,15 @@ function scanSupabaseLocalStorageForJwt(): string | null {
                 if (session?.access_token && typeof session.access_token === "string" && session.access_token.startsWith("eyJ")) {
                     return session.access_token;
                 }
-            } catch {
+            } catch (err) { console.error("Automatically logged error:", err);
                 // Not JSON — check if raw value is a JWT
                 if (raw.startsWith("eyJ") && raw.split(".").length === 3) {
                     return raw;
                 }
             }
         }
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
     return null;
@@ -338,7 +340,7 @@ function toOriginPermissionPattern(url: string): string | null {
         const parsedUrl = new URL(url);
 
         return `${parsedUrl.origin}/*`;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return null;
     }
 }
@@ -485,7 +487,7 @@ async function getTabUrl(tabId: number): Promise<string | null> {
         const tab = await chrome.tabs.get(tabId);
 
         return tab.url ?? null;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return null;
     }
 }
@@ -516,7 +518,8 @@ function extractProjectIdFromTabUrl(url: string | null): string | null {
         // Pattern 4: bare UUID subdomain: {uuid}.lovableproject.com
         const bareUuidLabelMatch = firstLabel.match(/^([a-f0-9-]{36})$/i);
         if (bareUuidLabelMatch) return bareUuidLabelMatch[1];
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
     const subdomainMatch = url.match(/id-preview--([a-f0-9-]{36})\./i);
@@ -568,7 +571,7 @@ async function resolveSessionCookieNamesFromProjects(): Promise<readonly string[
             .filter((cookieName): cookieName is string => typeof cookieName === "string" && cookieName.length > 0);
 
         return [...new Set([...names, ...SESSION_COOKIE_NAME_FALLBACKS])];
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return SESSION_COOKIE_NAME_FALLBACKS;
     }
 }

@@ -363,7 +363,8 @@ function writeSentinelInPage(
             const host = document.body ?? document.documentElement;
             host.appendChild(element);
         }
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 }
 

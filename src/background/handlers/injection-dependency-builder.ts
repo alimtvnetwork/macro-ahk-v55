@@ -71,7 +71,7 @@ export async function prependDependencyScripts(callerScripts: ScriptEntry[], all
 
     const resolution = resolveInjectionOrder(nodes);
 
-    const isMissingIsSuccess = !resolution.isSuccess;
+    const isMissingIsSuccess = resolution.isFail;
 
     if (isMissingIsSuccess) {
         logBgWarnError(BgLogTag.INJECTION_DEPS, `Dependency resolution failed: ${resolution.errorMessage}`);

@@ -90,7 +90,7 @@ export function SdkSelfTestPanel() {
                 type: "GET_SDK_SELFTEST",
             });
             setSnapshot(res?.snapshot ?? null);
-        } catch {
+        } catch (err) { console.error("Automatically logged error:", err);
 
             setSnapshot(null);
         } finally {

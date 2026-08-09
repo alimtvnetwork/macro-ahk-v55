@@ -72,14 +72,14 @@ interface Props {
 function validateJson(raw: string): boolean {
   try { JSON.parse(raw);
 
- return true; } catch { return false; }
+ return true; } catch (err) { console.error("Automatically logged error:", err); return false; }
 }
 
 function formatJson(input: JsonValue): string {
   if (typeof input === "string") {
-    try { return JSON.stringify(JSON.parse(input), null, 2); } catch { return input; }
+    try { return JSON.stringify(JSON.parse(input), null, 2); } catch (err) { console.error("Automatically logged error:", err); return input; }
   }
-  try { return JSON.stringify(input ?? {}, null, 2); } catch { return "{}"; }
+  try { return JSON.stringify(input ?? {}, null, 2); } catch (err) { console.error("Automatically logged error:", err); return "{}"; }
 }
 
 /* ------------------------------------------------------------------ */
@@ -398,7 +398,7 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
                 setIsCheckingUpdate(true);
                 try {
                   const res = ServiceResult.wrapFetch(await fetch(updateUrl.trim()));
-                  if (!res.isSuccess) {
+                  if (res.isFail) {
                     // HEFF: single attempt; report status and stop.
                     throw new Error(
                       `HEFF: HTTP ${res.status} on GET ${updateUrl.trim()} — update fetch halted. Awaiting user instruction.`,

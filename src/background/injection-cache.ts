@@ -113,7 +113,7 @@ export async function cacheGet<T>(category: CacheCategory, subKey = ""): Promise
                 resolve(null);
             };
         });
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return null;
     }
 }
@@ -163,7 +163,8 @@ export async function cacheDelete(category: CacheCategory, subKey = ""): Promise
             request.onsuccess = () => resolve();
             request.onerror = () => resolve(); // best-effort
         });
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 }
 
@@ -191,7 +192,7 @@ export async function cacheClearAll(): Promise<{ cleared: number }> {
             };
             countReq.onerror = () => resolve({ cleared: 0 });
         });
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return { cleared: 0 };
     }
 }
@@ -220,7 +221,7 @@ export async function cacheStats(): Promise<{ entryCount: number; categories: Re
 
             request.onerror = () => resolve({ entryCount: 0, categories: {} });
         });
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return { entryCount: 0, categories: {} };
     }
 }
@@ -322,7 +323,7 @@ export async function purgeStaleEntries(): Promise<number> {
 
             request.onerror = () => resolve(0);
         });
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return 0;
     }
 }

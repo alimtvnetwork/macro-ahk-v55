@@ -40,7 +40,7 @@ type ApiStatus = {
 function toPrettyJson(value: JsonValue): string {
   try {
     return JSON.stringify(value, null, 2);
-  } catch {
+  } catch (err) { console.error("Automatically logged error:", err);
     return String(value);
   }
 }
@@ -77,7 +77,7 @@ export function ApiExplorerCard() {
         endpointCount: result.endpointCount,
         persistenceMode: result.persistenceMode,
       });
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Failed to load API status");
     }
   };
@@ -94,7 +94,7 @@ export function ApiExplorerCard() {
         setSelectedType(initialType);
         applyEndpointRequestTemplate(initialType, docs);
       }
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Failed to load API endpoint docs");
     }
   };
@@ -107,7 +107,7 @@ export function ApiExplorerCard() {
     let parsedBody: JsonValue = {};
     try {
       parsedBody = requestJson.trim() ? JSON.parse(requestJson) : {};
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Request JSON is invalid");
 
       return;

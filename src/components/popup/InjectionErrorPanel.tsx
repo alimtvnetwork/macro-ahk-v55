@@ -82,7 +82,7 @@ export function InjectionErrorPanel() {
         type: "GET_ACTIVE_ERRORS",
       });
       setErrors(res.errors ?? []);
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
 
       setErrors([]);
     }
@@ -359,9 +359,9 @@ function ClearAllButton({ onCleared }: { onCleared: () => void }) {
     try {
       await sendMessage({ type: "CLEAR_ERRORS" });
       onCleared();
-    } catch {
-
+    } catch (err) { 
       // ignore
+      RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err);
     }
     setClearing(false);
   };
@@ -409,7 +409,7 @@ function formatTime(timestamp: string): string {
       minute: "2-digit",
       second: "2-digit",
     });
-  } catch {
+  } catch (err) { console.error("Automatically logged error:", err);
     return timestamp;
   }
 }

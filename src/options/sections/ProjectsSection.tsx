@@ -50,7 +50,7 @@ export function ProjectsSection() {
                 type: "GET_ALL_PROJECTS",
             });
             setProjects(response.projects ?? []);
-        } catch {
+        } catch (err) { console.error("Automatically logged error:", err);
 
             setProjects([]);
         } finally {

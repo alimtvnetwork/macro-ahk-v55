@@ -181,7 +181,7 @@ async function fetchManifest(): Promise<SeedManifest | null> {
     console.log("[manifest-seeder] Fetching seed-manifest.json — relative: '%s', absolute: %s", MANIFEST_PATH, url);
     try {
         const resp = ServiceResult.wrapFetch(await fetch(url));
-        if (!resp.isSuccess) {
+        if (resp.isFail) {
             logBgWarnError(BgLogTag.MANIFEST_SEEDER, `Fetch failed: HTTP ${resp.status} for ${url} — file does not exist in extension dist`);
 
             return null;
@@ -454,7 +454,7 @@ async function fetchConfigJson(filePath: string): Promise<string> {
     // mem://constraints/http-error-fail-fast. Bundled-asset fetch failures
     // mean the file is missing from dist/ — retrying cannot help.
     const resp = ServiceResult.wrapFetch(await fetch(url));
-    if (!resp.isSuccess) {
+    if (resp.isFail) {
         throw new Error(`HTTP ${resp.status} on GET ${url} — config asset missing from dist/. Loop halted.`);
     }
     const data = await resp.json();

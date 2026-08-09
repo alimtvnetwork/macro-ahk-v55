@@ -1,21 +1,14 @@
-/**
- * Riseup Macro SDK — API Registry
- *
- * Config-driven endpoint definitions. Each entry defines URL pattern,
- * method, auth requirement, and optional retry/timeout overrides.
- *
- * URL params use `{paramName}` placeholders, resolved at call time.
- */
-
-/* ------------------------------------------------------------------ */
-/*  Types                                                              */
-/* ------------------------------------------------------------------ */
-
-export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+export enum HttpMethodType {
+    GET = "GET",
+    POST = "POST",
+    PUT = "PUT",
+    DELETE = "DELETE",
+    PATCH = "PATCH"
+}
 
 export interface EndpointConfig {
     readonly url: string;
-    readonly method: HttpMethod;
+    readonly method: HttpMethodType;
     readonly auth: boolean;
     readonly description: string;
     readonly timeoutMs?: number;

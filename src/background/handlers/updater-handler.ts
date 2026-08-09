@@ -13,6 +13,7 @@ import type { Database as SqlJsDatabase } from "sql.js";
 import type { DbManager } from "../db-manager";
 import { bindOpt, requireField } from "./handler-guards";
 import { InstructionStepType, ResourceType } from "../../types/enums";
+import { logCaughtError, BgLogTag } from "../bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -279,7 +280,7 @@ async function fetchVersionInfo(
         signal: AbortSignal.timeout(10_000),
     }));
 
-    if (!response.isSuccess) {
+    if (response.isFail) {
         // HEFF: single attempt, no retry.
         throw new Error(
             `HEFF: HTTP ${response.status} on GET ${url} — VersionInfo fetch failed (${response.statusText}). ` +
@@ -308,7 +309,7 @@ export async function fetchInstructions(
         signal: AbortSignal.timeout(15_000),
     }));
 
-    if (!response.isSuccess) {
+    if (response.isFail) {
         // HEFF: single attempt, no retry.
         throw new Error(
             `HEFF: HTTP ${response.status} on GET ${url} — Instruction fetch failed. ` +
@@ -359,7 +360,8 @@ export function linkUpdaterToCategory(updaterId: number, categoryName: string): 
             [updaterId, categoryId],
         );
         dbManager?.markDirty();
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 }
 

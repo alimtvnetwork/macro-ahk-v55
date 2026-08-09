@@ -70,7 +70,7 @@ export function toPascalCaseKeys(source: Record<string, unknown>): Record<string
 export function toPrettyJson(value: unknown): string {
   try {
     return JSON.stringify(value, null, 2);
-  } catch {
+  } catch (err) { console.error("Automatically logged error:", err);
     return String(value);
   }
 }

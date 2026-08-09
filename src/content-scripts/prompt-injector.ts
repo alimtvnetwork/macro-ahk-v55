@@ -45,7 +45,7 @@ function findEditorByXPath(xpath: string): HTMLElement | null {
         }
 
         return null;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return null;
     }
 }

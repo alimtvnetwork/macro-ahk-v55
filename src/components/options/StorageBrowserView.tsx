@@ -103,7 +103,7 @@ export function StorageBrowserView() {
       });
       setTables(resp.tables ?? []);
       setDbSizeBytes(resp.dbSizeBytes ?? 0);
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
 
       setTables([]);
       setDbSizeBytes(0);
@@ -120,7 +120,7 @@ export function StorageBrowserView() {
       const resp = await platform.sendMessage<{ cleared: string[] }>({ type: "STORAGE_CLEAR_ALL" });
       toast.success(`Cleared ${resp.cleared?.length ?? 0} tables`);
       void loadTables();
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Failed to clear all tables");
     }
   };
@@ -131,7 +131,7 @@ export function StorageBrowserView() {
       const resp = await platform.sendMessage<{ seeded: string[] }>({ type: "STORAGE_RESEED" });
       toast.success(`Reseeded: ${resp.seeded?.join(", ") ?? "done"}`);
       void loadTables();
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Failed to reseed");
     }
   };
@@ -165,7 +165,7 @@ export function StorageBrowserView() {
         for (const k of keys) size += (sessionStorage.getItem(k) ?? "").length * 2;
         setSessionSize(size);
       }
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
  setSessionCount(0); }
 
     // Cookies
@@ -180,7 +180,7 @@ export function StorageBrowserView() {
       } else {
         setCookieCount(document.cookie ? document.cookie.split(";").length : 0);
       }
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
  setCookieCount(0); }
 
     // LocalStorage / chrome.storage.local
@@ -202,7 +202,7 @@ export function StorageBrowserView() {
         for (const k of keys) size += (localStorage.getItem(k) ?? "").length * 2;
         setLocalSize(size);
       }
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
  setLocalCount(0); }
   }, []);
 
@@ -474,7 +474,7 @@ function CssAssetsSection() {
         type: "GET_SCRIPT_ASSETS",
       });
       setAssets(resp.assets ?? []);
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
 
       // Fallback: show known assets from manifest data
       setAssets([
@@ -646,7 +646,7 @@ function TableDataView({
       });
       toast.success("Row deleted");
       void loadData();
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Delete failed");
     }
   };
@@ -660,7 +660,7 @@ function TableDataView({
       });
       toast.success(`Cleared ${resp.deleted ?? 0} rows from ${tableName}`);
       void loadData();
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Clear failed");
     }
   };
@@ -711,7 +711,7 @@ function TableDataView({
       toast.success("Row updated");
       setEditRow(null);
       void loadData();
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Update failed");
     }
   };

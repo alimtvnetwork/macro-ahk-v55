@@ -367,7 +367,7 @@ const OptionsPage = () => {
         };
         await pSave(newProject);
         toast.success(`Imported "${newProject.name}"`);
-      } catch {
+      } catch (err) { console.error("Automatically logged error:", err);
         toast.error("Failed to parse JSON file");
       }
     };

@@ -13,6 +13,7 @@ import type { SqlValue } from "sql.js";
 import type { MessageRequest } from "../../shared/messages";
 import type { DbManager } from "../db-manager";
 import { DatabaseType } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { logCaughtError, BgLogTag } from "../bg-logger";
 
 let dbManager: DbManager | null = null;
 
@@ -71,6 +72,7 @@ export async function handleGetStorageStats(): Promise<Record<string, unknown>> 
     // Defensive: Sessions lives in logs.db — catch startup race where schema may not be ready
     let sessionCount = 0;
     try { sessionCount = countTable(logsDb, "Sessions"); } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err);
     } // allow-swallow: Sessions schema may not exist yet at startup; sessionCount=0 is the safe default
 
     return {

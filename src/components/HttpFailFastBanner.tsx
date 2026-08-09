@@ -39,8 +39,9 @@ function useCopyReport(detail: HttpFailFastEventDetail | null): { copied: boolea
             if (timerRef.current !== null) clearTimeout(timerRef.current);
             timerRef.current = window.setTimeout(() => setCopied(false), 2000);
         // allow-swallow: clipboard denied; user can select text manually
-        } catch {
- /* intentionally empty */ }
+        } catch (err) { 
+ /* intentionally empty */
+        RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); }
     }, [detail]);
 
     return { copied, handleCopy };

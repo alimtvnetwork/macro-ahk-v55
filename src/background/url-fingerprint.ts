@@ -27,7 +27,7 @@ export function urlFingerprint(rawUrl: string): string {
         const sortedSearch = sortSearchParams(parsed.searchParams);
 
         return `${parsed.origin}${parsed.pathname}${sortedSearch}`;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return rawUrl;
     }
 }

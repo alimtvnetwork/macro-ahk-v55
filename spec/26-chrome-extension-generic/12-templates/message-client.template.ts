@@ -146,7 +146,7 @@ export const messageClient = {
                 context: { type: def.type },
             });
         }
-        if (!reply.isSuccess) {
+        if (reply.isFail) {
             throw reply.error ? AppError.fromJSON(reply.error) : new AppError({
                 code: "UNKNOWN_REPLY_ERROR",
                 reason: `Handler ${def.type} returned ok=false without an error body`,

@@ -9,10 +9,14 @@ const MIME_JSON = "application/json";
 const BEARER_PREFIX = "Bearer ";
 const EMPTY_JSON_BODY = "{}";
 
-export type LovableHttpMethod = "GET" | "POST" | "PUT";
+export enum LovableHttpMethodType {
+    GET = "GET",
+    POST = "POST",
+    PUT = "PUT"
+}
 
 export interface LovableHttpRequest {
-    method: LovableHttpMethod;
+    method: LovableHttpMethodType;
     endpoint: string;
     bearerToken: string;
     jsonBody?: object;

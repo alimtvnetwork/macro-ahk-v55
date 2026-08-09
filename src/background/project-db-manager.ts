@@ -14,6 +14,7 @@ import { DEFAULT_PROJECT_DATABASES, type DefaultDatabaseDef } from "../types/def
 import { wrapDatabaseWithBindSafety } from "./sqlite-bind-safety";
 import { RECORDER_DB_SCHEMA, applyParamsJsonMigration, applyChainColumnsMigration } from "./recorder-db-schema";
 import { BootPersistenceMode } from "../types/enums";
+import { logCaughtError, BgLogTag } from "./bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -181,7 +182,8 @@ function ensureDefaultDatabases(db: SqlJsDatabase, slug: string): void { // esli
                     [def.databaseName, def.databaseKindId, def.description],
                 );
             }
-        } catch {
+        } catch (err) {
+        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
     }
 
@@ -219,7 +221,8 @@ async function tryLoadDb(sql: SqlJs, slug: string, schema: string): Promise<SqlJ
         console.log(`[project-db] OPFS: ${slug}`);
 
         return db;
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
     // Try chrome.storage.local
@@ -229,7 +232,8 @@ async function tryLoadDb(sql: SqlJs, slug: string, schema: string): Promise<SqlJ
         console.log(`[project-db] storage: ${slug}`);
 
         return db;
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
     // In-memory fallback
@@ -309,7 +313,8 @@ export async function dropProjectDb(slug: string): Promise<void> {
         try {
             const root = await navigator.storage.getDirectory();
             await root.removeEntry(dbFileName(slug));
-        }catch {}
+        }catch (err) {
+        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); }
  // allow-swallow: removeEntry is best-effort cleanup
     } else if (persistenceMode === "storage") {
         await chrome.storage.local.remove(storageKey(slug));

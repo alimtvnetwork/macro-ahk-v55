@@ -290,7 +290,7 @@ function formatBootError(step: string, error: unknown): string {
 async function readCurrentBuildId(): Promise<string | null> {
     try {
         const response = ServiceResult.wrapFetch(await fetch(chrome.runtime.getURL(BUILD_META_URL), { cache: "no-store" }));
-        if (!response.isSuccess) {
+        if (response.isFail) {
             return null;
         }
 
@@ -397,7 +397,7 @@ async function precacheStableScripts(): Promise<void> {
 
             const url = chrome.runtime.getURL(path);
             const response = ServiceResult.wrapFetch(await fetch(url));
-            if (!response.isSuccess) {
+            if (response.isFail) {
                 cacheResults.push(path + " (fetch failed: " + response.status + ") — halting remaining warms");
                 break;
             }

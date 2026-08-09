@@ -70,7 +70,7 @@ export function DefaultDatabasesStatus({ projectSlug }: DefaultDatabasesStatusPr
           rowCount: result.total ?? 0,
           loading: false,
         });
-      } catch {
+      } catch (err) { console.error("Automatically logged error:", err);
 
         updated.push({ name: def.databaseName, exists: false, rowCount: 0, loading: false });
       }

@@ -166,7 +166,8 @@ function bridgePagePayload(): void {
         if (o.type !== "MARCO_FIRST_ATTACH_ACTION") return;
         try {
             chrome.runtime.sendMessage(o);
-        } catch {
+        } catch (err) {
+        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
     };
 
@@ -186,7 +187,7 @@ export async function maybeShowFirstAttachToast(
     if (isOriginSeen(url)) return;
 
     let origin = "";
-    try { origin = new URL(url).origin; } catch { return; }
+    try { origin = new URL(url).origin; } catch (err) { console.error("Automatically logged error:", err); return; }
     if (origin === "") return;
 
     try {

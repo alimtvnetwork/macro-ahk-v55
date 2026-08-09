@@ -173,7 +173,7 @@ function VersionRow({ version, isCurrent, isFirst, isLast, prevHash, onRollback 
 function formatContent(json: string): string {
   try {
     return JSON.stringify(JSON.parse(json), null, 2);
-  } catch {
+  } catch (err) { console.error("Automatically logged error:", err);
     return json;
   }
 }

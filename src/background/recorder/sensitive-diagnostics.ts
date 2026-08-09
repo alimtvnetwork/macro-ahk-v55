@@ -39,7 +39,7 @@ function diagnosticValueLength(value: JsonValue | undefined): number {
 function safeJsonStringify(value: JsonValue): string {
     try {
         return JSON.stringify(value) ?? "null";
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return "[unserializable]";
     }
 }

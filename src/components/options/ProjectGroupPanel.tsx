@@ -114,13 +114,14 @@ async function readProjectStorageKey(storage: ProjectStorageLocal): Promise<Reco
   try {
     const out = await storage.get("marco_projects");
     if (out && typeof out === "object") return out;
-  } catch {
- /* fall through to callback storage API */ }
+  } catch (err) { 
+ /* fall through to callback storage API */
+    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); }
 
   return new Promise((resolve) => {
     try {
       storage.get("marco_projects", (out) => resolve(out ?? null));
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
  resolve(null); }
   });
 }

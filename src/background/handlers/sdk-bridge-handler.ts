@@ -109,7 +109,7 @@ export async function handleSdkCookiesGetAll(
         const cookies = await chrome.cookies.getAll(details);
 
         return { cookies };
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return { cookies: [] };
     }
 }

@@ -147,7 +147,7 @@ function buildEditorLink(file: string, line: number): string {
 function formatTimestamp(iso: string): string {
     try {
         return new Date(iso).toLocaleString();
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return iso;
     }
 }
@@ -170,7 +170,7 @@ export default function ErrorSwallowAuditView() {
 
                 return;
             }
-            if (!res.isSuccess) {
+            if (res.isFail) {
                 // HEFF: single attempt; surface status, do NOT retry.
                 setState({
                     kind: "error",
@@ -397,7 +397,7 @@ function MissingReportEmptyState() {
       "Line":     42,
       "Rule":     "no-empty-catch",
       "Message":  "Empty catch block swallows error",
-      "Snippet":  "} catch { /* swallowed */ }"
+      "Snippet":  "} catch (err) { console.error("Automatically logged error:", err); /* swallowed */ }"
     }
   ]
 }`}

@@ -54,7 +54,7 @@ export function InjectionDiagnosticsPanel() {
         (l: LogEntry) => l.Category === "INJECTION",
       );
       setEvents(injectionLogs.slice(0, 30));
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
 
       setEvents([]);
     } finally {

@@ -274,7 +274,7 @@ function sanitizeDiagnosticValue(name: string, value: JsonValue): JsonValue {
 }
 
 function safeStringify(v: JsonValue): string {
-    try { return JSON.stringify(v) ?? "undefined"; } catch { return String(v); }
+    try { return JSON.stringify(v) ?? "undefined"; } catch (err) { console.error("Automatically logged error:", err); return String(v); }
 }
 
 function valueToReplacement(value: JsonValue | null): string {

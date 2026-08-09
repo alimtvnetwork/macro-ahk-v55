@@ -79,7 +79,7 @@ export function DependencyChainPanel() {
         type: "GET_INJECTION_CHAIN",
       });
       setSnapshot(result?.latest ?? null);
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
 
       setSnapshot(null);
     } finally {
@@ -134,7 +134,7 @@ export function DependencyChainPanel() {
       setCopied(true);
       setTimeout(() => setCopied(false), Timings.TIMEOUT_NORMAL);
       toast.success("Chain diagnostics copied to clipboard");
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Failed to copy to clipboard");
     }
   }, [snapshot, formatChainText]);

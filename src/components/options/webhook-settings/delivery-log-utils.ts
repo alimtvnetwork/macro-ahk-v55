@@ -37,7 +37,7 @@ export function isCorruptPlaceholder(entry: WebhookDeliveryResult): boolean {
 export function formatTime(iso: string): string {
     try {
         return new Date(iso).toLocaleTimeString();
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return iso;
     }
 }

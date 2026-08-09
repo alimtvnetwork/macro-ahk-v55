@@ -91,7 +91,7 @@ async function resolveScriptCode(script: StoredScript): Promise<ResolvedCode> {
                 : chrome.runtime.getURL(candidate.path);
             const fetchT0 = performance.now();
             const response = ServiceResult.wrapFetch(await fetch(url));
-            if (!response.isSuccess) {
+            if (response.isFail) {
                 // HEFF D-1 (ambiguity #53): an HTTP response means the server
                 // received and rejected us. Stop the resolver — do NOT try the
                 // next candidate. Only network errors (caught below) fall

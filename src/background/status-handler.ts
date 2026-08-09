@@ -60,6 +60,7 @@ async function readAuthCookie(): Promise<ChromeCookie | null> {
         const [tab] = await _chr.tabs.query({ active: true, currentWindow: true });
         primaryUrl = tab?.url ?? null;
     } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err);
     } // allow-swallow: tabs.query rejects on restricted pages; primaryUrl is a heuristic, cookie fallback covers the miss.
 
     const sessionCookie = await readCookieFromCandidates("lovable-session-id.id", primaryUrl);
@@ -151,7 +152,7 @@ async function resolveConfigStatus(): Promise<StatusResponse["config"]> {
         }
 
         return { status: "defaults", source: "hardcoded" };
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return { status: "defaults", source: "hardcoded" };
     }
 }

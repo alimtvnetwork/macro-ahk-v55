@@ -39,7 +39,7 @@ function getStorage(): Storage | null {
         if (typeof window === "undefined") return null;
 
         return window.localStorage;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return null;
     }
 }
@@ -70,7 +70,7 @@ export function loadDiagnosticsCache(): TokenSeederDiagnosticsCache | null {
         }
 
         return parsed;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return null;
     }
 }

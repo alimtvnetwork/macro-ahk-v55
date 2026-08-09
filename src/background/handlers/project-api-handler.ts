@@ -433,7 +433,7 @@ function readLastInsertId(db: ProjectDb): number | undefined {
         const n = typeof value === "number" ? value : Number(value);
 
         return Number.isFinite(n) ? n : undefined;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return undefined;
     }
 }
@@ -445,7 +445,7 @@ function getRowsModified(db: ProjectDb): number | undefined {
         const n = reader.call(db);
 
         return Number.isFinite(n) ? n : undefined;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return undefined;
     }
 }

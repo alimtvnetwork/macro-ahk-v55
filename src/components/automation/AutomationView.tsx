@@ -44,7 +44,7 @@ async function loadChains(project: string): Promise<AutomationChain[]> {
     });
 
     return result.isOk && result.chains ? result.chains : [];
-  } catch {
+  } catch (err) { console.error("Automatically logged error:", err);
     return [];
   }
 }
@@ -103,7 +103,7 @@ async function loadProjects(): Promise<Array<{ id: string; name: string; slug: s
     }
 
     return [];
-  } catch {
+  } catch (err) { console.error("Automatically logged error:", err);
     return [];
   }
 }
@@ -221,7 +221,7 @@ export function AutomationView() {
         const count = await importChainsToDb(imported, selectedProject);
         toast.success(`Imported ${count} chain(s)`);
         void refreshChains();
-      } catch {
+      } catch (err) { console.error("Automatically logged error:", err);
         toast.error("Failed to import chains");
       }
     };

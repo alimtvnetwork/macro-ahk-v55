@@ -6,6 +6,7 @@
  */
 
 import type { Database as SqlJsDatabase } from "sql.js";
+import { logCaughtError, BgLogTag } from "./bg-logger";
 
 type SqlJs = import("sql.js").SqlJsStatic;
 
@@ -35,7 +36,8 @@ function ensureIdempotentSchema(db: SqlJsDatabase, schema: string): void {
         for (const stmt of statements) {
             try {
                 db.run(stmt);
-            } catch {
+            } catch (err) {
+            logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
         }
     }
@@ -82,7 +84,7 @@ async function readOpfsFile(
         const hasContent = buffer.byteLength > 0;
 
         return hasContent ? buffer : null;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return null;
     }
 }

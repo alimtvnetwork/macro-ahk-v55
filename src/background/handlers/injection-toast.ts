@@ -22,7 +22,7 @@ export async function isInjectionToastEnabled(): Promise<boolean> {
         const { settings } = await handleGetSettings();
 
         return settings.showInjectionToast !== false;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return true; // default on
     }
 }

@@ -42,7 +42,7 @@ export function readClickTrail(): ClickTrailEntry[] {
         if (Array.isArray(parsed) === false) return [];
 
         return parsed;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return [];
     }
 }
@@ -59,7 +59,8 @@ export function recordTrail(entry: Omit<ClickTrailEntry, "at">): void {
             ? next.slice(next.length - MAX_ENTRIES)
             : next;
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
-    } catch {
+    } catch (err) {
+    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); 
 }
 }
 
@@ -67,7 +68,8 @@ export function recordTrail(entry: Omit<ClickTrailEntry, "at">): void {
 export function clearClickTrail(): void {
     try {
         sessionStorage.removeItem(STORAGE_KEY);
-    } catch {
+    } catch (err) {
+    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); 
 }
 }
 
@@ -92,7 +94,7 @@ export function freezeClickTrail(failureId: string): ClickTrailEntry[] {
         evictOldFrozenSnapshots(key);
 
         return live;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return readClickTrail();
     }
 }
@@ -105,7 +107,7 @@ export function readFrozenClickTrail(failureId: string): ClickTrailEntry[] | nul
         const parsed = JSON.parse(raw) as ClickTrailEntry[];
 
         return Array.isArray(parsed) ? parsed : null;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return null;
     }
 }
@@ -121,7 +123,8 @@ export function clearFrozenClickTrails(): void {
             }
         }
         keysToRemove.forEach((k) => sessionStorage.removeItem(k));
-    } catch {
+    } catch (err) {
+    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); 
 }
 }
 
@@ -140,7 +143,8 @@ function evictOldFrozenSnapshots(keepKey: string): void {
             .filter((k) => k !== keepKey)
             .slice(0, frozenKeys.length - MAX_FROZEN_SNAPSHOTS);
         toRemove.forEach((k) => sessionStorage.removeItem(k));
-    } catch {
+    } catch (err) {
+    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); 
 }
 }
 

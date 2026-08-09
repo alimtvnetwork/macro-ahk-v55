@@ -18,6 +18,7 @@
  */
 
 import { syncCacheWithBuildId } from "./injection-cache";
+import { logCaughtError, BgLogTag } from "./bg-logger";
 
 const HOT_RELOAD_INTERVAL_MS = 1000;
 const BUILD_META_URL = "build-meta.json";
@@ -40,7 +41,7 @@ function isDevBuild(): boolean {
         const versionName = manifest.version_name ?? "";
 
         return versionName.toLowerCase().includes("dev");
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         // If we cannot read the manifest, fail safe and treat as production.
         return false;
     }
@@ -83,7 +84,7 @@ async function pollBuildMeta(): Promise<void> {
         const metaUrl = chrome.runtime.getURL(BUILD_META_URL);
         const response = ServiceResult.wrapFetch(await fetch(metaUrl, { cache: "no-store" }));
 
-        if (!response.isSuccess) {
+        if (response.isFail) {
             // HEFF: a non-2xx from build-meta.json means the file is gone or
             // mis-served. Do NOT keep polling once per second — stop the loop
             // and surface the status so the dev sees it.
@@ -129,6 +130,7 @@ async function pollBuildMeta(): Promise<void> {
             );
             chrome.runtime.reload();
         }
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 }

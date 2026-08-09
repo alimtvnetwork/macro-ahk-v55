@@ -30,7 +30,7 @@ export function ScriptsLibrary() {
                 type: "GET_ALL_SCRIPTS",
             });
             setScripts(response.scripts ?? []);
-        } catch {
+        } catch (err) { console.error("Automatically logged error:", err);
 
             setScripts([]);
         } finally {

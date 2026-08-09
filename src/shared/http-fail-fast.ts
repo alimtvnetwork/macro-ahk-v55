@@ -51,7 +51,8 @@ const emitHttpFailFastEvent = (err: { status: number; method: string; url: strin
         };
         window.dispatchEvent(new CustomEvent(HTTP_FAIL_FAST_EVENT, { detail }));
     // allow-swallow: event dispatch is best-effort UI surfacing; no listener is a valid state
-    } catch {
+    } catch (err) {
+    RiseupAsiaMacroExt.Logger.error("Automatically caught swallowed error", err); 
 }
 };
 

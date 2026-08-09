@@ -185,7 +185,7 @@ export function ErrorDrawer({ open, onOpenChange }: ErrorDrawerProps) {
       await sendMessage({ type: "CLEAR_ERRORS" });
       toast.success("All errors cleared");
       await refresh();
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Failed to clear errors");
     }
   }, [refresh]);

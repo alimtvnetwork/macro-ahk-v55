@@ -89,7 +89,7 @@ function isProjectPageUrl(url: string): boolean {
 
         // Only allow /projects/* paths on lovable.dev
         return path.startsWith("/projects/");
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return false;
     }
 }
@@ -405,7 +405,7 @@ async function injectSingleResolved(
             logCspFallbackUsed(resolved.injectable.id, tabId);
         }
 
-        const isInjectionFailed = !result.isSuccess;
+        const isInjectionFailed = result.isFail;
 
         if (isInjectionFailed) {
             logInjectionError(resolved.injectable.id, result.errorMessage);

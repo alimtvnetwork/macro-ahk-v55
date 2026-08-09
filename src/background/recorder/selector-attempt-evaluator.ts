@@ -271,5 +271,5 @@ function failure(
 function extractMessage(err: unknown): string {
     if (err instanceof Error) { return err.message; }
     if (typeof err === "string") { return err; }
-    try { return JSON.stringify(err); } catch { return String(err); }
+    try { return JSON.stringify(err); } catch (err) { console.error("Automatically logged error:", err); return String(err); }
 }

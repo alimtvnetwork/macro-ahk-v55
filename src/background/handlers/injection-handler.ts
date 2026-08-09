@@ -58,6 +58,7 @@ import {
     executeInTab,
 } from "./injection-pipeline";
 import { PipelineLineLevel, MirrorDiagnosticToTabLevel } from "../../types/enums";
+import { logCaughtError, BgLogTag } from "../bg-logger";
 
 // Pipeline cache types/helpers + Stage 3/4 machinery moved to ./injection-pipeline (PERF-R2b step 5).
 // Syntax preflight helpers moved to ./injection-syntax-preflight (PERF-R2b step 1).
@@ -338,7 +339,8 @@ export async function handleInjectScripts(
     try {
         const { settings } = await handleGetSettings();
         budgetMs = settings.injectionBudgetMs ?? 500;
-    } catch { /* use default */ } // allow-swallow: settings load failure falls back to default budget
+    } catch {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); /* use default */ } // allow-swallow: settings load failure falls back to default budget
     if (totalMs > budgetMs) {
         logBgWarnError(
             BgLogTag.INJECTION,
@@ -374,7 +376,7 @@ export async function handleInjectScripts(
         });
     }
     if (toastEnabled && failCount > 0) {
-        const failedNames = execResults.filter(r => !r.isSuccess).map(r => r.scriptName ?? r.scriptId);
+        const failedNames = execResults.filter(r => r.isFail).map(r => r.scriptName ?? r.scriptId);
         void showInjectionFailureToastInTab(injectRequest.tabId, failedNames, failCount, execResults.length, totalMs).catch((toastErr) => {
             logBgWarnError(BgLogTag.INJECTION, `showInjectionFailureToastInTab failed (tab ${injectRequest.tabId}, ${failCount} failed scripts) — UI cosmetic only`, toastErr);
         });
@@ -456,7 +458,8 @@ async function executeCachedPayload(
     try {
         const { settings } = await handleGetSettings();
         budgetMs = settings.injectionBudgetMs ?? 500;
-    } catch { /* use default */ } // allow-swallow: settings load failure falls back to default budget
+    } catch {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); /* use default */ } // allow-swallow: settings load failure falls back to default budget
     if (totalMs > budgetMs) {
         logBgWarnError(BgLogTag.INJECTION, `PERFORMANCE BUDGET EXCEEDED (cached path) — ${totalMs}ms (budget: ${budgetMs}ms)`);
     }

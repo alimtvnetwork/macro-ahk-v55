@@ -12,6 +12,7 @@
 
 import type { Database as SqlJsDatabase } from "sql.js";
 import { ColumnValidationType, Type, OnDeleteEnum } from "../types/enums";
+import { logCaughtError, BgLogTag } from "./bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Meta table schemas                                                  */
@@ -292,6 +293,7 @@ export function applyJsonSchema(db: SqlJsDatabase, schema: JsonSchemaDef): Migra
         db.run("COMMIT");
     } catch (err) {
         try { db.run("ROLLBACK"); } catch (err) {
+        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err);
         } // allow-swallow: ROLLBACK after failed COMMIT may itself fail if no active txn; outer error is already recorded
         result.errors.push(`Transaction failed: ${String(err)}`);
     }

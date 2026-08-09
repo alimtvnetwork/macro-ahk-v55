@@ -90,7 +90,7 @@ export function VariablesEditor({ json, onChange }: VariablesEditorProps) {
     const parsedJson = useMemo(() => {
         try {
             return JSON.parse(json || "{}");
-        } catch {
+        } catch (err) { console.error("Automatically logged error:", err);
             return null;
         }
     }, [json]);

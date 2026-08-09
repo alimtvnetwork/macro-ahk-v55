@@ -36,6 +36,7 @@ export type SkipReason = SkipReasonType;
 export interface InjectionResult {
     scriptId: string;
     isSuccess: boolean;
+    isFail?: boolean;
     errorMessage?: string;
     durationMs: number;
     /** Set when the script was skipped before execution. */

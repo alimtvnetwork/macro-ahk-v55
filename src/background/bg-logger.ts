@@ -17,6 +17,7 @@
 
 import { MessageType, type MessageRequest } from "../shared/messages";
 import { handleLogError } from "./handlers/logging-handler";
+import { logCaughtError, BgLogTag } from "./bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Log Tag Enum                                                       */
@@ -121,7 +122,8 @@ export function logBgError(
             configId: context?.configId,
             scriptFile: context?.scriptFile,
         } as MessageRequest).catch(() => { /* fall through to console.error */ }); // allow-swallow: DB/session not ready — console.error below preserves the error
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
     // Step 3: Console.error LAST — always executes, preserves full stack trace

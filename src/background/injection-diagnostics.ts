@@ -8,6 +8,7 @@
 import { MessageType, type MessageRequest } from "../shared/messages";
 import { handleLogEntry, handleLogError } from "./handlers/logging-handler";
 import { LevelEnum, MirrorDiagnosticToTabLevel, PipelineLineLevel } from "../types/enums";
+import { logCaughtError, BgLogTag } from "./bg-logger";
 
 export interface InjectionDiagnosticContext {
     configId?: string;
@@ -51,7 +52,8 @@ async function persistLogEntry(
             projectId: context.projectId,
             configId: context.configId,
         } as MessageRequest);
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 }
 
@@ -80,7 +82,8 @@ export async function persistInjectionError(
             configId: context.configId,
             scriptFile: context.scriptFile,
         } as MessageRequest);
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 }
 
@@ -109,7 +112,8 @@ export async function mirrorDiagnosticToTab(
             },
             args: [message, level],
         });
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 }
 
@@ -172,6 +176,7 @@ export async function mirrorPipelineLogsToTab(
             },
             args: [lines, groupTitle],
         });
-    } catch {
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 }

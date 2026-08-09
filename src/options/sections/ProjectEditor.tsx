@@ -55,7 +55,7 @@ export function ProjectEditor({ project, onBack }: ProjectEditorProps) {
         if (!project?.settings) return "{}";
         const vars = (project.settings as Record<string, unknown>).variables;
         if (vars === undefined) return "{}";
-        try { return JSON.stringify(vars, null, 2); } catch { return "{}"; }
+        try { return JSON.stringify(vars, null, 2); } catch (err) { console.error("Automatically logged error:", err); return "{}"; }
     });
     const [isSaving, setIsSaving] = useState(false);
     const [toast, setToast] = useState<{ message: string; variant: AlertVariantType } | null>(null);

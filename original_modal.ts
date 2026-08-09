@@ -1390,7 +1390,7 @@ async function buildRoleSection(refs: ModalRefs, role: PromptRole): Promise<HTML
     wrap.appendChild(h);
 
     const result = await listPromptsByRole(role);
-    if (!result.isSuccess || !result.value) {
+    if (result.isFail || !result.value) {
         const err = document.createElement('div');
         err.textContent = 'Load error: ' + (result.error ?? 'unknown');
         err.style.cssText = 'color:#f5a3a3;font-size:11px;';
@@ -1545,7 +1545,7 @@ async function handleResetToDefault(refs: ModalRefs, row: PromptRow): Promise<vo
             replaceKey: row.ReplaceKey, replaceValues: row.ReplaceValues,
             previousBody: row.Body, previousReplaceKey: row.ReplaceKey,
         });
-        if (!result.isSuccess) {
+        if (result.isFail) {
             logError(LOG_SCOPE, 'reset-to-default upsertPrompt failed for slug=' + row.Slug, new Error(result.error ?? 'unknown'));
             refs.status.textContent = 'Reset failed: ' + (result.error ?? 'unknown error');
             showToast('Γ¥î Reset failed for ' + row.Slug, TOAST_ERROR);
@@ -1722,7 +1722,7 @@ async function handleEditSave(refs: ModalRefs, row: PromptRow, payload: EditSave
             replaceKey: payload.replaceKey,
             replaceValues: payload.replaceValues,
         });
-        if (!res.isSuccess) {
+        if (res.isFail) {
             refs.status.textContent = 'Save failed: ' + (res.error ?? 'unknown');
             logError(LOG_SCOPE, 'edit save failed', res);
             return;
@@ -1740,7 +1740,7 @@ async function handleSetDefault(refs: ModalRefs, row: PromptRow): Promise<void> 
     refs.status.textContent = 'Setting default: ' + row.Slug + ' ...';
     try {
         const res = await setDefaultPromptForRole(row.Id, row.Role);
-        if (!res.isSuccess) {
+        if (res.isFail) {
             refs.status.textContent = 'Set-default failed: ' + (res.error ?? 'unknown');
             logError(LOG_SCOPE, 'setDefault failed', res);
             return;
@@ -1763,7 +1763,7 @@ async function handleDuplicate(refs: ModalRefs, row: PromptRow): Promise<void> {
             body: row.Body,
             role: row.Role,
         });
-        if (!res.isSuccess) {
+        if (res.isFail) {
             refs.status.textContent = 'Duplicate failed: ' + (res.error ?? 'unknown');
             logError(LOG_SCOPE, 'duplicate failed', res);
             return;
@@ -1782,7 +1782,7 @@ async function handleDelete(refs: ModalRefs, row: PromptRow): Promise<void> {
     refs.status.textContent = 'Deleting: ' + row.Slug + ' ...';
     try {
         const res = await deletePromptById(row.Id);
-        if (!res.isSuccess) {
+        if (res.isFail) {
             const reason = res.error ?? 'unknown';
             const msgText = 'Cannot delete "' + row.Name + '": ' + reason;
             refs.status.textContent = 'Delete blocked: ' + reason;

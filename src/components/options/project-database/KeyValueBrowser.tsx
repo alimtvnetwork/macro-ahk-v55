@@ -71,7 +71,7 @@ export function KeyValueBrowser({ projectSlug }: KeyValueBrowserProps) {
         const uniqueNs = [...new Set(result.rows.map((r) => r.Namespace))].sort();
         setNamespaces(uniqueNs);
       }
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
 
       setEntries([]);
     } finally {

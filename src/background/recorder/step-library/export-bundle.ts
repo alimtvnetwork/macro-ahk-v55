@@ -32,6 +32,7 @@ import type JSZipType from "jszip";
 import { applySchema, StepKindId } from "./schema";
 import { StepLibraryDb, type StepGroupRow, type StepRow } from "./db";
 import { ExportReasonEnum } from "../../../types/enums";
+import { logCaughtError, BgLogTag } from "../../bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -451,7 +452,8 @@ function writeSnapshot(
     try {
         return populateSnapshotDb(dst, src, projectId, projectRow, effectiveIds, preflight);
     } catch (err) {
-        try { dst.exec("ROLLBACK;"); } catch {
+        try { dst.exec("ROLLBACK;"); } catch (err) {
+        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
         return {

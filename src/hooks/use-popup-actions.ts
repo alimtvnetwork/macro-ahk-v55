@@ -126,12 +126,12 @@ export function usePopupActions() {
       );
 
       const successes = result.results.filter((r) => r.isSuccess).length;
-      const failures = result.results.filter((r) => !r.isSuccess && !r.skipReason).length;
+      const failures = result.results.filter((r) => r.isFail && !r.skipReason).length;
       const skipped = result.results.filter((r) => r.skipReason).length;
 
       if (failures > 0) {
         const failedNames = result.results
-          .filter((r) => !r.isSuccess && !r.skipReason)
+          .filter((r) => r.isFail && !r.skipReason)
           .map((r) => `${r.scriptName ?? r.scriptId}: ${r.errorMessage ?? "unknown"}`)
           .join("\n");
         toast.error(`${failures} script(s) failed:\n${failedNames}`);

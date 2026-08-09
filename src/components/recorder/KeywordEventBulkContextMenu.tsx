@@ -447,7 +447,7 @@ function loadPersistedSequence(): SequenceRenameInput {
         }
 
         return DEFAULT_SEQUENCE_RENAME;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return DEFAULT_SEQUENCE_RENAME;
     }
 }

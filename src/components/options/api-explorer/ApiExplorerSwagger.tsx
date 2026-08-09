@@ -36,7 +36,7 @@ export function ApiExplorerSwagger() {
         endpointCount: result.endpointCount,
         persistenceMode: result.persistenceMode,
       });
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Failed to load API status");
     }
   };
@@ -46,7 +46,7 @@ export function ApiExplorerSwagger() {
       const result = await sendMessage<ApiEndpointsResponse>({ type: "GET_API_ENDPOINTS" as any });
       const raw = result.endpoints ?? [];
       setEndpoints(raw.map((e) => normalizeEndpoint(e as unknown as Record<string, unknown>)));
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
       toast.error("Failed to load API endpoint docs");
     }
   };

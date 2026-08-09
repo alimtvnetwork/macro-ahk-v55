@@ -18,6 +18,7 @@ import { DomTargetEnum } from "../types/enums";
 /** Result of a CSP-aware injection attempt. */
 export interface CspInjectionResult {
     isSuccess: boolean;
+    isFail?: boolean;
     world: chrome.scripting.ExecutionWorld | "USER_SCRIPT";
     isFallback: boolean;
     errorMessage?: string;
@@ -285,18 +286,18 @@ async function executeInMainWorld(code: string): Promise<string> {
                 Node.prototype.appendChild.call(target, node);
 
                 return true;
-            } catch {
+            } catch (err) { console.error("Automatically logged error:", err);
                 try {
                     Node.prototype.insertBefore.call(target, node, null);
 
                     return true;
-                } catch {
+                } catch (err) { console.error("Automatically logged error:", err);
                     if (node.nodeType === Node.ELEMENT_NODE) {
                         try {
                             Element.prototype.insertAdjacentElement.call(target, "beforeend", node as Element);
 
                             return true;
-                        } catch {
+                        } catch (err) { console.error("Automatically logged error:", err);
                             return false;
                         }
                     }
@@ -323,7 +324,8 @@ async function tryInjectViaScripting(
     tabId: number,
     code: string,
     world: chrome.scripting.ExecutionWorld,
-): Promise<{ isSuccess: boolean; errorMessage?: string; domTarget?: string }> {
+): Promise<{ isSuccess: boolean;
+    isFail?: boolean; errorMessage?: string; domTarget?: string }> {
     try {
         const results = await chrome.scripting.executeScript({
             target: { tabId },
@@ -602,18 +604,18 @@ async function executeBlobInjection(code: string): Promise<string> {
                 Node.prototype.appendChild.call(target, node);
 
                 return true;
-            } catch {
+            } catch (err) { console.error("Automatically logged error:", err);
                 try {
                     Node.prototype.insertBefore.call(target, node, null);
 
                     return true;
-                } catch {
+                } catch (err) { console.error("Automatically logged error:", err);
                     if (node.nodeType === Node.ELEMENT_NODE) {
                         try {
                             Element.prototype.insertAdjacentElement.call(target, "beforeend", node as Element);
 
                             return true;
-                        } catch {
+                        } catch (err) { console.error("Automatically logged error:", err);
                             return false;
                         }
                     }

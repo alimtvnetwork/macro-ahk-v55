@@ -50,7 +50,7 @@ export function readSentinel(): SentinelSnapshot | null {
             canRun: canRunRaw === "true",
             trigger,
         };
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return null;
     }
 }

@@ -194,7 +194,7 @@ async function loadScriptCode(projectId: string, script: ScriptEntry): Promise<s
         const file = files.find((f: { path: string; content: string }) => f.path === script.path);
 
         return file?.content ?? null;
-    } catch {
+    } catch (err) { console.error("Automatically logged error:", err);
         return null;
     }
 }
@@ -216,7 +216,8 @@ function logDynamicLoad(
         let version = "unknown";
         try {
             version = chrome.runtime.getManifest().version;
-        } catch {
+        } catch (err) {
+        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
         db.run(
