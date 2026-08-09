@@ -594,7 +594,7 @@ export function saveRoleScopedPrompt(input: PromptSaveInput, role: PromptRole): 
   // Extended to `next` in v4.183.0 to close the asymmetric-validator gap.
   if (role === 'plan' || role === 'next') {
     const check = validateRuleZero(input.text);
-    const isMissingOk = check.isFail;
+    const isMissingOk = !check.ok;
     if (isMissingOk) {
       const slug = buildSlug(role, input.name, input.editPrompt);
       logDiagnosticFromCode(
@@ -864,7 +864,7 @@ function _buildPromptModalFooter(
   const refreshDriftState = function (): void {
     const missing = tokenStrip ? tokenStrip.recomputeMissing(contentArea.value) : [];
     const ruleZero = ruleZeroIndicator ? ruleZeroIndicator.recompute(contentArea.value) : null;
-    const ruleZeroBlocks = ruleZero !== null && ruleZero.isFail;
+    const ruleZeroBlocks = ruleZero !== null && !ruleZero.ok;
     const blocked = missing.length > 0 || ruleZeroBlocks;
     (saveBtn as HTMLButtonElement).disabled = blocked;
     saveBtn.style.opacity = blocked ? '0.5' : '1';
@@ -933,7 +933,7 @@ function _buildPromptModalFooter(
         if (previousId !== undefined) undoPayload.id = previousId;
 
         return upsertPrompt(undoPayload).then(function(r) {
-          const isMissingOk = r.isFail;
+          const isMissingOk = !r.ok;
           if (isMissingOk) {
             showPasteToast('❌ Undo failed: ' + (r.error ?? 'upsert failed'), true);
             logDiagnosticFromCode(
