@@ -43,7 +43,18 @@ export interface RuleZeroCheck {
     actualN: number | null;
     /** Human-readable reason. Non-empty on both pass and fail for logging. */
     reason: string;
+    /**
+     * Stable machine code. Callers switch on this instead of parsing `reason`.
+     * `'template'`, `'match'`, `'no-declaration'`, `'no-steps'`, `'mismatch'`.
+     */
+    code: RuleZeroCodeCategoryType;
 }
+
+const RE_FENCE = /^\s*```/;
+const RE_STEPS_HEADING = /^#{1,6}\s+steps\s*$/i;
+const RE_NEXT_HEADING = /^#{1,6}\s+\S+/;
+const RE_TOP_LEVEL_NUMBERED = /^(\d+)\.\s+\S/;
+
 /** Frontmatter line: `Steps: 5` or `Steps: {{n}}`. First match wins. */
 const RE_FRONTMATTER_STEPS = /^\s*steps\s*:\s*(\S.*?)\s*$/im;
 

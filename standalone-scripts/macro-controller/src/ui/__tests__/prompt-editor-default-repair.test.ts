@@ -151,7 +151,7 @@ describe('openDefaultPromptEditor default repair', () => {
     expect(mocks.openPromptCreationModal).not.toHaveBeenCalled();
     // PlanTierType 26 step 8: toast now carries a diagnostic code suffix.
     const errorToast = mocks.showToast.mock.calls.find(([, level]) => level === 'error');
-    expect(errorToast?.[0]).toContain('Default prompt repair failed');
+    expect(errorToast?.[0]).toContain('Default prompt lookup failed');
     expect(errorToast?.[0]).toContain('[code=PROMPT_EDIT_E005]');
   });
 });
