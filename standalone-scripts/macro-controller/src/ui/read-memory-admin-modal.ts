@@ -48,7 +48,7 @@ async function fetchReadMemoryRows(): Promise<ReadMemoryRow[]> {
     + "OR Name LIKE '" + DUPLICATE_PREFIX + "%' "
     + 'ORDER BY IsDefault DESC, Slug ASC';
   const resp = await runSqlBridge('QUERY', sql);
-  if (!resp?.ok || !Array.isArray(resp.rows)) return [];
+  if (resp.isFail || !Array.isArray(resp.rows)) return [];
 
   return coerceRows(resp.rows as unknown[]);
 }
@@ -76,7 +76,7 @@ async function deactivateRow(row: ReadMemoryRow): Promise<boolean> {
     "UPDATE Prompt SET IsDefault = 0, Name = '" + escaped + "', "
     + 'UpdatedAt = ' + now + ' WHERE Id = ' + row.Id;
   const resp = await runSqlBridge('SCHEMA', sql);
-  if (!resp?.ok) {
+  if (resp.isFail) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'read-memory-admin-deactivate',
       reason: resp?.errorMessage ?? 'unknown error',

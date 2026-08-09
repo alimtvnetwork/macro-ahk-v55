@@ -30,11 +30,21 @@ import { RunSqlMethod, SqlBucketType } from "../types/enums";
 import { logError } from '../error-utils';
 import { ServiceResult } from '../utils/result-wrapper';
 
-export interface SqlBridgeResp {
-    ok: boolean;
-    rows?: unknown[];
-    errorMessage?: string;
-    lastInsertId?: number;
+export class SqlBridgeResp {
+    constructor(
+        public readonly ok: boolean,
+        public readonly rows?: unknown[],
+        public readonly errorMessage?: string,
+        public readonly lastInsertId?: number
+    ) {}
+
+    get isSuccess(): boolean {
+        return this.ok;
+    }
+
+    get isFail(): boolean {
+        return !this.ok;
+    }
 }
 
 export type LegacyMethod = MethodEnum;
@@ -142,11 +152,12 @@ function classify(legacy: LegacyMethod, sql: string): Bucket {
 }
 
 async function sendOnce(method: string, sql: string, project: string): Promise<SqlBridgeResp> {
-    const resp = await sendToExtension('PROJECT_API', {
+    const raw = await sendToExtension('PROJECT_API', {
         project, method, endpoint: 'rawSql', params: { sql },
-    });
+    }) as any;
 
-    return (resp as SqlBridgeResp) ?? { ok: false, errorMessage: 'no response' };
+    const obj = raw ?? { ok: false, errorMessage: 'no response' };
+    return new SqlBridgeResp(obj.ok, obj.rows, obj.errorMessage, obj.lastInsertId);
 }
 
 /**
@@ -164,7 +175,7 @@ export async function runSql(legacy: LegacyMethod, sql: string, project: string 
         delete winning[bucket];
     }
 
-    let lastResp: SqlBridgeResp = { ok: false, errorMessage: 'no candidate methods tried' };
+    let lastResp = new SqlBridgeResp(false, undefined, 'no candidate methods tried');
     for (const method of CANDIDATES[bucket]) {
         const resp = await sendOnce(method, sql, project);
         if (resp.ok) {
@@ -199,7 +210,7 @@ export async function runLoggedQuery(
     project: string = DB_NAME
 ): Promise<SqlBridgeResp> {
     const resp = await runSql(legacy, sql, project);
-    if (!resp.ok) {
+    if (resp.isFail) {
         logError('runLoggedQuery', contextInfo + ': ' + (resp.errorMessage || 'unknown error'), new Error(resp.errorMessage || 'unknown error'));
 
         return resp;

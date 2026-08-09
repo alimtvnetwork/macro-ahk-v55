@@ -153,7 +153,7 @@ async function readPromptColumnNames(): Promise<Set<string>> {
 
 async function applyPromptColumnMigration(migration: PromptColumnMigration): Promise<void> {
   const resp = await runLoggedQuery('SCHEMA', migration.ddl, 'context');
-  if (!resp?.ok) {
+  if (resp.isFail) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', { column: migration.column, reason: resp?.errorMessage ?? UNKNOWN_ERROR });
 
     return;
@@ -217,7 +217,7 @@ async function runOrphanRepairStage(stages: Stage[]): Promise<OrphanRepairReport
 async function runSeedPlanNextStage(stages: Stage[]): Promise<void> {
   const { seedPlanNextPrompts } = await import('../seed/seed-plan-next');
   const seedResult = await seedPlanNextPrompts();
-  if (!seedResult.ok) {
+  if (seedResult.isFail) {
     const reason = seedResult.error ?? UNKNOWN_ERROR;
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'seed-plan-next', reason });
     stages.push({ stage: 'seed-plan-next', status: 'failed', reason });

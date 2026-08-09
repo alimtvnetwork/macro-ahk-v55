@@ -24,11 +24,21 @@ export interface ApiCallOptions {
     timeoutMs?: number;
 }
 
-export interface ApiResponse<T = unknown> {
-    readonly ok: boolean;
-    readonly status: number;
-    readonly data: T;
-    readonly headers: Record<string, string>;
+export class ApiResponse<T = unknown> {
+    constructor(
+        public readonly ok: boolean,
+        public readonly status: number,
+        public readonly data: T,
+        public readonly headers: Record<string, string>
+    ) {}
+
+    get isSuccess(): boolean {
+        return this.ok;
+    }
+
+    get isFail(): boolean {
+        return !this.ok;
+    }
 }
 
 /* ------------------------------------------------------------------ */
@@ -68,12 +78,8 @@ async function callEndpoint<T = unknown>(
         }
     }
 
-    return {
-        ok: response.status >= 200 && response.status < 300,
-        status: response.status,
-        data: response.data,
-        headers: responseHeaders,
-    };
+    const isOk = response.status >= 200 && response.status < 300;
+    return new ApiResponse<T>(isOk, response.status, response.data, responseHeaders);
 }
 
 /* ------------------------------------------------------------------ */

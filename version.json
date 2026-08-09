@@ -3,6 +3,6 @@
   "generatedFrom": "git-describe",
   "note": "This file is a build-time artifact derived from the git tag by scripts/write-version-from-tag.mjs. The release version is the git tag (vX.Y.Z), not this file. Do not hand-edit the 'version' field. See .lovable/spec/commands/05-tag-is-single-source-of-truth-for-version.md.",
   "timezonePolicy": "UTC storage; user-local rendering",
-  "generatedAt": "2026-08-09T14:50:59.319Z",
+  "generatedAt": "2026-08-09T16:52:17.430Z",
   "releaseDate": "2026-08-09"
 }

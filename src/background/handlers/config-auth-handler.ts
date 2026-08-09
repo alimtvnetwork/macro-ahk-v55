@@ -359,24 +359,18 @@ export async function handleRefreshToken(
         console.log("[config-auth] REFRESH: found JWT directly in session cookie");
     }
 
-    const isMissingAuthToken = !authToken;
-
     // Strategy 2: Supabase localStorage JWT
-    if (isMissingAuthToken) {
+    if (!authToken) {
         authToken = await readSupabaseJwtFromPlatformTabs(tabUrlHint);
     }
 
-    const isMissingAuthToken = !authToken;
-
     // Strategy 3: Signed URL token fallback (no network)
-    if (isMissingAuthToken) {
+    if (!authToken) {
         authToken = await resolveSignedUrlTokenCandidate(tabUrlHint, primaryUrl);
     }
 
-    const isMissingAuthToken = !authToken;
-
     // Strategy 4: Opaque session-cookie exchange
-    if (isMissingAuthToken) {
+    if (!authToken) {
         authToken = await fetchAuthTokenFromSessionExchange(
             projectId,
             sessionId !== null || refreshToken !== null,

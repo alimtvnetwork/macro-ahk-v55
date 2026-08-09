@@ -50,7 +50,7 @@ function toDuplicateRows(rows: readonly unknown[]): DuplicateRow[] {
 async function findDuplicates(): Promise<DuplicateRow[]> {
   const sql = 'SELECT Id, Slug, Name FROM Prompt WHERE ' + READ_MEMORY_MATCH_WHERE;
   const resp = await runLoggedQuery('QUERY', sql, 'context');
-  if (!resp?.ok || !Array.isArray(resp.rows)) return [];
+  if (resp.isFail || !Array.isArray(resp.rows)) return [];
 
   return toDuplicateRows(resp.rows as unknown[]);
 }
@@ -64,7 +64,7 @@ async function demoteDuplicates(ids: readonly number[]): Promise<boolean> {
     + 'UpdatedAt = ' + now + ' '
     + 'WHERE Id IN (' + idList + ')';
   const resp = await runLoggedQuery('SCHEMA', sql, 'context');
-  if (!resp?.ok) {
+  if (resp.isFail) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'read-memory-duplicates',
       reason: resp?.errorMessage ?? 'unknown error',
