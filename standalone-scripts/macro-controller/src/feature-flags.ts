@@ -10,19 +10,19 @@
  *   - mem://constraints/no-retry-policy — flag reads are single-shot.
  */
 
-export type FeatureFlagName = 'Loop.RunStateGate.Enabled';
+export enum FeatureFlagNameType { LoopRunStateGateEnabled = 'Loop.RunStateGate.Enabled' };
 
-const DEFAULTS: Readonly<Record<FeatureFlagName, boolean>> = {
+const DEFAULTS: Readonly<Record<FeatureFlagNameType, boolean>> = {
     // Enabled in v3.37.0 (Issue 124 §6). Run-state gate + queue pause/resume
     // now wrap every adjacent move. STOP button is never clicked.
     'Loop.RunStateGate.Enabled': true,
 };
 
 interface FlagBridge {
-    featureFlags?: Partial<Record<FeatureFlagName, boolean>>;
+    featureFlags?: Partial<Record<FeatureFlagNameType, boolean>>;
 }
 
-function readOverride(flag: FeatureFlagName): boolean | null {
+function readOverride(flag: FeatureFlagNameType): boolean | null {
     if (typeof window === 'undefined') {
         return null;
     }
@@ -38,7 +38,7 @@ function readOverride(flag: FeatureFlagName): boolean | null {
     return null;
 }
 
-export function isFeatureFlagEnabled(flag: FeatureFlagName): boolean {
+export function isFeatureFlagEnabled(flag: FeatureFlagNameType): boolean {
     const override = readOverride(flag);
     if (override !== null) {
         return override;
@@ -48,7 +48,7 @@ export function isFeatureFlagEnabled(flag: FeatureFlagName): boolean {
 }
 
 /** Test-only: seed an override on window.marco.featureFlags. */
-export function setFeatureFlagOverrideForTests(flag: FeatureFlagName, value: boolean | null): void {
+export function setFeatureFlagOverrideForTests(flag: FeatureFlagNameType, value: boolean | null): void {
     if (typeof window === 'undefined') {
         return;
     }

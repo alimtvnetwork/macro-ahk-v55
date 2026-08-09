@@ -11,6 +11,7 @@
  * listeners. Esc / outside click / ✕ all dismiss when not submitting.
  */
 
+import { EVENT_LISTENER_DELAY_MS, MODAL_ANIMATION_DELAY_MS } from './constants';
 import { cPanelBg, cPanelFg, cPanelBorder, cPrimary, cPrimaryLight, lDropdownRadius } from './shared-state';
 import { getRemixConfig, openRemixRedirect } from './remix-config';
 import { submitRemix } from './remix-fetch';
@@ -244,7 +245,7 @@ export function showRemixModal(opts: RemixModalOpts): void {
     if (e.key === 'Escape' && !state.submitting) hideRemixModal();
   };
   (el as HTMLElement & ModalHandlerStore)._marcoRemixKey = onKey;
-  setTimeout(function () { document.addEventListener('keydown', onKey, true); }, 10);
+  setTimeout(function () { document.addEventListener('keydown', onKey, true); }, EVENT_LISTENER_DELAY_MS);
 
   // Focus name input for quick edit.
   setTimeout(function () {

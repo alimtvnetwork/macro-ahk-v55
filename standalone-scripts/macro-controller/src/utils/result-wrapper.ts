@@ -10,7 +10,7 @@ export class ServiceResult<T = unknown, E = unknown> {
     }
 
     get isFail(): boolean {
-        return !this.ok;
+        return this.isFail;
     }
 
     static wrapFetch(response: Response): ServiceResult<Response, Error> {

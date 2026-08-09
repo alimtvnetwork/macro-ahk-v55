@@ -47,7 +47,7 @@ interface LoadState {
 async function attemptInitialLoad(role: PromptRole): Promise<{ res: ListRes; initialReason: string | null }> {
   let res = await listPromptsByRole(role);
   let initialReason = res.isSuccess ? null : (res.error ?? 'listPromptsByRole returned !ok');
-  if (!res.isSuccess && isSqlBridgeContractError(initialReason ?? undefined)) {
+  if (res.isFail && isSqlBridgeContractError(initialReason ?? undefined)) {
     resetSqlBridgeCache();
     const retry = await listPromptsByRole(role);
     if (retry.isSuccess) { res = retry; initialReason = null; }
@@ -58,7 +58,7 @@ async function attemptInitialLoad(role: PromptRole): Promise<{ res: ListRes; ini
 
 async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ res: ListRes; stage: LoadStage; seedReason: string | null; seedAttempted: boolean }> {
   const isManaged = role === 'plan' || role === 'next';
-  const emptyOrFailed = !current.isSuccess || ((current.value ?? []).length === 0);
+  const emptyOrFailed = current.isFail || ((current.value ?? []).length === 0);
   if (!isManaged || !emptyOrFailed) {
     return { res: current, stage: 'initial-list', seedReason: null, seedAttempted: false };
   }
@@ -68,7 +68,7 @@ async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ re
   try {
     const seedMod = await import('../seed/seed-plan-next');
     const seedRes = await seedMod.seedPlanNextPrompts();
-    const isMissingOk = !seedRes.isSuccess;
+    const isMissingOk = seedRes.isFail;
     if (isMissingOk) {
       seedReason = seedRes.error ?? 'seedPlanNextPrompts returned !ok';
       logError('ChipGearPicker', 'auto-seed before pick failed for ' + role, new Error(seedReason));
@@ -130,7 +130,7 @@ export async function pickPromptFromRole(opts: PickPromptOptions): Promise<Promp
     seedReason: seeded.seedReason,
   };
   state.res = await retryOnContractError(opts.role, state);
-  const isMissingOk = !state.res.isSuccess;
+  const isMissingOk = state.res.isFail;
   if (isMissingOk) return emitLoadFailure(opts, state);
   const rows = (state.res.value ?? []).filter((r) => !opts.excludeDefault || r.IsDefault !== 1);
   if (rows.length === 0) return emitEmptyToast(opts, state.seedReason);

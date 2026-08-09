@@ -17,7 +17,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
 
 import { logDiagnosticFromCode } from '../error-utils';
 import { DB_NAME } from './db-name';
-import { runSql as runSqlBridge } from './sql-bridge';
+import { runLoggedQuery } from './sql-bridge';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
 
 import { ServiceResult } from '../utils/result-wrapper';
@@ -57,7 +57,7 @@ export async function enforceSingleDefaultPerRole(role: PromptRole, keepId: numb
 
     try {
         void DB_NAME;
-        const resp = await runSqlBridge('SCHEMA', sql);
+        const resp = await runLoggedQuery('SCHEMA', sql, 'context');
         if (resp && resp.isOk) return new ServiceResult(true);
         const reason = resp?.errorMessage || 'unknown error';
         const message = 'enforceSingleDefaultPerRole failed: ' + reason;

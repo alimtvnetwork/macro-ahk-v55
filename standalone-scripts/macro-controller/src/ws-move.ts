@@ -106,7 +106,7 @@ async function probeSessionWithToken(context: string, token: string): Promise<vo
   try {
     const resp = await window.marco!.api!.workspace.probe({ baseUrl: CREDIT_API_BASE });
 
-    const isMissingOk = !resp.ok;
+    const isMissingOk = resp.isFail;
 
     if (isMissingOk) {
       logError('unknown', LabelType.LogSessionCheck + context + '] ❌ Session probe failed: HTTP ' + resp.status + ' (auth: ' + authLabel + ')');

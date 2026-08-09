@@ -292,7 +292,7 @@ async function runReseedAndOpen(role: PromptRole, force: boolean): Promise<void>
   }
   showToast(force ? '⚠️ Forcing default reset…' : '🔄 Re-seeding defaults…', 'info');
   const result = await reseedPromptsOnDemand({ force });
-  const isMissingOk = !result.isSuccess;
+  const isMissingOk = result.isFail;
   if (isMissingOk) {
     const reason = result.error ?? 'unknown';
     reportGearFailure(
@@ -360,7 +360,7 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
 
  return; }
   const res = await setDefaultPromptForRole(picked.Id, role);
-  const isMissingOk = !res.isSuccess;
+  const isMissingOk = res.isFail;
   if (isMissingOk) {
     const reason = res.error ?? 'unknown';
     reportGearFailure(
@@ -396,7 +396,7 @@ async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> 
   const isMissingOk = !ok;
   if (isMissingOk) return;
   const res = await deletePromptById(picked.Id);
-  const isMissingOk = !res.isSuccess;
+  const isMissingOk = res.isFail;
   if (isMissingOk) {
     const reason = res.error ?? 'unknown';
     reportGearFailure(

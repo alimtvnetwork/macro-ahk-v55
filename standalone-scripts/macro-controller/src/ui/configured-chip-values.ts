@@ -43,7 +43,7 @@ export async function resolveConfiguredChipValues(
     try {
         const mod = await import('../db/prompt-db');
         const result = await mod.getDefaultPromptForRole(role);
-        if (!result.isSuccess || !result.value) return [...fallback];
+        if (result.isFail || !result.value) return [...fallback];
         const raw = decodeReplaceValues((result.value as { ReplaceValues?: unknown }).ReplaceValues);
         // Only override the fallback if the row diverges from the plan-14
         // default set — otherwise we would replace tuned legacy chip lists

@@ -15,7 +15,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
 
 import { log } from '../logger';
 import { logDiagnosticFromCode } from '../error-utils';
-import { runSql as runSqlBridge } from './sql-bridge';
+import { runLoggedQuery } from './sql-bridge';
 
 const CANONICAL_SLUG = 'read-memory-enhanced';
 const DUPLICATE_PREFIX = '[duplicate] ';
@@ -49,7 +49,7 @@ function toDuplicateRows(rows: readonly unknown[]): DuplicateRow[] {
 
 async function findDuplicates(): Promise<DuplicateRow[]> {
   const sql = 'SELECT Id, Slug, Name FROM Prompt WHERE ' + READ_MEMORY_MATCH_WHERE;
-  const resp = await runSqlBridge('QUERY', sql);
+  const resp = await runLoggedQuery('QUERY', sql, 'context');
   if (!resp?.isOk || !Array.isArray(resp.rows)) return [];
 
   return toDuplicateRows(resp.rows as unknown[]);
@@ -63,7 +63,7 @@ async function demoteDuplicates(ids: readonly number[]): Promise<boolean> {
     + "Name = '" + DUPLICATE_PREFIX.replace(/'/g, "''") + "' || Name, "
     + 'UpdatedAt = ' + now + ' '
     + 'WHERE Id IN (' + idList + ')';
-  const resp = await runSqlBridge('SCHEMA', sql);
+  const resp = await runLoggedQuery('SCHEMA', sql, 'context');
   if (!resp?.isOk) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'read-memory-duplicates',

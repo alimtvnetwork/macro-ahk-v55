@@ -16,7 +16,7 @@ const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled ex
 
 import { log } from '../logger';
 import { logDiagnosticFromCode } from '../error-utils';
-import { runSql as runSqlBridge } from './sql-bridge';
+import { runLoggedQuery } from './sql-bridge';
 
 /**
  * Legacy Read Memory slugs that MUST be purged. Never re-add the canonical
@@ -41,7 +41,7 @@ function buildInList(): string {
 
 async function countLegacyRows(): Promise<number> {
   const sql = 'SELECT COUNT(*) AS c FROM Prompt WHERE Slug IN (' + buildInList() + ')';
-  const resp = await runSqlBridge('QUERY', sql);
+  const resp = await runLoggedQuery('QUERY', sql, 'context');
   if (!resp?.isOk || !Array.isArray(resp.rows) || resp.rows.length === 0) return 0;
   const row = resp.rows[0] as { c?: unknown };
   const count = typeof row?.c === 'number' ? row.c : Number(row?.c);
@@ -54,7 +54,7 @@ async function deleteLegacyPromptRows(): Promise<void> {
   const sql =
     'DELETE FROM PromptRevision WHERE Slug IN (' + inList + '); ' +
     'DELETE FROM Prompt WHERE Slug IN (' + inList + ');';
-  const resp = await runSqlBridge('SCHEMA', sql);
+  const resp = await runLoggedQuery('SCHEMA', sql, 'context');
   if (!resp?.isOk) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'legacy-read-memory',

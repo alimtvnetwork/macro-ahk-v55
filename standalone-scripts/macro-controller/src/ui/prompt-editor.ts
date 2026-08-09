@@ -111,7 +111,7 @@ function recordSlugOwner(
     return;
   }
   snapshot.slugOwnerRole = '(no-row)';
-  const isMissingOk = !bySlug.isSuccess;
+  const isMissingOk = bySlug.isFail;
   if (isMissingOk) snapshot.slugLookupError = bySlug.error ?? 'unknown';
 }
 
@@ -262,7 +262,7 @@ async function resolveRequiredTokensForRole(role: PromptRole): Promise<string[]>
 async function runPreflightSeed(role: PromptRole): Promise<void> {
   emitPromptSeedEvent({ event: 'editor.prefill.reseed', role, outcome: 'ok', detail: 'preflight' });
   const seed = await seedPlanNextPrompts();
-  const isMissingOk = !seed.isSuccess;
+  const isMissingOk = seed.isFail;
   if (isMissingOk) {
     logDiagnosticFromCode('SEED_INSERT_E002', { role, reason: seed.error ?? 'seed failed' });
     emitPromptSeedEvent({ event: 'editor.prefill.reseed', role, outcome: 'failed', detail: seed.error ?? 'seed failed' });
@@ -298,7 +298,7 @@ async function repairExistingSeedSlugBeforeInsert(
   seedRow: { slug: string; name: string; body: string },
 ): Promise<number | null> {
   const lookup = await getPromptBySlug(seedRow.slug);
-  if (!lookup.isSuccess || !lookup.value) return null;
+  if (lookup.isFail || !lookup.value) return null;
   if (lookup.value.Role === role) {
     return promoteExistingPromptId(role, seedRow, lookup.value.Id, 'promoted-existing-slug');
   }
@@ -439,14 +439,14 @@ async function tryInsertAndPromoteSeed(
       body: seedRow.body,
       role,
     });
-    if (!inserted.isSuccess || typeof inserted.value !== 'number' || inserted.value <= 0) {
+    if (inserted.isFail || typeof inserted.value !== 'number' || inserted.value <= 0) {
       const reason = inserted.isSuccess ? 'no id returned' : (inserted.error ?? 'upsert failed');
       logDiagnosticFromCode('DB_WRITE_E002', { role, slug: seedRow.slug, reason });
 
       return null;
     }
     const promoted = await setDefaultPromptForRole(inserted.value, role);
-    const isMissingOk = !promoted.isSuccess;
+    const isMissingOk = promoted.isFail;
     if (isMissingOk) {
       logDiagnosticFromCode('DB_WRITE_E003', {
         role, promptId: inserted.value, reason: promoted.error ?? 'setDefault failed',
@@ -480,7 +480,7 @@ async function tryPromoteExistingSeedRow(
 
 async function findSeedRowInRole(role: PromptRole, slug: string): Promise<PromptRow | null> {
   const listed = await listPromptsByRole(role);
-  if (!listed.isSuccess || !listed.value) {
+  if (listed.isFail || !listed.value) {
     logDiagnosticFromCode('DB_READ_E001', { role, reason: listed.error ?? 'list failed' });
 
     return null;
@@ -496,7 +496,7 @@ async function promoteExistingPromptId(
   detail: string,
 ): Promise<number> {
   const promoted = await setDefaultPromptForRole(promptId, role);
-  const isMissingOk = !promoted.isSuccess;
+  const isMissingOk = promoted.isFail;
   if (isMissingOk) {
     logDiagnosticFromCode('DB_WRITE_E003', {
       role, promptId, reason: promoted.error ?? 'setDefault failed',
@@ -516,11 +516,11 @@ async function tryAdoptSeedSlugRow(
   seedRow: { slug: string; name: string; body: string },
 ): Promise<number | null> {
   const lookup = await getPromptBySlug(seedRow.slug);
-  const isMissingOk = !lookup.isSuccess;
+  const isMissingOk = lookup.isFail;
   if (isMissingOk) {
     logDiagnosticFromCode('DB_READ_E001', { role, slug: seedRow.slug, reason: lookup.error ?? 'slug lookup failed' });
   }
-  if (!lookup.isSuccess || !lookup.value) {
+  if (lookup.isFail || !lookup.value) {
     return null;
   }
   const adopted = await adoptSeedSlugRole(role, seedRow, lookup.value);
@@ -552,7 +552,7 @@ async function adoptSeedSlugRole(
 
 async function loadEditablePrompt(role: PromptRole, id: number): Promise<EditablePrompt | null> {
   const listed = await listPromptsByRole(role);
-  if (!listed.isSuccess || !listed.value) {
+  if (listed.isFail || !listed.value) {
     logDiagnosticFromCode('DB_READ_E001', { role, reason: listed.error ?? 'list failed' });
 
     return null;

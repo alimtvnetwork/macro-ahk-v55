@@ -7,6 +7,7 @@
  * @see .lovable/memory/features/macro-controller/bulk-rename-system.md
  */
 
+import { EVENT_LISTENER_DELAY_MS, MODAL_ANIMATION_DELAY_MS } from './constants';
 import { log } from './logger';
 import { showToast } from './toast';
 import { loopCreditState, setLoopWsCheckedIds, setLoopWsLastCheckedIdx } from './shared-state';
@@ -254,7 +255,7 @@ export class BulkRenameManager {
         onProgress(results, false);
       }
 
-      setTimeout(() => { this._doNextRename(idx + 1, entries, results, onProgress, forceRetry, consecutiveFailures); }, 50);
+      setTimeout(() => { this._doNextRename(idx + 1, entries, results, onProgress, forceRetry, consecutiveFailures); }, MODAL_ANIMATION_DELAY_MS);
 
       return;
     }

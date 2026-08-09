@@ -45,7 +45,7 @@ export async function handleDelete(
   refs.status.textContent = 'Deleting...';
   try {
     const res = await deletePromptById(row.Id);
-    const isMissingOk = !res.isSuccess;
+    const isMissingOk = res.isFail;
     if (isMissingOk) {
       const reason = res.error ?? 'unknown';
       const msgText = 'Cannot delete "' + row.Name + '": ' + reason;
@@ -105,7 +105,7 @@ export async function handleDuplicate(
       body: row.Body,
       role: row.Role,
     });
-    const isMissingOk = !result.isSuccess;
+    const isMissingOk = result.isFail;
     if (isMissingOk) {
       refs.status.textContent = 'Failed to duplicate: ' + (result.error ?? 'unknown');
 
@@ -147,7 +147,7 @@ export async function handleResetToDefault(
       replaceKey: row.ReplaceKey, replaceValues: row.ReplaceValues,
       previousBody: row.Body, previousReplaceKey: row.ReplaceKey,
     });
-    const isMissingOk = !result.isSuccess;
+    const isMissingOk = result.isFail;
     if (isMissingOk) {
       logError(LOG_SCOPE, 'reset-to-default upsertPrompt failed for slug=' + row.Slug, new Error(result.error ?? 'unknown'));
       refs.status.textContent = 'Reset failed: ' + (result.error ?? 'unknown error');

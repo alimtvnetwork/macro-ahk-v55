@@ -102,7 +102,7 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
     // Always run the normal seeder first so missing rows are inserted and
     // legacy bodies get their non-destructive checksum upgrade.
     const seedResult = await seedPlanNextPrompts();
-    const isMissingOk = !seedResult.ok;
+    const isMissingOk = seedResult.isFail;
     if (isMissingOk) {
       emitPromptSeedEvent({
         event: EV_RESEED_COMPLETE, outcome: 'failed',

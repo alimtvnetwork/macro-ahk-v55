@@ -17,6 +17,7 @@
  * JSON config / default takes over), Cancel discards staged edits.
  */
 
+import { EVENT_LISTENER_DELAY_MS, MODAL_ANIMATION_DELAY_MS } from './constants';
 import { cPanelBg, cPanelFg, cPanelBorder, cPrimary, cPrimaryLight, lDropdownRadius } from './shared-state';
 import { getSettingsOverrides, saveSettingsOverrides, clearSettingsOverrides, type SettingsOverrides } from './settings-store';
 import { getWorkspaceLifecycleConfig } from './workspace-lifecycle-config';
@@ -333,7 +334,7 @@ export function showSettingsModal(): void {
     if (e.key === 'Escape' && !state.submitting) hideSettingsModal();
   };
   (el as HTMLElement & ModalHandlerStore)._marcoSettingsKey = onKey;
-  setTimeout(function () { document.addEventListener('keydown', onKey, true); }, 10);
+  setTimeout(function () { document.addEventListener('keydown', onKey, true); }, EVENT_LISTENER_DELAY_MS);
 
   setTimeout(function () {
     const gi = el.querySelector<HTMLInputElement>('[data-marco-el="grace"]');

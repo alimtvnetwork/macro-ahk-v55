@@ -168,7 +168,7 @@ export function hydratePendingRestoreUndo(now: number = Date.now()): boolean {
         const result = record.payload.kind === 'update'
             ? await reverseUpdate(record.payload)
             : await reverseInsert(record.payload);
-        const isMissingOk = !result.isSuccess;
+        const isMissingOk = result.isFail;
         if (isMissingOk) {
             logError(LOG_SCOPE, 'reverse failed after refresh', result.error);
             showToast('❌ Undo failed: ' + (result.error ?? 'unknown'), 'error');

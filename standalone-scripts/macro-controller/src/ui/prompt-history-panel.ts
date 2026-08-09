@@ -267,7 +267,7 @@ export async function openPromptHistoryPanel(
     }
 
     const revResult = await listRev(slug);
-    if (!revResult.isSuccess || !revResult.value) {
+    if (revResult.isFail || !revResult.value) {
         const reason = revResult.error ?? 'unknown';
         reportHistoryFailure(
             'HISTORY_LIST_E001',
@@ -852,7 +852,7 @@ async function handleRestoreUpdate(
             replaceKey: preImage.replaceKey,
             replaceValues: preImage.replaceValues,
         });
-        const isMissingOk = !revert.isSuccess;
+        const isMissingOk = revert.isFail;
         if (isMissingOk) {
             const reason = revert.error ?? 'unknown';
             reportHistoryFailure(
@@ -890,7 +890,7 @@ function handleRestoreInsert(
     undoToast(successMsg, async () => {
         clearPendingRestoreUndo();
         const del = await deleteFn(newId);
-        const isMissingOk = !del.isSuccess;
+        const isMissingOk = del.isFail;
         if (isMissingOk) {
             const reason = del.error ?? 'unknown';
             reportHistoryFailure(
@@ -929,7 +929,7 @@ async function handleRestore(
     if (isMissingProceed) return;
 
     const listResult = await listByRole(role);
-    if (!listResult.isSuccess || !listResult.value) {
+    if (listResult.isFail || !listResult.value) {
         const reason = listResult.error ?? 'unknown';
         reportHistoryFailure(
             'HISTORY_RESTORE_E001',
@@ -953,7 +953,7 @@ async function handleRestore(
         replaceKey: rev.ReplaceKey,
         replaceValues,
     });
-    const isMissingOk = !upsertResult.isSuccess;
+    const isMissingOk = upsertResult.isFail;
     if (isMissingOk) {
         const reason = upsertResult.error ?? 'unknown';
         reportHistoryFailure(
@@ -1178,12 +1178,12 @@ export function parseRevisionImportPayload(
         return new DbResult(false, undefined, 'Invalid JSON: ' + (err instanceof Error ? err.message : String(err)));
     }
     const envelope = validateImportEnvelope(parsed, expectedSlug, expectedRole);
-    const isMissingOk = !envelope.isSuccess;
+    const isMissingOk = envelope.isFail;
     if (isMissingOk) return new DbResult(false, undefined, envelope.error);
     const rows: ImportedRevisionInput[] = [];
     for (let i = 0; i < envelope.revisions.length; i += 1) {
         const coerced = coerceImportRow(envelope.revisions[i], i, expectedSlug, expectedRole);
-        const isMissingOk = !coerced.isSuccess;
+        const isMissingOk = coerced.isFail;
         if (isMissingOk) return new DbResult(false, undefined, coerced.error);
         rows.push(coerced.row);
     }
@@ -1240,7 +1240,7 @@ async function writeImportedRevisions(
 ): Promise<void> {
     const snapshotResult = await getMaxRevisionId();
     const sinceId = snapshotResult.isSuccess && typeof snapshotResult.value === 'number' ? snapshotResult.value : 0;
-    const isMissingOk = !snapshotResult.isSuccess;
+    const isMissingOk = snapshotResult.isFail;
     if (isMissingOk) {
         logHistoryDiagnostic(
             'HISTORY_INTERNAL_E001',
@@ -1248,7 +1248,7 @@ async function writeImportedRevisions(
         );
     }
     const write = await insertImportedRevisions(slug, rows);
-    const isMissingOk = !write.isSuccess;
+    const isMissingOk = write.isFail;
     if (isMissingOk) {
         const reason = write.error ?? '?';
         reportHistoryFailure(
@@ -1266,7 +1266,7 @@ async function writeImportedRevisions(
     if (snapshotResult.isSuccess && count > 0) {
         undoToast(successMsg, async () => {
             const del = await deleteImportedRevisionsAfter(slug, sinceId);
-            const isMissingOk = !del.isSuccess;
+            const isMissingOk = del.isFail;
             if (isMissingOk) {
                 const reason = del.error ?? 'unknown';
                 reportHistoryFailure(
@@ -1303,7 +1303,7 @@ async function handleImportFile(
     try {
         const text = await file.text();
         const parsed = parseRevisionImportPayload(text, slug, role);
-        if (!parsed.isSuccess || !parsed.rows) {
+        if (parsed.isFail || !parsed.rows) {
             const reason = parsed.error ?? 'unknown';
             captureLastImportFailure('parse', 'parse rejected: ' + reason);
             reportHistoryFailure(

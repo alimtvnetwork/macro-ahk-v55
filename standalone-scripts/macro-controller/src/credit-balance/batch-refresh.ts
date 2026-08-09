@@ -25,7 +25,7 @@ import { INTER_WS_GAP_MS } from './throttle';
 import { BatchRefreshSourceType } from "../types/enums";
 
 /** Machine-readable reason attached to a `'skipped'` outcome. */
-export type BatchSkipReason = 'plan-not-eligible';
+export enum BatchSkipReasonType { PlanNotEligible = 'plan-not-eligible' };
 
 /** Minimal workspace shape needed by the batch. */
 export interface BatchWorkspaceCandidate {
@@ -57,7 +57,7 @@ export interface BatchRefreshIterationResult {
     readonly workspaceId: string;
     readonly outcome: FetchAndPersistResult['outcome'] | 'skipped';
     /** Present only when `outcome === 'skipped'`. */
-    readonly reason?: BatchSkipReason;
+    readonly reason?: BatchSkipReasonType;
 }
 
 export interface BatchRefreshSummary {

@@ -23,7 +23,7 @@ import { DbResult } from '../db/db-result';
 
 import { logDiagnosticFromCode } from '../error-utils';
 import { DB_NAME } from './db-name';
-import { runSql as runSqlBridge, type SqlBridgeResp } from './sql-bridge';
+import { runLoggedQuery } from './sql-bridge';
 import { sqlLit } from './prompt-role-db';
 import type { PromptRow } from './prompt-db';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
@@ -56,7 +56,7 @@ type RawSqlOk = SqlBridgeResp;
 async function runSql(method: RunSqlMethod, sql: string): Promise<RawSqlOk> {
     void DB_NAME;
 
-    return runSqlBridge(method, sql);
+    return runLoggedQuery(method, sql, 'context');
 }
 
 function fail<T>(where: string, message: string, context?: unknown): DbResult<T> {

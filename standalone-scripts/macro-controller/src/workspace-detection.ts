@@ -232,7 +232,7 @@ async function processTier1Response(
     return;
   }
 
-  const isMissingOk = !resp.ok;
+  const isMissingOk = resp.isFail;
 
   if (isMissingOk) {
     log(fn + ': Tier 1 FAILED — HTTP ' + resp.status + ' — falling to passive fallback', 'warn');

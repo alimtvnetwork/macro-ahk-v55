@@ -129,7 +129,7 @@ async function collectRevisionsForEntries(entries: CachedPromptEntry[]): Promise
     if (!slug || seenSlugs.has(slug)) continue;
     seenSlugs.add(slug);
     const res = await listPromptRevisions(slug);
-    if (!res.isSuccess || !res.value) {
+    if (res.isFail || !res.value) {
       log('[PromptIO] revision fetch failed for slug=' + slug + ': ' + (res.error ?? 'unknown'), 'warn');
       continue;
     }

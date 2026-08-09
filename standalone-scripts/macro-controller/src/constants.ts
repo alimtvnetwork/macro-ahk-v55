@@ -181,3 +181,6 @@ export const DEFAULT_REMIX_NEXT_MAX_COLLISION_INCREMENTS = 50;
 export const DEFAULT_REMIX_OPEN_IN_CURRENT_TAB = false;
 /** 'preserve' (default) keeps the V/v casing from input; 'upper' forces V; 'lower' forces v. */
 export const DEFAULT_REMIX_NEXT_V_CASING: RemixCasingType = 'preserve';
+
+export const EVENT_LISTENER_DELAY_MS = 10;
+export const MODAL_ANIMATION_DELAY_MS = 50;

@@ -7,7 +7,7 @@ import { ServiceResult } from '../utils/result-wrapper';
 import { sendToExtension } from '../ui/extension-relay';
 import { log } from '../logger';
 import { logDiagnosticFromCode } from '../error-utils';
-import { runSql as runSqlBridge } from './sql-bridge';
+import { runLoggedQuery } from './sql-bridge';
 import {
   REPLACE_KEY_DEFAULT,
   REPLACE_VALUES_DEFAULT_JSON,
@@ -144,7 +144,7 @@ const PROMPT_COLUMN_MIGRATIONS: readonly PromptColumnMigration[] = [
 ];
 
 async function readPromptColumnNames(): Promise<Set<string>> {
-  const resp = await runSqlBridge('QUERY', 'PRAGMA table_info(Prompt)');
+  const resp = await runLoggedQuery('QUERY', 'PRAGMA table_info(Prompt)', 'context');
   const isOk = Boolean(resp?.isOk) && Array.isArray(resp?.rows);
   const rows = isOk ? (resp.rows as PragmaColumnRow[]) : [];
 
@@ -152,7 +152,7 @@ async function readPromptColumnNames(): Promise<Set<string>> {
 }
 
 async function applyPromptColumnMigration(migration: PromptColumnMigration): Promise<void> {
-  const resp = await runSqlBridge('SCHEMA', migration.ddl);
+  const resp = await runLoggedQuery('SCHEMA', migration.ddl, 'context');
   if (!resp?.isOk) {
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', { column: migration.column, reason: resp?.errorMessage ?? UNKNOWN_ERROR });
 
@@ -162,7 +162,7 @@ async function applyPromptColumnMigration(migration: PromptColumnMigration): Pro
 }
 
 async function ensurePromptRoleDefaultIndex(): Promise<void> {
-  const resp = await runSqlBridge('SCHEMA', `CREATE INDEX IF NOT EXISTS ${PROMPT_ROLE_DEFAULT_INDEX} ON Prompt (${PROMPT_ROLE_COLUMN}, ${PROMPT_IS_DEFAULT_COLUMN})`);
+  const resp = await runLoggedQuery('SCHEMA', `CREATE INDEX IF NOT EXISTS ${PROMPT_ROLE_DEFAULT_INDEX} ON Prompt (${PROMPT_ROLE_COLUMN}, ${PROMPT_IS_DEFAULT_COLUMN}, 'context')`);
   if (resp?.isOk) return;
   logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', { column: PROMPT_ROLE_DEFAULT_INDEX, reason: resp?.errorMessage ?? UNKNOWN_ERROR });
 }
@@ -217,7 +217,7 @@ async function runOrphanRepairStage(stages: Stage[]): Promise<OrphanRepairReport
 async function runSeedPlanNextStage(stages: Stage[]): Promise<void> {
   const { seedPlanNextPrompts } = await import('../seed/seed-plan-next');
   const seedResult = await seedPlanNextPrompts();
-  const isMissingOk = !seedResult.isSuccess;
+  const isMissingOk = seedResult.isFail;
   if (isMissingOk) {
     const reason = seedResult.error ?? UNKNOWN_ERROR;
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'seed-plan-next', reason });
@@ -284,7 +284,7 @@ export async function initMacroDb(): Promise<void> {
   const stages: Stage[] = [];
   let orphanReportRef: OrphanRepairReport | undefined;
   try {
-    const resp = await runSqlBridge('SCHEMA', SCHEMA_SQL);
+    const resp = await runLoggedQuery('SCHEMA', SCHEMA_SQL, 'context');
     if (resp && resp.isOk) {
       log('Macro DB initialized: ' + DB_NAME, 'success');
       stages.push({ stage: STAGE_SCHEMA_INIT, status: 'ok' });
@@ -320,7 +320,7 @@ export async function saveProjectMetadata(projectId: string, name: string, url: 
                VALUES ('${projectId.replace(/'/g, "''")}', '${name.replace(/'/g, "''")}', '${url.replace(/'/g, "''")}', CURRENT_TIMESTAMP)`;
 
   try {
-    await runSqlBridge('SCHEMA', sql);
+    await runLoggedQuery('SCHEMA', sql, 'context');
   } catch (err) {
     logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'saveProjectMetadata', reason: err instanceof Error ? err.message : String(err) }, err);
@@ -342,7 +342,7 @@ export async function saveCommunication(projectId: string, prompt: string, respo
                VALUES ('${projectId.replace(/'/g, "''")}', '${prompt.replace(/'/g, "''")}', '${response.replace(/'/g, "''")}')`;
   
   try {
-    await runSqlBridge('SCHEMA', sql);
+    await runLoggedQuery('SCHEMA', sql, 'context');
     log('Communication saved to Macro DB', 'info');
   } catch (err) {
     logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
@@ -369,7 +369,7 @@ export async function syncTaskQueueToDb(projectId: string, tasks: DbTask[]): Pro
     : deleteSql;
 
   try {
-    await runSqlBridge('SCHEMA', sql);
+    await runLoggedQuery('SCHEMA', sql, 'context');
   } catch (err) {
     logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
     logDiagnosticFromCode('DB_MACRO_WRITE_E001', { op: 'syncTaskQueueToDb', reason: err instanceof Error ? err.message : String(err) }, err);
@@ -403,7 +403,7 @@ export async function forceSyncQueueToDb(): Promise<void> {
 export async function purgeOldCommunications(days: number = 30): Promise<void> {
   const sql = `DELETE FROM Communications WHERE Timestamp < datetime('now', '-${days} days')`;
   try {
-    await runSqlBridge('SCHEMA', sql);
+    await runLoggedQuery('SCHEMA', sql, 'context');
     log(`[MacroDb] Purged communications older than ${days} days`, 'info');
   } catch (err) {
     logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
@@ -417,7 +417,7 @@ export async function purgeOldCommunications(days: number = 30): Promise<void> {
 export async function getCommunicationHistory(projectId: string, limit: number = 50): Promise<unknown[]> {
   const sql = `SELECT * FROM v_prompt_history WHERE ProjectId = '${projectId.replace(/'/g, "''")}' ORDER BY Timestamp DESC LIMIT ${limit}`;
   try {
-    const resp = await runSqlBridge('QUERY', sql);
+    const resp = await runLoggedQuery('QUERY', sql, 'context');
 
     return resp?.isOk ? (Array.isArray(resp.rows) ? (resp.rows as unknown[]) : []) : [];
   } catch (err) {

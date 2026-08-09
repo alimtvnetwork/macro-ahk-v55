@@ -253,7 +253,7 @@ async function selectDbTaskNextPrompt(n: number): Promise<TaskNextPromptSelectio
     function() { return listPromptsByRole('next'); },
     function(r) { return r.isSuccess ? undefined : (r.error ?? 'listPromptsByRole !ok'); },
   );
-  if (!res.isSuccess || !res.value || res.value.length === 0) return null;
+  if (res.isFail || !res.value || res.value.length === 0) return null;
   const rows = res.value;
   const active = rows.find(function(r) { return r.IsDefault === 1; }) ?? rows[0];
   if (!active || !active.Body) return null;

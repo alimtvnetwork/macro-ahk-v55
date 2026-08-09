@@ -194,7 +194,7 @@ export async function fetchWorkspaceCreditBalance(
             },
         }, timeoutMs);
 
-        if (!response.isSuccess) {
+        if (response.isFail) {
             return await handleNonOkResponse(response, options, url, token, startMs);
         }
 

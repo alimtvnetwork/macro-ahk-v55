@@ -16,7 +16,7 @@
  */
 
 import { logDiagnosticFromCode } from '../error-utils';
-import { runSql as runSqlBridge } from './sql-bridge';
+import { runLoggedQuery } from './sql-bridge';
 import { ChatSubmitSourceType } from "../types/enums";
 
 // Scope tag retained for future logError() call sites during migration to
@@ -61,7 +61,7 @@ function quoteOrNull(value: string | null): string {
 
 async function runSchemaSql(sql: string, scope: string): Promise<boolean> {
   try {
-    const resp = await runSqlBridge('SCHEMA', sql);
+    const resp = await runLoggedQuery('SCHEMA', sql, 'context');
     if (resp?.isOk) return true;
     logDiagnosticFromCode('DB_CHAT_SUBMIT_E001', { op: scope, kind: 'schema-failure', reason: resp?.errorMessage || 'unknown error' });
 
@@ -75,7 +75,7 @@ async function runSchemaSql(sql: string, scope: string): Promise<boolean> {
 
 async function runQuerySql<T>(sql: string, scope: string): Promise<T[]> {
   try {
-    const resp = await runSqlBridge('QUERY', sql);
+    const resp = await runLoggedQuery('QUERY', sql, 'context');
     if (resp?.isOk && Array.isArray(resp.rows)) return resp.rows as T[];
     logDiagnosticFromCode('DB_CHAT_SUBMIT_E001', { op: scope, kind: 'query-failure', reason: resp?.errorMessage || 'no rows' });
 

@@ -135,7 +135,7 @@ async function postSync(
         return { ok: false, jobId: null, httpStatus: 0, reason: 'network_error' };
     }
 
-    const isMissingOk = !resp.isSuccess;
+    const isMissingOk = resp.isFail;
 
     if (isMissingOk) {
         const preview = JSON.stringify(resp.data).substring(0, 200);
@@ -232,7 +232,7 @@ export async function ensureGithubRepo(
 
     // ── 2) POST /sync once (no retry).
     const posted = await postSync(wsId, connId, projectId);
-    if (!posted.isSuccess || !posted.jobId) {
+    if (posted.isFail || !posted.jobId) {
         setGitsyncCache(wsId, projectId, 'error');
 
         return { status: 'failed', reason: posted.reason, httpStatus: posted.httpStatus };

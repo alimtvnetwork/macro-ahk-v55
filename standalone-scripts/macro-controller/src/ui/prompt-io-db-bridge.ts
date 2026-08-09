@@ -67,7 +67,7 @@ async function readAllDbRows(): Promise<PromptRow[]> {
     const all: PromptRow[] = [];
     for (const role of PROMPT_ROLES) {
         const res = await listPromptsByRole(role);
-        if (!res.isSuccess || !res.value) {
+        if (res.isFail || !res.value) {
             logError('PromptIoDbBridge', 'readAllDbRows: listPromptsByRole failed for ' + role, res);
             continue;
         }
@@ -100,7 +100,7 @@ export function mergeDbIntoExport(
 
 async function findExistingRow(role: PromptRole, slug: string): Promise<PromptRow | null> {
     const res = await listPromptsByRole(role);
-    if (!res.isSuccess || !res.value) return null;
+    if (res.isFail || !res.value) return null;
 
     return res.value.find((r) => r.Slug === slug) ?? null;
 }
