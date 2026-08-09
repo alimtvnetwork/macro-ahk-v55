@@ -156,7 +156,7 @@ const ROOT_FILES_TO_SCAN = ["vite.config.extension.ts"];
 /* ----------------------------------------------------------------- */
 /*  Helpers                                                           */
 /* ----------------------------------------------------------------- */
-const rel = (p) => relative(REPO_ROOT, p) || p;
+const rel = (p) => (relative(REPO_ROOT, p) || p).replace(/\\/g, "/");
 
 /** Recursively list files under `dir` matching SCAN_EXTS. */
 function listSourceFiles(dir) {

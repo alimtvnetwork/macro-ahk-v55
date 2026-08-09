@@ -1,10 +1,13 @@
+import { InjectionWorldType } from "../../types/instruction/enums/injection-world";
+import { VERSION } from "../../shared-version";
+
 const instruction = {
     SchemaVersion: "1.0",
     Name: "prompt-manager",
     DisplayName: "Prompt Manager",
-    Version: "1.0",
+    Version: VERSION,
     Description: "Python prompt manager integration",
-    World: "MAIN",
+    World: InjectionWorldType.Main,
     IsGlobal: false,
     Dependencies: [],
     LoadOrder: 1,
