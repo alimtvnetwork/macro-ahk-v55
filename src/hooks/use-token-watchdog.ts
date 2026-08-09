@@ -149,7 +149,6 @@ export function useTokenWatchdog(): TokenWatchdogState {
       const src = typeof result.source === "string" ? result.source : "extension";
       updateFromToken(token, src);
     } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
       updateFromToken(null, "error");
     }
   }, [updateFromToken]);
@@ -168,7 +167,6 @@ export function useTokenWatchdog(): TokenWatchdogState {
         setLastRefreshResult("failed");
       }
     } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
       setLastRefreshResult("failed");
     } finally {
       setRefreshing(false);

@@ -182,7 +182,6 @@ export async function handleGetSdkSelfTest(): Promise<{ snapshot: SdkSelfTestSna
 export async function __resetSdkSelfTestForTests(): Promise<void> {
     try {
         await chrome.storage.local.remove(STORAGE_KEY);
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }

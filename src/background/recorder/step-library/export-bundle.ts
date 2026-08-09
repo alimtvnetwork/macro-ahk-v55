@@ -451,9 +451,8 @@ function writeSnapshot(
     try {
         return populateSnapshotDb(dst, src, projectId, projectRow, effectiveIds, preflight);
     } catch (err) {
-        try { dst.exec("ROLLBACK;"); } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
-        }
+        try { dst.exec("ROLLBACK;"); } catch {
+}
 
         return {
             Reason: "InternalError",

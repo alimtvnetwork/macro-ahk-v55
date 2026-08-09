@@ -163,9 +163,8 @@ export async function cacheDelete(category: CacheCategory, subKey = ""): Promise
             request.onsuccess = () => resolve();
             request.onerror = () => resolve(); // best-effort
         });
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }
 
 /**

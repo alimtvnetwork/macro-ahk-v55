@@ -132,7 +132,6 @@ function useCsvFileReader(
             setPasted("");
             acceptText(text, file.name);
         } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
             toast({
                 variant: "destructive",
                 title: "Could not read file",

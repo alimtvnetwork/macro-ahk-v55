@@ -181,7 +181,7 @@ async function fetchManifest(): Promise<SeedManifest | null> {
     console.log("[manifest-seeder] Fetching seed-manifest.json — relative: '%s', absolute: %s", MANIFEST_PATH, url);
     try {
         const resp = ServiceResult.wrapFetch(await fetch(url));
-        if (resp.isFail) {
+        if (!resp.isSuccess) {
             logBgWarnError(BgLogTag.MANIFEST_SEEDER, `Fetch failed: HTTP ${resp.status} for ${url} — file does not exist in extension dist`);
 
             return null;
@@ -253,7 +253,6 @@ async function seedScriptsFromManifest(
                         scriptDef.File, scriptDef.SeedId);
                 }
             } catch (err) {
-                logError("AutoCatch", "Unhandled exception", err);
                 const seedErrorMessage = `[seedScriptsFromManifest] Failed to seed script ${scriptDef.File} for ${project.Name}: ${err}`;
                 errors.push(seedErrorMessage);
                 logBgWarnError(BgLogTag.MANIFEST_SEEDER, seedErrorMessage);
@@ -418,7 +417,6 @@ async function seedConfigsFromManifest(
                     seeded++;
                 }
             } catch (err) {
-                logError("AutoCatch", "Unhandled exception", err);
                 const seedErrorMessage = `[seedConfigsFromManifest→fetchConfigJson] Failed to seed config ${configDef.File} for ${project.Name}: ${err}`;
                 errors.push(seedErrorMessage);
                 // Use warn instead of error — config fetch failures are non-fatal
@@ -456,7 +454,7 @@ async function fetchConfigJson(filePath: string): Promise<string> {
     // mem://constraints/http-error-fail-fast. Bundled-asset fetch failures
     // mean the file is missing from dist/ — retrying cannot help.
     const resp = ServiceResult.wrapFetch(await fetch(url));
-    if (resp.isFail) {
+    if (!resp.isSuccess) {
         throw new Error(`HTTP ${resp.status} on GET ${url} — config asset missing from dist/. Loop halted.`);
     }
     const data = await resp.json();
@@ -549,7 +547,6 @@ export async function seedProjectsFromManifest(
                 seeded++;
             }
         } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
             const seedErrorMessage = `[seedProjectsFromManifest] Failed to seed project ${project.Name}: ${err}`;
             errors.push(seedErrorMessage);
             logBgWarnError(BgLogTag.MANIFEST_SEEDER, seedErrorMessage);

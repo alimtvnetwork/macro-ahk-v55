@@ -40,22 +40,22 @@ for (const sourceFile of project.getSourceFiles()) {
     }
 
     // 2. Wrap custom Service calls returning {ok: boolean} like seedPlanNextPrompts
-    // Not easy to do automatically for all functions, but we can wrap where we see them, or we can just change `.ok` to `.isSuccess` everywhere.
-    // Let's replace `.ok` accesses on wrapped objects.
+    // Not easy to do automatically for all functions, but we can wrap where we see them, or we can just change `.isSuccess` to `.isSuccess` everywhere.
+    // Let's replace `.isSuccess` accesses on wrapped objects.
     const propAccesses = sourceFile.getDescendantsOfKind(SyntaxKind.PropertyAccessExpression);
     for (const access of propAccesses) {
         if (access.getName() === 'ok') {
             // Check if it's negated
             const parent = access.getParent();
             if (parent && parent.getKind() === SyntaxKind.PrefixUnaryExpression && parent.getOperatorToken() === SyntaxKind.ExclamationToken) {
-                // !resp.ok -> resp.isFail
+                // !resp.isSuccess -> !resp.isSuccess
                 parent.replaceWithText(`${access.getExpression().getText()}.isFail`);
                 modified = true;
             } else {
-                // resp.ok -> resp.isSuccess
+                // resp.isSuccess -> resp.isSuccess
                 // Skip assignments
                 if (parent && parent.getKind() === SyntaxKind.BinaryExpression && parent.getOperatorToken().getKind() === SyntaxKind.EqualsToken && parent.getLeft() === access) {
-                    continue; // Skip `obj.ok = true`
+                    continue; // Skip `obj.isSuccess = true`
                 }
                 // Skip if it's `ok: boolean` in an interface
                 if (parent && parent.getKind() === SyntaxKind.PropertySignature) continue;

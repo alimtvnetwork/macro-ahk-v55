@@ -90,7 +90,6 @@ export function useConfigDb(projectSlug: string) {
         });
         if (resp.isOk) saved++; else failed++;
       } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
         failed++;
       }
     }

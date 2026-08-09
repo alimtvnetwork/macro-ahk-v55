@@ -279,7 +279,7 @@ async function fetchVersionInfo(
         signal: AbortSignal.timeout(10_000),
     }));
 
-    if (response.isFail) {
+    if (!response.isSuccess) {
         // HEFF: single attempt, no retry.
         throw new Error(
             `HEFF: HTTP ${response.status} on GET ${url} — VersionInfo fetch failed (${response.statusText}). ` +
@@ -308,7 +308,7 @@ export async function fetchInstructions(
         signal: AbortSignal.timeout(15_000),
     }));
 
-    if (response.isFail) {
+    if (!response.isSuccess) {
         // HEFF: single attempt, no retry.
         throw new Error(
             `HEFF: HTTP ${response.status} on GET ${url} — Instruction fetch failed. ` +
@@ -359,9 +359,8 @@ export function linkUpdaterToCategory(updaterId: number, categoryName: string): 
             [updaterId, categoryId],
         );
         dbManager?.markDirty();
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }
 
 /* ------------------------------------------------------------------ */

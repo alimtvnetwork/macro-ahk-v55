@@ -61,7 +61,7 @@ describe('reseedPromptsOnDemand', () => {
     it('R1: idempotent path completes and returns ok', async () => {
         queueHappySeed();
         const r = await reseedPromptsOnDemand();
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         expect(r.mode).toBe('idempotent');
         expect(r.forcedUpdates).toBeUndefined();
     });
@@ -71,7 +71,7 @@ describe('reseedPromptsOnDemand', () => {
         const defaults = PLAN_NEXT_SEED_ROWS.filter(r => r.isDefault);
         for (let i = 0; i < defaults.length; i++) responsesQueue.push(OK());
         const r = await reseedPromptsOnDemand({ force: true });
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         expect(r.mode).toBe('force');
         expect(r.forcedUpdates).toBe(defaults.length);
         // Verify at least one UPDATE was issued mentioning a canonical slug.
@@ -90,7 +90,7 @@ describe('reseedPromptsOnDemand', () => {
                 return { isOk: true, rows: [] };
             });
         const r = await reseedPromptsOnDemand({ force: true });
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toContain('disk full');
     });
 

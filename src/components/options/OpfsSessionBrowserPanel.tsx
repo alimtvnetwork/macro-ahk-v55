@@ -160,8 +160,6 @@ export function OpfsSessionBrowserPanel() {
             });
             setData(result);
         } catch (err) {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
 
             const msg = err instanceof Error ? err.message : "Failed to browse OPFS sessions";
             setError(msg);

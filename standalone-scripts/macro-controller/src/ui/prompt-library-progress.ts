@@ -112,8 +112,7 @@ export function renderPartialImportErrors(
   parseErrors: readonly string[],
 ): void {
   const panel = refs.partialErrorsPanel;
-  const isMissingPanel = !panel;
-  if (isMissingPanel) return;
+  if (!panel) return;
   panel.textContent = '';
   const total = entryErrors.length + parseErrors.length;
   if (total === 0) {
@@ -167,8 +166,7 @@ export function renderPartialImportErrors(
 
 export function clearPartialImportErrors(refs: ModalRefs): void {
   const panel = refs.partialErrorsPanel;
-  const isMissingPanel = !panel;
-  if (isMissingPanel) return;
+  if (!panel) return;
   panel.textContent = '';
   panel.hidden = true;
   panel.style.display = 'none';

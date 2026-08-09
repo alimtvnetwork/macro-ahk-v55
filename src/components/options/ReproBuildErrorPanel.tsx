@@ -36,8 +36,6 @@ export function ReproBuildErrorPanel() {
       if (timerRef.current !== null) clearTimeout(timerRef.current);
       timerRef.current = window.setTimeout(() => setCopied(false), 2000);
     } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
 
       setCopied(false);
     }

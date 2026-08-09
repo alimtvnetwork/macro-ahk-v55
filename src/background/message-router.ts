@@ -54,7 +54,6 @@ export async function handleMessage(
         const response = await routeMessage(message, sender);
         sendResponse(response);
     } catch (routingError) {
-        logError("AutoCatch", "Unhandled exception", routingError);
         sendResponse(buildErrorResponse(routingError, messageType));
     }
 }

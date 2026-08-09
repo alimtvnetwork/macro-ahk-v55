@@ -32,15 +32,13 @@ async function readProjectStorageKey(storage: ProjectStorageLocal): Promise<Reco
   try {
     const out = await storage.get("marco_projects");
     if (out && typeof out === "object") return out;
-  } catch (err) {
-    logError('AutoCatch', 'Unhandled exception', err);
-  }
+  } catch {
+}
 
   return new Promise((resolve) => {
     try {
       storage.get("marco_projects", (out) => resolve(out ?? null));
     } catch (err) {
-      logError('AutoCatch', 'Unhandled exception', err);
       resolve(null);
     }
   });

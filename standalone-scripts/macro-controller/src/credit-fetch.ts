@@ -110,7 +110,7 @@ function buildAuthFailureDetail(): string {
   const snapshot = getAuthDebugSnapshot();
   const bridgeText = !snapshot.bridgeOutcome.hasAttempted
     ? 'not attempted'
-    : (snapshot.bridgeOutcome.ok
+    : (snapshot.bridgeOutcome.isSuccess
       ? 'success via ' + snapshot.bridgeOutcome.source
       : 'failed' + (snapshot.bridgeOutcome.error ? ' — ' + snapshot.bridgeOutcome.error : ''));
 
@@ -187,9 +187,7 @@ function logCreditPreflight(token: string, isRetry?: boolean): void {
   log('Credit API: GET /user/workspaces' + (isRetry ? ' (RETRY after recovery)' : ''), 'check');
   logSub('Auth: ' + (token ? 'Bearer ' + token.substring(0, 12) + '...REDACTED' : 'cookies only (no bearer)'), 1);
 
-  const isMissingToken = !token;
-
-  if (isMissingToken) {
+  if (!token) {
     const preflight = getAuthDebugSnapshot();
     logSub('Auth preflight: no bearer. Session cookie names=' + preflight.sessionCookieNames.join(', '), 1);
     logSub('Auth preflight flow: ' + preflight.flow, 1);
@@ -320,7 +318,7 @@ export function fetchLoopCredits(
 
     apiFetchWorkspaces()
       .then(async function (resp: SdkApiResponse): Promise<Record<string, unknown> | undefined> {
-      const isMissingOk = !resp.ok;
+      const isMissingOk = !resp.isSuccess;
       if (isMissingOk) {
         if (isAuthFailure(resp.status) && !isRetry) {
           const recovered = await handleAuthRecovery(token, resp.status, '');
@@ -443,9 +441,7 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
 
   log('Credit API (async): GET /user/workspaces' + (isRetry ? ' (RETRY after recovery)' : ''), 'check');
 
-  const isMissingToken = !token;
-
-  if (isMissingToken) {
+  if (!token) {
     const preflightDetail = buildAuthFailureDetail().replace(/\n/g, ' | ');
     log('Credit API (async): still no bearer after preflight; proceeding with cookie credentials only', 'warn');
     logSub('Auth preflight detail: ' + preflightDetail, 1);
@@ -453,7 +449,7 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
 
   const resp = await apiFetchWorkspaces();
 
-  const isMissingOk = !resp.ok;
+  const isMissingOk = !resp.isSuccess;
 
   if (isMissingOk) {
     if (isAuthFailure(resp.status) && !isRetry) {

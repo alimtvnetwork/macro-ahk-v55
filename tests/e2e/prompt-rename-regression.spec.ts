@@ -122,7 +122,7 @@ test.describe('prompt rename regression (plan-15)', () => {
             });
         }) as UpsertResult;
 
-        expect(result.ok).toBe(true);
+        expect(result.isSuccess).toBe(true);
         expect(result.error).toBeUndefined();
 
         const calls = await page.evaluate(() => (globalThis as unknown as { __calls: FakeSqlCall[] }).__calls);
@@ -148,7 +148,7 @@ test.describe('prompt rename regression (plan-15)', () => {
             });
         }) as UpsertResult;
 
-        expect(result.ok).toBe(false);
+        expect(result.isSuccess).toBe(false);
         expect(result.error ?? '').toContain('ParamTokenMismatch');
         expect(result.error ?? '').toContain('removed');
 
@@ -175,7 +175,7 @@ test.describe('prompt rename regression (plan-15)', () => {
             });
         }) as UpsertResult;
 
-        expect(result.ok).toBe(true);
+        expect(result.isSuccess).toBe(true);
         expect(result.value).toBe(42);
 
         const calls = await page.evaluate(() => (globalThis as unknown as { __calls: FakeSqlCall[] }).__calls);

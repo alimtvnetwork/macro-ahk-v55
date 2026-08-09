@@ -51,7 +51,7 @@ function isReply(value: unknown): value is MessageReply<unknown> {
     return typeof value === "object" && value !== null &&
         (value as { tag?: unknown }).tag === ENVELOPE_TAG &&
         typeof (value as { id?: unknown }).id === "string" &&
-        typeof (value as { ok?: unknown }).ok === "boolean";
+        typeof (value as { ok?: unknown }).isSuccess === "boolean";
 }
 
 function nextId(): string {
@@ -146,7 +146,7 @@ export const messageClient = {
                 context: { type: def.type },
             });
         }
-        if (!reply.ok) {
+        if (!reply.isSuccess) {
             throw reply.error ? AppError.fromJSON(reply.error) : new AppError({
                 code: "UNKNOWN_REPLY_ERROR",
                 reason: `Handler ${def.type} returned ok=false without an error body`,
@@ -177,7 +177,7 @@ export const pageBridge = {
                 const data = event.data;
                 if (!isReply(data) || data.id !== envelope.id) return;
                 window.removeEventListener("message", listener);
-                if (data.ok) resolve(data.result as TRes);
+                if (data.isSuccess) resolve(data.result as TRes);
                 else reject(data.error ? AppError.fromJSON(data.error) : new AppError({
                     code: "PAGE_BRIDGE_NO_ERROR",
                     reason: `Reply ok=false without error body for ${def.type}`,

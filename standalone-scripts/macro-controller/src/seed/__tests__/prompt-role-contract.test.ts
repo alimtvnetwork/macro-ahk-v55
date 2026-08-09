@@ -15,7 +15,7 @@ import { ServiceResult } from '../../utils/result-wrapper';
  *       even for a pristine seed).
  *   C2. `assertParamTokensUnchanged(body, body)` is a no-op — a row is its own
  *       drift-guard baseline. Guards against `extractParamTokens` non-determinism.
- *   C3. `validateRuleZero(body).ok === true` — every seed body must either use
+ *   C3. `validateRuleZero(body).isSuccess === true` — every seed body must either use
  *       the `{{n}}` template placeholder or declare a matching step count.
  *   C4. Slug uniqueness and default-per-role uniqueness (exactly one
  *       `isDefault:true` row per non-generic role) — the health-check inspector
@@ -63,10 +63,10 @@ describe('Prompt role contract matrix (v4.179.0)', () => {
 
     describe('C3. Rule-0 passes for every seed body (template or declared-count)', () => {
         for (const row of PLAN_NEXT_SEED_ROWS) {
-            it('slug=' + row.slug + ' — validateRuleZero.ok===true', () => {
+            it('slug=' + row.slug + ' — validateRuleZero.isSuccess===true', () => {
                 const result = validateRuleZero(row.body);
                 expect(
-                    result.ok,
+                    result.isSuccess,
                     'Rule-0 violation on seed slug=' + row.slug + ' code=' + result.code
                     + ' reason=' + result.reason,
                 ).toBe(true);
@@ -112,11 +112,11 @@ describe('Prompt role contract matrix (v4.179.0)', () => {
         const MISMATCH_BODY = '# 5 steps PlanTierType, Maximal Enforcement\n\n1. one\n2. two\n3. three\n';
         it('validateRuleZero flags mismatch (shared by plan and next callers)', () => {
             const r = validateRuleZero(MISMATCH_BODY);
-            expect(r.ok).toBe(false);
+            expect(r.isSuccess).toBe(false);
         });
         it('validateRuleZero passes on template bodies for both roles', () => {
             const r = validateRuleZero('# {{n}} steps PlanTierType\n\n1. only\n');
-            expect(r.ok).toBe(true);
+            expect(r.isSuccess).toBe(true);
         });
     });
 });

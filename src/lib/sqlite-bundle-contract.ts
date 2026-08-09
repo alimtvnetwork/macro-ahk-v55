@@ -414,7 +414,7 @@ function validateTableColumns(
  * toast / dialog stays readable when an entire schema is wrong.
  */
 export function formatValidationError(result: BundleValidationResult): string {
-    if (result.isSuccess) return "";
+    if (result.ok) return "";
     const MAX = 10;
     const head = result.errors.slice(0, MAX).map((e, i) => `  ${i + 1}. [${e.code}] ${e.message}`);
     const tail = result.errors.length > MAX

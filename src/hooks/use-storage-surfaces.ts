@@ -28,7 +28,6 @@ export function useSessionStorage() {
       });
       setEntries(result.entries ?? []);
     } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
       setEntries([]);
     }
     setLoading(false);
@@ -65,7 +64,6 @@ export function useCookies() {
       });
       setEntries(result.entries ?? []);
     } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
       setEntries([]);
     }
     setLoading(false);
@@ -99,7 +97,6 @@ export function useLocalStorage() {
       });
       setEntries(result.entries ?? []);
     } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
       setEntries([]);
     }
     setLoading(false);

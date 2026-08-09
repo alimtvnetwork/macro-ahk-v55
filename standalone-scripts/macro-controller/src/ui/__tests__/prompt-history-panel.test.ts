@@ -196,7 +196,7 @@ describe('openPromptHistoryPanel', () => {
   it('parseRevisionImportPayload accepts a matching schema-v1 payload (v4.183.0)', () => {
     const payload = buildRevisionExportPayload('plan-default', 'plan', [makeRev()], 1_700_000_000_000);
     const parsed = parseRevisionImportPayload(JSON.stringify(payload), 'plan-default', 'plan');
-    expect(parsed.ok).toBe(true);
+    expect(parsed.isSuccess).toBe(true);
     expect(parsed.rows).toHaveLength(1);
     expect(parsed.rows?.[0].Body).toBe('old body {{n}}');
     expect(parsed.rows?.[0].CreatedAt).toBe(1_700_000_000_000);
@@ -204,11 +204,11 @@ describe('openPromptHistoryPanel', () => {
 
   it('parseRevisionImportPayload rejects slug/role/schema mismatches (v4.183.0)', () => {
     const good = buildRevisionExportPayload('plan-default', 'plan', [makeRev()]);
-    expect(parseRevisionImportPayload(JSON.stringify(good), 'other-slug', 'plan').ok).toBe(false);
-    expect(parseRevisionImportPayload(JSON.stringify(good), 'plan-default', 'next').ok).toBe(false);
-    expect(parseRevisionImportPayload('not json{', 'plan-default', 'plan').ok).toBe(false);
+    expect(parseRevisionImportPayload(JSON.stringify(good), 'other-slug', 'plan').isSuccess).toBe(false);
+    expect(parseRevisionImportPayload(JSON.stringify(good), 'plan-default', 'next').isSuccess).toBe(false);
+    expect(parseRevisionImportPayload('not json{', 'plan-default', 'plan').isSuccess).toBe(false);
     const bad = { ...good, schemaVersion: 99 };
-    expect(parseRevisionImportPayload(JSON.stringify(bad), 'plan-default', 'plan').ok).toBe(false);
+    expect(parseRevisionImportPayload(JSON.stringify(bad), 'plan-default', 'plan').isSuccess).toBe(false);
   });
 
   // ── v4.185.0: undo-toast on restore ─────────────────────────────────

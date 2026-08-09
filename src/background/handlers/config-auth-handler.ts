@@ -729,7 +729,7 @@ async function fetchAuthTokenFromSessionExchange(
             method: "GET",
             credentials: "include",
         }));
-        if (response.isFail) {
+        if (!response.isSuccess) {
             logBgWarnError(
                 BgLogTag.CONFIG_AUTH,
                 `HEFF: HTTP ${response.status} on GET ${url} — auth-token exchange failed; ` +

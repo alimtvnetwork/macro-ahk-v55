@@ -104,8 +104,6 @@ export function StorageBrowserView() {
       setTables(resp.tables ?? []);
       setDbSizeBytes(resp.dbSizeBytes ?? 0);
     } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
 
       setTables([]);
       setDbSizeBytes(0);
@@ -168,8 +166,6 @@ export function StorageBrowserView() {
         setSessionSize(size);
       }
     } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
  setSessionCount(0); }
 
     // Cookies
@@ -185,8 +181,6 @@ export function StorageBrowserView() {
         setCookieCount(document.cookie ? document.cookie.split(";").length : 0);
       }
     } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
  setCookieCount(0); }
 
     // LocalStorage / chrome.storage.local
@@ -209,8 +203,6 @@ export function StorageBrowserView() {
         setLocalSize(size);
       }
     } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
  setLocalCount(0); }
   }, []);
 
@@ -483,8 +475,6 @@ function CssAssetsSection() {
       });
       setAssets(resp.assets ?? []);
     } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
 
       // Fallback: show known assets from manifest data
       setAssets([

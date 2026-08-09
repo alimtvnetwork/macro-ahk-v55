@@ -26,7 +26,6 @@ function ensureIdempotentSchema(db: SqlJsDatabase, schema: string): void {
     try {
         db.run(schema);
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
         // Schema may contain statements that conflict with existing objects
         // (e.g., column already exists). Fall back to statement-by-statement.
         const statements = schema
@@ -36,9 +35,8 @@ function ensureIdempotentSchema(db: SqlJsDatabase, schema: string): void {
         for (const stmt of statements) {
             try {
                 db.run(stmt);
-            } catch (err) {
-                logError("AutoCatch", "Unhandled exception", err);
-            }
+            } catch {
+}
         }
     }
 }

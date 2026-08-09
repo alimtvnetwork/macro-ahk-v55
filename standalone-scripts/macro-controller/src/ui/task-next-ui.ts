@@ -252,9 +252,9 @@ function selectLegacyTaskNextPrompt(deps: TaskNextDeps, n: number): TaskNextProm
 async function selectDbTaskNextPrompt(n: number): Promise<TaskNextPromptSelection | null> {
   const res = await runWithBridgeRetry(
     function() { return listPromptsByRole('next'); },
-    function(r) { return r.ok ? undefined : (r.error ?? 'listPromptsByRole !ok'); },
+    function(r) { return r.isSuccess ? undefined : (r.error ?? 'listPromptsByRole !ok'); },
   );
-  if (!res.ok || !res.value || res.value.length === 0) return null;
+  if (!res.isSuccess || !res.value || res.value.length === 0) return null;
   const rows = res.value;
   const active = rows.find(function(r) { return r.IsDefault === 1; }) ?? rows[0];
   if (!active || !active.Body) return null;

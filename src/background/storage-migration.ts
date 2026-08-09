@@ -156,7 +156,7 @@ export async function runStorageMigrations(): Promise<StorageMigrationResult> {
     let lastApplied = fromVersion;
     for (const migration of pending) {
         const outcome = await applyMigration(migration);
-        if (outcome.isFail) {
+        if (!outcome.isSuccess) {
             return {
                 fromVersion,
                 toVersion: lastApplied,

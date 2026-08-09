@@ -212,7 +212,6 @@ function installTransport(): void {
             try {
                 dispatch(e.newValue === null ? null : parseSession(JSON.parse(e.newValue)));
             } catch (err) {
-                logError("AutoCatch", "Unhandled exception", err);
                 dispatch(null);
             }
         };

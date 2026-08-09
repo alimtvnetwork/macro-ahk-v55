@@ -101,7 +101,6 @@ function deleteGroupsSequentially(
             lib.deleteGroup(id);
             deleted += 1;
         } catch (caught) {
-            logError("AutoCatch", "Unhandled exception", caught);
             firstError = caught instanceof Error ? caught.message : String(caught);
             break;
         }

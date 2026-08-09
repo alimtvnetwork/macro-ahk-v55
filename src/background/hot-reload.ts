@@ -83,7 +83,7 @@ async function pollBuildMeta(): Promise<void> {
         const metaUrl = chrome.runtime.getURL(BUILD_META_URL);
         const response = ServiceResult.wrapFetch(await fetch(metaUrl, { cache: "no-store" }));
 
-        if (response.isFail) {
+        if (!response.isSuccess) {
             // HEFF: a non-2xx from build-meta.json means the file is gone or
             // mis-served. Do NOT keep polling once per second — stop the loop
             // and surface the status so the dev sees it.
@@ -129,7 +129,6 @@ async function pollBuildMeta(): Promise<void> {
             );
             chrome.runtime.reload();
         }
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }

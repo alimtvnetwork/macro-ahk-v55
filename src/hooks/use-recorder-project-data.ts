@@ -184,7 +184,6 @@ export function useRecorderProjectData(projectSlug: string): HookResult {
         setError(null);
         try { setData(await fetchProjectData(projectSlug)); }
         catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
             setError(err instanceof Error ? err.message : String(err));
             setData(EMPTY_DATA);
         } finally { setLoading(false); }

@@ -84,7 +84,6 @@ export function usePrompts() {
             const normalized = rawList.map((entry, index) => normalizePrompt(entry, index));
             setPrompts(normalized);
         } catch (error) {
-            logError("AutoCatch", "Unhandled exception", error);
             setPrompts([]);
             setFatalError(toError(error, "Failed to load prompts"));
         } finally {

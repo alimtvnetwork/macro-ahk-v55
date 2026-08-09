@@ -88,7 +88,7 @@ async function doubleConfirmAndMove(threshold: number): Promise<void> {
   }
   const resp = await window.marco.api.credits.fetchWorkspaces({ baseUrl: CREDIT_API_BASE });
 
-  const isMissingOk = !resp.ok;
+  const isMissingOk = !resp.isSuccess;
 
   if (isMissingOk) {
     logError('Double-confirm API fetch failed', 'HTTP ' + resp.status);
@@ -320,7 +320,7 @@ async function doCycleFetchWithToken(isRetryAttempt: boolean): Promise<void> {
       markBearerTokenExpired(LOG_SCOPE_LOOP_CYCLE);
     }
 
-    const isMissingOk = !resp.ok;
+    const isMissingOk = !resp.isSuccess;
 
     if (isMissingOk) {
       throwDiagnostic('LOOP_FALLBACK_HTTP_E001', {
@@ -348,9 +348,7 @@ async function doCycleFetchWithToken(isRetryAttempt: boolean): Promise<void> {
 export async function doCycleFetchFallback(): Promise<void> {
   const token = resolveToken();
 
-  const isMissingToken = !token;
-
-  if (isMissingToken) {
+  if (!token) {
     log('Cycle fallback: No token - attempting recovery before API call...', 'warn');
 
     try {

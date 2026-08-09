@@ -278,7 +278,7 @@ function _addReadSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLElem
   readMenu.panel.appendChild(createMenuItem(menuCtx, '🔍', 'Auth Trace', 'Copy auth trace snapshot to clipboard', function() {
     const s = getAuthDebugSnapshot();
     const bridge = !s.bridgeOutcome.hasAttempted ? 'not attempted'
-      : s.bridgeOutcome.ok ? 'OK via ' + s.bridgeOutcome.source
+      : s.bridgeOutcome.isSuccess ? 'OK via ' + s.bridgeOutcome.source
       : 'FAIL: ' + (s.bridgeOutcome.error || 'unknown');
     const lines = [
       '=== Auth Trace @ ' + new Date().toISOString() + ' ===',

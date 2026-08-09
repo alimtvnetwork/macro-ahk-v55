@@ -72,7 +72,6 @@ function broadcastLibraryChanged(): void {
             logSampledDebug(BgLogTag.LIBRARY, "LIBRARY_CHANGED failed", "LIBRARY_CHANGED broadcast had no receiver", sendErr instanceof Error ? sendErr : String(sendErr));
         });
     } catch (broadcastErr) {
-        logError("AutoCatch", "Unhandled exception", broadcastErr);
         logBgWarnError(BgLogTag.LIBRARY, "broadcastLibraryChanged failed", broadcastErr instanceof Error ? broadcastErr : undefined);
     }
 }
@@ -99,7 +98,6 @@ function broadcastLibrarySynced(payload: Omit<LibrarySyncBroadcast, "type">): vo
             logSampledDebug(BgLogTag.LIBRARY, "LIBRARY_SYNC failed", "LIBRARY_SYNC_BROADCAST had no receiver", sendErr instanceof Error ? sendErr : String(sendErr));
         });
     } catch (broadcastErr) {
-        logError("AutoCatch", "Unhandled exception", broadcastErr);
         logBgWarnError(BgLogTag.LIBRARY, "broadcastLibrarySynced failed", broadcastErr instanceof Error ? broadcastErr : undefined);
     }
 }
@@ -728,7 +726,6 @@ function exportAssets(db: SqlJsDatabase): LibraryExport["assets"] {
         const row = stmt.getAsObject() as SharedAsset;
         let content: JsonValue;
         try { content = JSON.parse(row.ContentJson); } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
             content = row.ContentJson;
         }
         assets.push({ type: row.Type, slug: row.Slug, name: row.Name, version: row.Version, content });
@@ -748,7 +745,6 @@ function exportGroups(db: SqlJsDatabase): LibraryExport["groups"] {
         let sharedSettings: JsonValue = null;
         if (row.SharedSettingsJson) {
             try { sharedSettings = JSON.parse(row.SharedSettingsJson); } catch (err) {
-                logError("AutoCatch", "Unhandled exception", err);
                 sharedSettings = row.SharedSettingsJson;
             }
         }

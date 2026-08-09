@@ -367,8 +367,6 @@ export function ProjectFilesPanel({ projectId }: Props) {
       setFiles(fileList);
       setTree(buildTree(fileList));
     } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
 
       setFiles([]);
       setTree([]);

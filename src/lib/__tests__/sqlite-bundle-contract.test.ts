@@ -114,7 +114,7 @@ function fullValidBundle(): BundleSpec {
 describe("validateBundleSchema, happy path", () => {
     it("accepts a v4 PascalCase bundle with every required column", () => {
         const result = validateBundleSchema(makeDb(fullValidBundle()), "full");
-        expect(result.isSuccess).toBe(true);
+        expect(result.ok).toBe(true);
         expect(result.errors).toHaveLength(0);
         expect(result.formatVersion).toBe("4");
     });
@@ -125,7 +125,7 @@ describe("validateBundleSchema, happy path", () => {
         const projects = spec.tables.find((t) => t.name === "Projects");
         projects!.columns.push("Uid", "Description");
         const result = validateBundleSchema(makeDb(spec), "full");
-        expect(result.isSuccess).toBe(true);
+        expect(result.ok).toBe(true);
     });
 });
 
@@ -143,7 +143,7 @@ describe("validateBundleSchema, legacy snake_case rejection", () => {
             }),
             "full",
         );
-        expect(result.isSuccess).toBe(false);
+        expect(result.ok).toBe(false);
         const codes = result.errors.map((e) => e.code);
         // Expect MISSING_TABLE for each PascalCase table + LEGACY_SNAKE_CASE for each lowercase one
         expect(codes).toContain("MISSING_TABLE");
@@ -160,7 +160,7 @@ describe("validateBundleSchema, legacy snake_case rejection", () => {
         const projects = spec.tables.find((t) => t.name === "Projects")!;
         projects.columns.push("created_at"); // legacy duplicate
         const result = validateBundleSchema(makeDb(spec), "full");
-        expect(result.isSuccess).toBe(false);
+        expect(result.ok).toBe(false);
         const err = result.errors.find(
             (e) => e.code === "LEGACY_SNAKE_CASE" && e.column === "created_at",
         );
@@ -175,7 +175,7 @@ describe("validateBundleSchema, column-level drift", () => {
         const scripts = spec.tables.find((t) => t.name === "Scripts")!;
         scripts.columns = scripts.columns.filter((c) => c !== "Code");
         const result = validateBundleSchema(makeDb(spec), "full");
-        expect(result.isSuccess).toBe(false);
+        expect(result.ok).toBe(false);
         expect(result.errors).toContainEqual(
             expect.objectContaining({
                 code: "MISSING_COLUMN",
@@ -190,7 +190,7 @@ describe("validateBundleSchema, column-level drift", () => {
         const projects = spec.tables.find((t) => t.name === "Projects")!;
         projects.columns.push("MysteryFieldFromTheFuture");
         const result = validateBundleSchema(makeDb(spec), "full");
-        expect(result.isSuccess).toBe(false);
+        expect(result.ok).toBe(false);
         expect(result.errors).toContainEqual(
             expect.objectContaining({
                 code: "UNKNOWN_COLUMN",
@@ -204,7 +204,7 @@ describe("validateBundleSchema, column-level drift", () => {
         const spec = fullValidBundle();
         spec.tables.push({ name: "ShinyNewThing", columns: ["Id", "Name"] });
         const result = validateBundleSchema(makeDb(spec), "full");
-        expect(result.isSuccess).toBe(false);
+        expect(result.ok).toBe(false);
         expect(result.errors).toContainEqual(
             expect.objectContaining({
                 code: "UNKNOWN_TABLE",
@@ -219,7 +219,7 @@ describe("validateBundleSchema, format_version gate", () => {
         const spec = fullValidBundle();
         spec.formatVersion = null; // row absent
         const result = validateBundleSchema(makeDb(spec), "full");
-        expect(result.isSuccess).toBe(false);
+        expect(result.ok).toBe(false);
         expect(result.errors.map((e) => e.code)).toContain("MISSING_FORMAT_VERSION");
     });
 
@@ -227,7 +227,7 @@ describe("validateBundleSchema, format_version gate", () => {
         const spec = fullValidBundle();
         spec.formatVersion = "99";
         const result = validateBundleSchema(makeDb(spec), "full");
-        expect(result.isSuccess).toBe(false);
+        expect(result.ok).toBe(false);
         expect(result.errors.map((e) => e.code)).toContain("UNSUPPORTED_FORMAT_VERSION");
     });
 });
@@ -244,7 +244,7 @@ describe("validateBundleSchema, prompts-only mode", () => {
             }),
             "prompts-only",
         );
-        expect(result.isSuccess).toBe(true);
+        expect(result.ok).toBe(true);
     });
 
     it("still rejects legacy 'prompts' table in prompts-only mode", () => {
@@ -258,7 +258,7 @@ describe("validateBundleSchema, prompts-only mode", () => {
             }),
             "prompts-only",
         );
-        expect(result.isSuccess).toBe(false);
+        expect(result.ok).toBe(false);
         expect(result.errors.map((e) => e.code)).toContain("MISSING_TABLE");
     });
 });

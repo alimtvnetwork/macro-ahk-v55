@@ -141,7 +141,7 @@ function initializeMacroDbAndCapture(): void {
     installReseedCommandGlobal();
     try {
       const result = await seedPlanNextPrompts();
-      const isMissingOk = !result.ok;
+      const isMissingOk = !result.isSuccess;
       if (isMissingOk) {
         logError('Startup', 'first-run prompt seed failed: ' + (result.error || 'Unknown'));
       }
@@ -697,7 +697,7 @@ function fetchTier1Prefetch(projectId: string, _token: string): Promise<MarkView
 }
 
 function handleTier1Response(resp: { ok: boolean; status?: number; data?: unknown }): MarkViewedResponse | null {
-  const isFailed = !resp.ok;
+  const isFailed = !resp.isSuccess;
   if (isFailed) {
     log('Startup: Tier 1 prefetch HTTP ' + resp.status, 'warn');
     timingEnd(LabelType.WsPrefetch, 'warn', 'HTTP ' + resp.status);

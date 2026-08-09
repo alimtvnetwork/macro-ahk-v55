@@ -57,7 +57,6 @@ function buildSdkPreamble(script: InjectableScript): string {
     try {
         version = chrome.runtime.getManifest().version;
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
         // allow-swallow: preview/test contexts lack chrome.runtime; "0.0.0" sentinel is the documented fallback (throttled to avoid test-run flooding)
         logBgWarnSampled(BgLogTag.INJECTION, "manifest-unavailable", "chrome.runtime.getManifest unavailable, using version fallback", err);
     }

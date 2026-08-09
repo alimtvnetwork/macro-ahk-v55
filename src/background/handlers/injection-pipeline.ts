@@ -379,7 +379,6 @@ async function logInjectionSuccess(
                     stackTrace: `Injected version: ${injectedVersion}, Expected: ${EXTENSION_VERSION}, Source: ${codeSource ?? "unknown"}, Code length: ${script.code.length}`,
                 } as MessageRequest);
             } catch (logErr) {
-                logError("AutoCatch", "Unhandled exception", logErr);
                 logBgWarnError(BgLogTag.INJECTION, `handleLogError(LEGACY_SCRIPT_INJECTED) failed for "${script.name}" — telemetry suppressed but injection continues`, logErr);
             }
         }

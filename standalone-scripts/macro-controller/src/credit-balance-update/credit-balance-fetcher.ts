@@ -175,9 +175,7 @@ export async function fetchWorkspaceCreditBalance(
     const startMs = Date.now();
     const token = await getBearerToken(options.forceTokenRefresh ? { force: true } : undefined);
 
-    const isMissingToken = !token;
-
-    if (isMissingToken) {
+    if (!token) {
         const detail = 'No bearer token returned by unified getBearerToken() contract';
         logCreditFetchFailure(buildFailurePayload('MissingToken', detail, options, url, null, null, null, startMs));
 
@@ -196,7 +194,7 @@ export async function fetchWorkspaceCreditBalance(
             },
         }, timeoutMs);
 
-        if (response.isFail) {
+        if (!response.isSuccess) {
             return await handleNonOkResponse(response, options, url, token, startMs);
         }
 

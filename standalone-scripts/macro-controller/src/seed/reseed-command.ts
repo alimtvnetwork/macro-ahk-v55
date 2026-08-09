@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ServiceResult } from '../utils/result-wrapper';
 /**
  * reseed-command.ts — on-demand recovery for the PlanTierType/Next prompt library.

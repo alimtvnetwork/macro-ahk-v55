@@ -50,7 +50,7 @@ async function resolvePlanBody(n: number): Promise<string> {
   try {
     const mod = await import('../db/prompt-db');
     const result = await mod.getDefaultPromptForRole('plan');
-    if (result.ok && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
+    if (result.isSuccess && result.value && typeof result.value.Body === 'string' && result.value.Body.length > 0) {
       const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
 
       return substituteToken(result.value.Body, key, n);

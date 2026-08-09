@@ -132,7 +132,7 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
             const seedApi = (window as unknown as { __seed: { seedPlanNextPrompts: () => Promise<{ ok: boolean; telemetry?: unknown[] }> } }).__seed;
             return seedApi.seedPlanNextPrompts();
         });
-        expect(result.ok).toBe(true);
+        expect(result.isSuccess).toBe(true);
 
         // Role counts contract
         const telemetry = result.telemetry as Array<{ role: string; inserted: number; skipped: number; promotedDefault: number; alreadyDefault: number }>;
@@ -182,7 +182,7 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
             const seedApi = (window as unknown as { __seed: { seedPlanNextPrompts: () => Promise<{ ok: boolean; telemetry?: unknown[] }> } }).__seed;
             return seedApi.seedPlanNextPrompts();
         });
-        expect(result.ok).toBe(true);
+        expect(result.isSuccess).toBe(true);
         const telemetry = result.telemetry as Array<{ role: string; inserted: number; skipped: number; promotedDefault: number; alreadyDefault: number }>;
         const plan = telemetry.find(t => t.role === 'plan');
         const next = telemetry.find(t => t.role === 'next');
@@ -243,7 +243,7 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
             const seedApi = (window as unknown as { __seed: { seedPlanNextPrompts: () => Promise<{ ok: boolean; error?: string }> } }).__seed;
             return seedApi.seedPlanNextPrompts();
         });
-        expect(result.ok).toBe(false);
+        expect(result.isSuccess).toBe(false);
         expect(result.error).toMatch(/disk full/);
 
         const stored = await page.evaluate((k) => window.localStorage.getItem(k), TELEMETRY_KEY);

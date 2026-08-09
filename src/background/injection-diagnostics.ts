@@ -51,9 +51,8 @@ async function persistLogEntry(
             projectId: context.projectId,
             configId: context.configId,
         } as MessageRequest);
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }
 
 /** Persists an injection error entry. */
@@ -81,9 +80,8 @@ export async function persistInjectionError(
             configId: context.configId,
             scriptFile: context.scriptFile,
         } as MessageRequest);
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }
 
 /** Mirrors a diagnostic message into the active tab console. */
@@ -111,9 +109,8 @@ export async function mirrorDiagnosticToTab(
             },
             args: [message, level],
         });
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }
 
 /**
@@ -175,7 +172,6 @@ export async function mirrorPipelineLogsToTab(
             },
             args: [lines, groupTitle],
         });
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }

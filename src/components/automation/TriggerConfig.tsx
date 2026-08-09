@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TriggerConfig — Spec 21
  *

@@ -166,9 +166,8 @@ function bridgePagePayload(): void {
         if (o.type !== "MARCO_FIRST_ATTACH_ACTION") return;
         try {
             chrome.runtime.sendMessage(o);
-        } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
-        }
+        } catch {
+}
     };
 
     window.addEventListener(Events.MESSAGE, onMessage);

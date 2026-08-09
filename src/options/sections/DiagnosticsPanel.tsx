@@ -85,8 +85,6 @@ export function DiagnosticsPanel() {
             setData(statusRes);
             setMessages(msgRes.messages ?? []);
         } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
 
             setData(null);
         }
@@ -278,7 +276,7 @@ export function DiagnosticsPanel() {
                                         <td className="diag-msg-time">{timeStr}</td>
                                         <td className="diag-msg-type">{m.type}</td>
                                         <td>{m.durationMs} ms</td>
-                                        <td className={m.isSuccess ? "diag-msg-ok" : "diag-msg-fail"}>{m.isSuccess ? "✓" : "✗"}</td>
+                                        <td className={m.ok ? "diag-msg-ok" : "diag-msg-fail"}>{m.ok ? "✓" : "✗"}</td>
                                     </tr>
                                 );
                             })}
@@ -326,7 +324,7 @@ function buildReport(data: StatusData, messages: TrackedMessage[]): string {
         `Token:       ${data.token.status}`,
         "",
         "── Recent Messages ──",
-        ...messages.map((m) => `  ${m.timestamp}  ${m.type.padEnd(24)} ${String(m.durationMs).padStart(4)} ms  ${m.isSuccess ? "OK" : "FAIL"}`),
+        ...messages.map((m) => `  ${m.timestamp}  ${m.type.padEnd(24)} ${String(m.durationMs).padStart(4)} ms  ${m.ok ? "OK" : "FAIL"}`),
         "",
         "=== End Report ===",
     ];

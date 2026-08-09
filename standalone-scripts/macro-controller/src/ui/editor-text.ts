@@ -123,8 +123,7 @@ function writeContentEditable(editor: HTMLElement, text: string): boolean {
     for (let i = 0; i < lines.length; i++) {
       const isFirst = i === 0;
       const isOk = insertLineWithBreaks(lines[i], isFirst);
-      const isMissingIsOk = !isOk;
-      if (isMissingIsOk) allOk = false;
+      if (!isOk) allOk = false;
     }
     editor.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: text }));
 

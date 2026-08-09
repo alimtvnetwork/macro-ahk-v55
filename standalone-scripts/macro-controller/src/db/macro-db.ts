@@ -217,7 +217,7 @@ async function runOrphanRepairStage(stages: Stage[]): Promise<OrphanRepairReport
 async function runSeedPlanNextStage(stages: Stage[]): Promise<void> {
   const { seedPlanNextPrompts } = await import('../seed/seed-plan-next');
   const seedResult = await seedPlanNextPrompts();
-  const isMissingOk = !seedResult.ok;
+  const isMissingOk = !seedResult.isSuccess;
   if (isMissingOk) {
     const reason = seedResult.error ?? UNKNOWN_ERROR;
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: 'seed-plan-next', reason });

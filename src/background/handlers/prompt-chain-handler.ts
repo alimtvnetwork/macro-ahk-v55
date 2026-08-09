@@ -156,9 +156,8 @@ async function clearPendingArg(correlationId: string): Promise<void> {
         } else {
             await chrome.storage.session.set({ [PROMPT_ARGS_KEY]: map });
         }
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }
 
 function isPromptResultMessage(value: unknown, correlationId: string): value is PromptInjectResultMessage {

@@ -147,7 +147,6 @@ export function useStepGroupBatchActions(lib: UseStepLibraryApi) {
                     lib.renameGroup(c.Id, c.NewName);
                     applied.push(c);
                 } catch (err) {
-                    logError("AutoCatch", "Unhandled exception", err);
                     firstError = err instanceof Error ? err.message : String(err);
                     break;
                 }
@@ -160,7 +159,6 @@ export function useStepGroupBatchActions(lib: UseStepLibraryApi) {
                         lib.renameGroup(c.Id, c.OldName);
                         undone.push({ Id: c.Id, OldName: c.NewName, NewName: c.OldName });
                     } catch (err) {
-                        logError("AutoCatch", "Unhandled exception", err);
                         undoError = err instanceof Error ? err.message : String(err);
                         break;
                     }

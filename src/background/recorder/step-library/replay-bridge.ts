@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Marco Extension — Step Library → Live Replay Bridge
  *

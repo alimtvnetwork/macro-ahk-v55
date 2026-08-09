@@ -216,9 +216,8 @@ function logDynamicLoad(
         let version = "unknown";
         try {
             version = chrome.runtime.getManifest().version;
-        } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
-        }
+        } catch {
+}
 
         db.run(
             `INSERT INTO DynamicLoadLog (Timestamp, Requester, Target, Status, Detail, ExtVersion)

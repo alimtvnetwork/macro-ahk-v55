@@ -399,8 +399,6 @@ function HotkeyQuickAdd(props: { onClose: () => void }): JSX.Element {
             setWaitMs("");
             setLabel("");
         } catch (err) {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
 
             setError(err instanceof Error ? err.message : String(err));
         }

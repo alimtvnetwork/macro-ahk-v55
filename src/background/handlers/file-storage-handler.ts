@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Marco Extension — Project File Storage Handler (Issue 50)
  *

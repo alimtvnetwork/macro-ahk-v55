@@ -104,7 +104,7 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: true },                          // audit INSERT
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         const updates = captured.filter(c => /^UPDATE Prompt SET Body =/.test(c.sql));
         expect(updates).toHaveLength(1);
         expect(updates[0]!.sql).toContain("WHERE Slug = 'plan-default'");
@@ -126,7 +126,7 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: true, rows: [{ '1': 1 }] },
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         const updates = captured.filter(c => /^UPDATE Prompt SET Body =/.test(c.sql));
         expect(updates, 'user-authored body must be preserved').toHaveLength(0);
         // No observable change -> audit row must be skipped.
@@ -144,7 +144,7 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: true, rows: [{ '1': 1 }] },
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         expect(logDiagnosticFromCode).toHaveBeenCalledWith(
             'SEED_LEGACY_UPGRADE_E001',
             expect.objectContaining({
@@ -171,7 +171,7 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: false, errorMessage: 'audit table missing' }, // audit INSERT fails
         ];
         const r = await seedPlanNextPrompts();
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         expect(captured[8]!.sql).toMatch(/^INSERT INTO PromptSeedAudit/);
         expect(logDiagnosticFromCode).toHaveBeenCalledWith(
             'SEED_AUDIT_E001',
@@ -191,7 +191,7 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: true },
         ];
         const result = await seedPlanNextPrompts();
-        expect(result.ok).toBe(true);
+        expect(result.isSuccess).toBe(true);
         const updates = captured.filter(call => /^UPDATE Prompt SET Body =/.test(call.sql));
         expect(updates).toHaveLength(1);
         expect(updates[0]!.sql).toContain("WHERE Slug = 'next-default'");
@@ -210,7 +210,7 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: true },
         ];
         const result = await seedPlanNextPrompts();
-        expect(result.ok).toBe(true);
+        expect(result.isSuccess).toBe(true);
         const updates = captured.filter(call => /^UPDATE Prompt SET Body =/.test(call.sql));
         expect(updates).toHaveLength(1);
         expect(updates[0]!.sql).toContain("WHERE Slug = 'plan-default'");
@@ -227,7 +227,7 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: true, rows: [{ '1': 1 }] },
         ];
         const result = await seedPlanNextPrompts();
-        expect(result.ok).toBe(true);
+        expect(result.isSuccess).toBe(true);
         const updates = captured.filter(call => /^UPDATE Prompt SET Body =/.test(call.sql));
         expect(updates).toHaveLength(0);
     });
@@ -242,7 +242,7 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
             { isOk: true, rows: [{ '1': 1 }] },
         ];
         const result = await seedPlanNextPrompts();
-        expect(result.ok).toBe(true);
+        expect(result.isSuccess).toBe(true);
         const updates = captured.filter(call => /^UPDATE Prompt SET Body =/.test(call.sql));
         expect(updates).toHaveLength(0);
     });

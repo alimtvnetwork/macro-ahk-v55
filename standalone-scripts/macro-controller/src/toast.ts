@@ -86,9 +86,7 @@ function getNotify(): MarcoNotify | null {
     if (hasToast) {
       return notify!;
     }
-  } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
-  }
+  }catch {}
 
   return null;
 }
@@ -188,7 +186,7 @@ class ToastManager {
       try {
         listener();
       } catch (_e) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, _e);
+        
         logDebug('ToastManager', 'Error change listener threw: ' + (_e instanceof Error ? _e.message : String(_e)));
       }
     }

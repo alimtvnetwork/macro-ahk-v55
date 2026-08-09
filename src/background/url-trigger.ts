@@ -263,7 +263,6 @@ async function injectSentinel(
             args: buildSentinelArgs(decision),
         });
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
         handleSentinelError(tabId, decision, err);
     }
 }
@@ -357,9 +356,8 @@ function writeSentinelInPage(
             const host = document.body ?? document.documentElement;
             host.appendChild(element);
         }
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }
 
 /* ------------------------------------------------------------------ */

@@ -67,7 +67,7 @@ async function readAllDbRows(): Promise<PromptRow[]> {
     const all: PromptRow[] = [];
     for (const role of PROMPT_ROLES) {
         const res = await listPromptsByRole(role);
-        if (!res.ok || !res.value) {
+        if (!res.isSuccess || !res.value) {
             logError('PromptIoDbBridge', 'readAllDbRows: listPromptsByRole failed for ' + role, res);
             continue;
         }
@@ -100,7 +100,7 @@ export function mergeDbIntoExport(
 
 async function findExistingRow(role: PromptRole, slug: string): Promise<PromptRow | null> {
     const res = await listPromptsByRole(role);
-    if (!res.ok || !res.value) return null;
+    if (!res.isSuccess || !res.value) return null;
 
     return res.value.find((r) => r.Slug === slug) ?? null;
 }
@@ -126,7 +126,7 @@ async function commitOneEntry(entry: CachedPromptEntry): Promise<CommitOutcome> 
         previousReplaceKey: existing?.ReplaceKey,
     });
 
-    return res.ok ? { status: 'ok' } : { status: 'error', reason: res.error ?? 'upsert failed' };
+    return res.isSuccess ? { status: 'ok' } : { status: 'error', reason: res.error ?? 'upsert failed' };
 }
 
 /** Route role-tagged entries to `upsertPrompt`; collect per-entry errors. */

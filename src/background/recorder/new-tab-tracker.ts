@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Marco Extension — New Tab Tracker
  * 

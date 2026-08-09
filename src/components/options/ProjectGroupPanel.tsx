@@ -115,16 +115,12 @@ async function readProjectStorageKey(storage: ProjectStorageLocal): Promise<Reco
     const out = await storage.get("marco_projects");
     if (out && typeof out === "object") return out;
   } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
  /* fall through to callback storage API */ }
 
   return new Promise((resolve) => {
     try {
       storage.get("marco_projects", (out) => resolve(out ?? null));
     } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
  resolve(null); }
   });
 }

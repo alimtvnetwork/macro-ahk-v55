@@ -285,16 +285,13 @@ export function applyJsonSchema(db: SqlJsDatabase, schema: JsonSchemaDef): Migra
             try {
                 migrateTable(db, tableDef, existingTables, result);
             } catch (err) {
-                logError("AutoCatch", "Unhandled exception", err);
                 result.errors.push(`Table "${tableDef.TableName}": ${String(err)}`);
             }
         }
 
         db.run("COMMIT");
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
         try { db.run("ROLLBACK"); } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
         } // allow-swallow: ROLLBACK after failed COMMIT may itself fail if no active txn; outer error is already recorded
         result.errors.push(`Transaction failed: ${String(err)}`);
     }

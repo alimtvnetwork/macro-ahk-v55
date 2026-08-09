@@ -197,9 +197,8 @@ function applyV6Up(logsDb: SqlJsDatabase, _errorsDb: SqlJsDatabase): void {
         if (existing.length > 0 && (existing[0].values[0][0] as number) === 0) {
             logsDb.run("INSERT INTO UpdateSettings (AutoCheckIntervalMinutes, HasUserConfirmBeforeUpdate, HasChangelogFromVersionInfo, CacheExpiryMinutes) VALUES (1440, 0, 1, 10080)");
         }
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
     console.log("[migration] v6: Added updater settings, caching, and changelog columns");
 }
 

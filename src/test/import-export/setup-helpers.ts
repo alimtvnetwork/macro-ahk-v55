@@ -195,7 +195,6 @@ async function buildCachedBundle(): Promise<CachedBundle> {
   try {
     importResult = await sqliteBundle.importFromSqliteZip(file);
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
     // The importer writes back through sendMessage which is stubbed to
     // { ok: true }. Some integration paths still throw on parse — that's
     // a real signal we want surfaced.

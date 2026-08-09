@@ -46,11 +46,11 @@ interface LoadState {
 
 async function attemptInitialLoad(role: PromptRole): Promise<{ res: ListRes; initialReason: string | null }> {
   let res = await listPromptsByRole(role);
-  let initialReason = res.ok ? null : (res.error ?? 'listPromptsByRole returned !ok');
-  if (!res.ok && isSqlBridgeContractError(initialReason ?? undefined)) {
+  let initialReason = res.isSuccess ? null : (res.error ?? 'listPromptsByRole returned !ok');
+  if (!res.isSuccess && isSqlBridgeContractError(initialReason ?? undefined)) {
     resetSqlBridgeCache();
     const retry = await listPromptsByRole(role);
-    if (retry.ok) { res = retry; initialReason = null; }
+    if (retry.isSuccess) { res = retry; initialReason = null; }
   }
 
   return { res, initialReason };
@@ -58,7 +58,7 @@ async function attemptInitialLoad(role: PromptRole): Promise<{ res: ListRes; ini
 
 async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ res: ListRes; stage: LoadStage; seedReason: string | null; seedAttempted: boolean }> {
   const isManaged = role === 'plan' || role === 'next';
-  const emptyOrFailed = !current.ok || ((current.value ?? []).length === 0);
+  const emptyOrFailed = !current.isSuccess || ((current.value ?? []).length === 0);
   if (!isManaged || !emptyOrFailed) {
     return { res: current, stage: 'initial-list', seedReason: null, seedAttempted: false };
   }
@@ -68,7 +68,7 @@ async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ re
   try {
     const seedMod = await import('../seed/seed-plan-next');
     const seedRes = await seedMod.seedPlanNextPrompts();
-    const isMissingOk = !seedRes.ok;
+    const isMissingOk = !seedRes.isSuccess;
     if (isMissingOk) {
       seedReason = seedRes.error ?? 'seedPlanNextPrompts returned !ok';
       logError('ChipGearPicker', 'auto-seed before pick failed for ' + role, new Error(seedReason));
@@ -84,19 +84,19 @@ async function attemptAutoSeed(role: PromptRole, current: ListRes): Promise<{ re
 }
 
 async function retryOnContractError(role: PromptRole, state: LoadState): Promise<ListRes> {
-  if (state.res.ok) return state.res;
+  if (state.res.isSuccess) return state.res;
   const dbReason = state.res.error ?? 'listPromptsByRole returned !ok';
   if (isSqlBridgeContractError(dbReason) || isSqlBridgeContractError(state.seedReason ?? undefined)) {
     resetSqlBridgeCache();
     const retry = await listPromptsByRole(role);
-    if (retry.ok) return retry;
+    if (retry.isSuccess) return retry;
   }
 
   return state.res;
 }
 
 function emitLoadFailure(opts: PickPromptOptions, state: LoadState): null {
-  const dbReason = state.res.ok ? '' : (state.res.error ?? 'listPromptsByRole returned !ok');
+  const dbReason = state.res.isSuccess ? '' : (state.res.error ?? 'listPromptsByRole returned !ok');
   const detail = buildLoadFailureDetail({
     stage: state.stage, role: opts.role, roleLabel: opts.roleLabel,
     seedAttempted: state.seedAttempted, dbReason,
@@ -130,7 +130,7 @@ export async function pickPromptFromRole(opts: PickPromptOptions): Promise<Promp
     seedReason: seeded.seedReason,
   };
   state.res = await retryOnContractError(opts.role, state);
-  const isMissingOk = !state.res.ok;
+  const isMissingOk = !state.res.isSuccess;
   if (isMissingOk) return emitLoadFailure(opts, state);
   const rows = (state.res.value ?? []).filter((r) => !opts.excludeDefault || r.IsDefault !== 1);
   if (rows.length === 0) return emitEmptyToast(opts, state.seedReason);

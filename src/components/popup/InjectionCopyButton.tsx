@@ -216,8 +216,6 @@ export function InjectionCopyButton() {
         const res = await sendMessage<{ errors: ErrorEntry[] }>({ type: "GET_ACTIVE_ERRORS" });
         applyCount(res.errors?.length ?? 0);
       } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
  /* silent */ } // allow-swallow: poll failure is non-critical; next tick retries
     };
 
@@ -240,8 +238,6 @@ export function InjectionCopyButton() {
         runtime!.onMessage!.addListener(handleBroadcast);
         listenerAttached = true;
       } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
  /* extension context invalidated */ } // allow-swallow: extension context invalidated during teardown
     }
 
@@ -269,8 +265,6 @@ export function InjectionCopyButton() {
       document.removeEventListener("visibilitychange", onVisChange);
       if (listenerAttached) {
         try { runtime!.onMessage!.removeListener(handleBroadcast); } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
  /* ignore */ } // allow-swallow: extension context already torn down
       }
     };

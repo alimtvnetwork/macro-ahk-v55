@@ -51,8 +51,7 @@ export function showWsMembersBulkPanel(wsIds: string[], x: number, y: number): v
 
 function renderShell(x: number, y: number): void {
   let panel = document.getElementById(PANEL_ID);
-  const isMissingPanel = !panel;
-  if (isMissingPanel) {
+  if (!panel) {
     panel = document.createElement('div');
     panel.id = PANEL_ID;
     document.body.appendChild(panel);

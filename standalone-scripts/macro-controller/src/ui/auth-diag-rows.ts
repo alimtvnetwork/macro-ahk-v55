@@ -91,7 +91,7 @@ export function updateBridgeRow(deps: AuthDiagDeps, bridgeRow: DiagRowElements):
     return;
   }
 
-  if (bridge.ok) {
+  if (bridge.isSuccess) {
     bridgeRow.iconEl.textContent = '✅';
     bridgeRow.valEl.textContent = 'OK via ' + bridge.source;
     bridgeRow.valEl.style.color = '#4ade80';
@@ -228,7 +228,7 @@ export function updateRefreshRow(refreshRow: DiagRowElements): void {
     return;
   }
 
-  if (outcome.ok) {
+  if (outcome.isSuccess) {
     refreshRow.iconEl.textContent = '✅';
     refreshRow.valEl.textContent = 'OK @ ' + outcome.time + ' via ' + outcome.source;
     refreshRow.valEl.style.color = '#4ade80';

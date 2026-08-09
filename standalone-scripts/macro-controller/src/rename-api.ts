@@ -230,8 +230,7 @@ async function executeRename(
   attempt: RenameAttemptState,
   forceRetry: boolean,
 ): Promise<RenameStrategy> {
-  const isMissingToken = !token;
-  if (isMissingToken) {
+  if (!token) {
     throw rejectNoBearerToken(wsId);
   }
 
@@ -280,7 +279,7 @@ async function executeRename(
     return executeRename(wsId, newName, newToken, { ...attempt, didAuthRecovery: true }, forceRetry);
   }
 
-  const isMissingOk = !resp.ok;
+  const isMissingOk = !resp.isSuccess;
 
   // Other errors — handleRenameError already surfaced the structured toast;
   // throw the SAME DiagnosticError instance so the message never drifts.
@@ -315,9 +314,7 @@ export async function renameWorkspace(wsId: string, newName: string, forceRetry?
 
   let token = resolveToken();
 
-  const isMissingToken = !token;
-
-  if (isMissingToken) {
+  if (!token) {
     log('[Rename] No bearer token — recovering before request', 'warn');
 
     try {
@@ -327,9 +324,7 @@ export async function renameWorkspace(wsId: string, newName: string, forceRetry?
       throw rejectNoBearerToken(wsId);
     }
 
-    const isMissingToken = !token;
-
-    if (isMissingToken) {
+    if (!token) {
       throw rejectNoBearerToken(wsId);
     }
   }

@@ -38,9 +38,8 @@ function tryIdShortcut(el: Element, id: string): string | null {
         if (matches.length === 1 && matches[0] === el) {
             return `//*[@id='${escapeXPathLiteral(id)}']`;
         }
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 
     return null;
 }

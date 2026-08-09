@@ -155,9 +155,8 @@ function evaluateXPathAndSelector(
         if (selector) {
             selectorFound = document.querySelectorAll(selector).length;
         }
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 
     return { xpathFound, selectorFound };
 }

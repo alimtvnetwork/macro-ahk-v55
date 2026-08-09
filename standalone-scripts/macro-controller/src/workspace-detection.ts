@@ -233,7 +233,7 @@ async function processTier1Response(
     return;
   }
 
-  const isMissingOk = !resp.ok;
+  const isMissingOk = !resp.isSuccess;
 
   if (isMissingOk) {
     log(fn + ': Tier 1 FAILED — HTTP ' + resp.status + ' — falling to passive fallback', 'warn');
@@ -364,9 +364,7 @@ export async function autoDetectLoopCurrentWorkspace(
     return;
   }
 
-  const isMissingToken = !token;
-
-  if (isMissingToken) {
+  if (!token) {
     log(fn + ': No bearer token — skipping Tier 1, falling to passive fallback', 'info');
     await fallbackDetect(fn, perWs, skipDialog);
 

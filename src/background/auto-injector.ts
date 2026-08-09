@@ -405,7 +405,6 @@ async function injectSingleResolved(
             logInjectionError(resolved.injectable.id, result.errorMessage);
         }
     } catch (injectionError) {
-        logError("AutoCatch", "Unhandled exception", injectionError);
         logInjectionError(resolved.injectable.id, injectionError);
     }
 }

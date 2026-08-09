@@ -189,9 +189,8 @@ function writeJwtToLocalStorage(
         localStorage.setItem(sessionKey, jwt);
         localStorage.setItem(sessionCookieKey, jwt);
         localStorage.setItem(marcoBearerKey, jwt);
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }
 
 /* ------------------------------------------------------------------ */
@@ -265,9 +264,8 @@ function scanSupabaseLocalStorageForJwt(): string | null {
                 }
             }
         }
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 
     return null;
 }
@@ -518,9 +516,8 @@ function extractProjectIdFromTabUrl(url: string | null): string | null {
         // Pattern 4: bare UUID subdomain: {uuid}.lovableproject.com
         const bareUuidLabelMatch = firstLabel.match(/^([a-f0-9-]{36})$/i);
         if (bareUuidLabelMatch) return bareUuidLabelMatch[1];
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 
     const subdomainMatch = url.match(/id-preview--([a-f0-9-]{36})\./i);
     if (subdomainMatch) return subdomainMatch[1];

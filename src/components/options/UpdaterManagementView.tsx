@@ -158,8 +158,6 @@ export function UpdaterManagementView() {
       const res = await sendMessage<{ updaters: UpdaterEntry[] }>({ type: "LIST_UPDATERS" });
       setUpdaters(res.updaters ?? []);
     } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
 
       setUpdaters([]);
     } finally {

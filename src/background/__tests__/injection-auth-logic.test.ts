@@ -260,9 +260,8 @@ describe("Auth: extractProjectIdFromUrl", () => {
 
             const bareUuidMatch = firstLabel.match(/^([a-f0-9-]{36})$/i);
             if (bareUuidMatch) return bareUuidMatch[1];
-        } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
-        }
+        } catch {
+}
 
         return null;
     }

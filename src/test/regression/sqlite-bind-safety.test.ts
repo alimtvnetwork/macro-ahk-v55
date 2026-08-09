@@ -137,7 +137,6 @@ describe("assertBindable, column-name inference", () => {
             assertBindable(sql, ["p1", undefined, Date.now()]);
             expect.fail("expected BindError");
         } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
             expect(err).toBeInstanceOf(BindError);
             expect((err as BindError).paramIndex).toBe(1);
             expect((err as BindError).columnName).toBe("Name");

@@ -69,7 +69,7 @@ async function ensureSqlJs(): Promise<SqlJs> {
     const wasmUrl = chrome.runtime.getURL("wasm/sql-wasm.wasm");
     let wasmResponse: Response;
     try {
-        wasmResponse = ServiceResult.wrapFetch(await fetch(wasmUrl));
+        wasmResponse = await fetch(wasmUrl);
     } catch (err) {
         throw new Error(
             `Failed to fetch WASM binary at "${wasmUrl}". ` +
@@ -77,7 +77,7 @@ async function ensureSqlJs(): Promise<SqlJs> {
             `Original error: ${err instanceof Error ? err.message : String(err)}`,
         );
     }
-    if (wasmResponse.isFail) {
+    if (!wasmResponse.ok) {
         throw new Error(
             `WASM fetch returned HTTP ${wasmResponse.status} for "${wasmUrl}". ` +
             `Ensure "wasm/sql-wasm.wasm" is listed in manifest web_accessible_resources.`,
@@ -181,9 +181,8 @@ function ensureDefaultDatabases(db: SqlJsDatabase, slug: string): void { // esli
                     [def.databaseName, def.databaseKindId, def.description],
                 );
             }
-        } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
-        }
+        } catch {
+}
     }
 
     console.log(`[project-db] Default databases ensured for project "${slug}"`);
@@ -220,9 +219,8 @@ async function tryLoadDb(sql: SqlJs, slug: string, schema: string): Promise<SqlJ
         console.log(`[project-db] OPFS: ${slug}`);
 
         return db;
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 
     // Try chrome.storage.local
     try {
@@ -231,9 +229,8 @@ async function tryLoadDb(sql: SqlJs, slug: string, schema: string): Promise<SqlJ
         console.log(`[project-db] storage: ${slug}`);
 
         return db;
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 
     // In-memory fallback
     const db = new sql.Database();
@@ -312,9 +309,8 @@ export async function dropProjectDb(slug: string): Promise<void> {
         try {
             const root = await navigator.storage.getDirectory();
             await root.removeEntry(dbFileName(slug));
-        } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
-        } // allow-swallow: removeEntry is best-effort cleanup
+        }catch {}
+ // allow-swallow: removeEntry is best-effort cleanup
     } else if (persistenceMode === "storage") {
         await chrome.storage.local.remove(storageKey(slug));
     }

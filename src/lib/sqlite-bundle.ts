@@ -777,7 +777,6 @@ function readVariablesTable(db: Database): Map<string, Record<string, unknown>> 
     let parsed: unknown = null;
     if (rawValue != null) {
       try { parsed = JSON.parse(String(rawValue)); } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
         parsed = String(rawValue);
       }
     }
@@ -992,7 +991,7 @@ export async function previewSqliteZip(
   // Strict PascalCase v4 contract gate. Block the preview dialog from
   // ever showing rows extracted from a malformed/legacy bundle.
   const validation = validateBundleSchema(db, "full");
-  if (validation.isFail) {
+  if (!validation.ok) {
     db.close();
     throw new Error(formatValidationError(validation));
   }
@@ -1135,7 +1134,7 @@ async function extractBundle(file: File, options?: ImportOptions) {
   // so a malformed bundle never reaches the SAVE_* messaging layer (where
   // partial writes could corrupt the live extension state).
   const validation = validateBundleSchema(db, "full");
-  if (validation.isFail) {
+  if (!validation.ok) {
     db.close();
     throw new Error(formatValidationError(validation));
   }
@@ -1301,7 +1300,7 @@ async function extractPromptsBundle(
   const dbData = await dbFile.async("uint8array");
   const db = await openDb(dbData);
   const validation = validateBundleSchema(db, "prompts-only");
-  if (validation.isFail) {
+  if (!validation.ok) {
     db.close();
     throw new Error(formatValidationError(validation));
   }

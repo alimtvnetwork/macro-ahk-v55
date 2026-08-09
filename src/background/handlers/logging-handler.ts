@@ -304,7 +304,6 @@ export async function handleGetLogStats(): Promise<{ logCount: number; errorCoun
     try {
         sessionCount = countTable(getLogsDb(), "Sessions");
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
         // allow-swallow: startup race — Sessions schema may not yet exist; bg-logger forbidden here (recursion). Throttled to avoid flooding when GET_LOG_STATS is polled.
         warnSessionsUnavailableThrottled(err);
     }

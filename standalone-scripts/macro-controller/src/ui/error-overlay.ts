@@ -788,9 +788,7 @@ function bridgeErrorToExtension(message: string, stack?: string, source?: string
       stack: stack || '',
       scriptCode: source || 'overlay',
     });
-  } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
-  }
+  }catch {}
 }
 
 /** Get current overlay error count (for badge integrations). */

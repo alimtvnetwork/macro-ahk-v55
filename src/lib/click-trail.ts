@@ -59,18 +59,16 @@ export function recordTrail(entry: Omit<ClickTrailEntry, "at">): void {
             ? next.slice(next.length - MAX_ENTRIES)
             : next;
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }
 
 /** Clears the live trail. Useful after the user reloads the extension. */
 export function clearClickTrail(): void {
     try {
         sessionStorage.removeItem(STORAGE_KEY);
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }
 
 /**
@@ -123,9 +121,8 @@ export function clearFrozenClickTrails(): void {
             }
         }
         keysToRemove.forEach((k) => sessionStorage.removeItem(k));
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }
 
 /** Trims frozen snapshot count to MAX_FROZEN_SNAPSHOTS, preserving `keepKey`. */
@@ -143,9 +140,8 @@ function evictOldFrozenSnapshots(keepKey: string): void {
             .filter((k) => k !== keepKey)
             .slice(0, frozenKeys.length - MAX_FROZEN_SNAPSHOTS);
         toRemove.forEach((k) => sessionStorage.removeItem(k));
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }
 
 /**

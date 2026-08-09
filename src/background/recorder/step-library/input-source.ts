@@ -321,7 +321,7 @@ function handleResponse(
     durationMs: number,
     continueOnFail: boolean,
 ): FetchInputResult {
-    if (res.isFail) {
+    if (!res.ok) {
         return buildErrorResult({ url: config.Url, status: res.status, error: `HTTP ${res.status} ${res.statusText}`, durationMs, continueOnFail });
     }
     const parsed = parseResponseBag(text);

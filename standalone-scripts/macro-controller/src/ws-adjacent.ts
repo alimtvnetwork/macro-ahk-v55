@@ -221,9 +221,7 @@ async function doFetchWorkspacesForMove(
 ): Promise<void> {
   const token = resolveToken();
 
-  const isMissingToken = !token;
-
-  if (isMissingToken) {
+  if (!token) {
     if (isRetry) {
       handleNoTokenFailure();
 
@@ -256,7 +254,7 @@ async function doFetchWorkspacesForMove(
     return;
   }
 
-  const isMissingOk = !resp.ok;
+  const isMissingOk = !resp.isSuccess;
 
   if (isMissingOk) {
     throwDiagnostic('WS_CONTEXT_ADJACENT_E001', { status: resp.status, op: 'fetchWorkspaces' });
@@ -328,9 +326,7 @@ export async function moveToAdjacentWorkspace(direction: string): Promise<void> 
 
   let token = resolveToken();
 
-  const isMissingToken = !token;
-
-  if (isMissingToken) {
+  if (!token) {
     log('moveToAdjacentWorkspace: no token — recovering before initial fetch', 'warn');
 
     try {
@@ -342,9 +338,7 @@ export async function moveToAdjacentWorkspace(direction: string): Promise<void> 
       return;
     }
 
-    const isMissingToken = !token;
-
-    if (isMissingToken) {
+    if (!token) {
       handleNoTokenFailure();
 
       return;

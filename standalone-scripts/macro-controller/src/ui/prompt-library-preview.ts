@@ -114,8 +114,7 @@ export async function computeAndRenderPreview(
   handleImportFile: (r: ModalRefs, f: File, fi: HTMLInputElement, ib: HTMLButtonElement, o: PreviewTriggerType) => Promise<void>,
 ): Promise<void> {
   const panel = refs.previewPanel;
-  const isMissingPanel = !panel;
-  if (isMissingPanel) return;
+  if (!panel) return;
   const invalid = validateImportFile(file);
   if (invalid) {
     refs.status.textContent = 'Preview rejected: ' + invalid.headline;

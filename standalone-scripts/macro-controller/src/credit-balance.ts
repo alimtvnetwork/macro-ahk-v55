@@ -100,9 +100,7 @@ export async function resolveWorkspaceId(): Promise<string | null> {
 
   const token = resolveToken();
 
-  const isMissingToken = !token;
-
-  if (isMissingToken) {
+  if (!token) {
     log('CreditBalance: No bearer token — cannot resolve workspace', 'warn');
 
     return null;
@@ -115,7 +113,7 @@ export async function resolveWorkspaceId(): Promise<string | null> {
   try {
     const resp = await window.marco!.api!.workspace.resolveByProject(projectId, { baseUrl: CREDIT_API_BASE });
 
-    const isMissingOk = !resp.ok;
+    const isMissingOk = !resp.isSuccess;
 
     if (isMissingOk) {
       if (isAuthFailure(resp.status)) {
@@ -211,9 +209,7 @@ export async function fetchCreditBalance(
 
   const token = resolveToken();
 
-  const isMissingToken = !token;
-
-  if (isMissingToken) {
+  if (!token) {
     log('CreditBalance: No bearer token', 'warn');
 
     return null;
@@ -224,7 +220,7 @@ export async function fetchCreditBalance(
   try {
     const resp = await window.marco!.api!.credits.fetchBalance(wsId, { baseUrl: CREDIT_API_BASE });
 
-    const isMissingOk = !resp.ok;
+    const isMissingOk = !resp.isSuccess;
 
     if (isMissingOk) {
       if (isAuthFailure(resp.status) && !isRetry) {

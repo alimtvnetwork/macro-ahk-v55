@@ -75,9 +75,8 @@ function sendNetworkEntry(entry: CapturedEntry): void {
             type: MESSAGE_TYPE_NETWORK_REQUEST,
             entry,
         });
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }
 
 /* ------------------------------------------------------------------ */
@@ -251,9 +250,8 @@ function reportNetworkStatus(isOnline: boolean): void {
             type: MESSAGE_TYPE_NETWORK_STATUS,
             isOnline,
         });
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 }
 
 /** Registers online/offline event listeners on the window. */
@@ -306,7 +304,6 @@ let flushTimerId: ReturnType<typeof setInterval> | null = null;
 function onPageHide(): void {
     // Final best-effort flush before tearing down.
     try { flushBuffer(); } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
     } // allow-swallow: pagehide flush is best-effort
     stopNetworkReporter();
 }

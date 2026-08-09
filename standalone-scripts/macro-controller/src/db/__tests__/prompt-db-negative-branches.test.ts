@@ -58,7 +58,7 @@ describe('prompt-db negative branches (PlanTierType 22 gap #1 + #3)', () => {
         const r = await upsertPrompt({
             slug: 's', name: 'n', body: 'b', role: 'unknown' as never,
         });
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/invalid role/);
         expect(captured).toHaveLength(0);
     });
@@ -68,7 +68,7 @@ describe('prompt-db negative branches (PlanTierType 22 gap #1 + #3)', () => {
             slug: 's', name: 'n', body: 'b', role: 'plan',
             replaceKey: '1-bad', // leading digit fails REPLACE_KEY_RE
         });
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/replaceKey/);
         expect(captured).toHaveLength(0);
     });
@@ -78,7 +78,7 @@ describe('prompt-db negative branches (PlanTierType 22 gap #1 + #3)', () => {
             slug: 's', name: 'n', body: 'b', role: 'plan',
             replaceValues: ['', '   '],
         });
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/replaceValues/);
         expect(captured).toHaveLength(0);
     });
@@ -91,7 +91,7 @@ describe('prompt-db negative branches (PlanTierType 22 gap #1 + #3)', () => {
             { isOk: true, rows: [{ c: 1 }] },
         ];
         const r = await deletePromptById(7);
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/last row for role plan/);
         // no third DELETE call was issued
         expect(captured).toHaveLength(2);
@@ -108,7 +108,7 @@ describe('prompt-db negative branches (PlanTierType 22 gap #1 + #3)', () => {
         const r = await upsertPrompt({
             slug: 'new-slug', name: 'n', body: 'b', role: 'generic',
         });
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/inserted Prompt Id could not be resolved/);
     });
 });

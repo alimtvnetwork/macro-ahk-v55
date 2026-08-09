@@ -69,7 +69,6 @@ export async function bootstrapNamespaceRoot(tabId: number): Promise<void> {
                 world: "MAIN" as chrome.scripting.ExecutionWorld,
             });
         } catch (warnErr) {
-            logError("AutoCatch", "Unhandled exception", warnErr);
             logBgWarnError(BgLogTag.INJECTION, "MAIN-world bootstrap-warning script failed to inject (best-effort console banner suppressed)", warnErr);
         }
     }
@@ -159,7 +158,6 @@ export async function injectProjectNamespaces(tabId: number, allProjects: Stored
             ? configResult[STORAGE_KEY_ALL_CONFIGS]
             : [];
     } catch (cfgErr) {
-        logError("AutoCatch", "Unhandled exception", cfgErr);
         logBgWarnError(BgLogTag.INJECTION, `chrome.storage.local.get("${STORAGE_KEY_ALL_CONFIGS}") failed — proceeding with empty configs[]`, cfgErr);
     }
     void allConfigs;
@@ -190,7 +188,6 @@ export async function injectProjectNamespaces(tabId: number, allProjects: Stored
             try {
                 fileCache = getFilesByProject(pid, 50);
             } catch (err) {
-                logError("AutoCatch", "Unhandled exception", err);
                 fileCache = [];
             }
 

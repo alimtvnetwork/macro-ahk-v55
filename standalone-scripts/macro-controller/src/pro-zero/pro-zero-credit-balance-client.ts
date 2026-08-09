@@ -35,7 +35,7 @@ function buildNetworkError(reason: string): CreditBalanceFetchResult {
 }
 
 function handleResponse(resp: SdkBalanceResponse): CreditBalanceFetchResult {
-    const isMissingOk = !resp.ok;
+    const isMissingOk = !resp.isSuccess;
     if (isMissingOk) return buildHttpError(resp.status);
     const parsed = parseCreditBalanceResponse(resp.data);
     const isMissingIsOk = !parsed.isOk;

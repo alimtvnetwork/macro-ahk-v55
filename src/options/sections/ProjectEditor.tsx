@@ -107,8 +107,6 @@ export function ProjectEditor({ project, onBack }: ProjectEditorProps) {
             setToast({ message: "Project saved and persisted.", variant: "success" });
             setTimeout(onBack, 800);
         } catch (err) {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
 
             const msg = err instanceof Error ? err.message : String(err);
             setToast({ message: `Save failed: ${msg}`, variant: "error" });

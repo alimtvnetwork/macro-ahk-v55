@@ -657,9 +657,8 @@ function performAtomicMerge(ctx: AtomicMergeInput): StepGroupImportResult {
     } catch (err) {
         try {
             rawDest.exec("ROLLBACK;");
-        } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
-        }
+        } catch {
+}
 
         return {
             Reason: "InternalError",

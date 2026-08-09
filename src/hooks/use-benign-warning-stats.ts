@@ -62,7 +62,6 @@ export function useBenignWarningStats(bumpKey: number, limit = 500): BenignWarni
                     setTally(tallyBenignWarnings(merged));
                 }
             } catch (err) {
-                logError("AutoCatch", "Unhandled exception", err);
                 // Preview / SW-unavailable — leave tally empty so the report
                 // simply omits the section.
                 if (cancelled === false) {

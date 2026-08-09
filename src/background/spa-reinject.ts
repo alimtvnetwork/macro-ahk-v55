@@ -246,7 +246,6 @@ async function reinjectFromSnapshot(tabId: number): Promise<void> {
 
         logReinjectSuccess(tabId, sorted.length);
     } catch (error) {
-        logError("AutoCatch", "Unhandled exception", error);
         logReinjectError(tabId, error);
     }
 }

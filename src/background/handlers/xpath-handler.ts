@@ -86,9 +86,8 @@ async function resolveTargetTabId(): Promise<number | null> {
             const tabs = await chrome.tabs.query(query);
             const candidate = tabs.find((t) => t.id !== undefined && isWebTab(t.url));
             if (candidate?.id !== undefined) return candidate.id;
-        } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
-        }
+        } catch {
+}
     }
 
     return null;
@@ -106,7 +105,6 @@ async function startRecording(tabId: number): Promise<void> {
         activeRecordingTabId = tabId;
         recordedXPaths = [];
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
         logInjectionError("start", err);
     }
 }
@@ -121,7 +119,6 @@ async function stopRecording(tabId: number): Promise<void> {
             },
         });
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
         logInjectionError("stop", err);
     }
 

@@ -9,7 +9,7 @@ import { HttpCodes } from "../constants/http";
  *   - spec/03-error-manage/01-error-resolution/05-http-error-fail-fast.md
  *
  * Usage:
- *   const res = ServiceResult.wrapFetch(await fetch(url, init));
+ *   const res = await fetch(url, init);
  *   await httpFailFast(res, { method: "GET", url });   // throws on non-2xx
  *   const body = await res.json();
  *
@@ -51,9 +51,8 @@ const emitHttpFailFastEvent = (err: { status: number; method: string; url: strin
         };
         window.dispatchEvent(new CustomEvent(HTTP_FAIL_FAST_EVENT, { detail }));
     // allow-swallow: event dispatch is best-effort UI surfacing; no listener is a valid state
-    } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
-    }
+    } catch {
+}
 };
 
 export interface HttpCallContext {
@@ -152,7 +151,6 @@ export const httpFailFast = async (response: Response, context: HttpCallContext)
         const text = await response.clone().text();
         bodySnippet = truncateBody(text);
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
         bodySnippet = null;
     }
 
@@ -171,7 +169,7 @@ export const httpFailFast = async (response: Response, context: HttpCallContext)
  */
 export const httpFetchOrThrow = async (url: string, init?: RequestInit): Promise<Response> => {
     const method = (init?.method ?? "GET").toUpperCase();
-    const response = ServiceResult.wrapFetch(await fetch(url, init));
+    const response = await fetch(url, init);
 
     return httpFailFast(response, { method, url });
 };

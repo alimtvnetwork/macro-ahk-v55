@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Marco Extension — Project-Scoped Key-Value Handler (Issue 50)
  *

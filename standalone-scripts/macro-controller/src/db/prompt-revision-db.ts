@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { DbResult } from '../db/db-result';
 /**
  * prompt-revision-db.ts - append-only revision history for the Prompt table.

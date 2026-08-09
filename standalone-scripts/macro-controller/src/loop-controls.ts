@@ -252,8 +252,7 @@ function refreshStatusStopped(): void {
 
 function triggerBackgroundCreditFetch(): void {
   const token = resolveToken();
-  const isMissingToken = !token;
-  if (isMissingToken) return;
+  if (!token) return;
 
   logSub('No workspace + no credits — triggering background credit fetch', 1);
   fetchLoopCreditsAsync(false).then(function() {

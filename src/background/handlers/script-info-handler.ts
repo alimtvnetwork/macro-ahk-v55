@@ -96,7 +96,7 @@ async function fetchInstruction(folder: string): Promise<InstructionManifest> {
         `projects/scripts/${folder}/instruction.json`,
     );
     const res = ServiceResult.wrapFetch(await fetch(url));
-    if (res.isFail) {
+    if (!res.isSuccess) {
         throw new Error(`Failed to fetch instruction.json: ${res.status}`);
     }
 
@@ -149,9 +149,8 @@ export async function handleGetScriptInfo(
             const headRes = ServiceResult.wrapFetch(await fetch(scriptUrl, { method: "HEAD" }));
             const cl = headRes.headers.get("content-length");
             if (cl) sizeBytes = parseInt(cl, 10);
-        } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
-        }
+        } catch {
+}
 
         return {
             isOk: true,
@@ -199,7 +198,7 @@ export async function handleHotReloadScript(
             `projects/scripts/${folder}/${outputFile}`,
         );
         const scriptRes = ServiceResult.wrapFetch(await fetch(scriptUrl));
-        if (scriptRes.isFail) {
+        if (!scriptRes.isSuccess) {
             return {
                 isOk: false,
                 errorMessage: `Script fetch failed: ${scriptRes.status}`,

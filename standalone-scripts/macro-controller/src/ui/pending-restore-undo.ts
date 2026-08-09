@@ -135,13 +135,13 @@ async function reverseUpdate(p: UpdatePayload): Promise<{ ok: boolean; error?: s
         replaceValues: p.preReplaceValues,
     });
 
-    return revert.ok ? new DbResult(true, undefined) : new DbResult(false, undefined, revert.error ?? 'unknown');
+    return revert.isSuccess ? new DbResult(true, undefined) : new DbResult(false, undefined, revert.error ?? 'unknown');
 }
 
 async function reverseInsert(p: InsertPayload): Promise<{ ok: boolean; error?: string }> {
     const del = await deletePromptById(p.newId);
 
-    return del.ok ? new DbResult(true, undefined) : new DbResult(false, undefined, del.error ?? 'unknown');
+    return del.isSuccess ? new DbResult(true, undefined) : new DbResult(false, undefined, del.error ?? 'unknown');
 }
 
 /**
@@ -168,7 +168,7 @@ export function hydratePendingRestoreUndo(now: number = Date.now()): boolean {
         const result = record.payload.kind === 'update'
             ? await reverseUpdate(record.payload)
             : await reverseInsert(record.payload);
-        const isMissingOk = !result.ok;
+        const isMissingOk = !result.isSuccess;
         if (isMissingOk) {
             logError(LOG_SCOPE, 'reverse failed after refresh', result.error);
             showToast('❌ Undo failed: ' + (result.error ?? 'unknown'), 'error');

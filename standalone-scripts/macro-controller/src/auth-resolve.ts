@@ -142,9 +142,7 @@ export function getBearerTokenFromSessionBridge(): string {
       const raw = localStorage.getItem(key) || '';
       const token = utils.extractBearerTokenFromUnknown(raw);
 
-      const isMissingToken = !token;
-
-      if (isMissingToken) {
+      if (!token) {
         if (raw.length >= 10) {
           log('resolveToken: ignoring non-usable value in localStorage[' + key + ']', 'warn');
         }

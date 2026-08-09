@@ -73,7 +73,7 @@ export function sendToExtension(type: string, payload: Record<string, unknown>):
 
         return;
       } catch (e) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, e);
+        
         logSub('chrome.runtime.sendMessage unavailable, falling through to relay: ' + (e instanceof Error ? e.message : String(e)), 1);
       }
     }

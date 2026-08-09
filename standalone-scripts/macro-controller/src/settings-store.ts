@@ -271,7 +271,7 @@ export async function saveSettingsOverrides(next: SettingsOverrides): Promise<vo
   } else {
     // MAIN-world fallback: persist to localStorage so the user's edits survive reload.
     const result = writeToLocalStorage(sanitized);
-    if (!result.ok) {
+    if (!result.isSuccess) {
       throwDiagnostic('SETTINGS_PERSIST_E001', {
         reason: result.reason,
         fallbackStage: 'localStorage',

@@ -99,7 +99,6 @@ export function useActivityTimeline(limit = 500) {
       setLogs(mappedLogs.filter((e) => !isBenignWarning(e)));
       setErrors(mappedErrors.filter((e) => !isBenignWarning(e)));
     } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
       // Preview mode — use empty arrays
       setLogs([]);
       setErrors([]);

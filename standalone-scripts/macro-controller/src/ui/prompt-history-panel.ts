@@ -267,7 +267,7 @@ export async function openPromptHistoryPanel(
     }
 
     const revResult = await listRev(slug);
-    if (!revResult.ok || !revResult.value) {
+    if (!revResult.isSuccess || !revResult.value) {
         const reason = revResult.error ?? 'unknown';
         reportHistoryFailure(
             'HISTORY_LIST_E001',
@@ -291,10 +291,10 @@ async function resolveSlug(
 ): Promise<string | null> {
     if (typeof input.slug === 'string' && input.slug.length > 0) return input.slug;
     const def = await getDef(input.role);
-    if (def.ok && def.value) return def.value.Slug;
+    if (def.isSuccess && def.value) return def.value.Slug;
     // Fallback 1: any existing row for this role (default flag may have been lost).
     const listed = await listRole(input.role);
-    if (listed.ok && Array.isArray(listed.value) && listed.value.length > 0) {
+    if (listed.isSuccess && Array.isArray(listed.value) && listed.value.length > 0) {
         const first = listed.value[0];
         if (first && typeof first.Slug === 'string' && first.Slug.length > 0) return first.Slug;
     }
@@ -308,7 +308,7 @@ async function resolveSlug(
             role: input.role,
             fallbackChain: 'getDefault->listByRole->seed',
         },
-        def.ok ? undefined : def.error,
+        def.isSuccess ? undefined : def.error,
     );
 
     return null;
@@ -852,7 +852,7 @@ async function handleRestoreUpdate(
             replaceKey: preImage.replaceKey,
             replaceValues: preImage.replaceValues,
         });
-        const isMissingOk = !revert.ok;
+        const isMissingOk = !revert.isSuccess;
         if (isMissingOk) {
             const reason = revert.error ?? 'unknown';
             reportHistoryFailure(
@@ -890,7 +890,7 @@ function handleRestoreInsert(
     undoToast(successMsg, async () => {
         clearPendingRestoreUndo();
         const del = await deleteFn(newId);
-        const isMissingOk = !del.ok;
+        const isMissingOk = !del.isSuccess;
         if (isMissingOk) {
             const reason = del.error ?? 'unknown';
             reportHistoryFailure(
@@ -929,7 +929,7 @@ async function handleRestore(
     if (isMissingProceed) return;
 
     const listResult = await listByRole(role);
-    if (!listResult.ok || !listResult.value) {
+    if (!listResult.isSuccess || !listResult.value) {
         const reason = listResult.error ?? 'unknown';
         reportHistoryFailure(
             'HISTORY_RESTORE_E001',
@@ -953,7 +953,7 @@ async function handleRestore(
         replaceKey: rev.ReplaceKey,
         replaceValues,
     });
-    const isMissingOk = !upsertResult.ok;
+    const isMissingOk = !upsertResult.isSuccess;
     if (isMissingOk) {
         const reason = upsertResult.error ?? 'unknown';
         reportHistoryFailure(
@@ -1178,12 +1178,12 @@ export function parseRevisionImportPayload(
         return new DbResult(false, undefined, 'Invalid JSON: ' + (err instanceof Error ? err.message : String(err)));
     }
     const envelope = validateImportEnvelope(parsed, expectedSlug, expectedRole);
-    const isMissingOk = !envelope.ok;
+    const isMissingOk = !envelope.isSuccess;
     if (isMissingOk) return new DbResult(false, undefined, envelope.error);
     const rows: ImportedRevisionInput[] = [];
     for (let i = 0; i < envelope.revisions.length; i += 1) {
         const coerced = coerceImportRow(envelope.revisions[i], i, expectedSlug, expectedRole);
-        const isMissingOk = !coerced.ok;
+        const isMissingOk = !coerced.isSuccess;
         if (isMissingOk) return new DbResult(false, undefined, coerced.error);
         rows.push(coerced.row);
     }
@@ -1239,8 +1239,8 @@ async function writeImportedRevisions(
     toast: NonNullable<HistoryPanelDeps['toast']>,
 ): Promise<void> {
     const snapshotResult = await getMaxRevisionId();
-    const sinceId = snapshotResult.ok && typeof snapshotResult.value === 'number' ? snapshotResult.value : 0;
-    const isMissingOk = !snapshotResult.ok;
+    const sinceId = snapshotResult.isSuccess && typeof snapshotResult.value === 'number' ? snapshotResult.value : 0;
+    const isMissingOk = !snapshotResult.isSuccess;
     if (isMissingOk) {
         logHistoryDiagnostic(
             'HISTORY_INTERNAL_E001',
@@ -1248,7 +1248,7 @@ async function writeImportedRevisions(
         );
     }
     const write = await insertImportedRevisions(slug, rows);
-    const isMissingOk = !write.ok;
+    const isMissingOk = !write.isSuccess;
     if (isMissingOk) {
         const reason = write.error ?? '?';
         reportHistoryFailure(
@@ -1263,10 +1263,10 @@ async function writeImportedRevisions(
     const count = write.value ?? 0;
     const successMsg = '✓ Imported ' + String(count) + ' revision(s). Reopen History to see them.';
     const undoToast = deps.undoToast ?? showUndoToast;
-    if (snapshotResult.ok && count > 0) {
+    if (snapshotResult.isSuccess && count > 0) {
         undoToast(successMsg, async () => {
             const del = await deleteImportedRevisionsAfter(slug, sinceId);
-            const isMissingOk = !del.ok;
+            const isMissingOk = !del.isSuccess;
             if (isMissingOk) {
                 const reason = del.error ?? 'unknown';
                 reportHistoryFailure(
@@ -1303,7 +1303,7 @@ async function handleImportFile(
     try {
         const text = await file.text();
         const parsed = parseRevisionImportPayload(text, slug, role);
-        if (!parsed.ok || !parsed.rows) {
+        if (!parsed.isSuccess || !parsed.rows) {
             const reason = parsed.error ?? 'unknown';
             captureLastImportFailure('parse', 'parse rejected: ' + reason);
             reportHistoryFailure(

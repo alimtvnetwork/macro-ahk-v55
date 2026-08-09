@@ -80,8 +80,6 @@ export function DependencyChainPanel() {
       });
       setSnapshot(result?.latest ?? null);
     } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
 
       setSnapshot(null);
     } finally {

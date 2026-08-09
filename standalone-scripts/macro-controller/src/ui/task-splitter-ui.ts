@@ -683,7 +683,7 @@ async function resolvePlanPromptFromDb(n: number): Promise<string | null> {
   try {
     const mod = await import('../db/prompt-db');
     const result = await mod.getDefaultPromptForRole('plan');
-    if (!result.ok || !result.value || result.value.Body.length === 0) return null;
+    if (!result.isSuccess || !result.value || result.value.Body.length === 0) return null;
     const key = result.value.ReplaceKey || REPLACE_KEY_DEFAULT;
     logPlanSource(n, 'db-default', 'Prompt table plan default');
 

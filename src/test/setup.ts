@@ -55,7 +55,6 @@ if (typeof window !== "undefined") {
       value: matchMediaStub,
     });
   } catch (err) {
-    logError("AutoCatch", "Unhandled exception", err);
     (window as unknown as { matchMedia: typeof matchMediaStub }).matchMedia = matchMediaStub;
   }
 }
@@ -122,6 +121,5 @@ try {
     if (originalFetch) return originalFetch(input, init);
     throw new Error(`fetch shim: unexpected URL ${url}`);
   }) as typeof fetch;
-} catch (err) {
-  logError("AutoCatch", "Unhandled exception", err);
+} catch {
 }

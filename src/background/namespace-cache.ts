@@ -41,7 +41,6 @@ export async function rebuildNamespaceCache(project: StoredProject): Promise<voi
         try {
             fileCache = getFilesByProject(project.id, 50);
         } catch (err) {
-            logError("AutoCatch", "Unhandled exception", err);
         } // allow-swallow: db not bound yet at cache rebuild time
 
         const nsScript = buildProjectNamespaceScript({
@@ -83,7 +82,6 @@ export async function invalidateNamespaceCache(projectId: string): Promise<void>
     try {
         await chrome.storage.local.remove(nsCacheKey(projectId));
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
     } // allow-swallow: cache invalidation is best-effort; storage failure is benign
 }
 

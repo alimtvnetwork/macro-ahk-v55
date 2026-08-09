@@ -107,7 +107,7 @@ async function probeSessionWithToken(context: string, token: string): Promise<vo
   try {
     const resp = await window.marco!.api!.workspace.probe({ baseUrl: CREDIT_API_BASE });
 
-    const isMissingOk = !resp.ok;
+    const isMissingOk = !resp.isSuccess;
 
     if (isMissingOk) {
       logError('unknown', LabelType.LogSessionCheck + context + '] ❌ Session probe failed: HTTP ' + resp.status + ' (auth: ' + authLabel + ')');
@@ -345,7 +345,7 @@ async function handleMoveResponse(
 
     return;
   }
-  if (resp.ok) {
+  if (resp.isSuccess) {
     log('Move response: ' + resp.status + label, 'success');
     handleMoveSuccess(targetWorkspaceName, label);
 
@@ -366,8 +366,7 @@ async function executeMove(
   isRetry: boolean,
 ): Promise<void> {
   const token = await resolveMoveToken(isRetry);
-  const isMissingToken = !token;
-  if (isMissingToken) { handleMoveNoToken();
+  if (!token) { handleMoveNoToken();
 
  return; }
 
@@ -456,8 +455,7 @@ async function executeSwitchContext(
   isRetry: boolean,
 ): Promise<void> {
   const token = await resolveSwitchToken(isRetry);
-  const isMissingToken = !token;
-  if (isMissingToken) {
+  if (!token) {
     handleMoveNoToken();
 
     return;
@@ -493,7 +491,7 @@ async function executeSwitchContext(
       return;
     }
 
-    if (resp.ok) {
+    if (resp.isSuccess) {
       log('Switch context response: ' + resp.status + label, 'success');
     } else {
       const bodyPreview = JSON.stringify(resp.data).substring(0, 500);
@@ -541,9 +539,7 @@ export async function moveToWorkspace(targetWorkspaceId: string, targetWorkspace
     token = '';
   }
 
-  const isMissingToken = !token;
-
-  if (isMissingToken) {
+  if (!token) {
     // Last-ditch: force a fresh refresh (skip TTL cache) before giving up.
     try {
       token = await getBearerToken({ force: true });
@@ -553,9 +549,7 @@ export async function moveToWorkspace(targetWorkspaceId: string, targetWorkspace
     }
   }
 
-  const isMissingToken = !token;
-
-  if (isMissingToken) {
+  if (!token) {
     handleMoveNoToken();
 
     return;

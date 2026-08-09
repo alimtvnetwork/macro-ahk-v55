@@ -108,13 +108,12 @@ async function runWasmHeadAttempt(
     let attemptContentLength: string | null = null;
     let attemptError: string | null = null;
     try {
-        response = ServiceResult.wrapFetch(await fetch(wasmUrl, { method: "HEAD" }));
+        response = await fetch(wasmUrl, { method: "HEAD" });
         attemptStatus = response.status;
         attemptContentLength = response.headers.get("content-length");
         probe.status = attemptStatus;
         probe.contentLength = attemptContentLength;
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
         attemptError = err instanceof Error ? err.message : String(err);
     }
     const durationMs = Math.round(performance.now() - attemptStart);
@@ -155,7 +154,7 @@ function validateWasmHeadResponse(wasmUrl: string, response: Response, probe: Wa
             `Loop halted. Awaiting user instruction.`,
         );
     }
-    if (response.isFail) {
+    if (!response.ok) {
         setWasmProbeResult(probe);
         // HEFF: HEAD 405/4xx/5xx must NOT trigger a GET-method-swap retry.
         // Surface and halt.
@@ -214,7 +213,7 @@ async function verifyWasmPresence(wasmUrl: string): Promise<void> {
     probe.totalDurationMs = Math.round(performance.now() - probeStartedAt);
     if (headResponse === null) { throwAllAttemptsFailed(wasmUrl, probe); }
     validateWasmHeadResponse(wasmUrl, headResponse, probe);
-    probe.isSuccess = true;
+    probe.ok = true;
     setWasmProbeResult(probe);
     // Final summary line — useful when triaging "boot took N seconds" reports.
     console.debug(
@@ -239,7 +238,7 @@ async function loadSqlJs(): Promise<SqlJs> {
 
     let wasmResponse: Response;
     try {
-        wasmResponse = ServiceResult.wrapFetch(await fetch(wasmUrl));
+        wasmResponse = await fetch(wasmUrl);
     } catch (err) {
         throw new Error(
             `Failed to fetch WASM binary at "${wasmUrl}". ` +
@@ -248,7 +247,7 @@ async function loadSqlJs(): Promise<SqlJs> {
             `Original error: ${err instanceof Error ? err.message : String(err)}`,
         );
     }
-    if (wasmResponse.isFail) {
+    if (!wasmResponse.ok) {
         // HEFF: single attempt, no retry.
         throw new Error(
             `HEFF: HTTP ${wasmResponse.status} on GET "${wasmUrl}". ` +

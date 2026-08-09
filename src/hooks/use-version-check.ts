@@ -160,7 +160,6 @@ export function useVersionCheck(): VersionCheckResult {
         error: null,
       });
     } catch (err) {
-      logError("AutoCatch", "Unhandled exception", err);
       setResult({
         loading: false,
         hasMismatch: false,

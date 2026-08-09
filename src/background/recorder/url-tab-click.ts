@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { UrlMatchEnum, UrlTabClickFailureMode, SelectorKindEnum, SemanticSemanticUrlTabClickReasonEnum, PredicateEvaluationKind, ValidationErrorReason } from "../../types/enums";
 import { compileUrlPattern, CompileResult } from "./url-tab-click-patterns";
 

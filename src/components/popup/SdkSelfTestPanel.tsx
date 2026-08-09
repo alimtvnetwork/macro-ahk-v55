@@ -91,8 +91,6 @@ export function SdkSelfTestPanel() {
             });
             setSnapshot(res?.snapshot ?? null);
         } catch {
-        // TODO: Auto-injected by CatchAudit
-        logError('AutoCatch', 'Unhandled exception', err);
 
             setSnapshot(null);
         } finally {

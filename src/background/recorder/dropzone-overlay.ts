@@ -226,7 +226,6 @@ async function handleFile(file: File, options: DropZoneOptions): Promise<void> {
         const parsed = mimeKind === "csv" ? parseCsv(rawText) : parseJson(rawText);
         options.OnFileDropped({ FileName: file.name, MimeKind: mimeKind, RawText: rawText, Parsed: parsed });
     } catch (err) {
-        logError("AutoCatch", "Unhandled exception", err);
         onError(err instanceof Error ? err : new Error(String(err)), file.name);
     }
 }

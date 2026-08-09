@@ -53,7 +53,7 @@ describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => 
             previousBody: 'Task {{n}} of {{n}}',
             body: 'Task of', // both tokens dropped
         });
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/token/i);
         // No SQL round-trip; the guard fires before runSql.
         expect(captured).toHaveLength(0);
@@ -65,7 +65,7 @@ describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => 
             previousBody: '{{n}} more',
             body: 'no token here',
         });
-        expect(r.ok).toBe(false);
+        expect(r.isSuccess).toBe(false);
         expect(r.error).toMatch(/token/i);
         expect(captured).toHaveLength(0);
     });
@@ -78,7 +78,7 @@ describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => 
         });
         // Generic prompts do not carry the required-token contract; guard
         // MUST NOT block them. Write proceeds and hits the DB.
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
         expect(captured.length).toBeGreaterThan(0);
     });
 
@@ -90,7 +90,7 @@ describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => 
             replaceKey: 'count',
             body: 'iterate {{count}} times',
         });
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
     });
 
     it('G5: no previousBody => guard is skipped (new-row create path)', async () => {
@@ -100,7 +100,7 @@ describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => 
             slug: 'brand-new', name: 'New', role: 'plan',
             body: 'anything without tokens',
         });
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
     });
 
     it('G6: unchanged tokens pass through cleanly (positive baseline)', async () => {
@@ -109,6 +109,6 @@ describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => 
             previousBody: 'do {{n}} steps',
             body: 'please do {{n}} steps carefully',
         });
-        expect(r.ok).toBe(true);
+        expect(r.isSuccess).toBe(true);
     });
 });

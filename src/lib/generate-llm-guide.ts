@@ -505,7 +505,7 @@ ${ns}.log.info("Fetched data", { count: data.length });
 try {
   const result = await marco.utils.withRetry(async () => {
     const res = ServiceResult.wrapFetch(await fetch("/api/submit", { method: "POST", body: payload }));
-    if (res.isFail) throw new Error("HTTP " + res.status);
+    if (!res.isSuccess) throw new Error("HTTP " + res.status);
     return res.json();
   }, { maxAttempts: 3, delayMs: 2000, backoffMultiplier: 1.5 });
 

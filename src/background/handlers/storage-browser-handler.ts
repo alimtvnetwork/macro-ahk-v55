@@ -339,7 +339,6 @@ export async function handleStorageClearAll(): Promise<{ isOk: true; cleared: st
             db.run(`DELETE FROM ${table}`);
             cleared.push(table);
         } catch (tableErr) {
-            logError("AutoCatch", "Unhandled exception", tableErr);
             // Table may not exist in this schema version. Debug-only because
             // BROWSABLE_TABLES intentionally lists tables across multiple DBs.
             logSampledDebug(
