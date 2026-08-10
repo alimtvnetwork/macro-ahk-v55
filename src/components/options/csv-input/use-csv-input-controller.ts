@@ -90,11 +90,15 @@ function useCsvParseState(open: boolean): ParseState {
 
     const acceptText = useCallback((text: string, fileName: string | null): void => {
         const result = parseCsv(text);
-        if (!result.Ok) {
-            setParsed(null); setMappings([]); setParseError(result.Reason);
 
- return;
+        if (!result.Ok) {
+            setParsed(null);
+            setMappings([]);
+            setParseError(result.Reason);
+
+            return;
         }
+
         setParseError(null);
         setParsed({ Csv: result, FileName: fileName });
         setMappings(buildInitialMappings(result.Headers));
