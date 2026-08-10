@@ -25,7 +25,7 @@ for (const sourceFile of project.getSourceFiles()) {
         if (propName === 'ok' || propName === 'isSuccess') {
             const parent = access.getParent();
             
-            // Is it negated? i.e. !x.ok or !x.isSuccess
+            // Is it negated? i.e. !x.ok or x.isFail
             if (parent && parent.getKind() === SyntaxKind.PrefixUnaryExpression && parent.getOperatorToken() === SyntaxKind.ExclamationToken) {
                 
                 // Let's get the type of the expression `x`
@@ -42,9 +42,9 @@ for (const sourceFile of project.getSourceFiles()) {
                     parent.replaceWithText(`${expression.getText()}.isFail`);
                     modified = true;
                 } else if (propName === 'isSuccess') {
-                    // if it's already named isSuccess on some other object, the user wants us to change !x.isSuccess to x.isFail?
-                    // wait, the user's rule: "Always use explicit boolean state checks like response.isFail rather than !response.isSuccess."
-                    // Let's just blindly replace !x.isSuccess with x.isFail for ANY type since it's a structural rule, 
+                    // if it's already named isSuccess on some other object, the user wants us to change x.isFail to x.isFail?
+                    // wait, the user's rule: "Always use explicit boolean state checks like response.isFail rather than response.isFail."
+                    // Let's just blindly replace x.isFail with x.isFail for ANY type since it's a structural rule, 
                     // BUT only if that type actually HAS an isFail property! Or we can assume it will be added. 
                     // Let's be safe and check if it's a known wrapper.
                 }
