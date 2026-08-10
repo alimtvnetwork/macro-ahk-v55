@@ -112,8 +112,7 @@ function recordSlugOwner(
     return;
   }
   snapshot.slugOwnerRole = '(no-row)';
-  const isMissingOk = bySlug.isFail;
-  if (isMissingOk) snapshot.slugLookupError = bySlug.error ?? 'unknown';
+  if (bySlug.isFail) snapshot.slugLookupError = bySlug.error ?? 'unknown';
 }
 
 async function collectSlugOwner(
@@ -263,8 +262,7 @@ async function resolveRequiredTokensForRole(role: PromptRole): Promise<string[]>
 async function runPreflightSeed(role: PromptRole): Promise<void> {
   emitPromptSeedEvent({ event: 'editor.prefill.reseed', role, outcome: 'ok', detail: 'preflight' });
   const seed = await seedPlanNextPrompts();
-  const isMissingOk = seed.isFail;
-  if (isMissingOk) {
+  if (seed.isFail) {
     logDiagnosticFromCode('SEED_INSERT_E002', { role, reason: seed.error ?? 'seed failed' });
     emitPromptSeedEvent({ event: 'editor.prefill.reseed', role, outcome: 'failed', detail: seed.error ?? 'seed failed' });
   }
@@ -447,8 +445,7 @@ async function tryInsertAndPromoteSeed(
       return null;
     }
     const promoted = await setDefaultPromptForRole(inserted.value, role);
-    const isMissingOk = promoted.isFail;
-    if (isMissingOk) {
+    if (promoted.isFail) {
       logDiagnosticFromCode('DB_WRITE_E003', {
         role, promptId: inserted.value, reason: promoted.error ?? 'setDefault failed',
       });
@@ -497,8 +494,7 @@ async function promoteExistingPromptId(
   detail: string,
 ): Promise<number> {
   const promoted = await setDefaultPromptForRole(promptId, role);
-  const isMissingOk = promoted.isFail;
-  if (isMissingOk) {
+  if (promoted.isFail) {
     logDiagnosticFromCode('DB_WRITE_E003', {
       role, promptId, reason: promoted.error ?? 'setDefault failed',
     });
@@ -517,8 +513,7 @@ async function tryAdoptSeedSlugRow(
   seedRow: { slug: string; name: string; body: string },
 ): Promise<number | null> {
   const lookup = await getPromptBySlug(seedRow.slug);
-  const isMissingOk = lookup.isFail;
-  if (isMissingOk) {
+  if (lookup.isFail) {
     logDiagnosticFromCode('DB_READ_E001', { role, slug: seedRow.slug, reason: lookup.error ?? 'slug lookup failed' });
   }
   if (lookup.isFail || !lookup.value) {

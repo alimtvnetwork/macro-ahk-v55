@@ -103,7 +103,7 @@ describe('autoResumeQueueIfNeeded — safety guards', () => {
                 },
             });
             expect(result).toEqual({ acted: false, reason: 'threw' });
-            expect(errSpy).toHaveBeenCalledWith('[AutoResume] Unexpected failure', expect.any(Error));
+            expect(errSpy).toHaveBeenCalledWith('[RiseupAsia] [MacroController] [AutoResume] Unexpected failure', expect.any(Error));
         } finally {
             errSpy.mockRestore();
         }

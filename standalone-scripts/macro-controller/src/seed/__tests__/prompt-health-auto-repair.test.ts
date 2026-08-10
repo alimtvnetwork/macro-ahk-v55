@@ -26,14 +26,14 @@ vi.mock('../../error-utils', async () => {
 
 let responsesQueue: unknown[] = [];
 vi.mock('../../db/extension-bridge', () => ({
-    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { ok: true, rows: [] }),
+    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
-    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { ok: true, rows: [] }),
+    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] }),
 }));
 
 const reseedCalls: Array<{ force?: boolean }> = [];
-let reseedResult: { ok: boolean; error?: string; mode: ReseedModeType } = { ok: true, mode: 'idempotent' };
+let reseedResult: { ok: boolean; error?: string; mode: ReseedModeType } = { ok: true, isFail: false, isSuccess: true, mode: 'idempotent' };
 vi.mock('../reseed-command', () => ({
     reseedPromptsOnDemand: vi.fn(async (opts?: { force?: boolean }) => {
         reseedCalls.push({ force: opts?.force });
@@ -62,14 +62,14 @@ function healthyRow(role: PromptRowRoleType, overrides: Partial<Row> = {}): Row 
         ...overrides,
     };
 }
-const ok = (row: Row): unknown => ({ ok: true, rows: [row] });
-const empty = (): unknown => ({ ok: true, rows: [] });
+const ok = (row: Row): unknown => ({ ok: true, isFail: false, isSuccess: true, rows: [row] });
+const empty = (): unknown => ({ ok: true, isFail: false, isSuccess: true, rows: [] });
 
 beforeEach(() => {
     toastCalls.length = 0;
     responsesQueue = [];
     reseedCalls.length = 0;
-    reseedResult = { ok: true, mode: 'idempotent' };
+    reseedResult = { ok: true, isFail: false, isSuccess: true, mode: 'idempotent' };
 });
 
 describe('runPromptHealthCheckWithAutoRepair', () => {

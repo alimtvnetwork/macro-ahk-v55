@@ -94,8 +94,7 @@ export async function disconnectGithubRepo(
 
     return { status: 'not_linked' };
   }
-  const isMissingOk = resp.isFail;
-  if (isMissingOk) {
+  if (resp.isFail) {
     logError('GitsyncDisconnect',
       'HTTP ' + resp.status + ' for ws=' + wsId + ' pid=' + pid
       + ' bodyPreview=' + JSON.stringify(resp.data).substring(0, 200));
@@ -133,8 +132,7 @@ export async function confirmAndDisconnectGithubRepo(
     return { status: 'error', message: 'confirm_unavailable' };
   }
   const ok = askFn(message);
-  const isMissingOk = !ok;
-  if (isMissingOk) {
+  if (!ok) {
     log('[GitsyncDisconnect] user cancelled ws=' + wsId + ' pid=' + pid, 'info');
 
     return { status: 'cancelled' };

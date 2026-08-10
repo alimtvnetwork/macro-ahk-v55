@@ -18,14 +18,14 @@ vi.mock('../../db/extension-bridge', () => ({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] };
     }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] };
     }),
 }));
 vi.mock('../../error-utils', async () => {
@@ -54,15 +54,15 @@ describe('seedPlanNextPrompts', () => {
         // [4] hasDefault plan, [5] promote plan, [6] hasDefault next, [7] promote next,
         // [8] audit-log INSERT (because inserts+promotes occurred).
         responsesQueue = [
-            { ok: true, rows: [] },                 // pre-select existing slugs -> none
-            { ok: true },                            // INSERT OR IGNORE
-            { ok: true, rows: [] },                 // legacy read plan-default (row-missing -> skip)
-            { ok: true, rows: [] },                 // legacy read next-default (row-missing -> skip)
-            { ok: true, rows: [] },                 // hasDefault plan -> none
-            { ok: true },                            // promote plan-default
-            { ok: true, rows: [] },                 // hasDefault next -> none
-            { ok: true },                            // promote next-default
-            { ok: true },                            // audit-log INSERT
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // pre-select existing slugs -> none
+            { ok: true, isFail: false, isSuccess: true },                            // INSERT OR IGNORE
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default (row-missing -> skip)
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default (row-missing -> skip)
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // hasDefault plan -> none
+            { ok: true, isFail: false, isSuccess: true },                            // promote plan-default
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // hasDefault next -> none
+            { ok: true, isFail: false, isSuccess: true },                            // promote next-default
+            { ok: true, isFail: false, isSuccess: true },                            // audit-log INSERT
         ];
         const r = await seedPlanNextPrompts();
         expect(r.ok).toBe(true);
@@ -85,12 +85,12 @@ describe('seedPlanNextPrompts', () => {
             'next-default', 'next-concise', 'next-with-time', 'next-with-risk',
         ].map(s => ({ Slug: s }));
         responsesQueue = [
-            { ok: true, rows: allSlugs },           // pre-select -> all present
-            { ok: true },                            // INSERT OR IGNORE (driver no-op)
-            { ok: true, rows: [] },                 // legacy read plan-default (skip)
-            { ok: true, rows: [] },                 // legacy read next-default (skip)
-            { ok: true, rows: [{ '1': 1 }] },       // hasDefault plan
-            { ok: true, rows: [{ '1': 1 }] },       // hasDefault next
+            { ok: true, isFail: false, isSuccess: true, rows: allSlugs },           // pre-select -> all present
+            { ok: true, isFail: false, isSuccess: true },                            // INSERT OR IGNORE (driver no-op)
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default (skip)
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default (skip)
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },       // hasDefault plan
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },       // hasDefault next
         ];
         const r = await seedPlanNextPrompts();
         expect(r.ok).toBe(true);
@@ -103,14 +103,14 @@ describe('seedPlanNextPrompts', () => {
 
     it('mixed: plan default already set, next default missing -> promotes only next + writes audit row', async () => {
         responsesQueue = [
-            { ok: true, rows: [] },
-            { ok: true },
-            { ok: true, rows: [] },                 // legacy read plan-default (skip)
-            { ok: true, rows: [] },                 // legacy read next-default (skip)
-            { ok: true, rows: [{ '1': 1 }] },       // plan has default
-            { ok: true, rows: [] },                 // next missing
-            { ok: true },                            // promote next
-            { ok: true },                            // audit-log INSERT
+            { ok: true, isFail: false, isSuccess: true, rows: [] },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default (skip)
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default (skip)
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },       // plan has default
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // next missing
+            { ok: true, isFail: false, isSuccess: true },                            // promote next
+            { ok: true, isFail: false, isSuccess: true },                            // audit-log INSERT
         ];
         const r = await seedPlanNextPrompts();
         expect(r.ok).toBe(true);
@@ -123,8 +123,8 @@ describe('seedPlanNextPrompts', () => {
 
     it('surfaces INSERT failure instead of swallowing it', async () => {
         responsesQueue = [
-            { ok: true, rows: [] },                 // pre-select
-            { ok: false, errorMessage: 'disk full' },
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // pre-select
+            { ok: false, isFail: true, isSuccess: false, errorMessage: 'disk full' },
         ];
         const r = await seedPlanNextPrompts();
         expect(r.ok).toBe(false);
@@ -133,12 +133,12 @@ describe('seedPlanNextPrompts', () => {
 
     it('INSERT SQL includes all 8 seed rows', async () => {
         responsesQueue = [
-            { ok: true, rows: [] },
-            { ok: true },
-            { ok: true, rows: [] },                 // legacy read plan-default
-            { ok: true, rows: [] },                 // legacy read next-default
-            { ok: true, rows: [{ '1': 1 }] },
-            { ok: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [] },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
         ];
         await seedPlanNextPrompts();
         const sql = captured[1].sql;
@@ -152,15 +152,15 @@ describe('seedPlanNextPrompts', () => {
 
     it('persists telemetry to localStorage under marco_last_seed_telemetry', async () => {
         responsesQueue = [
-            { ok: true, rows: [] },
-            { ok: true },
-            { ok: true, rows: [] },                 // legacy read plan-default
-            { ok: true, rows: [] },                 // legacy read next-default
-            { ok: true, rows: [] },
-            { ok: true },
-            { ok: true, rows: [] },
-            { ok: true },
-            { ok: true },                            // audit-log INSERT
+            { ok: true, isFail: false, isSuccess: true, rows: [] },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default
+            { ok: true, isFail: false, isSuccess: true, rows: [] },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [] },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true },                            // audit-log INSERT
         ];
         await seedPlanNextPrompts();
         const raw = localStorage.getItem('marco_last_seed_telemetry');

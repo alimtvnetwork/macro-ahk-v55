@@ -287,13 +287,11 @@ async function runReseedAndOpen(role: PromptRole, force: boolean): Promise<void>
       'Force reset will overwrite the "plan-default" and "next-default" prompt bodies with the shipped canonical text. '
       + 'Any edits you made to those two rows will be lost. Custom prompts you added are untouched.\n\nProceed?'
     );
-    const isMissingOk = !ok;
-    if (isMissingOk) return;
+    if (!ok) return;
   }
   showToast(force ? '⚠️ Forcing default reset…' : '🔄 Re-seeding defaults…', 'info');
   const result = await reseedPromptsOnDemand({ force });
-  const isMissingOk = result.isFail;
-  if (isMissingOk) {
+  if (result.isFail) {
     const reason = result.error ?? 'unknown';
     reportGearFailure(
       'SEED_RESEED_E001',
@@ -360,8 +358,7 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
 
  return; }
   const res = await setDefaultPromptForRole(picked.Id, role);
-  const isMissingOk = res.isFail;
-  if (isMissingOk) {
+  if (res.isFail) {
     const reason = res.error ?? 'unknown';
     reportGearFailure(
       'DB_WRITE_E003',
@@ -393,11 +390,9 @@ async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> 
     cancelLabel: 'Cancel',
     destructive: true,
   });
-  const isMissingOk = !ok;
-  if (isMissingOk) return;
+  if (!ok) return;
   const res = await deletePromptById(picked.Id);
-  const isMissingOk = res.isFail;
-  if (isMissingOk) {
+  if (res.isFail) {
     const reason = res.error ?? 'unknown';
     reportGearFailure(
       'DB_WRITE_E004',

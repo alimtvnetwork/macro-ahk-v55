@@ -36,7 +36,7 @@ vi.mock('./prompt-cache', () => ({
 }));
 vi.mock('./prompt-loader', () => buildPromptLoaderMock({
   getPromptsConfig: () => ({ entries: [] } as unknown as { editorXPath: string }),
-  sendToExtension: vi.fn(async () => ({ ok: true, rows: [] })),
+  sendToExtension: vi.fn(async () => ({ ok: true, isFail: false, isSuccess: true, rows: [] })),
   loadPromptsFromJson: vi.fn(),
   setRevalidateContext: vi.fn(), setRenderDropdownFn: vi.fn(),
   getPromptCategoryFilter: () => null,

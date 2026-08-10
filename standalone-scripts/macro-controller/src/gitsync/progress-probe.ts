@@ -148,8 +148,7 @@ export async function probeProgress(
 
         return null;
     }
-    const isMissingOk = resp.isFail;
-    if (isMissingOk) {
+    if (!resp.ok) {
         const preview = JSON.stringify(resp.data).substring(0, 200);
         logError('GitsyncProbe', 'probeProgress HTTP ' + resp.status
             + ' [ws=' + wsId + ' pid=' + projectId + ' job=' + jobId + ']'

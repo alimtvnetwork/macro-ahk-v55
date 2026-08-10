@@ -42,7 +42,7 @@ describe('ws-members-mutations bulk', () => {
 
     it('should invite multiple emails to multiple workspaces', async () => {
         const api: MembershipsApi = {
-            invite: vi.fn().mockResolvedValue({ ok: true, status: 200, data: {} }),
+            invite: vi.fn().mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
             remove: vi.fn(),
             updateRole: vi.fn(),
         };
@@ -58,8 +58,8 @@ describe('ws-members-mutations bulk', () => {
     it('should track failures in bulk invite', async () => {
         const api: MembershipsApi = {
             invite: vi.fn()
-                .mockResolvedValueOnce({ ok: false, status: 429, data: 'Rate limited' })
-                .mockResolvedValue({ ok: true, status: 200, data: {} }),
+                .mockResolvedValueOnce({ ok: false, isFail: true, isSuccess: false, status: 429, data: 'Rate limited' })
+                .mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
             remove: vi.fn(),
             updateRole: vi.fn(),
         };
@@ -77,7 +77,7 @@ describe('ws-members-mutations bulk', () => {
         const api: MembershipsApi = {
             invite: vi.fn(),
             remove: vi.fn(),
-            updateRole: vi.fn().mockResolvedValue({ ok: true, status: 200, data: {} }),
+            updateRole: vi.fn().mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
         };
         installSdk(api);
 
@@ -89,7 +89,7 @@ describe('ws-members-mutations bulk', () => {
     it('should remove member across workspaces', async () => {
         const api: MembershipsApi = {
             invite: vi.fn(),
-            remove: vi.fn().mockResolvedValue({ ok: true, status: 200, data: {} }),
+            remove: vi.fn().mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
             updateRole: vi.fn(),
         };
         installSdk(api);

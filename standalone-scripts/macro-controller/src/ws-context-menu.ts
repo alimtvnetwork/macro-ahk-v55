@@ -541,8 +541,7 @@ export function startInlineRename(wsId: string, currentName: string): void {
       const ok = window.confirm(
         'Discard unsaved rename?\n\n"' + currentName + '" → "' + typed + '"',
       );
-      const isMissingOk = !ok;
-      if (isMissingOk) {
+      if (!ok) {
         input.focus();
 
         return;

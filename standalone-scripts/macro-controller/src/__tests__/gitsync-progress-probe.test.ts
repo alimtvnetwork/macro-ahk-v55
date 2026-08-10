@@ -37,26 +37,26 @@ describe('wellKnownJobId', () => {
 
 describe('probeProgress', () => {
     it('returns null on 404 (no job yet)', async () => {
-        installSdk(() => ({ ok: false, status: 404, data: {} }));
+        installSdk(() => ({ ok: false, isFail: true, isSuccess: false, status: 404, data: {} }));
         const r = await probeProgress('ws1', 'p1', 'job1');
         expect(r).toBeNull();
     });
 
     it('returns body on 200', async () => {
-        installSdk(() => ({ ok: true, status: 200, data: { status: 'completed', result: { repo_url: 'https://github.com/a/b' } } }));
+        installSdk(() => ({ ok: true, isFail: false, isSuccess: true, status: 200, data: { status: 'completed', result: { repo_url: 'https://github.com/a/b' } } }));
         const r = await probeProgress('ws1', 'p1', 'job1');
         expect(r?.status).toBe('completed');
         expect(r?.result?.repo_url).toBe('https://github.com/a/b');
     });
 
     it('returns null on 401/403 (caller lacks access)', async () => {
-        installSdk(() => ({ ok: false, status: 403, data: {} }));
+        installSdk(() => ({ ok: false, isFail: true, isSuccess: false, status: 403, data: {} }));
         const r = await probeProgress('ws1', 'p1', 'job1');
         expect(r).toBeNull();
     });
 
     it('throws on 5xx', async () => {
-        installSdk(() => ({ ok: false, status: 500, data: { error: 'boom' } }));
+        installSdk(() => ({ ok: false, isFail: true, isSuccess: false, status: 500, data: { error: 'boom' } }));
         await expect(probeProgress('ws1', 'p1', 'job1')).rejects.toThrow(/GITSYNC_PROBE_E003|HTTP 500|http_500/);
     });
 
@@ -68,7 +68,7 @@ describe('probeProgress', () => {
 describe('resolveConnection', () => {
     it('returns connected on first probe when status=completed + repo_url', async () => {
         installSdk(() => ({
-            ok: true, status: 200,
+            ok: true, isFail: false, isSuccess: true, status: 200,
             data: { status: 'completed', result: { repo_url: 'https://github.com/a/b', repo_name: 'b', owner: 'a' } },
         }));
         const r = await resolveConnection('ws1', 'conn1', 'p1');
@@ -76,13 +76,13 @@ describe('resolveConnection', () => {
     });
 
     it('returns not_connected reason=no_job on 404', async () => {
-        installSdk(() => ({ ok: false, status: 404, data: {} }));
+        installSdk(() => ({ ok: false, isFail: true, isSuccess: false, status: 404, data: {} }));
         const r = await resolveConnection('ws1', 'conn1', 'p1');
         expect(r).toEqual({ connected: false, reason: 'no_job' });
     });
 
     it('returns no_repo_url when completed without result.repo_url', async () => {
-        installSdk(() => ({ ok: true, status: 200, data: { status: 'completed', result: {} } }));
+        installSdk(() => ({ ok: true, isFail: false, isSuccess: true, status: 200, data: { status: 'completed', result: {} } }));
         const r = await resolveConnection('ws1', 'conn1', 'p1');
         expect(r).toEqual({ connected: false, reason: 'no_repo_url' });
     });
@@ -91,9 +91,9 @@ describe('resolveConnection', () => {
         let n = 0;
         installSdk(() => {
             n += 1;
-            if (n < 3) return { ok: true, status: 200, data: { status: 'running', step: 'pushing_code' } };
+            if (n < 3) return { ok: true, isFail: false, isSuccess: true, status: 200, data: { status: 'running', step: 'pushing_code' } };
 
-            return { ok: true, status: 200, data: { status: 'completed', result: { repo_url: 'https://github.com/a/b' } } };
+            return { ok: true, isFail: false, isSuccess: true, status: 200, data: { status: 'completed', result: { repo_url: 'https://github.com/a/b' } } };
         });
         const r = await resolveConnection('ws1', 'conn1', 'p1', PROBE_POLL_INTERVAL_MS * 5);
         expect(r.connected).toBe(true);
@@ -102,13 +102,13 @@ describe('resolveConnection', () => {
     });
 
     it('returns reason=deadline when running forever', async () => {
-        installSdk(() => ({ ok: true, status: 200, data: { status: 'running' } }));
+        installSdk(() => ({ ok: true, isFail: false, isSuccess: true, status: 200, data: { status: 'running' } }));
         const r = await resolveConnection('ws1', 'conn1', 'p1', PROBE_POLL_INTERVAL_MS * 2 + 50);
         expect(r).toEqual({ connected: false, reason: 'deadline' });
     });
 
     it('returns error on transport failure (5xx)', async () => {
-        installSdk(() => ({ ok: false, status: 500, data: {} }));
+        installSdk(() => ({ ok: false, isFail: true, isSuccess: false, status: 500, data: {} }));
         const r = await resolveConnection('ws1', 'conn1', 'p1');
         expect(r).toEqual({ connected: false, reason: 'error' });
     });
@@ -118,7 +118,7 @@ describe('resolveConnection', () => {
     });
 
     it('returns error when wsId/projectId missing without calling SDK', async () => {
-        const calls = installSdk(() => ({ ok: true, status: 200, data: {} }));
+        const calls = installSdk(() => ({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }));
         const r = await resolveConnection('', 'conn1', '');
         expect(r).toEqual({ connected: false, reason: 'error' });
         expect(calls.length).toBe(0);

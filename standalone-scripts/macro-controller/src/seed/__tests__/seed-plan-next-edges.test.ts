@@ -34,7 +34,7 @@ vi.mock('../../db/extension-bridge', () => ({
         captured.push({ method: p.method, sql: p.params.sql });
         if (sendImpl) return sendImpl(p.params.sql);
 
-        return responsesQueue.shift() ?? { ok: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] };
     }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
@@ -42,7 +42,7 @@ vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
         captured.push({ method: p.method, sql: p.params.sql });
         if (sendImpl) return sendImpl(p.params.sql);
 
-        return responsesQueue.shift() ?? { ok: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] };
     }),
 }));
 vi.mock('../../error-utils', async () => {
@@ -73,10 +73,10 @@ beforeEach(() => {
 describe('seedPlanNextPrompts — negative + idempotency edges', () => {
     it('E1: pre-select failure degrades to empty set; seed still completes', async () => {
         responsesQueue = [
-            { ok: false, errorMessage: 'pre-select boom' }, // pre-select fails
-            { ok: true },                                    // INSERT OR IGNORE ok
-            { ok: true, rows: [{ '1': 1 }] },                // plan default present
-            { ok: true, rows: [{ '1': 1 }] },                // next default present
+            { ok: false, isFail: true, isSuccess: false, errorMessage: 'pre-select boom' }, // pre-select fails
+            { ok: true, isFail: false, isSuccess: true },                                    // INSERT OR IGNORE ok
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },                // plan default present
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },                // next default present
         ];
         const r = await seedPlanNextPrompts();
         expect(r.ok).toBe(true);
@@ -90,14 +90,14 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
     it('E2: promote UPDATE failure logs via SeedPlanNext but overall seed still ok', async () => {
         // v4.187.0: two legacy-body SELECTs (plan + next) run before promotion.
         responsesQueue = [
-            { ok: true, rows: [] },                          // pre-select empty
-            { ok: true },                                    // INSERT ok
-            { ok: true, rows: [] },                          // legacy-body SELECT plan-default (skip)
-            { ok: true, rows: [] },                          // legacy-body SELECT next-default (skip)
-            { ok: true, rows: [] },                          // plan hasDefault -> false
-            { ok: false, errorMessage: 'update denied' },    // plan promote fails
-            { ok: true, rows: [] },                          // next hasDefault -> false
-            { ok: true },                                    // next promote ok
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                          // pre-select empty
+            { ok: true, isFail: false, isSuccess: true },                                    // INSERT ok
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                          // legacy-body SELECT plan-default (skip)
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                          // legacy-body SELECT next-default (skip)
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                          // plan hasDefault -> false
+            { ok: false, isFail: true, isSuccess: false, errorMessage: 'update denied' },    // plan promote fails
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                          // next hasDefault -> false
+            { ok: true, isFail: false, isSuccess: true },                                    // next promote ok
         ];
         const r = await seedPlanNextPrompts();
         expect(r.ok).toBe(true);
@@ -113,8 +113,8 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
 
     it('E3: localStorage.setItem throwing logs but does not flip ok=false', async () => {
         responsesQueue = [
-            { ok: true, rows: [] }, { ok: true },
-            { ok: true, rows: [{ '1': 1 }] }, { ok: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [] }, { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] }, { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
         ];
         const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
             throw new Error('quota exceeded');
@@ -134,8 +134,8 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
 
     it('E4: INSERT SQL carries the PlanTierType-15 default ReplaceKey and ReplaceValues literals', async () => {
         responsesQueue = [
-            { ok: true, rows: [] }, { ok: true },
-            { ok: true, rows: [{ '1': 1 }] }, { ok: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [] }, { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] }, { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
         ];
         await seedPlanNextPrompts();
         const sql = captured[1].sql;
@@ -148,8 +148,8 @@ describe('seedPlanNextPrompts — negative + idempotency edges', () => {
 
     it('E5: telemetry rows include replaceKey and replaceValueCount', async () => {
         responsesQueue = [
-            { ok: true, rows: [] }, { ok: true },
-            { ok: true, rows: [{ '1': 1 }] }, { ok: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [] }, { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] }, { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
         ];
         const r = await seedPlanNextPrompts();
         expect(r.ok).toBe(true);

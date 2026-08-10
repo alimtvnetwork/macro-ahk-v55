@@ -28,10 +28,10 @@ vi.mock('../../error-utils', async () => {
 // ROLES_TO_CHECK).
 let responsesQueue: unknown[] = [];
 vi.mock('../../db/extension-bridge', () => ({
-    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { ok: true, rows: [] }),
+    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
-    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { ok: true, rows: [] }),
+    sendToExtension: vi.fn(async () => responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] }),
 }));
 
 import { runPromptHealthCheck } from '../prompt-health-check';
@@ -61,8 +61,8 @@ function healthyRow(role: PromptRowRoleType, overrides: Partial<DbShape> = {}): 
         ...overrides,
     };
 }
-const ok = (row: DbShape): unknown => ({ ok: true, rows: [row] });
-const empty = (): unknown => ({ ok: true, rows: [] });
+const ok = (row: DbShape): unknown => ({ ok: true, isFail: false, isSuccess: true, rows: [row] });
+const empty = (): unknown => ({ ok: true, isFail: false, isSuccess: true, rows: [] });
 
 beforeEach(() => {
     toastCalls.length = 0;
@@ -111,7 +111,7 @@ describe('runPromptHealthCheck', () => {
     });
 
     it('H5: DB query error surfaces query-failed and does not throw', async () => {
-        responsesQueue = [{ ok: false, errorMessage: 'boom' }, ok(healthyRow('next'))];
+        responsesQueue = [{ ok: false, isFail: true, isSuccess: false, errorMessage: 'boom' }, ok(healthyRow('next'))];
         const report = await runPromptHealthCheck();
         expect(report.ok).toBe(false);
         const planIssue = report.issues.find(i => i.role === 'plan');

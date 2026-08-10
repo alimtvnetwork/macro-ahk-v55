@@ -33,14 +33,14 @@ vi.mock('../../db/extension-bridge', () => ({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] };
     }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] };
     }),
 }));
 vi.mock('../../error-utils', async () => {
@@ -94,14 +94,14 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
         //   hasDefault plan -> true -> hasDefault next -> true ->
         //   audit INSERT (upgraded=1, so audit fires).
         responsesQueue = [
-            { ok: true, rows: ALL_SLUGS },
-            { ok: true },
-            { ok: true, rows: [{ Body: LEGACY_PLAN_BODY }] },
-            { ok: true },                          // UPDATE legacy body
-            { ok: true, rows: [] },                // legacy read next-default (row-missing)
-            { ok: true, rows: [{ '1': 1 }] },
-            { ok: true, rows: [{ '1': 1 }] },
-            { ok: true },                          // audit INSERT
+            { ok: true, isFail: false, isSuccess: true, rows: ALL_SLUGS },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Body: LEGACY_PLAN_BODY }] },
+            { ok: true, isFail: false, isSuccess: true },                          // UPDATE legacy body
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                // legacy read next-default (row-missing)
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true },                          // audit INSERT
         ];
         const r = await seedPlanNextPrompts();
         expect(r.ok).toBe(true);
@@ -118,12 +118,12 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
     it('L2: user-customized plan-default body must NOT be overwritten', async () => {
         const CUSTOM = '# my hand-edited plan prompt body\n\n1. do stuff';
         responsesQueue = [
-            { ok: true, rows: ALL_SLUGS },
-            { ok: true },
-            { ok: true, rows: [{ Body: CUSTOM }] },  // legacy read plan-default -> user body
-            { ok: true, rows: [] },                  // legacy read next-default -> row-missing skip
-            { ok: true, rows: [{ '1': 1 }] },
-            { ok: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: ALL_SLUGS },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Body: CUSTOM }] },  // legacy read plan-default -> user body
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                  // legacy read next-default -> row-missing skip
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
         ];
         const r = await seedPlanNextPrompts();
         expect(r.ok).toBe(true);
@@ -135,13 +135,13 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
 
     it('L3: legacy UPDATE failure logs SEED_LEGACY_UPGRADE_E001 but seed still ok:true', async () => {
         responsesQueue = [
-            { ok: true, rows: ALL_SLUGS },
-            { ok: true },
-            { ok: true, rows: [{ Body: LEGACY_PLAN_BODY }] },
-            { ok: false, errorMessage: 'row locked' }, // UPDATE fails
-            { ok: true, rows: [] },                    // legacy read next-default (skip)
-            { ok: true, rows: [{ '1': 1 }] },
-            { ok: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: ALL_SLUGS },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Body: LEGACY_PLAN_BODY }] },
+            { ok: false, isFail: true, isSuccess: false, errorMessage: 'row locked' }, // UPDATE fails
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                    // legacy read next-default (skip)
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
         ];
         const r = await seedPlanNextPrompts();
         expect(r.ok).toBe(true);
@@ -160,15 +160,15 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
         // First-boot flow (all inserts + both promotes) so audit fires,
         // then the audit INSERT itself fails.
         responsesQueue = [
-            { ok: true, rows: [] },                 // pre-select empty
-            { ok: true },                            // INSERT OR IGNORE
-            { ok: true, rows: [] },                 // legacy read plan-default (skip)
-            { ok: true, rows: [] },                 // legacy read next-default (skip)
-            { ok: true, rows: [] },                 // plan hasDefault false
-            { ok: true },                            // promote plan
-            { ok: true, rows: [] },                 // next hasDefault false
-            { ok: true },                            // promote next
-            { ok: false, errorMessage: 'audit table missing' }, // audit INSERT fails
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // pre-select empty
+            { ok: true, isFail: false, isSuccess: true },                            // INSERT OR IGNORE
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read plan-default (skip)
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // legacy read next-default (skip)
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // plan hasDefault false
+            { ok: true, isFail: false, isSuccess: true },                            // promote plan
+            { ok: true, isFail: false, isSuccess: true, rows: [] },                 // next hasDefault false
+            { ok: true, isFail: false, isSuccess: true },                            // promote next
+            { ok: false, isFail: true, isSuccess: false, errorMessage: 'audit table missing' }, // audit INSERT fails
         ];
         const r = await seedPlanNextPrompts();
         expect(r.ok).toBe(true);
@@ -181,14 +181,14 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
 
     it('upgrades managed stale next-default drift used by Next preset buttons', async () => {
         responsesQueue = [
-            { ok: true, rows: ALL_SLUGS },
-            { ok: true },
-            { ok: true, rows: [{ Body: '# custom plan prompt' }] },
-            { ok: true, rows: [{ Body: STALE_NEXT_BODY }] },
-            { ok: true },
-            { ok: true, rows: [{ '1': 1 }] },
-            { ok: true, rows: [{ '1': 1 }] },
-            { ok: true },
+            { ok: true, isFail: false, isSuccess: true, rows: ALL_SLUGS },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Body: '# custom plan prompt' }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Body: STALE_NEXT_BODY }] },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true },
         ];
         const result = await seedPlanNextPrompts();
         expect(result.ok).toBe(true);
@@ -200,14 +200,14 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
 
     it('upgrades managed stale plan-default drift used by PlanTierType preset buttons', async () => {
         responsesQueue = [
-            { ok: true, rows: ALL_SLUGS },
-            { ok: true },
-            { ok: true, rows: [{ Body: STALE_PLAN_BODY }] },
-            { ok: true },
-            { ok: true, rows: [{ Body: '# custom next prompt' }] },
-            { ok: true, rows: [{ '1': 1 }] },
-            { ok: true, rows: [{ '1': 1 }] },
-            { ok: true },
+            { ok: true, isFail: false, isSuccess: true, rows: ALL_SLUGS },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Body: STALE_PLAN_BODY }] },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Body: '# custom next prompt' }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true },
         ];
         const result = await seedPlanNextPrompts();
         expect(result.ok).toBe(true);
@@ -219,12 +219,12 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
 
     it('preserves custom plan-default bodies that do not match managed prompt shape', async () => {
         responsesQueue = [
-            { ok: true, rows: ALL_SLUGS },
-            { ok: true },
-            { ok: true, rows: [{ Body: '# PlanTierType private\n\nUse {{n}} in my private workflow.' }] },
-            { ok: true, rows: [{ Body: '# custom next prompt' }] },
-            { ok: true, rows: [{ '1': 1 }] },
-            { ok: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: ALL_SLUGS },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Body: '# PlanTierType private\n\nUse {{n}} in my private workflow.' }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Body: '# custom next prompt' }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
         ];
         const result = await seedPlanNextPrompts();
         expect(result.ok).toBe(true);
@@ -234,12 +234,12 @@ describe('seedPlanNextPrompts: legacy-body upgrade + audit surfaces', () => {
 
     it('preserves custom next-default bodies that do not match managed prompt shape', async () => {
         responsesQueue = [
-            { ok: true, rows: ALL_SLUGS },
-            { ok: true },
-            { ok: true, rows: [{ Body: '# custom plan prompt' }] },
-            { ok: true, rows: [{ Body: '# Next private\n\nDo my private {{n}} workflow.' }] },
-            { ok: true, rows: [{ '1': 1 }] },
-            { ok: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: ALL_SLUGS },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Body: '# custom plan prompt' }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Body: '# Next private\n\nDo my private {{n}} workflow.' }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
         ];
         const result = await seedPlanNextPrompts();
         expect(result.ok).toBe(true);

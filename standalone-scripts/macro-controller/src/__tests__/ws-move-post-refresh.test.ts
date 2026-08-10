@@ -86,7 +86,7 @@ beforeEach(() => {
     (window as unknown as { marco: { api: { workspace: { move: (p: string, w: string) => Promise<{ ok: boolean; status: number; data: unknown }> } } } }).marco = {
         api: {
             workspace: {
-                move: vi.fn(async () => ({ ok: true, status: 200, data: new DbResult(true, undefined) })),
+                move: vi.fn(async () => ({ ok: true, isFail: false, isSuccess: true, status: 200, data: new DbResult(true, undefined) })),
             } as unknown as { move: (p: string, w: string) => Promise<{ ok: boolean; status: number; data: unknown }> },
         },
     };

@@ -177,7 +177,7 @@ describe("executeInTab", () => {
     });
 
     it("falls back to default error message when none provided", async () => {
-        mockedInject.mockResolvedValueOnce({ isSuccess: false });
+        mockedInject.mockResolvedValueOnce({ isFail: true });
         await expect(executeInTab(1, "code")).rejects.toThrow(/Injection failed/);
     });
 });

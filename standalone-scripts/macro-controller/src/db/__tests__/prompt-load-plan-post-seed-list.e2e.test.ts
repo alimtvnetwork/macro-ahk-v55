@@ -48,13 +48,13 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
     it('recovers when backend rejects QUERY and accepts SELECT', async () => {
         sendMock.mockImplementation((_t: string, p: Record<string, unknown>) => {
             if (p.method === 'QUERY') {
-                return Promise.resolve({ ok: false, errorMessage: 'Unsupported method: QUERY' });
+                return Promise.resolve({ ok: false, isFail: true, isSuccess: false, errorMessage: 'Unsupported method: QUERY' });
             }
             if (p.method === 'SELECT') {
-                return Promise.resolve({ ok: true, rows: [fakePlanRow()] });
+                return Promise.resolve({ ok: true, isFail: false, isSuccess: true, rows: [fakePlanRow()] });
             }
 
-            return Promise.resolve({ ok: false, errorMessage: 'unexpected: ' + String(p.method) });
+            return Promise.resolve({ ok: false, isFail: true, isSuccess: false, errorMessage: 'unexpected: ' + String(p.method) });
         });
 
         const res = await listPromptsByRole('plan');
@@ -69,7 +69,7 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
     });
 
     it('surfaces PROMPT_LOAD_E001-shaped reason when every SELECT candidate is rejected', async () => {
-        sendMock.mockResolvedValue({ ok: false, errorMessage: 'Unsupported method: QUERY' });
+        sendMock.mockResolvedValue({ ok: false, isFail: true, isSuccess: false, errorMessage: 'Unsupported method: QUERY' });
         const res = await listPromptsByRole('plan');
         expect(res.ok).toBe(false);
         expect(isSqlBridgeContractError(res.error) || /no accepted method/.test(res.error ?? ''))
@@ -79,7 +79,7 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
     it('recovers on retry-once after a poisoned cache goes stale', async () => {
         // First call: SELECT accepted -> cached.
         sendMock.mockImplementationOnce(() =>
-            Promise.resolve({ ok: true, rows: [fakePlanRow()] }));
+            Promise.resolve({ ok: true, isFail: false, isSuccess: true, rows: [fakePlanRow()] }));
         const first = await listPromptsByRole('plan');
         expect(first.ok).toBe(true);
 
@@ -88,13 +88,13 @@ describe('PROMPT_LOAD_E001 regression — post-seed-list plan load', () => {
         // re-probe on the very next call.
         sendMock.mockImplementation((_t: string, p: Record<string, unknown>) => {
             if (p.method === 'QUERY') {
-                return Promise.resolve({ ok: false, errorMessage: 'Unsupported method: QUERY' });
+                return Promise.resolve({ ok: false, isFail: true, isSuccess: false, errorMessage: 'Unsupported method: QUERY' });
             }
             if (p.method === 'SELECT') {
-                return Promise.resolve({ ok: true, rows: [fakePlanRow()] });
+                return Promise.resolve({ ok: true, isFail: false, isSuccess: true, rows: [fakePlanRow()] });
             }
 
-            return Promise.resolve({ ok: false, errorMessage: 'unexpected' });
+            return Promise.resolve({ ok: false, isFail: true, isSuccess: false, errorMessage: 'unexpected' });
         });
 
         const second = await listPromptsByRole('plan');

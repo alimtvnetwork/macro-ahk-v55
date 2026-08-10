@@ -4,7 +4,7 @@ import { ServiceResult } from '../../utils/result-wrapper';
  *
  * Root cause pinned: Every failure in `prompt-db.ts` routes through
  * `fail(where, message)` which MUST emit `logDiagnosticFromCode('DB_PROMPT_E001',
- * { where, reason }, context)` before returning `{ ok:false, error }`. A silent
+ * { where, reason }, context)` before returning `{ ok:false, isFail: true, isSuccess: false, error }`. A silent
  * regression that skipped the diagnostic (or dropped `where` / `reason`)
  * would still return an error to callers but lose the structured surface
  * the audit/toast layers depend on. No test locked that contract, so this
@@ -15,7 +15,7 @@ import type { Mock } from 'vitest';
 import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-mock';
 
 const captured: { method: string; sql: string }[] = [];
-let nextResp: Record<string, unknown> = { ok: true, rows: [], lastInsertId: 1 };
+let nextResp: Record<string, unknown> = { ok: true, isFail: false, isSuccess: true, rows: [], lastInsertId: 1 };
 
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
@@ -45,7 +45,7 @@ import { upsertPrompt, deletePromptById } from '../prompt-db';
 beforeEach(() => {
     captured.length = 0;
     logDiagnosticMock.mockReset();
-    nextResp = { ok: true, rows: [], lastInsertId: 1 };
+    nextResp = { ok: true, isFail: false, isSuccess: true, rows: [], lastInsertId: 1 };
 });
 
 function pickWhere(): string | undefined {
@@ -85,7 +85,7 @@ describe('prompt-db diagnostic surface (PlanTierType 22 gap #2)', () => {
     });
 
     it('D3: upsertPrompt SQL failure surfaces DB errorMessage in reason', async () => {
-        nextResp = { ok: false, errorMessage: 'disk I/O failure' };
+        nextResp = { ok: false, isFail: true, isSuccess: false, errorMessage: 'disk I/O failure' };
         const r = await upsertPrompt({ slug: 's', name: 'n', role: 'generic', body: 'x' });
         expect(r.ok).toBe(false);
         expect(pickCode()).toBe('DB_PROMPT_E001');
@@ -103,7 +103,7 @@ describe('prompt-db diagnostic surface (PlanTierType 22 gap #2)', () => {
     });
 
     it('D5: successful upsert emits NO diagnostic (positive baseline: no false-positive logs)', async () => {
-        nextResp = { ok: true, rows: [], lastInsertId: 42 };
+        nextResp = { ok: true, isFail: false, isSuccess: true, rows: [], lastInsertId: 42 };
         const r = await upsertPrompt({ slug: 's', name: 'n', role: 'generic', body: 'x' });
         expect(r.ok).toBe(true);
         expect(logDiagnosticMock).not.toHaveBeenCalled();

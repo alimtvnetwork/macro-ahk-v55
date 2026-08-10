@@ -133,8 +133,7 @@ export async function recordPromptRevision(input: RecordRevisionInput): Promise<
     ].join(', ');
     const insertSql = 'INSERT INTO PromptRevision (' + cols + ') VALUES (' + vals + ')';
     const insertResp = await runSql('SCHEMA', insertSql);
-    const isMissingIsOk = insertResp.isFail;
-    if (isMissingIsOk) {
+    if (insertResp.isFail) {
         return fail('recordPromptRevision', insertResp.errorMessage ?? 'insert failed');
     }
     const insertedId = Number(insertResp.lastInsertId ?? 0);
@@ -145,8 +144,7 @@ export async function recordPromptRevision(input: RecordRevisionInput): Promise<
         ' AND Id NOT IN (SELECT Id FROM PromptRevision WHERE Slug = ' + sqlLit(previous.Slug) +
         ' ORDER BY CreatedAt DESC, Id DESC LIMIT ' + String(PROMPT_REVISION_LIMIT_PER_SLUG) + ')';
     const trimResp = await runSql('SCHEMA', trimSql);
-    const isMissingIsOk = trimResp.isFail;
-    if (isMissingIsOk) {
+    if (trimResp.isFail) {
         // Trim failure is not fatal: the insert succeeded, history is preserved
         // (just over-cap). Log so we notice recurring cases.
         logDiagnosticFromCode('DB_REVISION_TRIM_E001', { stage: 'record', slug: previous.Slug, reason: trimResp.errorMessage ?? 'unknown error' });
@@ -167,8 +165,7 @@ export async function listPromptRevisions(slug: string): Promise<DbResult<Prompt
         'SELECT * FROM PromptRevision WHERE Slug = ' + sqlLit(slug) +
         ' ORDER BY CreatedAt DESC, Id DESC';
     const resp = await runSql('QUERY', sql);
-    const isMissingIsOk = resp.isFail;
-    if (isMissingIsOk) return fail('listPromptRevisions', resp.errorMessage ?? 'query failed');
+    if (resp.isFail) return fail('listPromptRevisions', resp.errorMessage ?? 'query failed');
     const rows = Array.isArray(resp.rows) ? resp.rows.map(rowToRevision) : [];
 
     return new DbResult(true, rows);
@@ -181,8 +178,7 @@ export async function getPromptRevisionById(id: number): Promise<DbResult<Prompt
     }
     const sql = 'SELECT * FROM PromptRevision WHERE Id = ' + String(id) + ' LIMIT 1';
     const resp = await runSql('QUERY', sql);
-    const isMissingIsOk = resp.isFail;
-    if (isMissingIsOk) return fail('getPromptRevisionById', resp.errorMessage ?? 'query failed');
+    if (resp.isFail) return fail('getPromptRevisionById', resp.errorMessage ?? 'query failed');
     const rows = Array.isArray(resp.rows) ? resp.rows : [];
     if (rows.length === 0) return new DbResult(true, undefined);
 
@@ -242,8 +238,7 @@ export async function insertImportedRevisions(
         ].join(', ');
         const insertSql = 'INSERT INTO PromptRevision (' + cols + ') VALUES (' + vals + ')';
         const resp = await runSql('SCHEMA', insertSql);
-        const isMissingIsOk = resp.isFail;
-        if (isMissingIsOk) {
+        if (resp.isFail) {
             return fail('insertImportedRevisions', resp.errorMessage ?? 'insert failed');
         }
         inserted += 1;
@@ -254,8 +249,7 @@ export async function insertImportedRevisions(
         ' AND Id NOT IN (SELECT Id FROM PromptRevision WHERE Slug = ' + sqlLit(slug) +
         ' ORDER BY CreatedAt DESC, Id DESC LIMIT ' + String(PROMPT_REVISION_LIMIT_PER_SLUG) + ')';
     const trimResp = await runSql('SCHEMA', trimSql);
-    const isMissingIsOk = trimResp.isFail;
-    if (isMissingIsOk) {
+    if (trimResp.isFail) {
         logDiagnosticFromCode('DB_REVISION_TRIM_E001', { stage: 'import', slug, reason: trimResp.errorMessage ?? 'unknown error' });
     }
 
@@ -271,8 +265,7 @@ export async function insertImportedRevisions(
  */
 export async function getMaxRevisionId(): Promise<DbResult<number>> {
     const resp = await runSql('QUERY', 'SELECT MAX(Id) AS MaxId FROM PromptRevision');
-    const isMissingIsOk = resp.isFail;
-    if (isMissingIsOk) return fail('getMaxRevisionId', resp.errorMessage ?? 'query failed');
+    if (resp.isFail) return fail('getMaxRevisionId', resp.errorMessage ?? 'query failed');
     const rows = Array.isArray(resp.rows) ? resp.rows : [];
     const first = rows.length > 0 ? (rows[0] as Record<string, unknown>) : {};
     const raw = first.MaxId;
@@ -304,8 +297,7 @@ export async function deleteImportedRevisionsAfter(
     const sql = 'DELETE FROM PromptRevision WHERE Slug = ' + sqlLit(slug)
         + ' AND PromptId = 0 AND Id > ' + String(Math.floor(sinceId));
     const resp = await runSql('SCHEMA', sql);
-    const isMissingIsOk = resp.isFail;
-    if (isMissingIsOk) return fail('deleteImportedRevisionsAfter', resp.errorMessage ?? 'delete failed');
+    if (resp.isFail) return fail('deleteImportedRevisionsAfter', resp.errorMessage ?? 'delete failed');
 
     // rawSql does not surface a changes() count reliably across all shims,
     // so callers should not rely on the returned number for anything beyond

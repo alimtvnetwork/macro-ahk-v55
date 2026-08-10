@@ -87,12 +87,12 @@ describe('rename-api remaining toast migrations', () => {
         // First call → 403 (triggers fallback + retry), second → 200 OK success.
         workspaceRenameMock
             .mockResolvedValueOnce({
-                ok: false,
+                ok: false, isFail: true, isSuccess: false,
                 status: 403,
                 data: { error: 'monthly limit field forbidden' },
                 headers: {},
             })
-            .mockResolvedValueOnce({ ok: true, status: 200, data: {}, headers: {} });
+            .mockResolvedValueOnce({ ok: true, isFail: false, isSuccess: true, status: 200, data: {}, headers: {} });
 
         await expect(renameWorkspace('ws-403', 'renamed')).resolves.toBe('no-limit');
 
@@ -114,8 +114,8 @@ describe('rename-api remaining toast migrations', () => {
     it('A1: 401 auth-recovery path emits RENAME_AUTH_RECOVERY_E001 via showDiagnosticToast', async () => {
         recoverAuthOnceMock.mockResolvedValue('tok-new-recovered');
         workspaceRenameMock
-            .mockResolvedValueOnce({ ok: false, status: 401, data: {}, headers: {} })
-            .mockResolvedValueOnce({ ok: true, status: 200, data: {}, headers: {} });
+            .mockResolvedValueOnce({ ok: false, isFail: true, isSuccess: false, status: 401, data: {}, headers: {} })
+            .mockResolvedValueOnce({ ok: true, isFail: false, isSuccess: true, status: 200, data: {}, headers: {} });
 
         await expect(renameWorkspace('ws-401', 'renamed')).resolves.toBe('auth-retry');
 
@@ -133,7 +133,7 @@ describe('rename-api remaining toast migrations', () => {
 
     it('E1: generic HTTP failure surfaces RENAME_REQUEST_E001 once and throws the SAME DiagnosticError instance', async () => {
         workspaceRenameMock.mockResolvedValueOnce({
-            ok: false,
+            ok: false, isFail: true, isSuccess: false,
             status: 500,
             data: { message: 'boom' },
             headers: {},

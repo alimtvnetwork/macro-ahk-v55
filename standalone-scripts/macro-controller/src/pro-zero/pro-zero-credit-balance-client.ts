@@ -35,11 +35,9 @@ function buildNetworkError(reason: string): CreditBalanceFetchResult {
 }
 
 function handleResponse(resp: SdkBalanceResponse): CreditBalanceFetchResult {
-    const isMissingOk = resp.isFail;
-    if (isMissingOk) return buildHttpError(resp.status);
+    if (resp.isFail) return buildHttpError(resp.status);
     const parsed = parseCreditBalanceResponse(resp.data);
-    const isMissingIsOk = !parsed.isOk;
-    if (isMissingIsOk) return buildParseError(parsed.reason);
+    if (!parsed.isOk) return buildParseError(parsed.reason);
     logReceived(parsed.data.total_granted, parsed.data.total_remaining, parsed.data.total_billing_period_used);
 
     return { status: CreditBalanceFetchStatusType.SUCCESS, data: parsed.data };

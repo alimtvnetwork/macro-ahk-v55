@@ -20,14 +20,13 @@ const STORAGE_KEY = 'marco.promptOrder.v2';
 const DRAG_TOUCHED_KEY = 'marco.promptOrder.dragTouched.v2';
 const LEGACY_STORAGE_KEYS = ['marco.promptOrder.v1'] as const;
 const MIGRATION_REV_KEY = 'marco.promptOrder.rev';
+const UNKNOWN_ERROR = 'Unknown error';
 /**
  * Bump this whenever DEFAULT_PROMPT_ORDER's terminal sequence or canonical
  * slug list changes materially. `runPromptOrderMigrations` will rewrite each
  * user's saved order in-place instead of purging via a fresh STORAGE_KEY.
  */
 const CURRENT_MIGRATION_REV = 5;
-
-runPromptOrderMigrations();
 
 /**
  * Upgrade any older persisted order to the current DEFAULT_PROMPT_ORDER
@@ -47,7 +46,7 @@ function runPromptOrderMigrations(): void {
     for (const key of LEGACY_STORAGE_KEYS) localStorage.removeItem(key);
     localStorage.setItem(MIGRATION_REV_KEY, String(CURRENT_MIGRATION_REV));
   } catch (err) {
-    logError('MacroController', 'Unknown error');
+    logError('PromptDragOrder', UNKNOWN_ERROR);
   }
 }
 
@@ -62,7 +61,7 @@ function readLegacyOrder(): string[] {
         return parsed.filter((v): v is string => typeof v === 'string');
       }
     } catch (err) {
-      logError('MacroController', 'Unknown error');
+      logError('PromptDragOrder', UNKNOWN_ERROR);
     }
   }
 
@@ -155,7 +154,7 @@ export function savePromptOrder(order: string[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
   } catch (err) {
-    logError('MacroController', 'Unknown error');
+    logError('PromptDragOrder', UNKNOWN_ERROR);
   }
 }
 
@@ -193,7 +192,7 @@ function saveDragTouched(set: Set<string>): void {
     if (typeof localStorage === 'undefined') return;
     localStorage.setItem(DRAG_TOUCHED_KEY, JSON.stringify([...set]));
   } catch (err) {
-    logError('MacroController', 'Unknown error');
+    logError('PromptDragOrder', UNKNOWN_ERROR);
   }
 }
 
@@ -201,7 +200,7 @@ function clearDragTouched(): void {
   try {
     if (typeof localStorage !== 'undefined') localStorage.removeItem(DRAG_TOUCHED_KEY);
   } catch (err) {
-    logError('MacroController', 'Unknown error');
+    logError('PromptDragOrder', UNKNOWN_ERROR);
   }
 }
 
@@ -230,7 +229,7 @@ export function getSlugPositionSource(slug: string): SlugPositionInfo {
       migrationRev = Number(localStorage.getItem(MIGRATION_REV_KEY) ?? '0') || 0;
     }
   } catch (err) {
-    logError('MacroController', 'Unknown error');
+    logError('PromptDragOrder', UNKNOWN_ERROR);
   }
   const effective = saved.length > 0 ? saved : DEFAULT_PROMPT_ORDER.slice();
   const index = effective.indexOf(slug);
@@ -270,7 +269,7 @@ export function getPromptOrderSource(): PromptOrderSource {
       migrationRev = Number(localStorage.getItem(MIGRATION_REV_KEY) ?? '0') || 0;
     }
   } catch (err) {
-    logError('MacroController', 'Unknown error');
+    logError('PromptDragOrder', UNKNOWN_ERROR);
   }
   const usingSaved = saved.length > 0;
 
@@ -427,4 +426,6 @@ function mergeOrder(existing: string[], domSlugs: string[], seenInDom: Set<strin
 
   return [...domSlugs, ...tail];
 }
+
+runPromptOrderMigrations();
 

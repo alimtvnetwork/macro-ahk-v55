@@ -280,7 +280,7 @@ async function executeRename(
     return executeRename(wsId, newName, newToken, { ...attempt, didAuthRecovery: true }, forceRetry);
   }
 
-  const isMissingOk = resp.isFail;
+  const isMissingOk = !resp.ok;
 
   // Other errors — handleRenameError already surfaced the structured toast;
   // throw the SAME DiagnosticError instance so the message never drifts.

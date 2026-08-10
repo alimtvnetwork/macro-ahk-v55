@@ -18,14 +18,14 @@ vi.mock('../../db/extension-bridge', () => ({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] };
     }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] };
     }),
 }));
 vi.mock('../../error-utils', async () => {
@@ -38,8 +38,8 @@ vi.mock('../../logging', () => ({ log: vi.fn() }));
 import { reseedPromptsOnDemand, installReseedCommandGlobal } from '../reseed-command';
 import { PLAN_NEXT_SEED_ROWS } from '../plan-next-prompts';
 
-const OK = (): unknown => ({ ok: true, rows: [] });
-const OK_ROW = (): unknown => ({ ok: true, rows: [{ '1': 1 }] });
+const OK = (): unknown => ({ ok: true, isFail: false, isSuccess: true, rows: [] });
+const OK_ROW = (): unknown => ({ ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] });
 
 function queueHappySeed(): void {
     // Matches seedPlanNextPrompts happy-path shape used elsewhere in tests.
@@ -84,10 +84,10 @@ describe('reseedPromptsOnDemand', () => {
         (sendToExtension as unknown as { mockImplementation: (impl: (c: string, p: { params: { sql: string } }) => Promise<unknown>) => void })
             .mockImplementation(async (_c: string, p: { params: { sql: string } }) => {
                 if (p.params.sql.startsWith('UPDATE Prompt SET Body')) {
-                    return { ok: false, errorMessage: 'disk full' };
+                    return { ok: false, isFail: true, isSuccess: false, errorMessage: 'disk full' };
                 }
 
-                return { ok: true, rows: [] };
+                return { ok: true, isFail: false, isSuccess: true, rows: [] };
             });
         const r = await reseedPromptsOnDemand({ force: true });
         expect(r.ok).toBe(false);

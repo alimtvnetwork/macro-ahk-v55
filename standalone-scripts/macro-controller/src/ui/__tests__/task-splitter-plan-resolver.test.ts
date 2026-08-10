@@ -56,7 +56,7 @@ describe('task splitter PlanTierType strip resolver', () => {
 
   it('uses the managed plan default row before the hidden prompt library', async () => {
     mocks.getDefaultPromptForRole.mockResolvedValue({
-      ok: true,
+      ok: true, isFail: false, isSuccess: true,
       value: { Body: 'DB PlanTierType {{n}} body', ReplaceKey: 'n' },
     });
 

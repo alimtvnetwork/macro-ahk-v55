@@ -307,8 +307,7 @@ describe("runJsStepWithDiagnostics", () => {
             },
         });
         expect(outcome.IsOk).toBe(false);
-        const isMissingIsOk = !outcome.IsOk;
-        if (isMissingIsOk) {
+        if (!outcome.IsOk) {
             const report = outcome.FailureReport;
             expect(report.Reason).toBe("JsThrew");
             expect(report.ReasonDetail).toMatch(/^Runtime: boom/);

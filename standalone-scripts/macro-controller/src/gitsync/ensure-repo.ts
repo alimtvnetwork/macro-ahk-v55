@@ -135,9 +135,7 @@ async function postSync(
         return { ok: false, jobId: null, httpStatus: 0, reason: 'network_error' };
     }
 
-    const isMissingOk = resp.isFail;
-
-    if (isMissingOk) {
+    if (!resp.ok) {
         const preview = JSON.stringify(resp.data).substring(0, 200);
         logError('EnsureRepo', 'postSync HTTP ' + resp.status
             + ' [ws=' + wsId + ' conn=' + connId + ' pid=' + projectId + ']'

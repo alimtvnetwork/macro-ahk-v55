@@ -111,8 +111,7 @@ export async function runPromptHealthCheck(opts: RunHealthCheckOptions = {}): Pr
     const seedSlug = PLAN_NEXT_SEED_ROWS.find(r => r.role === role && r.isDefault)?.slug ?? (role + '-default');
     try {
       const res = await getDefaultPromptForRole(role);
-      const isMissingOk = res.isFail;
-      if (isMissingOk) {
+      if (res.isFail) {
         issues.push({ role, slug: seedSlug, code: 'query-failed', detail: res.error ?? 'unknown query error' });
         continue;
       }

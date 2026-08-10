@@ -35,7 +35,7 @@ vi.mock('../ui/prompt-utils', async (importOriginal) => {
 vi.mock('../ui/prompt-loader', () => buildPromptLoaderMock({
   getPromptsConfig: () => ({ editorXPath: '//div' }),
   // v4.187.0: required by runSql; empty-rows response drives the fallback path.
-  sendToExtension: async () => ({ ok: true, rows: [] }),
+  sendToExtension: async () => ({ ok: true, isFail: false, isSuccess: true, rows: [] }),
 }));
 vi.mock('../xpath-utils', () => ({
   getByXPath: () => document.createElement('div'),

@@ -35,7 +35,7 @@ vi.mock('../ui/extension-relay', () => ({
     sendToExtension: vi.fn(async (_channel, payload) => {
         captured.push({ method: payload.method, sql: payload.params.sql });
 
-        return (typeof responsesQueue !== 'undefined' && responsesQueue.length) ? responsesQueue.shift() : (typeof nextResponse !== 'undefined' ? nextResponse : { ok: true });
+        return (typeof responsesQueue !== 'undefined' && responsesQueue.length) ? responsesQueue.shift() : (typeof nextResponse !== 'undefined' ? nextResponse : { ok: true, isFail: false, isSuccess: true });
     }),
 }));
 
@@ -192,7 +192,7 @@ describe('open-tabs-section', () => {
   });
 
   it('renders error state when extension returns isOk=false', async () => {
-    _mockSend!.mockResolvedValueOnce({ ok: false, errorMessage: 'Background busy' });
+    _mockSend!.mockResolvedValueOnce({ ok: false, isFail: true, isSuccess: false, errorMessage: 'Background busy' });
 
     const result = createOpenTabsSection();
     document.body.appendChild(result.section);

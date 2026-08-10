@@ -20,7 +20,7 @@ const mocks = vi.hoisted(() => ({
     runPromptHealthCheckWithAutoRepair: vi.fn(),
     openDefaultPromptEditor: vi.fn(async () => undefined),
     openPromptEditor: vi.fn(async () => undefined),
-    reseedPromptsOnDemand: vi.fn(async () => ({ ok: true, mode: 'idempotent' as const })),
+    reseedPromptsOnDemand: vi.fn(async () => ({ ok: true, isFail: false, isSuccess: true, mode: 'idempotent' as const })),
     showToast: vi.fn(),
     logDiagnosticFromCode: vi.fn(),
 }));
@@ -38,9 +38,6 @@ vi.mock('../prompt-editor', () => ({
 vi.mock('../prompt-history-panel', () => ({ openPromptHistoryPanel: vi.fn() }));
 vi.mock('../chip-gear-picker', () => ({ pickPromptFromRole: vi.fn() }));
 vi.mock('../../db/prompt-db', () => ({
-    DbResult,
-    DbResult,
-    DbResult,
     setDefaultPromptForRole: vi.fn(),
     deletePromptById: vi.fn(),
 }));

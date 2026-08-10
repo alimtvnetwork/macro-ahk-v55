@@ -99,8 +99,7 @@ async function hasDefaultForRole(role: PromptRole): Promise<boolean> {
     const sql = 'SELECT 1 FROM Prompt WHERE Role = ' + sqlLit(role)
         + ' AND IsDefault = 1 LIMIT 1';
     const resp = await rawSql('QUERY', sql);
-    const isMissingIsOk = resp.isFail;
-    if (isMissingIsOk) return false;
+    if (resp.isFail) return false;
 
     return Array.isArray(resp.rows) && resp.rows.length > 0;
 }
@@ -109,8 +108,7 @@ async function promoteSeedDefault(role: PromptRole, slug: string): Promise<boole
     const sql = 'UPDATE Prompt SET IsDefault = 1 WHERE Slug = '
         + sqlLit(slug) + ' AND Role = ' + sqlLit(role);
     const resp = await rawSql('SCHEMA', sql);
-    const isMissingIsOk = resp.isFail;
-    if (isMissingIsOk) {
+    if (resp.isFail) {
         const message = resp.errorMessage ?? '?';
         logDiagnosticFromCode('SEED_PROMOTE_E001', { role, slug, reason: message });
         emitPromptSeedEvent({ event: 'seed.promote-default', role, slug, outcome: 'failed', detail: message });
@@ -327,8 +325,7 @@ async function applyLegacyBodyUpgrade(
     match: UpgradeMatch,
 ): Promise<boolean> {
     const updateResp = await rawSql('SCHEMA', buildBodyUpdateSql(row));
-    const isMissingIsOk = updateResp.isFail;
-    if (isMissingIsOk) {
+    if (updateResp.isFail) {
         emitLegacyUpgradeFailure(row, match, updateResp.errorMessage ?? '?');
 
         return false;
@@ -415,8 +412,7 @@ async function writeSeedAuditRow(params: {
             sqlLit(JSON.stringify(params.telemetry)),
         ].join(', ') + ')';
     const resp = await rawSql('SCHEMA', sql);
-    const isMissingIsOk = resp.isFail;
-    if (isMissingIsOk) {
+    if (resp.isFail) {
         const message = resp.errorMessage ?? '?';
         logDiagnosticFromCode('SEED_AUDIT_E001', { reason: message });
         emitPromptSeedEvent({ event: 'seed.audit-write', outcome: 'failed', detail: message });
@@ -440,8 +436,7 @@ export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> 
         const existing = await selectExistingSlugs();
         tallyInsertCounts(existing, tel);
         const insertResp = await rawSql('SCHEMA', buildInsertOrIgnoreSql(Date.now()));
-        const isMissingIsOk = insertResp.isFail;
-        if (isMissingIsOk) {
+        if (insertResp.isFail) {
             const message = 'insert-or-ignore failed: ' + (insertResp.errorMessage ?? 'unknown');
             logDiagnosticFromCode('SEED_INSERT_E001', {
                 role: 'all', reason: message, boot: 'true', dbVersion: DB_NAME,

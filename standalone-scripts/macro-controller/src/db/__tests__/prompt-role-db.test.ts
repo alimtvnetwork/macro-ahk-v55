@@ -8,7 +8,7 @@ import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-moc
 
 interface CapturedCall { method: string; sql: string }
 const captured: CapturedCall[] = [];
-let nextResponse: Record<string, unknown> = { ok: true };
+let nextResponse: Record<string, unknown> = { ok: true, isFail: false, isSuccess: true };
 
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
@@ -34,7 +34,7 @@ vi.mock('../../logging', () => ({ log: vi.fn() }));
 import { initMacroDb } from '../macro-db';
 import { enforceSingleDefaultPerRole } from '../prompt-role-db';
 
-beforeEach(() => { captured.length = 0; nextResponse = { ok: true }; });
+beforeEach(() => { captured.length = 0; nextResponse = { ok: true, isFail: false, isSuccess: true }; });
 
 describe('Prompt table schema (step 3)', () => {
     it('initMacroDb schema string creates Prompt with Role + IsDefault + composite index', async () => {
@@ -86,7 +86,7 @@ describe('enforceSingleDefaultPerRole (step 4)', () => {
     });
 
     it('surfaces driver errors instead of swallowing them', async () => {
-        nextResponse = { ok: false, errorMessage: 'db locked' };
+        nextResponse = { ok: false, isFail: true, isSuccess: false, errorMessage: 'db locked' };
         const r = await enforceSingleDefaultPerRole('next', 3);
         expect(r.ok).toBe(false);
         expect(r.error).toMatch(/db locked/);

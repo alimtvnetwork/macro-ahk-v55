@@ -43,7 +43,7 @@ describe("handleDeletePrompt", () => {
 
     it("rejects missing prompt ids instead of returning success", async () => {
         const result = await handleDeletePrompt({ promptId: "999999" });
-        expect(result.ok).toBe(false);
+        expect(result.isOk).toBe(false);
         expect("errorMessage" in result ? result.errorMessage : "").toContain("not found");
         expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining("DB_WRITE_E004"));
     });
@@ -52,7 +52,7 @@ describe("handleDeletePrompt", () => {
         await handleSavePrompt({ prompt: { name: "Schema", text: "seed" } });
         const promptId = createDefaultPrompt();
         const result = await handleDeletePrompt({ promptId });
-        expect(result.ok).toBe(false);
+        expect(result.isOk).toBe(false);
         expect("errorMessage" in result ? result.errorMessage : "").toContain("default prompts cannot be deleted");
         expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining("DB_WRITE_E004"));
     });

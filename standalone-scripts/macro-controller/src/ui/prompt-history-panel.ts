@@ -852,8 +852,7 @@ async function handleRestoreUpdate(
             replaceKey: preImage.replaceKey,
             replaceValues: preImage.replaceValues,
         });
-        const isMissingOk = revert.isFail;
-        if (isMissingOk) {
+        if (revert.isFail) {
             const reason = revert.error ?? 'unknown';
             reportHistoryFailure(
                 'HISTORY_UNDO_E001',
@@ -890,8 +889,7 @@ function handleRestoreInsert(
     undoToast(successMsg, async () => {
         clearPendingRestoreUndo();
         const del = await deleteFn(newId);
-        const isMissingOk = del.isFail;
-        if (isMissingOk) {
+        if (del.isFail) {
             const reason = del.error ?? 'unknown';
             reportHistoryFailure(
                 'HISTORY_UNDO_E001',
@@ -953,8 +951,7 @@ async function handleRestore(
         replaceKey: rev.ReplaceKey,
         replaceValues,
     });
-    const isMissingOk = upsertResult.isFail;
-    if (isMissingOk) {
+    if (upsertResult.isFail) {
         const reason = upsertResult.error ?? 'unknown';
         reportHistoryFailure(
             'HISTORY_RESTORE_E001',
@@ -1178,13 +1175,11 @@ export function parseRevisionImportPayload(
         return new DbResult(false, undefined, 'Invalid JSON: ' + (err instanceof Error ? err.message : String(err)));
     }
     const envelope = validateImportEnvelope(parsed, expectedSlug, expectedRole);
-    const isMissingOk = envelope.isFail;
-    if (isMissingOk) return new DbResult(false, undefined, envelope.error);
+    if (envelope.isFail) return new DbResult(false, undefined, envelope.error);
     const rows: ImportedRevisionInput[] = [];
     for (let i = 0; i < envelope.revisions.length; i += 1) {
         const coerced = coerceImportRow(envelope.revisions[i], i, expectedSlug, expectedRole);
-        const isMissingOk = coerced.isFail;
-        if (isMissingOk) return new DbResult(false, undefined, coerced.error);
+        if (coerced.isFail) return new DbResult(false, undefined, coerced.error);
         rows.push(coerced.row);
     }
 
@@ -1240,16 +1235,15 @@ async function writeImportedRevisions(
 ): Promise<void> {
     const snapshotResult = await getMaxRevisionId();
     const sinceId = snapshotResult.isSuccess && typeof snapshotResult.value === 'number' ? snapshotResult.value : 0;
-    const isMissingOk = snapshotResult.isFail;
-    if (isMissingOk) {
+    if (snapshotResult.isFail) {
         logHistoryDiagnostic(
             'HISTORY_INTERNAL_E001',
             { stage: 'max-rev-id', reason: 'getMaxRevisionId failed before import: ' + (snapshotResult.error ?? '?') },
         );
     }
     const write = await insertImportedRevisions(slug, rows);
-    const isMissingOk = write.isFail;
-    if (isMissingOk) {
+    const isMissingOkWrite = write.isFail;
+    if (isMissingOkWrite) {
         const reason = write.error ?? '?';
         reportHistoryFailure(
             'HISTORY_IMPORT_E002',
@@ -1266,8 +1260,7 @@ async function writeImportedRevisions(
     if (snapshotResult.isSuccess && count > 0) {
         undoToast(successMsg, async () => {
             const del = await deleteImportedRevisionsAfter(slug, sinceId);
-            const isMissingOk = del.isFail;
-            if (isMissingOk) {
+            if (del.isFail) {
                 const reason = del.error ?? 'unknown';
                 reportHistoryFailure(
                     'HISTORY_UNDO_E001',

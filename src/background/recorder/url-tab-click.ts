@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { UrlMatchType, UrlTabClickFailureModeType, SelectorKindType, OkTabnotfoundType, PredicateEvaluationKindType, ValidationErrorReasonType } from "../../types/enums";
-import { compileUrlPattern, CompileResult } from "./url-tab-click-patterns";
+import { compileUrlPattern, CompileResult, splitForCaseFold } from "./url-tab-click-patterns";
 
 /**
  * Marco Extension — UrlTabClick Step (Spec 19 §1)

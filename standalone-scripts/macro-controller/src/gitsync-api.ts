@@ -112,8 +112,7 @@ export async function fetchGitsyncConfig(
 
     return { status: 'not_linked' };
   }
-  const isMissingOk = resp.isFail;
-  if (isMissingOk) {
+  if (resp.isFail) {
     logError('GitsyncApi', 'HTTP ' + resp.status + ' for ws=' + wsId + ' pid=' + pid
       + ' bodyPreview=' + JSON.stringify(resp.data).substring(0, 200));
 

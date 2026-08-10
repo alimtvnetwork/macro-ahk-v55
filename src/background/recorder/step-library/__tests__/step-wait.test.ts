@@ -70,8 +70,7 @@ describe("validateSelector", () => {
         } as unknown as Document;
         const r = validateSelector(":nope:nope", "Css", { doc });
         expect(r.Ok).toBe(false);
-        const isMissingOk = !r.Ok;
-        if (isMissingOk) expect(r.Reason).toContain("bad pseudo");
+        if (!r.Ok) expect(r.Reason).toContain("bad pseudo");
     });
 
     it("uses the live document for XPath errors when available", () => {
@@ -80,8 +79,7 @@ describe("validateSelector", () => {
         } as unknown as Document;
         const r = validateSelector("//bad[", "XPath", { doc });
         expect(r.Ok).toBe(false);
-        const isMissingOk = !r.Ok;
-        if (isMissingOk) expect(r.Reason).toContain("bad axis");
+        if (!r.Ok) expect(r.Reason).toContain("bad axis");
     });
 });
 
@@ -277,8 +275,7 @@ describe("waitForSelector", () => {
             pollIntervalMs: 100,
         });
         expect(r.Ok).toBe(false);
-        const isMissingOk = !r.Ok;
-        if (isMissingOk) {
+        if (!r.Ok) {
             expect(r.Reason).toBe("Timeout");
             expect(r.DurationMs).toBeGreaterThanOrEqual(1_000);
         }
@@ -290,7 +287,6 @@ describe("waitForSelector", () => {
             { doc: stubDoc, root: {} as ParentNode },
         );
         expect(r.Ok).toBe(false);
-        const isMissingOk = !r.Ok;
-        if (isMissingOk) expect(r.Reason).toBe("InvalidSelector");
+        if (!r.Ok) expect(r.Reason).toBe("InvalidSelector");
     });
 });

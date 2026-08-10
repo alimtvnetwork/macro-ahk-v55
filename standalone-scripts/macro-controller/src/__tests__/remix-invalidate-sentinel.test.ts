@@ -20,7 +20,7 @@ vi.mock('../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: async (type: string, payload: unknown) => {
         sendCalls.push({ type, payload });
 
-        return { ok: true };
+        return { ok: true, isFail: false, isSuccess: true };
     },
 }));
 vi.mock('../error-utils', () => ({ logError: () => {} }));

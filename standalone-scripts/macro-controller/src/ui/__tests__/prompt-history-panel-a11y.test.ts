@@ -30,7 +30,7 @@ async function mount(): Promise<HTMLElement> {
         { slug: 'plan-default', role: 'plan' },
         {
             listRevisions: async () => ({
-                ok: true,
+                ok: true, isFail: false, isSuccess: true,
                 value: [
                     rev({ Id: 1, CreatedAt: 100, Reason: 'upsert' }),
                     rev({ Id: 2, CreatedAt: 200, Reason: 'import' }),

@@ -13,7 +13,7 @@ export type CompileResult = CompiledPattern | CompiledPatternError;
 
 const SCHEME_HOST_RE = /^([a-z][a-z0-9+.-]*:\/\/)([^/?#]+)(.*)$/i;
 
-function splitForCaseFold(url: string): { readonly Lead: string; readonly Tail: string } {
+export function splitForCaseFold(url: string): { readonly Lead: string; readonly Tail: string } {
     const match = SCHEME_HOST_RE.exec(url);
     const isMissingMatch = !match;
     if (isMissingMatch) return { Lead: "", Tail: url };

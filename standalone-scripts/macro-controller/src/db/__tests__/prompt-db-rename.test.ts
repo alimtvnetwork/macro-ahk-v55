@@ -29,7 +29,7 @@ import { upsertPrompt } from '../prompt-db';
 beforeEach(() => {
     sendMock.mockReset();
     // Default: every rawSql call succeeds and returns lastInsertId=42.
-    sendMock.mockImplementation(async () => ({ ok: true, rows: [], lastInsertId: 42 }));
+    sendMock.mockImplementation(async () => ({ ok: true, isFail: false, isSuccess: true, rows: [], lastInsertId: 42 }));
 });
 
 describe('upsertPrompt: token rename acceptance', () => {

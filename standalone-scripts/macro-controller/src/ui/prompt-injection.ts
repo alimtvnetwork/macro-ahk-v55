@@ -594,8 +594,7 @@ export function saveRoleScopedPrompt(input: PromptSaveInput, role: PromptRole): 
   // Extended to `next` in v4.183.0 to close the asymmetric-validator gap.
   if (role === 'plan' || role === 'next') {
     const check = validateRuleZero(input.text);
-    const isMissingOk = !check.ok;
-    if (isMissingOk) {
+    if (!check.ok) {
       const slug = buildSlug(role, input.name, input.editPrompt);
       logDiagnosticFromCode(
         'PROMPT_VALIDATE_E001',
@@ -741,8 +740,7 @@ function _buildPromptModalFooter(
       const current = contentArea.value;
       if (current.trim().length > 0 && current !== seedBody) {
         const ok = window.confirm('Reset the prompt body to the shipped default? Unsaved edits in this editor will be discarded (existing DB row is untouched until you click Save).');
-        const isMissingOk = !ok;
-        if (isMissingOk) return;
+        if (!ok) return;
       }
       contentArea.value = seedBody;
       contentArea.dispatchEvent(new Event('input', { bubbles: true }));
@@ -933,8 +931,7 @@ function _buildPromptModalFooter(
         if (previousId !== undefined) undoPayload.id = previousId;
 
         return upsertPrompt(undoPayload).then(function(r) {
-          const isMissingOk = !r.ok;
-          if (isMissingOk) {
+          if (!r.ok) {
             showPasteToast('❌ Undo failed: ' + (r.error ?? 'upsert failed'), true);
             logDiagnosticFromCode(
               'PROMPT_UNDO_E001',
@@ -1062,8 +1059,7 @@ function _buildRequiredTokenStrip(requiredTokens: string[]): {
       chip.style.background = ok ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)';
       chip.style.borderColor = ok ? 'rgba(34,197,94,0.6)' : 'rgba(239,68,68,0.7)';
       chip.style.color = ok ? '#86efac' : '#fca5a5';
-      const isMissingOk = !ok;
-      if (isMissingOk) missing.push(token);
+      if (!ok) missing.push(token);
     }
 
     return missing;

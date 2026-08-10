@@ -65,22 +65,19 @@ describe("parseCsv, failures", () => {
     it("fails on duplicate headers", () => {
         const r = parseCsv("A,A\n1,2");
         expect(r.Ok).toBe(false);
-        const isMissingOk = !r.Ok;
-        if (isMissingOk) expect(r.Reason).toMatch(/Duplicate column/);
+        if (!r.Ok) expect(r.Reason).toMatch(/Duplicate column/);
     });
 
     it("fails on empty header cell", () => {
         const r = parseCsv("A,,B\n1,2,3");
         expect(r.Ok).toBe(false);
-        const isMissingOk = !r.Ok;
-        if (isMissingOk) expect(r.Reason).toMatch(/empty column name/);
+        if (!r.Ok) expect(r.Reason).toMatch(/empty column name/);
     });
 
     it("fails on unterminated quote with line number", () => {
         const r = parseCsv(`A,B\n"oops,2`);
         expect(r.Ok).toBe(false);
-        const isMissingOk = !r.Ok;
-        if (isMissingOk) expect(r.Reason).toMatch(/Unterminated/);
+        if (!r.Ok) expect(r.Reason).toMatch(/Unterminated/);
     });
 
     it("rejects files over 5 MB", () => {
@@ -89,8 +86,7 @@ describe("parseCsv, failures", () => {
         if (big.length > MAX_BYTES) {
             const r = parseCsv(big);
             expect(r.Ok).toBe(false);
-            const isMissingOk = !r.Ok;
-            if (isMissingOk) expect(r.Reason).toMatch(/in-memory limit/);
+            if (!r.Ok) expect(r.Reason).toMatch(/in-memory limit/);
         }
     });
 
@@ -99,8 +95,7 @@ describe("parseCsv, failures", () => {
         for (let i = 0; i < MAX_ROWS + 5; i++) lines.push(`${i},x`);
         const r = parseCsv(lines.join("\n"));
         expect(r.Ok).toBe(false);
-        const isMissingOk = !r.Ok;
-        if (isMissingOk) expect(r.Reason).toMatch(/limit is 10000/);
+        if (!r.Ok) expect(r.Reason).toMatch(/limit is 10000/);
     });
 });
 

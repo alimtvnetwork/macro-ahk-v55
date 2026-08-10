@@ -80,8 +80,7 @@ export async function handleEditSave(refs: ModalRefs, row: PromptRow, payload: E
       replaceKey: payload.replaceKey,
       replaceValues: payload.replaceValues,
     });
-    const isMissingOk = res.isFail;
-    if (isMissingOk) {
+    if (res.isFail) {
       refs.status.textContent = 'Save failed: ' + (res.error ?? 'unknown');
       logError(LOG_SCOPE, 'edit save failed', res);
 

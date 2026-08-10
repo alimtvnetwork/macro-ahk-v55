@@ -16,7 +16,7 @@ import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-moc
 
 interface CapturedCall { method: string; sql: string }
 const captured: CapturedCall[] = [];
-let nextResponse: Record<string, unknown> = { ok: true, rows: [], lastInsertId: 42 };
+let nextResponse: Record<string, unknown> = { ok: true, isFail: false, isSuccess: true, rows: [], lastInsertId: 42 };
 
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
@@ -43,7 +43,7 @@ import { upsertPrompt } from '../prompt-db';
 
 beforeEach(() => {
     captured.length = 0;
-    nextResponse = { ok: true, rows: [], lastInsertId: 42 };
+    nextResponse = { ok: true, isFail: false, isSuccess: true, rows: [], lastInsertId: 42 };
 });
 
 describe('upsertPrompt token-guard integration (PlanTierType 22 gap #4)', () => {

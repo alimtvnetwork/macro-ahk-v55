@@ -58,7 +58,7 @@ beforeEach(() => {
 
 describe('disconnectGithubRepo', () => {
     it('issues DELETE /sync and invalidates cache on 200', async () => {
-        installSdkMock(() => ({ ok: true, status: 200, data: {} }));
+        installSdkMock(() => ({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }));
         const { disconnectGithubRepo } = await import('../gitsync/disconnect-repo');
         const out = await disconnectGithubRepo('ws-1', 'pid-1');
         expect(out).toEqual({ status: 'ok' });
@@ -67,7 +67,7 @@ describe('disconnectGithubRepo', () => {
     });
 
     it('returns not_linked + invalidates on 404', async () => {
-        installSdkMock(() => ({ ok: false, status: 404, data: {} }));
+        installSdkMock(() => ({ ok: false, isFail: true, isSuccess: false, status: 404, data: {} }));
         const { disconnectGithubRepo } = await import('../gitsync/disconnect-repo');
         const out = await disconnectGithubRepo('ws-2', 'pid-2');
         expect(out).toEqual({ status: 'not_linked' });
@@ -75,7 +75,7 @@ describe('disconnectGithubRepo', () => {
     });
 
     it('returns error and does NOT invalidate on 500', async () => {
-        installSdkMock(() => ({ ok: false, status: 500, data: { error: 'boom' } }));
+        installSdkMock(() => ({ ok: false, isFail: true, isSuccess: false, status: 500, data: { error: 'boom' } }));
         const { disconnectGithubRepo } = await import('../gitsync/disconnect-repo');
         const out = await disconnectGithubRepo('ws-3', 'pid-3');
         expect(out.status).toBe('error');
@@ -84,7 +84,7 @@ describe('disconnectGithubRepo', () => {
     });
 
     it('returns error on missing ids without calling SDK', async () => {
-        installSdkMock(() => ({ ok: true, status: 200, data: {} }));
+        installSdkMock(() => ({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }));
         const { disconnectGithubRepo } = await import('../gitsync/disconnect-repo');
         const out = await disconnectGithubRepo('', 'pid');
         expect(out.status).toBe('error');
@@ -95,14 +95,14 @@ describe('disconnectGithubRepo', () => {
         let calls = 0;
         installSdkMock(() => { calls++;
 
- return { ok: false, status: 502, data: {} }; });
+ return { ok: false, isFail: true, isSuccess: false, status: 502, data: {} }; });
         const { disconnectGithubRepo } = await import('../gitsync/disconnect-repo');
         await disconnectGithubRepo('ws-4', 'pid-4');
         expect(calls).toBe(1);
     });
 
     it('confirmAndDisconnectGithubRepo: cancelled when user declines', async () => {
-        installSdkMock(() => ({ ok: true, status: 200, data: {} }));
+        installSdkMock(() => ({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }));
         const { confirmAndDisconnectGithubRepo } = await import('../gitsync/disconnect-repo');
         const out = await confirmAndDisconnectGithubRepo('ws-5', 'pid-5', () => false);
         expect(out).toEqual({ status: 'cancelled' });
@@ -111,7 +111,7 @@ describe('disconnectGithubRepo', () => {
     });
 
     it('confirmAndDisconnectGithubRepo: proceeds when user confirms', async () => {
-        installSdkMock(() => ({ ok: true, status: 200, data: {} }));
+        installSdkMock(() => ({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }));
         const { confirmAndDisconnectGithubRepo } = await import('../gitsync/disconnect-repo');
         const out = await confirmAndDisconnectGithubRepo('ws-6', 'pid-6', () => true);
         expect(out).toEqual({ status: 'ok' });

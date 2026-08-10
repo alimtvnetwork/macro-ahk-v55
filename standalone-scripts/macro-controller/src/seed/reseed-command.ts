@@ -69,8 +69,7 @@ async function forceResetDefaultBodies(): Promise<{ forced: number; error?: stri
       + ', UpdatedAt = ' + String(now)
       + ' WHERE Slug = ' + sqlLit(row.slug);
     const resp = await rawSql('SCHEMA', updateSql);
-    const isMissingIsOk = resp.isFail;
-    if (isMissingIsOk) {
+    if (resp.isFail) {
       const message = 'force update failed for ' + row.slug + ': ' + (resp.errorMessage ?? '?');
       logError('ReseedCommand', message);
       emitPromptSeedEvent({
@@ -102,8 +101,7 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
     // Always run the normal seeder first so missing rows are inserted and
     // legacy bodies get their non-destructive checksum upgrade.
     const seedResult = await seedPlanNextPrompts();
-    const isMissingOk = seedResult.isFail;
-    if (isMissingOk) {
+    if (seedResult.isFail) {
       emitPromptSeedEvent({
         event: EV_RESEED_COMPLETE, outcome: 'failed',
         detail: 'seedPlanNextPrompts: ' + (seedResult.error ?? '?'),

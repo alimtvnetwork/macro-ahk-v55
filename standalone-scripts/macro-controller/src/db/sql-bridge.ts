@@ -154,11 +154,11 @@ function classify(legacy: LegacyMethod, sql: string): Bucket {
 async function sendOnce(method: string, sql: string, project: string): Promise<SqlBridgeResp> {
     const raw = await sendToExtension('PROJECT_API', {
         project, method, endpoint: 'rawSql', params: { sql },
-    }) as any;
+    }) as Record<string, unknown>;
 
-    const obj = raw ?? { ok: false, errorMessage: 'no response' };
+    const res = raw ?? { ok: false, errorMessage: 'no response' };
 
-    return new SqlBridgeResp(obj.ok, obj.rows, obj.errorMessage, obj.lastInsertId);
+    return new SqlBridgeResp(Boolean(res.ok), res.rows as unknown[] | undefined, res.errorMessage as string | undefined, res.lastInsertId as number | undefined);
 }
 
 /**
@@ -192,12 +192,11 @@ export async function runSql(legacy: LegacyMethod, sql: string, project: string 
         lastResp = resp;
     }
 
-    return {
-        ok: false,
-        errorMessage:
-            'sql-bridge: no accepted method for ' + bucket
-            + ' (last: ' + (lastResp.errorMessage ?? 'unknown') + ')',
-    };
+    return new SqlBridgeResp(
+        false,
+        undefined,
+        'sql-bridge: no accepted method for ' + bucket + ' (last: ' + (lastResp.errorMessage ?? 'unknown') + ')'
+    );
 }
 
 /**

@@ -59,7 +59,7 @@ beforeEach(() => {
 describe('ensureGithubRepo', () => {
     it('returns connected without POSTing /sync when probe finds repo_url', async () => {
         installSdkMock(() => ({
-            ok: true,
+            ok: true, isFail: false, isSuccess: true,
             status: 200,
             data: { status: 'completed', result: { repo_url: 'https://github.com/x/y' } },
         }));
@@ -79,16 +79,16 @@ describe('ensureGithubRepo', () => {
             if (path === 'gitsync.progress' && phase === 0) {
                 phase = 1;
 
-                return { ok: false, status: 404, data: {} };
+                return { ok: false, isFail: true, isSuccess: false, status: 404, data: {} };
             }
             if (path === 'gitsync.syncProject') {
                 phase = 2;
 
-                return { ok: true, status: 200, data: { job_id: 'job-X' } };
+                return { ok: true, isFail: false, isSuccess: true, status: 200, data: { job_id: 'job-X' } };
             }
 
             return {
-                ok: true,
+                ok: true, isFail: false, isSuccess: true,
                 status: 200,
                 data: { status: 'completed', result: { repo_url: 'https://github.com/a/b' } },
             };
@@ -105,9 +105,9 @@ describe('ensureGithubRepo', () => {
 
     it('persists error when POST /sync fails (no retry)', async () => {
         installSdkMock((path) => {
-            if (path === 'gitsync.progress') return { ok: false, status: 404, data: {} };
+            if (path === 'gitsync.progress') return { ok: false, isFail: true, isSuccess: false, status: 404, data: {} };
 
-            return { ok: false, status: 500, data: { error: 'boom' } };
+            return { ok: false, isFail: true, isSuccess: false, status: 500, data: { error: 'boom' } };
         });
         const { ensureGithubRepo } = await import('../gitsync/ensure-repo');
         const out = await ensureGithubRepo('ws3', 'conn3', 'proj3');
@@ -118,7 +118,7 @@ describe('ensureGithubRepo', () => {
 
     it('forceRefresh invalidates cache before probing', async () => {
         installSdkMock(() => ({
-            ok: true,
+            ok: true, isFail: false, isSuccess: true,
             status: 200,
             data: { status: 'completed', result: { repo_url: 'https://github.com/q/r' } },
         }));
@@ -128,7 +128,7 @@ describe('ensureGithubRepo', () => {
     });
 
     it('rejects missing args', async () => {
-        installSdkMock(() => ({ ok: true, status: 200, data: {} }));
+        installSdkMock(() => ({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }));
         const { ensureGithubRepo } = await import('../gitsync/ensure-repo');
         const out = await ensureGithubRepo('', 'c', 'p');
         expect(out).toEqual({ status: 'failed', reason: 'missing_args' });

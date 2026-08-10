@@ -122,8 +122,7 @@ describe("Spec 19 §2.4, Appearance-Wait AC suite", () => {
             { Doc: document },
         );
         expect(outcome.Ok).toBe(false);
-        const isMissingOk = !outcome.Ok;
-        if (isMissingOk) {
+        if (!outcome.Ok) {
             // The unified primitive still surfaces a timeout, legacy callers
             // see the same "Timeout" reason they always have.
             expect(outcome.Reason).toBe("Timeout");

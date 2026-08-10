@@ -25,7 +25,7 @@ import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-moc
 
 interface CapturedCall { method: string; sql: string }
 const captured: CapturedCall[] = [];
-let nextResponse: Record<string, unknown> = { ok: true, rows: [] };
+let nextResponse: Record<string, unknown> = { ok: true, isFail: false, isSuccess: true, rows: [] };
 
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
@@ -59,7 +59,7 @@ import { enforceSingleDefaultPerRole } from '../prompt-role-db';
 
 beforeEach(() => {
     captured.length = 0;
-    nextResponse = { ok: true, rows: [] };
+    nextResponse = { ok: true, isFail: false, isSuccess: true, rows: [] };
 });
 
 /** Values that must all be rejected as invalid roles. Includes SQL-injection

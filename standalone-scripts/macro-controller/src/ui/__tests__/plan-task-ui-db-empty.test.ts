@@ -8,7 +8,7 @@ import { DbResult } from '../../db/db-result';
  * and returns `buildPlanTaskPrompt(n)`, so the chip never dies silently.
  *
  * These tests lock BOTH negative branches:
- *   1. DB reachable, `getDefaultPromptForRole('plan')` -> `{ok:true, value:undefined}`
+ *   1. DB reachable, `getDefaultPromptForRole('plan')` -> `{ok:true, isFail: false, isSuccess: true, value:undefined}`
  *      -> console.warn fires, hardcoded fallback pasted, NO error toast.
  *   2. DB throws -> `logError('PlanTask', 'resolvePlanBody DB read failed;
  *      falling back to hardcoded template', err)` fires, hardcoded fallback

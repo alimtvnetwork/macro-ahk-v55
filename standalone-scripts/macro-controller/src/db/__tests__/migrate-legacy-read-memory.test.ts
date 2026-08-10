@@ -19,7 +19,7 @@ vi.mock('../extension-bridge', () => ({
     sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
         captured.push({ method: payload.method, sql: payload.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true };
+        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true };
     }),
 }));
 vi.mock('../../ui/prompt-cache', () => ({
@@ -42,7 +42,7 @@ beforeEach(() => {
 
 describe('migrateRemoveLegacyReadMemoryDuplicates', () => {
     it('is a no-op when no legacy rows exist', async () => {
-        responsesQueue = [{ ok: true, rows: [{ c: 0 }] }];
+        responsesQueue = [{ ok: true, isFail: false, isSuccess: true, rows: [{ c: 0 }] }];
         await migrateRemoveLegacyReadMemoryDuplicates();
         expect(captured).toHaveLength(1);
         expect(captured[0]?.method).toBe('QUERY');
@@ -51,8 +51,8 @@ describe('migrateRemoveLegacyReadMemoryDuplicates', () => {
 
     it('deletes legacy Prompt + PromptRevision rows and clears cache', async () => {
         responsesQueue = [
-            { ok: true, rows: [{ c: 2 }] },
-            { ok: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ c: 2 }] },
+            { ok: true, isFail: false, isSuccess: true },
         ];
         await migrateRemoveLegacyReadMemoryDuplicates();
         expect(captured).toHaveLength(2);
@@ -70,7 +70,7 @@ describe('migrateRemoveLegacyReadMemoryDuplicates', () => {
     });
 
     it('does not throw when the count query fails', async () => {
-        responsesQueue = [{ ok: false, errorMessage: 'boom' }];
+        responsesQueue = [{ ok: false, isFail: true, isSuccess: false, errorMessage: 'boom' }];
         await expect(migrateRemoveLegacyReadMemoryDuplicates()).resolves.toBeUndefined();
     });
 });

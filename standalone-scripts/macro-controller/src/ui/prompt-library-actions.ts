@@ -15,8 +15,7 @@ export async function handleSetDefault(
   refs.status.textContent = 'Setting default...';
   try {
     const ok = await setDefaultPromptForRole(row.Id, row.Role);
-    const isMissingOk = !ok;
-    if (isMissingOk) {
+    if (!ok) {
       refs.status.textContent = 'Failed to set default.';
 
       return;
@@ -40,13 +39,11 @@ export async function handleDelete(
     return;
   }
   const ok = window.confirm('Delete prompt "' + row.Name + '"?');
-  const isMissingOk = !ok;
-  if (isMissingOk) return;
+  if (!ok) return;
   refs.status.textContent = 'Deleting...';
   try {
     const res = await deletePromptById(row.Id);
-    const isMissingOk = res.isFail;
-    if (isMissingOk) {
+    if (res.isFail) {
       const reason = res.error ?? 'unknown';
       const msgText = 'Cannot delete "' + row.Name + '": ' + reason;
       refs.status.textContent = 'Delete blocked: ' + reason;
@@ -105,8 +102,7 @@ export async function handleDuplicate(
       body: row.Body,
       role: row.Role,
     });
-    const isMissingOk = result.isFail;
-    if (isMissingOk) {
+    if (result.isFail) {
       refs.status.textContent = 'Failed to duplicate: ' + (result.error ?? 'unknown');
 
       return;
@@ -137,8 +133,7 @@ export async function handleResetToDefault(
     return;
   }
   const ok = window.confirm('Reset "' + row.Name + '" (' + row.Slug + ') to its shipped default body?\n\nThis discards the current edits to the body.');
-  const isMissingOk = !ok;
-  if (isMissingOk) return;
+  if (!ok) return;
   refs.status.textContent = 'Resetting to default: ' + row.Slug + ' ...';
   try {
     const result = await upsertPrompt({
@@ -147,8 +142,7 @@ export async function handleResetToDefault(
       replaceKey: row.ReplaceKey, replaceValues: row.ReplaceValues,
       previousBody: row.Body, previousReplaceKey: row.ReplaceKey,
     });
-    const isMissingOk = result.isFail;
-    if (isMissingOk) {
+    if (result.isFail) {
       logError(LOG_SCOPE, 'reset-to-default upsertPrompt failed for slug=' + row.Slug, new Error(result.error ?? 'unknown'));
       refs.status.textContent = 'Reset failed: ' + (result.error ?? 'unknown error');
       showToast('❌ Reset failed for ' + row.Slug, TOAST_ERROR);

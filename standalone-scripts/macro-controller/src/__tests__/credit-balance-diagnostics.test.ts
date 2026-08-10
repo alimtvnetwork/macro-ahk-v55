@@ -91,7 +91,7 @@ beforeEach(() => {
 
 describe('credit-balance diagnostic toasts', () => {
   it('CREDIT_BALANCE_E001 fires on workspace-resolve HTTP failure', async () => {
-    stubMarco({ ok: false, status: 500, data: null }, { ok: true, status: 200, data: {} });
+    stubMarco({ ok: false, isFail: true, isSuccess: false, status: 500, data: null }, { ok: true, isFail: false, isSuccess: true, status: 200, data: {} });
     const mod = await loadModule();
     mod.clearResolvedWorkspace();
 
@@ -102,7 +102,7 @@ describe('credit-balance diagnostic toasts', () => {
   });
 
   it('CREDIT_BALANCE_E002 fires when workspace payload is missing id', async () => {
-    stubMarco({ ok: true, status: 200, data: { workspace: {} } }, { ok: true, status: 200, data: {} });
+    stubMarco({ ok: true, isFail: false, isSuccess: true, status: 200, data: { workspace: {} } }, { ok: true, isFail: false, isSuccess: true, status: 200, data: {} });
     const mod = await loadModule();
     mod.clearResolvedWorkspace();
 
@@ -116,7 +116,7 @@ describe('credit-balance diagnostic toasts', () => {
     testWin.marco = {
       api: {
         workspace: { resolveByProject: vi.fn(async () => { throw new Error('boom'); }) },
-        credits: { fetchBalance: vi.fn(async () => ({ ok: true, status: 200, data: {} })) },
+        credits: { fetchBalance: vi.fn(async () => ({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} })) },
       },
     };
     const mod = await loadModule();
@@ -130,7 +130,7 @@ describe('credit-balance diagnostic toasts', () => {
 
   it('CREDIT_BALANCE_E004 fires when auth recovery fails on 401', async () => {
     recoverAuthOnceSpy.mockResolvedValueOnce(null);
-    stubMarco({ ok: true, status: 200, data: { workspace: { id: 'ws_1', name: 'W' } } }, { ok: false, status: 401, data: null });
+    stubMarco({ ok: true, isFail: false, isSuccess: true, status: 200, data: { workspace: { id: 'ws_1', name: 'W' } } }, { ok: false, isFail: true, isSuccess: false, status: 401, data: null });
     const mod = await loadModule();
 
     const result = await mod.fetchCreditBalance('ws_1');
@@ -140,7 +140,7 @@ describe('credit-balance diagnostic toasts', () => {
   });
 
   it('CREDIT_BALANCE_E005 fires on non-auth HTTP failure', async () => {
-    stubMarco({ ok: true, status: 200, data: { workspace: { id: 'ws_1', name: 'W' } } }, { ok: false, status: 500, data: null });
+    stubMarco({ ok: true, isFail: false, isSuccess: true, status: 200, data: { workspace: { id: 'ws_1', name: 'W' } } }, { ok: false, isFail: true, isSuccess: false, status: 500, data: null });
     const mod = await loadModule();
 
     const result = await mod.fetchCreditBalance('ws_1');
@@ -150,7 +150,7 @@ describe('credit-balance diagnostic toasts', () => {
   });
 
   it('CREDIT_BALANCE_E006 fires when daily_remaining is missing', async () => {
-    stubMarco({ ok: true, status: 200, data: { workspace: { id: 'ws_1' } } }, { ok: true, status: 200, data: { total_remaining: 1 } });
+    stubMarco({ ok: true, isFail: false, isSuccess: true, status: 200, data: { workspace: { id: 'ws_1' } } }, { ok: true, isFail: false, isSuccess: true, status: 200, data: { total_remaining: 1 } });
     const mod = await loadModule();
 
     const result = await mod.fetchCreditBalance('ws_1');
@@ -162,7 +162,7 @@ describe('credit-balance diagnostic toasts', () => {
   it('CREDIT_BALANCE_E007 fires on network error', async () => {
     testWin.marco = {
       api: {
-        workspace: { resolveByProject: vi.fn(async () => ({ ok: true, status: 200, data: { workspace: { id: 'ws_1' } } })) },
+        workspace: { resolveByProject: vi.fn(async () => ({ ok: true, isFail: false, isSuccess: true, status: 200, data: { workspace: { id: 'ws_1' } } })) },
         credits: { fetchBalance: vi.fn(async () => { throw new Error('offline'); }) },
       },
     };
@@ -176,8 +176,8 @@ describe('credit-balance diagnostic toasts', () => {
 
   it('CREDIT_BALANCE_E008 fires with warn severity on low-balance move', async () => {
     stubMarco(
-      { ok: true, status: 200, data: { workspace: { id: 'ws_1' } } },
-      { ok: true, status: 200, data: { daily_remaining: 0, daily_limit: 5, total_remaining: 0 } },
+      { ok: true, isFail: false, isSuccess: true, status: 200, data: { workspace: { id: 'ws_1' } } },
+      { ok: true, isFail: false, isSuccess: true, status: 200, data: { daily_remaining: 0, daily_limit: 5, total_remaining: 0 } },
     );
     const mod = await loadModule();
 

@@ -51,7 +51,7 @@ describe('resolveConfiguredChipValues', () => {
 
     it('returns fallback when DB row still holds the seed default set (never trample legacy ramps)', async () => {
         getDefaultMock.mockResolvedValueOnce({
-            ok: true,
+            ok: true, isFail: false, isSuccess: true,
             value: { ReplaceValues: REPLACE_VALUES_DEFAULT_JSON },
         });
         expect(await resolveConfiguredChipValues('plan', fallback)).toEqual(fallback);
@@ -59,7 +59,7 @@ describe('resolveConfiguredChipValues', () => {
 
     it('returns DB values when user customised the list', async () => {
         getDefaultMock.mockResolvedValueOnce({
-            ok: true,
+            ok: true, isFail: false, isSuccess: true,
             value: { ReplaceValues: JSON.stringify(['3', '7', '11']) },
         });
         expect(await resolveConfiguredChipValues('plan', fallback)).toEqual([3, 7, 11]);
@@ -67,7 +67,7 @@ describe('resolveConfiguredChipValues', () => {
 
     it('returns fallback when customised list has no numeric entries', async () => {
         getDefaultMock.mockResolvedValueOnce({
-            ok: true,
+            ok: true, isFail: false, isSuccess: true,
             value: { ReplaceValues: JSON.stringify(['a', 'b']) },
         });
         expect(await resolveConfiguredChipValues('generic', fallback)).toEqual(fallback);

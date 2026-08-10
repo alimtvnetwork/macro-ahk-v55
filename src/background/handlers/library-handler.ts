@@ -13,7 +13,7 @@ import { computeContentHash } from "./library-content-hasher";
 import { bumpMinor } from "./library-version-manager";
 import { collectTypedRows, type JsonValue } from "./handler-types";
 import { bindOpt, missingFieldError, requireField, type HandlerErrorResponse } from "./handler-guards";
-import { logBgWarnError, logSampledDebug, BgLogTag } from "../utils/logger";
+import { logBgWarnError, logSampledDebug, BgLogTag } from "../bg-logger";
 import { AssetType, ActionType } from "../../types/enums";
 import { LinkStateType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 import { logBgError } from "@/background/bg-logger";

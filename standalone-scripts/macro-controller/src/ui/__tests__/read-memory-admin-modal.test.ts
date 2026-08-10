@@ -21,7 +21,7 @@ vi.mock('../extension-relay', () => ({
     sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
         captured.push({ method: payload.method, sql: payload.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true };
+        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true };
     }),
 }));
 vi.mock('../prompt-cache', () => ({ clearPromptCache: clearPromptCacheSpy }));
@@ -47,7 +47,7 @@ beforeEach(() => {
 });
 
 function queueRows(rows: unknown[]): void {
-    responsesQueue.push({ ok: true, rows });
+    responsesQueue.push({ ok: true, isFail: false, isSuccess: true, rows });
 }
 
 describe('openReadMemoryAdminModal', () => {
@@ -77,7 +77,7 @@ describe('openReadMemoryAdminModal', () => {
 
     it('deactivating a row issues UPDATE with [duplicate] prefix and clears cache', async () => {
         queueRows([{ Id: 42, Slug: 'read-memory-legacy', Name: 'Read Memory Legacy', IsDefault: 1 }]);
-        responsesQueue.push({ ok: true });
+        responsesQueue.push({ ok: true, isFail: false, isSuccess: true });
         queueRows([{ Id: 42, Slug: 'read-memory-legacy', Name: READ_MEMORY_ADMIN_DUPLICATE_PREFIX_FOR_TEST + 'Read Memory Legacy', IsDefault: 0 }]);
         await openReadMemoryAdminModal();
         const activeBtn = document.querySelector<HTMLButtonElement>('button:not([disabled])');

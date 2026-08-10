@@ -311,8 +311,7 @@ async function sendSplitterPromptAndQueue(text: string, expectedN: number): Prom
   const prompt = getSplitterPrompt({ rawInstruction: text, n: expectedN });
   log('TaskSplitter: sending split JSON prompt (' + prompt.length + ' chars, n=' + expectedN + ')', 'info');
   const ok = await pasteAndSubmit(prompt);
-  const isMissingOk = !ok;
-  if (isMissingOk) { showPasteToast('❌ Task Splitter: paste/submit failed', true);
+  if (!ok) { showPasteToast('❌ Task Splitter: paste/submit failed', true);
 
  return; }
   showPasteToast('✂ Task Splitter: split sent — waiting for JSON reply', false);
@@ -370,8 +369,7 @@ async function sendOneStep(): Promise<boolean> {
     return false;
   }
   const ok = await pasteAndSubmit(perText);
-  const isMissingOk = !ok;
-  if (isMissingOk) { showPasteToast('❌ Task Splitter: paste/submit failed', true);
+  if (!ok) { showPasteToast('❌ Task Splitter: paste/submit failed', true);
 
  return false; }
   state.completed++;
@@ -397,8 +395,7 @@ async function runAuto(): Promise<void> {
   try {
     while (state.completed < state.stepCount && !state.cancelled) {
       const ok = await sendOneStep();
-      const isMissingOk = !ok;
-      if (isMissingOk) break;
+      if (!ok) break;
       if (state.completed >= state.stepCount) break;
       // Wait for Lovable to finish, then fixed delay
       await waitForCompletion(MAX_WAIT_MS);

@@ -279,7 +279,7 @@ describe("recorder-capture-handler, batch protocol", () => {
                 AnchorXPath: null,
             },
         } as never);
-        expect(res.ok).toBe(true);
+        expect(res.isOk).toBe(true);
         expect((insertStep as ReturnType<typeof vi.fn>).mock.calls[0][0]).toBe(
             "proj-1",
         );

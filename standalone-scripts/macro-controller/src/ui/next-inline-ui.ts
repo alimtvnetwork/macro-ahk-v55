@@ -15,7 +15,7 @@ import { ServiceResult } from '../utils/result-wrapper';
  */
 
 import { log } from '../logger';
-import { logError, logError } from '../error-utils';
+import { logError } from '../error-utils';
 import { showPasteToast, pasteIntoEditor, findPasteTarget } from './prompt-utils';
 import { DEFAULT_PROMPTS, getPromptsConfig } from './prompt-manager';
 import { getByXPath } from '../xpath-utils';

@@ -327,8 +327,7 @@ function handleResponse(
         return buildErrorResult({ url: config.Url, status: res.status, error: `HTTP ${res.status} ${res.statusText}`, durationMs, continueOnFail });
     }
     const parsed = parseResponseBag(text);
-    const isMissingOk = !parsed.Ok;
-    if (isMissingOk) {
+    if (!parsed.Ok) {
         return buildErrorResult({ url: config.Url, status: res.status, error: parsed.Reason, durationMs, continueOnFail });
     }
 

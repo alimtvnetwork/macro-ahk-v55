@@ -98,7 +98,9 @@ describe('inline strip decoupling (plan 09)', () => {
     const promptDb = await import('../db/prompt-db');
     const spy = vi.mocked(promptDb.getDefaultPromptForRole);
     spy.mockResolvedValueOnce({
-      ok: true,
+      ok: true, isFail: false, isSuccess: true,
+      isSuccess: true,
+      isFail: false,
       value: { Id: 1, Slug: 'next-default', Name: 'Next (default)', Body: 'DB-NEXT for N={{n}} end', Role: 'next', IsDefault: 1, CreatedAt: 0, UpdatedAt: 0 },
     } as never);
     await stageNextPrompt(deps, 7);

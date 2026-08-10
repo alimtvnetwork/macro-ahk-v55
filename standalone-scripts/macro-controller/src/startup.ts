@@ -141,8 +141,7 @@ function initializeMacroDbAndCapture(): void {
     installReseedCommandGlobal();
     try {
       const result = await seedPlanNextPrompts();
-      const isMissingOk = result.isFail;
-      if (isMissingOk) {
+      if (result.isFail) {
         logError('Startup', 'first-run prompt seed failed: ' + (result.error || 'Unknown'));
       }
     } catch (err: unknown) {

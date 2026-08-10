@@ -56,8 +56,7 @@ async function enrichOne(ws: WorkspaceCredit): Promise<boolean> {
     try {
         const typed = adaptWorkspaceInfoTyped(ws.rawApi || {});
         const outcome = await buildProZeroCreditSummary(typed);
-        const isMissingIsOk = !outcome.isOk;
-        if (isMissingIsOk) return false;
+        if (!outcome.isOk) return false;
         applySummaryToRow(ws, outcome.summary, JSON.stringify(outcome.balance, null, 2));
 
         return true;

@@ -253,9 +253,7 @@ async function doFetchWorkspacesForMove(
     return;
   }
 
-  const isMissingOk = resp.isFail;
-
-  if (isMissingOk) {
+  if (resp.isFail) {
     throwDiagnostic('WS_CONTEXT_ADJACENT_E001', { status: resp.status, op: 'fetchWorkspaces' });
   }
 

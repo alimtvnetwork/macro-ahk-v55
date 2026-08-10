@@ -20,7 +20,7 @@ import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-moc
 interface CapturedCall { method: string; sql: string }
 const captured: CapturedCall[] = [];
 let responsesQueue: Record<string, unknown>[] | null = null;
-let nextResponse: Record<string, unknown> = { ok: true, rows: [] };
+let nextResponse: Record<string, unknown> = { ok: true, isFail: false, isSuccess: true, rows: [] };
 
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_channel: string, payload: { method: string; params: { sql: string } }) => {
@@ -50,7 +50,7 @@ import { upsertPrompt, deletePromptById } from '../prompt-db';
 beforeEach(() => {
     captured.length = 0;
     responsesQueue = null;
-    nextResponse = { ok: true, rows: [] };
+    nextResponse = { ok: true, isFail: false, isSuccess: true, rows: [] };
 });
 
 describe('prompt-db negative branches (PlanTierType 22 gap #1 + #3)', () => {
@@ -86,9 +86,9 @@ describe('prompt-db negative branches (PlanTierType 22 gap #1 + #3)', () => {
     it('N4: deletePromptById refuses to remove the last row for a role', async () => {
         responsesQueue = [
             // readPromptRow(id)
-            { ok: true, rows: [{ Id: 7, Slug: 's', Name: 'n', Body: 'b', Role: 'plan', IsDefault: 1, CreatedAt: 1, UpdatedAt: 2 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Id: 7, Slug: 's', Name: 'n', Body: 'b', Role: 'plan', IsDefault: 1, CreatedAt: 1, UpdatedAt: 2 }] },
             // countRowsForRole('plan') -> 1
-            { ok: true, rows: [{ c: 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ c: 1 }] },
         ];
         const r = await deletePromptById(7);
         expect(r.ok).toBe(false);
@@ -101,9 +101,9 @@ describe('prompt-db negative branches (PlanTierType 22 gap #1 + #3)', () => {
     it('N5: INSERT with missing lastInsertId falls back and surfaces failure', async () => {
         responsesQueue = [
             // INSERT succeeds but driver returns no lastInsertId
-            { ok: true },
+            { ok: true, isFail: false, isSuccess: true },
             // resolveInsertedPromptId query fails -> returns null
-            { ok: false, error: 'transient read error' },
+            { ok: false, isFail: true, isSuccess: false, error: 'transient read error' },
         ];
         const r = await upsertPrompt({
             slug: 'new-slug', name: 'n', body: 'b', role: 'generic',

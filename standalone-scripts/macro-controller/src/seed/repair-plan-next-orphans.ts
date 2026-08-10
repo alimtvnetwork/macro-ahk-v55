@@ -54,8 +54,7 @@ export async function repairPlanNextOrphans(): Promise<OrphanRepairReport> {
 
 async function repairSingleOrphan(seedRow: typeof PLAN_NEXT_SEED_ROWS[number]): Promise<OrphanRepairEntry> {
   const lookup = await getPromptBySlug(seedRow.slug);
-  const isMissingOk = lookup.isFail;
-  if (isMissingOk) {
+  if (lookup.isFail) {
     logDiagnosticFromCode('SEED_ORPHAN_REPAIR_E001', {
       slug: seedRow.slug, fromRole: 'unknown', toRole: seedRow.role,
       stage: 'lookup', reason: lookup.error ?? 'getPromptBySlug returned !ok',
@@ -73,8 +72,7 @@ async function repairSingleOrphan(seedRow: typeof PLAN_NEXT_SEED_ROWS[number]): 
     previousReplaceKey: existing.ReplaceKey, replaceKey: existing.ReplaceKey,
     replaceValues: existing.ReplaceValues,
   });
-  const isMissingOk = saved.isFail;
-  if (isMissingOk) {
+  if (saved.isFail) {
     logDiagnosticFromCode('SEED_ORPHAN_REPAIR_E001', {
       slug: seedRow.slug, fromRole: existing.Role, toRole: seedRow.role,
       stage: 'upsert', reason: saved.error ?? 'upsertPrompt returned !ok',

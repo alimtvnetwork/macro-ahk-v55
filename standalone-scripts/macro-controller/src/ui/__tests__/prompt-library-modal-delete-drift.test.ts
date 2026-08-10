@@ -4,8 +4,8 @@ import { DbResult } from '../../db/db-result';
  *
  * - Delete happy path: window.confirm=true -> deletePromptById called with row id.
  * - Delete cancel:     window.confirm=false -> deletePromptById NOT called.
- * - Delete blocked:    deletePromptById returns {ok:false} -> status shows "Delete blocked: <err>".
- * - Token-drift on Save: upsertPrompt returns {ok:false, error:'token drift: {{n}} missing'}
+ * - Delete blocked:    deletePromptById returns {ok:false, isFail: true, isSuccess: false} -> status shows "Delete blocked: <err>".
+ * - Token-drift on Save: upsertPrompt returns {ok:false, isFail: true, isSuccess: false, error:'token drift: {{n}} missing'}
  *                        -> status shows "Save failed: token drift: {{n}} missing" and modal stays open.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';

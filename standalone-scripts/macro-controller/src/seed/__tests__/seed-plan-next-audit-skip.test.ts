@@ -30,14 +30,14 @@ vi.mock('../../db/extension-bridge', () => ({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] };
     }),
 }));
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
         captured.push({ method: p.method, sql: p.params.sql });
 
-        return responsesQueue.shift() ?? { ok: true, rows: [] };
+        return responsesQueue.shift() ?? { ok: true, isFail: false, isSuccess: true, rows: [] };
     }),
 }));
 vi.mock('../../error-utils', async () => {
@@ -89,12 +89,12 @@ describe('seedPlanNextPrompts: audit-skip on no-observable-change boot', () => {
         //  6. hasDefault next -> already true (kept)
         // -> upgradedTotal=0, promoted=0, inserted=0 -> audit must SKIP.
         responsesQueue = [
-            { ok: true, rows: ALL_SLUGS },
-            { ok: true },
-            { ok: true, rows: [{ Body: '# my own hand-authored plan body\n\n1. do work' }] },
-            { ok: true, rows: [{ Body: '# my own hand-authored next body\n\n1. pick task' }] },
-            { ok: true, rows: [{ '1': 1 }] },
-            { ok: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: ALL_SLUGS },
+            { ok: true, isFail: false, isSuccess: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Body: '# my own hand-authored plan body\n\n1. do work' }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Body: '# my own hand-authored next body\n\n1. pick task' }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ '1': 1 }] },
         ];
         const r = await seedPlanNextPrompts();
         expect(r.ok).toBe(true);

@@ -47,7 +47,7 @@ beforeEach(() => {
 describe('inviteMember', () => {
   it('calls SDK invite with (wsId, email, role, baseUrl) and clears cache on success', async () => {
     const api: MembershipsApi = {
-      invite: vi.fn().mockResolvedValue({ ok: true, status: 200, data: {} }),
+      invite: vi.fn().mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
       remove: vi.fn(),
       updateRole: vi.fn(),
     };
@@ -61,7 +61,7 @@ describe('inviteMember', () => {
 
   it('throws on non-2xx and does NOT invalidate cache', async () => {
     const api: MembershipsApi = {
-      invite: vi.fn().mockResolvedValue({ ok: false, status: 403, data: { error: 'forbidden' } }),
+      invite: vi.fn().mockResolvedValue({ ok: false, isFail: true, isSuccess: false, status: 403, data: { error: 'forbidden' } }),
       remove: vi.fn(),
       updateRole: vi.fn(),
     };
@@ -89,7 +89,7 @@ describe('removeMember', () => {
   it('calls SDK remove and clears cache on success', async () => {
     const api: MembershipsApi = {
       invite: vi.fn(),
-      remove: vi.fn().mockResolvedValue({ ok: true, status: 204, data: null }),
+      remove: vi.fn().mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 204, data: null }),
       updateRole: vi.fn(),
     };
     installSdk(api);
@@ -103,7 +103,7 @@ describe('removeMember', () => {
   it('throws on non-2xx and does NOT invalidate cache', async () => {
     const api: MembershipsApi = {
       invite: vi.fn(),
-      remove: vi.fn().mockResolvedValue({ ok: false, status: 404, data: { error: 'not found' } }),
+      remove: vi.fn().mockResolvedValue({ ok: false, isFail: true, isSuccess: false, status: 404, data: { error: 'not found' } }),
       updateRole: vi.fn(),
     };
     installSdk(api);
@@ -118,7 +118,7 @@ describe('updateMemberRole', () => {
     const api: MembershipsApi = {
       invite: vi.fn(),
       remove: vi.fn(),
-      updateRole: vi.fn().mockResolvedValue({ ok: true, status: 200, data: {} }),
+      updateRole: vi.fn().mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
     };
     installSdk(api);
 
@@ -132,7 +132,7 @@ describe('updateMemberRole', () => {
     const api: MembershipsApi = {
       invite: vi.fn(),
       remove: vi.fn(),
-      updateRole: vi.fn().mockResolvedValue({ ok: true, status: 200, data: {} }),
+      updateRole: vi.fn().mockResolvedValue({ ok: true, isFail: false, isSuccess: true, status: 200, data: {} }),
     };
     installSdk(api);
 
@@ -146,7 +146,7 @@ describe('updateMemberRole', () => {
     const api: MembershipsApi = {
       invite: vi.fn(),
       remove: vi.fn(),
-      updateRole: vi.fn().mockResolvedValue({ ok: false, status: 500, data: 'oops' }),
+      updateRole: vi.fn().mockResolvedValue({ ok: false, isFail: true, isSuccess: false, status: 500, data: 'oops' }),
     };
     installSdk(api);
 

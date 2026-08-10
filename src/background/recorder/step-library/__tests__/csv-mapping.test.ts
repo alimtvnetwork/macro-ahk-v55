@@ -103,8 +103,7 @@ describe("buildBagFromRow", () => {
         ];
         const r = buildBagFromRow({ Headers: headers, Row: row, Mappings: m });
         expect(r.Ok).toBe(false);
-        const isMissingOk = !r.Ok;
-        if (isMissingOk) {
+        if (!r.Ok) {
             expect(r.Column).toBe("Email");
             expect(r.Reason).toMatch(/number/);
         }
@@ -116,7 +115,6 @@ describe("buildBagFromRow", () => {
         ];
         const r = buildBagFromRow({ Headers: headers, Row: row, Mappings: m });
         expect(r.Ok).toBe(false);
-        const isMissingOk = !r.Ok;
-        if (isMissingOk) expect(r.Column).toBe("Nope");
+        if (!r.Ok) expect(r.Column).toBe("Nope");
     });
 });

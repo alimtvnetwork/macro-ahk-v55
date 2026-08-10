@@ -56,8 +56,7 @@ export async function fetchWorkspaceMembers(wsId: string, limit = DEFAULT_MEMBER
 
   log('[Members] GET list wsId=' + wsId + ' limit=' + limit, 'delegate');
   const resp = await getMemberships('list').list(wsId, { limit, baseUrl: CREDIT_API_BASE });
-  const isMissingOk = !resp.ok;
-  if (isMissingOk) {
+  if (!resp.ok) {
     throwDiagnostic('WS_MEMBERS_FETCH_E002', {
       status: resp.status,
       wsId,

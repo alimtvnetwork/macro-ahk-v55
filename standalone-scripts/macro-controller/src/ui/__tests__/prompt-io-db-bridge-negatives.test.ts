@@ -9,7 +9,7 @@ import { DbResult } from '../../db/db-result';
  * 1. `commitDbEntries` must surface `missing role` when an entry has no role.
  * 2. `commitDbEntries` must surface `missing slug for role=...` on empty slug.
  * 3. `collectDbEntriesForExport` must NOT throw when `listPromptsByRole`
- *    returns `{ ok: false }` for a role: it must log via `logError` and
+ *    returns `{ ok: false, isFail: true, isSuccess: false }` for a role: it must log via `logError` and
  *    continue with the remaining roles (no silent full-list failure).
  * 4. Empty `commitDbEntries([])` must return `{ upserted: 0, errors: [] }`
  *    and never touch the DB driver.
@@ -78,7 +78,7 @@ describe('collectDbEntriesForExport — driver failure per role', () => {
         listMock.mockImplementation(async (role: string) => {
             if (role === 'plan') return new DbResult(false, undefined, 'db locked');
             if (role === 'next') return {
-                ok: true,
+                ok: true, isFail: false, isSuccess: true,
                 value: [{
                     Id: 3, Slug: 'next-default', Name: 'Next default',
                     Body: 'N {{n}}', Role: 'next', IsDefault: 1,
@@ -96,7 +96,7 @@ describe('collectDbEntriesForExport — driver failure per role', () => {
         expect(logError).toHaveBeenCalledWith(
             'PromptIoDbBridge',
             expect.stringContaining('readAllDbRows: listPromptsByRole failed for plan'),
-            expect.objectContaining({ ok: false }),
+            expect.objectContaining({ ok: false, isFail: true, isSuccess: false }),
         );
     });
 });

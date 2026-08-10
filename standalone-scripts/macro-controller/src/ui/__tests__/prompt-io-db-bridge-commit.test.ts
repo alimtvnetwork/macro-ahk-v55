@@ -37,7 +37,7 @@ beforeEach(() => {
 describe('commitDbEntries (PlanTierType 22 gap #10 DB-side integration)', () => {
     it('C1: routes a valid plan entry to upsertPrompt with previousBody/replaceKey carried over', async () => {
         listPromptsByRoleMock.mockResolvedValue({
-            ok: true, value: [{ Id: 5, Slug: 's1', Body: 'old {{n}}', ReplaceKey: 'n' }],
+            ok: true, isFail: false, isSuccess: true, value: [{ Id: 5, Slug: 's1', Body: 'old {{n}}', ReplaceKey: 'n' }],
         });
         upsertPromptMock.mockResolvedValue(new DbResult(true, 5));
         const entries: CachedPromptEntry[] = [

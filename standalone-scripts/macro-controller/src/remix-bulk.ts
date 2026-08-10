@@ -43,8 +43,7 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
     throwDiagnostic('REMIX_BULK_E001', { missingApi: 'window.marco.api.projects.list', wsId });
   }
   const resp = await sdk.api.projects.list(wsId, { baseUrl: CREDIT_API_BASE });
-  const isMissingOk = resp.isFail;
-  if (isMissingOk) {
+  if (resp.isFail) {
     throwDiagnostic('REMIX_BULK_E003', { status: resp.status, wsId });
   }
   const data = resp.data as { projects?: Array<{ id?: string; name?: string }> };
@@ -99,8 +98,7 @@ export async function actionBulkRemixNext(hint: BulkRemixSourceHint = {}): Promi
       'Bulk Remix Next will remix the most recent project in '
       + checked.length + ' checked workspaces.\n\nProceed?',
     );
-    const isMissingOk = !ok;
-    if (isMissingOk) {
+    if (!ok) {
       showToast('Bulk Remix Next — cancelled', 'info');
 
       return;

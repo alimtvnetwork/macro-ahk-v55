@@ -98,8 +98,7 @@ export function buildBagFromRow(opts: BuildBagOptions): BuildBagResult {
     for (const m of Mappings) {
         if (m.Variable === null) continue;
         const outcome = applyMapping(m, Row, headerToIdx, seenVars);
-        const isMissingOk = !outcome.Ok;
-        if (isMissingOk) return outcome;
+        if (!outcome.Ok) return outcome;
         bag[outcome.Variable] = outcome.Value;
         used++;
     }
@@ -146,8 +145,7 @@ function applyMapping(
     }
     seenVars.add(m.Variable);
     const coerced = coerceValue(row[idx] ?? "", m.Coerce);
-    const isMissingOk = !coerced.Ok;
-    if (isMissingOk) {
+    if (!coerced.Ok) {
         return {
             Ok: false,
             Reason: `Column "${m.Column}" -> ${m.Variable}: ${coerced.Reason}`,

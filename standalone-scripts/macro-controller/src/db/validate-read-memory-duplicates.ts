@@ -106,8 +106,7 @@ export async function validateAndDisableReadMemoryDuplicates(): Promise<ReadMemo
       return { detected: 0, disabled: 0, slugs: [] };
     }
     const ok = await demoteDuplicates(duplicates.map((row) => row.Id));
-    const isMissingOk = !ok;
-    if (isMissingOk) {
+    if (!ok) {
       return { detected: duplicates.length, disabled: 0, slugs: duplicates.map((row) => row.Slug) };
     }
     await invalidateJsonCopy();

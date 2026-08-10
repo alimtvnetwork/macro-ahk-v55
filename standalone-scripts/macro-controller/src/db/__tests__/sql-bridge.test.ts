@@ -27,13 +27,13 @@ describe('sql-bridge probe', () => {
     it('falls back past QUERY when backend rejects Unsupported method', async () => {
         sendMock.mockImplementation((_type: string, payload: Record<string, unknown>) => {
             if (payload.method === 'QUERY') {
-                return Promise.resolve({ ok: false, errorMessage: 'Unsupported method: QUERY' });
+                return Promise.resolve({ ok: false, isFail: true, isSuccess: false, errorMessage: 'Unsupported method: QUERY' });
             }
             if (payload.method === 'SELECT') {
-                return Promise.resolve({ ok: true, rows: [{ Id: 1 }] });
+                return Promise.resolve({ ok: true, isFail: false, isSuccess: true, rows: [{ Id: 1 }] });
             }
 
-            return Promise.resolve({ ok: false, errorMessage: 'unexpected: ' + String(payload.method) });
+            return Promise.resolve({ ok: false, isFail: true, isSuccess: false, errorMessage: 'unexpected: ' + String(payload.method) });
         });
 
         const resp = await runSql('QUERY', 'SELECT * FROM Prompt');
@@ -46,13 +46,13 @@ describe('sql-bridge probe', () => {
         sendMock.mockImplementation((_type: string, payload: Record<string, unknown>) => {
             if (payload.method === 'SCHEMA') {
                 return Promise.resolve({
-                    ok: false,
+                    ok: false, isFail: true, isSuccess: false,
                     errorMessage: 'rawSql: only ALTER TABLE statements are allowed',
                 });
             }
-            if (payload.method === 'EXEC') return Promise.resolve({ ok: true, lastInsertId: 42 });
+            if (payload.method === 'EXEC') return Promise.resolve({ ok: true, isFail: false, isSuccess: true, lastInsertId: 42 });
 
-            return Promise.resolve({ ok: false, errorMessage: 'unexpected' });
+            return Promise.resolve({ ok: false, isFail: true, isSuccess: false, errorMessage: 'unexpected' });
         });
 
         const resp = await runSql('SCHEMA', 'INSERT OR IGNORE INTO Prompt (Slug) VALUES (\'x\')');
@@ -62,7 +62,7 @@ describe('sql-bridge probe', () => {
     });
 
     it('does NOT probe when SCHEMA + ALTER TABLE is the caller', async () => {
-        sendMock.mockResolvedValue({ ok: true });
+        sendMock.mockResolvedValue({ ok: true, isFail: false, isSuccess: true });
         const resp = await runSql('SCHEMA', 'ALTER TABLE Prompt ADD COLUMN X TEXT');
         expect(resp.ok).toBe(true);
         expect(sendMock).toHaveBeenCalledTimes(1);
@@ -70,7 +70,7 @@ describe('sql-bridge probe', () => {
     });
 
     it('does NOT probe on real SQL errors (syntax, missing table)', async () => {
-        sendMock.mockResolvedValue({ ok: false, errorMessage: 'no such table: Foo' });
+        sendMock.mockResolvedValue({ ok: false, isFail: true, isSuccess: false, errorMessage: 'no such table: Foo' });
         const resp = await runSql('QUERY', 'SELECT * FROM Foo');
         expect(resp.ok).toBe(false);
         expect(resp.errorMessage).toBe('no such table: Foo');
@@ -80,10 +80,10 @@ describe('sql-bridge probe', () => {
     it('caches the winning method so subsequent calls skip the probe', async () => {
         sendMock.mockImplementation((_type: string, payload: Record<string, unknown>) => {
             if (payload.method === 'QUERY') {
-                return Promise.resolve({ ok: false, errorMessage: 'Unsupported method: QUERY' });
+                return Promise.resolve({ ok: false, isFail: true, isSuccess: false, errorMessage: 'Unsupported method: QUERY' });
             }
 
-            return Promise.resolve({ ok: true, rows: [] });
+            return Promise.resolve({ ok: true, isFail: false, isSuccess: true, rows: [] });
         });
         await runSql('QUERY', 'SELECT 1');
         const callsAfterFirst = sendMock.mock.calls.length;

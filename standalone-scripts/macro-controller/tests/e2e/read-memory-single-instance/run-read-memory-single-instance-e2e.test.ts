@@ -39,14 +39,14 @@ function extractInList(sql: string): string[] {
     return (match[1] ?? '').split(',').map((s) => s.trim().replace(/^'/, '').replace(/'$/, ''));
 }
 
-function handleDelete(sql: string): { isOk: true } {
+function handleDelete(sql: string): { ok: true, isFail: false, isSuccess: true } {
     const slugs = extractInList(sql);
     state.prompts = state.prompts.filter((row) => !slugs.includes(row.Slug));
 
-    return { isOk: true };
+    return { ok: true, isFail: false, isSuccess: true };
 }
 
-function handleUpdate(sql: string): { isOk: true } {
+function handleUpdate(sql: string): { ok: true, isFail: false, isSuccess: true } {
     const ids = extractInList(sql).map((v) => Number(v)).filter((n) => Number.isFinite(n));
     const nameMatch = /Name\s*=\s*'((?:[^']|'')*)'/i.exec(sql);
     const prefix = nameMatch ? nameMatch[1]?.replace(/''/g, "'") ?? '' : '';
@@ -57,15 +57,15 @@ function handleUpdate(sql: string): { isOk: true } {
         else if (prefix.length > 0) row.Name = prefix;
     }
 
-    return { isOk: true };
+    return { ok: true, isFail: false, isSuccess: true };
 }
 
-function handleSelect(sql: string): { isOk: true; rows: unknown[] } {
+function handleSelect(sql: string): { ok: true, isFail: false, isSuccess: true; rows: unknown[] } {
     if (/COUNT\(\*\)/i.test(sql)) {
         const slugs = extractInList(sql);
         const count = state.prompts.filter((row) => slugs.includes(row.Slug)).length;
 
-        return { isOk: true, rows: [{ c: count }] };
+        return { ok: true, isFail: false, isSuccess: true, rows: [{ c: count }] };
     }
     const excludeCanonical = /Slug\s*<>\s*'read-memory-enhanced'/i.test(sql);
     const excludeDuplicatePrefix = /Name\s+NOT\s+LIKE\s+'\[duplicate\] %'/i.test(sql);
@@ -82,7 +82,7 @@ function handleSelect(sql: string): { isOk: true; rows: unknown[] } {
         return true;
     });
 
-    return { isOk: true, rows: rows.map((row) => ({ ...row })) };
+    return { ok: true, isFail: false, isSuccess: true, rows: rows.map((row) => ({ ...row })) };
 }
 
 vi.mock('../../../src/ui/extension-relay', () => ({
@@ -92,7 +92,7 @@ vi.mock('../../../src/ui/extension-relay', () => ({
         if (payload.method === 'SCHEMA' && /UPDATE\s+Prompt/i.test(sql)) return handleUpdate(sql);
         if (payload.method === 'QUERY' && /SELECT/i.test(sql)) return handleSelect(sql);
 
-        return { isOk: true };
+        return { ok: true, isFail: false, isSuccess: true };
     }),
 }));
 vi.mock('../../../src/ui/prompt-cache', () => ({ clearPromptCache: vi.fn(async () => { /* void */ }) }));

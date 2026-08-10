@@ -42,7 +42,7 @@ describe('collectDbEntriesForExport: ReplaceKey/ReplaceValues round-trip', () =>
             if (role !== 'plan') return new DbResult(true, []);
 
             return {
-                ok: true,
+                ok: true, isFail: false, isSuccess: true,
                 value: [{
                     Id: 1, Slug: 'plan-default', Name: 'PlanTierType default',
                     Body: 'P {{count}}', Role: 'plan', IsDefault: 1,
@@ -67,7 +67,7 @@ describe('collectDbEntriesForExport: ReplaceKey/ReplaceValues round-trip', () =>
             if (role !== 'next') return new DbResult(true, []);
 
             return {
-                ok: true,
+                ok: true, isFail: false, isSuccess: true,
                 value: [{
                     Id: 2, Slug: 'next-default', Name: 'Next default',
                     Body: 'N {{n}}', Role: 'next', IsDefault: 1,
@@ -90,7 +90,7 @@ describe('commitDbEntries: forwards replaceKey/replaceValues/previousReplaceKey'
             if (role !== 'plan') return new DbResult(true, []);
 
             return {
-                ok: true,
+                ok: true, isFail: false, isSuccess: true,
                 value: [{
                     Id: 1, Slug: 'plan-default', Name: 'PlanTierType default',
                     Body: 'P {{n}}', Role: 'plan', IsDefault: 0,

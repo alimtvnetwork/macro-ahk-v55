@@ -6,8 +6,8 @@ import { ServiceResult } from '../../utils/result-wrapper';
  * This file locks the RCA-critical failure surfaces that would otherwise be
  * caught only in prod:
  *
- *  - `sendToExtension` returning `{ ok: false, error }` MUST propagate
- *    into `{ ok: false, error }` for every mutation (never silently succeed).
+ *  - `sendToExtension` returning `{ ok: false, isFail: true, isSuccess: false, error }` MUST propagate
+ *    into `{ ok: false, isFail: true, isSuccess: false, error }` for every mutation (never silently succeed).
  *  - `deletePromptById` must reject non-integer / negative ids before any
  *    DB round-trip (defence-in-depth against caller drift).
  *  - `getDefaultPromptForRole` must reject an invalid role without DB I/O.
@@ -19,7 +19,7 @@ import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-moc
 
 interface CapturedCall { method: string; sql: string }
 const captured: CapturedCall[] = [];
-let nextResponse: Record<string, unknown> = { ok: true, rows: [] };
+let nextResponse: Record<string, unknown> = { ok: true, isFail: false, isSuccess: true, rows: [] };
 let responsesQueue: Record<string, unknown>[] | null = null;
 
 vi.mock('../../ui/prompt-loader', () => buildPromptLoaderMock({
@@ -52,34 +52,34 @@ import {
 
 beforeEach(() => {
     captured.length = 0;
-    nextResponse = { ok: true, rows: [] };
+    nextResponse = { ok: true, isFail: false, isSuccess: true, rows: [] };
     responsesQueue = null;
 });
 
 describe('prompt-db negative: DB-layer errors propagate to caller', () => {
     it('listPromptsByRole returns ok=false when driver reports isOk=false', async () => {
-        nextResponse = { ok: false, errorMessage: 'sql: table Prompt missing' };
+        nextResponse = { ok: false, isFail: true, isSuccess: false, errorMessage: 'sql: table Prompt missing' };
         const r = await listPromptsByRole('plan');
         expect(r.ok).toBe(false);
         expect(r.error).toMatch(/query failed|table Prompt missing/);
     });
 
     it('upsertPrompt INSERT surfaces DB error (never returns ok=true)', async () => {
-        nextResponse = { ok: false, errorMessage: 'UNIQUE constraint failed: Prompt.Slug' };
+        nextResponse = { ok: false, isFail: true, isSuccess: false, errorMessage: 'UNIQUE constraint failed: Prompt.Slug' };
         const r = await upsertPrompt({ slug: 'dup', name: 'n', body: 'b', role: 'generic' });
         expect(r.ok).toBe(false);
         expect(r.error).toMatch(/write failed|UNIQUE constraint failed/);
     });
 
     it('upsertPrompt UPDATE surfaces DB error and does not swallow it', async () => {
-        nextResponse = { ok: false, errorMessage: 'disk I/O error' };
+        nextResponse = { ok: false, isFail: true, isSuccess: false, errorMessage: 'disk I/O error' };
         const r = await upsertPrompt({ id: 4, slug: 's', name: 'n', body: 'b', role: 'generic' });
         expect(r.ok).toBe(false);
         expect(r.error).toMatch(/write failed|disk I\/O error/);
     });
 
     it('setDefaultPromptForRole propagates transactional flip failure', async () => {
-        nextResponse = { ok: false, errorMessage: 'transaction rolled back' };
+        nextResponse = { ok: false, isFail: true, isSuccess: false, errorMessage: 'transaction rolled back' };
         const r = await setDefaultPromptForRole(9, 'next');
         expect(r.ok).toBe(false);
         expect(r.error).toMatch(/enforceSingleDefaultPerRole failed|transaction rolled back/);
@@ -87,9 +87,9 @@ describe('prompt-db negative: DB-layer errors propagate to caller', () => {
 
     it('deletePromptById propagates DB error from the DELETE stage', async () => {
         responsesQueue = [
-            { ok: true, rows: [{ Id: 2, Slug: 's', Name: 'n', Body: 'b', Role: 'next', IsDefault: 0, CreatedAt: 1, UpdatedAt: 1 }] },
-            { ok: true, rows: [{ c: 4 }] },
-            { ok: false, errorMessage: 'row is locked' },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Id: 2, Slug: 's', Name: 'n', Body: 'b', Role: 'next', IsDefault: 0, CreatedAt: 1, UpdatedAt: 1 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ c: 4 }] },
+            { ok: false, isFail: true, isSuccess: false, errorMessage: 'row is locked' },
         ];
         const r = await deletePromptById(2);
         expect(r.ok).toBe(false);
@@ -137,7 +137,7 @@ describe('prompt-db negative: input validation short-circuits before DB I/O', ()
 
 describe('prompt-db positive: full happy-path integration for a plan-role edit', () => {
     it('upsertPrompt UPDATE with token-preserving edit writes body + replace columns', async () => {
-        nextResponse = { ok: true };
+        nextResponse = { ok: true, isFail: false, isSuccess: true };
         const r = await upsertPrompt({
             id: 12, slug: 'plan-a', name: 'PlanTierType A', role: 'plan',
             previousBody: 'Step {{n}} of the plan',
@@ -161,7 +161,7 @@ describe('prompt-db positive: full happy-path integration for a plan-role edit',
     it('listPromptsByRole -> setDefaultPromptForRole -> deletePromptById chain', async () => {
         // 1) list
         responsesQueue = [
-            { ok: true, rows: [
+            { ok: true, isFail: false, isSuccess: true, rows: [
                 { Id: 1, Slug: 'a', Name: 'A', Body: 'b1', Role: 'next', IsDefault: 1, CreatedAt: 1, UpdatedAt: 2 },
                 { Id: 2, Slug: 'b', Name: 'B', Body: 'b2', Role: 'next', IsDefault: 0, CreatedAt: 1, UpdatedAt: 3 },
             ] },
@@ -171,15 +171,15 @@ describe('prompt-db positive: full happy-path integration for a plan-role edit',
         expect(list.value).toHaveLength(2);
 
         // 2) flip default
-        responsesQueue = [{ ok: true }];
+        responsesQueue = [{ ok: true, isFail: false, isSuccess: true }];
         const flip = await setDefaultPromptForRole(2, 'next');
         expect(flip.ok).toBe(true);
 
         // 3) delete non-default row (row count > 1 -> allowed)
         responsesQueue = [
-            { ok: true, rows: [{ Id: 1, Slug: 'a', Name: 'A', Body: 'b1', Role: 'next', IsDefault: 0, CreatedAt: 1, UpdatedAt: 4 }] },
-            { ok: true, rows: [{ c: 2 }] },
-            { ok: true },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ Id: 1, Slug: 'a', Name: 'A', Body: 'b1', Role: 'next', IsDefault: 0, CreatedAt: 1, UpdatedAt: 4 }] },
+            { ok: true, isFail: false, isSuccess: true, rows: [{ c: 2 }] },
+            { ok: true, isFail: false, isSuccess: true },
         ];
         const del = await deletePromptById(1);
         expect(del.ok).toBe(true);

@@ -8,7 +8,7 @@ import { buildPromptLoaderMock } from '../../__tests__/helpers/prompt-loader-moc
 interface CapturedCall { method: string; sql: string }
 const captured: CapturedCall[] = [];
 let responsesQueue: Record<string, unknown>[] = [];
-let fallback: Record<string, unknown> = { ok: true, rows: [], lastInsertId: 1 };
+let fallback: Record<string, unknown> = { ok: true, isFail: false, isSuccess: true, rows: [], lastInsertId: 1 };
 
 vi.mock('../extension-bridge', () => ({
     sendToExtension: vi.fn(async (_c: string, p: { method: string; params: { sql: string } }) => {
@@ -56,7 +56,7 @@ const samplePrompt = (over: Partial<PromptRow> = {}): PromptRow => ({
 beforeEach(() => {
     captured.length = 0;
     responsesQueue = [];
-    fallback = { ok: true, rows: [], lastInsertId: 42 };
+    fallback = { ok: true, isFail: false, isSuccess: true, rows: [], lastInsertId: 42 };
 });
 
 describe('recordPromptRevision', () => {
@@ -102,7 +102,7 @@ describe('recordPromptRevision', () => {
 describe('listPromptRevisions', () => {
     it('emits SELECT ordered newest first, mapping rows to typed shape', async () => {
         responsesQueue = [{
-            ok: true,
+            ok: true, isFail: false, isSuccess: true,
             rows: [
                 { Id: 9, PromptId: 7, Slug: 'plan-default', Name: 'x', Body: 'old', Role: 'plan',
                   ReplaceKey: 'n', ReplaceValues: '["1"]', CreatedAt: 500, Reason: 'upsert' },
@@ -125,7 +125,7 @@ describe('listPromptRevisions', () => {
 
 describe('getPromptRevisionById', () => {
     it('returns undefined when the id has no row', async () => {
-        responsesQueue = [{ ok: true, rows: [] }];
+        responsesQueue = [{ ok: true, isFail: false, isSuccess: true, rows: [] }];
         const r = await getPromptRevisionById(999);
         expect(r.ok).toBe(true);
         expect(r.value).toBeUndefined();

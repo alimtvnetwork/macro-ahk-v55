@@ -113,9 +113,7 @@ export async function resolveWorkspaceId(): Promise<string | null> {
   try {
     const resp = await window.marco!.api!.workspace.resolveByProject(projectId, { baseUrl: CREDIT_API_BASE });
 
-    const isMissingOk = resp.isFail;
-
-    if (isMissingOk) {
+    if (!resp.ok) {
       if (isAuthFailure(resp.status)) {
         markBearerTokenExpired('credit-balance-ws');
       }
@@ -220,9 +218,7 @@ export async function fetchCreditBalance(
   try {
     const resp = await window.marco!.api!.credits.fetchBalance(wsId, { baseUrl: CREDIT_API_BASE });
 
-    const isMissingOk = resp.isFail;
-
-    if (isMissingOk) {
+    if (!resp.ok) {
       if (isAuthFailure(resp.status) && !isRetry) {
         markBearerTokenExpired('credit-balance');
         log('CreditBalance: Auth ' + resp.status + ' — recovering...', 'warn');

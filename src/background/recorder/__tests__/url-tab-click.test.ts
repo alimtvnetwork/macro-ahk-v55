@@ -5,15 +5,15 @@
 import { describe, it, expect } from "vitest";
 
 import {
-    compileUrlPattern,
-    deriveGlobPattern,
     executeUrlTabClick,
     shouldRecordAsUrlTabClick,
     validateUrlTabClickParams,
+    deriveGlobPattern,
     type TabRef,
     type TabsAdapter,
     type UrlTabClickParams,
 } from "../url-tab-click";
+import { compileUrlPattern } from "../url-tab-click-patterns";
 
 /* ------------------------------------------------------------------ */
 /*  Test adapter                                                       */
@@ -81,8 +81,7 @@ describe("compileUrlPattern", () => {
     it("Exact: trailing slash insensitive (case-sensitive path)", () => {
         const c = compileUrlPattern("https://app.example.com/orders/", "Exact");
         expect(c.Ok).toBe(true);
-        const isMissingOk = !c.Ok;
-        if (isMissingOk) return;
+        if (!c.Ok) return;
         expect(c.Test("https://app.example.com/orders")).toBe(true);
         expect(c.Test("https://app.example.com/Orders")).toBe(false);
     });
@@ -90,8 +89,7 @@ describe("compileUrlPattern", () => {
     it("Exact: scheme + host case-insensitive (AC-19.1.9)", () => {
         const c = compileUrlPattern("HTTPS://APP.EXAMPLE.COM/orders", "Exact");
         expect(c.Ok).toBe(true);
-        const isMissingOk = !c.Ok;
-        if (isMissingOk) return;
+        if (!c.Ok) return;
         expect(c.Test("https://app.example.com/orders")).toBe(true);
         expect(c.Test("https://app.example.com/ORDERS")).toBe(false);
     });
@@ -99,8 +97,7 @@ describe("compileUrlPattern", () => {
     it("Prefix matches startsWith with case-folded host", () => {
         const c = compileUrlPattern("https://APP.example.com/orders/", "Prefix");
         expect(c.Ok).toBe(true);
-        const isMissingOk = !c.Ok;
-        if (isMissingOk) return;
+        if (!c.Ok) return;
         expect(c.Test("https://app.example.com/orders/123")).toBe(true);
         expect(c.Test("https://app.example.com/billing")).toBe(false);
     });
@@ -108,13 +105,11 @@ describe("compileUrlPattern", () => {
     it("Glob: * is non-slash, ** is any", () => {
         const c = compileUrlPattern("https://app.example.com/orders/*/edit", "Glob");
         expect(c.Ok).toBe(true);
-        const isMissingOk = !c.Ok;
-        if (isMissingOk) return;
+        if (!c.Ok) return;
         expect(c.Test("https://app.example.com/orders/42/edit")).toBe(true);
         expect(c.Test("https://app.example.com/orders/42/sub/edit")).toBe(false);
         const cc = compileUrlPattern("https://app.example.com/**/edit", "Glob");
-        const isMissingOk = !cc.Ok;
-        if (isMissingOk) throw new Error("compile failed");
+        if (!cc.Ok) throw new Error("compile failed");
         expect(cc.Test("https://app.example.com/orders/42/sub/edit")).toBe(true);
     });
 
@@ -127,8 +122,7 @@ describe("compileUrlPattern", () => {
 
     it("Regex: valid pattern matches", () => {
         const c = compileUrlPattern("^https://app\\.example\\.com/orders/\\d+$", "Regex");
-        const isMissingOk = !c.Ok;
-        if (isMissingOk) throw new Error("compile failed");
+        if (!c.Ok) throw new Error("compile failed");
         expect(c.Test("https://app.example.com/orders/42")).toBe(true);
         expect(c.Test("https://app.example.com/orders/abc")).toBe(false);
     });
