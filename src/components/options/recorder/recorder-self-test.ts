@@ -46,31 +46,13 @@ export async function runRecorderSelfTest(projectSlug: string): Promise<SelfTest
     if (projectSlug.trim().length === 0) {
         throw new RecorderSelfTestError("insert", projectSlug, "ProjectSlug is empty — select a project first.");
     }
-
     const startedAt = Date.now();
     const variableName = `__selftest_${startedAt}`;
-
     const before = await listSteps(projectSlug, "insert");
     const insertedStepId = await insertDummyStep(projectSlug, variableName);
-
     try {
         const after = await listSteps(projectSlug, "verify");
-        const found = after.find((s) => s.StepId === insertedStepId);
-        if (found === undefined) {
-            throw new RecorderSelfTestError(
-                "verify",
-                projectSlug,
-                `Inserted StepId=${insertedStepId} not present in RECORDER_STEP_LIST after write.`,
-            );
-        }
-        if (found.VariableName !== variableName) {
-            throw new RecorderSelfTestError(
-                "verify",
-                projectSlug,
-                `Round-trip mismatch — wrote VariableName='${variableName}', read '${found.VariableName}'.`,
-            );
-        }
-
+        verifyStepExistsAndMatches(projectSlug, after, insertedStepId, variableName);
         await deleteStep(projectSlug, insertedStepId);
 
         return {
@@ -81,14 +63,39 @@ export async function runRecorderSelfTest(projectSlug: string): Promise<SelfTest
             DurationMs: Date.now() - startedAt,
         };
     } catch (err) {
-        // Best-effort cleanup; do not mask the original error.
-        await deleteStep(projectSlug, insertedStepId).catch((cleanupErr: unknown) => {
-            logError("recorderSelfTest.cleanup", `deleteStep failed for insertedStepId=${insertedStepId} during error-recovery cleanup — original error will still be rethrown`, cleanupErr);
-
-            return undefined;
-        });
+        await cleanupFailedTest(projectSlug, insertedStepId);
         throw err;
     }
+}
+
+function verifyStepExistsAndMatches(
+    projectSlug: string,
+    after: ListResponse["steps"],
+    insertedStepId: number,
+    variableName: string,
+) {
+    const found = after.find((s) => s.StepId === insertedStepId);
+    if (found === undefined) {
+        throw new RecorderSelfTestError(
+            "verify",
+            projectSlug,
+            `Inserted StepId=${insertedStepId} not present in RECORDER_STEP_LIST after write.`,
+        );
+    }
+    if (found.VariableName !== variableName) {
+        throw new RecorderSelfTestError(
+            "verify",
+            projectSlug,
+            `Round-trip mismatch — wrote VariableName='${variableName}', read '${found.VariableName}'.`,
+        );
+    }
+}
+
+async function cleanupFailedTest(projectSlug: string, insertedStepId: number): Promise<void> {
+    // Best-effort cleanup; do not mask the original error.
+    await deleteStep(projectSlug, insertedStepId).catch((cleanupErr: unknown) => {
+        logError("recorderSelfTest.cleanup", `deleteStep failed for insertedStepId=${insertedStepId} during error-recovery cleanup — original error will still be rethrown`, cleanupErr);
+    });
 }
 
 async function insertDummyStep(projectSlug: string, variableName: string): Promise<number> {
@@ -97,20 +104,7 @@ async function insertDummyStep(projectSlug: string, variableName: string): Promi
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             type: "RECORDER_STEP_INSERT" as any,
             projectSlug,
-            draft: {
-                StepKindId: STEP_KIND_WAIT,
-                VariableName: variableName,
-                LabelType: "Recorder self-test (auto-cleanup)",
-                InlineJs: null,
-                ParamsJson: null,
-                IsBreakpoint: false,
-                Selectors: [{
-                    SelectorKindId: SELECTOR_KIND_CSS,
-                    Expression: ".__marco_selftest__",
-                    AnchorSelectorId: null,
-                    IsPrimary: true,
-                }],
-            },
+            draft: createDummyStepDraft(variableName),
         });
         if (typeof response?.step?.StepId !== "number") {
             throw new Error("RECORDER_STEP_INSERT returned no StepId");
@@ -121,6 +115,23 @@ async function insertDummyStep(projectSlug: string, variableName: string): Promi
         const msg = err instanceof Error ? err.message : String(err);
         throw new RecorderSelfTestError("insert", projectSlug, msg);
     }
+}
+
+function createDummyStepDraft(variableName: string) {
+    return {
+        StepKindId: STEP_KIND_WAIT,
+        VariableName: variableName,
+        LabelType: "Recorder self-test (auto-cleanup)",
+        InlineJs: null,
+        ParamsJson: null,
+        IsBreakpoint: false,
+        Selectors: [{
+            SelectorKindId: SELECTOR_KIND_CSS,
+            Expression: ".__marco_selftest__",
+            AnchorSelectorId: null,
+            IsPrimary: true,
+        }],
+    };
 }
 
 async function listSteps(projectSlug: string, phase: SelfTestPhase): Promise<ListResponse["steps"]> {

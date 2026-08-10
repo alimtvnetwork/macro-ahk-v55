@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Marco Extension, Keyword Events, Target Picker Row
  *

@@ -34,27 +34,8 @@ export default function RecorderVisualisationPanel({ projectSlug }: Props): JSX.
     const ctrl = useRecorderVisualisationController(projectSlug);
     const { data, loading, error, reload } = ctrl;
 
-    if (loading) {
-        return (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground p-4">
-                <Loader2 className="h-4 w-4 animate-spin" /> Loading recorder data...
-            </div>
-        );
-    }
-    if (error) {
-        return (
-            <div className="space-y-3">
-                <div className="text-xs text-destructive p-3 border border-destructive/40 rounded-md bg-destructive/5 font-mono">
-                    {error}
-                </div>
-                <RecorderEmptyState
-                    projectSlug={projectSlug}
-                    hasDbError={true}
-                    onReload={() => { void reload(); }}
-                />
-            </div>
-        );
-    }
+    if (loading) return <LoadingView />;
+    if (error) return <ErrorView error={error} projectSlug={projectSlug} reload={() => { void reload(); }} />;
     if (data === null) return null;
 
     return (
@@ -89,6 +70,37 @@ export default function RecorderVisualisationPanel({ projectSlug }: Props): JSX.
                     onLinkChange={ctrl.handleLinkChange}
                 />
             )}
+        </div>
+    );
+}
+
+function LoadingView(): JSX.Element {
+    return (
+        <div className="flex items-center gap-2 text-xs text-muted-foreground p-4">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading recorder data...
+        </div>
+    );
+}
+
+function ErrorView({
+    error,
+    projectSlug,
+    reload,
+}: {
+    error: string;
+    projectSlug: string;
+    reload: () => void;
+}): JSX.Element {
+    return (
+        <div className="space-y-3">
+            <div className="text-xs text-destructive p-3 border border-destructive/40 rounded-md bg-destructive/5 font-mono">
+                {error}
+            </div>
+            <RecorderEmptyState
+                projectSlug={projectSlug}
+                hasDbError={true}
+                onReload={reload}
+            />
         </div>
     );
 }

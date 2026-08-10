@@ -571,46 +571,37 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
             const result = await chrome.scripting.executeScript({
                 target: { tabId: tab.id },
                 world: "MAIN",
-                func: function scanLocalStorageForJwt(): string | null { // eslint-disable-line sonarjs/cognitive-complexity -- localStorage scan with priority matching
+                func: function scanLocalStorageForJwt(): string | null { // eslint-disable-line sonarjs/cognitive-complexity
+                    const checkToken = (t: unknown) => typeof t === "string" && t.startsWith("eyJ") && t.split(".").length === 3;
                     try {
                         const len = localStorage.length;
-                        // Priority 1: Supabase auth token (sb-*-auth-token)
                         for (let i = 0; i < len; i++) {
                             const key = localStorage.key(i);
-                            if (!key) continue;
-                            if (key.startsWith("sb-") && key.includes("-auth-token")) {
-                                const raw = localStorage.getItem(key);
-                                if (!raw) continue;
-                                try {
-                                    const parsed = JSON.parse(raw);
-                                    const token = parsed?.access_token
-                                        ?? parsed?.currentSession?.access_token
-                                        ?? parsed?.session?.access_token;
-                                    if (typeof token === "string" && token.startsWith("eyJ") && token.split(".").length === 3) {
-                                        return token;
-                                    }
-                                } catch (err) {                                     if (raw.startsWith("eyJ") && raw.split(".").length === 3) {
-                                        return raw;
-                                    }
-                                }
-                            }
-                        }
-                        // Priority 2: Lovable-specific auth keys
-                        const lovableKeys = ["lovable-auth-token", "lovable:token", "auth-token", "supabase.auth.token"];
-                        for (let j = 0; j < lovableKeys.length; j++) {
-                            const storedToken = localStorage.getItem(lovableKeys[j]);
-                            if (!storedToken) continue;
+                            if (!key || !(key.startsWith("sb-") && key.includes("-auth-token"))) continue;
+                            const raw = localStorage.getItem(key);
+                            if (!raw) continue;
                             try {
-                                const p2 = JSON.parse(storedToken);
-                                const t2 = p2?.access_token ?? p2?.currentSession?.access_token ?? p2?.token;
-                                if (typeof t2 === "string" && t2.startsWith("eyJ") && t2.split(".").length === 3) return t2;
-                            } catch (parseErr) {
-                                logSampledDebug(BgLogTag.CONFIG_AUTH, "token parse failed", "Failed to parse storedToken", parseErr instanceof Error ? parseErr : String(parseErr));
-                                if (storedToken.startsWith("eyJ") && storedToken.split(".").length === 3) return storedToken;
+                                const p = JSON.parse(raw);
+                                const token = p?.access_token ?? p?.currentSession?.access_token ?? p?.session?.access_token;
+                                if (checkToken(token)) return token;
+                            } catch (error) {
+                                if (checkToken(raw)) return raw;
                             }
                         }
-                    } catch (lsErr) {
-                        logSampledDebug(BgLogTag.CONFIG_AUTH, "localStorage scan unavailable", "localStorage scan unavailable", lsErr instanceof Error ? lsErr : String(lsErr));
+                        const lovableKeys = ["lovable-auth-token", "lovable:token", "auth-token", "supabase.auth.token"];
+                        for (const key of lovableKeys) {
+                            const raw = localStorage.getItem(key);
+                            if (!raw) continue;
+                            try {
+                                const p = JSON.parse(raw);
+                                const token = p?.access_token ?? p?.currentSession?.access_token ?? p?.token;
+                                if (checkToken(token)) return token;
+                            } catch (error) {
+                                if (checkToken(raw)) return raw;
+                            }
+                        }
+                    } catch (error) {
+                        console.debug("[Marco] localStorage scan unavailable", error);
                     }
 
                     return null;

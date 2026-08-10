@@ -23,7 +23,7 @@ interface GroupFormDialogProps {
   editGroup?: ProjectGroup | null;
 }
 
-export function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: GroupFormDialogProps) {
+function useGroupFormDialog(editGroup: ProjectGroup | null | undefined, onOpenChange: (open: boolean) => void, onSaved: () => void) {
   const [name, setName] = useState(editGroup?.Name ?? "");
   const [settings, setSettings] = useState(editGroup?.SharedSettingsJson ?? "");
   const [saving, setSaving] = useState(false);
@@ -62,6 +62,12 @@ export function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: Grou
       setSaving(false);
     }
   }, [name, settings, isEdit, editGroup, onOpenChange, onSaved]);
+
+  return { name, setName, settings, setSettings, saving, isEdit, handleSave };
+}
+
+export function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: GroupFormDialogProps) {
+  const { name, setName, settings, setSettings, saving, isEdit, handleSave } = useGroupFormDialog(editGroup, onOpenChange, onSaved);
 
   const hasName = !!name.trim();
   const shouldDisableSave = saving || !hasName;

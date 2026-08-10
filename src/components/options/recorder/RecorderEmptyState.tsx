@@ -29,8 +29,36 @@ export function RecorderEmptyState({
     onReload,
 }: RecorderEmptyStateProps): JSX.Element {
     const projectMissing = projectSlug.trim().length === 0;
+    const causes = buildCauses(projectMissing, projectSlug, hasDbError, onReload);
 
-    const causes: ReadonlyArray<CauseRow> = [
+    return (
+        <div className="border border-border rounded-md bg-card/50 p-6 space-y-4">
+            <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                <div>
+                    <h3 className="text-sm font-semibold">No steps recorded yet</h3>
+                    <p className="text-xs text-muted-foreground mt-1">
+                        This project has no captured steps. The most likely causes are listed below.
+                    </p>
+                </div>
+            </div>
+
+            <ul className="space-y-2">
+                {causes.map((c) => (
+                    <CauseListItem key={c.title} c={c} />
+                ))}
+            </ul>
+        </div>
+    );
+}
+
+function buildCauses(
+    projectMissing: boolean,
+    projectSlug: string,
+    hasDbError: boolean,
+    onReload: () => void
+): ReadonlyArray<CauseRow> {
+    return [
         {
             title: "Project selected",
             detail: projectMissing
@@ -56,45 +84,28 @@ export function RecorderEmptyState({
             status: "warn",
         },
     ];
+}
 
+function CauseListItem({ c }: { c: CauseRow }): JSX.Element {
     return (
-        <div className="border border-border rounded-md bg-card/50 p-6 space-y-4">
-            <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
-                <div>
-                    <h3 className="text-sm font-semibold">No steps recorded yet</h3>
-                    <p className="text-xs text-muted-foreground mt-1">
-                        This project has no captured steps. The most likely causes are listed below.
-                    </p>
-                </div>
+        <li className="flex items-start gap-3 p-3 rounded-md border border-border/60 bg-background/40">
+            <CauseIcon status={c.status} />
+            <div className="flex-1 min-w-0">
+                <div className="text-xs font-medium">{c.title}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">{c.detail}</div>
             </div>
-
-            <ul className="space-y-2">
-                {causes.map((c) => (
-                    <li
-                        key={c.title}
-                        className="flex items-start gap-3 p-3 rounded-md border border-border/60 bg-background/40"
-                    >
-                        <CauseIcon status={c.status} />
-                        <div className="flex-1 min-w-0">
-                            <div className="text-xs font-medium">{c.title}</div>
-                            <div className="text-xs text-muted-foreground mt-0.5">{c.detail}</div>
-                        </div>
-                        {c.action !== undefined && (
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-7 gap-1.5 shrink-0"
-                                onClick={c.action.onClick}
-                            >
-                                <RefreshCw className="h-3 w-3" />
-                                {c.action.label}
-                            </Button>
-                        )}
-                    </li>
-                ))}
-            </ul>
-        </div>
+            {c.action !== undefined && (
+                <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 gap-1.5 shrink-0"
+                    onClick={c.action.onClick}
+                >
+                    <RefreshCw className="h-3 w-3" />
+                    {c.action.label}
+                </Button>
+            )}
+        </li>
     );
 }
 

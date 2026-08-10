@@ -129,9 +129,7 @@ function hydrateHotkeyForm(
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
-export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Element {
-    const { open, mode, groups, onCancel, onSubmit } = props;
-
+function useStepEditorState(open: boolean, mode: StepEditorMode | null, groups: ReadonlyArray<StepGroupRow>, onSubmit: StepEditorDialogProps["onSubmit"]) {
     const [kind, setKind] = useState<StepKindId>(StepKindId.Click);
     const [label, setLabel] = useState("");
     const [payloadJson, setPayloadJson] = useState("");
@@ -220,6 +218,34 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
         }
         onSubmit(result.Input);
     };
+
+    return {
+        kind, setKind,
+        label, setLabel,
+        payloadJson, setPayloadJson,
+        targetGroupId, setTargetGroupId,
+        hotkeyChords, setHotkeyChords,
+        hotkeyWaitMs, setHotkeyWaitMs,
+        urlTabClick, patchUrlTabClick,
+        targetCandidates,
+        handleSubmit,
+    };
+}
+
+export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Element {
+    const { open, mode, groups, onCancel, onSubmit } = props;
+
+    const {
+        kind, setKind,
+        label, setLabel,
+        payloadJson, setPayloadJson,
+        targetGroupId, setTargetGroupId,
+        hotkeyChords, setHotkeyChords,
+        hotkeyWaitMs, setHotkeyWaitMs,
+        urlTabClick, patchUrlTabClick,
+        targetCandidates,
+        handleSubmit,
+    } = useStepEditorState(open, mode, groups, onSubmit);
 
     const isEdit = mode?.Kind === "edit";
 

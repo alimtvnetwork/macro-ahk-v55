@@ -37,6 +37,8 @@ interface Props {
     projects?: ReadonlyMap<string, ProjectSummary>;
 }
 
+import type { ComponentProps } from "react";
+
 export function RecorderStepGraph({ steps, selectedStepId, onSelect, onDelete, links, projects }: Props) {
     const previewByStepId = useMemo(() => {
         const list = buildExecutionNextPreview({
@@ -70,43 +72,64 @@ export function RecorderStepGraph({ steps, selectedStepId, onSelect, onDelete, l
                 const preview = previewByStepId.get(step.StepId);
 
                 return (
-                    <li key={step.StepId}>
-                        <div
-                            className={`group flex items-center gap-2 rounded-md border px-2 py-1.5 text-xs transition-colors ${
-                                isSelected
-                                    ? "border-primary bg-primary/10"
-                                    : "border-border bg-card hover:bg-primary/5"
-                            }`}
-                        >
-                            <button
-                                type="button"
-                                onClick={() => onSelect(step.StepId)}
-                                className="flex-1 flex items-center gap-2 text-left"
-                            >
-                                <span className="font-mono text-[10px] text-muted-foreground w-6 shrink-0">
-                                    {step.OrderIndex}
-                                </span>
-                                <span className="font-mono text-primary shrink-0 w-16 truncate">
-                                    {STEP_KIND_LABEL[step.StepKindId] ?? `Kind${step.StepKindId}`}
-                                </span>
-                                <span className="font-medium truncate">{step.VariableName}</span>
-                                <span className="text-muted-foreground truncate">— {step.LabelType}</span>
-                                <ChevronRight className="h-3 w-3 ml-auto shrink-0 text-muted-foreground" />
-                            </button>
-                            <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-6 w-6 opacity-0 group-hover:opacity-100"
-                                onClick={() => onDelete(step.StepId)}
-                                title="Delete step"
-                            >
-                                <Trash2 className="h-3 w-3 text-destructive" />
-                            </Button>
-                        </div>
-                        {preview !== undefined && <ExecutionNextBadge preview={preview} />}
-                    </li>
+                    <StepListItem
+                        key={step.StepId}
+                        step={step}
+                        isSelected={isSelected}
+                        preview={preview}
+                        onSelect={onSelect}
+                        onDelete={onDelete}
+                    />
                 );
             })}
         </ol>
+    );
+}
+
+interface StepListItemProps {
+    step: StepRow;
+    isSelected: boolean;
+    preview: ComponentProps<typeof ExecutionNextBadge>["preview"];
+    onSelect: (stepId: number) => void;
+    onDelete: (stepId: number) => void;
+}
+
+function StepListItem({ step, isSelected, preview, onSelect, onDelete }: StepListItemProps): JSX.Element {
+    return (
+        <li>
+            <div
+                className={`group flex items-center gap-2 rounded-md border px-2 py-1.5 text-xs transition-colors ${
+                    isSelected
+                        ? "border-primary bg-primary/10"
+                        : "border-border bg-card hover:bg-primary/5"
+                }`}
+            >
+                <button
+                    type="button"
+                    onClick={() => onSelect(step.StepId)}
+                    className="flex-1 flex items-center gap-2 text-left"
+                >
+                    <span className="font-mono text-[10px] text-muted-foreground w-6 shrink-0">
+                        {step.OrderIndex}
+                    </span>
+                    <span className="font-mono text-primary shrink-0 w-16 truncate">
+                        {STEP_KIND_LABEL[step.StepKindId] ?? `Kind${step.StepKindId}`}
+                    </span>
+                    <span className="font-medium truncate">{step.VariableName}</span>
+                    <span className="text-muted-foreground truncate">— {step.LabelType}</span>
+                    <ChevronRight className="h-3 w-3 ml-auto shrink-0 text-muted-foreground" />
+                </button>
+                <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-6 w-6 opacity-0 group-hover:opacity-100"
+                    onClick={() => onDelete(step.StepId)}
+                    title="Delete step"
+                >
+                    <Trash2 className="h-3 w-3 text-destructive" />
+                </Button>
+            </div>
+            {preview !== undefined && <ExecutionNextBadge preview={preview} />}
+        </li>
     );
 }

@@ -29,13 +29,9 @@ interface UseStepGroupLibraryViewModelParams {
     readonly lib: StepLibrary;
     readonly showArchived: boolean;
     readonly pendingGroupOrder: ReadonlyMap<number | "root", ReadonlyArray<number>>;
-    readonly setPendingGroupOrder: (
-        next: ReadonlyMap<number | "root", ReadonlyArray<number>>,
-    ) => void;
+    readonly setPendingGroupOrder: (next: ReadonlyMap<number | "root", ReadonlyArray<number>>) => void;
     readonly pendingStepOrder: ReadonlyMap<number, ReadonlyArray<number>>;
-    readonly setPendingStepOrder: (
-        next: ReadonlyMap<number, ReadonlyArray<number>>,
-    ) => void;
+    readonly setPendingStepOrder: (next: ReadonlyMap<number, ReadonlyArray<number>>) => void;
     readonly expanded: ReadonlySet<number>;
     readonly activeGroupId: number | null;
     readonly selected: ReadonlySet<number>;
@@ -56,75 +52,50 @@ export interface StepGroupLibraryViewModel {
     readonly deletePreview: ReturnType<typeof buildDeletePreview>;
 }
 
-export function useStepGroupLibraryViewModel(
-    params: UseStepGroupLibraryViewModelParams,
-): StepGroupLibraryViewModel {
-    const {
-        lib,
-        showArchived,
-        pendingGroupOrder,
-        setPendingGroupOrder,
-        pendingStepOrder,
-        setPendingStepOrder,
-        expanded,
-        activeGroupId,
-        selected,
-        buildTree,
-    } = params;
-
-    const visibleGroups = useMemo(
-        () => (showArchived ? lib.Groups : lib.Groups.filter((g) => !g.IsArchived)),
-        [lib.Groups, showArchived],
-    );
-
+function useGroupOrdering(lib: StepLibrary, showArchived: boolean, pendingGroupOrder: ReadonlyMap<number | "root", ReadonlyArray<number>>) {
+    const visibleGroups = useMemo(() => (showArchived ? lib.Groups : lib.Groups.filter((g) => !g.IsArchived)), [lib.Groups, showArchived]);
     const orderedGroups = useMemo(() => {
         if (pendingGroupOrder.size === 0) return visibleGroups;
-        const positionByParent = new Map<number | "root", Map<number, number>>();
-        for (const [parentKey, ids] of pendingGroupOrder) {
+        const pos = new Map<number | "root", Map<number, number>>();
+        for (const [pk, ids] of pendingGroupOrder) {
             const m = new Map<number, number>();
             ids.forEach((id, i) => m.set(id, i));
-            positionByParent.set(parentKey, m);
+            pos.set(pk, m);
         }
 
         return [...visibleGroups].sort((a, b) => {
-            const aKey = (a.ParentStepGroupId ?? "root") as number | "root";
-            const bKey = (b.ParentStepGroupId ?? "root") as number | "root";
-            if (aKey !== bKey) return 0;
-            const positions = positionByParent.get(aKey);
-            if (positions === undefined) return 0;
-            const ai = positions.get(a.StepGroupId);
-            const bi = positions.get(b.StepGroupId);
+            const aK = (a.ParentStepGroupId ?? "root") as number | "root", bK = (b.ParentStepGroupId ?? "root") as number | "root";
+            if (aK !== bK) return 0;
+            const pm = pos.get(aK);
+            if (!pm) return 0;
+            const ai = pm.get(a.StepGroupId), bi = pm.get(b.StepGroupId);
             if (ai === undefined || bi === undefined) return 0;
 
             return ai - bi;
         });
     }, [visibleGroups, pendingGroupOrder]);
 
-    const tree = useMemo(() => buildTree(orderedGroups), [orderedGroups, buildTree]);
+    return { orderedGroups };
+}
 
+function useSettleGroupOrder(lib: StepLibrary, pendingGroupOrder: ReadonlyMap<number | "root", ReadonlyArray<number>>, setPendingGroupOrder: (next: ReadonlyMap<number | "root", ReadonlyArray<number>>) => void) {
     useEffect(() => {
         if (pendingGroupOrder.size === 0) return;
-        let allSettled = true;
-        for (const [parentKey, ids] of pendingGroupOrder) {
-            const parentId = parentKey === "root" ? null : parentKey;
-            const actual = lib.Groups
-                .filter((g) => (g.ParentStepGroupId ?? null) === parentId)
-                .sort((a, b) => a.OrderIndex - b.OrderIndex || a.Name.localeCompare(b.Name))
-                .map((g) => g.StepGroupId);
-            if (actual.length !== ids.length || actual.some((id, i) => id !== ids[i])) {
-                allSettled = false;
-                break;
-            }
+        let settled = true;
+        for (const [pk, ids] of pendingGroupOrder) {
+            const parentId = pk === "root" ? null : pk;
+            const act = lib.Groups.filter((g) => (g.ParentStepGroupId ?? null) === parentId).sort((a, b) => a.OrderIndex - b.OrderIndex || a.Name.localeCompare(b.Name)).map((g) => g.StepGroupId);
+            if (act.length !== ids.length || act.some((id, i) => id !== ids[i])) { settled = false; break; }
         }
-        if (allSettled) setPendingGroupOrder(new Map());
+        if (settled) setPendingGroupOrder(new Map());
     }, [lib.Groups, pendingGroupOrder, setPendingGroupOrder]);
+}
 
+function useTreeFilter(tree: TreeNode[]) {
     const [query, setQuery] = useState("");
     const trimmedQuery = query.trim().toLowerCase();
     const { filteredTree, autoExpand } = useMemo(() => {
-        if (trimmedQuery === "") {
-            return { filteredTree: tree, autoExpand: null as Set<number> | null };
-        }
+        if (trimmedQuery === "") return { filteredTree: tree, autoExpand: null as Set<number> | null };
         const expandIds = new Set<number>();
         const filterNodes = (nodes: ReadonlyArray<TreeNode>): TreeNode[] => {
             const out: TreeNode[] = [];
@@ -139,84 +110,80 @@ export function useStepGroupLibraryViewModel(
 
             return out;
         };
-        const filtered = filterNodes(tree);
 
-        return { filteredTree: filtered, autoExpand: expandIds };
+        return { filteredTree: filterNodes(tree), autoExpand: expandIds };
     }, [tree, trimmedQuery]);
 
-    const effectiveExpanded = useMemo(() => {
-        if (autoExpand === null) return expanded;
-        const merged = new Set(expanded);
-        for (const id of autoExpand) merged.add(id);
+    return { query, setQuery, trimmedQuery, filteredTree, autoExpand };
+}
 
-        return merged;
-    }, [expanded, autoExpand]);
-
-    const activeGroup = useMemo(
-        () => lib.Groups.find((g) => g.StepGroupId === activeGroupId) ?? null,
-        [lib.Groups, activeGroupId],
-    );
-
+function useActiveStepOrder(lib: StepLibrary, activeGroupId: number | null, pendingStepOrder: ReadonlyMap<number, ReadonlyArray<number>>) {
+    const activeGroup = useMemo(() => lib.Groups.find((g) => g.StepGroupId === activeGroupId) ?? null, [lib.Groups, activeGroupId]);
     const activeSteps: ReadonlyArray<StepRow> = useMemo(() => {
         if (activeGroupId === null) return [];
-        const loaded = lib.StepsByGroup.get(activeGroupId) ?? [];
-        const override = pendingStepOrder.get(activeGroupId);
+        const loaded = lib.StepsByGroup.get(activeGroupId) ?? [], override = pendingStepOrder.get(activeGroupId);
         if (override === undefined) return loaded;
-        const byId = new Map(loaded.map((s) => [s.StepId, s] as const));
-        const out: StepRow[] = [];
+        const byId = new Map(loaded.map((s) => [s.StepId, s] as const)), out: StepRow[] = [];
         for (const id of override) {
             const row = byId.get(id);
-            if (row !== undefined) {
-                out.push(row);
-                byId.delete(id);
-            }
+            if (row !== undefined) { out.push(row); byId.delete(id); }
         }
-        for (const remaining of byId.values()) out.push(remaining);
+        for (const r of byId.values()) out.push(r);
 
         return out;
     }, [activeGroupId, lib.StepsByGroup, pendingStepOrder]);
 
+    return { activeGroup, activeSteps };
+}
+
+function useSettleStepOrder(lib: StepLibrary, pendingStepOrder: ReadonlyMap<number, ReadonlyArray<number>>, setPendingStepOrder: (next: ReadonlyMap<number, ReadonlyArray<number>>) => void) {
     useEffect(() => {
         if (pendingStepOrder.size === 0) return;
-        let allSettled = true;
+        let settled = true;
         for (const [gid, ids] of pendingStepOrder) {
-            const actual = (lib.StepsByGroup.get(gid) ?? []).map((s) => s.StepId);
-            if (actual.length !== ids.length || actual.some((id, i) => id !== ids[i])) {
-                allSettled = false;
-                break;
-            }
+            const act = (lib.StepsByGroup.get(gid) ?? []).map((s) => s.StepId);
+            if (act.length !== ids.length || act.some((id, i) => id !== ids[i])) { settled = false; break; }
         }
-        if (allSettled) setPendingStepOrder(new Map());
+        if (settled) setPendingStepOrder(new Map());
     }, [lib.StepsByGroup, pendingStepOrder, setPendingStepOrder]);
+}
+
+function useDerivedState(expanded: ReadonlySet<number>, autoExpand: Set<number> | null, lib: StepLibrary, selected: ReadonlySet<number>) {
+    const effectiveExpanded = useMemo(() => {
+        if (autoExpand === null) return expanded;
+        const merged = new Set(expanded);
+        for (const id of autoExpand) merged.add(id);
+        return merged;
+    }, [expanded, autoExpand]);
 
     const groupsById = useMemo(() => {
         const m = new Map<number, StepGroupRow>();
         for (const g of lib.Groups) m.set(g.StepGroupId, g);
-
         return m;
     }, [lib.Groups]);
 
-    const selectedGroups = useMemo(
-        () => lib.Groups.filter((g) => selected.has(g.StepGroupId)),
-        [lib.Groups, selected],
-    );
+    const selectedGroups = useMemo(() => lib.Groups.filter((g) => selected.has(g.StepGroupId)), [lib.Groups, selected]);
+    const deletePreview = useMemo(() => buildDeletePreview(Array.from(selected), lib.Groups, lib.StepsByGroup), [selected, lib.Groups, lib.StepsByGroup]);
 
-    const deletePreview = useMemo(
-        () => buildDeletePreview(Array.from(selected), lib.Groups, lib.StepsByGroup),
-        [selected, lib.Groups, lib.StepsByGroup],
-    );
+    return { effectiveExpanded, groupsById, selectedGroups, deletePreview };
+}
+
+export function useStepGroupLibraryViewModel(params: UseStepGroupLibraryViewModelParams): StepGroupLibraryViewModel {
+    const { lib, showArchived, pendingGroupOrder, setPendingGroupOrder, pendingStepOrder, setPendingStepOrder, expanded, activeGroupId, selected, buildTree } = params;
+
+    const { orderedGroups } = useGroupOrdering(lib, showArchived, pendingGroupOrder);
+    useSettleGroupOrder(lib, pendingGroupOrder, setPendingGroupOrder);
+
+    const tree = useMemo(() => buildTree(orderedGroups), [orderedGroups, buildTree]);
+    const { query, setQuery, trimmedQuery, filteredTree, autoExpand } = useTreeFilter(tree);
+
+    const { activeGroup, activeSteps } = useActiveStepOrder(lib, activeGroupId, pendingStepOrder);
+    useSettleStepOrder(lib, pendingStepOrder, setPendingStepOrder);
+
+    const derived = useDerivedState(expanded, autoExpand, lib, selected);
 
     return {
-        query,
-        setQuery,
-        trimmedQuery,
-        tree,
-        filteredTree,
-        effectiveExpanded,
-        activeGroup,
-        activeSteps,
-        groupsById,
-        selectedGroups,
-        deletePreview,
+        query, setQuery, trimmedQuery, tree, filteredTree,
+        activeGroup, activeSteps, ...derived,
     };
 }

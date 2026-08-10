@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * State + handlers extracted from WebhookSettingsDialog so the top-level
  * component and each hook stay within max-lines-per-function caps.

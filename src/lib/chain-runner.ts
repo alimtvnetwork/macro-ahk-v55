@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Chain Runner — Spec 21
  *
@@ -8,7 +7,7 @@
 
 import type {
   AutomationChain, ChainStep, ChainExecutionState,
-  any, StepStatus, FlattenedStep,
+  StepStatus, FlattenedStep,
 } from "./automation-types";
 import { flattenSteps } from "./automation-types";
 import { evaluateCondition } from "./condition-evaluators";
@@ -48,7 +47,7 @@ export class ChainRunner {
     this.onStateChange({ ...this.state });
   }
 
-  private setStatus(status: any) {
+  private setStatus(status: ChainExecutionState["status"]) {
     this.state.status = status;
     this.emit();
   }
@@ -64,7 +63,7 @@ export class ChainRunner {
   /* ---------------------------------------------------------------- */
 
   async run(): Promise<void> {
-    if ((this.state.status as any) === "running") return;
+    if (this.state.status === "running") return;
 
     this.abortController = new AbortController();
     this.state.startedAt = new Date().toISOString();

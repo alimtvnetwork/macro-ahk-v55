@@ -1,4 +1,3 @@
-// @ts-nocheck
 /* eslint-disable max-lines-per-function */
 /**
  * Prompt Chain Panel — Spec 15 T-12

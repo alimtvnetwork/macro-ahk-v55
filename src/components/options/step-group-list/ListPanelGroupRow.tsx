@@ -27,35 +27,38 @@ export interface ListPanelGroupRowProps {
     readonly onActivate: (id: number) => void;
 }
 
-export function ListPanelGroupRow(props: ListPanelGroupRowProps): JSX.Element {
-    const {
-        group,
-        isActive,
-        isChecked,
-        stepCount,
-        parentName,
-        onToggleSelect,
-        onActivate,
-    } = props;
+function GroupRowDetails({ group, stepCount, parentName }: { group: StepGroupRow, stepCount: number, parentName: string | null }) {
+    return (
+        <>
+            <div className="flex w-full items-center gap-2">
+                <span className="truncate text-sm font-medium">{group.Name}</span>
+                {group.IsArchived && (
+                    <span className="inline-flex items-center gap-0.5 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground" title="Archived">
+                        <Archive className="h-3 w-3" /> Archived
+                    </span>
+                )}
+            </div>
+            <div className="flex w-full items-center gap-2 text-xs text-muted-foreground">
+                <ListOrdered className="h-3 w-3" />
+                <span>{stepCount} step{stepCount === 1 ? "" : "s"}</span>
+                {parentName !== null && <span className="truncate">· in {parentName}</span>}
+            </div>
+        </>
+    );
+}
 
+export function ListPanelGroupRow(props: ListPanelGroupRowProps): JSX.Element {
+    const { group, isActive, isChecked, stepCount, parentName, onToggleSelect, onActivate } = props;
     const checkboxId = `list-select-${group.StepGroupId}`;
-    const rowTone = isActive
-        ? "bg-primary/10"
-        : isChecked
-            ? "bg-primary/5"
-            : "hover:bg-muted/40";
+    const rowTone = isActive ? "bg-primary/10" : isChecked ? "bg-primary/5" : "hover:bg-muted/40";
 
     return (
         <li className={`flex items-stretch transition ${rowTone}`}>
-            {/* Checkbox lives outside the activate-row button so clicking it
-                never changes which group is showing in the details pane. */}
             <div className="flex shrink-0 items-center pl-4 pr-1">
                 <Checkbox
                     id={checkboxId}
                     checked={isChecked}
-                    onCheckedChange={(state) =>
-                        onToggleSelect(group.StepGroupId, state === true)
-                    }
+                    onCheckedChange={(state) => onToggleSelect(group.StepGroupId, state === true)}
                     aria-label={`Select ${group.Name}`}
                 />
             </div>
@@ -65,29 +68,7 @@ export function ListPanelGroupRow(props: ListPanelGroupRowProps): JSX.Element {
                 className="flex flex-1 flex-col items-start gap-0.5 py-2 pl-2 pr-4 text-left text-foreground"
                 aria-pressed={isActive}
             >
-                <div className="flex w-full items-center gap-2">
-                    <span className="truncate text-sm font-medium">
-                        {group.Name}
-                    </span>
-                    {group.IsArchived && (
-                        <span
-                            className="inline-flex items-center gap-0.5 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground"
-                            title="Archived"
-                        >
-                            <Archive className="h-3 w-3" />
-                            Archived
-                        </span>
-                    )}
-                </div>
-                <div className="flex w-full items-center gap-2 text-xs text-muted-foreground">
-                    <ListOrdered className="h-3 w-3" />
-                    <span>
-                        {stepCount} step{stepCount === 1 ? "" : "s"}
-                    </span>
-                    {parentName !== null && (
-                        <span className="truncate">· in {parentName}</span>
-                    )}
-                </div>
+                <GroupRowDetails group={group} stepCount={stepCount} parentName={parentName} />
             </button>
         </li>
     );

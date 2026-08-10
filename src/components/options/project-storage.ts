@@ -3,7 +3,7 @@ import type { StoredProject } from "@/hooks/use-projects-scripts";
 import { logError } from "./options-logger";
 
 type ProjectStorageGet = ((key: string) => Promise<Record<string, unknown>>)
-  & ((key: string, cb: (out: Record<string, unknown>) => void) => void);
+  & ((key: string, callback: (out: Record<string, unknown>) => void) => void);
 
 interface ProjectStorageLocal {
   get: ProjectStorageGet;

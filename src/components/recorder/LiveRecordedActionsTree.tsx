@@ -67,22 +67,6 @@ export interface LiveRecordedActionsTreeProps {
     readonly className?: string;
     readonly onStepClick?: (step: RecordedStep) => void;
     /**
-     * Controlled selection. When provided, the tree treats this StepId as the
-     * active selection (Options page passes the StepId currently shown in the
-     * detail panel). Internal click selection is still honored when this is
-     * `null` or `undefined`.
-     */
-    readonly selectedStepId?: string | null;
-}
-
-export function LiveRecordedActionsTree(props: LiveRecordedActionsTreeProps): JSX.Element {
-    const { className, onStepClick, selectedStepId: controlledStepId } = props;
-
-    // Subscribe directly to the shared backend transport so this tree
-    // stays in lockstep with the active session even if no parent
-    // (Options page, Floating Controller) is currently mounted.
-    const [session, setSession] = useState<RecordingSession | null>(null);
-    const [transport, setTransport] = useState<RecorderSyncTransport>(() => detectTransport());
     useEffect(() => {
         setTransport(detectTransport());
 
@@ -92,19 +76,12 @@ export function LiveRecordedActionsTree(props: LiveRecordedActionsTreeProps): JS
     const steps = session?.Steps ?? [];
     const [internalStepId, setInternalStepId] = useState<string | null>(null);
 
-    // Controlled selection wins over internal clicks so the Options page can
-    // drive which row is highlighted without extra plumbing.
     const activeStepId = useMemo<string | null>(() => {
         if (controlledStepId !== undefined && controlledStepId !== null) { return controlledStepId; }
 
         return internalStepId;
     }, [controlledStepId, internalStepId]);
 
-    // ─────────────────────────────────────────────────────────────────────
-    // Refs: one per row so we can scroll the matching row into view.
-    // The map is rebuilt each render via the callback ref pattern; rows that
-    // unmount remove themselves automatically.
-    // ─────────────────────────────────────────────────────────────────────
     const scrollRef = useRef<HTMLDivElement | null>(null);
     const rowRefs = useRef<Map<string, HTMLLIElement>>(new Map());
     const setRowRef = (stepId: string) => (node: HTMLLIElement | null): void => {
@@ -114,10 +91,6 @@ export function LiveRecordedActionsTree(props: LiveRecordedActionsTreeProps): JS
         rowRefs.current.set(stepId, node);
     };
 
-    // Auto-scroll to the latest step when a new one arrives so the user
-    // always sees the most recent action without manual scrolling. Only fires
-    // when the user has not pinned a specific selection; otherwise the
-    // selection-scroll effect below takes precedence.
     const lastCountRef = useRef<number>(0);
     useEffect(() => {
         if (activeStepId === null && steps.length > lastCountRef.current) {
@@ -127,96 +100,20 @@ export function LiveRecordedActionsTree(props: LiveRecordedActionsTreeProps): JS
         lastCountRef.current = steps.length;
     }, [steps.length, activeStepId]);
 
-    // Selection scroll + highlight pulse. Runs whenever the active selection
-    // changes (internal click OR controlled prop change) so the matching row
-    // is always visible regardless of how it was selected. Also re-runs when
-    // the underlying step list grows so a controlled selection set *before*
-    // the session loaded still gets scrolled/pulsed once its row mounts.
     const [pulseStepId, setPulseStepId] = useState<string | null>(null);
     useEffect(() => {
         if (activeStepId === null) { return; }
         const node = rowRefs.current.get(activeStepId);
         if (node === undefined) { return; }
-        // `block: "nearest"` keeps the row visible without jumping if it's
-        // already in view, which avoids jitter when the user clicks a visible row.
+        
         node.scrollIntoView({ block: "nearest", behavior: "smooth" });
         setPulseStepId(activeStepId);
         const timer = window.setTimeout(() => { setPulseStepId(null); }, HIGHLIGHT_PULSE_MS);
-
+        
         return () => { window.clearTimeout(timer); };
     }, [activeStepId, steps.length]);
 
-    const isRecording = session?.Phase === "Recording";
-    const isPaused = session?.Phase === "Paused";
-
-    return (
-        <div
-            className={cn(
-                "rounded-md border border-border/60 bg-background/40 p-2 space-y-1.5",
-                className,
-            )}
-            data-testid="live-recorded-actions-tree"
-        >
-            <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-muted-foreground px-1">
-                <div className="flex items-center gap-1.5">
-                    <span
-                        className={cn(
-                            "h-1.5 w-1.5 rounded-full",
-                            isRecording ? "bg-destructive animate-pulse" :
-                            isPaused ? "bg-amber-400" : "bg-muted",
-                        )}
-                        aria-hidden
-                    />
-                    <span>Live actions</span>
-                </div>
-                <div className="flex items-center gap-1">
-                    <Badge
-                        variant="outline"
-                        className={cn(
-                            "text-[9px] px-1 py-0 font-mono",
-                            transport === "chrome.storage" && "border-emerald-400/40 text-emerald-400",
-                            transport === "memory" && "border-amber-400/40 text-amber-400",
-                        )}
-                        title={`Live transport: ${transport}`}
-                        data-testid="live-actions-transport"
-                    >
-                        {transport === "chrome.storage" ? "ext" : transport === "localStorage" ? "preview" : "mem"}
-                    </Badge>
-                    <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                        {steps.length}
-                    </Badge>
-                </div>
-            </div>
-
-            <ScrollArea className="h-[180px]">
-                <div ref={scrollRef} className="pr-2">
-                    {steps.length === 0 ? (
-                        <p className="text-[11px] text-muted-foreground text-center py-6 italic">
-                            {session === null
-                                ? "No active session — press Play to start recording."
-                                : "Waiting for the first action…"}
-                        </p>
-                    ) : (
-                        <ul className="space-y-1" role="tree" aria-label="Recorded actions">
-                            {steps.map((step) => (
-                                <ActionRow
-                                    key={step.StepId}
-                                    rowRef={setRowRef(step.StepId)}
-                                    step={step}
-                                    selected={activeStepId === step.StepId}
-                                    pulsing={pulseStepId === step.StepId}
-                                    onClick={() => {
-                                        setInternalStepId(step.StepId);
-                                        onStepClick?.(step);
-                                    }}
-                                />
-                            ))}
-                        </ul>
-                    )}
-                </div>
-            </ScrollArea>
-        </div>
-    );
+    return { session, transport, steps, activeStepId, pulseStepId, scrollRef, setRowRef, setInternalStepId };
 }
 
 interface ActionRowProps {

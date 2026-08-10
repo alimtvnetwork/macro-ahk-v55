@@ -29,16 +29,16 @@ export function useDialogStates() {
     return { createDialog, setCreateDialog, renameDialog, setRenameDialog, deleteDialog, setDeleteDialog };
 }
 
-export function useValidationErrors(
-    lib: UseStepLibraryApi,
-    createName: string,
-    renameGroup: StepGroupRow | null,
-    renameName: string,
-) {
+function useCreateError(lib: UseStepLibraryApi, createName: string) {
     const rootSiblingNames = useMemo(
         () => lib.Groups.filter((g) => g.ParentStepGroupId === null).map((g) => g.Name),
         [lib.Groups],
     );
+
+    return useMemo(() => validateName(createName, rootSiblingNames), [createName, rootSiblingNames]);
+}
+
+function useRenameError(lib: UseStepLibraryApi, renameGroup: StepGroupRow | null, renameName: string) {
     const renameSiblingNames = useMemo(() => {
         if (renameGroup === null) return [] as string[];
         const parentId = renameGroup.ParentStepGroupId ?? null;
@@ -47,8 +47,8 @@ export function useValidationErrors(
             .filter((g) => (g.ParentStepGroupId ?? null) === parentId && g.StepGroupId !== renameGroup.StepGroupId)
             .map((g) => g.Name);
     }, [lib.Groups, renameGroup]);
-    const createError = useMemo(() => validateName(createName, rootSiblingNames), [createName, rootSiblingNames]);
-    const renameError = useMemo(() => {
+
+    return useMemo(() => {
         if (renameGroup === null) return null;
         const baseError = validateName(renameName, renameSiblingNames);
         if (baseError !== null) return baseError;
@@ -56,6 +56,16 @@ export function useValidationErrors(
 
         return null;
     }, [renameName, renameGroup, renameSiblingNames]);
+}
+
+export function useValidationErrors(
+    lib: UseStepLibraryApi,
+    createName: string,
+    renameGroup: StepGroupRow | null,
+    renameName: string,
+) {
+    const createError = useCreateError(lib, createName);
+    const renameError = useRenameError(lib, renameGroup, renameName);
 
     return { createError, renameError };
 }

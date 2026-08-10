@@ -85,47 +85,63 @@ export function intervalLabel(minutes: number): string {
 export const STATUS_UP_TO_DATE = "up-to-date" as const;
 export const STATUS_UPDATE_AVAILABLE = "update-available" as const;
 
-export function mapBackendEntry(u: Record<string, unknown>): UpdaterEntry {
-  const cats = typeof u.Categories === "string" && u.Categories
-    ? (u.Categories as string).split(", ").filter(Boolean)
-    : [];
-
-  const computeStatus = (): UpdaterEntry["status"] => {
-    if (!u.LastCheckedAt) return "unchecked";
-    if (u.CurrentVersion && u.LatestVersion && u.CurrentVersion !== u.LatestVersion) return STATUS_UPDATE_AVAILABLE;
-    if (u.LatestVersion) return STATUS_UP_TO_DATE;
-
-    return "unchecked";
-  };
-
+function extractBooleans(u: Record<string, unknown>) {
   return {
-    id: (u.UpdaterId ?? u.Id ?? 0) as number,
+    isGit: u.IsGit === 1 || u.IsGit === true,
+    isRedirectable: u.IsRedirectable !== 0 && u.IsRedirectable !== false,
+    isInstructionRedirect: u.IsInstructionRedirect === 1 || u.IsInstructionRedirect === true,
+    hasInstructions: u.HasInstructions === 1 || u.HasInstructions === true,
+    hasChangelogFromVersionInfo: u.HasChangelogFromVersionInfo !== 0 && u.HasChangelogFromVersionInfo !== false,
+    hasUserConfirmBeforeUpdate: u.HasUserConfirmBeforeUpdate === 1 || u.HasUserConfirmBeforeUpdate === true,
+    isEnabled: u.IsEnabled !== 0 && u.IsEnabled !== false,
+  };
+}
+
+function extractStrings(u: Record<string, unknown>) {
+  return {
     name: (u.Name ?? "") as string,
     description: (u.Description as string) ?? undefined,
     scriptUrl: (u.ScriptUrl ?? "") as string,
     versionInfoUrl: (u.VersionInfoUrl as string) ?? undefined,
     instructionUrl: (u.InstructionUrl as string) ?? undefined,
     changelogUrl: (u.ChangelogUrl as string) ?? undefined,
-    isGit: u.IsGit === 1 || u.IsGit === true,
-    isRedirectable: u.IsRedirectable !== 0 && u.IsRedirectable !== false,
-    maxRedirectDepth: (u.MaxRedirectDepth ?? 2) as number,
-    isInstructionRedirect: u.IsInstructionRedirect === 1 || u.IsInstructionRedirect === true,
-    instructionRedirectDepth: (u.InstructionRedirectDepth ?? 2) as number,
-    hasInstructions: u.HasInstructions === 1 || u.HasInstructions === true,
-    hasChangelogFromVersionInfo: u.HasChangelogFromVersionInfo !== 0 && u.HasChangelogFromVersionInfo !== false,
-    hasUserConfirmBeforeUpdate: u.HasUserConfirmBeforeUpdate === 1 || u.HasUserConfirmBeforeUpdate === true,
-    isEnabled: u.IsEnabled !== 0 && u.IsEnabled !== false,
-    autoCheckIntervalMinutes: (u.AutoCheckIntervalMinutes ?? 1440) as number,
-    cacheExpiryMinutes: (u.CacheExpiryMinutes ?? 10080) as number,
     cachedRedirectUrl: (u.CachedRedirectUrl as string) ?? undefined,
     cachedRedirectAt: (u.CachedRedirectAt as string) ?? undefined,
     currentVersion: (u.CurrentVersion as string) ?? undefined,
     latestVersion: (u.LatestVersion as string) ?? undefined,
     lastCheckedAt: (u.LastCheckedAt as string) ?? undefined,
     lastUpdatedAt: (u.LastUpdatedAt as string) ?? undefined,
+  };
+}
+
+function extractNumbers(u: Record<string, unknown>) {
+  return {
+    id: (u.UpdaterId ?? u.Id ?? 0) as number,
+    maxRedirectDepth: (u.MaxRedirectDepth ?? 2) as number,
+    instructionRedirectDepth: (u.InstructionRedirectDepth ?? 2) as number,
+    autoCheckIntervalMinutes: (u.AutoCheckIntervalMinutes ?? 1440) as number,
+    cacheExpiryMinutes: (u.CacheExpiryMinutes ?? 10080) as number,
+  };
+}
+
+function computeStatus(u: Record<string, unknown>): UpdaterEntry["status"] {
+  if (!u.LastCheckedAt) return "unchecked";
+  if (u.CurrentVersion && u.LatestVersion && u.CurrentVersion !== u.LatestVersion) return STATUS_UPDATE_AVAILABLE;
+  if (u.LatestVersion) return STATUS_UP_TO_DATE;
+
+  return "unchecked";
+}
+
+export function mapBackendEntry(u: Record<string, unknown>): UpdaterEntry {
+  const cats = typeof u.Categories === "string" && u.Categories ? (u.Categories as string).split(", ").filter(Boolean) : [];
+
+  return {
+    ...extractNumbers(u),
+    ...extractStrings(u),
+    ...extractBooleans(u),
     categories: cats,
     endpoints: [],
     steps: [],
-    status: computeStatus(),
+    status: computeStatus(u),
   };
 }

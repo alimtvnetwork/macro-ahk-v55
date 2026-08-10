@@ -67,116 +67,135 @@ interface Props {
     readonly draftUrl: string;
 }
 
+function DeliveryLogSearch(props: {
+    readonly searchQuery: string;
+    readonly setSearchQuery: Dispatch<SetStateAction<string>>;
+}) {
+    return (
+        <div className="relative">
+            <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden />
+            <Input
+                type="search"
+                value={props.searchQuery}
+                onChange={(e) => props.setSearchQuery(e.target.value)}
+                placeholder="Filter by event, time, or status…"
+                aria-label="Filter webhook deliveries by event, emitted time, or status"
+                className="h-8 pl-7 pr-7 text-xs"
+            />
+            {props.searchQuery.length > 0 && (
+                <button
+                    type="button"
+                    onClick={() => props.setSearchQuery("")}
+                    aria-label="Clear search"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm p-0.5 text-muted-foreground hover:text-foreground"
+                >
+                    <X className="h-3.5 w-3.5" />
+                </button>
+            )}
+        </div>
+    );
+}
+
+function DeliveryLogExport({ filteredLog }: { readonly filteredLog: ReadonlyArray<WebhookDeliveryResult> }) {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="outline" disabled={filteredLog.length === 0} title="Export filtered results">
+                    <Download className="mr-1 h-3.5 w-3.5" />
+                    Export ({filteredLog.length})
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="text-xs">
+                <DropdownMenuItem onSelect={() => exportFilteredLog(filteredLog, "json")}>
+                    Download as JSON
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => exportFilteredLog(filteredLog, "csv")}>
+                    Download as CSV
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
+
+function RepairButton(props: {
+    readonly corruptCount: number;
+    readonly repairBusy: boolean;
+    readonly onOpenRepairConfirm: () => void;
+}) {
+    if (props.corruptCount === 0) return null;
+
+    return (
+        <Button
+            size="sm"
+            variant="outline"
+            onClick={props.onOpenRepairConfirm}
+            disabled={props.repairBusy}
+            title={`Remove ${props.corruptCount} corrupted entr${props.corruptCount === 1 ? "y" : "ies"} from the log`}
+            className="border-destructive/60 text-destructive hover:bg-destructive/10"
+        >
+            <Wrench className="mr-1 h-3.5 w-3.5" />
+            {props.repairBusy ? "Repairing…" : `Repair (${props.corruptCount})`}
+        </Button>
+    );
+}
+
+function DeliveryLogHeader(props: {
+    readonly logLength: number;
+    readonly filteredLog: ReadonlyArray<WebhookDeliveryResult>;
+    readonly busy: boolean;
+    readonly repairBusy: boolean;
+    readonly corruptCount: number;
+    readonly onRefresh: () => void;
+    readonly onTest: () => void;
+    readonly onClear: () => void;
+    readonly onOpenRepairConfirm: () => void;
+}) {
+    return (
+        <div className="flex items-center justify-between">
+            <LabelType className="text-sm font-medium">
+                Recent deliveries
+                <span className="ml-1.5 text-xs font-normal text-muted-foreground">
+                    ({props.logLength}/20)
+                </span>
+            </LabelType>
+            <div className="flex items-center gap-2">
+                <Button size="sm" variant="ghost" onClick={props.onRefresh} title="Refresh log">
+                    <RefreshCw className="h-3.5 w-3.5" />
+                </Button>
+                <Button size="sm" variant="outline" onClick={props.onTest} disabled={props.busy}>
+                    <Send className="mr-1 h-3.5 w-3.5" />
+                    {props.busy ? "Sending…" : "Send test ping"}
+                </Button>
+                <RepairButton corruptCount={props.corruptCount} repairBusy={props.repairBusy} onOpenRepairConfirm={props.onOpenRepairConfirm} />
+                {props.logLength > 0 && <DeliveryLogExport filteredLog={props.filteredLog} />}
+                {props.logLength > 0 && <Button size="sm" variant="ghost" onClick={props.onClear}>Clear</Button>}
+            </div>
+        </div>
+    );
+}
+
 export function DeliveryLogSection(props: Props) {
-    const {
-        log,
-        filteredLog,
-        logCounts,
-        statusFilter,
-        setStatusFilter,
-        searchQuery,
-        setSearchQuery,
-        expandedIdx,
-        setExpandedIdx,
-        payloadOpenIdx,
-        setPayloadOpenIdx,
-        busy,
-        repairBusy,
-        corruptCount,
-        onRefresh,
-        onTest,
-        onClear,
-        onOpenRepairConfirm,
-        draftEnabled,
-        draftUrl,
-    } = props;
+    const { log, filteredLog, logCounts, statusFilter, setStatusFilter, searchQuery, setSearchQuery } = props;
 
     return (
         <section className="space-y-2 rounded-md border p-3">
-            <div className="flex items-center justify-between">
-                <LabelType className="text-sm font-medium">
-                    Recent deliveries
-                    <span className="ml-1.5 text-xs font-normal text-muted-foreground">
-                        ({log.length}/20)
-                    </span>
-                </LabelType>
-                <div className="flex items-center gap-2">
-                    <Button size="sm" variant="ghost" onClick={onRefresh} title="Refresh log">
-                        <RefreshCw className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={onTest} disabled={busy}>
-                        <Send className="mr-1 h-3.5 w-3.5" />
-                        {busy ? "Sending…" : "Send test ping"}
-                    </Button>
-                    {corruptCount > 0 && (
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={onOpenRepairConfirm}
-                            disabled={repairBusy}
-                            title={`Remove ${corruptCount} corrupted entr${corruptCount === 1 ? "y" : "ies"} from the log`}
-                            className="border-destructive/60 text-destructive hover:bg-destructive/10"
-                        >
-                            <Wrench className="mr-1 h-3.5 w-3.5" />
-                            {repairBusy ? "Repairing…" : `Repair (${corruptCount})`}
-                        </Button>
-                    )}
-                    {log.length > 0 && (
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    disabled={filteredLog.length === 0}
-                                    title="Export filtered results"
-                                >
-                                    <Download className="mr-1 h-3.5 w-3.5" />
-                                    Export ({filteredLog.length})
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="text-xs">
-                                <DropdownMenuItem onSelect={() => exportFilteredLog(filteredLog, "json")}>
-                                    Download as JSON
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onSelect={() => exportFilteredLog(filteredLog, "csv")}>
-                                    Download as CSV
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    )}
-                    {log.length > 0 && (
-                        <Button size="sm" variant="ghost" onClick={onClear}>
-                            Clear
-                        </Button>
-                    )}
-                </div>
-            </div>
+            <DeliveryLogHeader
+                logLength={log.length}
+                filteredLog={filteredLog}
+                busy={props.busy}
+                repairBusy={props.repairBusy}
+                corruptCount={props.corruptCount}
+                onRefresh={props.onRefresh}
+                onTest={props.onTest}
+                onClear={props.onClear}
+                onOpenRepairConfirm={props.onOpenRepairConfirm}
+            />
             {log.length > 0 && (
-                <div className="relative">
-                    <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden />
-                    <Input
-                        type="search"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Filter by event, time, or status…"
-                        aria-label="Filter webhook deliveries by event, emitted time, or status"
-                        className="h-8 pl-7 pr-7 text-xs"
-                    />
-                    {searchQuery.length > 0 && (
-                        <button
-                            type="button"
-                            onClick={() => setSearchQuery("")}
-                            aria-label="Clear search"
-                            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm p-0.5 text-muted-foreground hover:text-foreground"
-                        >
-                            <X className="h-3.5 w-3.5" />
-                        </button>
-                    )}
-                </div>
+                <DeliveryLogSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
             )}
             {log.length > 0 && <StatusChips statusFilter={statusFilter} setStatusFilter={setStatusFilter} logCounts={logCounts} />}
             {log.length === 0 ? (
-                <EmptyState draftEnabled={draftEnabled} draftUrl={draftUrl} />
+                <EmptyState draftEnabled={props.draftEnabled} draftUrl={props.draftUrl} />
             ) : filteredLog.length === 0 ? (
                 <NoMatches
                     searchQuery={searchQuery}
@@ -186,10 +205,10 @@ export function DeliveryLogSection(props: Props) {
             ) : (
                 <LogEntries
                     filteredLog={filteredLog}
-                    expandedIdx={expandedIdx}
-                    setExpandedIdx={setExpandedIdx}
-                    payloadOpenIdx={payloadOpenIdx}
-                    setPayloadOpenIdx={setPayloadOpenIdx}
+                    expandedIdx={props.expandedIdx}
+                    setExpandedIdx={props.setExpandedIdx}
+                    payloadOpenIdx={props.payloadOpenIdx}
+                    setPayloadOpenIdx={props.setPayloadOpenIdx}
                 />
             )}
         </section>
@@ -307,6 +326,42 @@ function LogEntries({
     );
 }
 
+function LogEntryRowHeader(props: {
+    readonly entry: WebhookDeliveryResult;
+    readonly idx: number;
+    readonly expanded: boolean;
+    readonly onToggle: () => void;
+    readonly presentation: ReturnType<typeof presentVariant>;
+}) {
+    const hasSummaryDetail = props.presentation.summaryDetail !== null;
+
+    return (
+        <button
+            type="button"
+            className={`flex w-full items-center justify-between gap-2 px-2 py-1.5 text-left ${props.presentation.hoverClass}`}
+            onClick={props.onToggle}
+            aria-expanded={props.expanded}
+            aria-controls={`hook-log-detail-${props.idx}`}
+        >
+            <div className="flex min-w-0 items-center gap-2">
+                <Badge variant={props.presentation.badgeVariant} className={`shrink-0 ${props.presentation.badgeExtraClass}`}>
+                    {props.presentation.badgeLabel}
+                </Badge>
+                <span className={`shrink-0 font-mono ${props.presentation.eventClass}`}>{props.entry.Event}</span>
+                {hasSummaryDetail && (
+                    <span className={`truncate ${props.presentation.summaryDetailClass}`}>
+                        , {props.presentation.summaryDetail}
+                    </span>
+                )}
+            </div>
+            <span className="flex shrink-0 items-center gap-1 text-muted-foreground">
+                <span>{formatTime(props.entry.EmittedAt)} · {props.entry.DurationMs} ms</span>
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${props.expanded ? "rotate-180" : ""}`} />
+            </span>
+        </button>
+    );
+}
+
 function LogEntryRow({
     entry,
     idx,
@@ -323,33 +378,16 @@ function LogEntryRow({
     readonly onTogglePayload: () => void;
 }) {
     const presentation = presentVariant(entry);
-    const hasSummaryDetail = presentation.summaryDetail !== null;
 
     return (
         <li className={presentation.rowClass}>
-            <button
-                type="button"
-                className={`flex w-full items-center justify-between gap-2 px-2 py-1.5 text-left ${presentation.hoverClass}`}
-                onClick={onToggle}
-                aria-expanded={expanded}
-                aria-controls={`hook-log-detail-${idx}`}
-            >
-                <div className="flex min-w-0 items-center gap-2">
-                    <Badge variant={presentation.badgeVariant} className={`shrink-0 ${presentation.badgeExtraClass}`}>
-                        {presentation.badgeLabel}
-                    </Badge>
-                    <span className={`shrink-0 font-mono ${presentation.eventClass}`}>{entry.Event}</span>
-                    {hasSummaryDetail && (
-                        <span className={`truncate ${presentation.summaryDetailClass}`}>
-                            , {presentation.summaryDetail}
-                        </span>
-                    )}
-                </div>
-                <span className="flex shrink-0 items-center gap-1 text-muted-foreground">
-                    <span>{formatTime(entry.EmittedAt)} · {entry.DurationMs} ms</span>
-                    <ChevronDown className={`h-3.5 w-3.5 transition-transform ${expanded ? "rotate-180" : ""}`} />
-                </span>
-            </button>
+            <LogEntryRowHeader
+                entry={entry}
+                idx={idx}
+                expanded={expanded}
+                onToggle={onToggle}
+                presentation={presentation}
+            />
             {expanded && (
                 <div id={`hook-log-detail-${idx}`} className="border-t px-2 py-1.5">
                     <LogEntryDetails entry={entry} />

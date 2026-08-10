@@ -45,6 +45,67 @@ interface ImportSummaryDialogProps {
     readonly fileName: string | null;
 }
 
+function ImportedSection({ counts }: { counts: ImportSummary["Counts"] }) {
+    return (
+        <section className="space-y-2">
+            <h3 className="flex items-center gap-2 text-sm font-semibold">
+                <Layers className="h-4 w-4 text-primary" />
+                Imported
+            </h3>
+            <div className="grid grid-cols-3 gap-3 rounded-md border bg-muted/20 p-3 text-center text-sm">
+                <CountStat label="Groups" value={counts.StepGroups} />
+                <CountStat label="Steps" value={counts.Steps} />
+                <CountStat
+                    label="Run-group refs"
+                    value={counts.RunGroupRefs}
+                    hint="Cross-group jumps preserved"
+                />
+            </div>
+        </section>
+    );
+}
+
+function ConflictsSection({ renames }: { renames: ImportSummary["RenamedRoots"] }) {
+    return (
+        <section className="space-y-2">
+            <h3 className="flex items-center gap-2 text-sm font-semibold">
+                <FileWarning className="h-4 w-4 text-amber-500" />
+                Conflicts ({renames.length})
+            </h3>
+            {renames.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                    No name clashes — every imported root kept its original name.
+                </p>
+            ) : (
+                <>
+                    <p className="text-xs text-muted-foreground">
+                        Roots whose names were already taken were renamed to keep
+                        both copies side by side.
+                    </p>
+                    <ScrollArea className="max-h-48 rounded-md border">
+                        <ul className="divide-y text-sm">
+                            {renames.map((r, idx) => (
+                                <li
+                                    key={`${r.OldName}-${idx}`}
+                                    className="flex items-center gap-2 px-3 py-1.5"
+                                >
+                                    <span className="truncate font-mono text-xs text-muted-foreground line-through">
+                                        {r.OldName}
+                                    </span>
+                                    <ArrowRight className="h-3 w-3 shrink-0 text-muted-foreground" />
+                                    <span className="truncate font-mono text-xs font-medium">
+                                        {r.NewName}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    </ScrollArea>
+                </>
+            )}
+        </section>
+    );
+}
+
 export default function ImportSummaryDialog(props: ImportSummaryDialogProps) {
     const { open, onOpenChange, summary, fileName } = props;
     if (summary === null) {
@@ -57,8 +118,6 @@ export default function ImportSummaryDialog(props: ImportSummaryDialogProps) {
         );
     }
 
-    const renames = summary.RenamedRoots;
-    const counts = summary.Counts;
     const bundleName = summary.Manifest.BundleName;
 
     return (
@@ -81,61 +140,12 @@ export default function ImportSummaryDialog(props: ImportSummaryDialogProps) {
                 </DialogHeader>
 
                 {/* ---------- Imported groups ---------- */}
-                <section className="space-y-2">
-                    <h3 className="flex items-center gap-2 text-sm font-semibold">
-                        <Layers className="h-4 w-4 text-primary" />
-                        Imported
-                    </h3>
-                    <div className="grid grid-cols-3 gap-3 rounded-md border bg-muted/20 p-3 text-center text-sm">
-                        <CountStat label="Groups" value={counts.StepGroups} />
-                        <CountStat label="Steps" value={counts.Steps} />
-                        <CountStat
-                            label="Run-group refs"
-                            value={counts.RunGroupRefs}
-                            hint="Cross-group jumps preserved"
-                        />
-                    </div>
-                </section>
+                <ImportedSection counts={summary.Counts} />
 
                 <Separator />
 
                 {/* ---------- Conflicts ---------- */}
-                <section className="space-y-2">
-                    <h3 className="flex items-center gap-2 text-sm font-semibold">
-                        <FileWarning className="h-4 w-4 text-amber-500" />
-                        Conflicts ({renames.length})
-                    </h3>
-                    {renames.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">
-                            No name clashes — every imported root kept its original name.
-                        </p>
-                    ) : (
-                        <>
-                            <p className="text-xs text-muted-foreground">
-                                Roots whose names were already taken were renamed to keep
-                                both copies side by side.
-                            </p>
-                            <ScrollArea className="max-h-48 rounded-md border">
-                                <ul className="divide-y text-sm">
-                                    {renames.map((r, idx) => (
-                                        <li
-                                            key={`${r.OldName}-${idx}`}
-                                            className="flex items-center gap-2 px-3 py-1.5"
-                                        >
-                                            <span className="truncate font-mono text-xs text-muted-foreground line-through">
-                                                {r.OldName}
-                                            </span>
-                                            <ArrowRight className="h-3 w-3 shrink-0 text-muted-foreground" />
-                                            <span className="truncate font-mono text-xs font-medium">
-                                                {r.NewName}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </ScrollArea>
-                        </>
-                    )}
-                </section>
+                <ConflictsSection renames={summary.RenamedRoots} />
 
                 <Separator />
 

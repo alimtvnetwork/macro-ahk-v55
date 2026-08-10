@@ -90,8 +90,60 @@ function runSelectorEvaluation(selector: string, kind: SelectorKind): TestResult
     }
 }
 
-export function useStepWaitDialog(args: Args) {
-    const { open, stepId, onChange, onOpenChange } = args;
+function performSave(
+    stepId: number, selector: string, effectiveKind: SelectorKind, condition: WaitCondition, timeoutMs: number,
+    validation: { Ok: boolean; Reason?: string }, onChange: (() => void) | undefined, onOpenChange: (open: boolean) => void
+) {
+    if (selector.trim().length === 0) { toast.error("Selector is required");
+
+ return; }
+    if (!validation.Ok) { toast.error(validation.Reason);
+
+ return; }
+    try {
+        writeStepWait(stepId, { Selector: selector.trim(), Kind: effectiveKind, Condition: condition, TimeoutMs: timeoutMs });
+        toast.success("Wait condition saved");
+        onChange?.();
+        onOpenChange(false);
+    } catch (e) {
+        toast.error(`Could not save: ${e instanceof Error ? e.message : "Unknown error"}`);
+    }
+}
+
+function performTest(
+    selector: string, effectiveKind: SelectorKind, validation: { Ok: boolean; Reason?: string }, setTestResult: (r: TestResult | null) => void
+) {
+    if (selector.trim().length === 0) { toast.error("Enter a selector first");
+
+ return; }
+    if (!validation.Ok) {
+        setTestResult({ Kind: effectiveKind, TotalCount: 0, VisibleCount: 0, DurationMs: 0, Error: validation.Reason! });
+
+        return;
+    }
+    setTestResult(runSelectorEvaluation(selector, effectiveKind));
+}
+
+function useStepWaitState(open: boolean, stepId: number | null) {
+    const [selector, setSelector] = useState("");
+    const [kindMode, setKindMode] = useState<KindMode>("Auto");
+    const [condition, setCondition] = useState<WaitCondition>(DEFAULT_WAIT_CONFIG.Condition);
+    const [timeoutMs, setTimeoutMs] = useState<number>(DEFAULT_WAIT_CONFIG.TimeoutMs);
+    const [hasExisting, setHasExisting] = useState(false);
+    const [testResult, setTestResult] = useState<TestResult | null>(null);
+
+    useEffect(() => {
+        if (!open || stepId === null) return;
+        hydrateFromExisting(stepId, { setSelector, setKindMode, setCondition, setTimeoutMs, setHasExisting });
+        setTestResult(null);
+    }, [open, stepId]);
+
+        return;
+    }
+    setTestResult(runSelectorEvaluation(selector, effectiveKind));
+}
+
+function useStepWaitState(open: boolean, stepId: number | null) {
     const [selector, setSelector] = useState("");
     const [kindMode, setKindMode] = useState<KindMode>("Auto");
     const [condition, setCondition] = useState<WaitCondition>(DEFAULT_WAIT_CONFIG.Condition);
@@ -107,60 +159,27 @@ export function useStepWaitDialog(args: Args) {
 
     useEffect(() => { setTestResult(null); }, [selector, kindMode]);
 
-    const detected: SelectorKind = useMemo(() => detectSelectorKind(selector), [selector]);
-    const effectiveKind: SelectorKind = kindMode === "Auto" ? detected : kindMode;
+    return { selector, setSelector, kindMode, setKindMode, condition, setCondition, timeoutMs, setTimeoutMs, hasExisting, testResult, setTestResult };
+}
 
+export function useStepWaitDialog(args: Args) {
+    const state = useStepWaitState(args.open, args.stepId);
+    const detected: SelectorKind = useMemo(() => detectSelectorKind(state.selector), [state.selector]);
+    const effectiveKind: SelectorKind = state.kindMode === "Auto" ? detected : state.kindMode;
     const validation = useMemo(
-        () => selector.trim().length === 0
-            ? { Ok: true as const, Kind: effectiveKind }
-            : validateSelector(selector, effectiveKind),
-        [selector, effectiveKind],
+        () => state.selector.trim().length === 0 ? { Ok: true as const, Kind: effectiveKind } : validateSelector(state.selector, effectiveKind),
+        [state.selector, effectiveKind]
     );
 
-    const handleSave = () => {
-        if (stepId === null) return;
-        if (selector.trim().length === 0) { toast.error("Selector is required");
-
- return; }
-        if (!validation.Ok) { toast.error(validation.Reason);
-
- return; }
-        const next: WaitConfig = { Selector: selector.trim(), Kind: effectiveKind, Condition: condition, TimeoutMs: timeoutMs };
-        try {
-            writeStepWait(stepId, next);
-            toast.success("Wait condition saved");
-            onChange?.();
-            onOpenChange(false);
-        } catch (e) {
-            const detail = e instanceof Error ? e.message : "Unknown error";
-            toast.error(`Could not save: ${detail}`);
-        }
-    };
-
-    const handleTest = () => {
-        if (selector.trim().length === 0) { toast.error("Enter a selector first");
-
- return; }
-        if (!validation.Ok) {
-            setTestResult({ Kind: effectiveKind, TotalCount: 0, VisibleCount: 0, DurationMs: 0, Error: validation.Reason });
-
-            return;
-        }
-        setTestResult(runSelectorEvaluation(selector, effectiveKind));
-    };
-
+    const handleSave = () => { if (args.stepId !== null) performSave(args.stepId, state.selector, effectiveKind, state.condition, state.timeoutMs, validation as unknown as { Ok: boolean; Reason?: string }, args.onChange, args.onOpenChange); };
+    const handleTest = () => performTest(state.selector, effectiveKind, validation as unknown as { Ok: boolean; Reason?: string }, state.setTestResult);
     const handleClear = () => {
-        if (stepId === null) return;
-        clearStepWait(stepId);
+        if (args.stepId === null) return;
+        clearStepWait(args.stepId);
         toast.success("Wait condition cleared");
-        onChange?.();
-        onOpenChange(false);
+        args.onChange?.();
+        args.onOpenChange(false);
     };
 
-    return {
-        selector, setSelector, kindMode, setKindMode, condition, setCondition,
-        timeoutMs, setTimeoutMs, hasExisting, testResult,
-        detected, effectiveKind, validation,
-        handleSave, handleTest, handleClear,
-    };
+    return { ...state, detected, effectiveKind, validation, handleSave, handleTest, handleClear };
 }

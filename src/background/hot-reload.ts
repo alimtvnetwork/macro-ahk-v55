@@ -42,7 +42,7 @@ function isDevBuild(): boolean {
         const versionName = manifest.version_name ?? "";
 
         return versionName.toLowerCase().includes("dev");
-    } catch (err) { 
+    } catch (error) { 
         // If we cannot read the manifest, fail safe and treat as production.
         return false;
     }
@@ -84,52 +84,29 @@ async function pollBuildMeta(): Promise<void> {
     try {
         const metaUrl = chrome.runtime.getURL(BUILD_META_URL);
         const response = ServiceResult.wrapFetch(await fetch(metaUrl, { cache: "no-store" }));
-
         if (response.isFail) {
-            // HEFF: a non-2xx from build-meta.json means the file is gone or
-            // mis-served. Do NOT keep polling once per second — stop the loop
-            // and surface the status so the dev sees it.
-            console.warn(
-                `[HEFF] HTTP ${response.status} on GET ${metaUrl} — build-meta poll halted. ` +
-                `Awaiting user instruction (reload extension after rebuild).`,
-            );
+            console.warn(`[HEFF] HTTP ${response.status} on GET ${metaUrl} — build-meta poll halted. Awaiting user instruction (reload extension after rebuild).`);
             stopHotReload();
 
             return;
         }
-
         const meta = await response.json() as { buildId?: string };
         const currentBuildId = meta.buildId ?? null;
-        const hasBuildId = currentBuildId !== null;
-
-        if (!hasBuildId) {
-            return;
-        }
-
-        const isFirstPoll = lastKnownBuildId === null;
-
-        if (isFirstPoll) {
+        if (!currentBuildId) return;
+        if (lastKnownBuildId === null) {
             lastKnownBuildId = currentBuildId;
             console.log("[hot-reload] Baseline buildId: %s", currentBuildId);
 
             return;
         }
-
-        const isBuildChanged = currentBuildId !== lastKnownBuildId;
-
-        if (isBuildChanged) {
+        if (currentBuildId !== lastKnownBuildId) {
             const previousBuildId = lastKnownBuildId;
             lastKnownBuildId = currentBuildId;
             const cacheSyncResult = await syncCacheWithBuildId(currentBuildId);
-            console.log(
-                "[hot-reload] Build changed: %s → %s — cleared %d cache entries, reloading!",
-                previousBuildId,
-                currentBuildId,
-                cacheSyncResult.cleared,
-            );
+            console.log("[hot-reload] Build changed: %s → %s — cleared %d cache entries, reloading!", previousBuildId, currentBuildId, cacheSyncResult.cleared);
             chrome.runtime.reload();
         }
-    } catch (err) {
-    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+    } catch (error) {
+        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", error); 
+    }
 }

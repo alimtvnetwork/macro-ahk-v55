@@ -175,6 +175,23 @@ function LazyTabContent({ value, activeTab, children }: { value: ProjectTab; act
   );
 }
 
+function ScriptsTabPanel(props: TabsBodyProps) {
+  const { activeTab, project, availableScripts, availableConfigs, onSave, sdkNamespace } = props;
+  const targetUrls = project.targetUrls ?? [];
+
+  return (
+    <TabsContent value="scripts" className="mt-4" forceMount={activeTab === "scripts" ? true : undefined}>
+      <AutoAttachDiagnosticsPanel
+        projectId={project.id}
+        autoStart={project.settings?.autoStart === true}
+        refreshKey={project.updatedAt ? new Date(project.updatedAt).getTime() : 0}
+      />
+      <ScriptsTabContent project={project} availableScripts={availableScripts} availableConfigs={availableConfigs} onSave={onSave} />
+      <DevGuideSection namespace={sdkNamespace} section="scripts" targetUrls={targetUrls} />
+    </TabsContent>
+  );
+}
+
 function PrimaryTabPanels({ activeTab, project, allProjects, availableScripts, availableConfigs, onSave, sdkNamespace, projectSlug }: TabsBodyProps) {
   const targetUrls = project.targetUrls ?? [];
 
@@ -183,15 +200,7 @@ function PrimaryTabPanels({ activeTab, project, allProjects, availableScripts, a
       <TabsContent value="general" className="mt-4" forceMount={activeTab === "general" ? true : undefined}>
         <GeneralTabContent project={project} allProjects={allProjects} onSave={onSave} />
       </TabsContent>
-      <TabsContent value="scripts" className="mt-4" forceMount={activeTab === "scripts" ? true : undefined}>
-        <AutoAttachDiagnosticsPanel
-          projectId={project.id}
-          autoStart={project.settings?.autoStart === true}
-          refreshKey={project.updatedAt ? new Date(project.updatedAt).getTime() : 0}
-        />
-        <ScriptsTabContent project={project} availableScripts={availableScripts} availableConfigs={availableConfigs} onSave={onSave} />
-        <DevGuideSection namespace={sdkNamespace} section="scripts" targetUrls={targetUrls} />
-      </TabsContent>
+      <ScriptsTabPanel activeTab={activeTab} project={project} allProjects={allProjects} availableScripts={availableScripts} availableConfigs={availableConfigs} onSave={onSave} sdkNamespace={sdkNamespace} projectSlug={projectSlug} />
       <LazyTabContent value="urls" activeTab={activeTab}>
         <ProjectUrlRulesEditor targetUrls={targetUrls} onChange={(urls) => onSave({ id: project.id, targetUrls: urls })} />
         <DevGuideSection namespace={sdkNamespace} section="urls" targetUrls={targetUrls} />

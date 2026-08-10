@@ -173,18 +173,14 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
 
   const handleApply = useCallback(async () => {
     const validTables = tables.filter((t) => t.name.trim() && t.columns.some((c) => c.name.trim()));
-    if (validTables.length === 0) { toast.error("Add at least one table with columns");
-
- return; }
+    if (validTables.length === 0) { toast.error("Add at least one table with columns"); return; }
 
     setApplying(true);
     setLastResult(null);
 
     try {
       const schema = buildSchemaPayload(validTables);
-      const result = await sendMessage<ApplyResult>({
-        type: "APPLY_JSON_SCHEMA", project: projectSlug, schema: JSON.stringify(schema),
-      });
+      const result = await sendMessage<ApplyResult>({ type: "APPLY_JSON_SCHEMA", project: projectSlug, schema: JSON.stringify(schema) });
       setLastResult(result);
       if (result.ok) {
         toast.success(`Schema applied: ${result.created ?? 0} created, ${result.migrated ?? 0} migrated`);

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { TabsAdapter, TabRef } from "./url-tab-click";
 
 export class ChromeTabsAdapter implements TabsAdapter {

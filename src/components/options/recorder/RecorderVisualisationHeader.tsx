@@ -47,41 +47,35 @@ export function RecorderVisualisationHeader(props: RecorderVisualisationHeaderPr
                     </Badge>
                 ))
             )}
-            <div className="ml-auto flex items-center gap-2">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 gap-1.5"
-                    onClick={onSelfTest}
-                    disabled={selfTestRunning}
-                    title="Insert a dummy step, verify it appears, and clean it up. Failures land in the Error Drawer."
-                >
-                    {selfTestRunning
-                        ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        : <FlaskConical className="h-3.5 w-3.5" />}
-                    Run self-test
-                </Button>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 gap-1.5"
-                            disabled={stepCount === 0}
-                            title={stepCount === 0
-                                ? "Record at least one step before exporting"
-                                : `Export ${stepCount} step(s)`}
-                        >
-                            <Download className="h-3.5 w-3.5" />
-                            Export
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onExport("json")}>Download as JSON</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onExport("csv")}>Download as CSV</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
+            <HeaderActionButtons
+                stepCount={stepCount}
+                selfTestRunning={selfTestRunning}
+                onSelfTest={onSelfTest}
+                onExport={onExport}
+            />
+        </div>
+    );
+}
+
+function HeaderActionButtons({ stepCount, selfTestRunning, onSelfTest, onExport }: Pick<RecorderVisualisationHeaderProps, "stepCount" | "selfTestRunning" | "onSelfTest" | "onExport">): JSX.Element {
+    return (
+        <div className="ml-auto flex items-center gap-2">
+            <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={onSelfTest} disabled={selfTestRunning} title="Insert a dummy step, verify it appears, and clean it up. Failures land in the Error Drawer.">
+                {selfTestRunning ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FlaskConical className="h-3.5 w-3.5" />}
+                Run self-test
+            </Button>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8 gap-1.5" disabled={stepCount === 0} title={stepCount === 0 ? "Record at least one step before exporting" : `Export ${stepCount} step(s)`}>
+                        <Download className="h-3.5 w-3.5" />
+                        Export
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => onExport("json")}>Download as JSON</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onExport("csv")}>Download as CSV</DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </div>
     );
 }

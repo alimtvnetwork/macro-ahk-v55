@@ -94,9 +94,41 @@ const GROUP_LABEL: Readonly<Record<ReasonGroup, string>> = {
 /* ------------------------------------------------------------------ */
 
 export function FailureDetailsPanel({ report, embedded }: FailureDetailsPanelProps) {
+    if (embedded === true) {
+        return (
+            <section
+                aria-label="Failure details"
+                data-testid="failure-details-panel"
+                className="rounded-md border border-border bg-card/40 p-3"
+            >
+                <FailureDetailsBody report={report} />
+            </section>
+        );
+    }
+
+    return (
+        <Card data-testid="failure-details-panel">
+            <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                    <FileWarning className="h-4 w-4 text-destructive" />
+                    Failure details
+                    <Badge variant="outline" className="ml-1 text-[10px]">
+                        {report.Phase}
+                    </Badge>
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <FailureDetailsBody report={report} />
+            </CardContent>
+        </Card>
+    );
+}
+
+function FailureDetailsBody({ report }: { readonly report: FailureReport }) {
     const group = REASON_GROUP[report.Reason] ?? "other";
     const targetXPath = report.DomContext?.XPath ?? null;
-    const body = (
+
+    return (
         <div className="space-y-3">
             <ReasonBanner
                 reason={report.Reason}
@@ -121,33 +153,6 @@ export function FailureDetailsPanel({ report, embedded }: FailureDetailsPanelPro
             )}
             <SourceFooter file={report.SourceFile} timestamp={report.Timestamp} stepId={report.StepId} stepKind={report.StepKind} />
         </div>
-    );
-
-    if (embedded === true) {
-        return (
-            <section
-                aria-label="Failure details"
-                data-testid="failure-details-panel"
-                className="rounded-md border border-border bg-card/40 p-3"
-            >
-                {body}
-            </section>
-        );
-    }
-
-    return (
-        <Card data-testid="failure-details-panel">
-            <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                    <FileWarning className="h-4 w-4 text-destructive" />
-                    Failure details
-                    <Badge variant="outline" className="ml-1 text-[10px]">
-                        {report.Phase}
-                    </Badge>
-                </CardTitle>
-            </CardHeader>
-            <CardContent>{body}</CardContent>
-        </Card>
     );
 }
 

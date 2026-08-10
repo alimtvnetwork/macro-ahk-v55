@@ -1,4 +1,5 @@
-// @ts-nocheck
+import { logBgError, BgLogTag } from "../bg-logger";
+
 /**
  * Marco Extension — New Tab Tracker
  * 
@@ -47,8 +48,8 @@ async function maybeInjectRecorder(tabId: number): Promise<void> {
                 files: ["content-scripts/xpath-recorder.js"]
             });
             console.log(`[Marco] Injected xpath-recorder.js into new tab ${tabId}`);
-        } catch (e) {
-            console.error(`[Marco] Failed to inject xpath-recorder.js into new tab ${tabId}:`, e);
+        } catch (error) {
+            logBgError(BgLogTag.MARCO, `Failed to inject xpath-recorder.js into new tab ${tabId}`, error);
         }
     }
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { DomainConstants } from "../../constants/domain";
 import type { JsonValue } from "@/background/handlers/handler-types";
 import { useCallback, useEffect, useMemo, useState } from "react";

@@ -10,6 +10,8 @@ import { handleLogEntry, handleLogError } from "./handlers/logging-handler";
 import { LevelType, MirrorDiagnosticToTabLevelType, PipelineLineLevelType } from "../types/enums";
 import { logCaughtError, BgLogTag } from "./bg-logger";
 
+const AUTO_CAUGHT_MSG = "Automatically caught swallowed error";
+
 export interface InjectionDiagnosticContext {
     configId?: string;
     projectId?: string;
@@ -52,9 +54,9 @@ async function persistLogEntry(
             projectId: context.projectId,
             configId: context.configId,
         } as MessageRequest);
-    } catch (err) {
-    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+    } catch (error) {
+        logCaughtError(BgLogTag.MARCO, AUTO_CAUGHT_MSG, error); 
+    }
 }
 
 /** Persists an injection error entry. */
@@ -82,9 +84,9 @@ export async function persistInjectionError(
             configId: context.configId,
             scriptFile: context.scriptFile,
         } as MessageRequest);
-    } catch (err) {
-    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+    } catch (error) {
+        logCaughtError(BgLogTag.MARCO, AUTO_CAUGHT_MSG, error); 
+    }
 }
 
 /** Mirrors a diagnostic message into the active tab console. */
@@ -112,9 +114,9 @@ export async function mirrorDiagnosticToTab(
             },
             args: [message, level],
         });
-    } catch (err) {
-    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+    } catch (error) {
+        logCaughtError(BgLogTag.MARCO, AUTO_CAUGHT_MSG, error); 
+    }
 }
 
 /**
@@ -176,7 +178,7 @@ export async function mirrorPipelineLogsToTab(
             },
             args: [lines, groupTitle],
         });
-    } catch (err) {
-    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-}
+    } catch (error) {
+        logCaughtError(BgLogTag.MARCO, AUTO_CAUGHT_MSG, error); 
+    }
 }

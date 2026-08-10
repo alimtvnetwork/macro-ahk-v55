@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { DomainConstants } from "../constants/domain";
 /**
  * Marco Extension — Auth Health Handler

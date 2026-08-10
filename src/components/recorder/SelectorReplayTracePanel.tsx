@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Marco Extension — Selector Replay Trace Panel
  *
@@ -78,35 +77,6 @@ function StatusIcon({ status }: { readonly status: TraceStepStatus }) {
 export function SelectorReplayTracePanel({ report, embedded }: SelectorReplayTracePanelProps) {
     const trace = buildReplayTrace(report.Selectors);
 
-    const body = (
-        <div className="space-y-2.5" data-testid="selector-replay-trace">
-            <SummaryBar
-                total={trace.Summary.Total}
-                evaluated={trace.Summary.Evaluated}
-                skipped={trace.Summary.Skipped}
-                stoppedAt={trace.Summary.StoppedAt}
-                outcome={trace.Summary.Outcome}
-                snapshot={report.FormSnapshot}
-            />
-            {trace.Steps.length === 0 ? (
-                <p
-                    data-testid="trace-empty"
-                    className="text-xs italic text-muted-foreground py-3 text-center"
-                >
-                    No selector attempts were recorded for this failure.
-                </p>
-            ) : (
-                <ScrollArea className="max-h-72 pr-2">
-                    <ol className="space-y-1.5">
-                        {trace.Steps.map((s) => (
-                            <TraceStepRow key={s.Order} step={s} />
-                        ))}
-                    </ol>
-                </ScrollArea>
-            )}
-        </div>
-    );
-
     if (embedded === true) {
         return (
             <section
@@ -118,7 +88,7 @@ export function SelectorReplayTracePanel({ report, embedded }: SelectorReplayTra
                     <ListOrdered className="h-3 w-3" aria-hidden />
                     Replay trace
                 </header>
-                {body}
+                <TraceBody trace={trace} snapshot={report.FormSnapshot} />
             </section>
         );
     }
@@ -131,8 +101,41 @@ export function SelectorReplayTracePanel({ report, embedded }: SelectorReplayTra
                     Selector replay trace
                 </CardTitle>
             </CardHeader>
-            <CardContent>{body}</CardContent>
+            <CardContent>
+                <TraceBody trace={trace} snapshot={report.FormSnapshot} />
+            </CardContent>
         </Card>
+    );
+}
+
+function TraceBody({ trace, snapshot }: { readonly trace: ReturnType<typeof buildReplayTrace>, readonly snapshot: FailureReport["FormSnapshot"] }) {
+    return (
+        <div className="space-y-2.5" data-testid="selector-replay-trace">
+            <SummaryBar
+                total={trace.Summary.Total}
+                evaluated={trace.Summary.Evaluated}
+                skipped={trace.Summary.Skipped}
+                stoppedAt={trace.Summary.StoppedAt}
+                outcome={trace.Summary.Outcome}
+                snapshot={snapshot}
+            />
+            {trace.Steps.length === 0 ? (
+                <p
+                    data-testid="trace-empty"
+                    className="text-xs italic text-muted-foreground py-3 text-center"
+                >
+                    No selector attempts were recorded for this failure.
+                </p>
+            ) : (
+                <ScrollArea className="max-h-72 pr-2">
+                    <ol className="space-y-1.5">
+                        {trace.Steps.map((s: TraceStep) => (
+                            <TraceStepRow key={s.Order} step={s} />
+                        ))}
+                    </ol>
+                </ScrollArea>
+            )}
+        </div>
     );
 }
 
@@ -193,9 +196,6 @@ function SummaryBar({
 }
 
 function TraceStepRow({ step }: { readonly step: TraceStep }) {
-    const showResolvedDistinct =
-        step.ResolvedExpression !== step.Expression && step.Expression.length > 0;
-
     return (
         <li
             data-testid="trace-step-row"
@@ -204,56 +204,75 @@ function TraceStepRow({ step }: { readonly step: TraceStep }) {
             data-role={step.Role}
             className={`relative rounded-md border ${STATUS_TONE[step.Status]} p-2 text-xs space-y-1`}
         >
-            <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="text-[10px] font-mono px-1.5 py-0">
-                    #{step.Order}
-                </Badge>
-                <StatusIcon status={step.Status} />
-                <Badge
-                    variant={step.Status === "matched" ? "default" : "outline"}
-                    className="text-[10px] px-1.5 py-0"
-                >
-                    {STATUS_LABEL[step.Status]}
-                </Badge>
-                <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                    {step.Role}
-                </Badge>
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                    {step.Strategy}
-                </Badge>
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 ml-auto">
-                    {step.MatchCount} match{step.MatchCount === 1 ? "" : "es"}
-                </Badge>
-            </div>
-
-            <div className="pl-5">
-                <code
-                    className="block break-all font-mono text-foreground"
-                    title={step.ResolvedExpression}
-                >
-                    {step.ResolvedExpression}
-                </code>
-                {showResolvedDistinct && (
-                    <div className="text-[11px] text-muted-foreground mt-0.5">
-                        Stored: <code className="break-all">{step.Expression}</code>
-                    </div>
-                )}
-            </div>
-
-            <div className="pl-5 flex items-start gap-1 text-[11px] text-muted-foreground">
-                <ArrowRight className="h-3 w-3 mt-0.5 shrink-0" aria-hidden />
-                <span>
-                    {step.Note}
-                    {(step.Status === "missed" || step.Status === "errored") && (
-                        <>
-                            {" "}
-                            <span className="font-mono text-destructive">
-                                ({step.FailureReason})
-                            </span>
-                        </>
-                    )}
-                </span>
-            </div>
+            <TraceStepBadges step={step} />
+            <TraceStepExpression step={step} />
+            <TraceStepNote step={step} />
         </li>
+    );
+}
+
+function TraceStepBadges({ step }: { readonly step: TraceStep }) {
+    return (
+        <div className="flex items-center gap-2 flex-wrap">
+            <Badge variant="outline" className="text-[10px] font-mono px-1.5 py-0">
+                #{step.Order}
+            </Badge>
+            <StatusIcon status={step.Status} />
+            <Badge
+                variant={step.Status === "matched" ? "default" : "outline"}
+                className="text-[10px] px-1.5 py-0"
+            >
+                {STATUS_LABEL[step.Status]}
+            </Badge>
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                {step.Role}
+            </Badge>
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                {step.Strategy}
+            </Badge>
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 ml-auto">
+                {step.MatchCount} match{step.MatchCount === 1 ? "" : "es"}
+            </Badge>
+        </div>
+    );
+}
+
+function TraceStepExpression({ step }: { readonly step: TraceStep }) {
+    const showResolvedDistinct =
+        step.ResolvedExpression !== step.Expression && step.Expression.length > 0;
+
+    return (
+        <div className="pl-5">
+            <code
+                className="block break-all font-mono text-foreground"
+                title={step.ResolvedExpression}
+            >
+                {step.ResolvedExpression}
+            </code>
+            {showResolvedDistinct && (
+                <div className="text-[11px] text-muted-foreground mt-0.5">
+                    Stored: <code className="break-all">{step.Expression}</code>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function TraceStepNote({ step }: { readonly step: TraceStep }) {
+    return (
+        <div className="pl-5 flex items-start gap-1 text-[11px] text-muted-foreground">
+            <ArrowRight className="h-3 w-3 mt-0.5 shrink-0" aria-hidden />
+            <span>
+                {step.Note}
+                {(step.Status === "missed" || step.Status === "errored") && (
+                    <>
+                        {" "}
+                        <span className="font-mono text-destructive">
+                            ({step.FailureReason})
+                        </span>
+                    </>
+                )}
+            </span>
+        </div>
     );
 }
