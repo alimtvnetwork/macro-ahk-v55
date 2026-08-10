@@ -9,7 +9,7 @@ Updated: now
 1. **CQ1 - PascalCase for exported object constants** (scalars remain UPPER_SNAKE_CASE)
 2. **CQ2 - No inline type definitions** - extract into named type/interface, reuse everywhere
 3. **CQ3 - No magic strings** - use `enum` for grouped values, named `const` for standalone values
-4. **CQ4 - Function size** - target ≤8 lines, hard max 25 lines; decompose via well-named helpers; never compress lines
+4. **CQ4 - Function size & Code Compression** - target ≤8 lines, hard max 25 lines; decompose via well-named helpers; **never compress lines or squash statements (e.g. `setA(); setB(); setC();`) onto a single line to artificially reduce line count**. If a function is too large, it MUST be extracted/refactored, not squashed. Never pass a raw `null` value if it isn't completely obvious; define it as a well-named `const` to explain *why* the null is being passed and pass that variable instead.
 5. **CQ5 - Simple conditions** - no complex `&&`/`||` in `if`; extract to named booleans or boolean-returning functions
 6. **CQ6 - No negation in conditions** - create positive counterpart variable instead of `!`
 7. **CQ7 - Boolean naming** - all booleans must use `is` or `has` prefix (variables, constants, functions)
