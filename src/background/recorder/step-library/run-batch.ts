@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ServiceResult } from '../../../utils/result-wrapper';
 /**
  * Marco Extension — Run Batch

@@ -39,73 +39,120 @@ interface ListPanelGroupsListProps {
     fileInputRef: RefObject<HTMLInputElement>;
 }
 
-function EmptyGroupsList(props: { totalCount: number, query: string, onOpenCreate: () => void, onPickImportFile: () => void, onClearQuery: () => void }) {
-    if (props.totalCount === 0) {
-        return (
-            <div className="flex h-full flex-col items-center justify-center gap-3 px-6 py-16 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary"><FolderTree className="h-7 w-7" /></div>
-                <div className="space-y-1">
-                    <p className="text-sm font-medium text-foreground">No step groups yet</p>
-                    <p className="max-w-[34ch] text-xs text-muted-foreground">Step groups bundle related actions you can replay later. Create your first one or import a ZIP bundle exported from another project.</p>
-                </div>
-                <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-                    <Button size="sm" onClick={props.onOpenCreate}><FilePlus2 className="mr-1 h-4 w-4" /> Create the first one</Button>
-                    <Button size="sm" variant="outline" onClick={props.onPickImportFile}><Upload className="mr-1 h-4 w-4" /> Import ZIP</Button>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="flex h-full flex-col items-center justify-center gap-3 px-6 py-16 text-center">
-            <Search className="h-8 w-8 text-muted-foreground/40" />
-            <p className="text-sm text-muted-foreground">No groups match &ldquo;{props.query}&rdquo;.</p>
-            <Button variant="ghost" size="sm" onClick={props.onClearQuery}>Clear search</Button>
-        </div>
-    );
-}
-
-function GroupsListContent(props: ListPanelGroupsListProps) {
-    return (
-        <ul className="divide-y">
-            {props.filtered.map((g) => {
-                const parent = g.ParentStepGroupId === null ? null : (props.groupsById.get(g.ParentStepGroupId) ?? null);
-
-                return (
-                    <ListPanelGroupRow
-                        key={g.StepGroupId}
-                        group={g}
-                        isActive={g.StepGroupId === props.activeGroupId}
-                        isChecked={props.selected.has(g.StepGroupId)}
-                        stepCount={props.stepCountFor(g.StepGroupId)}
-                        parentName={parent?.Name ?? null}
-                        onToggleSelect={props.toggleOne}
-                        onActivate={props.setActiveGroupId}
-                    />
-                );
-            })}
-        </ul>
-    );
-}
-
 export function ListPanelGroupsList(props: ListPanelGroupsListProps) {
+    const {
+        filtered,
+        totalCount,
+        query,
+        activeGroupId,
+        selected,
+        groupsById,
+        stepCountFor,
+        allVisibleSelected,
+        someVisibleSelected,
+        visibleIds,
+        toggleAllVisible,
+        toggleOne,
+        setActiveGroupId,
+        onClearQuery,
+        onOpenCreate,
+        onPickImportFile,
+    } = props;
+
     return (
         <Card className="flex min-h-[400px] flex-col overflow-hidden">
             <div className="flex items-center gap-3 border-b px-4 py-2 text-sm font-medium text-muted-foreground">
                 <Checkbox
                     id="list-select-all-visible"
-                    checked={props.allVisibleSelected ? true : props.someVisibleSelected ? "indeterminate" : false}
-                    onCheckedChange={(state) => props.toggleAllVisible(state === true)}
-                    disabled={props.visibleIds.length === 0}
-                    aria-label={props.allVisibleSelected ? "Deselect all visible groups" : "Select all visible groups"}
+                    checked={
+                        allVisibleSelected
+                            ? true
+                            : someVisibleSelected
+                                ? "indeterminate"
+                                : false
+                    }
+                    onCheckedChange={(state) => toggleAllVisible(state === true)}
+                    disabled={visibleIds.length === 0}
+                    aria-label={
+                        allVisibleSelected
+                            ? "Deselect all visible groups"
+                            : "Select all visible groups"
+                    }
                 />
-                <LabelType htmlFor="list-select-all-visible" className="cursor-pointer text-sm font-medium text-muted-foreground">Groups</LabelType>
+                <LabelType
+                    htmlFor="list-select-all-visible"
+                    className="cursor-pointer text-sm font-medium text-muted-foreground"
+                >
+                    Groups
+                </LabelType>
             </div>
             <ScrollArea className="flex-1">
-                {props.filtered.length === 0 ? (
-                    <EmptyGroupsList totalCount={props.totalCount} query={props.query} onOpenCreate={props.onOpenCreate} onPickImportFile={props.onPickImportFile} onClearQuery={props.onClearQuery} />
+                {filtered.length === 0 ? (
+                    <div className="flex h-full flex-col items-center justify-center gap-3 px-6 py-16 text-center">
+                        {totalCount === 0 ? (
+                            <>
+                                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                    <FolderTree className="h-7 w-7" />
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-sm font-medium text-foreground">
+                                        No step groups yet
+                                    </p>
+                                    <p className="max-w-[34ch] text-xs text-muted-foreground">
+                                        Step groups bundle related actions you can
+                                        replay later. Create your first one or import
+                                        a ZIP bundle exported from another project.
+                                    </p>
+                                </div>
+                                <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                                    <Button size="sm" onClick={onOpenCreate}>
+                                        <FilePlus2 className="mr-1 h-4 w-4" />
+                                        Create the first one
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={onPickImportFile}
+                                    >
+                                        <Upload className="mr-1 h-4 w-4" />
+                                        Import ZIP
+                                    </Button>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <Search className="h-8 w-8 text-muted-foreground/40" />
+                                <p className="text-sm text-muted-foreground">
+                                    No groups match &ldquo;{query}&rdquo;.
+                                </p>
+                                <Button variant="ghost" size="sm" onClick={onClearQuery}>
+                                    Clear search
+                                </Button>
+                            </>
+                        )}
+                    </div>
                 ) : (
-                    <GroupsListContent {...props} />
+                    <ul className="divide-y">
+                        {filtered.map((g) => {
+                            const parent =
+                                g.ParentStepGroupId === null
+                                    ? null
+                                    : (groupsById.get(g.ParentStepGroupId) ?? null);
+
+                            return (
+                                <ListPanelGroupRow
+                                    key={g.StepGroupId}
+                                    group={g}
+                                    isActive={g.StepGroupId === activeGroupId}
+                                    isChecked={selected.has(g.StepGroupId)}
+                                    stepCount={stepCountFor(g.StepGroupId)}
+                                    parentName={parent?.Name ?? null}
+                                    onToggleSelect={toggleOne}
+                                    onActivate={setActiveGroupId}
+                                />
+                            );
+                        })}
+                    </ul>
                 )}
             </ScrollArea>
         </Card>

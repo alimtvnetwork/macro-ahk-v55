@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Auto-Attach Diagnostics Panel

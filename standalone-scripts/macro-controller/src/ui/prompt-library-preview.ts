@@ -9,9 +9,6 @@ import { logLibraryImportFailure, extractImportErrorReason, renderImportErrorBan
 import { PreviewTriggerType } from "../types/enums";
 import { logError } from "../error-utils";
 
-const MACRO_CONTROLLER = 'MacroController';
-const UNKNOWN_ERROR_MSG = 'Unknown error';
-
 export function validateImportFile(file: File): { headline: string; hint: string } | null {
   const IMPORT_MAX_BYTES = 5 * 1024 * 1024;
   if (!file || !(file instanceof File)) return { headline: 'No file selected', hint: 'Please select a valid JSON file.' };
@@ -125,7 +122,7 @@ export async function computeAndRenderPreview(
     renderImportErrorBanner(refs, invalid.headline, invalid.hint);
     showToast(PREVIEW_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
     try { previewFileInput.value = ''; } catch (err) {
-      logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+      logError('MacroController', 'Unknown error');
     }
 
     return;
@@ -151,19 +148,19 @@ export async function computeAndRenderPreview(
     renderPreviewPanel(refs, panel, preview, file, parsed.errors.length, () => {
       hidePreviewPanel(panel);
       try { previewFileInput.value = ''; } catch (err) {
-        logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+        logError('MacroController', 'Unknown error');
       }
       void handleImportFile(refs, file, fileInput, importBtn, 'click');
     }, () => {
       hidePreviewPanel(panel);
       try { previewFileInput.value = ''; } catch (err) {
-        logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+        logError('MacroController', 'Unknown error');
       }
       refs.status.textContent = 'Preview cancelled.';
     });
     refs.status.textContent = 'Preview ready for ' + file.name + '.';
   } catch (err) {
-    logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+    logError('MacroController', 'Unknown error');
     logLibraryImportFailure('preview', 'threw during read/parse for name=' + file.name, err);
     const reason = extractImportErrorReason(err);
     refs.status.textContent = PREVIEW_FAILED_PREFIX + reason;

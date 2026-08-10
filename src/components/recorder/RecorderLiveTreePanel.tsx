@@ -76,10 +76,69 @@ function defaultExpanded(forest: TreeNode[]): Set<number> {
 }
 
 export function RecorderLiveTreePanel(): JSX.Element {
-    const {
-        lib, selection, select, expanded, query, setQuery, isFiltering,
-        visibleForest, visibleStepsByGroup, filtered, toggle,
-    } = useRecorderLiveTreePanel();
+    const lib = useStepLibrary();
+    const { selection, select } = useRecorderSelection("controller");
+    const [expanded, setExpanded] = useState<Set<number>>(new Set());
+    const [didAutoExpand, setDidAutoExpand] = useState(false);
+    const [query, setQuery] = useState("");
+
+    const forest = useMemo(() => buildForest(lib.Groups), [lib.Groups]);
+
+    // Filter the forest by the search query. When the query is empty this
+    // returns the original forest at zero cost so the unfiltered render path
+    // is unchanged.
+    const filtered = useMemo(
+        () => filterLiveTree(forest, lib.StepsByGroup, query),
+        [forest, lib.StepsByGroup, query],
+    );
+
+    const isFiltering = query.trim().length > 0;
+
+    useEffect(() => {
+        if (didAutoExpand || forest.length === 0) { return; }
+        setExpanded(defaultExpanded(forest));
+        setDidAutoExpand(true);
+    }, [didAutoExpand, forest]);
+
+    // While filtering, force-expand every ancestor of a match so the user
+    // can see results without manual clicking. We *merge* into the user's
+    // expansion set instead of replacing it so collapsing-after-clearing
+    // restores their previous state.
+    useEffect(() => {
+        if (!isFiltering) { return; }
+        setExpanded((prev) => {
+            const next = new Set(prev);
+            for (const id of filtered.ExpandIds) { next.add(id); }
+
+            return next;
+        });
+    }, [isFiltering, filtered.ExpandIds]);
+
+    // When the Options panel selects a group, expand its ancestor chain.
+    useEffect(() => {
+        if (selection.StepGroupId === null) { return; }
+        setExpanded((prev) => {
+            const next = new Set(prev);
+            let cursor: number | null = selection.StepGroupId;
+            const byId = new Map(lib.Groups.map((g) => [g.StepGroupId, g] as const));
+            while (cursor !== null) {
+                next.add(cursor);
+                const row = byId.get(cursor);
+                cursor = row?.ParentStepGroupId ?? null;
+            }
+
+            return next;
+        });
+    }, [selection.StepGroupId, lib.Groups]);
+
+    const toggle = (id: number) => {
+        setExpanded((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) { next.delete(id); } else { next.add(id); }
+
+            return next;
+        });
+    };
 
     if (lib.Loading) {
         return <div className="text-[11px] text-muted-foreground p-2">Loading library…</div>;
@@ -87,6 +146,9 @@ export function RecorderLiveTreePanel(): JSX.Element {
     if (lib.Project === null) {
         return <div className="text-[11px] text-muted-foreground p-2">No project loaded.</div>;
     }
+
+    const visibleForest = isFiltering ? filtered.Forest : forest;
+    const visibleStepsByGroup = isFiltering ? filtered.StepsByGroup : lib.StepsByGroup;
 
     return (
         <div className="border-t border-border/40 mt-1 pt-1.5">
@@ -168,72 +230,6 @@ export function RecorderLiveTreePanel(): JSX.Element {
     );
 }
 
-function useRecorderLiveTreePanel() {
-    const lib = useStepLibrary();
-    const { selection, select } = useRecorderSelection("controller");
-    const [expanded, setExpanded] = useState<Set<number>>(new Set());
-    const [didAutoExpand, setDidAutoExpand] = useState(false);
-    const [query, setQuery] = useState("");
-
-    const forest = useMemo(() => buildForest(lib.Groups), [lib.Groups]);
-
-    const filtered = useMemo(
-        () => filterLiveTree(forest, lib.StepsByGroup, query),
-        [forest, lib.StepsByGroup, query],
-    );
-
-    const isFiltering = query.trim().length > 0;
-
-    useEffect(() => {
-        if (didAutoExpand || forest.length === 0) { return; }
-        setExpanded(defaultExpanded(forest));
-        setDidAutoExpand(true);
-    }, [didAutoExpand, forest]);
-
-    useEffect(() => {
-        if (!isFiltering) { return; }
-        setExpanded((prev) => {
-            const next = new Set(prev);
-            for (const id of filtered.ExpandIds) { next.add(id); }
-
-            return next;
-        });
-    }, [isFiltering, filtered.ExpandIds]);
-
-    useEffect(() => {
-        if (selection.StepGroupId === null) { return; }
-        setExpanded((prev) => {
-            const next = new Set(prev);
-            let cursor: number | null = selection.StepGroupId;
-            const byId = new Map(lib.Groups.map((g) => [g.StepGroupId, g] as const));
-            while (cursor !== null) {
-                next.add(cursor);
-                const row = byId.get(cursor);
-                cursor = row?.ParentStepGroupId ?? null;
-            }
-
-            return next;
-        });
-    }, [selection.StepGroupId, lib.Groups]);
-
-    const toggle = (id: number) => {
-        setExpanded((prev) => {
-            const next = new Set(prev);
-            if (next.has(id)) { next.delete(id); } else { next.add(id); }
-
-            return next;
-        });
-    };
-
-    const visibleForest = isFiltering ? filtered.Forest : forest;
-    const visibleStepsByGroup = isFiltering ? filtered.StepsByGroup : lib.StepsByGroup;
-
-    return {
-        lib, selection, select, expanded, query, setQuery, isFiltering,
-        visibleForest, visibleStepsByGroup, filtered, toggle,
-    };
-}
-
 /* ------------------------------------------------------------------ */
 /*  Subcomponents                                                      */
 /* ------------------------------------------------------------------ */
@@ -276,16 +272,38 @@ function GroupNode(props: GroupNodeProps): JSX.Element {
 
     return (
         <div>
-            <GroupNodeHeader
-                node={node}
-                depth={depth}
-                isOpen={isOpen}
-                isActive={isActive}
-                hasChildren={hasChildren}
-                stepsCount={steps.length}
-                onToggle={onToggle}
-                onSelect={onSelect}
-            />
+            <div
+                className={cn(
+                    "flex items-center gap-1 rounded transition-colors group",
+                    isActive ? "bg-primary/10" : "hover:bg-muted/40",
+                )}
+                style={{ paddingLeft: `${depth * 10}px` }}
+            >
+                <button
+                    type="button"
+                    onClick={() => onToggle(node.Group.StepGroupId)}
+                    className="p-0.5 text-muted-foreground hover:text-foreground"
+                    aria-label={isOpen ? "Collapse" : "Expand"}
+                    aria-expanded={isOpen}
+                    disabled={!hasChildren}
+                >
+                    {hasChildren
+                        ? (isOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />)
+                        : <span className="inline-block w-3" />}
+                </button>
+                <button
+                    type="button"
+                    onClick={() => onSelect({ StepGroupId: node.Group.StepGroupId, StepId: null })}
+                    className="flex-1 min-w-0 flex items-center gap-1.5 py-0.5 text-left text-[12px]"
+                    data-testid={`controller-tree-group-${node.Group.StepGroupId}`}
+                >
+                    {isOpen ? <FolderOpen className="h-3 w-3 text-muted-foreground" /> : <Folder className="h-3 w-3 text-muted-foreground" />}
+                    <span className="truncate">{node.Group.Name}</span>
+                    {steps.length > 0 ? (
+                        <Badge variant="outline" className="text-[9px] px-1 ml-auto">{steps.length}</Badge>
+                    ) : null}
+                </button>
+            </div>
             {isOpen ? (
                 <>
                     {node.Children.map((child) => (
@@ -312,52 +330,6 @@ function GroupNode(props: GroupNodeProps): JSX.Element {
                     ))}
                 </>
             ) : null}
-        </div>
-    );
-}
-
-function GroupNodeHeader({ node, depth, isOpen, isActive, hasChildren, stepsCount, onToggle, onSelect }: {
-    node: TreeNode;
-    depth: number;
-    isOpen: boolean;
-    isActive: boolean;
-    hasChildren: boolean;
-    stepsCount: number;
-    onToggle: (id: number) => void;
-    onSelect: (payload: { StepGroupId: number | null; StepId: number | null }) => void;
-}) {
-    return (
-        <div
-            className={cn(
-                "flex items-center gap-1 rounded transition-colors group",
-                isActive ? "bg-primary/10" : "hover:bg-muted/40",
-            )}
-            style={{ paddingLeft: `${depth * 10}px` }}
-        >
-            <button
-                type="button"
-                onClick={() => onToggle(node.Group.StepGroupId)}
-                className="p-0.5 text-muted-foreground hover:text-foreground"
-                aria-label={isOpen ? "Collapse" : "Expand"}
-                aria-expanded={isOpen}
-                disabled={!hasChildren}
-            >
-                {hasChildren
-                    ? (isOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />)
-                    : <span className="inline-block w-3" />}
-            </button>
-            <button
-                type="button"
-                onClick={() => onSelect({ StepGroupId: node.Group.StepGroupId, StepId: null })}
-                className="flex-1 min-w-0 flex items-center gap-1.5 py-0.5 text-left text-[12px]"
-                data-testid={`controller-tree-group-${node.Group.StepGroupId}`}
-            >
-                {isOpen ? <FolderOpen className="h-3 w-3 text-muted-foreground" /> : <Folder className="h-3 w-3 text-muted-foreground" />}
-                <span className="truncate">{node.Group.Name}</span>
-                {stepsCount > 0 ? (
-                    <Badge variant="outline" className="text-[9px] px-1 ml-auto">{stepsCount}</Badge>
-                ) : null}
-            </button>
         </div>
     );
 }

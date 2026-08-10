@@ -67,7 +67,11 @@ export async function handleSdkAuthIsExpired(): Promise<boolean> {
 }
 
 /** AUTH_GET_JWT — returns the raw JWT/session ID string. */
-export const handleSdkAuthGetJwt = handleSdkAuthGetToken;
+export async function handleSdkAuthGetJwt(): Promise<string | null> {
+    const result = await handleGetToken();
+
+    return result.token;
+}
 
 /* ------------------------------------------------------------------ */
 /*  COOKIES handlers                                                   */
@@ -105,7 +109,7 @@ export async function handleSdkCookiesGetAll(
         const cookies = await chrome.cookies.getAll(details);
 
         return { cookies };
-    } catch (error) { 
+    } catch (err) { 
         return { cookies: [] };
     }
 }
@@ -123,7 +127,12 @@ export async function handleSdkConfigGet(): Promise<{
 }
 
 /** CONFIG_GET_ALL — alias, returns same as CONFIG_GET. */
-export const handleSdkConfigGetAll = handleSdkConfigGet;
+export async function handleSdkConfigGetAll(): Promise<{
+    config: Record<string, unknown>;
+    source: string;
+}> {
+    return handleGetConfig();
+}
 
 /** CONFIG_SET — store a config key in chrome.storage.local. */
 export async function handleSdkConfigSet(

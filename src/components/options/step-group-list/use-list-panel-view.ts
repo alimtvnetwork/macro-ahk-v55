@@ -27,33 +27,6 @@ interface UseListPanelViewArgs {
     readonly query: string;
 }
 
-function useFilteredGroups(groups: ReadonlyArray<StepGroupRow>, query: string) {
-    const groupsById = useMemo(() => {
-        const m = new Map<number, StepGroupRow>();
-        for (const g of groups) m.set(g.StepGroupId, g);
-
-        return m;
-    }, [groups]);
-    const sortedGroups = useMemo(() => groups.slice().sort((a, b) => a.Name.localeCompare(b.Name)), [groups]);
-    const filtered = useMemo(() => sortedGroups.filter((g) => matchesQuery(g, query.trim())), [sortedGroups, query]);
-
-    return { groupsById, filtered };
-}
-
-function useActiveGroupState(
-    groupsById: Map<number, StepGroupRow>,
-    stepsByGroup: ReadonlyMap<number, ReadonlyArray<StepRow>>,
-    groupInputs: ReadonlyMap<number, unknown>,
-    activeGroupId: number | null,
-) {
-    const activeGroup = useMemo(() => (activeGroupId === null ? null : (groupsById.get(activeGroupId) ?? null)), [activeGroupId, groupsById]);
-    const activeSteps: ReadonlyArray<StepRow> = activeGroupId === null ? [] : (stepsByGroup.get(activeGroupId) ?? []);
-    const hasBoundInputs = activeGroup !== null && groupInputs.has(activeGroup.StepGroupId);
-    const stepCountFor = (id: number): number => stepsByGroup.get(id)?.length ?? 0;
-
-    return { activeGroup, activeSteps, hasBoundInputs, stepCountFor };
-}
-
 export function useListPanelView({
     groups,
     stepsByGroup,
@@ -61,12 +34,41 @@ export function useListPanelView({
     activeGroupId,
     query,
 }: UseListPanelViewArgs) {
-    const { groupsById, filtered } = useFilteredGroups(groups, query);
-    const activeState = useActiveGroupState(groupsById, stepsByGroup, groupInputs, activeGroupId);
+    const groupsById = useMemo(() => {
+        const m = new Map<number, StepGroupRow>();
+        for (const g of groups) m.set(g.StepGroupId, g);
+
+        return m;
+    }, [groups]);
+
+    const sortedGroups = useMemo(
+        () => groups.slice().sort((a, b) => a.Name.localeCompare(b.Name)),
+        [groups],
+    );
+
+    const filtered = useMemo(
+        () => sortedGroups.filter((g) => matchesQuery(g, query.trim())),
+        [sortedGroups, query],
+    );
+
+    const activeGroup = useMemo(
+        () => (activeGroupId === null ? null : (groupsById.get(activeGroupId) ?? null)),
+        [activeGroupId, groupsById],
+    );
+    const activeSteps: ReadonlyArray<StepRow> =
+        activeGroupId === null ? [] : (stepsByGroup.get(activeGroupId) ?? []);
+
+    const hasBoundInputs =
+        activeGroup !== null && groupInputs.has(activeGroup.StepGroupId);
+    const stepCountFor = (id: number): number =>
+        stepsByGroup.get(id)?.length ?? 0;
 
     return {
         groupsById,
         filtered,
-        ...activeState,
+        activeGroup,
+        activeSteps,
+        hasBoundInputs,
+        stepCountFor,
     };
 }

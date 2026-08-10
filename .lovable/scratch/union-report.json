@@ -1,0 +1,3649 @@
+{
+  "totalOccurrences": 583,
+  "uniqueUnions": 364,
+  "groups": {
+    "\"authenticated\" | \"degraded\" | \"unauthenticated\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/auth-health-handler.ts",
+        "line": 36,
+        "text": "\"authenticated\" | \"degraded\" | \"unauthenticated\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/AuthHealthPanel.tsx",
+        "line": 25,
+        "text": "\"authenticated\" | \"degraded\" | \"unauthenticated\""
+      }
+    ],
+    "\"MAIN\" | \"ISOLATED\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/auto-attach-runner.ts",
+        "line": 54,
+        "text": "\"MAIN\" | \"ISOLATED\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/auto-attach.ts",
+        "line": 32,
+        "text": "\"MAIN\" | \"ISOLATED\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/seed-manifest-types.ts",
+        "line": 54,
+        "text": "\"MAIN\" | \"ISOLATED\""
+      }
+    ],
+    "| \"AUTOATTACH_SKIPPED_AUTOSTART_OFF\"            // C1\r\n    | \"AUTOATTACH_SKIPPED_OPT_OUT\"                  // C4\r\n    | \"AUTOATTACH_SKIPPED_URL_NO_MATCH\"             // C2\r\n    | \"AUTOATTACH_ALREADY_ATTACHED\"                 // C8\r\n    | \"AUTOATTACH_SKIPPED_INCOMPATIBLE_RUN_CONTEXT\" // C5\r\n    | \"AUTOATTACH_SKIPPED_COOKIE_BINDING_MISSING\"   // C6\r\n    | \"AUTOATTACH_SKIPPED_DEP_MISSING\"              // C7\r\n    | \"AUTOATTACH_SKIPPED_CONDITION_FAIL\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/auto-attach.ts",
+        "line": 45,
+        "text": "| \"AUTOATTACH_SKIPPED_AUTOSTART_OFF\"            // C1\r\n    | \"AUTOATTACH_SKIPPED_OPT_OUT\"                  // C4\r\n    | \"AUTOATTACH_SKIPPED_URL_NO_MATCH\"             // C2\r\n    | \"AUTOATTACH_ALREADY_ATTACHED\"                 // C8\r\n    | \"AUTOATTACH_SKIPPED_INCOMPATIBLE_RUN_CONTEXT\" // C5\r\n    | \"AUTOATTACH_SKIPPED_COOKIE_BINDING_MISSING\"   // C6\r\n    | \"AUTOATTACH_SKIPPED_DEP_MISSING\"              // C7\r\n    | \"AUTOATTACH_SKIPPED_CONDITION_FAIL\""
+      }
+    ],
+    "\"load\" | \"refresh\" | \"activate\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/auto-injector.ts",
+        "line": 254,
+        "text": "\"load\" | \"refresh\" | \"activate\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/state-manager.ts",
+        "line": 91,
+        "text": "\"load\" | \"refresh\" | \"activate\""
+      }
+    ],
+    "\"opfs\" | \"storage\" | \"memory\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/boot-diagnostics.ts",
+        "line": 99,
+        "text": "\"opfs\" | \"storage\" | \"memory\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/boot-diagnostics.ts",
+        "line": 145,
+        "text": "\"opfs\" | \"storage\" | \"memory\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/boot-diagnostics.ts",
+        "line": 150,
+        "text": "\"opfs\" | \"storage\" | \"memory\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/boot.ts",
+        "line": 76,
+        "text": "\"opfs\" | \"storage\" | \"memory\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/db-manager.ts",
+        "line": 31,
+        "text": "\"opfs\" | \"storage\" | \"memory\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/project-db-manager.ts",
+        "line": 22,
+        "text": "\"opfs\" | \"storage\" | \"memory\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/state-manager.ts",
+        "line": 48,
+        "text": "\"opfs\" | \"storage\" | \"memory\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 351,
+        "text": "\"opfs\" | \"storage\" | \"memory\""
+      }
+    ],
+    "\"document_start\" | \"document_idle\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/builtin-script-guard.ts",
+        "line": 42,
+        "text": "\"document_start\" | \"document_idle\""
+      }
+    ],
+    "\"body\" | \"documentElement\" | \"unknown\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/csp-fallback.ts",
+        "line": 24,
+        "text": "\"body\" | \"documentElement\" | \"unknown\""
+      }
+    ],
+    "\"accept\" | \"dismiss-tab\" | \"dismiss-persist\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/first-attach-toast.ts",
+        "line": 38,
+        "text": "\"accept\" | \"dismiss-tab\" | \"dismiss-persist\""
+      }
+    ],
+    "\"ok\" | \"warning\" | \"critical\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/health-handler.ts",
+        "line": 105,
+        "text": "\"ok\" | \"warning\" | \"critical\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/health-handler.ts",
+        "line": 167,
+        "text": "\"ok\" | \"warning\" | \"critical\""
+      }
+    ],
+    "\"ok\" | \"degraded\" | \"error\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/health-handler.ts",
+        "line": 123,
+        "text": "\"ok\" | \"degraded\" | \"error\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/health-handler.ts",
+        "line": 182,
+        "text": "\"ok\" | \"degraded\" | \"error\""
+      }
+    ],
+    "| \"scripts\"      // StoredScript[]\r\n    | \"configs\"      // StoredConfig[]\r\n    | \"projects\"     // StoredProject[]\r\n    | \"script_code\"  // Individual script code by filePath\r\n    | \"namespace\"    // Pre-built namespace blobs\r\n    | \"settings\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/injection-cache.ts",
+        "line": 42,
+        "text": "| \"scripts\"      // StoredScript[]\r\n    | \"configs\"      // StoredConfig[]\r\n    | \"projects\"     // StoredProject[]\r\n    | \"script_code\"  // Individual script code by filePath\r\n    | \"namespace\"    // Pre-built namespace blobs\r\n    | \"settings\""
+      }
+    ],
+    "\"global-dep\" | \"explicit-dep\" | \"target\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/injection-chain-tracker.ts",
+        "line": 19,
+        "text": "\"global-dep\" | \"explicit-dep\" | \"target\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/popup/DependencyChainPanel.tsx",
+        "line": 29,
+        "text": "\"global-dep\" | \"explicit-dep\" | \"target\""
+      }
+    ],
+    "\"INFO\" | \"WARN\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/injection-diagnostics.ts",
+        "line": 36,
+        "text": "\"INFO\" | \"WARN\""
+      }
+    ],
+    "\"log\" | \"warn\" | \"error\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/injection-diagnostics.ts",
+        "line": 92,
+        "text": "\"log\" | \"warn\" | \"error\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/injection-diagnostics.ts",
+        "line": 98,
+        "text": "\"log\" | \"warn\" | \"error\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/injection-handler.ts",
+        "line": 674,
+        "text": "\"log\" | \"warn\" | \"error\""
+      }
+    ],
+    "\"log\" | \"warn\" | \"error\" | \"__group__\" | \"__groupEnd__\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/injection-diagnostics.ts",
+        "line": 125,
+        "text": "\"log\" | \"warn\" | \"error\" | \"__group__\" | \"__groupEnd__\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/injection-handler.ts",
+        "line": 293,
+        "text": "\"log\" | \"warn\" | \"error\" | \"__group__\" | \"__groupEnd__\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/injection-handler.ts",
+        "line": 438,
+        "text": "\"log\" | \"warn\" | \"error\" | \"__group__\" | \"__groupEnd__\""
+      }
+    ],
+    "\"asc\" | \"desc\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/project-query-builder.ts",
+        "line": 23,
+        "text": "\"asc\" | \"desc\""
+      }
+    ],
+    "\"TEXT\" | \"INTEGER\" | \"REAL\" | \"BLOB\" | \"BOOLEAN\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/project-query-builder.ts",
+        "line": 232,
+        "text": "\"TEXT\" | \"INTEGER\" | \"REAL\" | \"BLOB\" | \"BOOLEAN\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/schema-meta-engine.ts",
+        "line": 82,
+        "text": "\"TEXT\" | \"INTEGER\" | \"REAL\" | \"BLOB\" | \"BOOLEAN\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/project-database/ColumnEditor.tsx",
+        "line": 21,
+        "text": "\"TEXT\" | \"INTEGER\" | \"REAL\" | \"BLOB\" | \"BOOLEAN\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/project-database/ProjectDatabasePanel.tsx",
+        "line": 38,
+        "text": "\"TEXT\" | \"INTEGER\" | \"REAL\" | \"BLOB\" | \"BOOLEAN\""
+      }
+    ],
+    "\"deep\" | \"replace\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/remote-config-fetcher.ts",
+        "line": 19,
+        "text": "\"deep\" | \"replace\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/remote-config-fetcher.ts",
+        "line": 199,
+        "text": "\"deep\" | \"replace\""
+      }
+    ],
+    "\"remote\" | \"local\" | \"hardcoded\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/remote-config-fetcher.ts",
+        "line": 25,
+        "text": "\"remote\" | \"local\" | \"hardcoded\""
+      }
+    ],
+    "\"string\" | \"number\" | \"date\" | \"regex\" | \"enum\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/schema-meta-engine.ts",
+        "line": 66,
+        "text": "\"string\" | \"number\" | \"date\" | \"regex\" | \"enum\""
+      }
+    ],
+    "\"CASCADE\" | \"SET NULL\" | \"NO ACTION\" | \"RESTRICT\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/schema-meta-engine.ts",
+        "line": 94,
+        "text": "\"CASCADE\" | \"SET NULL\" | \"NO ACTION\" | \"RESTRICT\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/schema-meta-engine.ts",
+        "line": 95,
+        "text": "\"CASCADE\" | \"SET NULL\" | \"NO ACTION\" | \"RESTRICT\""
+      }
+    ],
+    "\"cache\" | \"fetch\" | \"embedded\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/script-resolver.ts",
+        "line": 23,
+        "text": "\"cache\" | \"fetch\" | \"embedded\""
+      }
+    ],
+    "\"ISOLATED\" | \"MAIN\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/script-resolver.ts",
+        "line": 145,
+        "text": "\"ISOLATED\" | \"MAIN\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/platform/chrome-api-types.ts",
+        "line": 41,
+        "text": "\"ISOLATED\" | \"MAIN\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/types.ts",
+        "line": 15,
+        "text": "\"ISOLATED\" | \"MAIN\""
+      }
+    ],
+    "\"active-project\" | \"none\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/shortcut-command-handler.ts",
+        "line": 149,
+        "text": "\"active-project\" | \"none\""
+      }
+    ],
+    "\"Idle\" | \"Recording\" | \"Paused\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/shortcut-command-handler.ts",
+        "line": 259,
+        "text": "\"Idle\" | \"Recording\" | \"Paused\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/recorder-session-types.ts",
+        "line": 15,
+        "text": "\"Idle\" | \"Recording\" | \"Paused\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/__tests__/RecorderControlBar.test.tsx",
+        "line": 13,
+        "text": "\"Idle\" | \"Recording\" | \"Paused\""
+      }
+    ],
+    "\"HEALTHY\" | \"DEGRADED\" | \"ERROR\" | \"FATAL\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/state-manager.ts",
+        "line": 46,
+        "text": "\"HEALTHY\" | \"DEGRADED\" | \"ERROR\" | \"FATAL\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 365,
+        "text": "\"HEALTHY\" | \"DEGRADED\" | \"ERROR\" | \"FATAL\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/types.ts",
+        "line": 9,
+        "text": "\"HEALTHY\" | \"DEGRADED\" | \"ERROR\" | \"FATAL\""
+      }
+    ],
+    "\"empty\" | \"about-blank\" | \"prefix\" | \"allowed\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/url-trigger.ts",
+        "line": 160,
+        "text": "\"empty\" | \"about-blank\" | \"prefix\" | \"allowed\""
+      }
+    ],
+    "\"xhr\" | \"fetch\"": [
+      {
+        "file": "d:/work/macro-ahk/src/content-scripts/network-reporter.ts",
+        "line": 36,
+        "text": "\"xhr\" | \"fetch\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-network-data.ts",
+        "line": 11,
+        "text": "\"xhr\" | \"fetch\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 381,
+        "text": "\"xhr\" | \"fetch\""
+      }
+    ],
+    "\"id\" | \"testid\" | \"role-text\" | \"positional\"": [
+      {
+        "file": "d:/work/macro-ahk/src/content-scripts/xpath-recorder.ts",
+        "line": 43,
+        "text": "\"id\" | \"testid\" | \"role-text\" | \"positional\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/xpath-types.ts",
+        "line": 13,
+        "text": "\"id\" | \"testid\" | \"role-text\" | \"positional\""
+      }
+    ],
+    "\"log\" | \"error\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-activity-timeline.ts",
+        "line": 20,
+        "text": "\"log\" | \"error\""
+      }
+    ],
+    "\"all\" | \"info\" | \"warn\" | \"error\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-activity-timeline.ts",
+        "line": 23,
+        "text": "\"all\" | \"info\" | \"warn\" | \"error\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-log-viewer.ts",
+        "line": 19,
+        "text": "\"all\" | \"info\" | \"warn\" | \"error\""
+      }
+    ],
+    "\"all\" | \"background\" | \"content\" | \"user-script\" | \"macro\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-activity-timeline.ts",
+        "line": 24,
+        "text": "\"all\" | \"background\" | \"content\" | \"user-script\" | \"macro\""
+      }
+    ],
+    "\"dracula\" | \"monokai\" | \"nord\" | \"light\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-editor-theme.ts",
+        "line": 8,
+        "text": "\"dracula\" | \"monokai\" | \"nord\" | \"light\""
+      }
+    ],
+    "\"logs\" | \"errors\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-extension-data.ts",
+        "line": 106,
+        "text": "\"logs\" | \"errors\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 463,
+        "text": "\"logs\" | \"errors\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 464,
+        "text": "\"logs\" | \"errors\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/storage-browser-handler.ts",
+        "line": 61,
+        "text": "\"logs\" | \"errors\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/storage-handler.ts",
+        "line": 30,
+        "text": "\"logs\" | \"errors\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/storage-handler.ts",
+        "line": 35,
+        "text": "\"logs\" | \"errors\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/storage-handler.ts",
+        "line": 87,
+        "text": "\"logs\" | \"errors\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/storage-handler.ts",
+        "line": 145,
+        "text": "\"logs\" | \"errors\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/data-browser/DataBrowserPanel.tsx",
+        "line": 120,
+        "text": "\"logs\" | \"errors\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/data-browser/DataTable.tsx",
+        "line": 39,
+        "text": "\"logs\" | \"errors\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/data-browser/DataTable.tsx",
+        "line": 231,
+        "text": "\"logs\" | \"errors\""
+      }
+    ],
+    "\"up\" | \"down\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-keyword-events.ts",
+        "line": 96,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-keyword-events.ts",
+        "line": 194,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-step-library-types.ts",
+        "line": 37,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-step-library-types.ts",
+        "line": 56,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/hooks/step-library/step-library-hooks.ts",
+        "line": 223,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/step-group-library/LibraryStepPane.tsx",
+        "line": 32,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/step-group-library/LibraryTreePane.tsx",
+        "line": 45,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/step-group-library/mutation-handlers.ts",
+        "line": 176,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/step-group-library/mutation-handlers.ts",
+        "line": 233,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/step-group-library/StepRowItem.tsx",
+        "line": 42,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/step-group-library/TreeNodeRow.tsx",
+        "line": 67,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/step-group-library/use-step-group-mutations.ts",
+        "line": 81,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/step-group-library/use-step-group-mutations.ts",
+        "line": 85,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/keyword-events/KeywordEventCard.tsx",
+        "line": 30,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/keyword-events/KeywordEventsList.tsx",
+        "line": 48,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/keyword-events/KeywordEventStepList.tsx",
+        "line": 26,
+        "text": "\"up\" | \"down\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/keyword-events/KeywordEventStepList.tsx",
+        "line": 123,
+        "text": "\"up\" | \"down\""
+      }
+    ],
+    "\"synced\" | \"pinned\" | \"detached\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-library-link-map.ts",
+        "line": 15,
+        "text": "\"synced\" | \"pinned\" | \"detached\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/library-handler.ts",
+        "line": 108,
+        "text": "\"synced\" | \"pinned\" | \"detached\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/LibraryView.tsx",
+        "line": 88,
+        "text": "\"synced\" | \"pinned\" | \"detached\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/SyncBadge.tsx",
+        "line": 19,
+        "text": "\"synced\" | \"pinned\" | \"detached\""
+      }
+    ],
+    "\"scriptId\" | \"scriptName\" | \"isSuccess\" | \"errorMessage\" | \"skipReason\" | \"durationMs\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-popup-actions.ts",
+        "line": 33,
+        "text": "\"scriptId\" | \"scriptName\" | \"isSuccess\" | \"errorMessage\" | \"skipReason\" | \"durationMs\""
+      }
+    ],
+    "\"merge\" | \"replace\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-popup-actions.ts",
+        "line": 59,
+        "text": "\"merge\" | \"replace\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-popup-actions.ts",
+        "line": 259,
+        "text": "\"merge\" | \"replace\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/lib/import-summary.ts",
+        "line": 27,
+        "text": "\"merge\" | \"replace\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/lib/import-summary.ts",
+        "line": 56,
+        "text": "\"merge\" | \"replace\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ProjectsListView.tsx",
+        "line": 77,
+        "text": "\"merge\" | \"replace\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ProjectsListView.tsx",
+        "line": 287,
+        "text": "\"merge\" | \"replace\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/popup/ImportPreviewDialog.tsx",
+        "line": 21,
+        "text": "\"merge\" | \"replace\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/popup/PopupFooter.tsx",
+        "line": 24,
+        "text": "\"merge\" | \"replace\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/popup/PopupFooter.tsx",
+        "line": 170,
+        "text": "\"merge\" | \"replace\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/popup/PopupFooter.tsx",
+        "line": 298,
+        "text": "\"merge\" | \"replace\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/options/sections/ProjectsSection.tsx",
+        "line": 42,
+        "text": "\"merge\" | \"replace\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/popup/components/SqliteBundleActions.tsx",
+        "line": 39,
+        "text": "\"merge\" | \"replace\""
+      }
+    ],
+    "\"exact\" | \"prefix\" | \"contains\" | \"regex\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-projects-scripts.ts",
+        "line": 8,
+        "text": "\"exact\" | \"prefix\" | \"contains\" | \"regex\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/CookiesPanel.tsx",
+        "line": 33,
+        "text": "\"exact\" | \"prefix\" | \"contains\" | \"regex\""
+      }
+    ],
+    "\"session\" | \"refresh\" | \"custom\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-projects-scripts.ts",
+        "line": 16,
+        "text": "\"session\" | \"refresh\" | \"custom\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/project-types.ts",
+        "line": 36,
+        "text": "\"session\" | \"refresh\" | \"custom\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/CookiesPanel.tsx",
+        "line": 24,
+        "text": "\"session\" | \"refresh\" | \"custom\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/options/sections/ProjectEditor.tsx",
+        "line": 28,
+        "text": "\"session\" | \"refresh\" | \"custom\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/options/sections/ProjectEditor.tsx",
+        "line": 52,
+        "text": "\"session\" | \"refresh\" | \"custom\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/options/sections/ProjectsSection.tsx",
+        "line": 25,
+        "text": "\"session\" | \"refresh\" | \"custom\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/options/sections/editor/CookieBindingsEditor.tsx",
+        "line": 10,
+        "text": "\"session\" | \"refresh\" | \"custom\""
+      }
+    ],
+    "\"pending\" | \"running\" | \"done\" | \"error\" | \"skipped\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-prompt-chains.ts",
+        "line": 29,
+        "text": "\"pending\" | \"running\" | \"done\" | \"error\" | \"skipped\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/lib/automation-types.ts",
+        "line": 123,
+        "text": "\"pending\" | \"running\" | \"done\" | \"error\" | \"skipped\""
+      }
+    ],
+    "\"OnSuccessProjectId\" | \"OnFailureProjectId\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-recorder-project-data.ts",
+        "line": 52,
+        "text": "\"OnSuccessProjectId\" | \"OnFailureProjectId\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 485,
+        "text": "\"OnSuccessProjectId\" | \"OnFailureProjectId\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-chain-persistence.ts",
+        "line": 31,
+        "text": "\"OnSuccessProjectId\" | \"OnFailureProjectId\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/recorder/use-recorder-visualisation-controller.ts",
+        "line": 39,
+        "text": "\"OnSuccessProjectId\" | \"OnFailureProjectId\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/recorder/visualisation/use-recorder-step-mutations.ts",
+        "line": 16,
+        "text": "\"OnSuccessProjectId\" | \"OnFailureProjectId\""
+      }
+    ],
+    "\"options\" | \"controller\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-recorder-selection.ts",
+        "line": 28,
+        "text": "\"options\" | \"controller\""
+      }
+    ],
+    "\"success\" | \"error\" | \"skipped\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-run-stats.ts",
+        "line": 13,
+        "text": "\"success\" | \"error\" | \"skipped\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 500,
+        "text": "\"success\" | \"error\" | \"skipped\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/run-stats-handler.ts",
+        "line": 22,
+        "text": "\"success\" | \"error\" | \"skipped\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/run-stats-handler.ts",
+        "line": 68,
+        "text": "\"success\" | \"error\" | \"skipped\""
+      }
+    ],
+    "\"sqljs\" | \"storage-read\" | \"storage-write\" | \"other\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/use-step-library.ts",
+        "line": 81,
+        "text": "\"sqljs\" | \"storage-read\" | \"storage-write\" | \"other\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/hooks/step-library/step-library-hooks.ts",
+        "line": 54,
+        "text": "\"sqljs\" | \"storage-read\" | \"storage-write\" | \"other\""
+      }
+    ],
+    "\"info\" | \"success\" | \"warning\" | \"error\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/automation-types.ts",
+        "line": 55,
+        "text": "\"info\" | \"success\" | \"warning\" | \"error\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/automation/StepCard.tsx",
+        "line": 110,
+        "text": "\"info\" | \"success\" | \"warning\" | \"error\""
+      }
+    ],
+    "\"element_exists\" | \"element_absent\" | \"kv_equals\" | \"kv_exists\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/automation-types.ts",
+        "line": 59,
+        "text": "\"element_exists\" | \"element_absent\" | \"kv_equals\" | \"kv_exists\""
+      }
+    ],
+    "\"manual\" | \"on_page_load\" | \"on_element\" | \"interval\" | \"cron\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/automation-types.ts",
+        "line": 87,
+        "text": "\"manual\" | \"on_page_load\" | \"on_element\" | \"interval\" | \"cron\""
+      }
+    ],
+    "\"idle\" | \"running\" | \"paused\" | \"completed\" | \"error\" | \"cancelled\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/automation-types.ts",
+        "line": 125,
+        "text": "\"idle\" | \"running\" | \"paused\" | \"completed\" | \"error\" | \"cancelled\""
+      }
+    ],
+    "\"then\" | \"else\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/automation-types.ts",
+        "line": 130,
+        "text": "\"then\" | \"else\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/automation/ChainBuilder.tsx",
+        "line": 53,
+        "text": "\"then\" | \"else\""
+      }
+    ],
+    "\"click\" | \"route\" | \"key\" | \"mount\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/click-trail.ts",
+        "line": 24,
+        "text": "\"click\" | \"route\" | \"key\" | \"mount\""
+      }
+    ],
+    "\"Projects\" | \"Scripts\" | \"Configs\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/import-summary.ts",
+        "line": 48,
+        "text": "\"Projects\" | \"Scripts\" | \"Configs\""
+      }
+    ],
+    "| \"empty\"           // resolved name is empty / whitespace\r\n    | \"too-long\"        // > 200 chars; matches Keyword column soft limit\r\n    | \"duplicate\"       // collides with another row inside this rename batch\r\n    | \"collision\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/keyword-event-bulk-actions.ts",
+        "line": 54,
+        "text": "| \"empty\"           // resolved name is empty / whitespace\r\n    | \"too-long\"        // > 200 chars; matches Keyword column soft limit\r\n    | \"duplicate\"       // collides with another row inside this rename batch\r\n    | \"collision\""
+      }
+    ],
+    "\"run\" | \"stop\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/keyword-event-chain-shortcuts.ts",
+        "line": 18,
+        "text": "\"run\" | \"stop\""
+      }
+    ],
+    "\"keydown\" | \"keyup\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/keyword-event-playback.ts",
+        "line": 111,
+        "text": "\"keydown\" | \"keyup\""
+      }
+    ],
+    "| \"Empty\"\r\n    | \"ModifiersOnly\"\r\n    | \"UnknownKey\"\r\n    | \"MultipleKeys\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/keyword-event-validation.ts",
+        "line": 71,
+        "text": "| \"Empty\"\r\n    | \"ModifiersOnly\"\r\n    | \"UnknownKey\"\r\n    | \"MultipleKeys\""
+      }
+    ],
+    "| \"Empty\"\r\n    | \"NotANumber\"\r\n    | \"Negative\"\r\n    | \"NotFinite\"\r\n    | \"TooLarge\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/keyword-event-validation.ts",
+        "line": 129,
+        "text": "| \"Empty\"\r\n    | \"NotANumber\"\r\n    | \"Negative\"\r\n    | \"NotFinite\"\r\n    | \"TooLarge\""
+      }
+    ],
+    "| \"discovery\"\r\n    | \"sqlite-build\"\r\n    | \"zip-bundle\"\r\n    | \"download\"\r\n    | \"done\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/keyword-events-sqlite-export.ts",
+        "line": 154,
+        "text": "| \"discovery\"\r\n    | \"sqlite-build\"\r\n    | \"zip-bundle\"\r\n    | \"download\"\r\n    | \"done\""
+      }
+    ],
+    "\"uid\" | \"keyword\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/keyword-events-sqlite-import.ts",
+        "line": 298,
+        "text": "\"uid\" | \"keyword\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/lib/keyword-events-sqlite-import.ts",
+        "line": 342,
+        "text": "\"uid\" | \"keyword\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/lib/keyword-events-sqlite-import.ts",
+        "line": 347,
+        "text": "\"uid\" | \"keyword\""
+      }
+    ],
+    "\"vs\" | \"vs-dark\" | \"hc-black\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/monaco-themes.ts",
+        "line": 13,
+        "text": "\"vs\" | \"vs-dark\" | \"hc-black\""
+      }
+    ],
+    "\"chrome.storage\" | \"localStorage\" | \"memory\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/recorder-session-sync.ts",
+        "line": 34,
+        "text": "\"chrome.storage\" | \"localStorage\" | \"memory\""
+      }
+    ],
+    "\"full\" | \"prompts-only\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/sqlite-bundle-contract.ts",
+        "line": 158,
+        "text": "\"full\" | \"prompts-only\""
+      }
+    ],
+    "| \"MISSING_TABLE\"\r\n        | \"UNKNOWN_TABLE\"\r\n        | \"MISSING_COLUMN\"\r\n        | \"UNKNOWN_COLUMN\"\r\n        | \"NON_PASCAL_TABLE\"\r\n        | \"NON_PASCAL_COLUMN\"\r\n        | \"LEGACY_SNAKE_CASE\"\r\n        | \"MISSING_FORMAT_VERSION\"\r\n        | \"UNSUPPORTED_FORMAT_VERSION\"\r\n        | \"READ_ERROR\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/sqlite-bundle-contract.ts",
+        "line": 170,
+        "text": "| \"MISSING_TABLE\"\r\n        | \"UNKNOWN_TABLE\"\r\n        | \"MISSING_COLUMN\"\r\n        | \"UNKNOWN_COLUMN\"\r\n        | \"NON_PASCAL_TABLE\"\r\n        | \"NON_PASCAL_COLUMN\"\r\n        | \"LEGACY_SNAKE_CASE\"\r\n        | \"MISSING_FORMAT_VERSION\"\r\n        | \"UNSUPPORTED_FORMAT_VERSION\"\r\n        | \"READ_ERROR\""
+      }
+    ],
+    "\"new\" | \"overwrite\"": [
+      {
+        "file": "d:/work/macro-ahk/src/lib/sqlite-bundle.ts",
+        "line": 1053,
+        "text": "\"new\" | \"overwrite\""
+      }
+    ],
+    "\"tree\" | \"list\"": [
+      {
+        "file": "d:/work/macro-ahk/src/pages/Options.tsx",
+        "line": 179,
+        "text": "\"tree\" | \"list\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/pages/Options.tsx",
+        "line": 205,
+        "text": "\"tree\" | \"list\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/pages/Options.tsx",
+        "line": 566,
+        "text": "\"tree\" | \"list\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/pages/Options.tsx",
+        "line": 642,
+        "text": "\"tree\" | \"list\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/pages/Options.tsx",
+        "line": 643,
+        "text": "\"tree\" | \"list\""
+      }
+    ],
+    "\"forward\" | \"back\"": [
+      {
+        "file": "d:/work/macro-ahk/src/pages/Options.tsx",
+        "line": 212,
+        "text": "\"forward\" | \"back\""
+      }
+    ],
+    "\"AUTHOR\" | \"USER\"": [
+      {
+        "file": "d:/work/macro-ahk/src/platform/chrome-api-types.ts",
+        "line": 55,
+        "text": "\"AUTHOR\" | \"USER\""
+      }
+    ],
+    "\"USER_SCRIPT\" | \"MAIN\"": [
+      {
+        "file": "d:/work/macro-ahk/src/platform/chrome-api-types.ts",
+        "line": 68,
+        "text": "\"USER_SCRIPT\" | \"MAIN\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/platform/chrome-api-types.ts",
+        "line": 75,
+        "text": "\"USER_SCRIPT\" | \"MAIN\""
+      }
+    ],
+    "\"document_start\" | \"document_end\" | \"document_idle\"": [
+      {
+        "file": "d:/work/macro-ahk/src/platform/chrome-api-types.ts",
+        "line": 70,
+        "text": "\"document_start\" | \"document_end\" | \"document_idle\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/types.ts",
+        "line": 21,
+        "text": "\"document_start\" | \"document_end\" | \"document_idle\""
+      }
+    ],
+    "\"extension\" | \"preview\"": [
+      {
+        "file": "d:/work/macro-ahk/src/platform/platform-adapter.ts",
+        "line": 45,
+        "text": "\"extension\" | \"preview\""
+      }
+    ],
+    "\"manual\" | \"passive\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/injection-types.ts",
+        "line": 14,
+        "text": "\"manual\" | \"passive\""
+      }
+    ],
+    "\"document_start\" | \"document_idle\" | \"document_end\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/injection-types.ts",
+        "line": 22,
+        "text": "\"document_start\" | \"document_idle\" | \"document_end\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/project-types.ts",
+        "line": 19,
+        "text": "\"document_start\" | \"document_idle\" | \"document_end\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/script-bundle-types.ts",
+        "line": 15,
+        "text": "\"document_start\" | \"document_idle\" | \"document_end\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/script-config-types.ts",
+        "line": 19,
+        "text": "\"document_start\" | \"document_idle\" | \"document_end\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/seed-manifest-types.ts",
+        "line": 109,
+        "text": "\"document_start\" | \"document_idle\" | \"document_end\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/settings-handler.ts",
+        "line": 29,
+        "text": "\"document_start\" | \"document_idle\" | \"document_end\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ScriptsList.tsx",
+        "line": 461,
+        "text": "\"document_start\" | \"document_idle\" | \"document_end\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/SettingsView.tsx",
+        "line": 49,
+        "text": "\"document_start\" | \"document_idle\" | \"document_end\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/options/sections/editor/ScriptsConfigEditor.tsx",
+        "line": 20,
+        "text": "\"document_start\" | \"document_idle\" | \"document_end\""
+      }
+    ],
+    "\"disabled\" | \"missing\" | \"resolver_mismatch\" | \"empty_code\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/injection-types.ts",
+        "line": 31,
+        "text": "\"disabled\" | \"missing\" | \"resolver_mismatch\" | \"empty_code\""
+      }
+    ],
+    "\"wire\" | \"legacy-default\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/injection-types.ts",
+        "line": 99,
+        "text": "\"wire\" | \"legacy-default\""
+      }
+    ],
+    "\"valid\" | \"expiring\" | \"expired\" | \"missing\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 303,
+        "text": "\"valid\" | \"expiring\" | \"expired\" | \"missing\""
+      }
+    ],
+    "\"loaded\" | \"defaults\" | \"failed\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 308,
+        "text": "\"loaded\" | \"defaults\" | \"failed\""
+      }
+    ],
+    "\"local\" | \"remote\" | \"hardcoded\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 309,
+        "text": "\"local\" | \"remote\" | \"hardcoded\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/config-auth-handler.ts",
+        "line": 175,
+        "text": "\"local\" | \"remote\" | \"hardcoded\""
+      }
+    ],
+    "\"online\" | \"offline\" | \"degraded\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 345,
+        "text": "\"online\" | \"offline\" | \"degraded\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/popup/hooks/usePopupData.ts",
+        "line": 32,
+        "text": "\"online\" | \"offline\" | \"degraded\""
+      }
+    ],
+    "\"sqlite\" | \"fallback\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 348,
+        "text": "\"sqlite\" | \"fallback\""
+      }
+    ],
+    "\"csv\" | \"json\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 470,
+        "text": "\"csv\" | \"json\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/recorder-data-source-handler.ts",
+        "line": 30,
+        "text": "\"csv\" | \"json\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/recorder-data-source-handler.ts",
+        "line": 66,
+        "text": "\"csv\" | \"json\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/dropzone-overlay.ts",
+        "line": 25,
+        "text": "\"csv\" | \"json\""
+      }
+    ],
+    "\"markdown\" | \"prisma\" | \"both\" | \"meta\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 568,
+        "text": "\"markdown\" | \"prisma\" | \"both\" | \"meta\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/schema-meta-handler.ts",
+        "line": 73,
+        "text": "\"markdown\" | \"prisma\" | \"both\" | \"meta\""
+      }
+    ],
+    "\"sync\" | \"kv\" | \"files\" | \"gkv\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/messages.ts",
+        "line": 579,
+        "text": "\"sync\" | \"kv\" | \"files\" | \"gkv\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/popup/SdkSelfTestPanel.tsx",
+        "line": 23,
+        "text": "\"sync\" | \"kv\" | \"files\" | \"gkv\""
+      }
+    ],
+    "\"glob\" | \"regex\" | \"exact\" | \"prefix\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/project-types.ts",
+        "line": 11,
+        "text": "\"glob\" | \"regex\" | \"exact\" | \"prefix\""
+      }
+    ],
+    "\"debug\" | \"info\" | \"warn\" | \"error\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/project-types.ts",
+        "line": 43,
+        "text": "\"debug\" | \"info\" | \"warn\" | \"error\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/shared/seed-manifest-types.ts",
+        "line": 184,
+        "text": "\"debug\" | \"info\" | \"warn\" | \"error\""
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/instruction.ts",
+        "line": 21,
+        "text": "\"debug\" | \"info\" | \"warn\" | \"error\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/project-detail/GeneralTabContent.tsx",
+        "line": 369,
+        "text": "\"debug\" | \"info\" | \"warn\" | \"error\""
+      }
+    ],
+    "\"glob\" | \"exact\" | \"regex\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/script-config-types.ts",
+        "line": 71,
+        "text": "\"glob\" | \"exact\" | \"regex\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/__tests__/manifest-seeder-url-rules.test.ts",
+        "line": 33,
+        "text": "\"glob\" | \"exact\" | \"regex\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/__tests__/manifest-seeder-url-rules.test.ts",
+        "line": 75,
+        "text": "\"glob\" | \"exact\" | \"regex\""
+      }
+    ],
+    "\"glob\" | \"regex\" | \"exact\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/seed-manifest-types.ts",
+        "line": 162,
+        "text": "\"glob\" | \"regex\" | \"exact\""
+      }
+    ],
+    "\"session\" | \"refresh\" | \"other\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/seed-manifest-types.ts",
+        "line": 168,
+        "text": "\"session\" | \"refresh\" | \"other\""
+      }
+    ],
+    "\"exact\" | \"prefix\" | \"regex\" | \"glob\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/types.ts",
+        "line": 12,
+        "text": "\"exact\" | \"prefix\" | \"regex\" | \"glob\""
+      }
+    ],
+    "\"global\" | \"message\"": [
+      {
+        "file": "d:/work/macro-ahk/src/shared/types.ts",
+        "line": 18,
+        "text": "\"global\" | \"message\""
+      }
+    ],
+    "'preserve' | 'upper' | 'lower'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/constants.ts",
+        "line": 181,
+        "text": "'preserve' | 'upper' | 'lower'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/remix-config.ts",
+        "line": 25,
+        "text": "'preserve' | 'upper' | 'lower'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/remix-name-resolver.ts",
+        "line": 60,
+        "text": "'preserve' | 'upper' | 'lower'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/remix-name-resolver.ts",
+        "line": 85,
+        "text": "'preserve' | 'upper' | 'lower'"
+      }
+    ],
+    "'found' | 'not_linked' | 'error'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/gitsync-cache.ts",
+        "line": 42,
+        "text": "'found' | 'not_linked' | 'error'"
+      }
+    ],
+    "'bridge' | 'localStorage' | 'none'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/globals.d.ts",
+        "line": 109,
+        "text": "'bridge' | 'localStorage' | 'none'"
+      }
+    ],
+    "'hit' | 'timeout' | 'error' | 'skipped'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/globals.d.ts",
+        "line": 111,
+        "text": "'hit' | 'timeout' | 'error' | 'skipped'"
+      }
+    ],
+    "'manual' | 'passive'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/globals.d.ts",
+        "line": 192,
+        "text": "'manual' | 'passive'"
+      }
+    ],
+    "| 'debug' | 'info' | 'warn' | 'error'\r\n  | 'success' | 'delegate' | 'check' | 'skip' | 'sub'\r\n  | 'INFO' | 'ERROR' | 'WARN' | 'DEBUG' | 'SUB'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/log-manager.ts",
+        "line": 20,
+        "text": "| 'debug' | 'info' | 'warn' | 'error'\r\n  | 'success' | 'delegate' | 'check' | 'skip' | 'sub'\r\n  | 'INFO' | 'ERROR' | 'WARN' | 'DEBUG' | 'SUB'"
+      }
+    ],
+    "'api' | 'cache' | 'dom' | 'none'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/page-workspace-responder.ts",
+        "line": 33,
+        "text": "'api' | 'cache' | 'dom' | 'none'"
+      }
+    ],
+    "'manual' | 'next'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/remix-history.ts",
+        "line": 26,
+        "text": "'manual' | 'next'"
+      }
+    ],
+    "'expiryGracePeriodDays' | 'refillWarningThresholdDays'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/settings-modal.ts",
+        "line": 51,
+        "text": "'expiryGracePeriodDays' | 'refillWarningThresholdDays'"
+      }
+    ],
+    "'history' | 'popstate'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/spa-route-guard.ts",
+        "line": 130,
+        "text": "'history' | 'popstate'"
+      }
+    ],
+    "'proceed' | 'abort'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/startup-idempotent-check.ts",
+        "line": 20,
+        "text": "'proceed' | 'abort'"
+      }
+    ],
+    "'ok' | 'warn' | 'error' | 'pending'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/startup-timing.ts",
+        "line": 11,
+        "text": "'ok' | 'warn' | 'error' | 'pending'"
+      }
+    ],
+    "'info' | 'success' | 'warn' | 'error'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/task-manager.ts",
+        "line": 24,
+        "text": "'info' | 'success' | 'warn' | 'error'"
+      }
+    ],
+    "'pending' | 'processing' | 'completed' | 'failed' | 'hold'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/task-queue.ts",
+        "line": 17,
+        "text": "'pending' | 'processing' | 'completed' | 'failed' | 'hold'"
+      }
+    ],
+    "'up' | 'down'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/task-queue.ts",
+        "line": 251,
+        "text": "'up' | 'down'"
+      }
+    ],
+    "| 'canceled'\r\n  | 'expired'\r\n  | 'expired-hard'\r\n  | 'expire-soon'\r\n  | 'past-due-expiring'\r\n  | 'refill-soon'\r\n  | 'normal'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/workspace-display-status.ts",
+        "line": 29,
+        "text": "| 'canceled'\r\n  | 'expired'\r\n  | 'expired-hard'\r\n  | 'expire-soon'\r\n  | 'past-due-expiring'\r\n  | 'refill-soon'\r\n  | 'normal'"
+      }
+    ],
+    "| 'muted'      // canceled / past-due 0–2d — gray bg, light text, no red\r\n  | 'danger'     // expired / expire-soon / past-due ≥10d — red\r\n  | 'warning'    // past-due 3–9d — amber\r\n  | 'orange'     // reserved fallback\r\n  | 'info'       // refill-soon — sky\r\n  | 'none'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/workspace-display-status.ts",
+        "line": 46,
+        "text": "| 'muted'      // canceled / past-due 0–2d — gray bg, light text, no red\r\n  | 'danger'     // expired / expire-soon / past-due ≥10d — red\r\n  | 'warning'    // past-due 3–9d — amber\r\n  | 'orange'     // reserved fallback\r\n  | 'info'       // refill-soon — sky\r\n  | 'none'"
+      }
+    ],
+    "| 'fully-expired'\r\n  | 'expired-canceled'\r\n  | 'expired'\r\n  | 'about-to-expire'\r\n  | 'past-due-expiring'\r\n  | 'about-to-refill'\r\n  | 'normal'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/workspace-status.ts",
+        "line": 24,
+        "text": "| 'fully-expired'\r\n  | 'expired-canceled'\r\n  | 'expired'\r\n  | 'about-to-expire'\r\n  | 'past-due-expiring'\r\n  | 'about-to-refill'\r\n  | 'normal'"
+      }
+    ],
+    "'member' | 'owner'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ws-members-mutations.ts",
+        "line": 19,
+        "text": "'member' | 'owner'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ws-members-panel.ts",
+        "line": 529,
+        "text": "'member' | 'owner'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ws-members-panel.ts",
+        "line": 617,
+        "text": "'member' | 'owner'"
+      }
+    ],
+    "'none' | 'high' | 'low' | 'pro-high' | 'pro-low'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ws-view-state.ts",
+        "line": 3,
+        "text": "'none' | 'high' | 'low' | 'pro-high' | 'pro-low'"
+      }
+    ],
+    "\"loaded\" | \"denied\" | \"error\" | \"not_found\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/dynamic-require-handler.ts",
+        "line": 39,
+        "text": "\"loaded\" | \"denied\" | \"error\" | \"not_found\""
+      }
+    ],
+    "\"prompt\" | \"script\" | \"chain\" | \"preset\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/library-handler.ts",
+        "line": 107,
+        "text": "\"prompt\" | \"script\" | \"chain\" | \"preset\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/LibraryView.tsx",
+        "line": 87,
+        "text": "\"prompt\" | \"script\" | \"chain\" | \"preset\""
+      }
+    ],
+    "\"created\" | \"identical\" | \"conflict\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/library-handler.ts",
+        "line": 373,
+        "text": "\"created\" | \"identical\" | \"conflict\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/LibraryView.tsx",
+        "line": 283,
+        "text": "\"created\" | \"identical\" | \"conflict\""
+      }
+    ],
+    "| \"NoTabId\"\r\n    | \"NoReceiver\"\r\n    | \"EmptyResponse\"\r\n    | \"ProbeFailed\"\r\n    | \"Exception\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/open-tabs-handler.ts",
+        "line": 34,
+        "text": "| \"NoTabId\"\r\n    | \"NoReceiver\"\r\n    | \"EmptyResponse\"\r\n    | \"ProbeFailed\"\r\n    | \"Exception\""
+      }
+    ],
+    "\"api\" | \"cache\" | \"dom\" | \"none\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/open-tabs-handler.ts",
+        "line": 40,
+        "text": "\"api\" | \"cache\" | \"dom\" | \"none\""
+      }
+    ],
+    "\"injection-record\" | \"evaluated\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/open-tabs-handler.ts",
+        "line": 48,
+        "text": "\"injection-record\" | \"evaluated\""
+      }
+    ],
+    "\"injection\" | \"probe\" | \"none\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/open-tabs-handler.ts",
+        "line": 65,
+        "text": "\"injection\" | \"probe\" | \"none\""
+      }
+    ],
+    "\"read\" | \"write\" | \"schema\" | \"transaction\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/project-api-handler.ts",
+        "line": 57,
+        "text": "\"read\" | \"write\" | \"schema\" | \"transaction\""
+      }
+    ],
+    "\"system\" | \"light\" | \"dark\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/settings-handler.ts",
+        "line": 33,
+        "text": "\"system\" | \"light\" | \"dark\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/SettingsView.tsx",
+        "line": 54,
+        "text": "\"system\" | \"light\" | \"dark\""
+      }
+    ],
+    "| \"RESPECTIVE_HOST_PERMISSION\"\r\n    | \"MISSING_HOST_PERMISSION\"\r\n    | \"PAGE_CONTENTS_BLOCKED\"\r\n    | \"EXTENSIONS_GALLERY_BLOCKED\"\r\n    | \"RESTRICTED_SCHEME\"\r\n    | \"NO_HOST_PATTERN\"\r\n    | \"PERMISSION_NOT_GRANTED\"\r\n    | \"GENERIC_CANNOT_SCRIPT\"\r\n    | \"UNKNOWN\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/token-seeder.ts",
+        "line": 36,
+        "text": "| \"RESPECTIVE_HOST_PERMISSION\"\r\n    | \"MISSING_HOST_PERMISSION\"\r\n    | \"PAGE_CONTENTS_BLOCKED\"\r\n    | \"EXTENSIONS_GALLERY_BLOCKED\"\r\n    | \"RESTRICTED_SCHEME\"\r\n    | \"NO_HOST_PATTERN\"\r\n    | \"PERMISSION_NOT_GRANTED\"\r\n    | \"GENERIC_CANNOT_SCRIPT\"\r\n    | \"UNKNOWN\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/TokenSeederDiagnosticsPanel.tsx",
+        "line": 23,
+        "text": "| \"RESPECTIVE_HOST_PERMISSION\"\r\n    | \"MISSING_HOST_PERMISSION\"\r\n    | \"PAGE_CONTENTS_BLOCKED\"\r\n    | \"EXTENSIONS_GALLERY_BLOCKED\"\r\n    | \"RESTRICTED_SCHEME\"\r\n    | \"NO_HOST_PATTERN\"\r\n    | \"PERMISSION_NOT_GRANTED\"\r\n    | \"GENERIC_CANNOT_SCRIPT\"\r\n    | \"UNKNOWN\""
+      }
+    ],
+    "\"Download\" | \"Execute\" | \"Update\" | \"Validate\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/updater-handler.ts",
+        "line": 68,
+        "text": "\"Download\" | \"Execute\" | \"Update\" | \"Validate\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/updater/updater-types.ts",
+        "line": 14,
+        "text": "\"Download\" | \"Execute\" | \"Update\" | \"Validate\""
+      }
+    ],
+    "\"Script\" | \"Binary\" | \"ChromeExtension\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/updater-handler.ts",
+        "line": 71,
+        "text": "\"Script\" | \"Binary\" | \"ChromeExtension\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/updater/updater-types.ts",
+        "line": 16,
+        "text": "\"Script\" | \"Binary\" | \"ChromeExtension\""
+      }
+    ],
+    "\"pass\" | \"fail\" | \"fallback\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/handlers/xpath-validation-handler.ts",
+        "line": 23,
+        "text": "\"pass\" | \"fail\" | \"fallback\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/XPathValidationPanel.tsx",
+        "line": 33,
+        "text": "\"pass\" | \"fail\" | \"fallback\""
+      }
+    ],
+    "\"Auto\" | \"XPath\" | \"Css\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/condition-evaluator.ts",
+        "line": 20,
+        "text": "\"Auto\" | \"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/instruction-failure-adapters.ts",
+        "line": 56,
+        "text": "\"Auto\" | \"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/instruction-failure-adapters.ts",
+        "line": 194,
+        "text": "\"Auto\" | \"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/url-tab-click.ts",
+        "line": 26,
+        "text": "\"Auto\" | \"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/wait-for-element.ts",
+        "line": 27,
+        "text": "\"Auto\" | \"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/__tests__/instruction-failure-adapters.test.ts",
+        "line": 362,
+        "text": "\"Auto\" | \"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/__tests__/instruction-failure-adapters.test.ts",
+        "line": 548,
+        "text": "\"Auto\" | \"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/step-editor/payload-builders.ts",
+        "line": 26,
+        "text": "\"Auto\" | \"XPath\" | \"Css\""
+      }
+    ],
+    "\"eq\" | \"gte\" | \"lte\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/condition-evaluator.ts",
+        "line": 30,
+        "text": "\"eq\" | \"gte\" | \"lte\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/condition-evaluator.ts",
+        "line": 248,
+        "text": "\"eq\" | \"gte\" | \"lte\""
+      }
+    ],
+    "\"ConditionTimeout\" | \"InvalidSelector\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/condition-evaluator.ts",
+        "line": 51,
+        "text": "\"ConditionTimeout\" | \"InvalidSelector\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/wait-for-element.ts",
+        "line": 91,
+        "text": "\"ConditionTimeout\" | \"InvalidSelector\""
+      }
+    ],
+    "\"XPath\" | \"Css\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/condition-evaluator.ts",
+        "line": 57,
+        "text": "\"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/condition-evaluator.ts",
+        "line": 191,
+        "text": "\"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/condition-evaluator.ts",
+        "line": 258,
+        "text": "\"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/condition-evaluator.ts",
+        "line": 265,
+        "text": "\"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/condition-evaluator.ts",
+        "line": 274,
+        "text": "\"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/instruction-failure-adapters.ts",
+        "line": 211,
+        "text": "\"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/instruction-failure-adapters.ts",
+        "line": 217,
+        "text": "\"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/live-dom-replay.ts",
+        "line": 354,
+        "text": "\"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/wait-for-element.ts",
+        "line": 47,
+        "text": "\"XPath\" | \"Css\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/__tests__/instruction-failure-adapters.test.ts",
+        "line": 365,
+        "text": "\"XPath\" | \"Css\""
+      }
+    ],
+    "\"eq\" | \"contains\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/condition-evaluator.ts",
+        "line": 218,
+        "text": "\"eq\" | \"contains\""
+      }
+    ],
+    "| \"ConditionTimeout\"\r\n    | \"InvalidSelector\"\r\n    | \"InvalidUrlPattern\"\r\n    | \"RouteLoopDetected\"\r\n    | \"InvalidRouteTarget\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/condition-failure-record.ts",
+        "line": 26,
+        "text": "| \"ConditionTimeout\"\r\n    | \"InvalidSelector\"\r\n    | \"InvalidUrlPattern\"\r\n    | \"RouteLoopDetected\"\r\n    | \"InvalidRouteTarget\""
+      }
+    ],
+    "\"Pass\" | \"Fail\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/condition-step.ts",
+        "line": 14,
+        "text": "\"Pass\" | \"Fail\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/condition-step.ts",
+        "line": 26,
+        "text": "\"Pass\" | \"Fail\""
+      }
+    ],
+    "\"InvalidRouteTarget\" | \"RouteLoopDetected\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/condition-step.ts",
+        "line": 27,
+        "text": "\"InvalidRouteTarget\" | \"RouteLoopDetected\""
+      }
+    ],
+    "\"GET\" | \"POST\" | \"PUT\" | \"PATCH\" | \"DELETE\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/data-source-parsers.ts",
+        "line": 201,
+        "text": "\"GET\" | \"POST\" | \"PUT\" | \"PATCH\" | \"DELETE\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/http-request-step.ts",
+        "line": 19,
+        "text": "\"GET\" | \"POST\" | \"PUT\" | \"PATCH\" | \"DELETE\""
+      }
+    ],
+    "| \"TagName\"\r\n    | \"Id\"\r\n    | \"ClassName\"\r\n    | \"AriaLabel\"\r\n    | \"Name\"\r\n    | \"Type\"\r\n    | \"TextSnippet\"\r\n    | \"OuterHtmlSnippet\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/drift-element-diff.ts",
+        "line": 26,
+        "text": "| \"TagName\"\r\n    | \"Id\"\r\n    | \"ClassName\"\r\n    | \"AriaLabel\"\r\n    | \"Name\"\r\n    | \"Type\"\r\n    | \"TextSnippet\"\r\n    | \"OuterHtmlSnippet\""
+      }
+    ],
+    "\"Unchanged\" | \"Added\" | \"Removed\" | \"Modified\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/drift-element-diff.ts",
+        "line": 35,
+        "text": "\"Unchanged\" | \"Added\" | \"Removed\" | \"Modified\""
+      }
+    ],
+    "| \"Identical\"             // Both DomContexts are byte-equal.\r\n    | \"AttributeDrift\"        // Same tag, same/missing id, only attrs/text changed.\r\n    | \"RenamedIdentity\"       // Tag matches but id or aria-label changed.\r\n    | \"DifferentElement\"      // Different tag — fallback resolved a *different* node.\r\n    | \"PrimaryMissing\"        // Primary side absent (no recorded snapshot to compare).\r\n    | \"FallbackMissing\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/drift-element-diff.ts",
+        "line": 54,
+        "text": "| \"Identical\"             // Both DomContexts are byte-equal.\r\n    | \"AttributeDrift\"        // Same tag, same/missing id, only attrs/text changed.\r\n    | \"RenamedIdentity\"       // Tag matches but id or aria-label changed.\r\n    | \"DifferentElement\"      // Different tag — fallback resolved a *different* node.\r\n    | \"PrimaryMissing\"        // Primary side absent (no recorded snapshot to compare).\r\n    | \"FallbackMissing\""
+      }
+    ],
+    "| \"no-history\"      // Bucket has no runs at all.\r\n    | \"always-failing\"  // Never succeeded; FirstDrift is the first-ever failure.\r\n    | \"healthy\"         // No drift detected — last run still ok.\r\n    | \"drifted\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/drift-timeline.ts",
+        "line": 23,
+        "text": "| \"no-history\"      // Bucket has no runs at all.\r\n    | \"always-failing\"  // Never succeeded; FirstDrift is the first-ever failure.\r\n    | \"healthy\"         // No drift detected — last run still ok.\r\n    | \"drifted\""
+      }
+    ],
+    "\"Success\" | \"Failure\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/execution-next-preview.ts",
+        "line": 45,
+        "text": "\"Success\" | \"Failure\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/execution-next-preview.ts",
+        "line": 73,
+        "text": "\"Success\" | \"Failure\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/execution-next-preview.ts",
+        "line": 112,
+        "text": "\"Success\" | \"Failure\""
+      }
+    ],
+    "\"Record\" | \"Replay\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/failure-logger.ts",
+        "line": 53,
+        "text": "\"Record\" | \"Replay\""
+      }
+    ],
+    "| \"VariableMissing\"        // {{Token}} references a column not in the row.\r\n    | \"VariableNull\"           // Column exists but value is null.\r\n    | \"VariableUndefined\"      // Column exists but value is undefined.\r\n    | \"VariableEmpty\"          // Column exists but value is \"\".\r\n    | \"VariableTypeMismatch\"   // Column present but wrong type for this step.\r\n    // ---- Selector failures ------------------------------------------------\r\n    | \"ZeroMatches\"            // No selector (primary or fallback) matched anything.\r\n    | \"PrimaryMissedFallbackOk\" // Primary missed but a fallback matched — drift.\r\n    | \"XPathSyntaxError\"       // At least one XPath threw during evaluation.\r\n    | \"CssSyntaxError\"         // At least one CSS selector threw.\r\n    | \"UnresolvedAnchor\"       // XPathRelative anchor chain broken / cyclic.\r\n    | \"EmptyExpression\"        // A stored expression was \"\".\r\n    | \"NoSelectors\"            // Step had zero selectors persisted.\r\n    // ---- Other ------------------------------------------------------------\r\n    | \"Timeout\"                // Wait/Retry exceeded budget (set by callers).\r\n    | \"ConditionTimeout\"       // Gate condition not met within TimeoutMs (per spec 19 §2).\r\n    | \"JsThrew\"                // JsInline step threw inside the sandbox.\r\n    | \"Unknown\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/failure-logger.ts",
+        "line": 62,
+        "text": "| \"VariableMissing\"        // {{Token}} references a column not in the row.\r\n    | \"VariableNull\"           // Column exists but value is null.\r\n    | \"VariableUndefined\"      // Column exists but value is undefined.\r\n    | \"VariableEmpty\"          // Column exists but value is \"\".\r\n    | \"VariableTypeMismatch\"   // Column present but wrong type for this step.\r\n    // ---- Selector failures ------------------------------------------------\r\n    | \"ZeroMatches\"            // No selector (primary or fallback) matched anything.\r\n    | \"PrimaryMissedFallbackOk\" // Primary missed but a fallback matched — drift.\r\n    | \"XPathSyntaxError\"       // At least one XPath threw during evaluation.\r\n    | \"CssSyntaxError\"         // At least one CSS selector threw.\r\n    | \"UnresolvedAnchor\"       // XPathRelative anchor chain broken / cyclic.\r\n    | \"EmptyExpression\"        // A stored expression was \"\".\r\n    | \"NoSelectors\"            // Step had zero selectors persisted.\r\n    // ---- Other ------------------------------------------------------------\r\n    | \"Timeout\"                // Wait/Retry exceeded budget (set by callers).\r\n    | \"ConditionTimeout\"       // Gate condition not met within TimeoutMs (per spec 19 §2).\r\n    | \"JsThrew\"                // JsInline step threw inside the sandbox.\r\n    | \"Unknown\""
+      }
+    ],
+    "\"Message\" | \"Stack\" | \"Attempts\" | \"Reason\" | \"ReasonDetail\" | \"Verbose\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/failure-logger.ts",
+        "line": 244,
+        "text": "\"Message\" | \"Stack\" | \"Attempts\" | \"Reason\" | \"ReasonDetail\" | \"Verbose\""
+      }
+    ],
+    "| \"string\" | \"number\" | \"boolean\" | \"null\" | \"undefined\" | \"object\" | \"array\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/field-reference-resolver.ts",
+        "line": 44,
+        "text": "| \"string\" | \"number\" | \"boolean\" | \"null\" | \"undefined\" | \"object\" | \"array\""
+      }
+    ],
+    "| \"Resolved\"           // Not a failure — kept so the union covers OK rows.\r\n    | \"MissingColumn\"      // The token references a column that is not in the row at all.\r\n    | \"NullValue\"          // Column exists but value is null.\r\n    | \"UndefinedValue\"     // Column exists but value is undefined.\r\n    | \"EmptyString\"        // Column exists, value is \"\" — usually fatal for required inputs.\r\n    | \"TypeMismatch\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/field-reference-resolver.ts",
+        "line": 47,
+        "text": "| \"Resolved\"           // Not a failure — kept so the union covers OK rows.\r\n    | \"MissingColumn\"      // The token references a column that is not in the row at all.\r\n    | \"NullValue\"          // Column exists but value is null.\r\n    | \"UndefinedValue\"     // Column exists but value is undefined.\r\n    | \"EmptyString\"        // Column exists, value is \"\" — usually fatal for required inputs.\r\n    | \"TypeMismatch\""
+      }
+    ],
+    "| \"text\"\r\n    | \"email\"\r\n    | \"password\"\r\n    | \"number\"\r\n    | \"tel\"\r\n    | \"url\"\r\n    | \"search\"\r\n    | \"date\"\r\n    | \"datetime-local\"\r\n    | \"month\"\r\n    | \"week\"\r\n    | \"time\"\r\n    | \"color\"\r\n    | \"range\"\r\n    | \"file\"\r\n    | \"hidden\"\r\n    | \"checkbox\"\r\n    | \"radio\"\r\n    | \"select\"\r\n    | \"select-multiple\"\r\n    | \"textarea\"\r\n    | \"submit\"\r\n    | \"button\"\r\n    | \"other\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/form-snapshot.ts",
+        "line": 36,
+        "text": "| \"text\"\r\n    | \"email\"\r\n    | \"password\"\r\n    | \"number\"\r\n    | \"tel\"\r\n    | \"url\"\r\n    | \"search\"\r\n    | \"date\"\r\n    | \"datetime-local\"\r\n    | \"month\"\r\n    | \"week\"\r\n    | \"time\"\r\n    | \"color\"\r\n    | \"range\"\r\n    | \"file\"\r\n    | \"hidden\"\r\n    | \"checkbox\"\r\n    | \"radio\"\r\n    | \"select\"\r\n    | \"select-multiple\"\r\n    | \"textarea\"\r\n    | \"submit\"\r\n    | \"button\"\r\n    | \"other\""
+      }
+    ],
+    "\"form\" | \"container\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/form-snapshot.ts",
+        "line": 87,
+        "text": "\"form\" | \"container\""
+      }
+    ],
+    "\"off\" | \"recording\" | \"replay\" | \"inspector\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/hover-highlighter.ts",
+        "line": 23,
+        "text": "\"off\" | \"recording\" | \"replay\" | \"inspector\""
+      }
+    ],
+    "| \"Ok\"\r\n    | \"EndpointHttpError\"\r\n    | \"EndpointTimeout\"\r\n    | \"EndpointParseError\"\r\n    | \"BadParams\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/http-request-step.ts",
+        "line": 27,
+        "text": "| \"Ok\"\r\n    | \"EndpointHttpError\"\r\n    | \"EndpointTimeout\"\r\n    | \"EndpointParseError\"\r\n    | \"BadParams\""
+      }
+    ],
+    "| \"UrlTabClickTimeout\"\r\n    | \"TabNotFound\"\r\n    | \"InvalidUrlPattern\"\r\n    | \"SelectorNotFound\"\r\n    | \"UrlPatternMismatch\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/instruction-failure-adapters.ts",
+        "line": 42,
+        "text": "| \"UrlTabClickTimeout\"\r\n    | \"TabNotFound\"\r\n    | \"InvalidUrlPattern\"\r\n    | \"SelectorNotFound\"\r\n    | \"UrlPatternMismatch\""
+      }
+    ],
+    "\"Exact\" | \"Prefix\" | \"Glob\" | \"Regex\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/instruction-failure-adapters.ts",
+        "line": 52,
+        "text": "\"Exact\" | \"Prefix\" | \"Glob\" | \"Regex\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/url-tab-click.ts",
+        "line": 24,
+        "text": "\"Exact\" | \"Prefix\" | \"Glob\" | \"Regex\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/step-editor/payload-builders.ts",
+        "line": 24,
+        "text": "\"Exact\" | \"Prefix\" | \"Glob\" | \"Regex\""
+      }
+    ],
+    "\"OpenNew\" | \"FocusExisting\" | \"OpenOrFocus\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/instruction-failure-adapters.ts",
+        "line": 53,
+        "text": "\"OpenNew\" | \"FocusExisting\" | \"OpenOrFocus\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/url-tab-click.ts",
+        "line": 25,
+        "text": "\"OpenNew\" | \"FocusExisting\" | \"OpenOrFocus\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/step-editor/payload-builders.ts",
+        "line": 25,
+        "text": "\"OpenNew\" | \"FocusExisting\" | \"OpenOrFocus\""
+      }
+    ],
+    "\"Gate\" | \"ConditionStep\" | \"Wait\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/instruction-failure-adapters.ts",
+        "line": 117,
+        "text": "\"Gate\" | \"ConditionStep\" | \"Wait\""
+      }
+    ],
+    "\"InvalidSelector\" | \"ZeroMatches\" | \"ConditionTimeout\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/instruction-failure-adapters.ts",
+        "line": 195,
+        "text": "\"InvalidSelector\" | \"ZeroMatches\" | \"ConditionTimeout\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/__tests__/instruction-failure-adapters.test.ts",
+        "line": 363,
+        "text": "\"InvalidSelector\" | \"ZeroMatches\" | \"ConditionTimeout\""
+      }
+    ],
+    "\"Vars\" | \"Row\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/js-step-diagnostics.ts",
+        "line": 110,
+        "text": "\"Vars\" | \"Row\""
+      }
+    ],
+    "\"Click\" | \"Type\" | \"Select\" | \"Wait\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/live-dom-replay.ts",
+        "line": 54,
+        "text": "\"Click\" | \"Type\" | \"Select\" | \"Wait\""
+      }
+    ],
+    "\"Fail\" | \"Skip\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/live-dom-replay.ts",
+        "line": 83,
+        "text": "\"Fail\" | \"Skip\""
+      }
+    ],
+    "\"Timeout\" | \"InvalidSelector\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/live-dom-replay.ts",
+        "line": 369,
+        "text": "\"Timeout\" | \"InvalidSelector\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/wait-for-element.ts",
+        "line": 48,
+        "text": "\"Timeout\" | \"InvalidSelector\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/step-wait.ts",
+        "line": 359,
+        "text": "\"Timeout\" | \"InvalidSelector\""
+      }
+    ],
+    "| \"TargetNotFound\"     // SelectorId not present in the input list.\r\n    | \"AlreadyPrimary\"     // SelectorId is already the primary.\r\n    | \"EmptyInput\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/promote-selector.ts",
+        "line": 25,
+        "text": "| \"TargetNotFound\"     // SelectorId not present in the input list.\r\n    | \"AlreadyPrimary\"     // SelectorId is already the primary.\r\n    | \"EmptyInput\""
+      }
+    ],
+    "\"options\" | \"controller\" | \"external\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/recorder-selection-bus.ts",
+        "line": 28,
+        "text": "\"options\" | \"controller\" | \"external\""
+      }
+    ],
+    "\"Click\" | \"Type\" | \"Select\" | \"Submit\" | \"Wait\" | \"JsInline\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/recorder-session-types.ts",
+        "line": 17,
+        "text": "\"Click\" | \"Type\" | \"Select\" | \"Submit\" | \"Wait\" | \"JsInline\""
+      }
+    ],
+    "\"Id\" | \"TestId\" | \"RoleText\" | \"Positional\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/recorder-session-types.ts",
+        "line": 19,
+        "text": "\"Id\" | \"TestId\" | \"RoleText\" | \"Positional\""
+      }
+    ],
+    "\"idle\" | \"ok\" | \"warn\" | \"error\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/recorder-toolbar.ts",
+        "line": 341,
+        "text": "\"idle\" | \"ok\" | \"warn\" | \"error\""
+      }
+    ],
+    "\"start\" | \"pause\" | \"stop\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/recorder-toolbar.ts",
+        "line": 416,
+        "text": "\"start\" | \"pause\" | \"stop\""
+      }
+    ],
+    "\"XPath\" | \"Css\" | \"Aria\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/replay-resolver.ts",
+        "line": 27,
+        "text": "\"XPath\" | \"Css\" | \"Aria\""
+      }
+    ],
+    "| \"Matched\"               // Not a failure — kept so the union covers OK rows.\r\n    | \"ZeroMatches\"           // Expression evaluated cleanly but returned 0 nodes.\r\n    | \"XPathSyntaxError\"      // doc.evaluate threw.\r\n    | \"CssSyntaxError\"        // querySelector threw.\r\n    | \"UnresolvedAnchor\"      // XPathRelative pointed at a missing/cyclic anchor.\r\n    | \"EmptyExpression\"       // Stored expression is \"\" — recorder bug or stale data.\r\n    | \"EvaluationThrew\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/selector-attempt-evaluator.ts",
+        "line": 37,
+        "text": "| \"Matched\"               // Not a failure — kept so the union covers OK rows.\r\n    | \"ZeroMatches\"           // Expression evaluated cleanly but returned 0 nodes.\r\n    | \"XPathSyntaxError\"      // doc.evaluate threw.\r\n    | \"CssSyntaxError\"        // querySelector threw.\r\n    | \"UnresolvedAnchor\"      // XPathRelative pointed at a missing/cyclic anchor.\r\n    | \"EmptyExpression\"       // Stored expression is \"\" — recorder bug or stale data.\r\n    | \"EvaluationThrew\""
+      }
+    ],
+    "\"XPathFull\" | \"XPathRelative\" | \"Css\" | \"Aria\" | \"Unknown\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/selector-attempt-evaluator.ts",
+        "line": 45,
+        "text": "\"XPathFull\" | \"XPathRelative\" | \"Css\" | \"Aria\" | \"Unknown\""
+      }
+    ],
+    "\"Matched\" | \"MatchCount\" | \"Element\" | \"Error\" | \"ResolvedExpression\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/selector-comparison.ts",
+        "line": 101,
+        "text": "\"Matched\" | \"MatchCount\" | \"Element\" | \"Error\" | \"ResolvedExpression\""
+      }
+    ],
+    "\"healthy\" | \"regressed\" | \"always-failing\" | \"unknown\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/selector-history.ts",
+        "line": 43,
+        "text": "\"healthy\" | \"regressed\" | \"always-failing\" | \"unknown\""
+      }
+    ],
+    "\"Css\" | \"XPath\" | \"Auto\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/selector-tester.ts",
+        "line": 19,
+        "text": "\"Css\" | \"XPath\" | \"Auto\""
+      }
+    ],
+    "\"Css\" | \"XPath\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/selector-tester.ts",
+        "line": 24,
+        "text": "\"Css\" | \"XPath\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/selector-tester.ts",
+        "line": 31,
+        "text": "\"Css\" | \"XPath\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/selector-tester.ts",
+        "line": 52,
+        "text": "\"Css\" | \"XPath\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/selector-tester.ts",
+        "line": 67,
+        "text": "\"Css\" | \"XPath\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/selector-tester.ts",
+        "line": 100,
+        "text": "\"Css\" | \"XPath\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/url-tab-click.ts",
+        "line": 70,
+        "text": "\"Css\" | \"XPath\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/url-tab-click.ts",
+        "line": 299,
+        "text": "\"Css\" | \"XPath\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/step-wait.ts",
+        "line": 41,
+        "text": "\"Css\" | \"XPath\""
+      }
+    ],
+    "\"StepId\" | \"StepKindId\" | \"StepStatusId\" | \"OrderIndex\" | \"VariableName\" | \"Label\" | \"Description\" | \"InlineJs\" | \"ParamsJson\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-persistence.ts",
+        "line": 324,
+        "text": "\"StepId\" | \"StepKindId\" | \"StepStatusId\" | \"OrderIndex\" | \"VariableName\" | \"Label\" | \"Description\" | \"InlineJs\" | \"ParamsJson\""
+      }
+    ],
+    "| \"Ok\"\r\n    | \"TabNotFound\"\r\n    | \"InvalidUrlPattern\"\r\n    | \"SelectorNotFound\"\r\n    | \"UrlPatternMismatch\"\r\n    | \"UrlTabClickTimeout\"\r\n    | \"BadParams\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/url-tab-click.ts",
+        "line": 40,
+        "text": "| \"Ok\"\r\n    | \"TabNotFound\"\r\n    | \"InvalidUrlPattern\"\r\n    | \"SelectorNotFound\"\r\n    | \"UrlPatternMismatch\"\r\n    | \"UrlTabClickTimeout\"\r\n    | \"BadParams\""
+      }
+    ],
+    "\"InvalidUrlPattern\" | \"BadParams\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/url-tab-click.ts",
+        "line": 206,
+        "text": "\"InvalidUrlPattern\" | \"BadParams\""
+      }
+    ],
+    "\"Exists\" | \"Visible\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/wait-for-element.ts",
+        "line": 28,
+        "text": "\"Exists\" | \"Visible\""
+      }
+    ],
+    "\"top\" | \"then\" | \"else\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/automation/ChainBuilder.tsx",
+        "line": 32,
+        "text": "\"top\" | \"then\" | \"else\""
+      }
+    ],
+    "\"default\" | \"secondary\" | \"destructive\" | \"outline\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/AuthHealthPanel.tsx",
+        "line": 32,
+        "text": "\"default\" | \"secondary\" | \"destructive\" | \"outline\""
+      }
+    ],
+    "\"replace\" | \"prefix\" | \"suffix\" | \"sequence\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/BatchRenameDialog.tsx",
+        "line": 88,
+        "text": "\"replace\" | \"prefix\" | \"suffix\" | \"sequence\""
+      }
+    ],
+    "\"prefix\" | \"suffix\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/BatchRenameDialog.tsx",
+        "line": 303,
+        "text": "\"prefix\" | \"suffix\""
+      }
+    ],
+    "\"tree\" | \"raw\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ConfigsList.tsx",
+        "line": 38,
+        "text": "\"tree\" | \"raw\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ConfigsList.tsx",
+        "line": 131,
+        "text": "\"tree\" | \"raw\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/options/sections/editor/VariablesEditor.tsx",
+        "line": 19,
+        "text": "\"tree\" | \"raw\""
+      }
+    ],
+    "\"urls\" | \"variables\" | \"xpath\" | \"cookies\" | \"scripts\" | \"kv\" | \"files\" | \"all\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/DevGuideSection.tsx",
+        "line": 47,
+        "text": "\"urls\" | \"variables\" | \"xpath\" | \"cookies\" | \"scripts\" | \"kv\" | \"files\" | \"all\""
+      }
+    ],
+    "\"P0\" | \"P1\" | \"P2\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ErrorSwallowAuditView.tsx",
+        "line": 49,
+        "text": "\"P0\" | \"P1\" | \"P2\""
+      }
+    ],
+    "\"destructive\" | \"default\" | \"outline\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ErrorSwallowAuditView.tsx",
+        "line": 129,
+        "text": "\"destructive\" | \"default\" | \"outline\""
+      }
+    ],
+    "\"default\" | \"destructive\" | \"warn\" | \"muted\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ErrorSwallowAuditView.tsx",
+        "line": 519,
+        "text": "\"default\" | \"destructive\" | \"warn\" | \"muted\""
+      }
+    ],
+    "\"default\" | \"warn\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ExportPreviewDialog.tsx",
+        "line": 55,
+        "text": "\"default\" | \"warn\""
+      }
+    ],
+    "\"javascript\" | \"json\" | \"markdown\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/LazyMonacoCodeEditor.tsx",
+        "line": 14,
+        "text": "\"javascript\" | \"json\" | \"markdown\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/MonacoCodeEditor.tsx",
+        "line": 30,
+        "text": "\"javascript\" | \"json\" | \"markdown\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ProjectFilesPanel.tsx",
+        "line": 118,
+        "text": "\"javascript\" | \"json\" | \"markdown\""
+      }
+    ],
+    "\"assets\" | \"groups\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/LibraryView.tsx",
+        "line": 662,
+        "text": "\"assets\" | \"groups\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/LibraryView.tsx",
+        "line": 902,
+        "text": "\"assets\" | \"groups\""
+      }
+    ],
+    "\"edit\" | \"preview\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/MonacoCodeEditor.tsx",
+        "line": 501,
+        "text": "\"edit\" | \"preview\""
+      }
+    ],
+    "| \"projects\" | \"scripts\" | \"prompts\" | \"automation\" | \"updaters\" | \"storage\" | \"api\" | \"library\" | \"step-groups\" | \"settings\" | \"about\"\r\n  | \"logging\" | \"timing\" | \"data\" | \"network\" | \"activity\" | \"audit\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/OptionsSidebar.tsx",
+        "line": 45,
+        "text": "| \"projects\" | \"scripts\" | \"prompts\" | \"automation\" | \"updaters\" | \"storage\" | \"api\" | \"library\" | \"step-groups\" | \"settings\" | \"about\"\r\n  | \"logging\" | \"timing\" | \"data\" | \"network\" | \"activity\" | \"audit\""
+      }
+    ],
+    "\"section\" | \"project\" | \"script\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/OptionsSidebar.tsx",
+        "line": 49,
+        "text": "\"section\" | \"project\" | \"script\""
+      }
+    ],
+    "| \"general\"\r\n  | \"scripts\"\r\n  | \"urls\"\r\n  | \"variables\"\r\n  | \"xpath\"\r\n  | \"cookies\"\r\n  | \"updater\"\r\n  | \"docs\"\r\n  | \"files\"\r\n  | \"timing\"\r\n  | \"auth\"\r\n  | \"storage\"\r\n  | \"network\"\r\n  | \"recorder\"\r\n  | \"diagnostics\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ProjectDetailView.tsx",
+        "line": 64,
+        "text": "| \"general\"\r\n  | \"scripts\"\r\n  | \"urls\"\r\n  | \"variables\"\r\n  | \"xpath\"\r\n  | \"cookies\"\r\n  | \"updater\"\r\n  | \"docs\"\r\n  | \"files\"\r\n  | \"timing\"\r\n  | \"auth\"\r\n  | \"storage\"\r\n  | \"network\"\r\n  | \"recorder\"\r\n  | \"diagnostics\""
+      }
+    ],
+    "\"kv\" | \"database\" | \"config\" | \"indexeddb\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ProjectStoragePanel.tsx",
+        "line": 16,
+        "text": "\"kv\" | \"database\" | \"config\" | \"indexeddb\""
+      }
+    ],
+    "\"open\" | \"ignore\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ProjectUrlRulesEditor.tsx",
+        "line": 36,
+        "text": "\"open\" | \"ignore\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ProjectUrlRulesEditor.tsx",
+        "line": 162,
+        "text": "\"open\" | \"ignore\""
+      }
+    ],
+    "\"rules\" | \"project-urls\" | \"variables\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ProjectUrlRulesEditor.tsx",
+        "line": 53,
+        "text": "\"rules\" | \"project-urls\" | \"variables\""
+      }
+    ],
+    "\"green\" | \"amber\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/ProjectUrlRulesEditor.tsx",
+        "line": 267,
+        "text": "\"green\" | \"amber\""
+      }
+    ],
+    "\"key\" | \"value\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/PromptVariablesCard.tsx",
+        "line": 83,
+        "text": "\"key\" | \"value\""
+      }
+    ],
+    "\"synced\" | \"syncing\" | \"error\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/RecoveryIndicator.tsx",
+        "line": 9,
+        "text": "\"synced\" | \"syncing\" | \"error\""
+      }
+    ],
+    "\"default\" | \"success\" | \"muted\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/RunResultsSummaryPanel.tsx",
+        "line": 148,
+        "text": "\"default\" | \"success\" | \"muted\""
+      }
+    ],
+    "\"database\" | \"session\" | \"cookies\" | \"indexeddb\" | \"landing\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/StorageBrowserView.tsx",
+        "line": 75,
+        "text": "\"database\" | \"session\" | \"cookies\" | \"indexeddb\" | \"landing\""
+      }
+    ],
+    "\"session\" | \"cookies\" | \"indexeddb\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/StorageBrowserView.tsx",
+        "line": 438,
+        "text": "\"session\" | \"cookies\" | \"indexeddb\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/StorageRuntimePanels.tsx",
+        "line": 26,
+        "text": "\"session\" | \"cookies\" | \"indexeddb\""
+      }
+    ],
+    "\"host-permission\" | \"scripting-blocked\" | \"restricted-scheme\" | \"other\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/use-token-seeder-diagnostics.ts",
+        "line": 35,
+        "text": "\"host-permission\" | \"scripting-blocked\" | \"restricted-scheme\" | \"other\""
+      }
+    ],
+    "\"success\" | \"failed\" | \"in_progress\" | \"unknown\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/WasmStatusBanner.tsx",
+        "line": 101,
+        "text": "\"success\" | \"failed\" | \"in_progress\" | \"unknown\""
+      }
+    ],
+    "| \"all_clear\"\r\n    | \"manifest_missing_directive\"\r\n    | \"stale_build_reload_needed\"\r\n    | \"csp_blocked_unknown_cause\"\r\n    | \"boot_failed_non_csp\"\r\n    | \"build_tooling_pnpm_dlx_less\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/WasmStatusBanner.tsx",
+        "line": 411,
+        "text": "| \"all_clear\"\r\n    | \"manifest_missing_directive\"\r\n    | \"stale_build_reload_needed\"\r\n    | \"csp_blocked_unknown_cause\"\r\n    | \"boot_failed_non_csp\"\r\n    | \"build_tooling_pnpm_dlx_less\""
+      }
+    ],
+    "\"idle\" | \"running\" | \"error\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/overlay/DraggableOverlay.tsx",
+        "line": 148,
+        "text": "\"idle\" | \"running\" | \"error\""
+      }
+    ],
+    "\"short\" | \"full\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/popup/BootFailureBanner.tsx",
+        "line": 81,
+        "text": "\"short\" | \"full\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/popup/BootFailureBanner.tsx",
+        "line": 90,
+        "text": "\"short\" | \"full\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/popup/BootFailureBanner.tsx",
+        "line": 545,
+        "text": "\"short\" | \"full\""
+      }
+    ],
+    "\"wasm-missing\" | \"wasm\" | \"opfs\" | \"storage\" | \"migration\" | \"schema\" | \"unknown\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/popup/BootFailureBanner.tsx",
+        "line": 426,
+        "text": "\"wasm-missing\" | \"wasm\" | \"opfs\" | \"storage\" | \"migration\" | \"schema\" | \"unknown\""
+      }
+    ],
+    "\"idle\" | \"loading\" | \"copied\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/popup/InjectionCopyButton.tsx",
+        "line": 185,
+        "text": "\"idle\" | \"loading\" | \"copied\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/popup/SessionCopyButton.tsx",
+        "line": 136,
+        "text": "\"idle\" | \"loading\" | \"copied\""
+      }
+    ],
+    "\"warn\" | \"info\" | \"ok\" | \"error\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/DriftElementDiffView.tsx",
+        "line": 47,
+        "text": "\"warn\" | \"info\" | \"ok\" | \"error\""
+      }
+    ],
+    "\"primary\" | \"fallback\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/DriftElementDiffView.tsx",
+        "line": 266,
+        "text": "\"primary\" | \"fallback\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/DriftElementDiffView.tsx",
+        "line": 281,
+        "text": "\"primary\" | \"fallback\""
+      }
+    ],
+    "\"Default\" | \"Success\" | \"Failure\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/ExecutionNextBadge.tsx",
+        "line": 26,
+        "text": "\"Default\" | \"Success\" | \"Failure\""
+      }
+    ],
+    "\"pretty\" | \"minified\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/failure-export.ts",
+        "line": 58,
+        "text": "\"pretty\" | \"minified\""
+      }
+    ],
+    "\"variable\" | \"selector\" | \"syntax\" | \"timeout\" | \"other\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/FailureDetailsPanel.tsx",
+        "line": 54,
+        "text": "\"variable\" | \"selector\" | \"syntax\" | \"timeout\" | \"other\""
+      }
+    ],
+    "\"mini\" | \"compact\" | \"expanded\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/FloatingController.tsx",
+        "line": 57,
+        "text": "\"mini\" | \"compact\" | \"expanded\""
+      }
+    ],
+    "\"matched\" | \"missed\" | \"errored\" | \"pending\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/selector-replay-trace.ts",
+        "line": 23,
+        "text": "\"matched\" | \"missed\" | \"errored\" | \"pending\""
+      }
+    ],
+    "\"Primary\" | \"Fallback\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/selector-replay-trace.ts",
+        "line": 27,
+        "text": "\"Primary\" | \"Fallback\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/selector-replay-trace.ts",
+        "line": 67,
+        "text": "\"Primary\" | \"Fallback\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/selector-replay-trace.ts",
+        "line": 118,
+        "text": "\"Primary\" | \"Fallback\""
+      }
+    ],
+    "\"matched\" | \"exhausted\" | \"empty\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/selector-replay-trace.ts",
+        "line": 44,
+        "text": "\"matched\" | \"exhausted\" | \"empty\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/SelectorReplayTracePanel.tsx",
+        "line": 153,
+        "text": "\"matched\" | \"exhausted\" | \"empty\""
+      }
+    ],
+    "\"horizontal\" | \"vertical\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/ui/carousel.tsx",
+        "line": 16,
+        "text": "\"horizontal\" | \"vertical\""
+      }
+    ],
+    "\"line\" | \"dot\" | \"dashed\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/ui/chart.tsx",
+        "line": 99,
+        "text": "\"line\" | \"dot\" | \"dashed\""
+      }
+    ],
+    "\"payload\" | \"verticalAlign\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/ui/chart.tsx",
+        "line": 234,
+        "text": "\"payload\" | \"verticalAlign\""
+      }
+    ],
+    "\"expanded\" | \"collapsed\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/ui/sidebar.tsx",
+        "line": 23,
+        "text": "\"expanded\" | \"collapsed\""
+      }
+    ],
+    "\"left\" | \"right\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/ui/sidebar.tsx",
+        "line": 135,
+        "text": "\"left\" | \"right\""
+      }
+    ],
+    "\"sidebar\" | \"floating\" | \"inset\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/ui/sidebar.tsx",
+        "line": 136,
+        "text": "\"sidebar\" | \"floating\" | \"inset\""
+      }
+    ],
+    "\"offcanvas\" | \"icon\" | \"none\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/ui/sidebar.tsx",
+        "line": 137,
+        "text": "\"offcanvas\" | \"icon\" | \"none\""
+      }
+    ],
+    "\"sm\" | \"md\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/ui/sidebar.tsx",
+        "line": 588,
+        "text": "\"sm\" | \"md\""
+      }
+    ],
+    "\"sm\" | \"default\" | \"icon\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/webhook/CopyLogButton.tsx",
+        "line": 14,
+        "text": "\"sm\" | \"default\" | \"icon\""
+      }
+    ],
+    "\"Recording\" | \"Paused\"": [
+      {
+        "file": "d:/work/macro-ahk/src/hooks/__tests__/use-recorder-shortcuts.test.tsx",
+        "line": 25,
+        "text": "\"Recording\" | \"Paused\""
+      }
+    ],
+    "\"success\" | \"error\"": [
+      {
+        "file": "d:/work/macro-ahk/src/options/sections/ProjectEditor.tsx",
+        "line": 60,
+        "text": "\"success\" | \"error\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/options/sections/ScriptsLibrary.tsx",
+        "line": 23,
+        "text": "\"success\" | \"error\""
+      }
+    ],
+    "\"success\" | \"error\" | \"info\"": [
+      {
+        "file": "d:/work/macro-ahk/src/options/sections/ProjectsSection.tsx",
+        "line": 41,
+        "text": "\"success\" | \"error\" | \"info\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/options/shared/Toast.tsx",
+        "line": 9,
+        "text": "\"success\" | \"error\" | \"info\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/popup/hooks/useActionLog.ts",
+        "line": 14,
+        "text": "\"success\" | \"error\" | \"info\""
+      }
+    ],
+    "\"disabled\" | \"missing\" | \"resolver_mismatch\"": [
+      {
+        "file": "d:/work/macro-ahk/src/popup/components/InjectionResults.tsx",
+        "line": 17,
+        "text": "\"disabled\" | \"missing\" | \"resolver_mismatch\""
+      }
+    ],
+    "\"run\" | \"exec\" | \"prepare\" | \"close\" | \"export\"": [
+      {
+        "file": "d:/work/macro-ahk/src/test/regression/sqlite-bind-safety.test.ts",
+        "line": 36,
+        "text": "\"run\" | \"exec\" | \"prepare\" | \"close\" | \"export\""
+      }
+    ],
+    "\"bind\" | \"run\" | \"free\" | \"step\"": [
+      {
+        "file": "d:/work/macro-ahk/src/test/regression/sqlite-bind-safety.test.ts",
+        "line": 42,
+        "text": "\"bind\" | \"run\" | \"free\" | \"step\""
+      }
+    ],
+    "'injection' | 'probe' | 'none'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/__tests__/open-tabs-section.test.ts",
+        "line": 62,
+        "text": "'injection' | 'probe' | 'none'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/section-open-tabs.ts",
+        "line": 36,
+        "text": "'injection' | 'probe' | 'none'"
+      }
+    ],
+    "'injection-record' | 'evaluated'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/__tests__/open-tabs-section.test.ts",
+        "line": 67,
+        "text": "'injection-record' | 'evaluated'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/section-open-tabs.ts",
+        "line": 25,
+        "text": "'injection-record' | 'evaluated'"
+      }
+    ],
+    "'plan' | 'next'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/__tests__/prompt-io-import-revisions.test.ts",
+        "line": 44,
+        "text": "'plan' | 'next'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/seed/__tests__/prompt-health-auto-repair.test.ts",
+        "line": 50,
+        "text": "'plan' | 'next'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/seed/__tests__/prompt-health-check.test.ts",
+        "line": 44,
+        "text": "'plan' | 'next'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/__tests__/prompt-editor-diff-persistence.test.ts",
+        "line": 24,
+        "text": "'plan' | 'next'"
+      }
+    ],
+    "'mouseover' | 'mouseout'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/__tests__/ws-hover-card-interaction.test.ts",
+        "line": 83,
+        "text": "'mouseover' | 'mouseout'"
+      }
+    ],
+    "'batch' | 'manual'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/credit-balance/batch-refresh.ts",
+        "line": 51,
+        "text": "'batch' | 'manual'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/credit-balance/batch-refresh.ts",
+        "line": 94,
+        "text": "'batch' | 'manual'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/credit-balance/batch-refresh.ts",
+        "line": 128,
+        "text": "'batch' | 'manual'"
+      }
+    ],
+    "'fetched' | 'throttled' | 'failed'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/credit-balance/fetcher.ts",
+        "line": 40,
+        "text": "'fetched' | 'throttled' | 'failed'"
+      }
+    ],
+    "'id' | 'plan' | 'tier'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/credit-balance/needs-balance-enrichment.ts",
+        "line": 31,
+        "text": "'id' | 'plan' | 'tier'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/credit-balance/__tests__/needs-balance-enrichment.test.ts",
+        "line": 9,
+        "text": "'id' | 'plan' | 'tier'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/credit-balance/__tests__/needs-balance-enrichment.test.ts",
+        "line": 9,
+        "text": "'id' | 'plan' | 'tier'"
+      }
+    ],
+    "| 'ok'\r\n    | 'no-id'\r\n    | 'free-tier'\r\n    | 'non-enrichable-plan'\r\n    | 'cache-fresh'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/credit-balance/needs-balance-enrichment.ts",
+        "line": 40,
+        "text": "| 'ok'\r\n    | 'no-id'\r\n    | 'free-tier'\r\n    | 'non-enrichable-plan'\r\n    | 'cache-fresh'"
+      }
+    ],
+    "'auto' | 'batch' | 'manual'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/credit-balance/store.ts",
+        "line": 35,
+        "text": "'auto' | 'batch' | 'manual'"
+      }
+    ],
+    "'ok' | 'forced' | 'per-ws-cooldown' | 'inter-ws-cooldown'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/credit-balance/throttle.ts",
+        "line": 41,
+        "text": "'ok' | 'forced' | 'per-ws-cooldown' | 'inter-ws-cooldown'"
+      }
+    ],
+    "'AuthError' | 'Http5xx' | 'Http4xx'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/credit-balance-update/credit-balance-fetcher.ts",
+        "line": 101,
+        "text": "'AuthError' | 'Http5xx' | 'Http4xx'"
+      }
+    ],
+    "'Inline' | 'Cache' | 'Timeout' | 'Missing' | 'Pending'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/credit-balance-update/credit-summary-resolver.ts",
+        "line": 9,
+        "text": "'Inline' | 'Cache' | 'Timeout' | 'Missing' | 'Pending'"
+      }
+    ],
+    "| 'paste'\r\n  | 'repeat'\r\n  | 'next-chip'\r\n  | 'plan-chip'\r\n  | 'manual'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/db/project-chat-submit-db.ts",
+        "line": 28,
+        "text": "| 'paste'\r\n  | 'repeat'\r\n  | 'next-chip'\r\n  | 'plan-chip'\r\n  | 'manual'"
+      }
+    ],
+    "'QUERY' | 'SCHEMA'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/db/prompt-db.ts",
+        "line": 69,
+        "text": "'QUERY' | 'SCHEMA'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/db/prompt-revision-db.ts",
+        "line": 54,
+        "text": "'QUERY' | 'SCHEMA'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/db/sql-bridge.ts",
+        "line": 37,
+        "text": "'QUERY' | 'SCHEMA'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/seed/reseed-command.ts",
+        "line": 56,
+        "text": "'QUERY' | 'SCHEMA'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/seed/seed-plan-next.ts",
+        "line": 62,
+        "text": "'QUERY' | 'SCHEMA'"
+      }
+    ],
+    "| 'template'\r\n    | 'match'\r\n    | 'no-declaration'\r\n    | 'no-steps'\r\n    | 'mismatch'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/db/rule-zero-validator.ts",
+        "line": 52,
+        "text": "| 'template'\r\n    | 'match'\r\n    | 'no-declaration'\r\n    | 'no-steps'\r\n    | 'mismatch'"
+      }
+    ],
+    "'SELECT' | 'ALTER' | 'WRITE'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/db/sql-bridge.ts",
+        "line": 38,
+        "text": "'SELECT' | 'ALTER' | 'WRITE'"
+      }
+    ],
+    "'fatal' | 'error' | 'warn' | 'info'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/errors/error-codes.ts",
+        "line": 18,
+        "text": "'fatal' | 'error' | 'warn' | 'info'"
+      }
+    ],
+    "| 'PROMPT'\r\n  | 'PROMPT_IO'\r\n  | 'SEED'\r\n  | 'HEALTH'\r\n  | 'REPAIR'\r\n  | 'HISTORY'\r\n  | 'DB'\r\n  | 'HTTP'\r\n  | 'SDK'\r\n  | 'WS_MEMBERS'\r\n  | 'WS_MOVE'\r\n  | 'WS_CONTEXT'\r\n  | 'REMIX'\r\n  | 'RENAME'\r\n  | 'GITSYNC'\r\n  | 'CREDIT'\r\n  | 'PROZERO'\r\n  | 'SETTINGS'\r\n  | 'SPLITTER'\r\n  | 'TELEMETRY'\r\n  | 'UI'\r\n  | 'ASYNC'\r\n  | 'LOOP'\r\n  | 'QUEUE'\r\n  | 'TYPE'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/errors/error-codes.ts",
+        "line": 21,
+        "text": "| 'PROMPT'\r\n  | 'PROMPT_IO'\r\n  | 'SEED'\r\n  | 'HEALTH'\r\n  | 'REPAIR'\r\n  | 'HISTORY'\r\n  | 'DB'\r\n  | 'HTTP'\r\n  | 'SDK'\r\n  | 'WS_MEMBERS'\r\n  | 'WS_MOVE'\r\n  | 'WS_CONTEXT'\r\n  | 'REMIX'\r\n  | 'RENAME'\r\n  | 'GITSYNC'\r\n  | 'CREDIT'\r\n  | 'PROZERO'\r\n  | 'SETTINGS'\r\n  | 'SPLITTER'\r\n  | 'TELEMETRY'\r\n  | 'UI'\r\n  | 'ASYNC'\r\n  | 'LOOP'\r\n  | 'QUEUE'\r\n  | 'TYPE'"
+      }
+    ],
+    "'error' | 'warn' | 'info'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/errors/show-diagnostic-toast.ts",
+        "line": 18,
+        "text": "'error' | 'warn' | 'info'"
+      }
+    ],
+    "'pending' | 'running' | 'completed' | 'failed'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/gitsync/progress-probe.ts",
+        "line": 38,
+        "text": "'pending' | 'running' | 'completed' | 'failed'"
+      }
+    ],
+    "'no_job' | 'no_repo_url' | 'deadline' | 'error'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/gitsync/progress-probe.ts",
+        "line": 57,
+        "text": "'no_job' | 'no_repo_url' | 'deadline' | 'error'"
+      }
+    ],
+    "'api-423' | 'api-body-locked' | 'dom-banner'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/project-lock/types.ts",
+        "line": 5,
+        "text": "'api-423' | 'api-body-locked' | 'dom-banner'"
+      }
+    ],
+    "'loop-stopped' | 'document-hidden' | 'queue-missing' | 'queue-empty' | 'already-running' | 'no-resume-button' | 'ok' | 'threw'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/queue-control/auto-resume.ts",
+        "line": 18,
+        "text": "'loop-stopped' | 'document-hidden' | 'queue-missing' | 'queue-empty' | 'already-running' | 'no-resume-button' | 'ok' | 'threw'"
+      }
+    ],
+    "'ok' | 'pause-missing' | 'resume-missing'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/queue-control/index.ts",
+        "line": 18,
+        "text": "'ok' | 'pause-missing' | 'resume-missing'"
+      }
+    ],
+    "'primary-xpath' | 'fallback-header-walk' | 'fallback-aria-walk' | 'none'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/queue-control/queue-count.ts",
+        "line": 17,
+        "text": "'primary-xpath' | 'fallback-header-walk' | 'fallback-aria-walk' | 'none'"
+      }
+    ],
+    "\"pending\" | \"active\" | \"done\" | \"failed\"": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/queue-control/task-queue.ts",
+        "line": 21,
+        "text": "\"pending\" | \"active\" | \"done\" | \"failed\""
+      }
+    ],
+    "| 'query-failed'\r\n    | 'row-missing'\r\n    | 'not-flagged-default'\r\n    | 'name-empty'\r\n    | 'body-empty'\r\n    | 'missing-required-token'\r\n    | 'replace-key-invalid'\r\n    | 'replace-values-invalid'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/seed/prompt-health-check.ts",
+        "line": 39,
+        "text": "| 'query-failed'\r\n    | 'row-missing'\r\n    | 'not-flagged-default'\r\n    | 'name-empty'\r\n    | 'body-empty'\r\n    | 'missing-required-token'\r\n    | 'replace-key-invalid'\r\n    | 'replace-values-invalid'"
+      }
+    ],
+    "'adopted' | 'skipped-lookup-failed' | 'skipped-missing' | 'skipped-role-ok' | 'failed-upsert'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/seed/repair-plan-next-orphans.ts",
+        "line": 28,
+        "text": "'adopted' | 'skipped-lookup-failed' | 'skipped-missing' | 'skipped-role-ok' | 'failed-upsert'"
+      }
+    ],
+    "'idempotent' | 'force'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/seed/reseed-command.ts",
+        "line": 44,
+        "text": "'idempotent' | 'force'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/seed/reseed-command.ts",
+        "line": 96,
+        "text": "'idempotent' | 'force'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/seed/__tests__/prompt-health-auto-repair.test.ts",
+        "line": 34,
+        "text": "'idempotent' | 'force'"
+      }
+    ],
+    "'ok' | 'failed' | 'skipped'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/seed/seed-status-store.ts",
+        "line": 21,
+        "text": "'ok' | 'failed' | 'skipped'"
+      }
+    ],
+    "| 'schema-init'\r\n    | 'legacy-read-memory-dedupe'\r\n    | 'orphan-repair'\r\n    | 'seed-plan-next'\r\n    | 'auto-repair'\r\n    | 'read-memory-duplicate-validation'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/seed/seed-status-store.ts",
+        "line": 25,
+        "text": "| 'schema-init'\r\n    | 'legacy-read-memory-dedupe'\r\n    | 'orphan-repair'\r\n    | 'seed-plan-next'\r\n    | 'auto-repair'\r\n    | 'read-memory-duplicate-validation'"
+      }
+    ],
+    "'success' | 'warning' | 'error' | 'info'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/telemetry/diagnostic-toast-telemetry.ts",
+        "line": 138,
+        "text": "'success' | 'warning' | 'error' | 'info'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/telemetry/prompt-seed-telemetry.ts",
+        "line": 85,
+        "text": "'success' | 'warning' | 'error' | 'info'"
+      }
+    ],
+    "| 'seed.start'\r\n  | 'seed.insert-or-ignore'\r\n  | 'seed.legacy-upgrade'\r\n  | 'seed.legacy-upgrade-skip'\r\n  | 'seed.promote-default'\r\n  | 'seed.promote-default-kept'\r\n  | 'seed.complete'\r\n  | 'seed.failed'\r\n  | 'seed.audit-skip'\r\n  | 'seed.audit-write'\r\n  | 'editor.prefill.db-hit'\r\n  | 'editor.prefill.reseed'\r\n  | 'editor.prefill.direct-insert'\r\n  | 'editor.prefill.direct-insert-failed'\r\n  | 'editor.prefill.static-fallback'\r\n  | 'editor.prefill.missing'\r\n  | 'editor.prefill.drift'\r\n  | 'reseed.start'\r\n  | 'reseed.force'\r\n  | 'reseed.complete'\r\n  | 'health.default.isSuccess'\r\n  | 'health.default.missing'\r\n  | 'health.default.schema-drift'\r\n  | 'health.auto-repair.start'\r\n  | 'health.auto-repair.recovered'\r\n  | 'health.auto-repair.failed'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/telemetry/prompt-seed-telemetry.ts",
+        "line": 34,
+        "text": "| 'seed.start'\r\n  | 'seed.insert-or-ignore'\r\n  | 'seed.legacy-upgrade'\r\n  | 'seed.legacy-upgrade-skip'\r\n  | 'seed.promote-default'\r\n  | 'seed.promote-default-kept'\r\n  | 'seed.complete'\r\n  | 'seed.failed'\r\n  | 'seed.audit-skip'\r\n  | 'seed.audit-write'\r\n  | 'editor.prefill.db-hit'\r\n  | 'editor.prefill.reseed'\r\n  | 'editor.prefill.direct-insert'\r\n  | 'editor.prefill.direct-insert-failed'\r\n  | 'editor.prefill.static-fallback'\r\n  | 'editor.prefill.missing'\r\n  | 'editor.prefill.drift'\r\n  | 'reseed.start'\r\n  | 'reseed.force'\r\n  | 'reseed.complete'\r\n  | 'health.default.isSuccess'\r\n  | 'health.default.missing'\r\n  | 'health.default.schema-drift'\r\n  | 'health.auto-repair.start'\r\n  | 'health.auto-repair.recovered'\r\n  | 'health.auto-repair.failed'"
+      }
+    ],
+    "'ok' | 'skipped' | 'failed'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/telemetry/prompt-seed-telemetry.ts",
+        "line": 61,
+        "text": "'ok' | 'skipped' | 'failed'"
+      }
+    ],
+    "'success' | 'error' | 'info' | 'warn'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/types/ui-types.ts",
+        "line": 27,
+        "text": "'success' | 'error' | 'info' | 'warn'"
+      }
+    ],
+    "'normal' | 'no-limit' | 'auth-retry' | 'rate-retry'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/types/workspace-types.ts",
+        "line": 16,
+        "text": "'normal' | 'no-limit' | 'auth-retry' | 'rate-retry'"
+      }
+    ],
+    "'dollar' | 'hash' | 'star'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/bulk-rename.ts",
+        "line": 513,
+        "text": "'dollar' | 'hash' | 'star'"
+      }
+    ],
+    "'threw' | 'rejected'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/chip-gear-menu.ts",
+        "line": 230,
+        "text": "'threw' | 'rejected'"
+      }
+    ],
+    "'initial-list' | 'auto-seed' | 'post-seed-list'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/chip-gear-picker.ts",
+        "line": 27,
+        "text": "'initial-list' | 'auto-seed' | 'post-seed-list'"
+      }
+    ],
+    "'plan' | 'next' | 'generic'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/configured-chip-values.ts",
+        "line": 38,
+        "text": "'plan' | 'next' | 'generic'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-cache.ts",
+        "line": 35,
+        "text": "'plan' | 'next' | 'generic'"
+      }
+    ],
+    "'ok' | 'warn' | 'used' | 'total' | 'muted' | 'accent'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/credit-totals-modal.ts",
+        "line": 78,
+        "text": "'ok' | 'warn' | 'used' | 'total' | 'muted' | 'accent'"
+      }
+    ],
+    "'name' | 'plan' | 'projects' | 'used' | 'rem' | 'total'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/credit-totals-modal.ts",
+        "line": 137,
+        "text": "'name' | 'plan' | 'projects' | 'used' | 'rem' | 'total'"
+      }
+    ],
+    "'asc' | 'desc' | 'none'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/credit-totals-modal.ts",
+        "line": 138,
+        "text": "'asc' | 'desc' | 'none'"
+      }
+    ],
+    "'left' | 'right'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/credit-totals-modal.ts",
+        "line": 183,
+        "text": "'left' | 'right'"
+      }
+    ],
+    "'like' | 'exact'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/database-data-filter.ts",
+        "line": 159,
+        "text": "'like' | 'exact'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/database-modal-data.ts",
+        "line": 25,
+        "text": "'like' | 'exact'"
+      }
+    ],
+    "'ok' | 'err' | 'info' | 'warn'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/database-json-log.ts",
+        "line": 10,
+        "text": "'ok' | 'err' | 'info' | 'warn'"
+      }
+    ],
+    "'TEXT' | 'INTEGER' | 'REAL' | 'BLOB' | 'BOOLEAN'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/database-json-types.ts",
+        "line": 12,
+        "text": "'TEXT' | 'INTEGER' | 'REAL' | 'BLOB' | 'BOOLEAN'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/database-schema-editors.ts",
+        "line": 39,
+        "text": "'TEXT' | 'INTEGER' | 'REAL' | 'BLOB' | 'BOOLEAN'"
+      }
+    ],
+    "'addColumn' | 'dropColumn' | 'renameColumn'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/database-json-types.ts",
+        "line": 35,
+        "text": "'addColumn' | 'dropColumn' | 'renameColumn'"
+      }
+    ],
+    "'string' | 'date' | 'regex'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/database-schema-editors.ts",
+        "line": 18,
+        "text": "'string' | 'date' | 'regex'"
+      }
+    ],
+    "'CASCADE' | 'SET NULL' | 'RESTRICT'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/database-schema-editors.ts",
+        "line": 33,
+        "text": "'CASCADE' | 'SET NULL' | 'RESTRICT'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/database-schema-editors.ts",
+        "line": 34,
+        "text": "'CASCADE' | 'SET NULL' | 'RESTRICT'"
+      }
+    ],
+    "'ok' | 'err'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/database-schema-helpers.ts",
+        "line": 41,
+        "text": "'ok' | 'err'"
+      }
+    ],
+    "'error' | 'warn'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/error-overlay.ts",
+        "line": 44,
+        "text": "'error' | 'warn'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/error-overlay.ts",
+        "line": 138,
+        "text": "'error' | 'warn'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/error-overlay.ts",
+        "line": 749,
+        "text": "'error' | 'warn'"
+      }
+    ],
+    "'right' | 'left'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/flyout-placement.ts",
+        "line": 34,
+        "text": "'right' | 'left'"
+      }
+    ],
+    "'down' | 'up'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/flyout-placement.ts",
+        "line": 35,
+        "text": "'down' | 'up'"
+      }
+    ],
+    "'idle' | 'cancelled' | 'timeout'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/lovable-idle.ts",
+        "line": 35,
+        "text": "'idle' | 'cancelled' | 'timeout'"
+      }
+    ],
+    "'active' | 'history' | 'live'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/macro-ui.ts",
+        "line": 15,
+        "text": "'active' | 'history' | 'live'"
+      }
+    ],
+    "'json' | 'zip' | 'sqlite'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-bundle-types.ts",
+        "line": 22,
+        "text": "'json' | 'zip' | 'sqlite'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-import-audit.ts",
+        "line": 49,
+        "text": "'json' | 'zip' | 'sqlite'"
+      }
+    ],
+    "'id' | 'savedAt'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-cache.ts",
+        "line": 282,
+        "text": "'id' | 'savedAt'"
+      }
+    ],
+    "'default' | 'migrated' | 'drag'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-drag-order.ts",
+        "line": 192,
+        "text": "'default' | 'migrated' | 'drag'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-dropdown.ts",
+        "line": 58,
+        "text": "'default' | 'migrated' | 'drag'"
+      }
+    ],
+    "'localStorage' | 'default'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-drag-order.ts",
+        "line": 237,
+        "text": "'localStorage' | 'default'"
+      }
+    ],
+    "'info' | 'success' | 'error'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-history-panel.ts",
+        "line": 44,
+        "text": "'info' | 'success' | 'error'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-history-panel.ts",
+        "line": 138,
+        "text": "'info' | 'success' | 'error'"
+      }
+    ],
+    "'date' | 'reason'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-history-panel.ts",
+        "line": 454,
+        "text": "'date' | 'reason'"
+      }
+    ],
+    "'asc' | 'desc'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-history-panel.ts",
+        "line": 455,
+        "text": "'asc' | 'desc'"
+      }
+    ],
+    "'all' | 'only' | 'exclude'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-history-panel.ts",
+        "line": 462,
+        "text": "'all' | 'only' | 'exclude'"
+      }
+    ],
+    "'add' | 'overwrite' | 'skip' | 'rename'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-import-audit.ts",
+        "line": 47,
+        "text": "'add' | 'overwrite' | 'skip' | 'rename'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-import-modal.ts",
+        "line": 35,
+        "text": "'add' | 'overwrite' | 'skip' | 'rename'"
+      }
+    ],
+    "'in_progress' | 'committed' | 'rolled_back'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-import-audit.ts",
+        "line": 48,
+        "text": "'in_progress' | 'committed' | 'rolled_back'"
+      }
+    ],
+    "| 'PARSE_INVALID_JSON'\r\n  | 'PARSE_ZIP_CORRUPT'\r\n  | 'PARSE_SQLITE_INVALID'\r\n  | 'PARSE_UNKNOWN_FORMAT'\r\n  | 'PARSE_SCHEMA_MISMATCH'\r\n  | 'PARSE_EMPTY_BUNDLE'\r\n  | 'COMMIT_QUOTA_EXCEEDED'\r\n  | 'COMMIT_IDB_UNAVAILABLE'\r\n  | 'COMMIT_TRANSACTION_ABORTED'\r\n  | 'COMMIT_DOUBLE_FAULT'\r\n  | 'COMMIT_UNKNOWN'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-import-errors.ts",
+        "line": 16,
+        "text": "| 'PARSE_INVALID_JSON'\r\n  | 'PARSE_ZIP_CORRUPT'\r\n  | 'PARSE_SQLITE_INVALID'\r\n  | 'PARSE_UNKNOWN_FORMAT'\r\n  | 'PARSE_SCHEMA_MISMATCH'\r\n  | 'PARSE_EMPTY_BUNDLE'\r\n  | 'COMMIT_QUOTA_EXCEEDED'\r\n  | 'COMMIT_IDB_UNAVAILABLE'\r\n  | 'COMMIT_TRANSACTION_ABORTED'\r\n  | 'COMMIT_DOUBLE_FAULT'\r\n  | 'COMMIT_UNKNOWN'"
+      }
+    ],
+    "'parse' | 'commit'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-import-errors.ts",
+        "line": 92,
+        "text": "'parse' | 'commit'"
+      }
+    ],
+    "'info' | 'warn' | 'error'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-import-errors.ts",
+        "line": 133,
+        "text": "'info' | 'warn' | 'error'"
+      }
+    ],
+    "'idle' | 'parsing' | 'preview' | 'committing' | 'done' | 'error'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-import-modal.ts",
+        "line": 28,
+        "text": "'idle' | 'parsing' | 'preview' | 'committing' | 'done' | 'error'"
+      }
+    ],
+    "'new' | 'update' | 'identical' | 'duplicate'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-import-modal.ts",
+        "line": 40,
+        "text": "'new' | 'update' | 'identical' | 'duplicate'"
+      }
+    ],
+    "'primary' | 'ghost'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-import-modal.ts",
+        "line": 78,
+        "text": "'primary' | 'ghost'"
+      }
+    ],
+    "'rule-zero' | 'token-drift' | 'upstream'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-injection.ts",
+        "line": 126,
+        "text": "'rule-zero' | 'token-drift' | 'upstream'"
+      }
+    ],
+    "'entries' | 'revisions' | 'done'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-io.ts",
+        "line": 438,
+        "text": "'entries' | 'revisions' | 'done'"
+      }
+    ],
+    "'click' | 'drop'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-library-import-pipeline.ts",
+        "line": 111,
+        "text": "'click' | 'drop'"
+      },
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-library-preview.ts",
+        "line": 107,
+        "text": "'click' | 'drop'"
+      }
+    ],
+    "'parse' | 'entry'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-library-progress.ts",
+        "line": 132,
+        "text": "'parse' | 'entry'"
+      }
+    ],
+    "'ok' | 'out-of-order' | 'unknown' | 'missing'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-order-indicator.ts",
+        "line": 17,
+        "text": "'ok' | 'out-of-order' | 'unknown' | 'missing'"
+      }
+    ],
+    "'injected' | 'clipboard' | 'failed' | 'cancelled'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-utils.ts",
+        "line": 504,
+        "text": "'injected' | 'clipboard' | 'failed' | 'cancelled'"
+      }
+    ],
+    "'paste' | 'next-chip' | 'plan-chip'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/prompt-utils.ts",
+        "line": 608,
+        "text": "'paste' | 'next-chip' | 'plan-chip'"
+      }
+    ],
+    "'idle' | 'submitting' | 'waiting-completion' | 'waiting-delay'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/repeat-loop-ui.ts",
+        "line": 48,
+        "text": "'idle' | 'submitting' | 'waiting-completion' | 'waiting-delay'"
+      }
+    ],
+    "'flex' | 'inline-flex'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/repeat-loop-ui.ts",
+        "line": 479,
+        "text": "'flex' | 'inline-flex'"
+      }
+    ],
+    "'ul' | 'ol'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/save-prompt-html-converter.ts",
+        "line": 85,
+        "text": "'ul' | 'ol'"
+      }
+    ],
+    "'glob' | 'regex' | 'exact' | 'prefix'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/section-open-tabs.ts",
+        "line": 24,
+        "text": "'glob' | 'regex' | 'exact' | 'prefix'"
+      }
+    ],
+    "'grace' | 'refill'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/settings-tab-panels.ts",
+        "line": 782,
+        "text": "'grace' | 'refill'"
+      }
+    ],
+    "'queue' | 'legacy'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/task-next-ui.ts",
+        "line": 190,
+        "text": "'queue' | 'legacy'"
+      }
+    ],
+    "'text' | 'replaceKey'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/task-next-ui.ts",
+        "line": 219,
+        "text": "'text' | 'replaceKey'"
+      }
+    ],
+    "'ok' | 'paste-failed' | 'submit-failed' | 'idle-cancelled' | 'idle-timeout' | 'cancelled' | 'queue-empty'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/task-next-ui.ts",
+        "line": 393,
+        "text": "'ok' | 'paste-failed' | 'submit-failed' | 'idle-cancelled' | 'idle-timeout' | 'cancelled' | 'queue-empty'"
+      }
+    ],
+    "| \"JsonMissing\"\r\n    | \"JsonParseFailed\"\r\n    | \"SubtasksMissing\"\r\n    | \"WrongLength\"\r\n    | \"SubtaskInvalid\"": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/task-splitter-parse.ts",
+        "line": 9,
+        "text": "| \"JsonMissing\"\r\n    | \"JsonParseFailed\"\r\n    | \"SubtasksMissing\"\r\n    | \"WrongLength\"\r\n    | \"SubtaskInvalid\""
+      }
+    ],
+    "'slug' | 'name' | 'text' | 'replaceKey' | 'parentSlug' | 'variantValue'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/task-splitter-ui.ts",
+        "line": 622,
+        "text": "'slug' | 'name' | 'text' | 'replaceKey' | 'parentSlug' | 'variantValue'"
+      }
+    ],
+    "'db-default' | 'window-config' | 'preamble-prompts' | 'default-prompts' | 'parent-slug-variant' | 'slug-variant' | 'not-found'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/task-splitter-ui.ts",
+        "line": 623,
+        "text": "'db-default' | 'window-config' | 'preamble-prompts' | 'default-prompts' | 'parent-slug-variant' | 'slug-variant' | 'not-found'"
+      }
+    ],
+    "\"dragenter\" | \"dragover\" | \"dragleave\" | \"drop\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/__tests__/dropzone-overlay.test.ts",
+        "line": 18,
+        "text": "\"dragenter\" | \"dragover\" | \"dragleave\" | \"drop\""
+      }
+    ],
+    "\"start\" | \"pause\" | \"resume\" | \"stop\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/__tests__/recorder-toolbar.test.ts",
+        "line": 37,
+        "text": "\"start\" | \"pause\" | \"resume\" | \"stop\""
+      }
+    ],
+    "\"auto\" | \"string\" | \"number\" | \"boolean\" | \"json\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/csv-mapping.ts",
+        "line": 29,
+        "text": "\"auto\" | \"string\" | \"number\" | \"boolean\" | \"json\""
+      }
+    ],
+    "| \"empty-input\"\r\n    | \"size-limit\"\r\n    | \"unterminated-quote\"\r\n    | \"no-rows\"\r\n    | \"duplicate-headers\"\r\n    | \"empty-header\"\r\n    | \"row-limit\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/csv-parse.ts",
+        "line": 42,
+        "text": "| \"empty-input\"\r\n    | \"size-limit\"\r\n    | \"unterminated-quote\"\r\n    | \"no-rows\"\r\n    | \"duplicate-headers\"\r\n    | \"empty-header\"\r\n    | \"row-limit\""
+      }
+    ],
+    "\",\" | \";\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/csv-parse.ts",
+        "line": 52,
+        "text": "\",\" | \";\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/csv-parse.ts",
+        "line": 179,
+        "text": "\",\" | \";\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/csv-parse.ts",
+        "line": 254,
+        "text": "\",\" | \";\""
+      }
+    ],
+    "| \"Ok\"\r\n    | \"ProjectNotFound\"\r\n    | \"GroupNotFound\"\r\n    | \"GroupOutsideProject\"\r\n    | \"EmptySelection\"\r\n    | \"RunGroupTargetMissing\"\r\n    | \"InternalError\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/export-bundle.ts",
+        "line": 57,
+        "text": "| \"Ok\"\r\n    | \"ProjectNotFound\"\r\n    | \"GroupNotFound\"\r\n    | \"GroupOutsideProject\"\r\n    | \"EmptySelection\"\r\n    | \"RunGroupTargetMissing\"\r\n    | \"InternalError\""
+      }
+    ],
+    "\"Selection\" | \"Bundle\" | \"Internal\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/export-error-explainer.ts",
+        "line": 26,
+        "text": "\"Selection\" | \"Bundle\" | \"Internal\""
+      }
+    ],
+    "\"querySelector\" | \"dispatchEvent\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/hotkey-executor.ts",
+        "line": 156,
+        "text": "\"querySelector\" | \"dispatchEvent\""
+      }
+    ],
+    "\"Skip\" | \"Rename\" | \"Fail\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/import-bundle.ts",
+        "line": 45,
+        "text": "\"Skip\" | \"Rename\" | \"Fail\""
+      }
+    ],
+    "| \"Ok\"\r\n    | \"BundleNotZip\"\r\n    | \"ManifestMissing\"\r\n    | \"ManifestMalformed\"\r\n    | \"ManifestVersionUnsupported\"\r\n    | \"DbFileMissing\"\r\n    | \"DbChecksumMismatch\"\r\n    | \"DbSchemaIncompatible\"\r\n    | \"DbCorrupt\"\r\n    | \"DestinationProjectMissing\"\r\n    | \"AttachParentMissing\"\r\n    | \"AttachParentWrongProject\"\r\n    | \"NameConflict\"\r\n    | \"RunGroupTargetMissing\"\r\n    | \"InternalError\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/import-bundle.ts",
+        "line": 70,
+        "text": "| \"Ok\"\r\n    | \"BundleNotZip\"\r\n    | \"ManifestMissing\"\r\n    | \"ManifestMalformed\"\r\n    | \"ManifestVersionUnsupported\"\r\n    | \"DbFileMissing\"\r\n    | \"DbChecksumMismatch\"\r\n    | \"DbSchemaIncompatible\"\r\n    | \"DbCorrupt\"\r\n    | \"DestinationProjectMissing\"\r\n    | \"AttachParentMissing\"\r\n    | \"AttachParentWrongProject\"\r\n    | \"NameConflict\"\r\n    | \"RunGroupTargetMissing\"\r\n    | \"InternalError\""
+      }
+    ],
+    "\"Keep\" | \"Collision\" | \"Skip\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/import-bundle.ts",
+        "line": 565,
+        "text": "\"Keep\" | \"Collision\" | \"Skip\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/import-bundle.ts",
+        "line": 593,
+        "text": "\"Keep\" | \"Collision\" | \"Skip\""
+      }
+    ],
+    "\"Bundle\" | \"Conflict\" | \"Internal\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/import-error-explainer.ts",
+        "line": 24,
+        "text": "\"Bundle\" | \"Conflict\" | \"Internal\""
+      }
+    ],
+    "\"GET\" | \"POST\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/input-source.ts",
+        "line": 45,
+        "text": "\"GET\" | \"POST\""
+      }
+    ],
+    "| \"Abort\"               // halt the batch — receiver must be reachable.\r\n    | \"ContinueWithLocal\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/input-source.ts",
+        "line": 48,
+        "text": "| \"Abort\"               // halt the batch — receiver must be reachable.\r\n    | \"ContinueWithLocal\""
+      }
+    ],
+    "\"Type\" | \"Select\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/replay-bridge.ts",
+        "line": 265,
+        "text": "\"Type\" | \"Select\""
+      }
+    ],
+    "| \"Pending\"\r\n    | \"Running\"\r\n    | \"Succeeded\"\r\n    | \"Failed\"\r\n    | \"Skipped\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/run-batch.ts",
+        "line": 40,
+        "text": "| \"Pending\"\r\n    | \"Running\"\r\n    | \"Succeeded\"\r\n    | \"Failed\"\r\n    | \"Skipped\""
+      }
+    ],
+    "\"StopOnFailure\" | \"ContinueOnFailure\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/run-batch.ts",
+        "line": 56,
+        "text": "\"StopOnFailure\" | \"ContinueOnFailure\""
+      }
+    ],
+    "\"Executed\" | \"Skipped\" | \"EnteredGroup\" | \"ExitedGroup\" | \"Failed\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/run-group-runner.ts",
+        "line": 65,
+        "text": "\"Executed\" | \"Skipped\" | \"EnteredGroup\" | \"ExitedGroup\" | \"Failed\""
+      }
+    ],
+    "| \"LeafStepFailed\"        // executor returned/threw a FailureReport.\r\n    | \"RunGroupCycle\"         // group already on the active call stack.\r\n    | \"RunGroupDepthExceeded\" // call stack exceeded MAX_RUN_GROUP_CALL_DEPTH.\r\n    | \"MissingTargetGroup\"    // RunGroup step has no resolvable target.\r\n    | \"MissingRootGroup\"      // caller passed a rootGroupId that does not exist.\r\n    | \"TargetNotInProject\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/run-group-runner.ts",
+        "line": 79,
+        "text": "| \"LeafStepFailed\"        // executor returned/threw a FailureReport.\r\n    | \"RunGroupCycle\"         // group already on the active call stack.\r\n    | \"RunGroupDepthExceeded\" // call stack exceeded MAX_RUN_GROUP_CALL_DEPTH.\r\n    | \"MissingTargetGroup\"    // RunGroup step has no resolvable target.\r\n    | \"MissingRootGroup\"      // caller passed a rootGroupId that does not exist.\r\n    | \"TargetNotInProject\""
+      }
+    ],
+    "\"plan\" | \"group\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/run-group-runner.ts",
+        "line": 626,
+        "text": "\"plan\" | \"group\""
+      }
+    ],
+    "\"Appears\" | \"Disappears\" | \"Visible\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/step-wait.ts",
+        "line": 42,
+        "text": "\"Appears\" | \"Disappears\" | \"Visible\""
+      }
+    ],
+    "\"Selector\" | \"Kind\"": [
+      {
+        "file": "d:/work/macro-ahk/src/background/recorder/step-library/step-wait.ts",
+        "line": 303,
+        "text": "\"Selector\" | \"Kind\""
+      }
+    ],
+    "\"logs\" | \"errors\" | \"datastore\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/data-browser/DataBrowserPanel.tsx",
+        "line": 16,
+        "text": "\"logs\" | \"errors\" | \"datastore\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/data-browser/DataTable.tsx",
+        "line": 40,
+        "text": "\"logs\" | \"errors\" | \"datastore\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/data-browser/DataTable.tsx",
+        "line": 115,
+        "text": "\"logs\" | \"errors\" | \"datastore\""
+      }
+    ],
+    "\"database\" | \"session\" | \"cookies\" | \"local\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/data-browser/StorageCategoryCards.tsx",
+        "line": 11,
+        "text": "\"database\" | \"session\" | \"cookies\" | \"local\""
+      }
+    ],
+    "\"string\" | \"number\" | \"boolean\" | \"object\" | \"array\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/json-tree/AddPropertyButton.tsx",
+        "line": 12,
+        "text": "\"string\" | \"number\" | \"boolean\" | \"object\" | \"array\""
+      }
+    ],
+    "\"CASCADE\" | \"SET NULL\" | \"RESTRICT\" | \"NO ACTION\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/project-database/ForeignKeyEditor.tsx",
+        "line": 19,
+        "text": "\"CASCADE\" | \"SET NULL\" | \"RESTRICT\" | \"NO ACTION\""
+      }
+    ],
+    "\"markdown\" | \"prisma\" | \"both\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/project-database/JsonSchemaTab.tsx",
+        "line": 416,
+        "text": "\"markdown\" | \"prisma\" | \"both\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/project-database/ProjectDatabasePanel.tsx",
+        "line": 206,
+        "text": "\"markdown\" | \"prisma\" | \"both\""
+      }
+    ],
+    "\"create\" | \"modify\" | \"drop\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/project-database/SchemaDiffPreview.tsx",
+        "line": 26,
+        "text": "\"create\" | \"modify\" | \"drop\""
+      }
+    ],
+    "\"string\" | \"date\" | \"regex\" | \"enum\" | \"number\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/project-database/ValidationRuleEditor.tsx",
+        "line": 27,
+        "text": "\"string\" | \"date\" | \"regex\" | \"enum\" | \"number\""
+      }
+    ],
+    "\"info\" | \"warn\" | \"error\" | \"debug\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/project-detail/ActivityLogSection.tsx",
+        "line": 15,
+        "text": "\"info\" | \"warn\" | \"error\" | \"debug\""
+      }
+    ],
+    "\"markdown\" | \"prisma\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/project-detail/DocsTab.tsx",
+        "line": 25,
+        "text": "\"markdown\" | \"prisma\""
+      }
+    ],
+    "\"global\" | \"dependency\" | \"project\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/project-detail/InjectionOrderPreview.tsx",
+        "line": 31,
+        "text": "\"global\" | \"dependency\" | \"project\""
+      }
+    ],
+    "\"json\" | \"csv\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/recorder/recorder-export.ts",
+        "line": 18,
+        "text": "\"json\" | \"csv\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/options/webhook-settings/delivery-log-utils.ts",
+        "line": 246,
+        "text": "\"json\" | \"csv\""
+      }
+    ],
+    "\"insert\" | \"verify\" | \"cleanup\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/recorder/recorder-self-test.ts",
+        "line": 20,
+        "text": "\"insert\" | \"verify\" | \"cleanup\""
+      }
+    ],
+    "\"ok\" | \"warn\" | \"error\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/recorder/RecorderEmptyState.tsx",
+        "line": 12,
+        "text": "\"ok\" | \"warn\" | \"error\""
+      }
+    ],
+    "\"Auto\" | \"Css\" | \"XPath\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/step-wait/use-step-wait-dialog.ts",
+        "line": 25,
+        "text": "\"Auto\" | \"Css\" | \"XPath\""
+      }
+    ],
+    "\"up-to-date\" | \"update-available\" | \"error\" | \"unchecked\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/updater/updater-types.ts",
+        "line": 55,
+        "text": "\"up-to-date\" | \"update-available\" | \"error\" | \"unchecked\""
+      }
+    ],
+    "\"default\" | \"secondary\" | \"outline\" | \"destructive\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/webhook-settings/delivery-log-utils.ts",
+        "line": 65,
+        "text": "\"default\" | \"secondary\" | \"outline\" | \"destructive\""
+      }
+    ],
+    "\"all\" | \"success\" | \"skipped\" | \"failure\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/webhook-settings/DeliveryLogSection.tsx",
+        "line": 39,
+        "text": "\"all\" | \"success\" | \"skipped\" | \"failure\""
+      }
+    ],
+    "\"empty\" | \"invalid\" | \"no-match\" | \"match\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/keyword-events/target-picker-status.ts",
+        "line": 11,
+        "text": "\"empty\" | \"invalid\" | \"no-match\" | \"match\""
+      }
+    ],
+    "\"ActiveElement\" | \"Body\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/keyword-events/TargetPickerRow.tsx",
+        "line": 119,
+        "text": "\"ActiveElement\" | \"Body\""
+      },
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/keyword-events/TargetPickerRow.tsx",
+        "line": 154,
+        "text": "\"ActiveElement\" | \"Body\""
+      }
+    ],
+    "'paste' | 'repeat' | 'next-chip' | 'plan-chip' | 'manual'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/capture/__tests__/chat-submit-window-panel.integration.test.ts",
+        "line": 21,
+        "text": "'paste' | 'repeat' | 'next-chip' | 'plan-chip' | 'manual'"
+      }
+    ],
+    "'unhidden' | 'child-added'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/__tests__/prompt-library-modal-aria-live-import-error.test.ts",
+        "line": 85,
+        "text": "'unhidden' | 'child-added'"
+      }
+    ],
+    "\"marco-save-prompt-btn\" | \"marco-chatbox-prompts-btn\"": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/__tests__/save-prompt-insertion.test.ts",
+        "line": 44,
+        "text": "\"marco-save-prompt-btn\" | \"marco-chatbox-prompts-btn\""
+      }
+    ],
+    "'pro' | 'proCredits' | 'freeCredits'": [
+      {
+        "file": "d:/work/macro-ahk/standalone-scripts/macro-controller/src/ui/summary-bar/hover-card.ts",
+        "line": 29,
+        "text": "'pro' | 'proCredits' | 'freeCredits'"
+      }
+    ],
+    "\"reload\" | \"updateStepMeta\" | \"setStepTags\" | \"setStepLink\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/options/recorder/visualisation/use-recorder-step-mutations.ts",
+        "line": 28,
+        "text": "\"reload\" | \"updateStepMeta\" | \"setStepTags\" | \"setStepLink\""
+      }
+    ],
+    "\"add\" | \"remove\"": [
+      {
+        "file": "d:/work/macro-ahk/src/components/recorder/keyword-events/bulk-menu/BulkTagsDialog.tsx",
+        "line": 24,
+        "text": "\"add\" | \"remove\""
+      }
+    ]
+  }
+}

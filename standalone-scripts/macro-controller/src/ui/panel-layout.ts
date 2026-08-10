@@ -17,12 +17,9 @@ import { PANEL_EDGE_MARGIN, PANEL_MIN_VISIBLE_HEIGHT, PANEL_MIN_VISIBLE_WIDTH, D
 import { DomIdType, StorageKeyType } from '../types';
 import { logError } from "../error-utils";
 
-const MACRO_CONTROLLER = 'MacroController';
-const UNKNOWN_ERROR_MSG = 'Unknown error';
-
 function savePanelState(state: string): void {
   try { localStorage.setItem(StorageKeyType.PanelState, state); } catch (_e) {
-    logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+    logError('MacroController', 'Unknown error');
     logSub('Failed to save panel state: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
   }
 }
@@ -50,7 +47,7 @@ function savePanelGeometry(ui: HTMLElement): void {
     };
     localStorage.setItem(StorageKeyType.PanelGeometry, JSON.stringify(geo));
   } catch (_e) {
-    logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+    logError('MacroController', 'Unknown error');
     logSub('Failed to save panel geometry: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
   }
 }
@@ -178,7 +175,7 @@ export function getBackdropOpacity(): number {
 export function setBackdropOpacity(opacity: number): void {
   const clamped = Math.min(1, Math.max(0, opacity));
   try { localStorage.setItem(StorageKeyType.BackdropOpacity, String(clamped)); } catch (_e) {
-    logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+    logError('MacroController', 'Unknown error');
     logSub('Failed to save backdrop opacity: ' + (_e instanceof Error ? _e.message : String(_e)), 1);
   }
   const backdrop = document.getElementById(BACKDROP_ID);
@@ -311,7 +308,7 @@ export function setupDragListeners(ctx: PanelLayoutCtx) {
     ctx.isDragging = false;
     if ((e.target as HTMLElement).releasePointerCapture && ctx.dragPointerId != null) {
       try { (e.target as HTMLElement).releasePointerCapture(ctx.dragPointerId); } catch (ex) {
-        logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+        logError('MacroController', 'Unknown error');
         logSub('releasePointerCapture (drag) failed: ' + (ex instanceof Error ? ex.message : String(ex)), 1);
       }
     }
@@ -416,7 +413,7 @@ export function setupResizeListeners(ctx: PanelLayoutCtx) {
     ctx.isResizing = false;
     if ((e.target as HTMLElement).releasePointerCapture && ctx.resizePointerId != null) {
       try { (e.target as HTMLElement).releasePointerCapture(ctx.resizePointerId); } catch (ex) {
-        logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+        logError('MacroController', 'Unknown error');
         logSub('releasePointerCapture (resize) failed: ' + (ex instanceof Error ? ex.message : String(ex)), 1);
       }
     }
@@ -501,7 +498,7 @@ function rollbackMinimize(ctx: PanelLayoutCtx, snapshot: ToggleSnapshot, isExpan
       if (isExpanded) _showBodyElement(element); else _hideBodyElement(element);
     }
   } catch (err) {
-    logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+    logError('MacroController', 'Unknown error');
   }
 }
 
@@ -511,7 +508,7 @@ export function toggleMinimize(ctx: PanelLayoutCtx) {
   try {
     runMinimizeTransition(ctx, isExpanded);
   } catch (err) {
-    logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+    logError('MacroController', 'Unknown error');
     rollbackMinimize(ctx, snapshot, isExpanded, err);
   }
 }

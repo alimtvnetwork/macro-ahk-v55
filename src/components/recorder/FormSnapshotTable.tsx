@@ -35,28 +35,6 @@ interface FormSnapshotTableProps {
 }
 
 export function FormSnapshotTable({ snapshot, embedded, title }: FormSnapshotTableProps) {
-    const heading = title ?? "Form snapshot";
-    const verboseTone = snapshot.Verbose
-        ? "border-amber-500/40 bg-amber-500/5"
-        : "border-border bg-muted/20";
-
-    const body = <FormSnapshotTableBody snapshot={snapshot} heading={heading} />;
-
-    if (embedded === true) return body;
-
-    return (
-        <section
-            aria-label="Form snapshot"
-            data-testid="form-snapshot-section"
-            data-verbose={snapshot.Verbose}
-            className={`rounded-md border ${verboseTone} p-2.5`}
-        >
-            {body}
-        </section>
-    );
-}
-
-function FormSnapshotTableBody({ snapshot, heading }: { snapshot: FormSnapshot; heading: string }) {
     const valueByName = new Map<string, { Value: string; Masked: boolean }>();
     if (snapshot.Values !== null) {
         for (const v of snapshot.Values) {
@@ -64,9 +42,36 @@ function FormSnapshotTableBody({ snapshot, heading }: { snapshot: FormSnapshot; 
         }
     }
 
-    return (
+    const heading = title ?? "Form snapshot";
+    const verboseTone = snapshot.Verbose
+        ? "border-amber-500/40 bg-amber-500/5"
+        : "border-border bg-muted/20";
+
+    const body = (
         <div className="space-y-2" data-testid="form-snapshot-table">
-            <FormSnapshotTableHeader snapshot={snapshot} heading={heading} />
+            <header className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted-foreground">
+                <ClipboardList className="h-3 w-3" aria-hidden />
+                <span className="font-medium">{heading}</span>
+                <Badge variant="secondary" className="text-[10px]">
+                    {snapshot.Fields.length} field{snapshot.Fields.length === 1 ? "" : "s"}
+                </Badge>
+                {snapshot.Form.Id !== null && (
+                    <span className="text-[11px] text-muted-foreground normal-case tracking-normal">
+                        #{snapshot.Form.Id}
+                    </span>
+                )}
+                {snapshot.Verbose ? (
+                    <Badge variant="default" className="ml-auto text-[10px]" title="Captured under verbose logging — values included (sensitive fields masked)">
+                        VALUES
+                    </Badge>
+                ) : (
+                    <Badge variant="outline" className="ml-auto text-[10px]" title="Verbose logging was OFF — only field names + types captured">
+                        <EyeOff className="h-2.5 w-2.5 mr-1" aria-hidden />
+                        NAMES ONLY
+                    </Badge>
+                )}
+            </header>
+
             <ScrollArea className="max-h-56 pr-2">
                 <table className="w-full text-xs">
                     <thead>
@@ -92,32 +97,18 @@ function FormSnapshotTableBody({ snapshot, heading }: { snapshot: FormSnapshot; 
             </ScrollArea>
         </div>
     );
-}
 
-function FormSnapshotTableHeader({ snapshot, heading }: { snapshot: FormSnapshot; heading: string }) {
+    if (embedded === true) return body;
+
     return (
-        <header className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted-foreground">
-            <ClipboardList className="h-3 w-3" aria-hidden />
-            <span className="font-medium">{heading}</span>
-            <Badge variant="secondary" className="text-[10px]">
-                {snapshot.Fields.length} field{snapshot.Fields.length === 1 ? "" : "s"}
-            </Badge>
-            {snapshot.Form.Id !== null && (
-                <span className="text-[11px] text-muted-foreground normal-case tracking-normal">
-                    #{snapshot.Form.Id}
-                </span>
-            )}
-            {snapshot.Verbose ? (
-                <Badge variant="default" className="ml-auto text-[10px]" title="Captured under verbose logging — values included (sensitive fields masked)">
-                    VALUES
-                </Badge>
-            ) : (
-                <Badge variant="outline" className="ml-auto text-[10px]" title="Verbose logging was OFF — only field names + types captured">
-                    <EyeOff className="h-2.5 w-2.5 mr-1" aria-hidden />
-                    NAMES ONLY
-                </Badge>
-            )}
-        </header>
+        <section
+            aria-label="Form snapshot"
+            data-testid="form-snapshot-section"
+            data-verbose={snapshot.Verbose}
+            className={`rounded-md border ${verboseTone} p-2.5`}
+        >
+            {body}
+        </section>
     );
 }
 

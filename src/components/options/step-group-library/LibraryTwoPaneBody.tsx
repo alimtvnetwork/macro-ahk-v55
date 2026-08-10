@@ -16,9 +16,7 @@ import type { useStepGroupLibraryViewModel } from "./use-view-model";
 import type { useStepGroupMutations } from "./use-step-group-mutations";
 import type { useStepGroupExportImport } from "./use-export-import";
 import type { useLibrarySelection } from "./use-library-selection";
-import type { useLibrarySelection } from "./use-library-selection";
 import type { useStepLibrary } from "@/hooks/use-step-library";
-import type { StepGroupRow, StepRow } from "@/background/recorder/step-library/db";
 
 type Lib = ReturnType<typeof useStepLibrary>;
 type State = ReturnType<typeof useLibraryPanelState>;
@@ -36,87 +34,82 @@ interface Props {
     readonly selection: Selection;
 }
 
-function buildTreePaneProps(props: Props) {
+export function LibraryTwoPaneBody(props: Props) {
     const { lib, state, viewModel, mutations, exportImport, selection } = props;
     const {
-        selected, activeGroupId, hoveredId, setHoveredId,
+        selected, activeGroupId, setActiveGroupId,
+        hoveredId, setHoveredId,
         setCreateDialog, setRenameDialog, setDeleteDialog,
-        setInputsDialog, setCsvDialog, setActiveGroupId,
+        setInputsDialog, setCsvDialog,
+        setStepEditor, setWaitDialog, setDeleteStepDialog,
+        setRunGroupDialog, stepWaits,
     } = state;
-    const { query, setQuery, trimmedQuery, tree, filteredTree, effectiveExpanded } = viewModel;
-    const { handleMove, handleArchiveToggle, handleDropReorder } = mutations;
+    const {
+        query, setQuery, trimmedQuery,
+        tree, filteredTree, effectiveExpanded,
+        activeGroup, activeSteps,
+    } = viewModel;
+    const {
+        handleMove, handleArchiveToggle,
+        handleDropReorder, handleStepDropReorder,
+        handleStepMove,
+    } = mutations;
     const { handleExport, handleImportClick } = exportImport;
     const { toggleOne, toggleSubtree, toggleExpanded } = selection;
 
-    return {
-        tree,
-        filteredTree,
-        query,
-        trimmedQuery,
-        setQuery,
-        selected,
-        effectiveExpanded,
-        activeGroupId,
-        hoveredId,
-        setHoveredId,
-        toggleOne,
-        toggleSubtree,
-        toggleExpanded,
-        setActiveGroupId,
-        onCreateChild: (parentId: number | null) => setCreateDialog({ open: true, parent: parentId, name: "" }),
-        onRename: (g: StepGroupRow) => setRenameDialog({ open: true, group: g, name: g.Name }),
-        onDelete: (g: StepGroupRow) => setDeleteDialog({ open: true, group: g }),
-        onExportOne: (id: number) => handleExport([id]),
-        onMove: handleMove,
-        onArchiveToggle: handleArchiveToggle,
-        onApplyInputs: (g: StepGroupRow) => setInputsDialog({ open: true, group: g }),
-        onImportCsvInputs: (g: StepGroupRow) => setCsvDialog({ open: true, group: g }),
-        hasInputs: (gid: number) => lib.GroupInputs.has(gid),
-        onDropReorder: handleDropReorder,
-        onCreateRoot: () => setCreateDialog({ open: true, parent: null, name: "" }),
-        onImportClick: handleImportClick,
-    };
-}
-
-function buildStepPaneProps(props: Props) {
-    const { lib, state, viewModel, mutations } = props;
-    const {
-        setInputsDialog, setCsvDialog, setStepEditor,
-        setWaitDialog, setDeleteStepDialog, setRunGroupDialog, stepWaits,
-    } = state;
-    const { activeGroup, activeSteps } = viewModel;
-    const { handleStepDropReorder, handleStepMove } = mutations;
-
-    return {
-        activeGroup,
-        activeSteps,
-        stepWaits,
-        groupInputs: lib.GroupInputs,
-        onOpenInputs: (g: StepGroupRow) => setInputsDialog({ open: true, group: g }),
-        onOpenCsv: (g: StepGroupRow) => setCsvDialog({ open: true, group: g }),
-        onCreateStep: (g: StepGroupRow) => setStepEditor({ open: true, mode: { Kind: "create", StepGroupId: g.StepGroupId } }),
-        onRunGroup: (g: StepGroupRow) => setRunGroupDialog({ open: true, group: g }),
-        onStepMove: handleStepMove,
-        onStepDropReorder: handleStepDropReorder,
-        onStepToggleDisabled: (step: StepRow, nextDisabled: boolean) => {
-            lib.setStepDisabled(step.StepId, nextDisabled);
-            toast.success(
-                nextDisabled
-                    ? `Step "${step.LabelType ?? step.StepId}" disabled, will be skipped on run`
-                    : `Step "${step.LabelType ?? step.StepId}" enabled`,
-            );
-        },
-        onStepEdit: (step: StepRow) => setStepEditor({ open: true, mode: { Kind: "edit", Step: step } }),
-        onStepEditWait: (step: StepRow) => setWaitDialog({ open: true, stepId: step.StepId, stepLabel: step.LabelType }),
-        onStepDelete: (step: StepRow) => setDeleteStepDialog({ open: true, step }),
-    };
-}
-
-export function LibraryTwoPaneBody(props: Props) {
     return (
         <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[minmax(320px,420px)_1fr]">
-            <LibraryTreePane {...buildTreePaneProps(props)} />
-            <LibraryStepPane {...buildStepPaneProps(props)} />
+            <LibraryTreePane
+                tree={tree}
+                filteredTree={filteredTree}
+                query={query}
+                trimmedQuery={trimmedQuery}
+                setQuery={setQuery}
+                selected={selected}
+                effectiveExpanded={effectiveExpanded}
+                activeGroupId={activeGroupId}
+                hoveredId={hoveredId}
+                setHoveredId={setHoveredId}
+                toggleOne={toggleOne}
+                toggleSubtree={toggleSubtree}
+                toggleExpanded={toggleExpanded}
+                setActiveGroupId={setActiveGroupId}
+                onCreateChild={(parentId) => setCreateDialog({ open: true, parent: parentId, name: "" })}
+                onRename={(g) => setRenameDialog({ open: true, group: g, name: g.Name })}
+                onDelete={(g) => setDeleteDialog({ open: true, group: g })}
+                onExportOne={(id) => handleExport([id])}
+                onMove={handleMove}
+                onArchiveToggle={handleArchiveToggle}
+                onApplyInputs={(g) => setInputsDialog({ open: true, group: g })}
+                onImportCsvInputs={(g) => setCsvDialog({ open: true, group: g })}
+                hasInputs={(gid) => lib.GroupInputs.has(gid)}
+                onDropReorder={handleDropReorder}
+                onCreateRoot={() => setCreateDialog({ open: true, parent: null, name: "" })}
+                onImportClick={handleImportClick}
+            />
+            <LibraryStepPane
+                activeGroup={activeGroup}
+                activeSteps={activeSteps}
+                stepWaits={stepWaits}
+                groupInputs={lib.GroupInputs}
+                onOpenInputs={(g) => setInputsDialog({ open: true, group: g })}
+                onOpenCsv={(g) => setCsvDialog({ open: true, group: g })}
+                onCreateStep={(g) => setStepEditor({ open: true, mode: { Kind: "create", StepGroupId: g.StepGroupId } })}
+                onRunGroup={(g) => setRunGroupDialog({ open: true, group: g })}
+                onStepMove={handleStepMove}
+                onStepDropReorder={handleStepDropReorder}
+                onStepToggleDisabled={(step, nextDisabled) => {
+                    lib.setStepDisabled(step.StepId, nextDisabled);
+                    toast.success(
+                        nextDisabled
+                            ? `Step "${step.LabelType ?? step.StepId}" disabled, will be skipped on run`
+                            : `Step "${step.LabelType ?? step.StepId}" enabled`,
+                    );
+                }}
+                onStepEdit={(step) => setStepEditor({ open: true, mode: { Kind: "edit", Step: step } })}
+                onStepEditWait={(step) => setWaitDialog({ open: true, stepId: step.StepId, stepLabel: step.LabelType })}
+                onStepDelete={(step) => setDeleteStepDialog({ open: true, step })}
+            />
         </div>
     );
 }

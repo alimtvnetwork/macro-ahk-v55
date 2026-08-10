@@ -28,12 +28,14 @@ export interface EditFormProps {
     onCancel: () => void;
 }
 
-function usePromptEditForm(initial: Partial<PromptEntry> | undefined, onSave: (data: Partial<PromptEntry>) => Promise<void>) {
+export function PromptEditForm({ initial, categories, onSave, onCancel }: EditFormProps) {
     const [name, setName] = useState(initial?.name ?? "");
     const [text, setText] = useState(initial?.text ?? "");
     const [category, setCategory] = useState(initial?.category ?? "__none__");
     const [isSaving, setIsSaving] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
+
+    const allCategories = Array.from(new Set([...categories, ...CATEGORY_SUGGESTIONS])).sort();
 
     const handleSubmit = async () => {
         const isNameEmpty = !name.trim();
@@ -61,28 +63,6 @@ function usePromptEditForm(initial: Partial<PromptEntry> | undefined, onSave: (d
             setIsSaving(false);
         }
     };
-
-    return {
-        name, setName,
-        text, setText,
-        category, setCategory,
-        isSaving,
-        isFullscreen, setIsFullscreen,
-        handleSubmit,
-    };
-}
-
-export function PromptEditForm({ initial, categories, onSave, onCancel }: EditFormProps) {
-    const {
-        name, setName,
-        text, setText,
-        category, setCategory,
-        isSaving,
-        isFullscreen, setIsFullscreen,
-        handleSubmit,
-    } = usePromptEditForm(initial, onSave);
-
-    const allCategories = Array.from(new Set([...categories, ...CATEGORY_SUGGESTIONS])).sort();
 
     const editorContent = (height: string) => (
         <MonacoCodeEditor

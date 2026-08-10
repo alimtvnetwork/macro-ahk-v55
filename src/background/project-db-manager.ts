@@ -16,8 +16,6 @@ import { RECORDER_DB_SCHEMA, applyParamsJsonMigration, applyChainColumnsMigratio
 import { BootPersistenceModeType } from "../types/enums";
 import { logCaughtError, BgLogTag } from "./bg-logger";
 
-const AUTO_CAUGHT_MSG = "Automatically caught swallowed error";
-
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
@@ -184,9 +182,9 @@ function ensureDefaultDatabases(db: SqlJsDatabase, slug: string): void { // esli
                     [def.databaseName, def.databaseKindId, def.description],
                 );
             }
-        } catch (error) {
-            logCaughtError(BgLogTag.MARCO, AUTO_CAUGHT_MSG, error); 
-        }
+        } catch (err) {
+        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
+}
     }
 
     console.log(`[project-db] Default databases ensured for project "${slug}"`);
@@ -222,9 +220,9 @@ async function tryLoadDb(sql: SqlJs, slug: string, schema: string): Promise<SqlJ
         console.log(`[project-db] OPFS: ${slug}`);
 
         return db;
-    } catch (error) {
-        logCaughtError(BgLogTag.MARCO, AUTO_CAUGHT_MSG, error); 
-    }
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
+}
 
     // Try chrome.storage.local
     try {
@@ -233,9 +231,9 @@ async function tryLoadDb(sql: SqlJs, slug: string, schema: string): Promise<SqlJ
         console.log(`[project-db] storage: ${slug}`);
 
         return db;
-    } catch (error) {
-        logCaughtError(BgLogTag.MARCO, AUTO_CAUGHT_MSG, error); 
-    }
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
+}
 
     // In-memory fallback
     const db = new sql.Database();
@@ -312,9 +310,8 @@ export async function dropProjectDb(slug: string): Promise<void> {
         try {
             const root = await navigator.storage.getDirectory();
             await root.removeEntry(dbFileName(slug));
-        } catch (error) {
-            logCaughtError(BgLogTag.MARCO, AUTO_CAUGHT_MSG, error); 
-        }
+        }catch (err) {
+        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); }
  // allow-swallow: removeEntry is best-effort cleanup
     } else if (persistenceMode === "storage") {
         await chrome.storage.local.remove(storageKey(slug));

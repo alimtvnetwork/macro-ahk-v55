@@ -74,12 +74,14 @@ export function useConfigDb(projectSlug: string) {
   const handleBulkSave = async () => {
     const dirtyEntries = Object.entries(edits).filter(([ek, editedValue]) => {
       const row = rows.find((r) => editKey(r.Section, r.Key) === ek);
+
       return row && editedValue !== row.Value;
     });
     if (dirtyEntries.length === 0) return;
 
     setBulkSaving(true);
-    let saved = 0, failed = 0;
+    let saved = 0;
+    let failed = 0;
     for (const [ek, editedValue] of dirtyEntries) {
       const [section, key] = ek.split("::");
       try {
@@ -87,11 +89,13 @@ export function useConfigDb(projectSlug: string) {
           type: "PROJECT_CONFIG_UPDATE", project: projectSlug, section, key, value: editedValue,
         });
         if (resp.ok) saved++; else failed++;
-      } catch (err) { failed++; }
+      } catch (err) {
+        failed++;
+      }
     }
     setBulkSaving(false);
-    if (failed > 0) toast.warning(`Saved ${saved}, failed ${failed}`);
-    else toast.success(`Saved ${saved} config value${saved !== 1 ? "s" : ""}`);
+    if (failed > 0) { toast.warning(`Saved ${saved}, failed ${failed}`); }
+    else { toast.success(`Saved ${saved} config value${saved !== 1 ? "s" : ""}`); }
     setEdits({});
     void load();
   };

@@ -32,10 +32,6 @@ import { createCollapsibleSection } from './sections';
 import { logError, logError } from '../error-utils';
 import { REINJECT_COOLDOWN_MS } from '../constants';
 import { CssFragmentType, StorageKeyType } from '../types';
-
-const MACRO_CONTROLLER = 'MacroController';
-const UNKNOWN_ERROR_MSG = 'Unknown error';
-
 /* ------------------------------------------------------------------ */
 /*  State preservation keys (spec §State Preservation Keys)           */
 /* ------------------------------------------------------------------ */
@@ -62,7 +58,7 @@ function saveStateBeforeReinject(): void {
       });
       localStorage.setItem(REINJECT_KEYS.creditData, creditSnapshot);
     } catch (_e) {
-      logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+      logError('MacroController', 'Unknown error');
       logSub('Re-inject: credit snapshot save failed — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
     }
     localStorage.setItem(REINJECT_KEYS.timestamp, String(Date.now()));
@@ -87,7 +83,7 @@ export function restoreReinjectState(): { restored: boolean; loopWasRunning: boo
     // Clear all keys regardless
     Object.values(REINJECT_KEYS).forEach(function(k) {
       try { localStorage.removeItem(k); } catch (_e) {
-        logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+        logError('MacroController', 'Unknown error');
         logSub('Re-inject: failed to clear key ' + k + ' — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
       }
     });
@@ -127,7 +123,7 @@ export function checkAndRestoreReinjectState(): { restored: boolean; loopWasRunn
     // Clear all keys
     Object.values(REINJECT_KEYS).forEach(function(k) {
       try { localStorage.removeItem(k); } catch (_e) {
-        logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+        logError('MacroController', 'Unknown error');
         logSub('Re-inject: failed to clear key ' + k + ' — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
       }
     });
@@ -233,7 +229,7 @@ function performVersionCheck(ctx: VersionCheckCtx): void {
   try {
     resultPromise = sendToExtension('GET_SCRIPT_INFO', { scriptName: 'macroController' }) as Promise<ExtensionResponse> | undefined;
   } catch (err) {
-    logError(MACRO_CONTROLLER, UNKNOWN_ERROR_MSG);
+    logError('MacroController', 'Unknown error');
     resultPromise = undefined;
   }
   if (!resultPromise || typeof resultPromise.then !== 'function') {

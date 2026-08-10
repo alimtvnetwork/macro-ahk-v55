@@ -51,41 +51,33 @@ export function FailureReportsPanel({ reports, onDownload, onCopy }: FailureRepo
                 />
             </CardHeader>
             <CardContent>
-                <FailureReportsList reports={reports} state={s} />
+                {reports.length === 0 ? (
+                    <p className="text-xs text-muted-foreground italic py-4 text-center">
+                        No failures recorded.
+                    </p>
+                ) : (
+                    <ScrollArea className="h-64 pr-2">
+                        <ul className="space-y-1.5">
+                            {reports.map((r, i) => {
+                                const key = rowKey(r, i);
+
+                                return (
+                                    <FailureReportRow
+                                        key={key}
+                                        report={r}
+                                        rowKey={key}
+                                        index={i}
+                                        checked={s.selected.has(key)}
+                                        expanded={s.expanded.has(key)}
+                                        onToggle={() => s.toggle(key)}
+                                        onToggleExpanded={() => s.toggleExpanded(key)}
+                                    />
+                                );
+                            })}
+                        </ul>
+                    </ScrollArea>
+                )}
             </CardContent>
         </Card>
-    );
-}
-
-function FailureReportsList({ reports, state: s }: { reports: ReadonlyArray<FailureReport>; state: ReturnType<typeof useFailureReportsPanel> }) {
-    if (reports.length === 0) {
-        return (
-            <p className="text-xs text-muted-foreground italic py-4 text-center">
-                No failures recorded.
-            </p>
-        );
-    }
-
-    return (
-        <ScrollArea className="h-64 pr-2">
-            <ul className="space-y-1.5">
-                {reports.map((r, i) => {
-                    const key = rowKey(r, i);
-
-                    return (
-                        <FailureReportRow
-                            key={key}
-                            report={r}
-                            rowKey={key}
-                            index={i}
-                            checked={s.selected.has(key)}
-                            expanded={s.expanded.has(key)}
-                            onToggle={() => s.toggle(key)}
-                            onToggleExpanded={() => s.toggleExpanded(key)}
-                        />
-                    );
-                })}
-            </ul>
-        </ScrollArea>
     );
 }

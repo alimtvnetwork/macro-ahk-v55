@@ -179,21 +179,6 @@ function AttemptRow({ attempt, history, showHistory, onPromote, isPromoting }: A
                 )}
             </div>
 
-            <AttemptRowDetails attempt={attempt} matched={matched} />
-
-            {showHistory && history !== null && <HistoryBlock bucket={history} />}
-            {showHistory && history === null && (
-                <div className="ml-5 mt-1 text-[11px] text-muted-foreground italic">
-                    No prior replay history for this selector.
-                </div>
-            )}
-        </li>
-    );
-}
-
-function AttemptRowDetails({ attempt, matched }: { attempt: SelectorAttemptComparison, matched: boolean }) {
-    return (
-        <>
             {attempt.ResolvedExpression !== attempt.Expression && (
                 <div className="text-[11px] text-muted-foreground pl-5">
                     Resolved: <code>{attempt.ResolvedExpression}</code>
@@ -210,7 +195,14 @@ function AttemptRowDetails({ attempt, matched }: { attempt: SelectorAttemptCompa
             {attempt.Error !== null && (
                 <div className="pl-5 text-destructive text-[11px]">Error: {attempt.Error}</div>
             )}
-        </>
+
+            {showHistory && history !== null && <HistoryBlock bucket={history} />}
+            {showHistory && history === null && (
+                <div className="ml-5 mt-1 text-[11px] text-muted-foreground italic">
+                    No prior replay history for this selector.
+                </div>
+            )}
+        </li>
     );
 }
 
@@ -235,7 +227,9 @@ export function SelectorComparisonPanel({ comparison, stepId, url, history, onPr
                 await onPromoteToPrimary(selectorId);
                 toast.success(`Promoted selector #${selectorId} to primary`);
             } catch (err) {
-                toast.error(`Failed to promote selector: ${err instanceof Error ? err.message : String(err)}`);
+                toast.error(
+                    `Failed to promote selector: ${err instanceof Error ? err.message : String(err)}`,
+                );
             } finally {
                 setPromotingId(null);
             }
@@ -244,132 +238,81 @@ export function SelectorComparisonPanel({ comparison, stepId, url, history, onPr
 
     return (
         <Card>
-            <ComparisonPanelHeader
-                PrimaryMatched={PrimaryMatched}
-                AnyFallbackMatched={AnyFallbackMatched}
-                showHistory={showHistory}
-                setShowHistory={setShowHistory}
-                hasHistory={hasHistory}
-                handleExport={handleExport}
-                attemptsLength={Attempts.length}
-            />
-            <ComparisonPanelBody
-                Attempts={Attempts}
-                DriftDetected={DriftDetected}
-                failureReport={failureReport}
-                hasHistory={hasHistory}
-                showHistory={showHistory}
-                history={history}
-                handlePromote={handlePromote}
-                promotingId={promotingId}
-            />
-        </Card>
-    );
-}
-
-function ComparisonPanelHeader({
-    PrimaryMatched, AnyFallbackMatched, showHistory, setShowHistory, hasHistory, handleExport, attemptsLength,
-}: {
-    PrimaryMatched: boolean; AnyFallbackMatched: boolean; showHistory: boolean; setShowHistory: (v: boolean) => void; hasHistory: boolean; handleExport: () => void; attemptsLength: number;
-}) {
-    return (
-        <CardHeader className="pb-2 flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <Crosshair className="h-4 w-4 text-primary" />
-                Selector Comparison
-                <Badge
-                    variant={PrimaryMatched ? "secondary" : "destructive"}
-                    className="ml-1 text-[10px]"
-                >
-                    {PrimaryMatched ? "Primary OK" : "Primary failed"}
-                </Badge>
-                {AnyFallbackMatched && (
-                    <Badge variant="outline" className="text-[10px]">Fallback found</Badge>
-                )}
-            </CardTitle>
-            <ComparisonPanelHeaderControls
-                showHistory={showHistory}
-                setShowHistory={setShowHistory}
-                hasHistory={hasHistory}
-                handleExport={handleExport}
-                attemptsLength={attemptsLength}
-            />
-        </CardHeader>
-    );
-}
-
-function ComparisonPanelHeaderControls({ showHistory, setShowHistory, hasHistory, handleExport, attemptsLength }: {
-    showHistory: boolean; setShowHistory: (v: boolean) => void; hasHistory: boolean; handleExport: () => void; attemptsLength: number;
-}) {
-    return (
-        <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5">
-                <Switch
-                    id="show-history"
-                    checked={showHistory && hasHistory}
-                    onCheckedChange={(v) => setShowHistory(Boolean(v))}
-                    disabled={!hasHistory}
-                    aria-label="Show prior replay outcomes per selector"
-                />
-                <LabelType
-                    htmlFor="show-history"
-                    className={`text-[11px] flex items-center gap-1 ${hasHistory ? "" : "text-muted-foreground"}`}
-                >
-                    <History className="h-3 w-3" aria-hidden />
-                    History
-                </LabelType>
-            </div>
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                disabled={attemptsLength === 0}
-                aria-label="Export selector comparison as JSON"
-            >
-                <FileDown className="h-3.5 w-3.5 mr-1.5" />
-                Export selector comparison
-            </Button>
-        </div>
-    );
-}
-
-function ComparisonPanelBody({
-    Attempts, DriftDetected, failureReport, hasHistory, showHistory, history, handlePromote, promotingId,
-}: {
-    Attempts: ReadonlyArray<SelectorAttemptComparison>; DriftDetected: boolean; failureReport?: FailureReport; hasHistory: boolean; showHistory: boolean; history?: ReadonlyArray<SelectorHistoryBucket>; handlePromote: ((selectorId: number) => Promise<void>) | null; promotingId: number | null;
-}) {
-    return (
-        <CardContent className="space-y-3">
-            {DriftDetected && (
-                <div className="flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-xs text-amber-700 dark:text-amber-300">
-                    <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                    <span>
-                        <strong>Selector drift:</strong> the primary selector no longer matches,
-                        but a fallback resolved. Consider promoting the fallback or repairing the primary.
-                    </span>
-                </div>
-            )}
-            {failureReport !== undefined && (
-                <FailureDetailsPanel report={failureReport} embedded />
-            )}
-            {Attempts.length === 0 ? (
-                <p className="text-xs text-muted-foreground italic py-2 text-center">
-                    No selectors recorded for this step.
-                </p>
-            ) : (
-                <ul className="space-y-2">
-                    {Attempts.map((a) => (
-                        <AttemptRow
-                            key={a.SelectorId}
-                            attempt={a}
-                            history={hasHistory ? findHistoryForSelector(history, a.ResolvedExpression) : null}
-                            showHistory={showHistory && hasHistory}
-                            onPromote={handlePromote}
-                            isPromoting={promotingId === a.SelectorId}
+            <CardHeader className="pb-2 flex flex-row items-center justify-between">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                    <Crosshair className="h-4 w-4 text-primary" />
+                    Selector Comparison
+                    <Badge
+                        variant={PrimaryMatched ? "secondary" : "destructive"}
+                        className="ml-1 text-[10px]"
+                    >
+                        {PrimaryMatched ? "Primary OK" : "Primary failed"}
+                    </Badge>
+                    {AnyFallbackMatched && (
+                        <Badge variant="outline" className="text-[10px]">Fallback found</Badge>
+                    )}
+                </CardTitle>
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5">
+                        <Switch
+                            id="show-history"
+                            checked={showHistory && hasHistory}
+                            onCheckedChange={(v) => setShowHistory(Boolean(v))}
+                            disabled={!hasHistory}
+                            aria-label="Show prior replay outcomes per selector"
                         />
-                    ))}
-                </ul>
-            )}
-        </CardContent>
+                        <LabelType
+                            htmlFor="show-history"
+                            className={`text-[11px] flex items-center gap-1 ${hasHistory ? "" : "text-muted-foreground"}`}
+                        >
+                            <History className="h-3 w-3" aria-hidden />
+                            History
+                        </LabelType>
+                    </div>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleExport}
+                        disabled={Attempts.length === 0}
+                        aria-label="Export selector comparison as JSON"
+                    >
+                        <FileDown className="h-3.5 w-3.5 mr-1.5" />
+                        Export selector comparison
+                    </Button>
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+                {DriftDetected && (
+                    <div className="flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-xs text-amber-700 dark:text-amber-300">
+                        <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                        <span>
+                            <strong>Selector drift:</strong> the primary selector no longer matches,
+                            but a fallback resolved. Consider promoting the fallback or repairing the primary.
+                        </span>
+                    </div>
+                )}
+                {failureReport !== undefined && (
+                    <FailureDetailsPanel report={failureReport} embedded />
+                )}
+                {Attempts.length === 0 ? (
+                    <p className="text-xs text-muted-foreground italic py-2 text-center">
+                        No selectors recorded for this step.
+                    </p>
+                ) : (
+                    <ul className="space-y-2">
+                        {Attempts.map((a) => (
+                            <AttemptRow
+                                key={a.SelectorId}
+                                attempt={a}
+                                history={hasHistory ? findHistoryForSelector(history, a.ResolvedExpression) : null}
+                                showHistory={showHistory && hasHistory}
+                                onPromote={handlePromote}
+                                isPromoting={promotingId === a.SelectorId}
+                            />
+                        ))}
+                    </ul>
+                )}
+            </CardContent>
+        </Card>
     );
 }

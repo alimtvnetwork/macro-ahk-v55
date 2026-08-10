@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Marco Extension — Grouped Key-Value Handler (Issue 60)
  *

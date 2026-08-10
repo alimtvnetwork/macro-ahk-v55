@@ -19,10 +19,16 @@ import { toast } from "sonner";
 
 import type { useStepLibrary } from "@/hooks/use-step-library";
 import type { useStepGroupImport } from "@/hooks/use-step-group-import";
-import { runStepGroupExport, previewStepGroupExport } from "@/background/recorder/step-library/export-bundle";
+import {
+    runStepGroupExport,
+    previewStepGroupExport,
+} from "@/background/recorder/step-library/export-bundle";
 import { explainExportFailure } from "@/background/recorder/step-library/export-error-explainer";
 import type { LastExportSummary } from "../BundleExchangePanel";
-import type { ExportErrorState, ExportPreviewState } from "./dialog-state";
+import type {
+    ExportErrorState,
+    ExportPreviewState,
+} from "./dialog-state";
 
 type StepLibrary = ReturnType<typeof useStepLibrary>;
 type ExportFailure = Parameters<typeof explainExportFailure>[0];
@@ -41,7 +47,10 @@ interface UseExportImportResult {
     setExportPreview: Dispatch<SetStateAction<ExportPreviewState>>;
     exportError: ExportErrorState;
     setExportError: Dispatch<SetStateAction<ExportErrorState>>;
-    handleExport: (idsOverride?: ReadonlyArray<number>, includeDescendants?: boolean) => void;
+    handleExport: (
+        idsOverride?: ReadonlyArray<number>,
+        includeDescendants?: boolean,
+    ) => void;
     confirmExport: () => Promise<void>;
     handleImportClick: () => void;
     handleImportFile: (file: File) => Promise<void>;
@@ -63,7 +72,10 @@ function downloadZipBlob(zipBytes: Uint8Array, fileName: string): void {
     URL.revokeObjectURL(url);
 }
 
-function surfaceExportFailure(failure: ExportFailure, setExportError: Dispatch<SetStateAction<ExportErrorState>>): void {
+function surfaceExportFailure(
+    failure: ExportFailure,
+    setExportError: Dispatch<SetStateAction<ExportErrorState>>,
+): void {
     const explanation = explainExportFailure(failure);
     setExportError({ Open: true, Explanation: explanation });
     toast.error(explanation.Title, { description: "See dialog for details" });
@@ -78,79 +90,122 @@ function toLastExportSummary(result: ExportSuccess): LastExportSummary {
     };
 }
 
-function resolveExportIds(idsOverride: ReadonlyArray<number> | undefined, selected: ReadonlySet<number>): ReadonlyArray<number> {
+function resolveExportIds(
+    idsOverride: ReadonlyArray<number> | undefined,
+    selected: ReadonlySet<number>,
+): ReadonlyArray<number> {
     return idsOverride ?? Array.from(selected);
 }
 
-async function doPerformExport(
-    lib: StepLibrary, ids: ReadonlyArray<number>, includeDescendants: boolean,
-    setExportError: Dispatch<SetStateAction<ExportErrorState>>, setLastExport: Dispatch<SetStateAction<LastExportSummary | null>>
-): Promise<void> {
-    if (!isLibraryReady(lib) || lib.Lib === null || lib.Project === null || lib.SqlJs === null) {
-        toast.error("Library not ready");
-
- return;
-    }
-    const result = await runStepGroupExport({
-        Source: lib.Lib, ProjectId: lib.Project.ProjectId, SelectedStepGroupIds: ids, IncludeDescendants: includeDescendants,
-        BundleName: `${lib.Project.Name} - ${ids.length} group(s)`, SqlJs: lib.SqlJs, JsZip: JSZip,
-    });
-    if (result.Reason !== "Ok") return surfaceExportFailure(result, setExportError);
-    downloadZipBlob(result.ZipBytes, result.ZipFileName);
-    setLastExport(toLastExportSummary(result));
-    toast.success(`Exported ${result.Manifest.Counts.StepGroups} group(s)`, { description: `${result.Manifest.Counts.Steps} steps, ${result.ZipFileName}` });
-}
-
-function doOpenExportPreview(
-    lib: StepLibrary, ids: ReadonlyArray<number>, includeDescendants: boolean,
-    setExportPreview: Dispatch<SetStateAction<ExportPreviewState>>, setExportError: Dispatch<SetStateAction<ExportErrorState>>
-): void {
-    if (lib.Lib === null || lib.Project === null) return;
-    const preview = previewStepGroupExport({
-        Source: lib.Lib, ProjectId: lib.Project.ProjectId,
-        SelectedStepGroupIds: ids, IncludeDescendants: includeDescendants,
-    });
-    if (preview.Reason !== "Ok") return surfaceExportFailure(preview, setExportError);
-    setExportPreview({ Open: true, Preview: preview, Pending: { Ids: ids, IncludeDescendants: includeDescendants } });
-}
-
-function doHandleExport(
-    lib: StepLibrary, selected: ReadonlySet<number>,
-    setExportPreview: Dispatch<SetStateAction<ExportPreviewState>>, setExportError: Dispatch<SetStateAction<ExportErrorState>>,
-    idsOverride?: ReadonlyArray<number>, includeDescendants: boolean = true
-): void {
-    if (!isLibraryReady(lib)) {
-        toast.error("Library not ready");
-
- return;
-    }
-    const ids = resolveExportIds(idsOverride, selected);
-    if (ids.length === 0) {
-        toast.error("Select at least one group to export");
-
- return;
-    }
-    doOpenExportPreview(lib, ids, includeDescendants, setExportPreview, setExportError);
-}
-
-export function useStepGroupExportImport(args: UseExportImportArgs): UseExportImportResult {
+export function useStepGroupExportImport(
+    args: UseExportImportArgs,
+): UseExportImportResult {
     const { lib, selected, importApi, fileInputRef } = args;
+
     const [lastExport, setLastExport] = useState<LastExportSummary | null>(null);
-    const [exportPreview, setExportPreview] = useState<ExportPreviewState>({ Open: false, Preview: null, Pending: null });
-    const [exportError, setExportError] = useState<ExportErrorState>({ Open: false, Explanation: null });
+    const [exportPreview, setExportPreview] = useState<ExportPreviewState>({
+        Open: false, Preview: null, Pending: null,
+    });
+    const [exportError, setExportError] = useState<ExportErrorState>({
+        Open: false, Explanation: null,
+    });
+
+    const performExport = async (
+        ids: ReadonlyArray<number>,
+        includeDescendants: boolean,
+    ): Promise<void> => {
+        if (!isLibraryReady(lib) || lib.Lib === null || lib.Project === null || lib.SqlJs === null) {
+            toast.error("Library not ready");
+
+            return;
+        }
+        const result = await runStepGroupExport({
+            Source: lib.Lib,
+            ProjectId: lib.Project.ProjectId,
+            SelectedStepGroupIds: ids,
+            IncludeDescendants: includeDescendants,
+            BundleName: `${lib.Project.Name} - ${ids.length} group(s)`,
+            SqlJs: lib.SqlJs,
+            JsZip: JSZip,
+        });
+        if (result.Reason !== "Ok") {
+            surfaceExportFailure(result, setExportError);
+
+            return;
+        }
+        downloadZipBlob(result.ZipBytes, result.ZipFileName);
+        setLastExport(toLastExportSummary(result));
+        toast.success(
+            `Exported ${result.Manifest.Counts.StepGroups} group(s)`,
+            { description: `${result.Manifest.Counts.Steps} steps, ${result.ZipFileName}` },
+        );
+    };
+
+    const openExportPreview = (
+        ids: ReadonlyArray<number>,
+        includeDescendants: boolean,
+    ): void => {
+        if (lib.Lib === null || lib.Project === null) return;
+        const preview = previewStepGroupExport({
+            Source: lib.Lib,
+            ProjectId: lib.Project.ProjectId,
+            SelectedStepGroupIds: ids,
+            IncludeDescendants: includeDescendants,
+        });
+        if (preview.Reason !== "Ok") {
+            surfaceExportFailure(preview, setExportError);
+
+            return;
+        }
+        setExportPreview({
+            Open: true,
+            Preview: preview,
+            Pending: { Ids: ids, IncludeDescendants: includeDescendants },
+        });
+    };
+
+    const handleExport = (
+        idsOverride?: ReadonlyArray<number>,
+        includeDescendants: boolean = true,
+    ): void => {
+        if (!isLibraryReady(lib)) {
+            toast.error("Library not ready");
+
+            return;
+        }
+        const ids = resolveExportIds(idsOverride, selected);
+        if (ids.length === 0) {
+            toast.error("Select at least one group to export");
+
+            return;
+        }
+        openExportPreview(ids, includeDescendants);
+    };
 
     const confirmExport = async (): Promise<void> => {
         const pending = exportPreview.Pending;
         setExportPreview({ Open: false, Preview: null, Pending: null });
-        if (pending !== null) {
-            await doPerformExport(lib, pending.Ids, pending.IncludeDescendants, setExportError, setLastExport);
-        }
+        if (pending === null) return;
+        await performExport(pending.Ids, pending.IncludeDescendants);
+    };
+
+    const handleImportClick = (): void => {
+        fileInputRef.current?.click();
+    };
+
+    const handleImportFile = async (file: File): Promise<void> => {
+        await importApi.importFile(file);
     };
 
     return {
-        lastExport, exportPreview, setExportPreview, exportError, setExportError, confirmExport,
-        handleExport: (ids?, inc?) => doHandleExport(lib, selected, setExportPreview, setExportError, ids, inc),
-        handleImportClick: () => fileInputRef.current?.click(),
-        handleImportFile: async (file) => importApi.importFile(file),
+        lastExport,
+        exportPreview,
+        setExportPreview,
+        exportError,
+        setExportError,
+        handleExport,
+        confirmExport,
+        handleImportClick,
+        handleImportFile,
     };
 }

@@ -58,82 +58,98 @@ export interface ListPanelDetailsCardProps {
     readonly onToggleStep: (stepId: number, disabled: boolean) => void;
 }
 
-function DetailsCardHeader(props: { activeGroup: StepGroupRow, hasBoundInputs: boolean, onRename: (group: StepGroupRow) => void, onDelete: (group: StepGroupRow) => void }) {
-    const { activeGroup, hasBoundInputs, onRename, onDelete } = props;
-
-    return (
-        <header className="flex flex-col gap-2 border-b px-4 py-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex min-w-0 items-center gap-2">
-                    <h2 className="truncate text-base font-semibold">{activeGroup.Name}</h2>
-                    {activeGroup.IsArchived && (
-                        <span className="inline-flex items-center gap-0.5 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                            <Archive className="h-3 w-3" /> Archived
-                        </span>
-                    )}
-                    {hasBoundInputs && (
-                        <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary">Inputs bound</span>
-                    )}
-                </div>
-                <div className="flex shrink-0 items-center gap-1">
-                    <Button size="sm" variant="outline" onClick={() => onRename(activeGroup)}><Pencil className="mr-1 h-4 w-4" /> Rename</Button>
-                    <Button size="sm" variant="outline" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => onDelete(activeGroup)}><Trash2 className="mr-1 h-4 w-4" /> Delete</Button>
-                </div>
-            </div>
-            {activeGroup.Description != null && activeGroup.Description !== "" && (
-                <p className="text-sm text-muted-foreground">{activeGroup.Description}</p>
-            )}
-        </header>
-    );
-}
-
-function DetailsCardGrid(props: { activeGroup: StepGroupRow, activeSteps: readonly StepRow[] }) {
-    const { activeGroup, activeSteps } = props;
-
-    return (
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1 border-b bg-muted/20 px-4 py-2 text-xs">
-            <DetailField label="ID" value={`#${activeGroup.StepGroupId}`} mono />
-            <DetailField label="Steps" value={String(activeSteps.length)} />
-            <DetailField label="Created" value={formatDate(activeGroup.CreatedAt)} />
-            <DetailField label="Updated" value={formatDate(activeGroup.UpdatedAt)} />
-        </div>
-    );
-}
-
-function DetailsCardSteps(props: { activeSteps: readonly StepRow[], onToggleStep: (stepId: number, disabled: boolean) => void }) {
-    const { activeSteps, onToggleStep } = props;
-
-    return (
-        <ScrollArea className="flex-1">
-            {activeSteps.length === 0 ? (
-                <div className="flex h-full items-center justify-center px-4 py-12 text-sm text-muted-foreground">This group has no steps yet.</div>
-            ) : (
-                <ol className="divide-y">
-                    {activeSteps.map((s, idx) => (
-                        <StepRowItem key={s.StepId} step={s} ordinal={idx + 1} onToggle={onToggleStep} />
-                    ))}
-                </ol>
-            )}
-        </ScrollArea>
-    );
-}
-
 export function ListPanelDetailsCard(props: ListPanelDetailsCardProps): JSX.Element {
-    const { activeGroup, activeSteps, hasBoundInputs, onRename, onDelete, onToggleStep } = props;
+    const {
+        activeGroup,
+        activeSteps,
+        hasBoundInputs,
+        onRename,
+        onDelete,
+        onToggleStep,
+    } = props;
 
     if (activeGroup === null) {
         return (
             <Card className="flex min-h-[400px] flex-col overflow-hidden">
-                <div className="flex h-full items-center justify-center px-4 py-12 text-sm text-muted-foreground">Select a group on the left to see its details.</div>
+                <div className="flex h-full items-center justify-center px-4 py-12 text-sm text-muted-foreground">
+                    Select a group on the left to see its details.
+                </div>
             </Card>
         );
     }
 
     return (
         <Card className="flex min-h-[400px] flex-col overflow-hidden">
-            <DetailsCardHeader activeGroup={activeGroup} hasBoundInputs={hasBoundInputs} onRename={onRename} onDelete={onDelete} />
-            <DetailsCardGrid activeGroup={activeGroup} activeSteps={activeSteps} />
-            <DetailsCardSteps activeSteps={activeSteps} onToggleStep={onToggleStep} />
+            <header className="flex flex-col gap-2 border-b px-4 py-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex min-w-0 items-center gap-2">
+                        <h2 className="truncate text-base font-semibold">
+                            {activeGroup.Name}
+                        </h2>
+                        {activeGroup.IsArchived && (
+                            <span className="inline-flex items-center gap-0.5 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                                <Archive className="h-3 w-3" />
+                                Archived
+                            </span>
+                        )}
+                        {hasBoundInputs && (
+                            <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary">
+                                Inputs bound
+                            </span>
+                        )}
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => onRename(activeGroup)}
+                        >
+                            <Pencil className="mr-1 h-4 w-4" />
+                            Rename
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            onClick={() => onDelete(activeGroup)}
+                        >
+                            <Trash2 className="mr-1 h-4 w-4" />
+                            Delete
+                        </Button>
+                    </div>
+                </div>
+                {activeGroup.Description != null && activeGroup.Description !== "" && (
+                    <p className="text-sm text-muted-foreground">
+                        {activeGroup.Description}
+                    </p>
+                )}
+            </header>
+
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1 border-b bg-muted/20 px-4 py-2 text-xs">
+                <DetailField label="ID" value={`#${activeGroup.StepGroupId}`} mono />
+                <DetailField label="Steps" value={String(activeSteps.length)} />
+                <DetailField label="Created" value={formatDate(activeGroup.CreatedAt)} />
+                <DetailField label="Updated" value={formatDate(activeGroup.UpdatedAt)} />
+            </div>
+
+            <ScrollArea className="flex-1">
+                {activeSteps.length === 0 ? (
+                    <div className="flex h-full items-center justify-center px-4 py-12 text-sm text-muted-foreground">
+                        This group has no steps yet.
+                    </div>
+                ) : (
+                    <ol className="divide-y">
+                        {activeSteps.map((s, idx) => (
+                            <StepRowItem
+                                key={s.StepId}
+                                step={s}
+                                ordinal={idx + 1}
+                                onToggle={onToggleStep}
+                            />
+                        ))}
+                    </ol>
+                )}
+            </ScrollArea>
         </Card>
     );
 }
@@ -144,43 +160,55 @@ interface StepRowItemProps {
     readonly onToggle: (stepId: number, disabled: boolean) => void;
 }
 
-function StepRowContent({ step: s, ordinal }: { step: StepRow; ordinal: number }) {
-    return (
-        <>
-            <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium tabular-nums">{ordinal}</span>
-            <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                    <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">{stepKindLabel(s.StepKindId)}</span>
-                    <span className={`truncate text-sm font-medium ${s.IsDisabled ? "line-through" : ""}`}>{s.LabelType ?? "(no label)"}</span>
-                    {s.IsDisabled && <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Skipped</span>}
-                </div>
-            </div>
-        </>
-    );
-}
-
-function StepRowToggle({ step: s, onToggle }: { step: StepRow; onToggle: (id: number, disabled: boolean) => void }) {
-    return (
-        <Switch
-            className="mt-0.5 shrink-0"
-            checked={!s.IsDisabled}
-            onCheckedChange={(checked) => {
-                onToggle(s.StepId, !checked);
-                toast.success(checked ? `Step "${s.LabelType ?? s.StepId}" enabled` : `Step "${s.LabelType ?? s.StepId}" disabled — will be skipped on run`);
-            }}
-            aria-label={s.IsDisabled ? "Enable step" : "Disable step"}
-            title={s.IsDisabled ? "Disabled — runner will skip this step" : "Enabled — runner will execute this step"}
-        />
-    );
-}
-
 function StepRowItem(props: StepRowItemProps): JSX.Element {
     const { step: s, ordinal, onToggle } = props;
 
     return (
-        <li className={`flex items-start gap-3 px-4 py-3 transition-opacity ${s.IsDisabled ? "opacity-50" : ""}`}>
-            <StepRowContent step={s} ordinal={ordinal} />
-            <StepRowToggle step={s} onToggle={onToggle} />
+        <li
+            className={`flex items-start gap-3 px-4 py-3 transition-opacity ${
+                s.IsDisabled ? "opacity-50" : ""
+            }`}
+        >
+            <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium tabular-nums">
+                {ordinal}
+            </span>
+            <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                    <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                        {stepKindLabel(s.StepKindId)}
+                    </span>
+                    <span
+                        className={`truncate text-sm font-medium ${
+                            s.IsDisabled ? "line-through" : ""
+                        }`}
+                    >
+                        {s.LabelType ?? "(no label)"}
+                    </span>
+                    {s.IsDisabled && (
+                        <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                            Skipped
+                        </span>
+                    )}
+                </div>
+            </div>
+            <Switch
+                className="mt-0.5 shrink-0"
+                checked={!s.IsDisabled}
+                onCheckedChange={(checked) => {
+                    onToggle(s.StepId, !checked);
+                    toast.success(
+                        checked
+                            ? `Step "${s.LabelType ?? s.StepId}" enabled`
+                            : `Step "${s.LabelType ?? s.StepId}" disabled — will be skipped on run`,
+                    );
+                }}
+                aria-label={s.IsDisabled ? "Enable step" : "Disable step"}
+                title={
+                    s.IsDisabled
+                        ? "Disabled — runner will skip this step"
+                        : "Enabled — runner will execute this step"
+                }
+            />
         </li>
     );
 }

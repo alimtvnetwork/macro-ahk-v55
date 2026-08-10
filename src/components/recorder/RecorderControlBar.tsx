@@ -35,6 +35,10 @@ export function RecorderControlBar(props: RecorderControlBarProps): JSX.Element 
     const isPaused = phase === "Paused";
     const isActive = isRecording || isPaused;
 
+    const playEnabled = !isActive || isPaused;
+    const pauseEnabled = isRecording;
+    const stopEnabled = isActive;
+
     const handlePlay = () => {
         if (isPaused) { void resume();
 
@@ -52,40 +56,11 @@ export function RecorderControlBar(props: RecorderControlBarProps): JSX.Element 
             aria-label="Recorder controls"
             data-testid="recorder-control-bar"
         >
-            <RecorderActionButtons
-                isPaused={isPaused}
-                playEnabled={!isActive || isPaused}
-                pauseEnabled={isRecording}
-                stopEnabled={isActive}
-                onPlay={handlePlay}
-                onPause={() => { void pause(); }}
-                onStop={() => { void stop(); }}
-            />
-            <Badge
-                variant="outline"
-                className="text-[10px] uppercase tracking-wider ml-1"
-                data-testid="recorder-control-phase"
-            >
-                {phase}
-            </Badge>
-            <KeywordEventsPanel className="ml-1" />
-        </div>
-    );
-}
-
-function RecorderActionButtons({
-    isPaused, playEnabled, pauseEnabled, stopEnabled, onPlay, onPause, onStop,
-}: {
-    isPaused: boolean; playEnabled: boolean; pauseEnabled: boolean; stopEnabled: boolean;
-    onPlay: () => void; onPause: () => void; onStop: () => void;
-}) {
-    return (
-        <>
             <Button
                 size="sm"
                 variant="secondary"
                 disabled={!playEnabled}
-                onClick={onPlay}
+                onClick={handlePlay}
                 className="h-8 px-3"
                 aria-label={isPaused ? "Resume recording" : "Start recording"}
                 data-testid="recorder-control-play"
@@ -97,7 +72,7 @@ function RecorderActionButtons({
                 size="sm"
                 variant="secondary"
                 disabled={!pauseEnabled}
-                onClick={onPause}
+                onClick={() => { void pause(); }}
                 className="h-8 px-3"
                 aria-label="Pause recording"
                 data-testid="recorder-control-pause"
@@ -109,7 +84,7 @@ function RecorderActionButtons({
                 size="sm"
                 variant="destructive"
                 disabled={!stopEnabled}
-                onClick={onStop}
+                onClick={() => { void stop(); }}
                 className="h-8 px-3"
                 aria-label="Stop recording"
                 data-testid="recorder-control-stop"
@@ -117,6 +92,14 @@ function RecorderActionButtons({
                 <Square className="h-3.5 w-3.5 mr-1" />
                 Stop
             </Button>
-        </>
+            <Badge
+                variant="outline"
+                className="text-[10px] uppercase tracking-wider ml-1"
+                data-testid="recorder-control-phase"
+            >
+                {phase}
+            </Badge>
+            <KeywordEventsPanel className="ml-1" />
+        </div>
     );
 }

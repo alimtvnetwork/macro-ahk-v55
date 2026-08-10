@@ -93,7 +93,7 @@ function useCsvParseState(open: boolean): ParseState {
         if (!result.Ok) {
             setParsed(null); setMappings([]); setParseError(result.Reason);
 
-            return;
+ return;
         }
         setParseError(null);
         setParsed({ Csv: result, FileName: fileName });

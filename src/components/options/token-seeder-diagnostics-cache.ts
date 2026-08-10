@@ -38,6 +38,47 @@ function getStorage(): Storage | null {
     try {
         if (typeof window === "undefined") return null;
 
+        return window.localStorage;
+    } catch (err) { /* swallowed */
+        return null;
+    }
+}
+
+export function loadDiagnosticsCache(): TokenSeederDiagnosticsCache | null {
+    const storage = getStorage();
+    if (!storage) return null;
+    try {
+        const raw = storage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw) as TokenSeederDiagnosticsCache;
+        if (!parsed || !Array.isArray(parsed.targets)) return null;
+
+        // Drop snapshots whose youngest failure is older than cooldown + grace.
+        const now = Date.now();
+        const maxLastFailure = parsed.targets.reduce(
+            (acc, t) => Math.max(acc, t.lastFailureAt ?? 0),
+            0,
+        );
+        const cooldown = parsed.cooldownMs ?? 0;
+        if (
+            maxLastFailure > 0 &&
+            now - maxLastFailure > cooldown + MAX_STALE_GRACE_MS
+        ) {
+            storage.removeItem(STORAGE_KEY);
+
+            return null;
+        }
+
+        return parsed;
+    } catch (err) { /* swallowed */
+        return null;
+    }
+}
+
+export function saveDiagnosticsCache(snapshot: TokenSeederDiagnosticsCache | null): void {
+    const storage = getStorage();
+    if (!storage) return;
+    try {
         if (!snapshot || snapshot.targets.length === 0) {
             storage.removeItem(STORAGE_KEY);
 

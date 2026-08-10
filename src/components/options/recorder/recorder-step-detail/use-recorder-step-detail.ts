@@ -24,30 +24,31 @@ export interface UseRecorderStepDetailArgs {
 export function useRecorderStepDetail(args: UseRecorderStepDetailArgs) {
     const { step, tags, onRename, onDescriptionSave, onTagsSave, onLinkChange } = args;
 
-    const nameProps = useStepNameEdit(step, onRename);
-    const descProps = useStepDescEdit(step, onDescriptionSave);
-    const tagsProps = useStepTagsEdit(step, tags, onTagsSave);
-    const linkProps = useStepLinkEdit(step, onLinkChange);
-
-    return {
-        ...nameProps,
-        ...descProps,
-        ...tagsProps,
-        ...linkProps,
-    };
-}
-
-function useStepNameEdit(step: StepRow, onRename: UseRecorderStepDetailArgs["onRename"]) {
     const [draftName, setDraftName] = useState(step.VariableName);
     const [renameError, setRenameError] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
 
+    const [draftDesc, setDraftDesc] = useState(step.Description ?? "");
+    const [descSaving, setDescSaving] = useState(false);
+    const [descError, setDescError] = useState<string | null>(null);
+
+    const [draftTag, setDraftTag] = useState("");
+    const [tagsError, setTagsError] = useState<string | null>(null);
+
+    const [linkError, setLinkError] = useState<string | null>(null);
+
     useEffect(() => {
         setDraftName(step.VariableName);
         setRenameError(null);
-    }, [step.StepId, step.VariableName]);
+        setDraftDesc(step.Description ?? "");
+        setDescError(null);
+        setDraftTag("");
+        setTagsError(null);
+        setLinkError(null);
+    }, [step.StepId, step.VariableName, step.Description]);
 
     const isDirty = draftName !== step.VariableName;
+    const isDescDirty = draftDesc !== (step.Description ?? "");
 
     const handleSave = useCallback(async () => {
         if (!isDirty) return;
@@ -57,21 +58,6 @@ function useStepNameEdit(step: StepRow, onRename: UseRecorderStepDetailArgs["onR
         catch (err) { setRenameError(errorText(err)); }
         finally { setIsSaving(false); }
     }, [isDirty, draftName, onRename, step.StepId]);
-
-    return { draftName, setDraftName, renameError, isSaving, isDirty, handleSave };
-}
-
-function useStepDescEdit(step: StepRow, onDescriptionSave: UseRecorderStepDetailArgs["onDescriptionSave"]) {
-    const [draftDesc, setDraftDesc] = useState(step.Description ?? "");
-    const [descSaving, setDescSaving] = useState(false);
-    const [descError, setDescError] = useState<string | null>(null);
-
-    useEffect(() => {
-        setDraftDesc(step.Description ?? "");
-        setDescError(null);
-    }, [step.StepId, step.Description]);
-
-    const isDescDirty = draftDesc !== (step.Description ?? "");
 
     const handleDescSave = useCallback(async () => {
         if (!isDescDirty) return;
@@ -83,18 +69,6 @@ function useStepDescEdit(step: StepRow, onDescriptionSave: UseRecorderStepDetail
         } catch (err) { setDescError(errorText(err)); }
         finally { setDescSaving(false); }
     }, [isDescDirty, draftDesc, onDescriptionSave, step.StepId]);
-
-    return { draftDesc, setDraftDesc, descSaving, descError, isDescDirty, handleDescSave };
-}
-
-function useStepTagsEdit(step: StepRow, tags: ReadonlyArray<string>, onTagsSave: UseRecorderStepDetailArgs["onTagsSave"]) {
-    const [draftTag, setDraftTag] = useState("");
-    const [tagsError, setTagsError] = useState<string | null>(null);
-
-    useEffect(() => {
-        setDraftTag("");
-        setTagsError(null);
-    }, [step.StepId]);
 
     const handleAddTag = useCallback(async () => {
         const next = draftTag.trim();
@@ -113,16 +87,6 @@ function useStepTagsEdit(step: StepRow, tags: ReadonlyArray<string>, onTagsSave:
         catch (err) { setTagsError(errorText(err)); }
     }, [tags, onTagsSave, step.StepId]);
 
-    return { draftTag, setDraftTag, tagsError, handleAddTag, handleRemoveTag };
-}
-
-function useStepLinkEdit(step: StepRow, onLinkChange: UseRecorderStepDetailArgs["onLinkChange"]) {
-    const [linkError, setLinkError] = useState<string | null>(null);
-
-    useEffect(() => {
-        setLinkError(null);
-    }, [step.StepId]);
-
     const handleLinkSave = useCallback(async (slot: StepLinkSlot, raw: string) => {
         setLinkError(null);
         try {
@@ -131,5 +95,10 @@ function useStepLinkEdit(step: StepRow, onLinkChange: UseRecorderStepDetailArgs[
         } catch (err) { setLinkError(errorText(err)); }
     }, [onLinkChange, step.StepId]);
 
-    return { linkError, handleLinkSave };
+    return {
+        draftName, setDraftName, renameError, isSaving, isDirty, handleSave,
+        draftDesc, setDraftDesc, descSaving, descError, isDescDirty, handleDescSave,
+        draftTag, setDraftTag, tagsError, handleAddTag, handleRemoveTag,
+        linkError, handleLinkSave,
+    };
 }

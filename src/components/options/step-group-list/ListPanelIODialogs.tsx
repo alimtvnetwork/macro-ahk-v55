@@ -39,40 +39,61 @@ interface ListPanelIODialogsProps {
     onBatchDeleteConfirm: Parameters<typeof BatchDeleteDialog>[0]["onConfirm"];
 }
 
-function ExportImportDialogs({ exportApi, importApi }: { exportApi: ExportApi, importApi: ImportApi }) {
-    return (
-        <>
-            <ExportPreviewDialog open={exportApi.previewState.Open} onOpenChange={exportApi.setPreviewOpen} preview={exportApi.previewState.Preview} includeDescendants={exportApi.previewState.Pending?.IncludeDescendants ?? true} onConfirm={() => { void exportApi.confirmExport(); }} />
-            <ExportErrorDialog open={exportApi.errorState.Open} onOpenChange={exportApi.setErrorOpen} explanation={exportApi.errorState.Explanation} />
-            <ImportSummaryDialog open={importApi.summaryState.Open} onOpenChange={importApi.setSummaryOpen} summary={importApi.summaryState.Summary} fileName={importApi.summaryState.FileName} />
-            <ImportErrorDialog open={importApi.errorState.Open} onOpenChange={importApi.setErrorOpen} explanation={importApi.errorState.Explanation} fileName={importApi.errorState.FileName} />
-        </>
-    );
-}
-
-function BatchActionDialogs(props: {
-    batchRenameOpen: boolean, setBatchRenameOpen: Dispatch<SetStateAction<boolean>>,
-    batchDeleteOpen: boolean, setBatchDeleteOpen: Dispatch<SetStateAction<boolean>>,
-    selectedGroups: ReadonlyArray<StepGroupRow>, allGroups: ReadonlyArray<StepGroupRow>, deletePreview: DeletePreview,
-    onBatchRenameApply: Parameters<typeof BatchRenameDialog>[0]["onApply"], onBatchDeleteConfirm: Parameters<typeof BatchDeleteDialog>[0]["onConfirm"]
-}) {
-    return (
-        <>
-            <BatchRenameDialog open={props.batchRenameOpen} onOpenChange={props.setBatchRenameOpen} targets={props.selectedGroups} allGroups={props.allGroups} onApply={props.onBatchRenameApply} />
-            <BatchDeleteDialog open={props.batchDeleteOpen} onOpenChange={props.setBatchDeleteOpen} rows={props.deletePreview} onConfirm={props.onBatchDeleteConfirm} />
-        </>
-    );
-}
-
 export function ListPanelIODialogs(props: ListPanelIODialogsProps) {
+    const {
+        exportApi,
+        importApi,
+        allGroups,
+        selectedGroups,
+        deletePreview,
+        batchRenameOpen,
+        setBatchRenameOpen,
+        batchDeleteOpen,
+        setBatchDeleteOpen,
+        onBatchRenameApply,
+        onBatchDeleteConfirm,
+    } = props;
+
     return (
         <>
-            <ExportImportDialogs exportApi={props.exportApi} importApi={props.importApi} />
-            <BatchActionDialogs
-                batchRenameOpen={props.batchRenameOpen} setBatchRenameOpen={props.setBatchRenameOpen}
-                batchDeleteOpen={props.batchDeleteOpen} setBatchDeleteOpen={props.setBatchDeleteOpen}
-                selectedGroups={props.selectedGroups} allGroups={props.allGroups} deletePreview={props.deletePreview}
-                onBatchRenameApply={props.onBatchRenameApply} onBatchDeleteConfirm={props.onBatchDeleteConfirm}
+            <ExportPreviewDialog
+                open={exportApi.previewState.Open}
+                onOpenChange={exportApi.setPreviewOpen}
+                preview={exportApi.previewState.Preview}
+                includeDescendants={exportApi.previewState.Pending?.IncludeDescendants ?? true}
+                onConfirm={() => { void exportApi.confirmExport(); }}
+            />
+            <ExportErrorDialog
+                open={exportApi.errorState.Open}
+                onOpenChange={exportApi.setErrorOpen}
+                explanation={exportApi.errorState.Explanation}
+            />
+
+            <ImportSummaryDialog
+                open={importApi.summaryState.Open}
+                onOpenChange={importApi.setSummaryOpen}
+                summary={importApi.summaryState.Summary}
+                fileName={importApi.summaryState.FileName}
+            />
+            <ImportErrorDialog
+                open={importApi.errorState.Open}
+                onOpenChange={importApi.setErrorOpen}
+                explanation={importApi.errorState.Explanation}
+                fileName={importApi.errorState.FileName}
+            />
+
+            <BatchRenameDialog
+                open={batchRenameOpen}
+                onOpenChange={setBatchRenameOpen}
+                targets={selectedGroups}
+                allGroups={allGroups}
+                onApply={onBatchRenameApply}
+            />
+            <BatchDeleteDialog
+                open={batchDeleteOpen}
+                onOpenChange={setBatchDeleteOpen}
+                rows={deletePreview}
+                onConfirm={onBatchDeleteConfirm}
             />
         </>
     );

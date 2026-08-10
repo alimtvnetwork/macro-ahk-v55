@@ -89,10 +89,10 @@ export async function handleProjectApi(payload: ProjectApiMessage): Promise<Reco
         const result = await dispatchMethod(db, slug, method, endpoint, params);
 
         return { ok: true, ...result };
-    } catch (error) {
+    } catch (err) {
         return {
             ok: false,
-            errorMessage: error instanceof Error ? error.message : String(error),
+            errorMessage: err instanceof Error ? err.message : String(err),
         };
     }
 }
@@ -342,23 +342,10 @@ function classifyStatement(statement: string): RawSqlKind {
     throw new Error("rawSql: unsupported statement: " + statement.slice(0, 80));
 }
 
-function handleOutsideQuote(sql: string, i: number, ch: string, next: string | undefined, statements: string[], current: string) {
-    if (ch === "'" || ch === "\"") return { newCurrent: current + ch, newI: i, newQuote: ch };
-    if (ch === "-" && next === "-") return { newCurrent: current, newI: skipLineComment(sql, i + 2), newQuote: null };
-    if (ch === "/" && next === "*") return { newCurrent: current, newI: skipBlockComment(sql, i + 2), newQuote: null };
-    if (ch === ";") {
-        pushSqlStatement(statements, current);
-
-        return { newCurrent: "", newI: i, newQuote: null };
-    }
-
-    return { newCurrent: current + ch, newI: i, newQuote: null };
-}
-
 function splitSqlStatements(sql: string): string[] {
     const statements: string[] = [];
     let current = "";
-    let quote: string | null = null;
+    let quote: "'" | "\"" | null = null;
     for (let i = 0; i < sql.length; i++) {
         const ch = sql[i];
         const next = sql[i + 1];
@@ -370,12 +357,27 @@ function splitSqlStatements(sql: string): string[] {
             } else if (ch === quote) {
                 quote = null;
             }
-        } else {
-            const res = handleOutsideQuote(sql, i, ch, next, statements, current);
-            current = res.newCurrent;
-            i = res.newI;
-            quote = res.newQuote;
+            continue;
         }
+        if (ch === "'" || ch === "\"") {
+            quote = ch;
+            current += ch;
+            continue;
+        }
+        if (ch === "-" && next === "-") {
+            i = skipLineComment(sql, i + 2);
+            continue;
+        }
+        if (ch === "/" && next === "*") {
+            i = skipBlockComment(sql, i + 2);
+            continue;
+        }
+        if (ch === ";") {
+            pushSqlStatement(statements, current);
+            current = "";
+            continue;
+        }
+        current += ch;
     }
     pushSqlStatement(statements, current);
 
@@ -426,7 +428,7 @@ function readLastInsertId(db: ProjectDb): number | undefined {
         const n = typeof value === "number" ? value : Number(value);
 
         return Number.isFinite(n) ? n : undefined;
-    } catch (error) { 
+    } catch (err) { 
         return undefined;
     }
 }
@@ -438,7 +440,7 @@ function getRowsModified(db: ProjectDb): number | undefined {
         const n = reader.call(db);
 
         return Number.isFinite(n) ? n : undefined;
-    } catch (error) { 
+    } catch (err) { 
         return undefined;
     }
 }

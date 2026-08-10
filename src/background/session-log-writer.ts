@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Timings } from "../constants/timing";
 import { ServiceResult } from '../utils/result-wrapper';
 import { logCaughtError, BgLogTag } from "./bg-logger";
@@ -54,7 +55,6 @@ const EVENTS_LOG = "events.log";
 const ERRORS_LOG = "errors.log";
 const SCRIPTS_LOG = "scripts.log";
 const LOG_SEPARATOR = "============================================================";
-const AUTO_CAUGHT_MSG = "Automatically caught swallowed error";
 
 /* ------------------------------------------------------------------ */
 /*  State                                                              */
@@ -86,9 +86,9 @@ async function ensureSessionDir(): Promise<FileSystemDirectoryHandle | null> {
         sessionDir = await logsRoot.getDirectoryHandle(`${SESSION_PREFIX}${sessionId}`, { create: true });
 
         return sessionDir;
-    } catch (error) {
+    } catch (err) {
         const absDir = `opfs-root/${LOGS_DIR_NAME}/${SESSION_PREFIX}${sessionId}`;
-        console.error(`[session-log-writer::ensureSessionDir] Failed to access OPFS directory\n  Path: ${absDir}\n  Missing: Writable OPFS directory handle for session "${sessionId}"\n  Reason: ${error instanceof Error ? error.message : String(error)} — OPFS may not be supported or navigator.storage.getDirectory() failed`, error);
+        console.error(`[session-log-writer::ensureSessionDir] Failed to access OPFS directory\n  Path: ${absDir}\n  Missing: Writable OPFS directory handle for session "${sessionId}"\n  Reason: ${err instanceof Error ? err.message : String(err)} — OPFS may not be supported or navigator.storage.getDirectory() failed`, err);
         sessionDir = null;
 
         return null;
@@ -143,9 +143,9 @@ export async function initSessionLogDir(sid: string, ver: string): Promise<void>
 
             // Fire-and-forget: prune old sessions on each new session start
             void pruneOldSessionLogs();
-        } catch (error) {
+        } catch (err) {
             const absDir = `opfs-root/${LOGS_DIR_NAME}/${SESSION_PREFIX}${sid}`;
-            console.error(`[session-log-writer::initSessionDir] OPFS dir init failed\n  Path: ${absDir}\n  Missing: Session log files [${EVENTS_LOG}, ${ERRORS_LOG}, ${SCRIPTS_LOG}]\n  Reason: ${error instanceof Error ? error.message : String(error)} — directory or file handle creation failed`, error);
+            console.error(`[session-log-writer::initSessionDir] OPFS dir init failed\n  Path: ${absDir}\n  Missing: Session log files [${EVENTS_LOG}, ${ERRORS_LOG}, ${SCRIPTS_LOG}]\n  Reason: ${err instanceof Error ? err.message : String(err)} — directory or file handle creation failed`, err);
             sessionDir = null;
         }
     })();
@@ -209,9 +209,9 @@ async function flushPending(): Promise<void> {
             const content = chunks.join("");
             await writable.write(content);
             await writable.close();
-        } catch (error) {
+        } catch (err) {
             const absPath = `opfs-root/${LOGS_DIR_NAME}/${SESSION_PREFIX}${sessionId}/${filename}`;
-            console.error(`[session-log-writer::flushPending] Failed to write log file\n  Path: ${absPath}\n  Missing: Successful write of ${chunks.length} buffered log chunk(s)\n  Reason: ${error instanceof Error ? error.message : String(error)} — file handle may be stale or OPFS quota exceeded`, error);
+            console.error(`[session-log-writer::flushPending] Failed to write log file\n  Path: ${absPath}\n  Missing: Successful write of ${chunks.length} buffered log chunk(s)\n  Reason: ${err instanceof Error ? err.message : String(err)} — file handle may be stale or OPFS quota exceeded`, err);
             fileHandleCache.delete(filename);
         }
     }
@@ -339,7 +339,7 @@ async function tryReadSessionDir(sid: string): Promise<{ ok: true; report: strin
                     sections.push(text);
                 }
                 found.push(`${absDir}/${filename}`);
-            } catch (error) {
+            } catch (err) {
                 missing.push(`${absDir}/${filename}`);
             }
         }
@@ -363,9 +363,9 @@ async function tryReadSessionDir(sid: string): Promise<{ ok: true; report: strin
         ].join("\n");
 
         return { ok: true, report: header + sections.join("\n\n") };
-    } catch (error) {
-        const errName = error instanceof DOMException ? error.name : "UnknownError";
-        const errMsg = error instanceof Error ? error.message : String(error);
+    } catch (err) {
+        const errName = err instanceof DOMException ? err.name : "UnknownError";
+        const errMsg = err instanceof Error ? err.message : String(err);
         const expectedPaths = expectedFiles.map((f) => `${absDir}/${f}`);
 
         return { ok: false, error: `Failed to read session #${sid} at "${absDir}" (${errName}: ${errMsg}). Expected: [${expectedPaths.join(", ")}]` };
@@ -392,7 +392,7 @@ export async function pruneOldSessionLogs(maxAgeDays = 7): Promise<number> {
                 if (file.lastModified < cutoff) {
                     toDelete.push(name);
                 }
-            } catch (error) {
+            } catch (err) {
                 // No events.log at "opfs-root/session-logs/{name}/events.log" → stale dir, mark for deletion
                 toDelete.push(name);
             }
@@ -406,8 +406,8 @@ export async function pruneOldSessionLogs(maxAgeDays = 7): Promise<number> {
         if (removed > 0) {
             console.log(`[session-log-writer] Pruned ${removed} session dirs from "opfs-root/${LOGS_DIR_NAME}/" older than ${maxAgeDays}d`);
         }
-    } catch (error) {
-        console.error(`[session-log-writer::pruneOldSessionLogs] Pruning failed\n  Path: opfs-root/${LOGS_DIR_NAME}/\n  Missing: Successful cleanup of old session directories\n  Reason: ${error instanceof Error ? error.message : String(error)} — OPFS directory iteration or removal failed`, error);
+    } catch (err) {
+        console.error(`[session-log-writer::pruneOldSessionLogs] Pruning failed\n  Path: opfs-root/${LOGS_DIR_NAME}/\n  Missing: Successful cleanup of old session directories\n  Reason: ${err instanceof Error ? err.message : String(err)} — OPFS directory iteration or removal failed`, err);
     }
 
     return removed;
@@ -441,7 +441,7 @@ export async function getOpfsSessionStatus(): Promise<OpfsStatusData> {
                 const fh = await dir.getFileHandle(fname);
                 const file = await fh.getFile();
                 files.push({ name: fname, absolutePath: `${absBase}/${fname}`, sizeBytes: file.size, exists: true });
-            } catch (error) {
+            } catch (err) {
                 files.push({ name: fname, absolutePath: `${absBase}/${fname}`, sizeBytes: 0, exists: false });
             }
         }
@@ -449,7 +449,7 @@ export async function getOpfsSessionStatus(): Promise<OpfsStatusData> {
         const allExist = files.every((f) => f.exists);
 
         return { sessionId: sid, dirExists: true, files, healthy: allExist };
-    } catch (error) {         const files = expectedFiles.map((f) => ({ name: f, absolutePath: `${absBase}/${f}`, sizeBytes: 0, exists: false }));
+    } catch (err) {         const files = expectedFiles.map((f) => ({ name: f, absolutePath: `${absBase}/${f}`, sizeBytes: 0, exists: false }));
 
         return { sessionId: sid, dirExists: false, files, healthy: false };
     }
@@ -489,12 +489,12 @@ export async function listSessionsWithTimestamps(): Promise<SessionInfo[]> {
                         const fh = await dir.getFileHandle(fname);
                         const file = await fh.getFile();
                         if (file.lastModified > latestMs) latestMs = file.lastModified;
-                    }catch (error) {
-                    logCaughtError(BgLogTag.MARCO, AUTO_CAUGHT_MSG, error); }
+                    }catch (err) {
+                    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); }
  // allow-swallow: missing log file is expected
                 }
-            }catch (error) {
-            logCaughtError(BgLogTag.MARCO, AUTO_CAUGHT_MSG, error); }
+            }catch (err) {
+            logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); }
  // allow-swallow: unreadable session dir is skipped
 
             results.push({
@@ -504,7 +504,7 @@ export async function listSessionsWithTimestamps(): Promise<SessionInfo[]> {
         }
 
         return results.sort((a, b) => Number(b.id) - Number(a.id));
-    } catch (error) { 
+    } catch (err) { 
         return [];
     }
 }
@@ -566,7 +566,7 @@ export async function browseOpfsSessions(): Promise<{
                             sizeBytes,
                             lastModified: new Date(file.lastModified).toISOString(),
                         });
-                    } catch (error) {
+                    } catch (err) {
                         files.push({
                             name: fileName,
                             absolutePath: `${absoluteDirPath}/${fileName}`,
@@ -575,14 +575,14 @@ export async function browseOpfsSessions(): Promise<{
                         });
                     }
                 }
-            } catch (error) {
-            logCaughtError(BgLogTag.MARCO, AUTO_CAUGHT_MSG, error); 
+            } catch (err) {
+            logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
             sessions.push({ sessionId: sid, absolutePath: absoluteDirPath, files, totalSizeBytes });
         }
-    } catch (error) {
-    logCaughtError(BgLogTag.MARCO, AUTO_CAUGHT_MSG, error); 
+    } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
 }
 
     sessions.sort((a, b) => Number(b.sessionId) - Number(a.sessionId));

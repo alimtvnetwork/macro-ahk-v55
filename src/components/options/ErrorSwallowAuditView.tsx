@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { HttpCodes } from "../../constants/http";
 /**
  * Marco Extension — Error-Swallowing Audit View

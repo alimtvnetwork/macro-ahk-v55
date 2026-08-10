@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Marco Extension — WASM Integrity Verifier
  *

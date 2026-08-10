@@ -54,31 +54,12 @@ function eventToChord(e: KeyboardEvent): string | null {
 
 export function HotkeyChordCapture(props: HotkeyChordCaptureProps): JSX.Element {
     const { value, onChange, placeholder, className, id } = props;
-    const { active, setActive, lastChord, boxRef, containerRef } = useHotkeyCapture(value, onChange);
-
-    const removeChord = (idx: number) => {
-        const next = value.slice();
-        next.splice(idx, 1);
-        onChange(next);
-    };
-
-    return (
-        <div ref={containerRef} className={cn("space-y-1.5", className)}>
-            <ChordChipList value={value} onRemove={removeChord} />
-            <CaptureBox
-                id={id}
-                boxRef={boxRef}
-                active={active}
-                setActive={setActive}
-                placeholder={placeholder}
-                lastChord={lastChord}
-            />
-        </div>
-    );
-}
-
-function useHotkeyCapture(value: readonly string[], onChange: (next: readonly string[]) => void) {
     const [active, setActive] = useState(false);
+    /**
+     * Sticky summary of the most-recently-captured chord. Survives chip
+     * removal, Esc, and outside-click so the user always sees what they
+     * just pressed without having to recount the chord chips.
+     */
     const [lastChord, setLastChord] = useState<string | null>(null);
     const boxRef = useRef<HTMLDivElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -93,6 +74,8 @@ function useHotkeyCapture(value: readonly string[], onChange: (next: readonly st
             return;
         }
         if (e.key === "Backspace" && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey && value.length > 0) {
+            // Only consume backspace when no other key is pressed —
+            // otherwise allow "Ctrl+Backspace" etc. to be captured.
             e.preventDefault();
             onChange(value.slice(0, -1));
 
@@ -115,6 +98,12 @@ function useHotkeyCapture(value: readonly string[], onChange: (next: readonly st
         return () => box.removeEventListener(Events.KEYDOWN, onKeyDown);
     }, [active, onKeyDown]);
 
+    /**
+     * Outside-click guard. Pointer-down is used (not click) so the
+     * deactivation runs *before* focus moves elsewhere — otherwise
+     * onBlur already fires and this is redundant. The pointer path
+     * also catches mousedown on non-focusable surfaces.
+     */
     useEffect(() => {
         if (!active) { return; }
         const onPointerDown = (e: PointerEvent) => {
@@ -129,91 +118,75 @@ function useHotkeyCapture(value: readonly string[], onChange: (next: readonly st
         return () => document.removeEventListener("pointerdown", onPointerDown, true);
     }, [active]);
 
-    return { active, setActive, lastChord, boxRef, containerRef };
-}
+    const removeChord = (idx: number) => {
+        const next = value.slice();
+        next.splice(idx, 1);
+        onChange(next);
+    };
 
-function ChordChipList({ value, onRemove }: { value: readonly string[]; onRemove: (idx: number) => void }) {
     return (
-        <div className="flex flex-wrap gap-1.5 min-h-[1.75rem]">
-            {value.length === 0 ? (
-                <span className="text-[11px] text-muted-foreground italic self-center">
-                    No chords yet — focus the box below and press keys.
-                </span>
-            ) : value.map((chord, i) => (
-                <span
-                    key={`${chord}-${i}`}
-                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[11px] font-mono"
-                    data-testid="hotkey-chord-chip"
-                >
-                    {chord}
-                    <button
-                        type="button"
-                        aria-label={`Remove chord ${chord}`}
-                        onClick={() => onRemove(i)}
-                        className="opacity-60 hover:opacity-100"
+        <div ref={containerRef} className={cn("space-y-1.5", className)}>
+            <div className="flex flex-wrap gap-1.5 min-h-[1.75rem]">
+                {value.length === 0 ? (
+                    <span className="text-[11px] text-muted-foreground italic self-center">
+                        No chords yet — focus the box below and press keys.
+                    </span>
+                ) : value.map((chord, i) => (
+                    <span
+                        key={`${chord}-${i}`}
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[11px] font-mono"
+                        data-testid="hotkey-chord-chip"
                     >
-                        <X className="h-3 w-3" />
-                    </button>
-                </span>
-            ))}
-        </div>
-    );
-}
-
-function CaptureBox({
-    id, boxRef, active, setActive, placeholder, lastChord,
-}: {
-    id?: string;
-    boxRef: React.RefObject<HTMLDivElement | null>;
-    active: boolean;
-    setActive: (active: boolean) => void;
-    placeholder?: string;
-    lastChord: string | null;
-}) {
-    return (
-        <div
-            ref={boxRef}
-            id={id}
-            role="textbox"
-            tabIndex={0}
-            aria-label="Hotkey capture area — focus then press keys"
-            onFocus={() => setActive(true)}
-            onBlur={() => setActive(false)}
-            onClick={() => boxRef.current?.focus()}
-            className={cn(
-                "border rounded px-2 py-1.5 text-xs cursor-text transition-colors outline-none",
-                "focus-visible:ring-2 focus-visible:ring-ring",
-                active
-                    ? "border-primary bg-primary/5 text-foreground"
-                    : "border-border bg-background text-muted-foreground hover:border-primary/50",
-            )}
-            data-testid="hotkey-capture-box"
-            aria-live="polite"
-        >
-            <CaptureBoxContent active={active} placeholder={placeholder} lastChord={lastChord} />
-        </div>
-    );
-}
-
-function CaptureBoxContent({ active, placeholder, lastChord }: { active: boolean; placeholder?: string; lastChord: string | null; }) {
-    return (
-        <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5">
-                <Keyboard className="h-3 w-3" />
-                {active
-                    ? "Listening… press a key combination (Esc to stop)"
-                    : (placeholder ?? "Click here, then press the key combination to record")}
-            </span>
-            {lastChord !== null ? (
-                <span
-                    className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground"
-                    data-testid="hotkey-last-chord"
-                    title={`Last captured chord: ${lastChord}`}
-                >
-                    <History className="h-3 w-3" />
-                    <span className="text-foreground">{lastChord}</span>
-                </span>
-            ) : null}
+                        {chord}
+                        <button
+                            type="button"
+                            aria-label={`Remove chord ${chord}`}
+                            onClick={() => removeChord(i)}
+                            className="opacity-60 hover:opacity-100"
+                        >
+                            <X className="h-3 w-3" />
+                        </button>
+                    </span>
+                ))}
+            </div>
+            <div
+                ref={boxRef}
+                id={id}
+                role="textbox"
+                tabIndex={0}
+                aria-label="Hotkey capture area — focus then press keys"
+                onFocus={() => setActive(true)}
+                onBlur={() => setActive(false)}
+                onClick={() => boxRef.current?.focus()}
+                className={cn(
+                    "border rounded px-2 py-1.5 text-xs cursor-text transition-colors outline-none",
+                    "focus-visible:ring-2 focus-visible:ring-ring",
+                    active
+                        ? "border-primary bg-primary/5 text-foreground"
+                        : "border-border bg-background text-muted-foreground hover:border-primary/50",
+                )}
+                data-testid="hotkey-capture-box"
+                aria-live="polite"
+            >
+                <div className="flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5">
+                        <Keyboard className="h-3 w-3" />
+                        {active
+                            ? "Listening… press a key combination (Esc to stop)"
+                            : (placeholder ?? "Click here, then press the key combination to record")}
+                    </span>
+                    {lastChord !== null ? (
+                        <span
+                            className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground"
+                            data-testid="hotkey-last-chord"
+                            title={`Last captured chord: ${lastChord}`}
+                        >
+                            <History className="h-3 w-3" />
+                            <span className="text-foreground">{lastChord}</span>
+                        </span>
+                    ) : null}
+                </div>
+            </div>
         </div>
     );
 }
