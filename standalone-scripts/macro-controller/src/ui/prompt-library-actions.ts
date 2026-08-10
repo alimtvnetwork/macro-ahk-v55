@@ -49,17 +49,17 @@ export async function handleDelete(
       refs.status.textContent = 'Delete blocked: ' + reason;
       logError(LOG_SCOPE, 'delete blocked', res);
       try { showToast(msgText, 'error'); } catch (err) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+        console.error();
       }
       try { window.alert(msgText); } catch (err) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+        console.error();
       }
 
       return;
     }
     refs.status.textContent = 'Deleted.';
     try { showToast('Deleted prompt "' + row.Slug + '"', 'success'); } catch (err) {
-      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+      console.error();
     }
     await renderAllRoles(refs);
     void (async (): Promise<void> => {

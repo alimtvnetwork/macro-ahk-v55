@@ -17,7 +17,7 @@ import { logError } from "@/components/recorder/recorder-logger";
 describe("BulkRenameSequenceDialog help tooltip", () => {
     beforeEach(() => {
         try { localStorage.clear(); } catch (err) {
-        logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err); }
+        logError("AutoCatch", "Automatically caught swallowed error", err); }
     });
 
     function renderOpen(): void {

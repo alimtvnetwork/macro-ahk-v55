@@ -25,7 +25,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
-import { UrlRuleAction, UrlSubTabEnum, AccentEnum } from "../../types/enums";
+import { UrlRuleActionType, UrlSubTabType, AccentType } from "../../types/enums";
 import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
@@ -35,7 +35,7 @@ import { logError } from "@/components/options/options-logger";
 interface UrlRule {
   pattern: string;
   matchType: string;
-  action?: UrlRuleAction;
+  action?: UrlRuleActionType;
   excludePattern?: string;
   label?: string;
 }
@@ -52,7 +52,7 @@ interface UrlVariable {
   description?: string;
 }
 
-type UrlSubTab = UrlSubTabEnum;
+type UrlSubTab = UrlSubTabType;
 
 interface Props {
   targetUrls: UrlRule[];
@@ -161,7 +161,7 @@ function updateUrlRule(targetUrls: UrlRule[], index: number, field: string, valu
 /*  Sub-Tab 1: URL Rules (open / ignore)                               */
 /* ------------------------------------------------------------------ */
 function UrlRulesSubTab({ targetUrls, onChange }: { targetUrls: UrlRule[]; onChange: (urls: UrlRule[]) => void }) {
-  const handleAdd = (action: UrlRuleAction) => {
+  const handleAdd = (action: UrlRuleActionType) => {
     onChange([...targetUrls, { pattern: "", matchType: "contains", action }]);
   };
 
@@ -266,7 +266,7 @@ function UrlRulesSubTab({ targetUrls, onChange }: { targetUrls: UrlRule[]; onCha
 
 interface UrlRuleRowProps {
   rule: UrlRule;
-  accent: AccentEnum;
+  accent: AccentType;
   onUpdate: (field: string, value: string) => void;
   onRemove: () => void;
 }

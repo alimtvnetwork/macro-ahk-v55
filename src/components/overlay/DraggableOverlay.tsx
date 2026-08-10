@@ -13,7 +13,7 @@ import { Events } from "@/constants/events";
 
 import { useState, useRef, useCallback, useEffect, type ReactNode } from "react";
 import { GripVertical, Minus } from "lucide-react";
-import { DraggableOverlayPropsStatus } from "../../types/enums";
+import { DraggableOverlayPropsStatusType } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types & Constants                                                  */
@@ -149,7 +149,7 @@ interface DraggableOverlayProps {
     children: ReactNode;
     headerExtra?: ReactNode;
     /** Status for the minimized badge: idle | running | error */
-    status?: DraggableOverlayPropsStatus;
+    status?: DraggableOverlayPropsStatusType;
 }
 
 // eslint-disable-next-line max-lines-per-function

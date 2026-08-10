@@ -81,7 +81,7 @@ interface ChainRow {
     Name: string;
     Slug: string;
     StepsJson: string;
-    TriggerType: string;
+    TriggerType: TaskTriggerType | string;
     TriggerConfigJson: string;
     Enabled: number;
     CreatedAt: string;

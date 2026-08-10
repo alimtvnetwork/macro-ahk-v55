@@ -95,10 +95,9 @@ try {
   const root = (typeof window !== 'undefined' ? window.RiseupAsiaMacroExt : undefined);
   const hasRoot = root !== null && root !== undefined;
   const hasProjects = hasRoot && root!.Projects !== null && root!.Projects !== undefined;
-  const hasMacroController = hasProjects && !!root!.Projects.MacroController;
-  if (hasMacroController) {
-    if (!root.Projects.MacroController.meta) root.Projects.MacroController.meta = {};
-    root.Projects.MacroController.meta.version = VERSION;
+  if (hasProjects && root!.Projects!.MacroController) {
+    if (!root!.Projects!.MacroController.meta) root!.Projects!.MacroController.meta = {};
+    root!.Projects!.MacroController.meta.version = VERSION;
   }
 } catch (_e) {
   logDebug('shared-state', 'SDK namespace not yet registered — version set at injection time');

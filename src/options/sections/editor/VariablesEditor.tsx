@@ -10,7 +10,7 @@ import type { JsonValue } from "@/background/handlers/handler-types";
 import { useState, useCallback, useMemo } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { MonacoCodeEditor } from "@/components/options/LazyMonacoCodeEditor";
-import { EditorMode } from "../../../types/enums";
+import { EditorModeType } from "../../../types/enums";
 import { logError } from "@/components/options/options-logger";
 
 interface VariablesEditorProps {
@@ -18,7 +18,7 @@ interface VariablesEditorProps {
     onChange: (json: string) => void;
 }
 
-type ViewMode = EditorMode;
+type ViewMode = EditorModeType;
 
 /* ------------------------------------------------------------------ */
 /*  Tree View                                                          */

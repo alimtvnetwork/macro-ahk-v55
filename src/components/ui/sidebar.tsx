@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { State, SemanticSemanticSideEnum, SemanticSemanticVariantEnum, CollapsibleEnum, SizeEnum } from "../../types/enums";
+import { StateType, SideType, VariantType, CollapsibleType, SizeType } from "../../types/enums";
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -22,7 +22,7 @@ const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
 type SidebarContext = {
-  state: State;
+  state: StateType;
   open: boolean;
   setOpen: (open: boolean) => void;
   openMobile: boolean;
@@ -135,9 +135,9 @@ SidebarProvider.displayName = "SidebarProvider";
 const Sidebar = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
-    side?: SemanticSemanticSideEnum;
-    variant?: SemanticSemanticVariantEnum;
-    collapsible?: CollapsibleEnum;
+    side?: SideType;
+    variant?: VariantType;
+    collapsible?: CollapsibleType;
   }
 // eslint-disable-next-line max-lines-per-function
 >(({ side = "left", variant = "sidebar", collapsible = "offcanvas", className, children, ...props }, ref) => {
@@ -167,7 +167,7 @@ const Sidebar = React.forwardRef<
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
             } as React.CSSProperties
           }
-          side={side}
+          side={side as "left" | "right"}
         >
           <nav className="flex h-full w-full flex-col">{children}</nav>
         </SheetContent>
@@ -588,7 +588,7 @@ const SidebarMenuSubButton = React.forwardRef<
   HTMLAnchorElement,
   React.ComponentProps<"a"> & {
     asChild?: boolean;
-    size?: SizeEnum;
+    size?: SizeType;
     isActive?: boolean;
   }
 >(({ asChild = false, size = "md", isActive, className, ...props }, ref) => {

@@ -43,7 +43,7 @@ async function loadChains(project: string): Promise<AutomationChain[]> {
       project,
     });
 
-    return result.ok && result.chains ? result.chains : [];
+    return result.isOk && result.chains ? result.chains : [];
   } catch (err) { void 0;
 
     return [];
@@ -57,7 +57,7 @@ async function saveChainToDb(chain: Partial<AutomationChain>, project: string): 
     chain,
   } as any);
 
-  return result.ok;
+  return result.isOk;
 }
 
 async function deleteChainFromDb(chainId: string, project: string): Promise<boolean> {
@@ -67,7 +67,7 @@ async function deleteChainFromDb(chainId: string, project: string): Promise<bool
     chainId,
   } as any);
 
-  return result.ok;
+  return result.isOk;
 }
 
 async function toggleChainInDb(chainId: string, project: string): Promise<boolean> {
@@ -77,7 +77,7 @@ async function toggleChainInDb(chainId: string, project: string): Promise<boolea
     chainId,
   } as any);
 
-  return result.ok;
+  return result.isOk;
 }
 
 async function importChainsToDb(chains: AutomationChain[], project: string): Promise<number> {
@@ -95,7 +95,7 @@ async function loadProjects(): Promise<Array<{ id: string; name: string; slug: s
     const result = await sendMessage<{ isOk: boolean; projects?: Array<{ id: string; name: string; slug?: string }> }>({
       type: "GET_PROJECTS" as any,
     });
-    if (result.ok && result.projects) {
+    if (result.isOk && result.projects) {
       return result.projects.map((p) => ({
         id: p.id,
         name: p.name,

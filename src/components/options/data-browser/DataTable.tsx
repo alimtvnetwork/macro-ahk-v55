@@ -23,7 +23,7 @@ import { formatDataTimestamp } from "./data-browser-helpers";
 import { LevelBadge, CategoryBadge } from "./DataBadges";
 import type { DataBrowserFilters } from "@/hooks/use-extension-data";
 import { DatabaseType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
-import { ActiveViewEnum } from "../../../types/enums";
+import { ActiveViewType } from "../../../types/enums";
 
 interface BrowserRow {
   id: number;
@@ -39,7 +39,7 @@ interface BrowserRow {
 
 interface DataTableProps {
   activeDb: DatabaseType;
-  onDbChange: (db: ActiveViewEnum) => void;
+  onDbChange: (db: ActiveViewType) => void;
   rows: BrowserRow[];
   isLoading: boolean;
   page: number;
@@ -114,7 +114,7 @@ export function DataTable({
           <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
             Data Browser
           </CardTitle>
-          <Select value={activeDb} onValueChange={(v) => onDbChange(v as ActiveViewEnum)}>
+          <Select value={activeDb} onValueChange={(v) => onDbChange(v as ActiveViewType)}>
             <SelectTrigger className="w-32 h-8 text-xs">
               <SelectValue />
             </SelectTrigger>

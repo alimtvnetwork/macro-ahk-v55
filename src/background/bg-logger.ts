@@ -17,7 +17,6 @@
 
 import { MessageType, type MessageRequest } from "../shared/messages";
 import { handleLogError } from "./handlers/logging-handler";
-import { logCaughtError, BgLogTag } from "./bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Log Tag Enum                                                       */

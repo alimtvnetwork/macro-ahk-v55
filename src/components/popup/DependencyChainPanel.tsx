@@ -23,13 +23,13 @@ import {
   Copy,
   Check,
 } from "lucide-react";
-import { RoleEnum } from "../../types/enums";
+import { RoleType } from "../../types/enums";
 import { logError } from "@/hooks/popup-logger";
 
 interface ChainEntry {
   scriptId: string;
   scriptName: string;
-  role: RoleEnum;
+  role: RoleType;
   order: number;
   resolved: boolean;
   fetched: boolean;

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Timings } from "../../constants/timing";
 import { ServiceResult } from '../../utils/result-wrapper';
 import { useState } from "react";

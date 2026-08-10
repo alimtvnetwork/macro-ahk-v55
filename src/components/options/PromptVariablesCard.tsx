@@ -8,7 +8,7 @@ import { Variable, Plus, Trash2, Save, Copy } from "lucide-react";
 import { sendMessage } from "@/lib/message-client";
 import { toast } from "sonner";
 import { logError } from "./options-logger";
-import { FieldEnum } from "../../types/enums";
+import { FieldType } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -82,7 +82,7 @@ export function PromptVariablesCard() {
     setCustomVars((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const updateVariable = (index: number, field: FieldEnum, nextValue: string) => {
+  const updateVariable = (index: number, field: FieldType, nextValue: string) => {
     setCustomVars((prev) =>
       prev.map((v, i) => (i === index ? { ...v, [field]: nextValue } : v))
     );

@@ -20,7 +20,7 @@ import {
     AlertTriangle,
     Loader2,
 } from "lucide-react";
-import { XPathValidationEntryStatus } from "../../types/enums";
+import { XPathValidationEntryStatusType } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -31,7 +31,7 @@ interface ValidationEntry {
     xpath: string;
     selector?: string;
     found: number;
-    status: XPathValidationEntryStatus;
+    status: XPathValidationEntryStatusType;
     error?: string;
     fallbackUsed?: boolean;
 }

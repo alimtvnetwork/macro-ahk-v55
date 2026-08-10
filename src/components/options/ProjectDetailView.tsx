@@ -33,7 +33,7 @@ import { DocsTab } from "./project-detail/DocsTab";
 import { ScriptsTabContent } from "./project-detail/ScriptsTabContent";
 import { ProjectHeader } from "./project-detail/ProjectHeader";
 import { GeneralTabContent } from "./project-detail/GeneralTabContent";
-import { ProjectTabEnum } from "../../types/enums";
+import { ProjectTabType } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Lazy-loaded sub-tab panels (EXT perf: split 314KB chunk)           */
@@ -61,7 +61,7 @@ const RecorderVisualisationPanel = lazy(() => import("./recorder/RecorderVisuali
 /* ------------------------------------------------------------------ */
 
 type ProjectTab =
-  ProjectTabEnum;
+  ProjectTabType;
 
 interface Props {
   project: StoredProject;

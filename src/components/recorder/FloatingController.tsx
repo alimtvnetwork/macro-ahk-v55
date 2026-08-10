@@ -49,7 +49,7 @@ import { useDraggable } from "@/hooks/use-draggable";
 import { openExtensionOptions } from "@/lib/open-extension-options";
 import { loadPanelToggles, savePanelToggles } from "@/lib/controller-panel-toggles";
 import { StepKindId } from "@/background/recorder/step-library/schema";
-import { ControllerMode } from "../../types/enums";
+import { ControllerModeType } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types & constants                                                  */
@@ -66,14 +66,14 @@ export interface FloatingControllerProps {
     readonly onResume: () => void | Promise<void>;
     readonly onStop: () => void | Promise<void>;
     /** Optional override for SSR/tests so we don't poke window during render. */
-    readonly initialMode?: ControllerMode;
+    readonly initialMode?: ControllerModeType;
 }
 
 /* ------------------------------------------------------------------ */
 /*  OperationModeType persistence                                                   */
 /* ------------------------------------------------------------------ */
 
-function loadMode(): ControllerMode {
+function loadMode(): ControllerModeType {
     if (typeof window === "undefined") { return "compact"; }
     try {
         const raw = window.localStorage.getItem(MODE_STORAGE_KEY);
@@ -85,7 +85,7 @@ function loadMode(): ControllerMode {
     return "compact";
 }
 
-function saveMode(mode: ControllerMode): void {
+function saveMode(mode: ControllerModeType): void {
     if (typeof window === "undefined") { return; }
     try {
         window.localStorage.setItem(MODE_STORAGE_KEY, mode);
@@ -130,7 +130,7 @@ function useElapsedTicker(startedAt: string, isRunning: boolean): string {
 export function FloatingController(props: FloatingControllerProps): JSX.Element {
     const { session, activeStepGroupName, activeSubGroupName, onStart, onPause, onResume, onStop, initialMode } = props;
 
-    const [mode, setMode] = useState<ControllerMode>(() => initialMode ?? loadMode());
+    const [mode, setMode] = useState<ControllerModeType>(() => initialMode ?? loadMode());
     const [stopArmed, setStopArmed] = useState<boolean>(false);
     const stopTimer = useRef<number | null>(null);
 
@@ -183,7 +183,7 @@ export function FloatingController(props: FloatingControllerProps): JSX.Element 
      * pop up to compact so the user can see step count + chips. We
      * remember the previous mode so Stop returns the user to it. */
     const prevPhaseRef = useRef(session.Phase);
-    const prePromoteModeRef = useRef<ControllerMode | null>(null);
+    const prePromoteModeRef = useRef<ControllerModeType | null>(null);
     useEffect(() => {
         const prev = prevPhaseRef.current;
         prevPhaseRef.current = session.Phase;
@@ -481,8 +481,8 @@ function ToolToggle(props: {
 
 // eslint-disable-next-line max-lines-per-function -- shell markup is intentionally kept with drag wiring
 function FloatingShell(props: {
-    mode: ControllerMode;
-    onModeChange: (m: ControllerMode) => void;
+    mode: ControllerModeType;
+    onModeChange: (m: ControllerModeType) => void;
     children: React.ReactNode;
     testid: string;
 }): JSX.Element {
@@ -539,9 +539,9 @@ function FloatingShell(props: {
     );
 }
 
-function ModeSwitcher(props: { mode: ControllerMode; onModeChange: (m: ControllerMode) => void }): JSX.Element {
+function ModeSwitcher(props: { mode: ControllerModeType; onModeChange: (m: ControllerModeType) => void }): JSX.Element {
     const { mode, onModeChange } = props;
-    const next: Record<ControllerMode, ControllerMode> = {
+    const next: Record<ControllerModeType, ControllerModeType> = {
         mini: "compact",
         compact: "expanded",
         expanded: "mini",

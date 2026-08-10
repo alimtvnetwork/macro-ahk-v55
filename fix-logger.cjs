@@ -1,38 +1,20 @@
 const fs = require('fs');
-const path = require('path');
-
-function walk(dir) {
-    let results = [];
-    const list = fs.readdirSync(dir);
-    list.forEach(file => {
-        file = path.join(dir, file);
-        const stat = fs.statSync(file);
-        if (stat && stat.isDirectory() && !file.includes('node_modules')) {
-            results = results.concat(walk(file));
-        } else if (file.endsWith('.ts') || file.endsWith('.tsx') || file.endsWith('.js')) {
-            results.push(file);
-        }
-    });
-    return results;
+const lines = fs.readFileSync('out.txt', 'utf8').split('\n');
+const toFix = {};
+for (const line of lines) {
+  const m = line.match(/^([^:]+)\((\d+),\d+\): error TS2554: Expected 2-3 arguments, but got 4./);
+  if (m) {
+    const file = m[1];
+    const lineNum = parseInt(m[2], 10) - 1;
+    if (!toFix[file]) toFix[file] = [];
+    toFix[file].push(lineNum);
+  }
 }
-
-const files = [
-    ...walk('src'),
-    ...walk('standalone-scripts')
-];
-
-let changed = 0;
-files.forEach(f => {
-    let content = fs.readFileSync(f, 'utf8');
-    let original = content;
-
-    // The injected logger from the previous agent
-    content = content.replace(/logError\(\s*ERROR_CONTEXT_AUTOCATCH,\s*ERROR_MSG_UNHANDLED,\s*([a-zA-Z0-9_]+)\s*\);/g, 'console.error();');
-    content = content.replace(/RiseupAsiaMacroExt\.Logger\.error\(/g, 'console.error(');
-
-    if (content !== original) {
-        fs.writeFileSync(f, content);
-        changed++;
-    }
-});
-console.log('Fixed ' + changed + ' logger files.');
+for (const file in toFix) {
+  const content = fs.readFileSync(file, 'utf8').split('\n');
+  for (const lineNum of toFix[file]) {
+    content[lineNum] = content[lineNum].replace(/logError\((.*?),\s*(.*?),\s*(.*?),\s*(.*?)\)/, 'logError($1, $3, $4)');
+  }
+  fs.writeFileSync(file, content.join('\n'));
+  console.log('Fixed logError in ' + file);
+}

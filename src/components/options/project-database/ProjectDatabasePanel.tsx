@@ -28,7 +28,7 @@ import { createErrorModel, type ErrorModel } from "@/types/error-model";
 import { DEFAULT_PROJECT_DATABASES, DATABASE_KINDS, MAX_USER_DATABASES, validateNamespace, type NamespaceDatabaseRequest } from "@/types/default-databases";
 import { CreateDatabaseForm } from "./CreateDatabaseForm";
 import { DefaultDatabasesStatus } from "./DefaultDatabasesStatus";
-import { Type, JsonSchemaTabFormat } from "../../../types/enums";
+import { Type, JsonSchemaTabFormatType } from "../../../types/enums";
 import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
@@ -97,7 +97,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
         endpoint: "ProjectDatabases",
         params: { limit: 100, offset: 0 },
       });
-      if (result.ok && result.rows) {
+      if (result.isOk && result.rows) {
         const userCreated = result.rows.filter((r) => r.IsDefault !== 1).length;
         setUserDbCount(userCreated);
       }
@@ -123,7 +123,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
         endpoint: "listTables",
         params: {},
       });
-      if (result.ok && result.tables) {
+      if (result.isOk && result.tables) {
         setTables(result.tables);
       }
     } catch (err) {
@@ -165,7 +165,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
           columns: validColumns,
         },
       });
-      if (result.ok) {
+      if (result.isOk) {
         toast.success(`Table "${trimmedName}" created`);
         setShowCreateForm(false);
         setNewTableName("");
@@ -208,7 +208,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
     URL.revokeObjectURL(url);
   };
 
-  const handleDownloadDocs = async (format: JsonSchemaTabFormat) => {
+  const handleDownloadDocs = async (format: JsonSchemaTabFormatType) => {
     setDownloadingDocs(true);
     try {
       const result = await sendMessage<{ isOk: boolean; markdown?: string; prisma?: string; errorMessage?: string }>({
@@ -217,7 +217,7 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
         format,
       });
 
-      if (!result.ok) {
+      if (!result.isOk) {
         toast.error(result.errorMessage || "Failed to generate docs");
 
         return;

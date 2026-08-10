@@ -15,7 +15,7 @@ import {
   ChevronDown, ChevronRight,
 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { DiffEntryAction } from "../../../types/enums";
+import { DiffEntryActionType } from "../../../types/enums";
 
 interface SimpleTable {
   name: string;
@@ -24,7 +24,7 @@ interface SimpleTable {
 
 interface DiffEntry {
   table: string;
-  action: DiffEntryAction;
+  action: DiffEntryActionType;
   addedCols: string[];
   removedCols: string[];
   modifiedCols: string[];

@@ -60,7 +60,7 @@ const PLAN_DEFAULT_CURRENT_MARKERS = [
     'If I could find you',
 ] as const;
 
-async function rawSql(method: MethodEnum, sql: string): Promise<RawSqlResp> {
+async function rawSql(method: RunSqlMethodType, sql: string): Promise<RawSqlResp> {
     void DB_NAME;
 
     return runSqlBridge(method, sql);
@@ -423,7 +423,7 @@ async function writeSeedAuditRow(params: {
 }
 
 import { ServiceResult } from '../utils/result-wrapper';
-import { MethodEnum } from "../types/enums";
+import { RunSqlMethodType } from "../types/enums";
 
 export async function seedPlanNextPrompts(): Promise<ServiceResult<SeedResult>> {
     const startedAt = Date.now();

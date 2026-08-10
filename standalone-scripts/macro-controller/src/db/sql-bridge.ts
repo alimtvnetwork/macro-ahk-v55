@@ -47,7 +47,7 @@ export class SqlBridgeResp {
     }
 }
 
-export type LegacyMethod = MethodEnum;
+export type LegacyMethod = RunSqlMethodType;
 export type Bucket = SqlBucketType;
 
 // Candidate method names, in probe order. The background handler accepts both

@@ -787,7 +787,7 @@ function _buildPromptModalFooter(
   };
   const writeDiffPref = function (open: boolean): void {
     try { window.localStorage.setItem(diffPersistKey, open ? '1' : '0'); } catch (err) {
-      logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+      console.error();
     }
   };
   let isDiffOpen = false;

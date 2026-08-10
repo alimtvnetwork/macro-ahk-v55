@@ -6,7 +6,7 @@
  */
 
 import type { MatchResult, ScriptBindingResolved } from "../shared/types";
-import { HealthStateType, BootPersistenceModeType, TriggerType } from "../types/enums";
+import { HealthStateType, BootPersistenceModeType, TaskTriggerType } from "../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -89,7 +89,7 @@ export interface TabDecision {
     /** Resolved matches (may be empty array — empty IS a valid decision). */
     matches: MatchResult[];
     /** Trigger that produced this decision. */
-    trigger: TriggerType;
+    trigger: TaskTriggerType;
     /** Decision wall-clock timestamp (ms since epoch). */
     decidedAt: number;
 }

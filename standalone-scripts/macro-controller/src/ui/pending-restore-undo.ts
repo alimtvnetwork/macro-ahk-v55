@@ -115,7 +115,7 @@ export function clearPendingRestoreUndo(): void {
     try {
         store.removeItem(STORAGE_KEY);
     } catch (err) {
-        logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+        console.error();
     }
 }
 

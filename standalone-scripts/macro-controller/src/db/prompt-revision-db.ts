@@ -23,7 +23,7 @@ import { DbResult } from '../db/db-result';
 
 import { logDiagnosticFromCode } from '../error-utils';
 import { DB_NAME } from './db-name';
-import { runLoggedQuery } from './sql-bridge';
+import { runLoggedQuery, SqlBridgeResp } from './sql-bridge';
 import { sqlLit } from './prompt-role-db';
 import type { PromptRow } from './prompt-db';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
@@ -45,11 +45,6 @@ export interface PromptRevisionRow {
     Reason: string;
 }
 
-export interface DbResult<T> {
-    ok: boolean;
-    value?: T;
-    error?: string;
-}
 
 type RawSqlOk = SqlBridgeResp;
 
@@ -63,7 +58,7 @@ function fail<T>(where: string, message: string, context?: unknown): DbResult<T>
     const slug = extractSlugFromContext(context);
     logDiagnosticFromCode('DB_REVISION_E001', { where, slug, reason: message }, context);
 
-    return new DbResult(false, undefined, message);
+    return new DbResult<T>(false, undefined, message);
 }
 
 function extractSlugFromContext(context: unknown): string {

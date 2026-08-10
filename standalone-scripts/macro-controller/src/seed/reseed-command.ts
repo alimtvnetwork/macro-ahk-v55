@@ -107,7 +107,7 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
         detail: 'seedPlanNextPrompts: ' + (seedResult.error ?? '?'),
       });
 
-      return { ok: false, mode, error: seedResult.error ?? 'seed failed' };
+      return { ok: false, mode, error: String(seedResult.error ?? 'seed failed') };
     }
     let forcedUpdates: number | undefined;
     if (force) {

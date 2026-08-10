@@ -92,7 +92,7 @@ async function collectRoleList(role: PromptRole, snapshot: RoleSnapshot): Promis
     }
     snapshot.roleListError = listed.isSuccess ? '(empty)' : (listed.error ?? 'unknown');
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     snapshot.roleListThrew = err instanceof Error ? err.message : String(err);
   }
 }
@@ -124,7 +124,7 @@ async function collectSlugOwner(
     const bySlug = await getPromptBySlug(slug);
     recordSlugOwner(bySlug as Parameters<typeof recordSlugOwner>[0], role, snapshot);
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     snapshot.slugLookupThrew = err instanceof Error ? err.message : String(err);
   }
 }
@@ -193,7 +193,7 @@ export async function openPromptEditor(input: OpenPromptEditorInput): Promise<vo
     if (templatePreview) modalOptions.templatePreview = templatePreview;
     openPromptCreationModal(rc.ctx, rc.taskNextDeps, editPrompt, prefill, modalOptions);
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     const reason = err instanceof Error ? err.message : String(err);
     reportEditorFailure(
       'PROMPT_EDIT_E003',
@@ -242,7 +242,7 @@ async function resolveRequiredTokensForRole(role: PromptRole): Promise<string[]>
       for (const t of extractParamTokens(result.value.Body)) tokens.add(t);
     }
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     const snap = await buildRoleDiagnosticSnapshot(role);
     const context: DiagnosticContext = {
       ...snap,
@@ -411,7 +411,7 @@ export async function openDefaultPromptEditor(role: PromptRole): Promise<void> {
       '❌ No default prompt found for ' + role,
     );
   } catch (err) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, err);
+    console.error();
     await handleOpenDefaultError(role, seedRow, err);
   }
 }

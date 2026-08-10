@@ -1,0 +1,88 @@
+src/background/bg-logger.ts(20,10): error TS2440: Import declaration conflicts with local declaration of 'logCaughtError'.
+src/background/bg-logger.ts(20,26): error TS2395: Individual declarations in merged declaration 'BgLogTag' must be all exported or all local.
+src/background/bg-logger.ts(20,26): error TS2440: Import declaration conflicts with local declaration of 'BgLogTag'.
+src/background/bg-logger.ts(27,19): error TS2395: Individual declarations in merged declaration 'BgLogTag' must be all exported or all local.
+src/background/recorder/step-library/result-webhook.ts(557,21): error TS2304: Cannot find name 'ServiceResult'.
+src/background/state-manager.ts(9,52): error TS2305: Module '"../types/enums"' has no exported member 'TriggerType'.
+src/components/automation/AutomationView.tsx(46,19): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; chains?: AutomationChain[] | undefined; }'.
+src/components/automation/AutomationView.tsx(60,17): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; }'.
+src/components/automation/AutomationView.tsx(70,17): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; }'.
+src/components/automation/AutomationView.tsx(80,17): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; }'.
+src/components/automation/AutomationView.tsx(98,16): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; projects?: { id: string; name: string; slug?: string | undefined; }[] | undefined; }'.
+src/components/options/ActivityLogTimeline.tsx(501,18): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; }'.
+src/components/options/BatchRenameDialog.tsx(55,10): error TS2724: '"../../types/enums"' has no exported member named 'ModeType'. Did you mean 'CodeType'?
+src/components/options/BatchRenameDialog.tsx(55,20): error TS2305: Module '"../../types/enums"' has no exported member 'KindType'.
+src/components/options/BatchRenameDialog.tsx(127,74): error TS2366: Function lacks ending return statement and return type does not include 'undefined'.
+src/components/options/LibraryView.tsx(287,17): error TS2304: Cannot find name 'ActionEnum'.
+src/components/options/project-database/DefaultDatabasesStatus.tsx(70,26): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; rows?: unknown[] | undefined; total?: number | undefined; }'.
+src/components/options/project-database/JsonSchemaTab.tsx(215,19): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; tables?: { TableName: string; Description?: string | undefined; }[] | undefined; columns?: { TableName: string; Name: string; Type: string; NotNull?: boolean | undefined; Unique?: boolean | undefined; Default?: string | undefined; Description?: string | undefined; ValidationJson?: string | undefined...'.
+src/components/options/project-database/JsonSchemaTab.tsx(297,19): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; tables?: { TableName: string; Description?: string | undefined; }[] | undefined; columns?: { TableName: string; Name: string; Type: string; NotNull?: boolean | undefined; Unique?: boolean | undefined; Default?: string | undefined; Description?: string | undefined; ValidationJson?: string | undefined...'.
+src/components/options/project-database/JsonSchemaTab.tsx(403,18): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; result?: MigrationResult | undefined; errorMessage?: string | undefined; }'.
+src/components/options/project-database/JsonSchemaTab.tsx(436,18): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; markdown?: string | undefined; prisma?: string | undefined; errorMessage?: string | undefined; }'.
+src/components/options/project-database/KeyValueBrowser.tsx(70,18): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; rows?: KvEntry[] | undefined; total?: number | undefined; }'.
+src/components/options/project-database/ProjectDatabasePanel.tsx(100,18): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; rows?: { IsDefault?: number | undefined; }[] | undefined; }'.
+src/components/options/project-database/ProjectDatabasePanel.tsx(126,18): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; tables?: TableInfo[] | undefined; }'.
+src/components/options/project-database/ProjectDatabasePanel.tsx(168,18): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; errorMessage?: string | undefined; }'.
+src/components/options/project-database/ProjectDatabasePanel.tsx(220,19): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; markdown?: string | undefined; prisma?: string | undefined; errorMessage?: string | undefined; }'.
+src/components/options/project-database/SchemaTab.tsx(160,14): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; created?: number | undefined; migrated?: number | undefined; errorMessage?: string | undefined; errors?: string[] | undefined; }'.
+src/components/options/project-database/SchemaTab.tsx(164,15): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; created?: number | undefined; migrated?: number | undefined; errorMessage?: string | undefined; errors?: string[] | undefined; }'.
+src/components/options/project-database/SchemaTab.tsx(166,17): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; created?: number | undefined; migrated?: number | undefined; errorMessage?: string | undefined; errors?: string[] | undefined; }'.
+src/components/options/project-database/SchemaVersionHistory.tsx(55,16): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; value?: string | undefined; }'.
+src/components/options/project-database/useConfigDb.ts(36,16): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; rows?: ConfigRow[] | undefined; errorMessage?: string | undefined; }'.
+src/components/options/project-database/useConfigDb.ts(58,16): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; errorMessage?: string | undefined; }'.
+src/components/options/project-database/useConfigDb.ts(91,18): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; }'.
+src/components/options/project-database/useConfigDb.ts(109,16): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; errorMessage?: string | undefined; }'.
+src/components/options/project-database/useSchemaBuilder.ts(87,17): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; tables?: { Name: string; Description?: string | undefined; }[] | undefined; columns?: { TableName: string; Name: string; Type: string; Nullable?: boolean | undefined; Unique?: boolean | undefined; DefaultValue?: string | undefined; Description?: string | undefined; }[] | undefined; relations?: { ......'.
+src/components/options/project-database/useSchemaBuilder.ts(189,18): error TS2339: Property 'ok' does not exist on type 'ApplyResult'.
+src/components/options/project-detail/DocsTab.tsx(37,16): error TS2339: Property 'ok' does not exist on type '{ isOk: boolean; markdown?: string | undefined; prisma?: string | undefined; errorMessage?: string | undefined; }'.
+src/components/options/project-storage.ts(36,86): error TS2554: Expected 2-3 arguments, but got 4.
+src/components/options/ProjectGroupPanel.tsx(119,86): error TS2554: Expected 2-3 arguments, but got 4.
+src/components/options/RecoveryIndicator.tsx(4,10): error TS2305: Module '"../../types/enums"' has no exported member 'SemanticSemanticType'.
+src/components/options/StorageBrowserView.tsx(76,23): error TS2552: Cannot find name 'StorageSurfaceEnum'. Did you mean 'StorageSurface'?
+src/components/popup/InjectionCopyButton.tsx(221,90): error TS2554: Expected 2-3 arguments, but got 4.
+src/components/popup/InjectionCopyButton.tsx(244,90): error TS2554: Expected 2-3 arguments, but got 4.
+src/components/popup/InjectionCopyButton.tsx(272,92): error TS2554: Expected 2-3 arguments, but got 4.
+src/components/popup/InjectionErrorPanel.tsx(364,88): error TS2554: Expected 2-3 arguments, but got 4.
+src/components/recorder/__tests__/BulkRenameSequenceDialog.help-tooltip.test.tsx(20,90): error TS2554: Expected 2-3 arguments, but got 4.
+src/components/recorder/DriftElementDiffView.tsx(49,38): error TS2322: Type '"ok"' is not assignable to type 'ToneType'.
+src/components/recorder/DriftElementDiffView.tsx(52,53): error TS2322: Type '"error"' is not assignable to type 'ToneType'.
+src/components/recorder/DriftElementDiffView.tsx(53,54): error TS2322: Type '"info"' is not assignable to type 'ToneType'.
+src/components/recorder/DriftElementDiffView.tsx(54,54): error TS2322: Type '"error"' is not assignable to type 'ToneType'.
+src/components/recorder/DriftElementDiffView.tsx(210,9): error TS2367: This comparison appears to be unintentional because the types 'ToneType' and '"ok"' have no overlap.
+src/components/recorder/DriftElementDiffView.tsx(218,9): error TS2367: This comparison appears to be unintentional because the types 'ToneType' and '"error"' have no overlap.
+src/components/recorder/ExecutionNextBadge.tsx(28,21): error TS2367: This comparison appears to be unintentional because the types 'BranchType' and '"Failure"' have no overlap.
+src/components/recorder/ExecutionNextBadge.tsx(68,43): error TS2322: Type '"Default"' is not assignable to type 'BranchType'.
+src/components/recorder/ExecutionNextBadge.tsx(73,57): error TS2322: Type '"Failure"' is not assignable to type 'BranchType'.
+src/components/ui/chart.tsx(101,19): error TS2304: Cannot find name 'IndicatorEnum'.
+src/components/ui/sidebar.tsx(170,11): error TS2322: Type 'string' is not assignable to type '"top" | "left" | "right" | "bottom" | null | undefined'.
+src/hooks/use-version-check.ts(139,17): error TS2339: Property 'ok' does not exist on type 'ScriptInfoResponse'.
+src/lib/automation-types.ts(1,51): error TS2305: Module '"../types/enums"' has no exported member 'TriggerType'.
+src/platform/chrome-adapter.ts(105,35): error TS2339: Property 'ok' does not exist on type 'BackgroundErrorEnvelope'.
+src/platform/chrome-adapter.ts(133,26): error TS2339: Property 'ok' does not exist on type 'BackgroundPingResponse & { type?: string | undefined; }'.
+src/popup/components/InjectionResults.tsx(72,41): error TS2339: Property 'isFail' does not exist on type 'InjectionResultEntry'.
+standalone-scripts/macro-controller/src/db/prompt-db.ts(29,10): error TS2300: Duplicate identifier 'DbResult'.
+standalone-scripts/macro-controller/src/db/prompt-db.ts(30,10): error TS2300: Duplicate identifier 'DbResult'.
+standalone-scripts/macro-controller/src/db/prompt-db.ts(31,10): error TS2300: Duplicate identifier 'DbResult'.
+standalone-scripts/macro-controller/src/db/prompt-db.ts(32,10): error TS2300: Duplicate identifier 'DbResult'.
+standalone-scripts/macro-controller/src/db/prompt-db.ts(33,10): error TS2305: Module '"../types/enums"' has no exported member 'MethodType'.
+standalone-scripts/macro-controller/src/db/prompt-db.ts(65,17): error TS2304: Cannot find name 'SqlBridgeResp'.
+standalone-scripts/macro-controller/src/db/prompt-db.ts(79,5): error TS2322: Type 'DbResult<undefined>' is not assignable to type 'DbResult<T>'.
+  Type 'undefined' is not assignable to type 'T'.
+    'T' could be instantiated with an arbitrary type which could be unrelated to 'undefined'.
+standalone-scripts/macro-controller/src/db/prompt-revision-db.ts(1,10): error TS2440: Import declaration conflicts with local declaration of 'DbResult'.
+standalone-scripts/macro-controller/src/db/prompt-revision-db.ts(54,17): error TS2304: Cannot find name 'SqlBridgeResp'.
+standalone-scripts/macro-controller/src/db/prompt-revision-db.ts(66,5): error TS2322: Type 'DbResult<undefined>' is not assignable to type 'DbResult<T>'.
+  Type 'undefined' is not assignable to type 'T'.
+    'T' could be instantiated with an arbitrary type which could be unrelated to 'undefined'.
+standalone-scripts/macro-controller/src/db/prompt-role-db.ts(37,86): error TS2366: Function lacks ending return statement and return type does not include 'undefined'.
+standalone-scripts/macro-controller/src/db/sql-bridge.ts(50,28): error TS2304: Cannot find name 'MethodEnum'.
+standalone-scripts/macro-controller/src/seed/prompt-health-check.ts(143,27): error TS2322: Type '"health.default.ok"' is not assignable to type 'PromptSeedEventType'.
+standalone-scripts/macro-controller/src/seed/reseed-command.ts(110,33): error TS2322: Type '{}' is not assignable to type 'string'.
+standalone-scripts/macro-controller/src/seed/seed-plan-next.ts(426,10): error TS2305: Module '"../types/enums"' has no exported member 'MethodType'.
+standalone-scripts/macro-controller/src/shared-state.ts(98,47): error TS2532: Object is possibly 'undefined'.
+standalone-scripts/macro-controller/src/shared-state.ts(100,10): error TS18048: 'root.Projects' is possibly 'undefined'.
+standalone-scripts/macro-controller/src/shared-state.ts(100,10): error TS18048: 'root.Projects.MacroController' is possibly 'undefined'.
+standalone-scripts/macro-controller/src/shared-state.ts(100,46): error TS18048: 'root.Projects' is possibly 'undefined'.
+standalone-scripts/macro-controller/src/shared-state.ts(100,46): error TS18048: 'root.Projects.MacroController' is possibly 'undefined'.
+standalone-scripts/macro-controller/src/shared-state.ts(101,5): error TS18048: 'root.Projects' is possibly 'undefined'.
+standalone-scripts/macro-controller/src/shared-state.ts(101,5): error TS18048: 'root.Projects.MacroController' is possibly 'undefined'.

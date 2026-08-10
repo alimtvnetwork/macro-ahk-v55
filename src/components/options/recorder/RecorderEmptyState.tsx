@@ -8,7 +8,7 @@
 
 import { AlertCircle, CheckCircle2, Circle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CauseStatus } from "../../../types/enums";
+import { CauseStatusType } from "../../../types/enums";
 
 export interface RecorderEmptyStateProps {
     readonly projectSlug: string;
@@ -19,7 +19,7 @@ export interface RecorderEmptyStateProps {
 interface CauseRow {
     readonly title: string;
     readonly detail: string;
-    readonly status: CauseStatus;
+    readonly status: CauseStatusType;
     readonly action?: { label: string; onClick: () => void };
 }
 
@@ -98,7 +98,7 @@ export function RecorderEmptyState({
     );
 }
 
-function CauseIcon({ status }: { status: CauseStatus }): JSX.Element {
+function CauseIcon({ status }: { status: CauseStatusType }): JSX.Element {
     if (status === "ok") {
         return <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />;
     }

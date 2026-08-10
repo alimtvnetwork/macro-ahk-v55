@@ -84,7 +84,7 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
         errorMessage?: string;
       }>({ type: "GENERATE_SCHEMA_DOCS", project: projectSlug, format: "meta" });
 
-      if (!resp.ok) { toast.error(resp.errorMessage || "Failed to load schema");
+      if (!resp.isOk) { toast.error(resp.errorMessage || "Failed to load schema");
 
  return; }
 
@@ -186,7 +186,7 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
         type: "APPLY_JSON_SCHEMA", project: projectSlug, schema: JSON.stringify(schema),
       });
       setLastResult(result);
-      if (result.ok) {
+      if (result.isOk) {
         toast.success(`Schema applied: ${result.created ?? 0} created, ${result.migrated ?? 0} migrated`);
         onMigrationComplete();
       } else {

@@ -12,10 +12,10 @@ import { CookiesTable } from "./CookiesTable";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
-import { ActiveViewEnum } from "../../../types/enums";
+import { ActiveViewType } from "../../../types/enums";
 import { DatabaseType } from "../../../../standalone-scripts/macro-controller/src/types/enums";
 
-type ActiveView = ActiveViewEnum;
+type ActiveView = ActiveViewType;
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;

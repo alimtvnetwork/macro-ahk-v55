@@ -33,7 +33,7 @@ async function readProjectStorageKey(storage: ProjectStorageLocal): Promise<Reco
     const out = await storage.get("marco_projects");
     if (out && typeof out === "object") return out;
   } catch (err) {
-    logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err); 
+    logError("AutoCatch", "Automatically caught swallowed error", err); 
 }
 
   return new Promise((resolve) => {

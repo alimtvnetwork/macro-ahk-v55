@@ -361,7 +361,7 @@ function ClearAllButton({ onCleared }: { onCleared: () => void }) {
       onCleared();
     } catch (err) { 
       // ignore
-      logError("AutoCatch", "Swallowed error", "Automatically caught swallowed error", err);
+      logError("AutoCatch", "Automatically caught swallowed error", err);
     }
     setClearing(false);
   };

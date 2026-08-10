@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Chain Runner — Spec 21
  *

@@ -49,7 +49,7 @@ import {
 import { toast } from "sonner";
 import { StorageRuntimePanels } from "./StorageRuntimePanels";
 import { logError } from "./options-logger";
-import { StorageSurfaceEnum, SemanticSemantic162dadd } from "../../types/enums";
+import { StorageSurfaceType } from "../../types/enums";
 
 const JsonSchemaTab = lazy(() =>
   import("./project-database/JsonSchemaTab").then(m => ({ default: m.JsonSchemaTab }))
@@ -73,7 +73,7 @@ interface ColumnInfo {
   pk: boolean;
 }
 
-type StorageSurface = StorageSurfaceEnum;
+type StorageSurface = StorageSurfaceType;
 
 /** Columns that should be read-only in the editor. */
 const READ_ONLY_COLUMNS = new Set([
@@ -440,7 +440,7 @@ export function StorageBrowserView() {
               <ArrowLeft className="h-3.5 w-3.5" /> All Categories
             </Button>
           </div>
-          <StorageRuntimePanels surface={activeSurface as SemanticSemantic162dadd} />
+          <StorageRuntimePanels surface={activeSurface as StorageSurfaceType} />
         </>
       )}
     </div>

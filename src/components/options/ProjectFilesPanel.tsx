@@ -43,7 +43,7 @@ import {
 } from "lucide-react";
 import { MonacoCodeEditor } from "./LazyMonacoCodeEditor";
 import { toast } from "sonner";
-import { LanguageEnum } from "../../types/enums";
+import { LanguageType } from "../../types/enums";
 import { logError } from "@/components/options/options-logger";
 
 /* ------------------------------------------------------------------ */
@@ -119,7 +119,7 @@ function buildTree(files: ProjectFile[]): FileNode[] {
   return root.children;
 }
 
-function getLanguage(filename: string): LanguageEnum {
+function getLanguage(filename: string): LanguageType {
   const ext = filename.split(".").pop()?.toLowerCase() ?? "";
   if (ext === "json") return "json";
   if (["md", "markdown", "txt", "prompt"].includes(ext)) return "markdown";

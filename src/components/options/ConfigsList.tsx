@@ -21,7 +21,7 @@ import { JsonTreeEditor } from "./JsonTreeEditor";
 import { MonacoCodeEditor } from "./LazyMonacoCodeEditor";
 import type { StoredConfig } from "@/hooks/use-projects-scripts";
 import { toast } from "sonner";
-import { EditorMode } from "../../types/enums";
+import { EditorModeType } from "../../types/enums";
 import { logError } from "@/components/options/options-logger";
 
 interface Props {
@@ -37,7 +37,7 @@ interface FormState {
   name: string;
   description: string;
   json: string;
-  editorMode: EditorMode;
+  editorMode: EditorModeType;
 }
 
 const emptyForm: FormState = {
@@ -132,7 +132,7 @@ export function ConfigsList({ configs, loading, onSave, onDelete }: Props) {
             {/* Tree / Raw toggle */}
             <Tabs
               value={form.editorMode}
-              onValueChange={(v) => setForm((f) => ({ ...f, editorMode: v as EditorMode }))}
+              onValueChange={(v) => setForm((f) => ({ ...f, editorMode: v as EditorModeType }))}
             >
               <TabsList className="h-7">
                 <TabsTrigger value="tree" className="text-[10px] gap-1 h-6 hover:bg-primary/15 hover:text-primary">

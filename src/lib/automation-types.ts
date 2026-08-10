@@ -1,4 +1,4 @@
-import { StepNotifyLevelType, ConditionCheckType, TriggerType, ChainRunnerStatusType, BranchLabelType } from "../types/enums";
+import { StepNotifyLevelType, ConditionCheckType, TaskTriggerType, ChainRunnerStatusType, BranchLabelType } from "../types/enums";
 import { ChainStepStatusType } from "../../standalone-scripts/macro-controller/src/types/enums";
 
 /**
@@ -110,7 +110,7 @@ export interface AutomationChain {
   name: string;
   slug: string;
   steps: ChainStep[];
-  triggerType: TriggerType;
+  triggerType: TaskTriggerType;
   triggerConfig?: TriggerConfig;
   enabled: boolean;
   createdAt: string;

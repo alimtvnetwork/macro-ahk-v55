@@ -14,7 +14,7 @@
 
 import { logDiagnosticFromCode } from '../error-utils';
 import { DB_NAME } from './db-name';
-import { runLoggedQuery } from './sql-bridge';
+import { runLoggedQuery, SqlBridgeResp } from './sql-bridge';
 import { isPromptRole, type PromptRole } from '../types/prompt-role';
 import { enforceSingleDefaultPerRole, sqlLit, type EnforceResult } from './prompt-role-db';
 import { assertParamTokensUnchanged } from './prompt-token-guard';
@@ -28,9 +28,7 @@ import {
 } from './prompt-defaults';
 import { DbResult } from './db-result';
 export { DbResult };
-import { DbResult } from './db-result';
-export { DbResult };
-import { MethodEnum } from "../types/enums";
+import { RunSqlMethodType } from "../types/enums";
 
 export interface PromptRow {
     Id: number;
@@ -64,7 +62,7 @@ export interface UpsertInput {
 
 type RawSqlOk = SqlBridgeResp;
 
-async function runSql(method: MethodEnum, sql: string): Promise<RawSqlOk> {
+async function runSql(method: RunSqlMethodType, sql: string): Promise<RawSqlOk> {
     // Delegates to the adaptive bridge (see db/sql-bridge.ts). The legacy
     // 'QUERY' | 'SCHEMA' signature is preserved for call-site compatibility;
     // the bridge maps it onto whichever method name the backend accepts.
@@ -76,7 +74,7 @@ async function runSql(method: MethodEnum, sql: string): Promise<RawSqlOk> {
 function fail<T>(where: string, message: string, context?: unknown): DbResult<T> {
     logDiagnosticFromCode('DB_PROMPT_E001', { where, reason: message }, context);
 
-    return new DbResult(false, undefined, message);
+    return new DbResult<T>(false, undefined, message);
 }
 
 function rowToPrompt(r: unknown): PromptRow {

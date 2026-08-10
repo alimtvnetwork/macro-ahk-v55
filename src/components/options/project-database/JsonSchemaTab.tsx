@@ -26,7 +26,7 @@ import { sendMessage } from "@/lib/message-client";
 import { ErrorModal } from "./ErrorModal";
 import { createErrorModel, type ErrorModel } from "@/types/error-model";
 import { logError } from "../options-logger";
-import { JsonSchemaTabFormat } from "../../../types/enums";
+import { JsonSchemaTabFormatType } from "../../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Example template                                                    */
@@ -212,7 +212,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
         format: "meta",
       });
 
-      if (!result.ok || !result.tables?.length) {
+      if (!result.isOk || !result.tables?.length) {
         toast.info("No tables found in MetaTables. Apply a schema first.");
 
         return;
@@ -294,7 +294,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
         format: "meta",
       });
 
-      if (!result.ok || !result.tables?.length) {
+      if (!result.isOk || !result.tables?.length) {
         setDbSchemaJson(JSON.stringify({ version: "1.0.0", tables: [] }, null, 2));
         setDiffMode(true);
         toast.info("No existing tables in DB — showing empty baseline");
@@ -400,7 +400,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
         schema: validation.schema,
       });
 
-      if (result.ok && result.result) {
+      if (result.isOk && result.result) {
         setLastResult(result.result);
         toast.success(
           `Migration complete: ${result.result.tablesCreated} table(s), ${result.result.columnsAdded} column(s), ${result.result.relationsCreated} relation(s)`,
@@ -424,7 +424,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
   };
 
   /* ---- Generate Docs ---- */
-  const handleGenerateDocs = async (format: JsonSchemaTabFormat) => {
+  const handleGenerateDocs = async (format: JsonSchemaTabFormatType) => {
     setGeneratingDocs(true);
     try {
       const result = await sendMessage<{ isOk: boolean; markdown?: string; prisma?: string; errorMessage?: string }>({
@@ -433,7 +433,7 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
         format,
       });
 
-      if (result.ok) {
+      if (result.isOk) {
         setDocsOutput({ markdown: result.markdown, prisma: result.prisma });
         toast.success("Docs generated");
       } else {

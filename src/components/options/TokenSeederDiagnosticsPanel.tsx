@@ -19,11 +19,11 @@ import {
     loadDiagnosticsCache,
     saveDiagnosticsCache,
 } from "./token-seeder-diagnostics-cache";
-import { AccessDeniedCodeEnum } from "../../types/enums";
+import { AccessDeniedCodeType } from "../../types/enums";
 import { logError } from "@/components/options/options-logger";
 
 type AccessDeniedCode =
-    AccessDeniedCodeEnum;
+    AccessDeniedCodeType;
 
 interface InaccessibleSeedTarget {
     tabId: number;

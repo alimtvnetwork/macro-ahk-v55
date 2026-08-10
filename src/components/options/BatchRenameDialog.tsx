@@ -52,7 +52,7 @@ import {
     STEP_GROUP_NAME_MAX_LEN,
     validateStepGroupName,
 } from "./step-group-name-validator";
-import { SemanticSemanticMode, SemanticSemanticKindEnum } from "../../types/enums";
+import { SemanticModeType } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Public types                                                       */
@@ -86,10 +86,9 @@ export interface BatchRenameDialogProps {
 /*  Transforms                                                         */
 /* ------------------------------------------------------------------ */
 
-type OperationModeType = SemanticSemanticMode;
 
 interface TransformInput {
-    readonly OperationModeType: OperationModeType;
+    readonly SemanticModeType: SemanticModeType;
     readonly Find: string;
     readonly Replace: string;
     readonly Prefix: string;
@@ -125,7 +124,7 @@ function applySequence(t: TransformInput, index: number): string {
 }
 
 function applyTransform(name: string, t: TransformInput, index: number): string {
-    switch (t.OperationModeType) {
+    switch (t.SemanticModeType) {
         case "replace":
             // Empty Find = identity. Splitting on empty string would
             // explode the name into per-character pieces.
@@ -138,6 +137,8 @@ function applyTransform(name: string, t: TransformInput, index: number): string 
             return `${name}${t.Suffix}`;
         case "sequence":
             return applySequence(t, index);
+        default:
+            return name;
     }
 }
 
@@ -223,8 +224,8 @@ function buildPreview(
 /* ------------------------------------------------------------------ */
 
 interface BatchRenameFormState {
-    readonly mode: OperationModeType;
-    readonly setMode: (m: OperationModeType) => void;
+    readonly mode: SemanticModeType;
+    readonly setMode: (m: SemanticModeType) => void;
     readonly find: string;
     readonly setFind: (v: string) => void;
     readonly replace: string;
@@ -245,7 +246,7 @@ interface BatchRenameFormState {
 }
 
 function useBatchRenameForm(): BatchRenameFormState {
-    const [mode, setMode] = useState<OperationModeType>("replace");
+    const [mode, setMode] = useState<SemanticModeType>("replace");
     const [find, setFind] = useState("");
     const [replace, setReplace] = useState("");
     const [prefix, setPrefix] = useState("");
@@ -255,7 +256,7 @@ function useBatchRenameForm(): BatchRenameFormState {
     const [sequencePadding, setSequencePadding] = useState(1);
     const [sequenceSeparator, setSequenceSeparator] = useState(" ");
     const transform: TransformInput = {
-        OperationModeType: mode, Find: find, Replace: replace,
+        SemanticModeType: mode, Find: find, Replace: replace,
         Prefix: prefix, Suffix: suffix,
         SequenceBase: sequenceBase, SequenceStart: sequenceStart,
         SequencePadding: sequencePadding, SequenceSeparator: sequenceSeparator,
@@ -306,7 +307,7 @@ function ReplaceTab({ find, setFind, replace, setReplace }: {
 function AffixTab({ id, label, placeholder, value, setValue, kind }: {
     id: string; label: string; placeholder: string;
     value: string; setValue: (v: string) => void;
-    kind: SemanticSemanticKindEnum;
+    kind: SemanticModeType;
 }) {
     return (
         <TabsContent value={kind} className="space-y-2 pt-3">
@@ -370,7 +371,7 @@ function SequenceTab(p: SequenceTabProps) {
 
 function ModeTabs({ form }: { form: BatchRenameFormState }) {
     return (
-        <Tabs value={form.mode} onValueChange={(v) => form.setMode(v as OperationModeType)}>
+        <Tabs value={form.mode} onValueChange={(v) => form.setMode(v as SemanticModeType)}>
             <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="replace">Find &amp; replace</TabsTrigger>
                 <TabsTrigger value="prefix">Add prefix</TabsTrigger>

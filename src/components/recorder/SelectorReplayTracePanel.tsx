@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Marco Extension — Selector Replay Trace Panel
  *

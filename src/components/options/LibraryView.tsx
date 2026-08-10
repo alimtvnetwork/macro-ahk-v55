@@ -121,7 +121,7 @@ interface ProjectGroup {
 /* ------------------------------------------------------------------ */
 
 import { SyncBadge } from "./SyncBadge";
-import { AssetType, ActionEnum, SemanticSemantic48fffa } from "../../types/enums";
+import { AssetType, ActionType, AssetsGroupsType } from "../../types/enums";
 import { LinkStateType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 import { logError } from "@/components/options/options-logger";
 
@@ -284,7 +284,7 @@ export function PromoteDialog({ open, onOpenChange, onPromoted }: PromoteDialogP
     setPromoting(true);
     try {
       const result = await sendMessage<{
-        action: ActionEnum;
+        action: ActionType;
         assetId?: number;
         existingVersion?: string;
       }>({
@@ -666,7 +666,7 @@ export function LibraryView() {
   const [promoteOpen, setPromoteOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<SharedAsset | null>(null);
   const [importExportLoading, setImportExportLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<SemanticSemantic48fffa>("assets");
+  const [activeTab, setActiveTab] = useState<AssetsGroupsType>("assets");
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -912,7 +912,7 @@ export function LibraryView() {
       </div>
 
       {/* Top-level Assets / Groups tabs */}
-      <Tabs value={activeTab} onValueChange={v => setActiveTab(v as SemanticSemantic48fffa)}>
+      <Tabs value={activeTab} onValueChange={v => setActiveTab(v as AssetsGroupsType)}>
         <TabsList className="h-9">
           <TabsTrigger value="assets" className="text-xs px-3 gap-1.5" data-testid="library-tab-assets">
             <Library className="h-3.5 w-3.5" />

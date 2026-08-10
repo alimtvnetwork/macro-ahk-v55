@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { OrientationEnum } from "../../types/enums";
+import { OrientationType } from "../../types/enums";
 
 type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
@@ -14,7 +14,7 @@ type CarouselPlugin = UseCarouselParameters[1];
 type CarouselProps = {
   opts?: CarouselOptions;
   plugins?: CarouselPlugin;
-  orientation?: OrientationEnum;
+  orientation?: OrientationType;
   setApi?: (api: CarouselApi) => void;
 };
 

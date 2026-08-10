@@ -3,7 +3,7 @@
  * Defers the ~2MB Monaco bundle until the editor is actually rendered.
  */
 import { lazy, Suspense } from "react";
-import { LanguageEnum } from "../../types/enums";
+import { LanguageType } from "../../types/enums";
 
 const MonacoCodeEditorLazy = lazy(() =>
   import("./MonacoCodeEditor").then((m) => ({ default: m.MonacoCodeEditor }))
@@ -12,7 +12,7 @@ const MonacoCodeEditorLazy = lazy(() =>
 interface Props {
   value: string;
   onChange: (v: string) => void;
-  language: LanguageEnum;
+  language: LanguageType;
   height?: string;
   readOnly?: boolean;
 }

@@ -339,7 +339,7 @@ async function parseAndEnqueueLatestReply(expectedN: number): Promise<void> {
     log('TaskSplitter: enqueued ' + added.length + '/' + expectedN + ' tasks for project ' + projectId, 'info');
     showPasteToast('✅ Task Splitter: queued ' + added.length + ' tasks', false);
   } catch (caught: CaughtError) {
-    logError(ERROR_CONTEXT_AUTOCATCH, ERROR_MSG_UNHANDLED, caught);
+    console.error();
     reportSplitterParseFailure(caught, expectedN);
   }
 }

@@ -67,7 +67,7 @@ export function DefaultDatabasesStatus({ projectSlug }: DefaultDatabasesStatusPr
 
         updated.push({
           name: def.databaseName,
-          exists: result.ok,
+          exists: result.isOk,
           rowCount: result.total ?? 0,
           loading: false,
         });

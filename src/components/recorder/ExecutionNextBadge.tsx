@@ -18,13 +18,13 @@ import {
     type ExecutionNextPreview,
     type NextNode,
 } from "@/background/recorder/execution-next-preview";
-import { SemanticSemanticBranchEnum } from "../../types/enums";
+import { DefaultSuccessType } from "../../types/enums";
 
 interface ExecutionNextBadgeProps {
     readonly preview: ExecutionNextPreview;
 }
 
-function NodePill({ node, branch }: { node: NextNode; branch: SemanticSemanticBranchEnum }) {
+function NodePill({ node, branch }: { node: NextNode; branch: DefaultSuccessType }) {
     const variant = branch === "Failure" ? "destructive"
         : node.Kind === "End" ? "outline"
         : node.Kind === "Project" ? "default"

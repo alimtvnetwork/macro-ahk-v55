@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Shield, Play, Copy, Check, Loader2 } from "lucide-react";
 import { sendMessage } from "@/lib/message-client";
-import { Status, VariantEnum } from "../../types/enums";
+import { StatusType, VariantType } from "../../types/enums";
 import { logError } from "@/components/options/options-logger";
 
 interface AuthStrategyResult {
@@ -24,14 +24,14 @@ interface AuthStrategyResult {
 }
 
 interface AuthHealthData {
-    status: Status;
+    status: StatusType;
     resolvedVia: string | null;
     totalMs: number;
     strategies: AuthStrategyResult[];
     checkedAt: string;
 }
 
-const STATUS_CONFIG: Record<string, { icon: string; variant: VariantEnum; label: string }> = {
+const STATUS_CONFIG: Record<string, { icon: string; variant: VariantType; label: string }> = {
     authenticated: { icon: "🟢", variant: "default", label: "Authenticated" },
     degraded: { icon: "🟡", variant: "secondary", label: "Degraded" },
     unauthenticated: { icon: "🔴", variant: "destructive", label: "Unauthenticated" },
@@ -64,7 +64,7 @@ export function AuthHealthPanel() {
         if (!data) return;
         const lines = [
             "=== Auth Health Report ===",
-            `Status: ${data.status}`,
+            `StatusType: ${data.status}`,
             `Resolved via: ${data.resolvedVia ?? "none"}`,
             `Total: ${data.totalMs}ms`,
             `Checked: ${data.checkedAt}`,
@@ -125,7 +125,7 @@ export function AuthHealthPanel() {
 
                 {data && statusConfig && (
                     <div className="space-y-3">
-                        {/* Status bar */}
+                        {/* StatusType bar */}
                         <div className="flex items-center gap-3 text-sm">
                             <Badge variant={statusConfig.variant}>
                                 {statusConfig.icon} {statusConfig.label}

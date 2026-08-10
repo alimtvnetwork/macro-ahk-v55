@@ -27,7 +27,7 @@ import {
     formatDuration,
     type DriftTimeline,
 } from "@/background/recorder/drift-timeline";
-import { SemanticSemanticToneEnum1, SideEnum } from "../../types/enums";
+import { SemanticToneExtendedType, SideType } from "../../types/enums";
 
 interface DriftElementDiffViewProps {
     /** Recorded / expected element snapshot (or null when never captured). */
@@ -45,7 +45,7 @@ interface DriftElementDiffViewProps {
     readonly now?: Date;
 }
 
-const VERDICT_META: Readonly<Record<DriftVerdict, { label: string; tone: SemanticSemanticToneEnum1 }>> = {
+const VERDICT_META: Readonly<Record<DriftVerdict, { label: string; tone: SemanticToneExtendedType }>> = {
     Identical: { label: "Identical", tone: "ok" },
     AttributeDrift: { label: "Attribute drift", tone: "warn" },
     RenamedIdentity: { label: "Renamed identity", tone: "warn" },
@@ -266,7 +266,7 @@ function ValueCell({
 }: {
     readonly value: string | null;
     readonly change: DriftChangeKind;
-    readonly side: SideEnum;
+    readonly side: SideType;
 }) {
     const empty = value === null || value === "";
     const highlight = changeClass(change, side);
@@ -282,7 +282,7 @@ function ValueCell({
     );
 }
 
-function changeClass(change: DriftChangeKind, side: SideEnum): string {
+function changeClass(change: DriftChangeKind, side: SideType): string {
     if (change === "Unchanged") return "bg-muted/40 text-foreground";
     if (change === "Modified") {
         return side === "primary"

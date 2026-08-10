@@ -11,7 +11,7 @@ import { BookOpen, Database, RefreshCw, FileCode, Braces } from "lucide-react";
 import { toast } from "sonner";
 import { sendMessage } from "@/lib/message-client";
 import { DevGuideSection } from "../DevGuideSection";
-import { SemanticSemantic4fd41a } from "../../../types/enums";
+import { MarkdownPrismaType } from "../../../types/enums";
 import { logError } from "@/components/options/options-logger";
 
 interface DocsTabProps {
@@ -24,7 +24,7 @@ interface DocsTabProps {
 export function DocsTab({ namespace, slug, targetUrls }: DocsTabProps) {
   const [generating, setGenerating] = useState(false);
   const [docsOutput, setDocsOutput] = useState<{ markdown?: string; prisma?: string } | null>(null);
-  const [docsFormat, setDocsFormat] = useState<SemanticSemantic4fd41a>("markdown");
+  const [docsFormat, setDocsFormat] = useState<MarkdownPrismaType>("markdown");
 
   const handleGenerateDocs = useCallback(async () => {
     setGenerating(true);
@@ -34,7 +34,7 @@ export function DocsTab({ namespace, slug, targetUrls }: DocsTabProps) {
         project: slug,
         format: "both",
       });
-      if (resp.ok) {
+      if (resp.isOk) {
         setDocsOutput({ markdown: resp.markdown, prisma: resp.prisma });
         toast.success("Schema docs generated");
       } else {

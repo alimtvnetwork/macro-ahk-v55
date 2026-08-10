@@ -35,7 +35,7 @@ import {
     formatTime,
     presentVariant,
 } from "./delivery-log-utils";
-import { StatusFilter } from "../../../types/enums";
+import { StatusFilterType } from "../../../types/enums";
 
 export interface LogCounts {
     readonly all: number;
@@ -48,8 +48,8 @@ interface Props {
     readonly log: ReadonlyArray<WebhookDeliveryResult>;
     readonly filteredLog: ReadonlyArray<WebhookDeliveryResult>;
     readonly logCounts: LogCounts;
-    readonly statusFilter: StatusFilter;
-    readonly setStatusFilter: Dispatch<SetStateAction<StatusFilter>>;
+    readonly statusFilter: StatusFilterType;
+    readonly setStatusFilter: Dispatch<SetStateAction<StatusFilterType>>;
     readonly searchQuery: string;
     readonly setSearchQuery: Dispatch<SetStateAction<string>>;
     readonly expandedIdx: number | null;
@@ -201,8 +201,8 @@ function StatusChips({
     setStatusFilter,
     logCounts,
 }: {
-    readonly statusFilter: StatusFilter;
-    readonly setStatusFilter: Dispatch<SetStateAction<StatusFilter>>;
+    readonly statusFilter: StatusFilterType;
+    readonly setStatusFilter: Dispatch<SetStateAction<StatusFilterType>>;
     readonly logCounts: LogCounts;
 }) {
     const chips = [
@@ -258,7 +258,7 @@ function NoMatches({
     onReset,
 }: {
     readonly searchQuery: string;
-    readonly statusFilter: StatusFilter;
+    readonly statusFilter: StatusFilterType;
     readonly onReset: () => void;
 }) {
     return (

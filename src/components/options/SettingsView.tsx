@@ -38,7 +38,7 @@ import { toast } from "sonner";
 import { DEFAULT_CHATBOX_XPATH } from "@/shared/defaults";
 import { logError } from "./options-logger";
 import { ScriptRunAtType } from "../../../standalone-scripts/macro-controller/src/types/enums";
-import { ThemeEnum } from "../../types/enums";
+import { ThemeType } from "../../types/enums";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -53,7 +53,7 @@ interface SettingsData {
   verboseLogging: boolean;
   maxCycleCount: number;
   idleTimeout: number;
-  theme: ThemeEnum;
+  theme: ThemeType;
   chatBoxXPath: string;
   injectionBudgetMs: number;
   optionsMountBudgetMs: number;

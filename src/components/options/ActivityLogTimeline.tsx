@@ -498,7 +498,7 @@ export function ActivityLogTimeline() {
     setExportLoading(true);
     try {
       const result = await sendMessage<{ isOk: boolean }>({ type: "EXPORT_ZIP" });
-      if (result.ok) {
+      if (result.isOk) {
         toast.success("ZIP bundle downloaded");
       }
     } catch (err) { /* swallowed */
