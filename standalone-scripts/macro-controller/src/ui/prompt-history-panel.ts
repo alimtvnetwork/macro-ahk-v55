@@ -184,12 +184,10 @@ function captureLastImportFailure(key: string, detail: string): void {
 
 function renderLastImportError(): void {
     const host = _lastImportErrorEl;
-    const isMissingHost = !host;
-    if (isMissingHost) return;
+    if (!host) return;
     while (host.firstChild) host.removeChild(host.firstChild);
     const err = _lastImportError;
-    const isMissingErr = !err;
-    if (isMissingErr) {
+    if (!err) {
         host.style.display = 'none';
 
         return;
@@ -658,8 +656,7 @@ function installRovingTabindex(toolbar: HTMLElement): void {
     if (controls.length === 0) return;
     for (let i = 0; i < controls.length; i += 1) {
         const btn = controls[i];
-        const isMissingBtn = !btn;
-        if (isMissingBtn) continue;
+        if (!btn) continue;
         btn.setAttribute('type', 'button');
         btn.tabIndex = i === 0 ? 0 : -1;
         btn.addEventListener('keydown', (ev: KeyboardEvent) => {
@@ -675,8 +672,7 @@ function installRovingTabindex(toolbar: HTMLElement): void {
             else if (key === 'Home') nextIdx = 0;
             else if (key === 'End') nextIdx = controls.length - 1;
             const next = controls[nextIdx];
-            const isMissingNext = !next;
-            if (isMissingNext) return;
+            if (!next) return;
             for (const c of controls) c.tabIndex = -1;
             next.tabIndex = 0;
             next.focus();
@@ -796,8 +792,7 @@ interface RestorePreImage {
 }
 
 function buildPreImage(currentRow: PromptRow | undefined): RestorePreImage | null {
-    const isMissingCurrentRow = !currentRow;
-    if (isMissingCurrentRow) return null;
+    if (!currentRow) return null;
 
     return {
         id: currentRow.Id,
@@ -923,8 +918,7 @@ async function handleRestore(
         'Restore "' + rev.Name + '" from ' + formatWhen(rev.CreatedAt) + '?\n\n'
         + 'The current body will itself be recorded as a new revision, so you can undo this restore later from the same history panel.',
     );
-    const isMissingProceed = !proceed;
-    if (isMissingProceed) return;
+    if (!proceed) return;
 
     const listResult = await listByRole(role);
     if (listResult.isFail || !listResult.value) {
@@ -1210,8 +1204,7 @@ function validateImportFile(
     const looksLikeJson = /\.json$/i.test(file.name)
         || file.type === 'application/json'
         || file.type === '';
-    const isMissingLooksLikeJson = !looksLikeJson;
-    if (isMissingLooksLikeJson) {
+    if (!looksLikeJson) {
         const detail = 'name=' + file.name + ' type=' + file.type;
         captureLastImportFailure('wrong-type', 'rejected non-JSON file: ' + detail + ' slug=' + slug + ' role=' + role);
         reportHistoryFailure(
@@ -1242,8 +1235,7 @@ async function writeImportedRevisions(
         );
     }
     const write = await insertImportedRevisions(slug, rows);
-    const isMissingOkWrite = write.isFail;
-    if (isMissingOkWrite) {
+    if (write.isFail) {
         const reason = write.error ?? '?';
         reportHistoryFailure(
             'HISTORY_IMPORT_E002',
@@ -1285,8 +1277,7 @@ async function handleImportFile(
     deps: HistoryPanelDeps,
 ): Promise<void> {
     const file = input.files && input.files[0];
-    const isMissingFile = !file;
-    if (isMissingFile) return;
+    if (!file) return;
     const toast = deps.toast ?? showToast;
     if (!validateImportFile(file, slug, role, toast)) {
         input.value = '';

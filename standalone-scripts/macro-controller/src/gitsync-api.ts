@@ -86,8 +86,7 @@ export async function fetchGitsyncConfig(
     return { status: 'error', message: 'missing wsId or projectId' };
   }
   const sdk = getSdk();
-  const isMissingSdk = !sdk;
-  if (isMissingSdk) {
+  if (!sdk) {
     logError('GitsyncApi', 'marco.api.call unavailable (SDK not injected yet)');
 
     return { status: 'error', message: 'sdk_unavailable' };
@@ -124,8 +123,7 @@ export async function fetchGitsyncConfig(
     return { status: 'not_linked' };
   }
   const repo = pickRepoUrl(body);
-  const isMissingRepo = !repo;
-  if (isMissingRepo) {
+  if (!repo) {
     log('[GitsyncApi] ws=' + wsId + ' pid=' + pid + ' returned no repo fields → not_linked', 'info');
 
     return { status: 'not_linked' };

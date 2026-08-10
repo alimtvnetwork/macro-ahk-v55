@@ -172,8 +172,7 @@ export { sendToExtension };
  */
 function tryLoadByMessage(type: string): Promise<PromptEntry[] | null> {
   return sendToExtension(type, {}).then(function(response: ExtensionResponse) {
-    const isMissingResponse = !response;
-    if (isMissingResponse) return null;
+    if (!response) return null;
     const prompts = normalizePromptEntries((response.prompts) as Partial<PromptEntry>[]);
 
     return prompts.length > 0 ? prompts : null;

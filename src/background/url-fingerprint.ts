@@ -29,8 +29,7 @@ export function urlFingerprint(rawUrl: string): string {
         const sortedSearch = sortSearchParams(parsed.searchParams);
 
         return `${parsed.origin}${parsed.pathname}${sortedSearch}`;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return rawUrl;
     }
 }
@@ -43,8 +42,7 @@ function sortSearchParams(params: URLSearchParams): string {
     });
 
     const hasParams = entries.length > 0;
-    const isMissingHasParams = !hasParams;
-    if (isMissingHasParams) {
+    if (!hasParams) {
         return "";
     }
 

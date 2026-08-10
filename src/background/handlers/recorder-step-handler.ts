@@ -89,8 +89,7 @@ export async function handleRecorderStepList(
     message: MessageRequest,
 ): Promise<{ steps: ReadonlyArray<PersistedStep> }> {
     const req = message as unknown as ListRequest;
-    const isMissingProjectSlug = !req.projectSlug;
-    if (isMissingProjectSlug) {
+    if (!req.projectSlug) {
         throw new Error("RECORDER_STEP_LIST requires projectSlug");
     }
     const steps = await listSteps(req.projectSlug);

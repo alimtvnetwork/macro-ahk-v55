@@ -135,8 +135,7 @@ export function resolveSelection(
     const allInProject = src.listGroups(projectId);
     const partitioned = partitionSelection(selected, allInProject, projectId);
     if ("Reason" in partitioned) return partitioned;
-    const isMissingIncludeDescendants = !includeDescendants;
-    if (isMissingIncludeDescendants) {
+    if (!includeDescendants) {
         return { Ok: true, Ids: dedupeSorted(partitioned.SeedIds) };
     }
 
@@ -528,8 +527,7 @@ function orderGroupsByAncestry(rows: ReadonlyArray<StepGroupRow>): StepGroupRow[
                 break;
             }
         }
-        const isMissingProgressed = !progressed;
-        if (isMissingProgressed) {
+        if (!progressed) {
             // Should be impossible — depth triggers prevent cycles —
             // but make it deterministic in case the DB was hand-edited.
             for (const r of remaining.values()) out.push(r);

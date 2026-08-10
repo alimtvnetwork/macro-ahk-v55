@@ -36,13 +36,11 @@ export async function bootstrapNamespaceRoot(tabId: number): Promise<void> {
             target: { tabId },
             func: () => {
                 const win = window as unknown as Record<string, unknown>;
-                const isMissingRiseupAsiaMacroExt = !win.RiseupAsiaMacroExt;
-                if (isMissingRiseupAsiaMacroExt) {
+                if (!win.RiseupAsiaMacroExt) {
                     win.RiseupAsiaMacroExt = { Projects: {} };
                 } else {
                     const ext = win.RiseupAsiaMacroExt as Record<string, unknown>;
-                    const isMissingProjects = !ext.Projects;
-                    if (isMissingProjects) {
+                    if (!ext.Projects) {
                         ext.Projects = {};
                     }
                 }
@@ -125,12 +123,10 @@ export async function injectSettingsNamespace(tabId: number, allProjects: Stored
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity
 export async function injectProjectNamespaces(tabId: number, allProjects: StoredProject[]): Promise<void> {
     const activeId = getActiveProjectId();
-    const isMissingActiveId = !activeId;
-    if (isMissingActiveId) return;
+    if (!activeId) return;
 
     const activeProject = allProjects.find((p) => p.id === activeId);
-    const isMissingActiveProject = !activeProject;
-    if (isMissingActiveProject) return;
+    if (!activeProject) return;
 
     const projectIds = new Set<string>([activeId]);
 
@@ -170,8 +166,7 @@ export async function injectProjectNamespaces(tabId: number, allProjects: Stored
 
     for (const pid of projectIds) {
         const project = allProjects.find((p) => p.id === pid);
-        const isMissingProject = !project;
-        if (isMissingProject) continue;
+        if (!project) continue;
 
         const projectSlug = project.slug || slugify(project.name);
         const codeName = project.codeName || toCodeName(projectSlug);
@@ -182,8 +177,7 @@ export async function injectProjectNamespaces(tabId: number, allProjects: Stored
         }
 
         let nsScript = cachedScripts.get(pid);
-        const isMissingNsScript = !nsScript;
-        if (isMissingNsScript) {
+        if (!nsScript) {
             let fileCache: Array<{ name: string; data: string }> = [];
             try {
                 fileCache = getFilesByProject(pid, 50);

@@ -83,8 +83,7 @@ export function InjectionErrorPanel() {
         type: "GET_ACTIVE_ERRORS",
       });
       setErrors(res.errors ?? []);
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
       setErrors([]);
     }
     setLoading(false);
@@ -410,8 +409,7 @@ function formatTime(timestamp: string): string {
       minute: "2-digit",
       second: "2-digit",
     });
-  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+  } catch (err) { /* swallowed */
     return timestamp;
   }
 }

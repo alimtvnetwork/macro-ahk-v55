@@ -351,8 +351,7 @@ function renderHealthChip(
 function computeHealthStatus(
     phase: RecordingPhase, stepCount: number, projectOk: boolean,
 ): ErrorIdleType {
-    const isMissingProjectOk = !projectOk;
-    if (isMissingProjectOk) { return "error"; }
+    if (!projectOk) { return "error"; }
     if (phase === "Recording") { return stepCount > 0 ? "ok" : "warn"; }
     if (phase === "Paused") { return "warn"; }
 

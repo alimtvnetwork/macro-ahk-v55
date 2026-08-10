@@ -67,15 +67,13 @@ export function showDatabaseModal(): void {
   wireTabSwitching(
     tabBar, [dataBody, schemaBody, jsonBody],
     () => {
-      const isMissingIsSchemaLoaded = !isSchemaLoaded;
-      if (isMissingIsSchemaLoaded) {
+      if (!isSchemaLoaded) {
         isSchemaLoaded = true;
         buildSchemaTab(schemaContent, statusBar, existingTables);
       }
     },
     () => {
-      const isMissingIsJsonLoaded = !isJsonLoaded;
-      if (isMissingIsJsonLoaded) {
+      if (!isJsonLoaded) {
         isJsonLoaded = true;
         buildJsonTab(jsonContent, statusBar);
       }

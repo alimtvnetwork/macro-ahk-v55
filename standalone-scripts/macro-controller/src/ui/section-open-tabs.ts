@@ -68,15 +68,12 @@ function createRefreshButton(onRefresh: () => void): HTMLButtonElement {
 function attachCopyDelegation(panel: HTMLElement): void {
     panel.addEventListener('click', function (e: Event): void {
         const target = e.target as HTMLElement | null;
-        const isMissingTarget = !target;
-        if (isMissingTarget) return;
+        if (!target) return;
         const btn = target.closest('[data-copy-url]') as HTMLElement | null;
-        const isMissingBtn = !btn;
-        if (isMissingBtn) return;
+        if (!btn) return;
         e.stopPropagation();
         const url = btn.getAttribute('data-copy-url') ?? '';
-        const isMissingUrl = !url;
-        if (isMissingUrl) return;
+        if (!url) return;
         void copyToClipboard(url, btn);
     });
 }

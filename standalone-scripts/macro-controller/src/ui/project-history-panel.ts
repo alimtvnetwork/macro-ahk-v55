@@ -61,8 +61,7 @@ function fmtTimestamp(ms: number): string {
 }
 
 function firstLine(text: string | null): string {
-  const isMissingText = !text;
-  if (isMissingText) return '(empty)';
+  if (!text) return '(empty)';
   const line = text.split(/\r?\n/, 1)[0] ?? '';
 
   return line.length > 160 ? line.slice(0, 157) + '...' : line;
@@ -199,8 +198,7 @@ export function openProjectHistoryPanel(
   async function handleDelete(entry: HistoryEntry): Promise<void> {
     try {
       const result = await deps.deleteEntry(projectId, entry.id, entry.fileId);
-      const isMissingIsDeleted = !result.isDeleted;
-      if (isMissingIsDeleted) {
+      if (!result.isDeleted) {
         setStatus(`Delete failed (row=${entry.id})`, true);
 
         return;

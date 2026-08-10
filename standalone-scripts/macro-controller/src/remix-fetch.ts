@@ -53,8 +53,7 @@ function getSdk(op: string): MarcoSDKApiModule {
  */
 export async function fetchWorkspaceProjectNames(wsId: string, force = false): Promise<Set<string>> {
   const op = 'fetchWorkspaceProjectNames';
-  const isMissingWsId = !wsId;
-  if (isMissingWsId) throwDiagnostic('REMIX_FETCH_E002', { argument: 'wsId', op });
+  if (!wsId) throwDiagnostic('REMIX_FETCH_E002', { argument: 'wsId', op });
   const existing = cache[wsId];
   const isForceFetch = force;
   const hasCachedEntry = existing !== undefined && existing !== null;

@@ -53,8 +53,7 @@ export function AuthHealthPanel() {
         try {
             const res = await sendMessage<AuthHealthData>({ type: "GET_AUTH_HEALTH" });
             setData(res);
-        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+        } catch (err) { /* swallowed */
             setData(null);
         } finally {
             setLoading(false);

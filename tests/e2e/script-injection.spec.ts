@@ -82,6 +82,7 @@ async function findTestTabId(extPage: Page): Promise<number> {
     });
   }, TEST_PAGE_URL);
   expect(tabId, 'test page tab not found').not.toBeNull();
+
   return tabId as number;
 }
 
@@ -110,10 +111,12 @@ type InjectionResponse = InjectScriptsResponse;
  */
 function formatResultsForFailure(results: readonly InjectionScriptResult[]): string {
   if (results.length === 0) return '(no results returned)';
+
   return results
     .map((r) => {
       const status = r.isSuccess ? 'OK' : 'FAIL';
       const why = r.errorMessage ?? r.skipReason ?? '(no errorMessage)';
+
       return `  - ${r.scriptId} [${status}]: ${why}`;
     })
     .join('\n');
@@ -138,6 +141,7 @@ function expectScriptSucceeded(
     result!.isSuccess,
     `Script "${scriptId}" failed: ${result!.errorMessage ?? '(no errorMessage)'}.\nAll results:\n${formatResultsForFailure(response.results)}`,
   ).toBe(true);
+
   return result!;
 }
 
@@ -163,6 +167,7 @@ function expectScriptFailedWithError(
     result!.errorMessage,
     `Expected "${scriptId}" to report an errorMessage, got undefined. All results:\n${formatResultsForFailure(response.results)}`,
   ).toBeDefined();
+
   return result!;
 }
 
@@ -197,7 +202,6 @@ function expectInlineSyntaxFlag(
 }
 
 test.describe('Script Injection', () => {
-
   test('injects a script that modifies the DOM on a test page', async ({ context, extensionId }) => {
     await stubTestPage(context);
     const extPage = await openPopupPage(context, extensionId);
@@ -360,6 +364,7 @@ test.describe('Script Injection', () => {
         },
         { targetTabId: tabId, force: forceReload },
       );
+
       return result as InjectionResponse;
     };
 

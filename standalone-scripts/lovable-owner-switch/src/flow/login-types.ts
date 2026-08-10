@@ -15,7 +15,7 @@ export interface LoginFlowOptions {
     LoginUrl: string;
 }
 
-export enum LoginStepCode {
+export enum LoginStepCodeType {
     NavigateToLogin = "NavigateToLogin",
     FillEmail = "FillEmail",
     ClickContinue = "ClickContinue",
@@ -25,6 +25,6 @@ export enum LoginStepCode {
 }
 
 export interface LoginStepOutcome {
-    Step: LoginStepCode;
+    Step: LoginStepCodeType;
     DurationMs: number;
 }

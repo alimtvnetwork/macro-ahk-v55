@@ -23,8 +23,7 @@ export async function isInjectionToastEnabled(): Promise<boolean> {
         const { settings } = await handleGetSettings();
 
         return settings.showInjectionToast !== false;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return true; // default on
     }
 }
@@ -64,8 +63,7 @@ export async function showInjectionToastInTab(
 
                 const CONTAINER_ID = "__marco-inject-toast";
                 let container = document.getElementById(CONTAINER_ID);
-                const isMissingContainer = !container;
-                if (isMissingContainer) {
+                if (!container) {
                     container = document.createElement("div");
                     container.id = CONTAINER_ID;
                     container.style.cssText = "position:fixed;bottom:20px;right:20px;z-index:2147483647;pointer-events:none;display:flex;flex-direction:column;gap:8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;";
@@ -184,8 +182,7 @@ export async function showInjectionFailureToastInTab(
 
                 const CONTAINER_ID = "__marco-inject-toast";
                 let container = document.getElementById(CONTAINER_ID);
-                const isMissingContainer = !container;
-                if (isMissingContainer) {
+                if (!container) {
                     container = document.createElement("div");
                     container.id = CONTAINER_ID;
                     container.style.cssText = "position:fixed;bottom:20px;right:20px;z-index:2147483647;pointer-events:none;display:flex;flex-direction:column;gap:8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;";
@@ -293,8 +290,7 @@ export async function showInjectionLoadingToast(tabId: number, scriptCount: numb
             func: (count: number, version: string, exitTransform: string) => {
                 const CONTAINER_ID = "__marco-inject-toast";
                 let container = document.getElementById(CONTAINER_ID);
-                const isMissingContainer = !container;
-                if (isMissingContainer) {
+                if (!container) {
                     container = document.createElement("div");
                     container.id = CONTAINER_ID;
                     container.style.cssText = "position:fixed;bottom:20px;right:20px;z-index:2147483647;pointer-events:none;display:flex;flex-direction:column;gap:8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;";

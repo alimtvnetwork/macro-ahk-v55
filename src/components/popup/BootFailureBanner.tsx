@@ -672,8 +672,7 @@ function formatTime(iso: string): string {
     const date = new Date(iso);
 
     return date.toLocaleTimeString("en-GB", { hour12: false });
-  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+  } catch (err) { /* swallowed */
     return iso;
   }
 }

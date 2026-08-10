@@ -84,8 +84,7 @@ export function updateProjectNameDisplay(): void {
  */
 export function updateTitleBarWorkspaceName(): void {
   const el = document.getElementById('loop-title-ws-name');
-  const isMissingEl = !el;
-  if (isMissingEl) return;
+  if (!el) return;
 
   clearSkeletons(el);
 
@@ -119,8 +118,7 @@ export function updateButtons(): void {
  * Button click animation — color flash only, no scale (v1.56).
  */
 export function animateBtn(btn: HTMLElement): void {
-  const isMissingBtn = !btn;
-  if (isMissingBtn) return;
+  if (!btn) return;
   const origBg = btn.style.background || '';
   btn.style.transition = 'filter 100ms ease, background 150ms ease, opacity 100ms ease';
   btn.style.filter = 'brightness(0.75)';
@@ -139,8 +137,7 @@ export function animateBtn(btn: HTMLElement): void {
  * Consistent hover feedback — color transition only, no scale/translate (v1.56).
  */
 export function attachButtonHoverFx(btn: HTMLElement): void {
-  const isMissingBtn = !btn;
-  if (isMissingBtn) return;
+  if (!btn) return;
   btn.style.transition = 'filter 150ms ease, background-color 150ms ease, box-shadow 150ms ease';
   btn.onmouseenter = function() {
     if ((btn as HTMLButtonElement).disabled) return;

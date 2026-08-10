@@ -276,6 +276,7 @@ export async function readStepHistoryFromEvents(
 ): Promise<OnboardingStepChangeRecord[]> {
   return page.evaluate(() => {
     const w = window as unknown as { __marcoOnboardingHistory?: OnboardingStepChangeRecord[] };
+
     return w.__marcoOnboardingHistory ?? [];
   });
 }
@@ -284,5 +285,6 @@ export async function readStepHistoryFromEvents(
 export async function readStepHistoryFromDom(page: Page): Promise<string[]> {
   const root = page.locator('[data-testid="onboarding-flow"]').first();
   const raw = await root.getAttribute('data-onboarding-step-history');
+
   return raw ? raw.split(',').filter(Boolean) : [];
 }

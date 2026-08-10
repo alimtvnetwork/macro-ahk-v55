@@ -77,8 +77,7 @@ function safeLocalStorage(): Storage | null {
 
 export function writePendingRestoreUndo(record: PendingRestoreUndo): void {
     const store = safeLocalStorage();
-    const isMissingStore = !store;
-    if (isMissingStore) return;
+    if (!store) return;
     try {
         store.setItem(STORAGE_KEY, JSON.stringify(record));
     } catch (err) {
@@ -88,8 +87,7 @@ export function writePendingRestoreUndo(record: PendingRestoreUndo): void {
 
 export function readPendingRestoreUndo(): PendingRestoreUndo | null {
     const store = safeLocalStorage();
-    const isMissingStore = !store;
-    if (isMissingStore) return null;
+    if (!store) return null;
     let raw: string | null = null;
     try {
         raw = store.getItem(STORAGE_KEY);
@@ -113,8 +111,7 @@ export function readPendingRestoreUndo(): PendingRestoreUndo | null {
 
 export function clearPendingRestoreUndo(): void {
     const store = safeLocalStorage();
-    const isMissingStore = !store;
-    if (isMissingStore) return;
+    if (!store) return;
     try {
         store.removeItem(STORAGE_KEY);
     } catch (err) {
@@ -151,8 +148,7 @@ async function reverseInsert(p: InsertPayload): Promise<{ ok: boolean; error?: s
  */
 export function hydratePendingRestoreUndo(now: number = Date.now()): boolean {
     const record = readPendingRestoreUndo();
-    const isMissingRecord = !record;
-    if (isMissingRecord) return false;
+    if (!record) return false;
     const remaining = record.expiresAt - now;
     if (remaining <= 0) {
         clearPendingRestoreUndo();

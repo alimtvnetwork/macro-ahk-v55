@@ -84,9 +84,7 @@ function evaluateCookieStatus(
         return buildMissingToken();
     }
 
-    const isMissingExpiration = cookie.expirationDate === undefined;
-
-    if (isMissingExpiration) {
+    if (cookie.expirationDate === undefined) {
         return {
             status: "valid",
             expiresIn: null,
@@ -154,8 +152,7 @@ async function resolveConfigStatus(): Promise<StatusResponse["config"]> {
         }
 
         return { status: "defaults", source: "hardcoded" };
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return { status: "defaults", source: "hardcoded" };
     }
 }

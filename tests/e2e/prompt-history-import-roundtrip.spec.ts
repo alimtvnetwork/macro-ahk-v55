@@ -42,6 +42,7 @@ let browser: Browser | undefined;
 function resolveChromiumExecutable(): string | undefined {
     const candidates = ['/usr/bin/chromium', '/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'];
     for (const candidate of candidates) if (fs.existsSync(candidate)) return candidate;
+
     return undefined;
 }
 
@@ -98,6 +99,7 @@ async function newHarnessPage(): Promise<Page> {
     });
     await page.goto('https://prompt-history-import-harness.test/');
     await page.addScriptTag({ content: bundleSource });
+
     return page;
 }
 
@@ -127,6 +129,7 @@ test.describe('prompt history import round-trip', () => {
             const listRevisions = async (): Promise<DbOk<RevRow[]>> => {
                 state.openCount += 1;
                 if (state.openCount === 1) return { ok: true, value: nativeRows.slice() };
+
                 return { ok: true, value: [...nativeRows, ...importedRows] };
             };
             const toast = (message: string, kind?: string) => { state.toasts.push({ message, kind }); };

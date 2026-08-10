@@ -48,8 +48,7 @@ export function bindLibraryDbManager(manager: DbManager): void {
 }
 
 function getDb(): SqlJsDatabase {
-    const isMissingDbManager = !dbManager;
-    if (isMissingDbManager) throw new Error("[library] DbManager not bound\n  Path: src/background/handlers/library-handler.ts\n  Missing: DbManager binding\n  Reason: bindLibraryDbManager() was never called");
+    if (!dbManager) throw new Error("[library] DbManager not bound\n  Path: src/background/handlers/library-handler.ts\n  Missing: DbManager binding\n  Reason: bindLibraryDbManager() was never called");
 
     return dbManager.getLogsDb();
 }
@@ -197,8 +196,7 @@ function snapshotVersion(db: ReturnType<typeof getDb>, assetId: number, version:
 
 export async function handleSaveSharedAsset(payload: SaveAssetMsg): Promise<{ assetId: number } | HandlerErrorResponse> {
     const asset = payload?.asset;
-    const isMissingAsset = !asset;
-    if (isMissingAsset) return missingFieldError("asset", "LIBRARY_SAVE_ASSET");
+    if (!asset) return missingFieldError("asset", "LIBRARY_SAVE_ASSET");
     if (requireField(asset.Name) === null) return missingFieldError("asset.Name", "LIBRARY_SAVE_ASSET");
     if (requireField(asset.Type) === null) return missingFieldError("asset.Type", "LIBRARY_SAVE_ASSET");
     if (requireField(asset.Slug) === null) return missingFieldError("asset.Slug", "LIBRARY_SAVE_ASSET");
@@ -299,8 +297,7 @@ export async function handleGetAssetLinks(payload: LinkFilterMsg): Promise<{ lin
 
 export async function handleSaveAssetLink(payload: SaveLinkMsg): Promise<{ linkId: number } | HandlerErrorResponse> {
     const link = payload?.link;
-    const isMissingLink = !link;
-    if (isMissingLink) return missingFieldError("link", "LIBRARY_SAVE_LINK");
+    if (!link) return missingFieldError("link", "LIBRARY_SAVE_LINK");
     if (typeof link.SharedAssetId !== "number") return missingFieldError("link.SharedAssetId", "LIBRARY_SAVE_LINK");
     if (typeof link.ProjectId !== "number") return missingFieldError("link.ProjectId", "LIBRARY_SAVE_LINK");
 
@@ -495,8 +492,7 @@ export async function handleGetProjectGroups(): Promise<{ groups: ProjectGroup[]
 
 export async function handleSaveProjectGroup(payload: GroupMsg): Promise<{ groupId: number; cascadedCount: number } | HandlerErrorResponse> {
     const group = payload?.group;
-    const isMissingGroup = !group;
-    if (isMissingGroup) return missingFieldError("group", "LIBRARY_SAVE_GROUP");
+    if (!group) return missingFieldError("group", "LIBRARY_SAVE_GROUP");
     if (requireField(group.Name) === null) return missingFieldError("group.Name", "LIBRARY_SAVE_GROUP");
 
     const db = getDb();
@@ -588,8 +584,7 @@ function cascadeSettingsToMembers(db: ReturnType<typeof getDb>, groupId: number,
     let parsed: Record<string, unknown>;
     try {
         parsed = JSON.parse(settingsJson);
-    } catch (err) { logBgError("Automatically logged error:", err);
-        console.warn(`[library] Cannot parse SharedSettingsJson for group ${groupId} — skipping cascade`);
+    } catch (err) {         console.warn(`[library] Cannot parse SharedSettingsJson for group ${groupId} — skipping cascade`);
 
         return 0;
     }
@@ -635,8 +630,7 @@ export async function handleCascadeGroupSettings(payload: GroupIdMsg): Promise<{
     }
 
     const settingsJson = result[0].values[0][0] as string | null;
-    const isMissingSettingsJson = !settingsJson;
-    if (isMissingSettingsJson) {
+    if (!settingsJson) {
         return { cascadedCount: 0 };
     }
 

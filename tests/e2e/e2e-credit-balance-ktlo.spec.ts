@@ -38,6 +38,7 @@ test.describe('E2E-Credit-Balance — Ktlo happy path', () => {
                     `https://api.lovable.dev/workspaces/${wsId}/credit-balance`,
                     { headers: { Accept: '*/*' } },
                 );
+
                 return { status: res.status, body: await res.json() };
             }, KTLO_WORKSPACE.id);
 

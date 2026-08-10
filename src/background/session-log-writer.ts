@@ -77,8 +77,7 @@ let flushTimerId: ReturnType<typeof setTimeout> | null = null;
 /* ------------------------------------------------------------------ */
 
 async function ensureSessionDir(): Promise<FileSystemDirectoryHandle | null> {
-    const isMissingSessionId = !sessionId;
-    if (isMissingSessionId) return null;
+    if (!sessionId) return null;
     if (sessionDir) return sessionDir;
 
     try {
@@ -107,8 +106,7 @@ export async function initSessionLogDir(sid: string, ver: string): Promise<void>
     sessionInitPromise = (async () => {
         try {
             const dir = await ensureSessionDir();
-            const isMissingDir = !dir;
-            if (isMissingDir) return;
+            if (!dir) return;
 
             // Seed files directly during init to avoid waiting on our own init promise
             const seeds = new Map<string, string>([
@@ -167,16 +165,13 @@ async function appendToFile(filename: string, text: string): Promise<void> {
     }
 
     const dir = await ensureSessionDir();
-    const isMissingDir = !dir;
-    if (isMissingDir) return;
+    if (!dir) return;
 
     const existing = pendingWrites.get(filename) ?? [];
     existing.push(text);
     pendingWrites.set(filename, existing);
 
-    const isMissingFlushScheduled = !flushScheduled;
-
-    if (isMissingFlushScheduled) {
+    if (!flushScheduled) {
         flushScheduled = true;
         // Microtask-batch: flush after current call stack clears
         flushTimerId = setTimeout(() => {
@@ -194,8 +189,7 @@ async function flushPending(): Promise<void> {
     }
     flushScheduled = false;
     const dir = await ensureSessionDir();
-    const isMissingDir = !dir;
-    if (isMissingDir) return;
+    if (!dir) return;
 
     const entries = Array.from(pendingWrites.entries());
     pendingWrites.clear();
@@ -203,8 +197,7 @@ async function flushPending(): Promise<void> {
     for (const [filename, chunks] of entries) {
         try {
             let handle = fileHandleCache.get(filename);
-            const isMissingHandle = !handle;
-            if (isMissingHandle) {
+            if (!handle) {
                 handle = await dir.getFileHandle(filename, { create: true });
                 fileHandleCache.set(filename, handle);
             }
@@ -287,8 +280,7 @@ export function writeErrorEntry(msg: ErrorLine): void {
 /** Reads all session log files and builds a comprehensive report string. */
 export async function buildSessionReport(sid?: string): Promise<string> {
     const targetSid = sid ?? sessionId;
-    const isMissingTargetSid = !targetSid;
-    if (isMissingTargetSid) {
+    if (!targetSid) {
         return "[session-log-writer] No active session.";
     }
 
@@ -431,8 +423,7 @@ export interface OpfsStatusData {
 
 export async function getOpfsSessionStatus(): Promise<OpfsStatusData> {
     const sid = sessionId;
-    const isMissingSid = !sid;
-    if (isMissingSid) {
+    if (!sid) {
         return { sessionId: null, dirExists: false, files: [], healthy: false };
     }
 
@@ -458,8 +449,7 @@ export async function getOpfsSessionStatus(): Promise<OpfsStatusData> {
         const allExist = files.every((f) => f.exists);
 
         return { sessionId: sid, dirExists: true, files, healthy: allExist };
-    } catch (err) { logBgError("Automatically logged error:", err);
-        const files = expectedFiles.map((f) => ({ name: f, absolutePath: `${absBase}/${f}`, sizeBytes: 0, exists: false }));
+    } catch (err) {         const files = expectedFiles.map((f) => ({ name: f, absolutePath: `${absBase}/${f}`, sizeBytes: 0, exists: false }));
 
         return { sessionId: sid, dirExists: false, files, healthy: false };
     }
@@ -514,8 +504,7 @@ export async function listSessionsWithTimestamps(): Promise<SessionInfo[]> {
         }
 
         return results.sort((a, b) => Number(b.id) - Number(a.id));
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return [];
     }
 }

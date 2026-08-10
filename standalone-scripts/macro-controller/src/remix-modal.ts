@@ -133,8 +133,7 @@ function ensureModalEl(): HTMLDivElement {
 
 function detachKeyHandler(): void {
   const el = document.getElementById(MODAL_ID);
-  const isMissingEl = !el;
-  if (isMissingEl) return;
+  if (!el) return;
   const store = el as HTMLElement & ModalHandlerStore;
   if (store._marcoRemixKey) {
     document.removeEventListener('keydown', store._marcoRemixKey, true);
@@ -171,8 +170,7 @@ export function showRemixModal(opts: RemixModalOpts): void {
   function attach(): void {
     el.onclick = function (e: MouseEvent): void {
       const t = e.target as HTMLElement | null;
-      const isMissingT = !t;
-      if (isMissingT) return;
+      if (!t) return;
       const action = t.getAttribute('data-marco-action');
       if (action === 'close' || action === 'cancel') {
         if (state.submitting) return;
@@ -184,8 +182,7 @@ export function showRemixModal(opts: RemixModalOpts): void {
       }
     };
     bd.onclick = function (): void {
-      const isMissingSubmitting = !state.submitting;
-      if (isMissingSubmitting) hideRemixModal();
+      if (!state.submitting) hideRemixModal();
     };
   }
 
@@ -195,8 +192,7 @@ export function showRemixModal(opts: RemixModalOpts): void {
     const knowInput = el.querySelector<HTMLInputElement>('[data-marco-el="know"]');
     if (!nameInput || !histInput || !knowInput) return;
     const projectName = nameInput.value.trim();
-    const isMissingProjectName = !projectName;
-    if (isMissingProjectName) {
+    if (!projectName) {
       state = { submitting: false, error: 'Project name cannot be empty.' };
       rerender();
       nameInput.focus();

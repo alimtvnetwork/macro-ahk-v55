@@ -132,8 +132,7 @@ function assertCapturePayload(payload: XPathCapturePayload): void {
     if (!payload.XPathFull || payload.XPathFull.length === 0) {
         throw new Error("Capture payload missing XPathFull");
     }
-    const isMissingSuggestedVariableName = !payload.SuggestedVariableName;
-    if (isMissingSuggestedVariableName) {
+    if (!payload.SuggestedVariableName) {
         throw new Error("Capture payload missing SuggestedVariableName");
     }
 }

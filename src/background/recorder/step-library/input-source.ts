@@ -169,8 +169,7 @@ export function loadInputSourceConfig(): InputSourceConfig {
             OnFailure: sanitiseFailurePolicy(parsed.OnFailure),
             TimeoutMs: clampTimeout(parsed.TimeoutMs),
         };
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return DEFAULT_INPUT_SOURCE_CONFIG;
     }
 }
@@ -287,8 +286,7 @@ interface FetchPreflight {
 
 function preflight(deps: FetchInputDeps, config: InputSourceConfig): FetchPreflight {
     const continueOnFail = config.OnFailure === "ContinueWithLocal";
-    const isMissingEnabled = !config.Enabled;
-    if (isMissingEnabled) return { Skip: buildSkipResult("Input source disabled"), FetchImpl: null, ContinueOnFail: continueOnFail };
+    if (!config.Enabled) return { Skip: buildSkipResult("Input source disabled"), FetchImpl: null, ContinueOnFail: continueOnFail };
     if (config.Url.trim().length === 0) return { Skip: buildSkipResult("No URL configured"), FetchImpl: null, ContinueOnFail: continueOnFail };
     const fetchImpl = deps.fetchImpl ?? (typeof fetch === "function" ? fetch : null);
     if (fetchImpl === null) {

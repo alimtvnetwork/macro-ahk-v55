@@ -367,8 +367,7 @@ export function ProjectFilesPanel({ projectId }: Props) {
       const fileList = Array.isArray(result.files) ? result.files : [];
       setFiles(fileList);
       setTree(buildTree(fileList));
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
       setFiles([]);
       setTree([]);
     } finally {

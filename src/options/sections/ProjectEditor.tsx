@@ -56,8 +56,7 @@ export function ProjectEditor({ project, onBack }: ProjectEditorProps) {
         if (!project?.settings) return "{}";
         const vars = (project.settings as Record<string, unknown>).variables;
         if (vars === undefined) return "{}";
-        try { return JSON.stringify(vars, null, 2); } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+        try { return JSON.stringify(vars, null, 2); } catch (err) { /* swallowed */
  return "{}"; }
     });
     const [isSaving, setIsSaving] = useState(false);

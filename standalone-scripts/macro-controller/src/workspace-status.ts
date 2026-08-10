@@ -68,8 +68,7 @@ export function daysBetween(isoOrMs: string | number, nowMs?: number): number {
 
 /** Days until a future ISO timestamp. Returns -1 when invalid or in the past. */
 export function daysUntil(iso: string, nowMs?: number): number {
-  const isMissingIso = !iso;
-  if (isMissingIso) return -1;
+  if (!iso) return -1;
   const t = Date.parse(iso);
   if (!Number.isFinite(t)) return -1;
   const now = typeof nowMs === 'number' ? nowMs : Date.now();
@@ -84,8 +83,7 @@ export function daysUntil(iso: string, nowMs?: number): number {
  * Returns empty string for missing or unparseable input.
  */
 export function formatDateDDMMMYY(iso: string): string {
-  const isMissingIso = !iso;
-  if (isMissingIso) return '';
+  if (!iso) return '';
   const t = Date.parse(iso);
   if (!Number.isFinite(t)) return '';
   const d = new Date(t);
@@ -193,8 +191,7 @@ function resolveRefillStatus(
   ws: WorkspaceCredit, config: WorkspaceLifecycleConfig, nowMs?: number,
 ): WorkspaceStatus | null {
   const refillIso = pickRefillIso(ws);
-  const isMissingRefillIso = !refillIso;
-  if (isMissingRefillIso) return null;
+  if (!refillIso) return null;
   const dToRefill = daysUntil(refillIso, nowMs);
   if (dToRefill >= 0 && dToRefill <= config.refillWarningThresholdDays) {
     return buildStatus('about-to-refill', { refillIso, daysToRefill: dToRefill });

@@ -70,8 +70,7 @@ function showSub(ctx: SubmenuCtx): void {
   ctx.subPanel.style.display = 'block';
   positionSub(ctx);
   ctx.subPanel.style.visibility = 'visible';
-  const isMissingReflowHandler = !ctx.reflowHandler;
-  if (isMissingReflowHandler) {
+  if (!ctx.reflowHandler) {
     let raf = 0;
     const handler = (): void => {
       if (raf) { return; }

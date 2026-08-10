@@ -102,8 +102,7 @@ function testRegexValidation(value: string, v: RegexValidation): boolean {
     const re = new RegExp(v.pattern, v.flags ?? "");
 
     return re.test(value);
-  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+  } catch (err) { /* swallowed */
     return false;
   }
 }

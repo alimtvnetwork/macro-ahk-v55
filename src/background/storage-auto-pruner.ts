@@ -105,8 +105,7 @@ function getTotalRows(): number {
         const errorCount = countTable(getErrorsDb(), "Errors");
 
         return logCount + errorCount;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return 0;
     }
 }

@@ -143,8 +143,7 @@ export function getRenamePresetStore(): RenamePresetStore {
     async loadPreset(name: string): Promise<RenamePreset | null> {
       try {
         const preset = await kv.get<RenamePreset>(SECTION, name);
-        const isMissingPreset = !preset;
-        if (isMissingPreset) { return null; }
+        if (!preset) { return null; }
         // Validate shape
         if (typeof preset.template !== 'string') {
           logDebug(FN, 'Corrupted preset "' + name + '" — returning default');
@@ -183,8 +182,7 @@ export function getRenamePresetStore(): RenamePresetStore {
       }
       // Ensure Default exists
       const def = await kv.get<RenamePreset>(SECTION, DEFAULT_PRESET_NAME);
-      const isMissingDef = !def;
-      if (isMissingDef) {
+      if (!def) {
         await kv.set(SECTION, DEFAULT_PRESET_NAME, createDefaultPreset());
       }
     },

@@ -103,8 +103,7 @@ export function StorageBrowserView() {
       });
       setTables(resp.tables ?? []);
       setDbSizeBytes(resp.dbSizeBytes ?? 0);
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
       setTables([]);
       setDbSizeBytes(0);
     } finally {
@@ -120,7 +119,7 @@ export function StorageBrowserView() {
       const resp = await platform.sendMessage<{ cleared: string[] }>({ type: "STORAGE_CLEAR_ALL" });
       toast.success(`Cleared ${resp.cleared?.length ?? 0} tables`);
       void loadTables();
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Failed to clear all tables");
     }
   };
@@ -131,7 +130,7 @@ export function StorageBrowserView() {
       const resp = await platform.sendMessage<{ seeded: string[] }>({ type: "STORAGE_RESEED" });
       toast.success(`Reseeded: ${resp.seeded?.join(", ") ?? "done"}`);
       void loadTables();
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Failed to reseed");
     }
   };
@@ -165,7 +164,7 @@ export function StorageBrowserView() {
         for (const k of keys) size += (sessionStorage.getItem(k) ?? "").length * 2;
         setSessionSize(size);
       }
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
  setSessionCount(0); }
 
     // Cookies
@@ -180,7 +179,7 @@ export function StorageBrowserView() {
       } else {
         setCookieCount(document.cookie ? document.cookie.split(";").length : 0);
       }
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
  setCookieCount(0); }
 
     // LocalStorage / chrome.storage.local
@@ -202,7 +201,7 @@ export function StorageBrowserView() {
         for (const k of keys) size += (localStorage.getItem(k) ?? "").length * 2;
         setLocalSize(size);
       }
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
  setLocalCount(0); }
   }, []);
 
@@ -474,8 +473,7 @@ function CssAssetsSection() {
         type: "GET_SCRIPT_ASSETS",
       });
       setAssets(resp.assets ?? []);
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
       // Fallback: show known assets from manifest data
       setAssets([
         { scriptName: "macroController", cssFile: "macro-looping.css", templatesFile: "templates.json", version: "1.56.0" },
@@ -646,7 +644,7 @@ function TableDataView({
       });
       toast.success("Row deleted");
       void loadData();
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Delete failed");
     }
   };
@@ -660,7 +658,7 @@ function TableDataView({
       });
       toast.success(`Cleared ${resp.deleted ?? 0} rows from ${tableName}`);
       void loadData();
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Clear failed");
     }
   };
@@ -711,7 +709,7 @@ function TableDataView({
       toast.success("Row updated");
       setEditRow(null);
       void loadData();
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Update failed");
     }
   };

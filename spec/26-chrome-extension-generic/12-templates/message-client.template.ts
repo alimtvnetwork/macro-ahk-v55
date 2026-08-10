@@ -88,6 +88,7 @@ export const messageRegistry = {
             });
         }
         handlers.set(def.type, handler as Handler<unknown, unknown>);
+
         return () => handlers.delete(def.type);
     },
 
@@ -104,6 +105,7 @@ export const messageRegistry = {
                 });
                 logger.error("Unknown message type", err, { type: raw.type });
                 sendResponse({ tag: ENVELOPE_TAG, id: raw.id, ok: false, error: err.toJSON() } satisfies MessageReply<never>);
+
                 return false;
             }
 
@@ -152,6 +154,7 @@ export const messageClient = {
                 reason: `Handler ${def.type} returned ok=false without an error body`,
             });
         }
+
         return reply.result as TRes;
     },
 };
@@ -171,6 +174,7 @@ export const pageBridge = {
             type: def.type,
             payload,
         };
+
         return await new Promise<TRes>((resolve, reject) => {
             const listener = (event: MessageEvent<unknown>) => {
                 if (event.source !== window) return;

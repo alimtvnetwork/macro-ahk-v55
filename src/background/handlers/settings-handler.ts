@@ -191,8 +191,7 @@ async function loadPromptVariables(): Promise<Record<string, string>> {
         const result = await chrome.storage.local.get(VARIABLES_KEY);
 
         return (result[VARIABLES_KEY] as Record<string, string>) ?? {};
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return {};
     }
 }
@@ -206,8 +205,7 @@ async function loadSettings(): Promise<Partial<ExtensionSettings>> {
         const result = await chrome.storage.local.get(STORAGE_KEY);
 
         return (result[STORAGE_KEY] as Partial<ExtensionSettings>) ?? {};
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return {};
     }
 }

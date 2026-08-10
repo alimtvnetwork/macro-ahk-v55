@@ -44,9 +44,11 @@ test.describe('E2E-Credit-Balance — timeout + slider change', () => {
                             `https://api.lovable.dev/workspaces/${wsId}/credit-balance`,
                             { signal: controller.signal },
                         );
+
                         return { outcome: 'Success', status: res.status };
                     } catch (err: unknown) {
                         const name = (err as { name?: string })?.name ?? 'Error';
+
                         return {
                             outcome: name === 'AbortError' ? 'Timeout' : 'Success',
                             status: null,
@@ -57,6 +59,7 @@ test.describe('E2E-Credit-Balance — timeout + slider change', () => {
                 }
                 const tight = await fetchWithBudget(1000);
                 const generous = await fetchWithBudget(8000);
+
                 return { tight, generous };
             }, KTLO_WORKSPACE.id);
 

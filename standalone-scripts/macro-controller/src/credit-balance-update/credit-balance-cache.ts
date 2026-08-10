@@ -85,8 +85,7 @@ export function writeCreditBalanceUpdateCache(
     ttlMs: number = DEFAULT_TTL_MS,
     nowMs: number = Date.now(),
 ): Promise<void> {
-    const isMissingWorkspaceId = !workspaceId;
-    if (isMissingWorkspaceId) {
+    if (!workspaceId) {
         return Promise.resolve();
     }
     const entry = buildEntry(workspaceId, result, ttlMs, nowMs);
@@ -169,16 +168,14 @@ export function __writeCreditBalanceUpdateMemoryCacheForTests(
     ttlMs: number = DEFAULT_TTL_MS,
     nowMs: number = Date.now(),
 ): void {
-    const isMissingWorkspaceId = !workspaceId;
-    if (isMissingWorkspaceId) {
+    if (!workspaceId) {
         return;
     }
     memoryCache.set(workspaceId, buildEntry(workspaceId, result, ttlMs, nowMs));
 }
 
 export function makeCachedResult(result: CreditFetchResult): CreditFetchResult {
-    const isMissingBalance = !result.balance;
-    if (isMissingBalance) {
+    if (!result.balance) {
         return result;
     }
 

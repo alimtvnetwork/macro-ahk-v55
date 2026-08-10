@@ -152,8 +152,7 @@ function addPlainTextLogs(zip: JSZip): void {
     const scriptMap = new Map<string, { status: string; detail: string; ts: string }>();
     for (const row of injectionRows) {
         const sid = scriptOf(row);
-        const isMissingSid = !sid;
-        if (isMissingSid) continue;
+        if (!sid) continue;
         const act = actionOf(row);
         const ts = String(row.timestamp || row.Timestamp || "");
         const det = detailOf(row);

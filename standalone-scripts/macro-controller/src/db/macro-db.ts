@@ -232,8 +232,7 @@ async function runAutoRepairStage(stages: Stage[]): Promise<void> {
   const health = await runPromptHealthCheckWithAutoRepair();
   const initialIssues = health.initialReport.issues.length;
   const finalIssues = health.finalReport.issues.length;
-  const isMissingIsHealthy = !health.isHealthy;
-  if (isMissingIsHealthy) {
+  if (!health.isHealthy) {
     logDiagnosticFromCode(CODE_DB_MACRO_INIT, { stage: STAGE_AUTO_REPAIR, reason: 'residual issues=' + finalIssues });
     stages.push({ stage: STAGE_AUTO_REPAIR, status: 'failed', reason: 'residual issues=' + finalIssues, metrics: { initialIssues, finalIssues } });
 
@@ -312,8 +311,7 @@ export async function initMacroDb(): Promise<void> {
  * Save project metadata.
  */
 export async function saveProjectMetadata(projectId: string, name: string, url: string): Promise<void> {
-  const isMissingProjectId = !projectId;
-  if (isMissingProjectId) return;
+  if (!projectId) return;
 
   const sql = `INSERT OR REPLACE INTO Projects (ProjectId, Name, Url, UpdatedAt) 
                VALUES ('${projectId.replace(/'/g, "''")}', '${name.replace(/'/g, "''")}', '${url.replace(/'/g, "''")}', CURRENT_TIMESTAMP)`;
@@ -353,8 +351,7 @@ export async function saveCommunication(projectId: string, prompt: string, respo
  * Sync the entire task queue for a project to SQLite.
  */
 export async function syncTaskQueueToDb(projectId: string, tasks: DbTask[]): Promise<void> {
-  const isMissingProjectId = !projectId;
-  if (isMissingProjectId) return;
+  if (!projectId) return;
 
   // Clear existing queue for this project
   const deleteSql = `DELETE FROM TaskQueue WHERE ProjectId = '${projectId.replace(/'/g, "''")}'`;
@@ -384,8 +381,7 @@ export async function forceSyncQueueToDb(): Promise<void> {
   const { extractProjectIdFromUrl } = await import('../workspace-detection');
 
   const projectId = extractProjectIdFromUrl();
-  const isMissingProjectId = !projectId;
-  if (isMissingProjectId) return;
+  if (!projectId) return;
 
   const queueState = await loadTaskQueue();
   // const projectName = state.projectNameFromApi || state.projectNameFromDom || 'Unknown Project';

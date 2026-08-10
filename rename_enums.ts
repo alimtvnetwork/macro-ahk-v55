@@ -4,8 +4,10 @@ function getDescriptiveName(name: string, values: string[]): string {
     if (name.startsWith("SemanticSemantic") && name.length > 20) {
         // likely a hash
         const parts = values.slice(0, 2).map(v => v.charAt(0).toUpperCase() + v.slice(1).toLowerCase().replace(/[^a-zA-Z0-9]/g, ''));
+
         return parts.join("") + "Type";
     }
+
     return name;
 }
 
@@ -35,6 +37,7 @@ function getNewName(oldName: string, values: string[]): string {
     if (!baseName.endsWith("Type")) {
         baseName += "Type";
     }
+
     return baseName;
 }
 

@@ -119,8 +119,7 @@ export function stashRepairReport(report: RepairReportSummary): void {
       reason: report.reseedError ?? 'unknown',
     });
   }
-  const isMissingIsHealthy = !report.isHealthy;
-  if (isMissingIsHealthy) {
+  if (!report.isHealthy) {
     logDiagnosticFromCode('REPAIR_RESIDUAL_E001', {
       finalCount: report.finalCount,
       fixedCount: report.fixed.length,

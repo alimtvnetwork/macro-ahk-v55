@@ -71,16 +71,14 @@ async function apiFetchWorkspaces(): Promise<SdkApiResponse> {
   // when MacroController runs before the marco-sdk has finished injecting
   // (load-order race). See mem://standards/verbose-logging-and-failure-diagnostics.
   const sdk = window.marco;
-  const isMissingSdk = !sdk;
-  if (isMissingSdk) {
+  if (!sdk) {
     throwDiagnostic('CREDIT_FETCH_E001', {
       missingApi: 'window.marco',
       readinessStage: 'sdk-root',
       op: 'apiFetchWorkspaces',
     });
   }
-  const isMissingApi = !sdk.api;
-  if (isMissingApi) {
+  if (!sdk.api) {
     throwDiagnostic('CREDIT_FETCH_E001', {
       missingApi: 'window.marco.api',
       readinessStage: 'sdk-api',
@@ -165,9 +163,7 @@ async function handleAuthRecovery(
 
   const newToken = await getBearerToken({ force: true });
 
-  const isMissingNewToken = !newToken;
-
-  if (isMissingNewToken) {
+  if (!newToken) {
     logError('Credit API', 'Auth recovery failed — no retry');
     emitAuthFailureToast(status, statusText);
 
@@ -267,8 +263,7 @@ async function processSuccessData(
   autoDetectFn?: (token: string) => Promise<void>,
 ): Promise<void> {
   const isParseOk = parseLoopApiResponse(data);
-  const isMissingIsParseOk = !isParseOk;
-  if (isMissingIsParseOk) return;
+  if (!isParseOk) return;
 
   const freshToken = resolveToken();
   nsWrite('_internal.resolvedToken', freshToken);
@@ -321,8 +316,7 @@ export function fetchLoopCredits(
       if (resp.isFail) {
         if (isAuthFailure(resp.status) && !isRetry) {
           const recovered = await handleAuthRecovery(token, resp.status, '');
-          const isMissingRecovered = !recovered;
-          if (isMissingRecovered) { mc().updateUI();
+          if (!recovered) { mc().updateUI();
 
  return undefined; }
           fetchLoopCredits(true, autoDetectFn);
@@ -345,8 +339,7 @@ export function fetchLoopCredits(
       return data;
     })
       .then(async function (data: Record<string, unknown> | undefined) {
-      const isMissingData = !data;
-      if (isMissingData) return;
+      if (!data) return;
       await processSuccessData(data, autoDetectFn);
     })
       .catch(function (err: Error) {
@@ -386,9 +379,7 @@ export function fetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
 
   const promise = doFetchLoopCreditsAsync(isRetry);
 
-  const isMissingIsRetry = !isRetry;
-
-  if (isMissingIsRetry) {
+  if (!isRetry) {
     creditAsyncState.inFlight = promise.finally(function () { creditAsyncState.inFlight = null; });
 
     return creditAsyncState.inFlight;
@@ -419,9 +410,7 @@ async function handleAsyncAuthFailure(resp: SdkApiResponse, token: string): Prom
 
   const newToken = await getBearerToken({ force: true });
 
-  const isMissingNewToken = !newToken;
-
-  if (isMissingNewToken) {
+  if (!newToken) {
     emitAuthFailureToast(resp.status, '');
     throwDiagnostic('CREDIT_FETCH_E003', {
       status: resp.status,

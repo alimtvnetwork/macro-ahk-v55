@@ -1,20 +1,20 @@
 {
-  "GeneratedAt": "2026-08-09T22:56:56.239Z",
+  "GeneratedAt": "2026-08-10T05:58:01.288Z",
   "Items": [
     {
-      "Id": "2454a2c1ca16",
+      "Id": "14cd35754ecd",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/seed/prompt-health-check.ts",
-      "Line": 140,
+      "Line": 138,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch (_e) {"
     },
     {
-      "Id": "35e01b7dda6d",
+      "Id": "20d023cc0966",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/seed/seed-plan-next.ts",
-      "Line": 402,
+      "Line": 396,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch (_e) {"
@@ -29,10 +29,10 @@
       "Snippet": "catch (_e) {"
     },
     {
-      "Id": "70c2838a9e08",
+      "Id": "33387d95c250",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/ui/error-overlay.ts",
-      "Line": 791,
+      "Line": 787,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch (_e) {"
@@ -56,10 +56,10 @@
       "Snippet": "catch(function() {"
     },
     {
-      "Id": "938ebd404e65",
+      "Id": "1735431333d9",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/src/ui/prompt-injection.ts",
-      "Line": 667,
+      "Line": 665,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch(function() {"

@@ -86,8 +86,7 @@ function getSdk(): SdkBridge | null {
 }
 
 function pickJobId(body: SyncPostBody | null): string | null {
-    const isMissingBody = !body;
-    if (isMissingBody) return null;
+    if (!body) return null;
 
     return body.job_id ?? body.jobId ?? body.id ?? null;
 }
@@ -113,8 +112,7 @@ async function postSync(
     projectId: string,
 ): Promise<PostSyncResult> {
     const sdk = getSdk();
-    const isMissingSdk = !sdk;
-    if (isMissingSdk) {
+    if (!sdk) {
         const reason = 'sdk_unavailable';
         logError('EnsureRepo', 'postSync: marco.api.call unavailable'
             + ' [ws=' + wsId + ' conn=' + connId + ' pid=' + projectId + ']');
@@ -145,8 +143,7 @@ async function postSync(
     }
 
     const jobId = pickJobId(resp.data as SyncPostBody);
-    const isMissingJobId = !jobId;
-    if (isMissingJobId) {
+    if (!jobId) {
         // Server may key job by the well-known id even when not returned.
         log('[EnsureRepo] postSync ok but no job_id in body → using well-known id', 'info');
 
@@ -161,8 +158,7 @@ async function postSync(
 /* ------------------------------------------------------------------ */
 
 function isTerminal(body: GitsyncProgressBody | null): boolean {
-    const isMissingBody = !body;
-    if (isMissingBody) return false;
+    if (!body) return false;
     const s = body.status;
 
     return s === 'completed' || s === 'failed';

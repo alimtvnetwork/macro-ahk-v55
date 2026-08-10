@@ -83,6 +83,7 @@ async function seedOnboardingFromServiceWorker(context: BrowserContext): Promise
         if (!c?.storage?.local) return 'chrome.storage.local unavailable';
         await c.storage.local.set({ [key]: true });
         const result = await c.storage.local.get(key);
+
         return result[key] === true ? true : `read-back=${JSON.stringify(result[key])}`;
       }, ONBOARDING_KEY);
       if (verified === true) return;
@@ -107,6 +108,7 @@ async function ensureOnboardingSeededFromPage(page: Page): Promise<boolean> {
   return await page.evaluate(async (key: string) => {
     await chrome.storage.local.set({ [key]: true });
     const result = await chrome.storage.local.get(key);
+
     return result[key] === true;
   }, ONBOARDING_KEY);
 }
@@ -193,11 +195,13 @@ async function captureDiagnostic(page: Page, label: string): Promise<string> {
     const storageRead = async (): Promise<unknown> => {
       try {
         const r = await chrome.storage.local.get(key);
+
         return r[key];
       } catch (err) {
         return `<storage error: ${(err as Error).message}>`;
       }
     };
+
     return {
       url: window.location.href,
       hash: window.location.hash,
@@ -212,6 +216,7 @@ async function captureDiagnostic(page: Page, label: string): Promise<string> {
   }, ONBOARDING_KEY).catch((err: Error) => ({ error: err.message }));
   const formatted = `\n[e2e-02 diagnostic — ${label}]\n${JSON.stringify(snapshot, null, 2)}\n`;
   process.stderr.write(formatted);
+
   return formatted;
 }
 
@@ -271,6 +276,7 @@ async function openProjectsView(context: BrowserContext, extensionId: string): P
     await captureDiagnostic(page, 'new-project-cta-missing');
     throw err;
   }
+
   return page;
 }
 

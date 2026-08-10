@@ -116,8 +116,7 @@ export function filterAndSortWorkspaces(
 
 function updateWsCountLabel(count: number, total: number, filter: string): void {
   const countLabel = document.getElementById('loop-ws-count-label');
-  const isMissingCountLabel = !countLabel;
-  if (isMissingCountLabel) return;
+  if (!countLabel) return;
   const anyFilterActive = filter || getLoopWsFreeOnly() || getLoopWsExpiredWithCredits()
     || getLoopWsExpiring() || getLoopWsRefillSoon()
     || viewState().getCreditSortMode() !== 'none' || count !== total;
@@ -132,8 +131,7 @@ export function renderLoopWorkspaceList(
   filter: string,
 ): void {
   const listEl = document.getElementById('loop-ws-list');
-  const isMissingListEl = !listEl;
-  if (isMissingListEl) return;
+  if (!listEl) return;
 
   const maxTotalCredits = computeMaxTotalCredits(workspaces);
   const survivors = filterAndSortWorkspaces(workspaces, filter);
@@ -246,8 +244,7 @@ function scrollToCurrentIfNeeded(listEl: HTMLElement, currentIdx: number, filter
 function _createClickHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    const isMissingItem = !item;
-    if (isMissingItem) return;
+    if (!item) return;
     if ((e.target as HTMLElement).classList && (e.target as HTMLElement).classList.contains('loop-ws-checkbox')) {
       e.preventDefault();
       e.stopPropagation();
@@ -267,8 +264,7 @@ function _createClickHandler(): (e: MouseEvent) => void {
 function _createDblClickHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    const isMissingItem = !item;
-    if (isMissingItem) return;
+    if (!item) return;
     e.preventDefault();
     e.stopPropagation();
     if (item.getAttribute(DataAttrType.WsCurrent) === 'true') {
@@ -284,8 +280,7 @@ function _createDblClickHandler(): (e: MouseEvent) => void {
 function _createCtxHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    const isMissingItem = !item;
-    if (isMissingItem) return;
+    if (!item) return;
     e.preventDefault();
     e.stopPropagation();
     showWsContextMenu(
@@ -299,8 +294,7 @@ function _createCtxHandler(): (e: MouseEvent) => void {
 function _createHoverHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    const isMissingItem = !item;
-    if (isMissingItem) return;
+    if (!item) return;
     const isCurrent = item.getAttribute(DataAttrType.WsCurrent) === 'true';
     if (isCurrent) return;
     const selEl = document.getElementById(DomIdType.LoopWsSelected);
@@ -314,8 +308,7 @@ function _createHoverHandler(): (e: MouseEvent) => void {
 function _createOutHandler(): (e: MouseEvent) => void {
   return function (e: MouseEvent) {
     const item = (e.target as HTMLElement).closest(SEL_LOOP_WS_ITEM) as HTMLElement | null;
-    const isMissingItem = !item;
-    if (isMissingItem) return;
+    if (!item) return;
     const isCurrent = item.getAttribute(DataAttrType.WsCurrent) === 'true';
     if (isCurrent) return;
     const selEl = document.getElementById(DomIdType.LoopWsSelected);
@@ -352,8 +345,7 @@ function dropdownState(): WsDropdownState {
 
 export function populateLoopWorkspaceDropdown(): void {
   const listEl = document.getElementById('loop-ws-list');
-  const isMissingListEl = !listEl;
-  if (isMissingListEl) return;
+  if (!listEl) return;
   const workspaces = loopCreditState.perWorkspace || [];
   if (workspaces.length === 0) {
     if (dropdownState().getHash() === '_empty') { dropdownState().recordSkip();

@@ -63,8 +63,7 @@ export async function handleDynamicRequire(
 
     // --- Resolve requester project ---
     const requester = allProjects.find((p) => p.id === requesterProjectId);
-    const isMissingRequester = !requester;
-    if (isMissingRequester) {
+    if (!requester) {
         logDynamicLoad(requesterProjectId, target, "denied", "Requester project not found");
 
         return { isOk: false, errorMessage: `Requester project "${requesterProjectId}" not found` };
@@ -82,8 +81,7 @@ export async function handleDynamicRequire(
 
     // --- Resolve target project + script ---
     const resolved = resolveTarget(target, allProjects);
-    const isMissingResolved = !resolved;
-    if (isMissingResolved) {
+    if (!resolved) {
         logDynamicLoad(requesterProjectId, target, "not_found", "Target project or script not found");
 
         return { isOk: false, errorMessage: `Cannot resolve target "${target}"` };
@@ -104,8 +102,7 @@ export async function handleDynamicRequire(
     // --- Load script code ---
     try {
         const code = await loadScriptCode(targetProject.id, targetScript);
-        const isMissingCode = !code;
-        if (isMissingCode) {
+        if (!code) {
             logDynamicLoad(requesterProjectId, target, "error", "Script code is empty or not found");
 
             return { isOk: false, errorMessage: `Script code for "${target}" is empty or not found` };
@@ -195,8 +192,7 @@ async function loadScriptCode(projectId: string, script: ScriptEntry): Promise<s
         const file = files.find((f: { path: string; content: string }) => f.path === script.path);
 
         return file?.content ?? null;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return null;
     }
 }

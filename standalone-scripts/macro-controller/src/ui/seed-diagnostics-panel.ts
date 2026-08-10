@@ -205,8 +205,7 @@ function buildContractMarkdown(bridge: ReturnType<typeof getSqlBridgeState>): st
       lines.push('- [' + r.at + '] ' + bucket + '/' + r.method + ': ' + r.message);
     }
   }
-  const isMissingAny = !any;
-  if (isMissingAny) lines.push('(none)');
+  if (!any) lines.push('(none)');
   lines.push('');
 
   return lines.join('\n');
@@ -266,8 +265,7 @@ function buildHeader(): HTMLDivElement {
 function buildSnapshotSection(): HTMLDivElement {
   const wrap = document.createElement('div');
   const snap = readSeedStatusSnapshot();
-  const isMissingSnap = !snap;
-  if (isMissingSnap) {
+  if (!snap) {
     wrap.appendChild(sectionTitle('Last boot snapshot'));
     wrap.appendChild(muted('No seeding snapshot recorded yet. Reload the extension to capture one.'));
 

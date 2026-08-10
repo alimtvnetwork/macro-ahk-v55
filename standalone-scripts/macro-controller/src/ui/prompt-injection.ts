@@ -54,8 +54,7 @@ interface FileHandlerRefs {
 
 // CQ16: Extracted from openPromptCreationModal closure
 function handleFile(file: File, refs: FileHandlerRefs): void {
-  const isMissingFile = !file;
-  if (isMissingFile) return;
+  if (!file) return;
   const ext = (file.name || '').split('.').pop()?.toLowerCase() || '';
   if (!['md', 'txt', 'prompt'].includes(ext)) { showPasteToast('❌ Unsupported file type: .' + ext, true);
 
@@ -757,8 +756,7 @@ function _buildPromptModalFooter(
   testBtn.onmouseout = function() { (this as HTMLElement).style.background = CSS_BTN_REST_BG; };
   testBtn.onclick = function() {
     let text = contentArea.value.trim();
-    const isMissingText = !text;
-    if (isMissingText) { showPasteToast('❌ No content to paste', true);
+    if (!text) { showPasteToast('❌ No content to paste', true);
 
  return; }
     const now = new Date();
@@ -836,8 +834,7 @@ function _buildPromptModalFooter(
       }
       const isDiffShortcut = (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey
         && (e.key === 'd' || e.key === 'D');
-      const isMissingIsDiffShortcut = !isDiffShortcut;
-      if (isMissingIsDiffShortcut) return;
+      if (!isDiffShortcut) return;
       e.preventDefault();
       e.stopPropagation();
       diffBtn.click();
@@ -850,12 +847,10 @@ function _buildPromptModalFooter(
   saveBtn.textContent = isEdit ? '💾 Update' : '💾 Save';
   saveBtn.style.cssText = 'padding:8px 18px;background:' + cPrimary + ';border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;';
   saveBtn.onmouseover = function() {
-    const isMissingDisabled = !(saveBtn as HTMLButtonElement).disabled;
-    if (isMissingDisabled) (this as HTMLElement).style.background = '#6d28d9';
+    if (!(saveBtn as HTMLButtonElement).disabled) (this as HTMLElement).style.background = '#6d28d9';
   };
   saveBtn.onmouseout = function() {
-    const isMissingDisabled = !(saveBtn as HTMLButtonElement).disabled;
-    if (isMissingDisabled) (this as HTMLElement).style.background = '#7c3aed';
+    if (!(saveBtn as HTMLButtonElement).disabled) (this as HTMLElement).style.background = '#7c3aed';
   };
 
   // Wire live drift check: recompute missing tokens on every keystroke.
@@ -957,12 +952,10 @@ function _buildPromptModalFooter(
     const { titleInput, contentArea, catSelect, catCustomInput, tagsInput, excludeFromExportInput } = bodyResult;
     const name = titleInput.value.trim();
     const text = contentArea.value.trim();
-    const isMissingName = !name;
-    if (isMissingName) { showPasteToast('❌ Title is required', true); titleInput.focus();
+    if (!name) { showPasteToast('❌ Title is required', true); titleInput.focus();
 
  return; }
-    const isMissingText = !text;
-    if (isMissingText) { showPasteToast('❌ Content is required', true); contentArea.focus();
+    if (!text) { showPasteToast('❌ Content is required', true); contentArea.focus();
 
  return; }
     if (text.length > 50 * 1024) { showPasteToast('❌ Content exceeds 50KB limit', true);

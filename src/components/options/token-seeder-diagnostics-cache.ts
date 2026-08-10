@@ -39,8 +39,7 @@ function getStorage(): Storage | null {
         if (typeof window === "undefined") return null;
 
         return window.localStorage;
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
         return null;
     }
 }
@@ -71,8 +70,7 @@ export function loadDiagnosticsCache(): TokenSeederDiagnosticsCache | null {
         }
 
         return parsed;
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
         return null;
     }
 }

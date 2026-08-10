@@ -56,6 +56,7 @@ class SlowStepReporter implements Reporter {
   onEnd(): void {
     if (this.slowEntries.length === 0) {
       process.stdout.write(`\n✓ [slow-step-reporter] No steps exceeded ${THRESHOLD_MS}ms.\n`);
+
       return;
     }
     process.stdout.write(

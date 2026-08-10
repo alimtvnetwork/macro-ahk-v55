@@ -16,7 +16,7 @@
 import { LovableApiClient } from "../../../lovable-common/src/api/lovable-api-client";
 import { extractWorkspaceId } from "./extract-workspace-id";
 import { toStepAApiRole } from "./role-api-mapper";
-import { StepAStepCode } from "./step-a-types";
+import { StepAStepCodeType } from "./step-a-types";
 import type { StepARequest, StepAResult, StepAStepOutcome } from "./step-a-types";
 import type { MembershipSummary } from "../../../lovable-common/src/api/lovable-api-types";
 
@@ -44,8 +44,8 @@ const runChain = async (api: LovableApiClient, request: StepARequest): Promise<C
 
     return {
         Outcomes: [
-            { Step: StepAStepCode.ResolveWorkspaceId, DurationMs: wsMs, WorkspaceId: workspaceId, UserId: null },
-            { Step: StepAStepCode.PostMembership, DurationMs: post.DurationMs, WorkspaceId: workspaceId, UserId: post.Value.UserId },
+            { Step: StepAStepCodeType.ResolveWorkspaceId, DurationMs: wsMs, WorkspaceId: workspaceId, UserId: null },
+            { Step: StepAStepCodeType.PostMembership, DurationMs: post.DurationMs, WorkspaceId: workspaceId, UserId: post.Value.UserId },
         ],
         Membership: post.Value,
         WorkspaceId: workspaceId,

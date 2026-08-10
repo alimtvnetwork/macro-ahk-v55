@@ -6,13 +6,13 @@
  * succeeded; sign-out is best-effort cleanup before the next row).
  */
 
-import { XPathKeyCode } from "../../../lovable-common/src/xpath/xpath-key-code";
+import { XPathKeyCodeType } from "../../../lovable-common/src/xpath/xpath-key-code";
 import { clickButton } from "./dom-actions";
 import { waitForXPath } from "./wait-for-xpath";
 import { resolveXPath } from "./xpath-resolver";
 import type { XPathSettingSeed } from "../migrations/xpath-setting-seed";
 
-export enum SignOutStepCode {
+export enum SignOutStepCodeType {
     ClickProfile = "ClickProfile",
     ClickSignOut = "ClickSignOut",
 }
@@ -24,7 +24,7 @@ export interface SignOutResult {
 }
 
 const clickXPath = async (
-    key: XPathKeyCode,
+    key: XPathKeyCodeType,
     overrides: ReadonlyArray<XPathSettingSeed>,
 ): Promise<void> => {
     const resolved = resolveXPath(key, overrides);
@@ -39,8 +39,8 @@ export const runSignOut = async (
     const startedAt = Date.now();
 
     try {
-        await clickXPath(XPathKeyCode.ProfileButton, overrides);
-        await clickXPath(XPathKeyCode.SignOutButton, overrides);
+        await clickXPath(XPathKeyCodeType.ProfileButton, overrides);
+        await clickXPath(XPathKeyCodeType.SignOutButton, overrides);
 
         return { Succeeded: true, DurationMs: Date.now() - startedAt, Error: null };
     } catch (caught: unknown) {

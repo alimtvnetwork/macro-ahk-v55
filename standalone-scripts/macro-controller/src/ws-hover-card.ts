@@ -463,8 +463,7 @@ function refillCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string 
   const iso = status.kind === KIND_ABOUT_TO_REFILL && status.refillIso
     ? status.refillIso
     : pickRefillEstimateIso(ws);
-  const isMissingIso = !iso;
-  if (isMissingIso) return '';
+  if (!iso) return '';
   const days = daysUntil(iso);
   const date = formatDateDDMMMYY(iso);
   const rel = days < 0 ? 'overdue' : (days === 0 ? 'today' : 'in ' + formatDayCount(days));
@@ -486,8 +485,7 @@ function expiresCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string
 
     return compactRow('Expires', html);
   }
-  const isMissingIso = !iso;
-  if (isMissingIso) return '';
+  if (!iso) return '';
   const days = daysUntil(iso);
   const date = formatDateDDMMMYY(iso);
   const rel = days < 0 ? 'expired ' + formatDayCount(-days) + ' ago' : (days === 0 ? 'today' : 'in ' + formatDayCount(days));
@@ -650,23 +648,17 @@ export function attachWorkspaceHoverCard(listEl: HTMLElement, lookup: WsLookup):
 
   const overHandler = function (e: MouseEvent): void {
     const config = getWorkspaceLifecycleConfig();
-    const isMissingEnableWorkspaceHoverDetails = !config.enableWorkspaceHoverDetails;
-    if (isMissingEnableWorkspaceHoverDetails) return;
+    if (!config.enableWorkspaceHoverDetails) return;
     const target = e.target as HTMLElement | null;
-    const isMissingTarget = !target;
-    if (isMissingTarget) return;
+    if (!target) return;
     const nameEl = target.closest(SEL_WS_NAME) as HTMLElement | null;
-    const isMissingNameEl = !nameEl;
-    if (isMissingNameEl) return;
+    if (!nameEl) return;
     const item = nameEl.closest(SEL_WS_ITEM) as HTMLElement | null;
-    const isMissingItem = !item;
-    if (isMissingItem) return;
+    if (!item) return;
     const wsId = item.getAttribute('data-ws-id') || '';
-    const isMissingWsId = !wsId;
-    if (isMissingWsId) return;
+    if (!wsId) return;
     const ws = lookup(wsId);
-    const isMissingWs = !ws;
-    if (isMissingWs) return;
+    if (!ws) return;
     cancelHideTimer();
     const status = getEffectiveStatus(ws, config);
     const card = ensureCardElement();
@@ -676,8 +668,7 @@ export function attachWorkspaceHoverCard(listEl: HTMLElement, lookup: WsLookup):
 
   const outHandler = function (e: MouseEvent): void {
     const target = e.target as HTMLElement | null;
-    const isMissingTarget = !target;
-    if (isMissingTarget) return;
+    if (!target) return;
     if (!target.closest(SEL_WS_NAME)) return;
     const related = e.relatedTarget as HTMLElement | null;
     if (related && related.closest(SEL_WS_NAME)) return;
@@ -712,15 +703,13 @@ export function hideWorkspaceHoverCard(): void {
 export function showWorkspaceHoverCardPinned(wsId: string): void {
   const anchor = document.querySelector('[data-ws-id="' + wsId + '"]') as HTMLElement | null;
   const row = anchor ? anchor.closest(SEL_WS_ITEM) as HTMLElement | null : null;
-  const isMissingRow = !row;
-  if (isMissingRow) return;
+  if (!row) return;
   const sdkWindow = window as unknown as {
     RiseupAsiaMacroExt?: { loopCreditState?: { perWorkspace?: WorkspaceCredit[] } };
   };
   const all = sdkWindow.RiseupAsiaMacroExt?.loopCreditState?.perWorkspace || [];
   const ws = all.find((w) => String(w.id) === wsId);
-  const isMissingWs = !ws;
-  if (isMissingWs) return;
+  if (!ws) return;
   const config = getWorkspaceLifecycleConfig();
   const status = getEffectiveStatus(ws, config);
   cancelHideTimer();

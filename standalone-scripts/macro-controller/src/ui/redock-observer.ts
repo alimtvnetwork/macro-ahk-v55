@@ -98,12 +98,10 @@ export function startRedockObserver(ctx: PanelLayoutCtx): void {
  */
 function tryRedock(ctx: PanelLayoutCtx): boolean {
   const target = getByXPath(CONFIG.CONTROLS_XPATH);
-  const isMissingTarget = !target;
-  if (isMissingTarget) return false;
+  if (!target) return false;
 
   const ui = document.getElementById(IDS.CONTAINER);
-  const isMissingUi = !ui;
-  if (isMissingUi) return false;
+  if (!ui) return false;
 
   // Already inside the target — just mark as docked
   if (target.contains(ui)) {

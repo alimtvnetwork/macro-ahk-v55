@@ -34,8 +34,7 @@ interface CookieEntry {
 function estimateBytes(value: JsonValue): number {
     try {
         return new TextEncoder().encode(JSON.stringify(value)).length;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return 0;
     }
 }
@@ -73,8 +72,7 @@ function resolveSetCookieUrl(input: {
     }
 
     const domain = (input.domain ?? "").trim();
-    const isMissingDomain = !domain;
-    if (isMissingDomain) {
+    if (!domain) {
         throw new Error("[Storage] Cookie set requires url or domain");
     }
 
@@ -135,9 +133,7 @@ export async function handleStorageSessionClear(
 ): Promise<{ isOk: true; cleared: number }> {
     const { prefix } = message as { prefix?: string };
 
-    const isMissingPrefix = !prefix;
-
-    if (isMissingPrefix) {
+    if (!prefix) {
         const raw = await chrome.storage.session.get(null);
         const total = Object.keys(raw).length;
         await chrome.storage.session.clear();
@@ -223,8 +219,7 @@ export async function handleStorageCookiesSet(
     }
 
     const cookie = await chrome.cookies.set(details);
-    const isMissingCookie = !cookie;
-    if (isMissingCookie) {
+    if (!cookie) {
         throw new Error("[Storage] Failed to set cookie");
     }
 

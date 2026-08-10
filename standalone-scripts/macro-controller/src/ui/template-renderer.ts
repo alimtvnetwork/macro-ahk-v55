@@ -76,8 +76,7 @@ export function hasTemplate(name: string): boolean {
  */
 export function renderTemplate(name: string, data: Record<string, unknown> = {}): string {
   const entry = templateState.registry[name];
-  const isMissingEntry = !entry;
-  if (isMissingEntry) {
+  if (!entry) {
     const availableList = Object.keys(templateState.registry).join(', ') || '(none)';
     throwDiagnostic('UI_TEMPLATE_NOT_FOUND_E001', { templateName: name, availableList });
   }

@@ -57,8 +57,7 @@ async function loadChains(): Promise<PromptChain[]> {
         const result = await chrome.storage.sync.get(STORAGE_KEY);
 
         return (result[STORAGE_KEY] as PromptChain[] | undefined) ?? [];
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return [];
     }
 }
@@ -226,15 +225,11 @@ export async function handleExecuteChainStep(payload: MessageRequest): Promise<{
 
         const result = await resultPromise;
 
-        const isMissingSuccess = !result.success;
-
-        if (isMissingSuccess) {
+        if (!result.success) {
             throw new Error("Could not find or inject into the editor — is the chat input visible?");
         }
 
-        const isMissingVerified = !result.verified;
-
-        if (isMissingVerified) {
+        if (!result.verified) {
             logBgWarnError(BgLogTag.MARCO, `Step ${step.stepIndex + 1}: prompt may be truncated`);
         }
 

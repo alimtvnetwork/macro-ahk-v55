@@ -389,8 +389,7 @@ function classifyZeroMatches(
     attempts: ReadonlyArray<SelectorAttempt>,
 ): { Reason: FailureReasonCode; ReasonDetail: string } | null {
     const anyEvaluated = attempts.some((a) => a.FailureReason !== "NotEvaluated");
-    const isMissingAnyEvaluated = !anyEvaluated;
-    if (isMissingAnyEvaluated) { return null; }
+    if (!anyEvaluated) { return null; }
     if (!attempts.every((a) => !a.Matched && a.MatchCount === 0)) { return null; }
 
     return {
@@ -551,8 +550,7 @@ export function logFailure(input: BuildFailureReportInput): FailureReport {
 function extractMessage(err: unknown): string {
     if (err instanceof Error) return err.message;
     if (typeof err === "string") return err;
-    try { return JSON.stringify(err); } catch (err) { logBgError("Automatically logged error:", err);
-
+    try { return JSON.stringify(err); } catch (err) { 
  return String(err); }
 }
 

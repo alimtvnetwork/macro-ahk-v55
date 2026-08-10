@@ -7,7 +7,7 @@
  * first option so users see the "promote" path is supported.
  */
 
-import { UserAddMembershipRoleCode } from "../migrations/membership-role-seed";
+import { UserAddMembershipRoleCodeType } from "../migrations/membership-role-seed";
 
 export interface RoleOption {
     Value: string;
@@ -15,10 +15,10 @@ export interface RoleOption {
 }
 
 export const DEFAULT_ROLE_OPTIONS: ReadonlyArray<RoleOption> = Object.freeze([
-    { Value: UserAddMembershipRoleCode.Owner, LabelType: "Owner (triggers Step B promotion)" },
-    { Value: UserAddMembershipRoleCode.Admin, LabelType: "Admin" },
-    { Value: UserAddMembershipRoleCode.Member, LabelType: "Member" },
+    { Value: UserAddMembershipRoleCodeType.Owner, LabelType: "Owner (triggers Step B promotion)" },
+    { Value: UserAddMembershipRoleCodeType.Admin, LabelType: "Admin" },
+    { Value: UserAddMembershipRoleCodeType.Member, LabelType: "Member" },
     { Value: "Editor", LabelType: "Editor (normalized to Member)" },
 ]);
 
-export const DEFAULT_ROLE_VALUE: string = UserAddMembershipRoleCode.Member;
+export const DEFAULT_ROLE_VALUE: string = UserAddMembershipRoleCodeType.Member;

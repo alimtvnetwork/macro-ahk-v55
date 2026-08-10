@@ -7,7 +7,6 @@ import { PlanTierType } from './plan';
 import { parseCreditBalance, type CreditBalanceWire } from './credit-balance-parser';
 import { logCreditFetchFailure, logCreditParseFailure, sanitizeBearerPrefix } from './credit-balance-logger';
 import type { CreditBalance, CreditFailureLogPayload, CreditFetchResult } from './credit-balance-types';
-import { Enum_76ebb585 } from "../types/enums";
 
 const CREDIT_BALANCE_PATH_SUFFIX = '/credit-balance';
 const DEFAULT_FETCH_TIMEOUT_MS = 3000;

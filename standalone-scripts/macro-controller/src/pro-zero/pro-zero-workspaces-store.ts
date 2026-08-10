@@ -41,8 +41,7 @@ function buildRow(workspace: WorkspaceInfoTyped, balance: CreditBalanceResponseT
 
 export function upsertWorkspacesRow(workspace: WorkspaceInfoTyped, balance: CreditBalanceResponseTyped): void {
     const kv = getKv();
-    const isMissingKv = !kv;
-    if (isMissingKv) { logError('ProZeroWorkspacesStore', 'marco.kv unavailable — skipping SQLite upsert');
+    if (!kv) { logError('ProZeroWorkspacesStore', 'marco.kv unavailable — skipping SQLite upsert');
 
  return; }
     const row = buildRow(workspace, balance);

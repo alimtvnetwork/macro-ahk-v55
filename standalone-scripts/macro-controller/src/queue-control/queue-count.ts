@@ -42,8 +42,7 @@ function tryHeaderWalk(): HTMLElement | null {
     for (const cand of Array.from(candidates)) {
         const txt = (cand.firstChild?.textContent ?? '').trim();
         const startsWithQueue = txt === 'Queue' || txt.startsWith('Queue');
-        const isMissingStartsWithQueue = !startsWithQueue;
-        if (isMissingStartsWithQueue) {
+        if (!startsWithQueue) {
             continue;
         }
         const inner = cand.querySelector<HTMLElement>('span');

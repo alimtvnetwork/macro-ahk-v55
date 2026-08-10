@@ -11,21 +11,21 @@
  * triggers Step B.
  */
 
-export enum UserAddMembershipRoleCode {
+export enum UserAddMembershipRoleCodeType {
     Owner = "Owner",
     Admin = "Admin",
     Member = "Member",
 }
 
 export interface MembershipRoleSeed {
-    Code: UserAddMembershipRoleCode;
+    Code: UserAddMembershipRoleCodeType;
     DisplayLabel: string;
     SortOrder: number;
     RequiresPromotion: 0 | 1;
 }
 
 export const MEMBERSHIP_ROLE_SEEDS: ReadonlyArray<MembershipRoleSeed> = Object.freeze([
-    { Code: UserAddMembershipRoleCode.Owner, DisplayLabel: "Owner", SortOrder: 1, RequiresPromotion: 1 },
-    { Code: UserAddMembershipRoleCode.Admin, DisplayLabel: "Admin", SortOrder: 2, RequiresPromotion: 0 },
-    { Code: UserAddMembershipRoleCode.Member, DisplayLabel: "Member", SortOrder: 3, RequiresPromotion: 0 },
+    { Code: UserAddMembershipRoleCodeType.Owner, DisplayLabel: "Owner", SortOrder: 1, RequiresPromotion: 1 },
+    { Code: UserAddMembershipRoleCodeType.Admin, DisplayLabel: "Admin", SortOrder: 2, RequiresPromotion: 0 },
+    { Code: UserAddMembershipRoleCodeType.Member, DisplayLabel: "Member", SortOrder: 3, RequiresPromotion: 0 },
 ]);

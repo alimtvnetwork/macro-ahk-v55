@@ -198,8 +198,7 @@ function buildCreateTableSql(
         "Id INTEGER PRIMARY KEY AUTOINCREMENT",
         ...tableDef.Columns.map((c) => {
             let col = `${c.Name} ${c.Type}`;
-            const isMissingNullable = !c.Nullable;
-            if (isMissingNullable) col += " NOT NULL";
+            if (!c.Nullable) col += " NOT NULL";
             if (c.Unique) col += " UNIQUE";
             if (c.Default !== undefined) col += ` DEFAULT ${c.Default}`;
 
@@ -251,8 +250,7 @@ async function tryLoadDb(sql: SqlJs, slug: string, schema: string): Promise<SqlJ
 
 export function getProjectDb(slug: string): SqlJsDatabase {
     const db = projectDbs.get(slug);
-    const isMissingDb = !db;
-    if (isMissingDb) throw new Error(`[project-db] Not initialized: ${slug}`);
+    if (!db) throw new Error(`[project-db] Not initialized: ${slug}`);
 
     return wrapDatabaseWithBindSafety(db);
 }
@@ -267,8 +265,7 @@ export function hasProjectDb(slug: string): boolean {
 
 export async function flushProjectDb(slug: string): Promise<void> {
     const db = projectDbs.get(slug);
-    const isMissingDb = !db;
-    if (isMissingDb) return;
+    if (!db) return;
 
     if (persistenceMode === "opfs") {
         const root = await navigator.storage.getDirectory();

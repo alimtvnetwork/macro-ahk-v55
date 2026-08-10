@@ -36,8 +36,7 @@ export function ReproBuildErrorPanel() {
       setCopied(true);
       if (timerRef.current !== null) clearTimeout(timerRef.current);
       timerRef.current = window.setTimeout(() => setCopied(false), 2000);
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
       setCopied(false);
     }
   };

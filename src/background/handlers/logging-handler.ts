@@ -76,9 +76,7 @@ export async function startSession(version: string): Promise<string> {
 
 /** Returns the logs database, throwing if not initialized. */
 export function getLogsDb() {
-    const isMissingDb = dbManager === null;
-
-    if (isMissingDb) {
+    if (dbManager === null) {
         throw new Error("[logging] DbManager not bound. Call bindDbManager() first.");
     }
 
@@ -87,9 +85,7 @@ export function getLogsDb() {
 
 /** Returns the errors database, throwing if not initialized. */
 export function getErrorsDb() {
-    const isMissingDb = dbManager === null;
-
-    if (isMissingDb) {
+    if (dbManager === null) {
         throw new Error("[logging] DbManager not bound. Call bindDbManager() first.");
     }
 
@@ -98,9 +94,7 @@ export function getErrorsDb() {
 
 /** Returns the current session ID, creating one if needed. */
 async function ensureSessionId(): Promise<number> {
-    const isMissingSession = currentSessionId === null;
-
-    if (isMissingSession) {
+    if (currentSessionId === null) {
         await startSession("0.0.0");
     }
 

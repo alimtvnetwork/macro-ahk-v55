@@ -90,15 +90,12 @@ function buildKey(workspaceId: string): string {
  * back to the network.
  */
 export async function readProjectListCache(workspaceId: string): Promise<ProjectListCacheRow | null> {
-    const isMissingWorkspaceId = !workspaceId;
-    if (isMissingWorkspaceId) return null;
+    if (!workspaceId) return null;
     const kv = getKv();
-    const isMissingKv = !kv;
-    if (isMissingKv) return null;
+    if (!kv) return null;
     try {
         const raw = await kv.get(buildKey(workspaceId));
-        const isMissingRaw = !raw;
-        if (isMissingRaw) return null;
+        if (!raw) return null;
         const parsed = JSON.parse(raw) as Partial<ProjectListCacheRow>;
         if (typeof parsed.ExpiresAt !== 'number' || !Array.isArray(parsed.Projects)) return null;
         if (parsed.ExpiresAt <= Date.now()) {
@@ -125,11 +122,9 @@ export function writeProjectListCache(
     projects: ReadonlyArray<CachedProject>,
     ttlMs: number = DEFAULT_PROJECT_CACHE_TTL_MS,
 ): void {
-    const isMissingWorkspaceId = !workspaceId;
-    if (isMissingWorkspaceId) return;
+    if (!workspaceId) return;
     const kv = getKv();
-    const isMissingKv = !kv;
-    if (isMissingKv) {
+    if (!kv) {
         logError('ProjectsCache.write', 'marco.kv unavailable — skipping SQLite upsert for ws=' + workspaceId);
 
         return;
@@ -150,11 +145,9 @@ export function writeProjectListCache(
 
 /** Drop a workspace's cache row (used by the Refresh button). */
 export function clearProjectListCache(workspaceId: string): void {
-    const isMissingWorkspaceId = !workspaceId;
-    if (isMissingWorkspaceId) return;
+    if (!workspaceId) return;
     const kv = getKv();
-    const isMissingKv = !kv;
-    if (isMissingKv) return;
+    if (!kv) return;
     kv.delete(buildKey(workspaceId)).catch(function (caught: unknown): void {
         logError('ProjectsCache.clear', 'kv.delete failed for ws=' + workspaceId, caught);
     });

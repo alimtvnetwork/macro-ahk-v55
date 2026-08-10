@@ -30,8 +30,7 @@ class WsNavState {
   private navIndex = -1;
 
   static getInstance(): WsNavState {
-    const isMissingInstance = !WsNavState.instance;
-    if (isMissingInstance) {
+    if (!WsNavState.instance) {
       WsNavState.instance = new WsNavState();
     }
 
@@ -62,8 +61,7 @@ export function getLoopWsNavIndex(): number { return navState().getIndex(); }
 /** v2.148.0: check every visible row whose data-ws-idx falls within [lo,hi]. */
 function checkVisibleRange(lo: number, hi: number): void {
   const listEl = document.getElementById(DomIdType.LoopWsList);
-  const isMissingListEl = !listEl;
-  if (isMissingListEl) return;
+  if (!listEl) return;
   const visibleItems = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);
   for (const item of Array.from(visibleItems)) {
     const visIdx = parseInt(item.getAttribute('data-ws-idx') || '-1', 10);
@@ -107,14 +105,12 @@ export function handleWsCheckboxClick(
 /** Sync checkbox visuals in the workspace list to match checked state. */
 function syncCheckboxVisuals(): void {
   const listEl = document.getElementById(DomIdType.LoopWsList);
-  const isMissingListEl = !listEl;
-  if (isMissingListEl) return;
+  if (!listEl) return;
 
   const items = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);
   for (const item of items) {
     const cb = item.querySelector('.loop-ws-checkbox');
-    const isMissingCb = !cb;
-    if (isMissingCb) continue;
+    if (!cb) continue;
 
     const wsId = item.getAttribute(DataAttrType.WsId);
     const isChecked = !!getLoopWsCheckedIds()[wsId!];
@@ -160,8 +156,7 @@ function resolveFromKeyboardNav(): { wsId: string; wsName: string } | null {
   if (!listEl || currentNavIndex < 0) return null;
   const items = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);
   const navItem = items[currentNavIndex] as HTMLElement | undefined;
-  const isMissingNavItem = !navItem;
-  if (isMissingNavItem) return null;
+  if (!navItem) return null;
   const wsId = navItem.getAttribute(DataAttrType.WsId) || '';
   const wsName = navItem.getAttribute('data-ws-name') || '';
   log('Move fallback: using keyboard-navigated item idx=' + currentNavIndex + ' (' + wsName + ')', 'info');
@@ -194,16 +189,12 @@ export function triggerLoopMoveFromSelection(): void {
   let wsId = selectedEl ? (selectedEl.getAttribute('data-selected-id') || '') : '';
   let wsName = selectedEl ? (selectedEl.getAttribute('data-selected-name') || '') : '';
 
-  const isMissingWsId = !wsId;
-
-  if (isMissingWsId) {
+  if (!wsId) {
     const fallback = resolveFromKeyboardNav() ?? resolveFromCheckedBox();
     if (fallback) { wsId = fallback.wsId; wsName = fallback.wsName; }
   }
 
-  const isMissingWsIdAfterFallback = !wsId;
-
-  if (isMissingWsIdAfterFallback) {
+  if (!wsId) {
     log('No workspace selected for move', 'warn');
     updateLoopMoveStatus('error', 'Select a workspace first');
     showToast('Select a different workspace first, then press Move', 'warn', { noStop: true });
@@ -243,8 +234,7 @@ function highlightActiveItem(item: Element): void {
 /** Update the selected-workspace indicator element from the active item. */
 function updateSelectedIndicator(item: Element): void {
   const selectedEl = document.getElementById('loop-ws-selected');
-  const isMissingSelectedEl = !selectedEl;
-  if (isMissingSelectedEl) return;
+  if (!selectedEl) return;
 
   const wsId = item.getAttribute(DataAttrType.WsId) || '';
   const wsName = item.getAttribute('data-ws-name') || '';
@@ -274,8 +264,7 @@ function resetItemStyles(item: Element): void {
 export function setLoopWsNavIndex(idx: number): void {
   navState().setIndex(idx);
   const listEl = document.getElementById(DomIdType.LoopWsList);
-  const isMissingListEl = !listEl;
-  if (isMissingListEl) return;
+  if (!listEl) return;
 
   const items = listEl.querySelectorAll(SEL_LOOP_WS_ITEM);
   for (const [itemIndex, item] of Array.from(items).entries()) {

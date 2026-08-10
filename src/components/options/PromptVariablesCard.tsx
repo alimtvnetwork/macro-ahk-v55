@@ -58,7 +58,7 @@ export function PromptVariablesCard() {
       }
       await sendMessage({ type: "SAVE_PROMPT_VARIABLES", variables });
       toast.success("Template variables saved");
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Failed to save variables");
     } finally {
       setSaving(false);

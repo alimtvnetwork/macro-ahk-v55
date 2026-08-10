@@ -45,9 +45,7 @@ export function extractUserIdFromBearer(bearerToken: string): string {
 
     const payload = decodeBase64UrlJson(parts[1]);
 
-    const isMissingPayload = !payload;
-
-    if (isMissingPayload) {
+    if (!payload) {
         return '';
     }
 

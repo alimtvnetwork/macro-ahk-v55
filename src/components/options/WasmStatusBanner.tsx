@@ -94,8 +94,7 @@ function readDeclaredCsp(): string | null {
         const csp = (manifest as { content_security_policy?: { extension_pages?: string } }).content_security_policy;
 
         return csp?.extension_pages ?? null;
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
         return null;
     }
 }

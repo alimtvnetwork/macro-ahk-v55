@@ -10,7 +10,7 @@
  *   user can paste into a spreadsheet or grep it.
  */
 
-import { LogViewerSeverityCode } from "./log-viewer-types";
+import { LogViewerSeverityCodeType } from "./log-viewer-types";
 import type { LogViewerEntry } from "./log-viewer-types";
 
 const LOCAL_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
@@ -38,12 +38,12 @@ export const formatRowIndex = (rowIndex: number | null): string => {
     return String(rowIndex);
 };
 
-export const cssClassForSeverity = (severity: LogViewerSeverityCode): string => {
-    if (severity === LogViewerSeverityCode.Error) {
+export const cssClassForSeverity = (severity: LogViewerSeverityCodeType): string => {
+    if (severity === LogViewerSeverityCodeType.Error) {
         return "lcl-sev-error";
     }
 
-    if (severity === LogViewerSeverityCode.Warn) {
+    if (severity === LogViewerSeverityCodeType.Warn) {
         return "lcl-sev-warn";
     }
 

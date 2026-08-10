@@ -46,7 +46,7 @@ export function GlobalScriptsView({
             name: file.name.replace(/\.[^.]+$/, ""),
             json: content,
           });
-        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+        } catch (err) { /* swallowed */
           toast.error(`Invalid JSON: ${file.name}`);
           continue;
         }

@@ -148,8 +148,7 @@ function buildEditorLink(file: string, line: number): string {
 function formatTimestamp(iso: string): string {
     try {
         return new Date(iso).toLocaleString();
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
         return iso;
     }
 }

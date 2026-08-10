@@ -9,7 +9,7 @@
  * pattern via `LogSink` in `log-sink.ts`.
  */
 
-import type { UserAddRowOutcomeCode } from "./row-types";
+import type { UserAddRowOutcomeCodeType } from "./row-types";
 
 export interface UserAddRowStateUpdate {
     RowIndex: number;
@@ -23,7 +23,7 @@ export interface UserAddRowStateUpdate {
      * can recognize `StepBFailedMemberAdded` without parsing
      * `LastError`.
      */
-    Outcome: UserAddRowOutcomeCode;
+    Outcome: UserAddRowOutcomeCodeType;
     /**
      * True when Step A POST succeeded (regardless of Step B outcome).
      * Re-runs MUST consult this to skip Step A and avoid 409 Conflict.

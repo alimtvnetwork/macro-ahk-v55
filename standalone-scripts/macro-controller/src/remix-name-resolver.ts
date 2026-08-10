@@ -39,8 +39,7 @@ const SUFFIX_REGEX = /^(.*?)([-_ ]?)([Vv])(\d+)$/;
 export function parseName(name: string): ParsedName {
   const trimmed = name.trim();
   const match = SUFFIX_REGEX.exec(trimmed);
-  const isMissingMatch = !match;
-  if (isMissingMatch) {
+  if (!match) {
     return { base: trimmed, separator: '', vLetter: '', current: 1 };
   }
   const [, base, separator, vLetter, numStr] = match;

@@ -175,8 +175,7 @@ function findButtonBySelectors(): HTMLElement | null {
   for (const selector of sendSelectors) {
     try {
       const el = document.querySelector(selector);
-      const isMissingEl = !el;
-      if (isMissingEl) continue;
+      if (!el) continue;
 
       const btn = el.tagName === 'BUTTON' ? el : el.closest('button');
       if (!btn || (btn as HTMLButtonElement).disabled) continue;
@@ -215,8 +214,7 @@ export async function dequeueTaskNextPrompt(): Promise<TaskNextPromptResult> {
     const projectId = resolveTaskQueueProjectId();
     const queue = getPersistentTaskQueue();
     const item = await queue.dequeue(projectId);
-    const isMissingItem = !item;
-    if (isMissingItem) return { selection: null, failed: false };
+    if (!item) return { selection: null, failed: false };
     const remaining = await queue.count(projectId);
     log('Task Next: dequeued splitter task for project ' + projectId + ' (' + remaining + ' left)', 'info');
 
@@ -433,8 +431,7 @@ async function runTaskNextCycle(
   const cycleStart = Date.now();
   const chosen = await resolveCyclePrompt(deps, legacyPromptText);
   if (chosen.remaining === -1) return 'paste-failed';
-  const isMissingText = !chosen.text;
-  if (isMissingText) return 'queue-empty';
+  if (!chosen.text) return 'queue-empty';
   const promptsCfg = deps.getPromptsConfig();
   const outcome = pasteIntoEditor(chosen.text, promptsCfg, deps.getByXPath);
   if (String(outcome) === 'failed') return 'paste-failed';

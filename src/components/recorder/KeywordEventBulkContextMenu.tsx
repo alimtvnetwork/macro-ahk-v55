@@ -447,8 +447,7 @@ function loadPersistedSequence(): SequenceRenameInput {
         }
 
         return DEFAULT_SEQUENCE_RENAME;
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
         return DEFAULT_SEQUENCE_RENAME;
     }
 }

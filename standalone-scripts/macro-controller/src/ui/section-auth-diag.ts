@@ -189,8 +189,7 @@ export function createAuthDiagRow(deps: AuthDiagDeps): AuthDiagResult {
   if (!diagBody.hasAttribute('data-auth-diag-poll')) {
     diagBody.setAttribute('data-auth-diag-poll', '1');
     const authDiagPollId = trackedSetInterval('UI.authDiagPoll', function () {
-      const isMissingIsConnected = !diagBody.isConnected;
-      if (isMissingIsConnected) {
+      if (!diagBody.isConnected) {
         trackedClearInterval(authDiagPollId);
 
         return;

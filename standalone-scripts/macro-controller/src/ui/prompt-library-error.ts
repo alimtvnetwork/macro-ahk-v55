@@ -92,8 +92,7 @@ export function clearImportErrorBanner(refs: ModalRefs): void {
 }
 
 export function focusErrorBanner(refs: ModalRefs): void {
-  const isMissingIsConnected = !refs.root.isConnected;
-  if (isMissingIsConnected) return;
+  if (!refs.root.isConnected) return;
   const banner = refs.errorBanner;
   if (!banner || banner.hidden) return;
   try { banner.focus(); } catch (err) {

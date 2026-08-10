@@ -41,6 +41,7 @@ const REQUIRED_PERMISSIONS = [
 function detectPackageManager(): 'pnpm' | 'npm' {
   try {
     execSync('pnpm --version', { stdio: 'ignore' });
+
     return 'pnpm';
   } catch {
     return 'npm';

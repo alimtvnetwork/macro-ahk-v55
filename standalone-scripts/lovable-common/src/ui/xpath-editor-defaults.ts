@@ -8,13 +8,13 @@
 
 import { DefaultXPaths } from "../xpath/default-xpaths";
 import { DefaultDelaysMs } from "../xpath/default-delays";
-import { XPathKeyCode } from "../xpath/xpath-key-code";
+import { XPathKeyCodeType } from "../xpath/xpath-key-code";
 import type { XPathEditorRow } from "./xpath-editor-types";
 
 export const buildDefaultEditorRows = (): ReadonlyArray<XPathEditorRow> => {
     const out: XPathEditorRow[] = [];
 
-    for (const key of Object.values(XPathKeyCode)) {
+    for (const key of Object.values(XPathKeyCodeType)) {
         out.push({
             KeyCode: key,
             XPath: DefaultXPaths[key],

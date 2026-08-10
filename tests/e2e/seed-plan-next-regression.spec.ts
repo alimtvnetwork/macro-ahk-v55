@@ -58,6 +58,7 @@ let browser: Browser | undefined;
 function resolveChromiumExecutable(): string | undefined {
     const candidates = ['/usr/bin/chromium', '/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'];
     for (const c of candidates) if (fs.existsSync(c)) return c;
+
     return undefined;
 }
 
@@ -108,6 +109,7 @@ async function newHarnessPage(responses: FakeSqlResp[]): Promise<Page> {
     });
     await page.goto('https://seed-harness.test/');
     await page.addScriptTag({ content: bundleSource });
+
     return page;
 }
 
@@ -130,6 +132,7 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
 
         const result = await page.evaluate(async () => {
             const seedApi = (window as unknown as { __seed: { seedPlanNextPrompts: () => Promise<{ ok: boolean; telemetry?: unknown[] }> } }).__seed;
+
             return seedApi.seedPlanNextPrompts();
         });
         expect(result.isSuccess).toBe(true);
@@ -177,9 +180,9 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
             { isOk: true, rows: [{ '1': 1 }] },
         ]);
 
-
         const result = await page.evaluate(async () => {
             const seedApi = (window as unknown as { __seed: { seedPlanNextPrompts: () => Promise<{ ok: boolean; telemetry?: unknown[] }> } }).__seed;
+
             return seedApi.seedPlanNextPrompts();
         });
         expect(result.isSuccess).toBe(true);
@@ -215,6 +218,7 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
         const block = await page.evaluate((k) => {
             const raw = window.localStorage.getItem(k);
             if (!raw) return ['Seed Telemetry: (not run this session)', '---'];
+
             return ['=== Seed Telemetry ===', raw, '---'];
         }, TELEMETRY_KEY);
 
@@ -241,6 +245,7 @@ test.describe('seed-plan-next regression (manual Chrome flow)', () => {
 
         const result = await page.evaluate(async () => {
             const seedApi = (window as unknown as { __seed: { seedPlanNextPrompts: () => Promise<{ ok: boolean; error?: string }> } }).__seed;
+
             return seedApi.seedPlanNextPrompts();
         });
         expect(result.isSuccess).toBe(false);

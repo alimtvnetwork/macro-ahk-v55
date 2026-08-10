@@ -337,9 +337,7 @@ function _renderFresh(
   // Append Search Bar
   promptsDropdown.appendChild(buildSearchInput(ctx, taskNextDeps));
 
-  const isMissingLength = !entries.length;
-
-  if (isMissingLength) {
+  if (!entries.length) {
     renderEmptyState(promptsDropdown, ctx, taskNextDeps);
 
     return;
@@ -519,8 +517,7 @@ function _rebindPlanTaskSubmenus(container: HTMLElement, ctx: PromptContext): vo
 /** Re-attach the Load button handler in the dropdown header. */
 function _rebindHeader(container: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): void {
   const header = container.firstElementChild as HTMLElement;
-  const isMissingHeader = !header;
-  if (isMissingHeader) return;
+  if (!header) return;
   const oldLoadBtn = header.querySelector('span[title="Reload prompts from database"]') as HTMLElement | null;
   if (oldLoadBtn) {
     // Rebuild the whole header (5 pills) rather than reach into the extracted
@@ -604,8 +601,7 @@ function _rebindPromptItems(
       || (id && byId.get(id))
       || (idxAttr !== null ? filtered[parseInt(idxAttr, 10)] : undefined)
       || filtered[i];
-    const isMissingResolved = !resolved;
-    if (isMissingResolved) continue;
+    if (!resolved) continue;
     _bindSinglePromptItem(dom, resolved, container, promptsCfg, ctx, taskNextDeps);
   }
 }
@@ -622,8 +618,7 @@ function _bindSinglePromptItem(
 ): void {
   item.onmouseover = function() { (this as HTMLElement).style.background = cBtnMenuHover; };
   item.onmouseout = function() { (this as HTMLElement).style.background = 'transparent'; };
-  const isMissingText = !p.text;
-  if (isMissingText) return;
+  if (!p.text) return;
 
   const actionsSpan = (item.querySelector('[data-prompt-actions]') as HTMLElement)
     || (item.querySelector('span:last-child') as HTMLElement);
@@ -717,8 +712,7 @@ function renderEmptyState(container: HTMLElement, ctx: PromptContext, taskNextDe
  */
 function normalizeCategory(raw: string | undefined): string {
   const cat = (raw || '').trim().toLowerCase();
-  const isMissingCat = !cat;
-  if (isMissingCat) return '';
+  if (!cat) return '';
   if (cat.includes('audit') || cat.includes('spec') || cat.includes('proofread') || cat.includes('true feed') || cat.includes('true-feed')) {
     return 'audit';
   }
@@ -866,8 +860,7 @@ function _appendPresetCounts(taskNextSub: HTMLElement, promptsDropdown: HTMLElem
     queueBtn.onclick = async (e: Event) => {
       e.stopPropagation();
       const prompt = findNextTasksPrompt(taskNextDeps);
-      const isMissingPrompt = !prompt;
-      if (isMissingPrompt) {
+      if (!prompt) {
         showPasteToast('❌ "Next Tasks" prompt not found', true);
 
         return;
@@ -965,8 +958,7 @@ function getPromptVariantValue(p: PromptEntry): number | null {
 
 function resolvePromptPasteText(p: PromptEntry): string {
   const variantValue = getPromptVariantValue(p);
-  const isMissingVariantValue = !variantValue;
-  if (isMissingVariantValue) return p.text;
+  if (!variantValue) return p.text;
 
   return substituteToken(p.text, p.replaceKey || REPLACE_KEY_DEFAULT, variantValue);
 }

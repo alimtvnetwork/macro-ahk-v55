@@ -10,8 +10,7 @@ export function classifySelector(kind: string, selectorText: string): SelectorSt
         const node = document.querySelector(trimmed);
 
         return node === null ? "no-match" : "match";
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
         return "invalid";
     }
 }

@@ -61,8 +61,7 @@ export function extractEditorPlainText(target: Element): string {
 
 function selectAllInside(editor: HTMLElement): void {
   const sel = window.getSelection();
-  const isMissingSel = !sel;
-  if (isMissingSel) return;
+  if (!sel) return;
   const range = document.createRange();
   range.selectNodeContents(editor);
   sel.removeAllRanges();
@@ -70,14 +69,11 @@ function selectAllInside(editor: HTMLElement): void {
 }
 
 function insertLineWithBreaks(line: string, isFirst: boolean): boolean {
-  const isMissingIsFirst = !isFirst;
-  if (isMissingIsFirst) {
+  if (!isFirst) {
     const isParaOk = document.execCommand('insertParagraph', false);
-    const isMissingIsParaOk = !isParaOk;
-    if (isMissingIsParaOk) document.execCommand('insertLineBreak', false);
+    if (!isParaOk) document.execCommand('insertLineBreak', false);
   }
-  const isMissingLine = !line;
-  if (isMissingLine) return true;
+  if (!line) return true;
 
   return document.execCommand('insertText', false, line);
 }

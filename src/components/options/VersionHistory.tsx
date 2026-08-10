@@ -174,8 +174,7 @@ function VersionRow({ version, isCurrent, isFirst, isLast, prevHash, onRollback 
 function formatContent(json: string): string {
   try {
     return JSON.stringify(JSON.parse(json), null, 2);
-  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+  } catch (err) { /* swallowed */
     return json;
   }
 }

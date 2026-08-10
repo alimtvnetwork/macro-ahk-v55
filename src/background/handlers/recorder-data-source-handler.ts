@@ -78,8 +78,7 @@ export async function handleRecorderDataSourceList(
     message: MessageRequest,
 ): Promise<{ dataSources: ReadonlyArray<PersistedDataSource> }> {
     const req = message as unknown as ListRequest;
-    const isMissingProjectSlug = !req.projectSlug;
-    if (isMissingProjectSlug) {
+    if (!req.projectSlug) {
         throw new Error("RECORDER_DATA_SOURCE_LIST requires projectSlug");
     }
 

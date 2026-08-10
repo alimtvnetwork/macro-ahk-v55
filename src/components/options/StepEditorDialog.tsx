@@ -120,8 +120,7 @@ function hydrateHotkeyForm(
         const waitMs = typeof parsed.WaitMs === "number" ? String(parsed.WaitMs) : "";
 
         return { chords, waitMs };
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
         return { chords: [], waitMs: "" };
     }
 }

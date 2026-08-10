@@ -150,9 +150,7 @@ export function getNamespace(): MacroControllerNamespace | null {
     ? (window as Window).RiseupAsiaMacroExt
     : undefined) as RiseupAsiaMacroExtNamespace | undefined;
 
-  const isMissingRoot = !root;
-
-  if (isMissingRoot) {
+  if (!root) {
     logError('getNamespace', buildNamespaceDiagnostic({
       lookup: 'window.RiseupAsiaMacroExt',
       missing: 'RiseupAsiaMacroExt (root SDK namespace)',
@@ -162,8 +160,7 @@ export function getNamespace(): MacroControllerNamespace | null {
 
     return null;
   }
-  const isMissingProjects = !root.Projects;
-  if (isMissingProjects) {
+  if (!root.Projects) {
     logError('getNamespace', buildNamespaceDiagnostic({
       lookup: 'window.RiseupAsiaMacroExt.Projects',
       missing: 'Projects (project registry container)',
@@ -176,8 +173,7 @@ export function getNamespace(): MacroControllerNamespace | null {
 
   try {
     const existing = root.Projects.MacroController as Record<string, unknown> | undefined;
-    const isMissingExisting = !existing;
-    if (isMissingExisting) {
+    if (!existing) {
       root.Projects.MacroController = {
         meta: { version: VERSION, displayName: 'Macro Controller' },
         api: {} as MacroControllerApi,
@@ -237,8 +233,7 @@ export function getNamespace(): MacroControllerNamespace | null {
  */
 export function nsWrite<P extends keyof NsPathMap>(path: P, value: NsPathMap[P]): void {
   const ns = getNamespace();
-  const isMissingNs = !ns;
-  if (isMissingNs) return;
+  if (!ns) return;
 
   // 2-segment: _internal.* or api.mc
   const dot1 = path.indexOf('.');
@@ -270,8 +265,7 @@ export function nsWrite<P extends keyof NsPathMap>(path: P, value: NsPathMap[P])
  */
 export function nsReadTyped<P extends keyof NsPathMap>(path: P): NsPathMap[P] | undefined {
   const ns = getNamespace();
-  const isMissingNs = !ns;
-  if (isMissingNs) return undefined;
+  if (!ns) return undefined;
 
   const dot1 = path.indexOf('.');
   const dot2 = path.indexOf('.', dot1 + 1);

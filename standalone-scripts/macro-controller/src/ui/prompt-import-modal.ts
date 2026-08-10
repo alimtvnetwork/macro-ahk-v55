@@ -491,8 +491,7 @@ function bucketPreviewRows(
       return;
     }
     const validated = validate(row.incoming);
-    const isMissingValidated = !validated;
-    if (isMissingValidated) {
+    if (!validated) {
       skippedCount += 1;
       auditActions.push({ slug: row.slug, action: 'skip' });
 
@@ -543,8 +542,7 @@ async function performImportCommit(
   transition: (next: Stage) => void,
   close: () => void,
 ): Promise<void> {
-  const isMissingBundle = !state.bundle;
-  if (isMissingBundle) return;
+  if (!state.bundle) return;
   transition('committing');
   try {
     const io = await import('./prompt-io');

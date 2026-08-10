@@ -71,8 +71,7 @@ export function DefaultDatabasesStatus({ projectSlug }: DefaultDatabasesStatusPr
           rowCount: result.total ?? 0,
           loading: false,
         });
-      } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+      } catch (err) { /* swallowed */
         updated.push({ name: def.databaseName, exists: false, rowCount: 0, loading: false });
       }
     }

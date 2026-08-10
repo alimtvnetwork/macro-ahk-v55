@@ -105,8 +105,7 @@ function isSdkLogger(value: unknown): value is SdkLogger {
 /** Resolve the SDK logger, or undefined if the namespace is not ready. */
 function getLogger(): SdkLogger | undefined {
   const ns = readSdkNamespace();
-  const isMissingNs = !ns;
-  if (isMissingNs) return undefined;
+  if (!ns) return undefined;
 
   return isSdkLogger(ns.Logger) ? ns.Logger : undefined;
 }

@@ -163,8 +163,7 @@ export interface OpenPromptEditorInput {
  */
 export async function openPromptEditor(input: OpenPromptEditorInput): Promise<void> {
   const rc = getRevalidateContext();
-  const isMissingRc = !rc;
-  if (isMissingRc) {
+  if (!rc) {
     reportEditorFailure(
       'PROMPT_EDIT_E002',
       { role: input.role, action: input.promptId !== undefined ? 'edit' : 'add' },
@@ -208,8 +207,7 @@ export async function openPromptEditor(input: OpenPromptEditorInput): Promise<vo
 function buildAddNewTemplatePrefill(role: PromptRole): OpenPromptEditorInput['prefill'] | undefined {
   if (role !== 'plan' && role !== 'next') return undefined;
   const seed = PLAN_NEXT_SEED_ROWS.find((r) => r.role === role && r.isDefault);
-  const isMissingSeed = !seed;
-  if (isMissingSeed) return undefined;
+  if (!seed) return undefined;
   const roleLabel = role === 'plan' ? 'PlanTierType' : 'Next';
 
   return {
@@ -223,8 +221,7 @@ function buildAddNewTemplatePrefill(role: PromptRole): OpenPromptEditorInput['pr
 function buildTemplatePreviewForRole(role: PromptRole): { body: string; slug?: string } | undefined {
   if (role !== 'plan' && role !== 'next') return undefined;
   const seed = PLAN_NEXT_SEED_ROWS.find((r) => r.role === role && r.isDefault);
-  const isMissingSeed = !seed;
-  if (isMissingSeed) return undefined;
+  if (!seed) return undefined;
 
   return { body: seed.body, slug: seed.slug };
 }
@@ -321,8 +318,7 @@ async function openWithDriftCheck(
     detail: isClean ? 'confirmed' : ('drift body=' + String(bodyMatches) + ' name=' + String(nameMatches)),
     metrics: { promptId: dbRow.Id },
   });
-  const isMissingIsClean = !isClean;
-  if (isMissingIsClean) {
+  if (!isClean) {
     logDiagnosticFromCode('PROMPT_EDIT_E004', {
       role, slug: dbRow.Slug, promptId: dbRow.Id,
       bodyMatches: String(bodyMatches), nameMatches: String(nameMatches),
@@ -554,8 +550,7 @@ async function loadEditablePrompt(role: PromptRole, id: number): Promise<Editabl
     return null;
   }
   const row = listed.value.find((r: PromptRow) => r.Id === id);
-  const isMissingRow = !row;
-  if (isMissingRow) {
+  if (!row) {
     logDiagnosticFromCode('PROMPT_EDIT_E007', { role, promptId: id });
 
     return null;

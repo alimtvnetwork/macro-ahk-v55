@@ -113,8 +113,7 @@ export function bindUpdaterDbManager(manager: DbManager): void {
 }
 
 function getDb(): SqlJsDatabase {
-    const isMissingDbManager = !dbManager;
-    if (isMissingDbManager) throw new Error("[updater] DbManager not bound");
+    if (!dbManager) throw new Error("[updater] DbManager not bound");
 
     return dbManager.getLogsDb();
 }
@@ -222,14 +221,11 @@ export function handleDeleteUpdater(updaterId: number): void {
  */
 export async function handleCheckForUpdate(updaterId: number): Promise<UpdateCheckResult> {
     const entry = handleGetUpdater(updaterId);
-    const isMissingEntry = !entry;
-    if (isMissingEntry) {
+    if (!entry) {
         return { updaterId, name: "Unknown", currentVersion: null, latestVersion: null, hasUpdate: false, errorMessage: "Updater not found" };
     }
 
-    const isMissingVersionInfoUrl = !entry.VersionInfoUrl;
-
-    if (isMissingVersionInfoUrl) {
+    if (!entry.VersionInfoUrl) {
         return { updaterId, name: entry.Name, currentVersion: entry.CurrentVersion, latestVersion: null, hasUpdate: false, errorMessage: "No VersionInfoUrl configured" };
     }
 

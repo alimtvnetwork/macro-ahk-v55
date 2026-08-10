@@ -138,8 +138,7 @@ function initTelemetry(): Map<PromptRole, RoleTelemetry> {
 function tallyInsertCounts(existing: Set<string>, tel: Map<PromptRole, RoleTelemetry>): void {
     for (const row of PLAN_NEXT_SEED_ROWS) {
         const bucket = tel.get(row.role);
-        const isMissingBucket = !bucket;
-        if (isMissingBucket) continue;
+        if (!bucket) continue;
         if (existing.has(row.slug)) bucket.skipped += 1;
         else bucket.inserted += 1;
     }
@@ -235,8 +234,7 @@ function isManagedPlanPromptDrift(slug: string, body: string): boolean {
 }
 
 function isBundledDefaultDrift(row: typeof PLAN_NEXT_SEED_ROWS[number], body: string): boolean {
-    const isMissingIsDefault = !row.isDefault;
-    if (isMissingIsDefault) return false;
+    if (!row.isDefault) return false;
     if (normalizePromptBody(body) === normalizePromptBody(row.body)) return false;
     if (row.slug === 'plan-default') return isManagedPlanDefault(body);
     if (row.slug === 'next-default') return isManagedNextDefault(body);
@@ -347,8 +345,7 @@ async function upgradeLegacyBodyForRow(row: typeof PLAN_NEXT_SEED_ROWS[number]):
 
  return false; }
     const match = resolveUpgradeMatch(row, currentBody);
-    const isMissingIsMatch = !match.isMatch;
-    if (isMissingIsMatch) {
+    if (!match.isMatch) {
         emitLegacySkip(row, match.detail, currentBody.length);
 
         return false;

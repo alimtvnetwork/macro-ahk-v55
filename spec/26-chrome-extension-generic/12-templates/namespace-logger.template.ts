@@ -73,6 +73,7 @@ const sinks: LogSink[] = [consoleSink, broadcastSink];
 
 export function registerLogSink(sink: LogSink): () => void {
     sinks.push(sink);
+
     return () => {
         const idx = sinks.indexOf(sink);
         if (idx >= 0) sinks.splice(idx, 1);
@@ -91,6 +92,7 @@ function normaliseError(value: unknown): AppErrorJSON | null {
             cause: value,
         }).toJSON();
     }
+
     return new AppError({
         code: "NON_ERROR_THROWN",
         reason: typeof value === "string" ? value : JSON.stringify(value),

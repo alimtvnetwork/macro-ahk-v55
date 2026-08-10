@@ -191,9 +191,7 @@ function handleAttemptResult(
     return true;
   }
 
-  const isMissingIsTimeout = !attempt.isTimeout;
-
-  if (isMissingIsTimeout) {
+  if (!attempt.isTimeout) {
     const errorMsg = attempt.errorMessage || 'No token returned';
 
     if (attempt.errorMessage) {
@@ -262,8 +260,7 @@ function finishBridgeAttempt(ctx: BridgeAttemptCtxFull, result: ExtensionBridgeA
 }
 
 function handleBridgeResponse(ctx: BridgeAttemptCtxFull, event: MessageEvent): void {
-  const isMissingData = !event.data;
-  if (isMissingData) return;
+  if (!event.data) return;
   if (event.data.source !== 'marco-extension') return;
   if (event.data.requestId !== ctx.requestId) return;
 
@@ -353,9 +350,7 @@ function handleRelayPong(ctx: RelayPingCtx, event: MessageEvent): void {
   const payload = unwrapRelayPayload((event.data as { payload?: unknown }).payload);
   const errorMsg = typeof payload.errorMessage === 'string' ? payload.errorMessage : '';
 
-  const isMissingIsSettled = !ctx.isSettled;
-
-  if (isMissingIsSettled) {
+  if (!ctx.isSettled) {
     ctx.isSettled = true;
     clearTimeout(ctx.timer);
     window.removeEventListener('message', ctx._onPong!);
@@ -370,8 +365,7 @@ export function isRelayActive(): Promise<boolean> {
     const ctx: RelayPingCtx = {
       isSettled: false,
       timer: setTimeout(function () {
-        const isMissingIsSettled = !ctx.isSettled;
-        if (isMissingIsSettled) {
+        if (!ctx.isSettled) {
           ctx.isSettled = true;
           window.removeEventListener('message', ctx._onPong!);
           resolve(false);

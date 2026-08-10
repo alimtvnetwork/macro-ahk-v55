@@ -35,6 +35,7 @@ let browser: Browser | undefined;
 function resolveChromiumExecutable(): string | undefined {
     const candidates = ['/usr/bin/chromium', '/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'];
     for (const candidate of candidates) if (fs.existsSync(candidate)) return candidate;
+
     return undefined;
 }
 
@@ -80,6 +81,7 @@ async function newHarnessPage(): Promise<Page> {
     });
     await page.goto('https://prompt-history-sort-filter-harness.test/');
     await page.addScriptTag({ content: bundleSource });
+
     return page;
 }
 

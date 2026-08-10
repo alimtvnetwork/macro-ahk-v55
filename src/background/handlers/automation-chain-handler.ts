@@ -112,12 +112,10 @@ function rowToChain(r: SqlRow): ChainOutput {
         projectId: (r.ProjectId as string) || "default",
         name: r.Name as string,
         slug: r.Slug as string,
-        steps: (() => { try { return JSON.parse(r.StepsJson as string) as JsonValue[]; } catch (err) { logBgError("Automatically logged error:", err);
-
+        steps: (() => { try { return JSON.parse(r.StepsJson as string) as JsonValue[]; } catch (err) { 
  return []; } })(),
         triggerType: (r.TriggerType as string) || "manual",
-        triggerConfig: (() => { try { return JSON.parse((r.TriggerConfigJson as string) || "{}") as JsonValue; } catch (err) { logBgError("Automatically logged error:", err);
-
+        triggerConfig: (() => { try { return JSON.parse((r.TriggerConfigJson as string) || "{}") as JsonValue; } catch (err) { 
  return {}; } })(),
         enabled: !!(r.Enabled as number),
         createdAt: r.CreatedAt as string,
@@ -193,8 +191,7 @@ export async function handleDeleteAutomationChain(request: MessageRequest): Prom
     const raw = request as ChainMessage;
     const project = resolveProject(raw);
     const chainId = raw.chainId;
-    const isMissingChainId = !chainId;
-    if (isMissingChainId) {
+    if (!chainId) {
         return { isOk: false, errorMessage: "Missing chainId" };
     }
 
@@ -213,8 +210,7 @@ export async function handleToggleAutomationChain(request: MessageRequest): Prom
     const raw = request as ChainMessage;
     const project = resolveProject(raw);
     const chainId = raw.chainId;
-    const isMissingChainId = !chainId;
-    if (isMissingChainId) {
+    if (!chainId) {
         return { isOk: false, errorMessage: "Missing chainId" };
     }
 

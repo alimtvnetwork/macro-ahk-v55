@@ -81,11 +81,9 @@ import { CssFragmentType } from '../types';
 
 function focusCurrentWorkspaceInList(): void {
   const listEl = document.getElementById('loop-ws-list');
-  const isMissingListEl = !listEl;
-  if (isMissingListEl) return;
+  if (!listEl) return;
   const currentName = state.workspaceName;
-  const isMissingCurrentName = !currentName;
-  if (isMissingCurrentName) {
+  if (!currentName) {
     log('Credits: no current workspace name to focus', 'warn');
 
     return;
@@ -424,8 +422,7 @@ function handlePromptsButtonClick(
   e.stopPropagation();
   const isOpen = promptsDropdown.style.display !== 'none';
   promptsDropdown.style.display = isOpen ? 'none' : 'block';
-  const isMissingIsOpen = !isOpen;
-  if (isMissingIsOpen) {
+  if (!isOpen) {
     positionPromptsDropdown(promptsBtn, promptsDropdown);
     loadTaskNextSettings(taskNextDeps);
     if (isPromptsCached()) {
@@ -559,9 +556,7 @@ function buildErrorToggleButton(btnStyle: string): HTMLElement {
     const hasErrors = count > 0;
     setOverlayVisible(true);
 
-    const isMissingHasErrors = !hasErrors;
-
-    if (isMissingHasErrors) {
+    if (!hasErrors) {
       log('[ErrorOverlay] Opened (no errors)', 'check');
     } else {
       log('[ErrorOverlay] Opened (' + count + ' errors)', 'check');
@@ -575,8 +570,7 @@ function buildErrorToggleButton(btnStyle: string): HTMLElement {
   if (!badge.hasAttribute('data-error-badge-poll')) {
     badge.setAttribute('data-error-badge-poll', '1');
     const badgePollId = trackedSetInterval('UI.errorBadgePoll', function () {
-      const isMissingIsConnected = !badge.isConnected;
-      if (isMissingIsConnected) {
+      if (!badge.isConnected) {
         trackedClearInterval(badgePollId);
 
         return;

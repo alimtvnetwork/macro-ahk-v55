@@ -48,8 +48,7 @@ async function flush(): Promise<void> {
 
 function resetButtonForSlug(slug: string): HTMLButtonElement | null {
     const row = document.querySelector('[data-prompt-slug="' + slug + '"]');
-    const isMissingRow = !row;
-    if (isMissingRow) return null;
+    if (!row) return null;
 
     return (Array.from(row.querySelectorAll('button')).find(
         (b) => (b.textContent ?? '').includes('Reset'),

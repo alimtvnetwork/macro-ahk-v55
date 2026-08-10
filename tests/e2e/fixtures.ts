@@ -71,6 +71,7 @@ export async function launchExtension(
       `Fix: ensure the build step succeeded, or run \`pnpm run build:extension\` manually.`
     );
   }
+
   return browserType.launchPersistentContext('', {
     headless: true,
     executablePath: resolveChromiumExecutablePath(),
@@ -92,6 +93,7 @@ export async function getExtensionId(context: BrowserContext): Promise<string> {
   const url = sw.url();
   const match = url.match(/chrome-extension:\/\/([^/]+)/);
   if (!match) throw new Error('Could not resolve extension ID from service worker URL');
+
   return match[1];
 }
 
@@ -100,6 +102,7 @@ export async function openPopup(context: BrowserContext, extensionId: string): P
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${extensionId}/${POPUP_PATH}`);
   await popup.waitForLoadState('domcontentloaded');
+
   return popup;
 }
 
@@ -108,6 +111,7 @@ export async function openOptions(context: BrowserContext, extensionId: string):
   const options = await context.newPage();
   await options.goto(`chrome-extension://${extensionId}/${OPTIONS_PATH}`);
   await options.waitForLoadState('domcontentloaded');
+
   return options;
 }
 
@@ -139,6 +143,7 @@ export const EXTENSION_PATHS = {
 /** Build any chrome-extension:// URL from a manifest-relative path. */
 export function extensionUrl(extensionId: string, relativePath: string): string {
   const clean = relativePath.replace(/^\/+/, '');
+
   return `chrome-extension://${extensionId}/${clean}`;
 }
 
@@ -167,6 +172,7 @@ export async function openExtensionPage(
   const url = which === 'popup' ? popupUrl(extensionId) : optionsUrl(extensionId);
   await page.goto(url);
   await page.waitForLoadState('domcontentloaded');
+
   return page;
 }
 
@@ -179,7 +185,6 @@ export function openPopupPage(context: BrowserContext, extensionId: string): Pro
 export function openOptionsPage(context: BrowserContext, extensionId: string): Promise<Page> {
   return openExtensionPage(context, extensionId, 'options');
 }
-
 
 // ─── Custom Test Fixture ─────────────────────────────────────────────
 

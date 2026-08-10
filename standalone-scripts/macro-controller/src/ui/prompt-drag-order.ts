@@ -54,8 +54,7 @@ function readLegacyOrder(): string[] {
   for (const key of LEGACY_STORAGE_KEYS) {
     try {
       const raw = localStorage.getItem(key);
-      const isMissingRaw = !raw;
-      if (isMissingRaw) continue;
+      if (!raw) continue;
       const parsed: unknown = JSON.parse(raw);
       if (Array.isArray(parsed)) {
         return parsed.filter((v): v is string => typeof v === 'string');
@@ -140,8 +139,7 @@ export const DEFAULT_PROMPT_ORDER: readonly string[] = [
 export function loadPromptOrder(): string[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    const isMissingRaw = !raw;
-    if (isMissingRaw) return [];
+    if (!raw) return [];
     const parsed: unknown = JSON.parse(raw);
 
     return Array.isArray(parsed) ? parsed.filter((v): v is string => typeof v === 'string') : [];
@@ -176,8 +174,7 @@ function loadDragTouched(): Set<string> {
   try {
     if (typeof localStorage === 'undefined') return new Set();
     const raw = localStorage.getItem(DRAG_TOUCHED_KEY);
-    const isMissingRaw = !raw;
-    if (isMissingRaw) return new Set();
+    if (!raw) return new Set();
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return new Set();
 
@@ -343,8 +340,7 @@ function handleDragEnd(item: HTMLElement): void {
 }
 
 function handleDragOver(event: DragEvent, item: HTMLElement): void {
-  const isMissingDraggingSlug = !dragState.draggingSlug;
-  if (isMissingDraggingSlug) return;
+  if (!dragState.draggingSlug) return;
   event.preventDefault();
   if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
   clearDropIndicators(findDropdownRoot(item));
@@ -365,8 +361,7 @@ function clearItemIndicator(item: HTMLElement): void {
 }
 
 function clearDropIndicators(root: HTMLElement | null): void {
-  const isMissingRoot = !root;
-  if (isMissingRoot) return;
+  if (!root) return;
   root.querySelectorAll<HTMLElement>('[data-prompt-slug]').forEach(node => {
     node.style.borderTop = '';
     node.style.borderBottom = '';
@@ -388,8 +383,7 @@ function handleDrop(event: DragEvent, target: HTMLElement, onReorder: () => void
   if (!source || source === target) return;
   const insertBefore = shouldInsertBefore(event, target);
   const targetParent = target.parentElement;
-  const isMissingTargetParent = !targetParent;
-  if (isMissingTargetParent) return;
+  if (!targetParent) return;
   if (insertBefore) targetParent.insertBefore(source, target);
   else targetParent.insertBefore(source, target.nextSibling);
   markDragTouched(sourceSlug);

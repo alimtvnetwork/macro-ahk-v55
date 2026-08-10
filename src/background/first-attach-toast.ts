@@ -188,8 +188,7 @@ export async function maybeShowFirstAttachToast(
     if (isOriginSeen(url)) return;
 
     let origin = "";
-    try { origin = new URL(url).origin; } catch (err) { logBgError("Automatically logged error:", err);
-
+    try { origin = new URL(url).origin; } catch (err) { 
  return; }
     if (origin === "") return;
 

@@ -22,7 +22,7 @@ export {
 export {
     buildFilterSelect, collectUniquePhases, filterEntries, FILTER_ALL_VALUE,
 } from "./log-viewer-filter";
-export { LogViewerSeverityCode } from "./log-viewer-types";
+export { LogViewerSeverityCodeType } from "./log-viewer-types";
 export type { LogViewerEntry, LogViewerOptions } from "./log-viewer-types";
 export {
     TITLE_VIEWER, LABEL_COPY, LABEL_COPIED, LABEL_COPY_FAILED, LABEL_FILTER_ALL, LABEL_EMPTY,

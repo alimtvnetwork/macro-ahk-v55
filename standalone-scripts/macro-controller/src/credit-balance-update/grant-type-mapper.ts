@@ -6,9 +6,7 @@ const LOG_SCOPE = 'CreditBalanceUpdate.grantType';
 export function mapGrantTypeFromWire(wireGrantType: string | null | undefined): GrantType {
     const normalized = (wireGrantType || '').trim().toLowerCase();
 
-    const isMissingNormalized = !normalized;
-
-    if (isMissingNormalized) {
+    if (!normalized) {
         return GrantType.Unknown;
     }
 

@@ -7,16 +7,16 @@
  */
 
 export { runStepA } from "./run-step-a";
-export { StepAStepCode } from "./step-a-types";
+export { StepAStepCodeType } from "./step-a-types";
 export type { StepARequest, StepAResult, StepAStepOutcome } from "./step-a-types";
 export { extractWorkspaceId } from "./extract-workspace-id";
 export { toStepAApiRole } from "./role-api-mapper";
 export { runStepB } from "./run-step-b";
-export { StepBStepCode } from "./step-b-types";
+export { StepBStepCodeType } from "./step-b-types";
 export type { StepBRequest, StepBResult, StepBStepOutcome } from "./step-b-types";
 export { shouldRunStepB } from "./should-run-step-b";
 export { runUserAddRow } from "./run-row";
-export { UserAddRowOutcomeCode } from "./row-types";
+export { UserAddRowOutcomeCodeType } from "./row-types";
 export type { UserAddRowContext, UserAddRowResult, UserAddTaskParams } from "./row-types";
 export { finalizeUserAddRow } from "./row-finalize";
 export { buildRowFailure, buildRowSuccess } from "./row-result-builders";

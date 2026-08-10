@@ -10,13 +10,13 @@
  * so the persisted row state allows a future re-run to skip Step A.
  */
 
-import { UserAddRowOutcomeCode } from "./row-types";
+import { UserAddRowOutcomeCodeType } from "./row-types";
 import type { UserAddRowResult } from "./row-types";
 
 export interface RowFailureInputs {
     rowIndex: number;
     startedAt: number;
-    outcome: UserAddRowOutcomeCode;
+    outcome: UserAddRowOutcomeCodeType;
     error: string;
     stepBRan: boolean;
     stepASucceeded: boolean;
@@ -40,7 +40,7 @@ export interface RowSuccessInputs {
 }
 
 export const buildRowSuccess = (inputs: RowSuccessInputs): UserAddRowResult => ({
-    RowIndex: inputs.rowIndex, Outcome: UserAddRowOutcomeCode.Succeeded,
+    RowIndex: inputs.rowIndex, Outcome: UserAddRowOutcomeCodeType.Succeeded,
     IsDone: true, HasError: false, LastError: null,
     DurationMs: Date.now() - inputs.startedAt, StepBRan: inputs.stepBRan,
     StepASucceeded: true, WorkspaceId: inputs.workspaceId, UserId: inputs.userId,

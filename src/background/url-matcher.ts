@@ -67,8 +67,7 @@ function isGlobMatch(url: string, pattern: string): boolean {
         const regex = new RegExp(regexPattern);
 
         return regex.test(url);
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return false;
     }
 }
@@ -79,8 +78,7 @@ function isRegexMatch(url: string, pattern: string): boolean {
         const regex = new RegExp(pattern);
 
         return regex.test(url);
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return false;
     }
 }
@@ -132,9 +130,7 @@ function checkExcludePattern(
     excludePattern: string | undefined,
 ): boolean {
     const hasPattern = excludePattern !== undefined && excludePattern !== "";
-    const isMissingPattern = hasPattern === false;
-
-    if (isMissingPattern) {
+    if (hasPattern === false) {
         return false;
     }
 
@@ -143,8 +139,7 @@ function checkExcludePattern(
         const regex = new RegExp(excludePattern!);
 
         return regex.test(pathname);
-    } catch (err) { logBgError("Automatically logged error:", err);
-        logBgWarnError(BgLogTag.URL_MATCHER, `Invalid excludePattern: ${excludePattern}`);
+    } catch (err) {         logBgWarnError(BgLogTag.URL_MATCHER, `Invalid excludePattern: ${excludePattern}`);
 
         return false;
     }
@@ -154,8 +149,7 @@ function checkExcludePattern(
 function extractPathname(url: string): string {
     try {
         return new URL(url).pathname;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return url;
     }
 }

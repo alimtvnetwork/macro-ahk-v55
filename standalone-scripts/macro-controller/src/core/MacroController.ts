@@ -79,8 +79,7 @@ export class MacroController {
   // ---- Singleton access ----
 
   static getInstance(): MacroController {
-    const isMissing_instance = !MacroController._instance;
-    if (isMissing_instance) {
+    if (!MacroController._instance) {
       MacroController._instance = new MacroController();
     }
 
@@ -121,60 +120,52 @@ export class MacroController {
   // ---- Public accessors with self-healing from persisted factories ----
 
   get auth(): AuthManagerInterface {
-    const isMissing_auth = !this._auth;
-    if (isMissing_auth) {
+    if (!this._auth) {
       const factory = nsReadTyped('_internal.createAuthManager') as (() => AuthManagerInterface) | null;
       if (factory) {
         log('[MacroController] Self-healing: auto-registering AuthManager from persisted factory', 'warn');
         this._auth = factory();
       }
-      const isMissing_auth = !this._auth;
-      if (isMissing_auth) throw this._notRegisteredError('AuthManager');
+      if (!this._auth) throw this._notRegisteredError('AuthManager');
     }
 
     return this._auth;
   }
 
   get credits(): CreditManagerInterface {
-    const isMissing_credits = !this._credits;
-    if (isMissing_credits) {
+    if (!this._credits) {
       const factory = nsReadTyped('_internal.createCreditManager') as (() => CreditManagerInterface) | null;
       if (factory) {
         log('[MacroController] Self-healing: auto-registering CreditManager from persisted factory', 'warn');
         this._credits = factory();
       }
-      const isMissing_credits = !this._credits;
-      if (isMissing_credits) throw this._notRegisteredError('CreditManager');
+      if (!this._credits) throw this._notRegisteredError('CreditManager');
     }
 
     return this._credits;
   }
 
   get workspaces(): WorkspaceManagerInterface {
-    const isMissing_workspaces = !this._workspaces;
-    if (isMissing_workspaces) {
+    if (!this._workspaces) {
       const factory = nsReadTyped('_internal.createWorkspaceManager') as (() => WorkspaceManagerInterface) | null;
       if (factory) {
         log('[MacroController] Self-healing: auto-registering WorkspaceManager from persisted factory', 'warn');
         this._workspaces = factory();
       }
-      const isMissing_workspaces = !this._workspaces;
-      if (isMissing_workspaces) throw this._notRegisteredError('WorkspaceManager');
+      if (!this._workspaces) throw this._notRegisteredError('WorkspaceManager');
     }
 
     return this._workspaces;
   }
 
   get loop(): LoopEngineInterface {
-    const isMissing_loop = !this._loop;
-    if (isMissing_loop) {
+    if (!this._loop) {
       const factory = nsReadTyped('_internal.createLoopEngine') as (() => LoopEngineInterface) | null;
       if (factory) {
         log('[MacroController] Self-healing: auto-registering LoopEngine from persisted factory', 'warn');
         this._loop = factory();
       }
-      const isMissing_loop = !this._loop;
-      if (isMissing_loop) throw this._notRegisteredError('LoopEngine');
+      if (!this._loop) throw this._notRegisteredError('LoopEngine');
     }
 
     return this._loop;
@@ -185,8 +176,7 @@ export class MacroController {
    * Returns null only if factory is also unavailable (early startup).
    */
   get ui(): UIManagerInterface | null {
-    const isMissing_ui = !this._ui;
-    if (isMissing_ui) {
+    if (!this._ui) {
       const factory = nsReadTyped('_internal.createUIManager') as (() => UIManagerInterface) | null;
       if (factory) {
         log('[MacroController] Self-healing: auto-registering UIManager from persisted factory', 'warn');

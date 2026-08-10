@@ -147,9 +147,7 @@ async function handleFallbackAuthRecovery(
 
   const newToken = await recoverAuthOnce();
 
-  const isMissingNewToken = !newToken;
-
-  if (isMissingNewToken) {
+  if (!newToken) {
     logError('Cycle fallback', 'Recovery failed - skipping this cycle');
     showToast('Auth recovery failed - will retry next cycle', 'warn', { noStop: true });
     releaseCycleLock();
@@ -184,9 +182,7 @@ async function processWorkspaceData(
 
   const isParseOk = parseLoopApiResponse(data);
 
-  const isMissingIsParseOk = !isParseOk;
-
-  if (isMissingIsParseOk) {
+  if (!isParseOk) {
     logError('Cycle aborted', 'API response parse failed');
 
     return;

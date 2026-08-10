@@ -51,8 +51,7 @@ export function detectWorkspaceViaProjectDialog(callerFn?: string, perWs?: Works
   }
 
   const hasWorkspaces = perWs.length > 0;
-  const isMissingHasWorkspaces = !hasWorkspaces;
-  if (isMissingHasWorkspaces) {
+  if (!hasWorkspaces) {
     log(fn + ': No workspaces loaded — will still try to read workspace name from dialog XPath directly', 'warn');
   }
 
@@ -62,8 +61,7 @@ export function detectWorkspaceViaProjectDialog(callerFn?: string, perWs?: Works
   if (keepDialogOpen) logSub('keepDialogOpen=true — caller will close dialog after Step 3', 1);
 
   return findProjectButtonWithRetry(fn, 3, 1000).then(function(btn: Element | null) {
-    const isMissingBtn = !btn;
-    if (isMissingBtn) {
+    if (!btn) {
       logError('ws-dialog-detection', 'Project button NOT found after retries — cannot open dialog. XPath=' + CONFIG.PROJECT_BUTTON_XPATH);
       log(fn + LabelType.KeepingExistingWs + (state.workspaceName || '(none)'), 'warn');
 
@@ -91,9 +89,7 @@ function tryFindProjectButton(ctx: ProjectBtnRetryCtx): void {
   ctx.attempt++;
   let btn: Element | null = getByXPath(CONFIG.PROJECT_BUTTON_XPATH) as Element | null;
 
-  const isMissingBtn = !btn;
-
-  if (isMissingBtn) {
+  if (!btn) {
     btn = findElement(ML_ELEMENTS.PROJECT_BUTTON);
     if (btn) { logSub('Project button found via fallback findElement (attempt ' + ctx.attempt + ')', 1); }
   }
@@ -235,15 +231,13 @@ function handlePollTimeout(
     state.workspaceName = cssFallback.matched.fullName || cssFallback.matched.name;
     loopCreditState.currentWs = cssFallback.matched;
     log(fn + ': ⚠️ Workspace detected via CSS fallback: "' + cssFallback.rawName + '" → ' + state.workspaceName, 'warn');
-    const isMissingKeepDialogOpen = !keepDialogOpen;
-    if (isMissingKeepDialogOpen) closeProjectDialogSafe(btn);
+    if (!keepDialogOpen) closeProjectDialogSafe(btn);
     resolve();
 
     return;
   }
   log(fn + ': CSS fallback also failed — preserving existing workspace', 'warn');
-  const isMissingKeepDialogOpen = !keepDialogOpen;
-  if (isMissingKeepDialogOpen) {
+  if (!keepDialogOpen) {
     closeDialogAndDefault(fn, btn, perWs, resolve);
   } else {
     resolve();
@@ -267,9 +261,7 @@ function pollForWorkspaceName(fn: string, btn: Element, perWs: WorkspaceCredit[]
       const chosen = resolveChosenWorkspace(fn, allNodes, perWs);
       applyChosenWorkspace(fn, chosen, allNodes, perWs);
 
-      const isMissingKeepDialogOpen = !keepDialogOpen;
-
-      if (isMissingKeepDialogOpen) {
+      if (!keepDialogOpen) {
         closeProjectDialogSafe(btn);
       } else {
         logSub('keepDialogOpen=true — leaving dialog open for Step 3 (progress bar)', 1);
@@ -304,9 +296,7 @@ function findWorkspaceNameViaCss(_fn: string, perWs: WorkspaceCredit[]): { match
         for (const candidate of nodeCandidates) {
           const matched = matchWorkspaceByName(candidate.name, perWs);
 
-          const isMissingMatched = !matched;
-
-          if (isMissingMatched) {
+          if (!matched) {
             continue;
           }
 
@@ -332,8 +322,7 @@ function findWorkspaceNameViaCss(_fn: string, perWs: WorkspaceCredit[]): { match
 // Close dialog and default helpers
 // ============================================
 function closeDialogAndDefault(fn: string, btn: Element, _perWs: WorkspaceCredit[], resolve: () => void): void {
-  const isMissingWorkspaceName = !state.workspaceName;
-  if (isMissingWorkspaceName) {
+  if (!state.workspaceName) {
     log(fn + ': No reliable workspace match — keeping workspace empty after fallback miss', 'warn');
   } else {
     log(fn + LabelType.KeepingExistingWs + state.workspaceName, 'warn');

@@ -120,8 +120,7 @@ function checkStorageQuota(): ApplyQuotaResultType {
         if (isWarning) return "warning";
 
         return "ok";
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return "ok";
     }
 }
@@ -152,8 +151,7 @@ function checkErrorRate(): ApplyErrorRateResultType {
         if (isDegraded) return "degraded";
 
         return "ok";
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return "ok";
     }
 }

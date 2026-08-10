@@ -164,8 +164,7 @@ function renderBody(body: HTMLElement): void {
 
 export function removeProjectsModal(): void {
     const existing = document.getElementById(DIALOG_ID) as DraggableElement | null;
-    const isMissingExisting = !existing;
-    if (isMissingExisting) return;
+    if (!existing) return;
     if (existing.__cleanupDrag) existing.__cleanupDrag();
     state.refreshWorkspaceFilter = null;
     existing.remove();
@@ -312,8 +311,7 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
     const out: ProjectEntry[] = [];
     for (const p of list) {
         const id = typeof p.id === 'string' ? p.id : '';
-        const isMissingId = !id;
-        if (isMissingId) continue;
+        if (!id) continue;
         const rawName = typeof p.name === 'string' ? p.name : '';
         out.push({
             id,
@@ -331,8 +329,7 @@ function attachRowClicks(body: HTMLElement): void {
     // eslint-disable-next-line sonarjs/cognitive-complexity
     body.addEventListener('click', function (e: Event): void {
         const target = e.target as HTMLElement | null;
-        const isMissingTarget = !target;
-        if (isMissingTarget) return;
+        if (!target) return;
 
         // Clear-all-filters action from the zero-results panel.
         const clearAll = target.closest('[data-clear-filters]') as HTMLElement | null;
@@ -366,8 +363,7 @@ function attachRowClicks(body: HTMLElement): void {
         const toggle = target.closest('[data-ws-toggle]') as HTMLElement | null;
         if (toggle) {
             const wsId = toggle.getAttribute('data-ws-toggle') ?? '';
-            const isMissingWsId = !wsId;
-            if (isMissingWsId) return;
+            if (!wsId) return;
             if (state.collapsed.has(wsId)) state.collapsed.delete(wsId);
             else state.collapsed.add(wsId);
             saveCollapsedState();
@@ -377,11 +373,9 @@ function attachRowClicks(body: HTMLElement): void {
         }
 
         const row = target.closest('[data-open-url]') as HTMLElement | null;
-        const isMissingRow = !row;
-        if (isMissingRow) return;
+        if (!row) return;
         const url = row.getAttribute('data-open-url') ?? '';
-        const isMissingUrl = !url;
-        if (isMissingUrl) return;
+        if (!url) return;
         try { window.open(url, '_blank', 'noopener'); }
         catch (err) { log('Projects: open tab failed: ' + String(err), 'warn'); }
     });
@@ -432,8 +426,7 @@ function applyProjectFilters(
     tabIndex: OpenTabIndex,
 ): WorkspaceBlock[] {
     return workspaceBlocks.map(function (b) {
-        const isMissingProjects = !b.projects;
-        if (isMissingProjects) return b;
+        if (!b.projects) return b;
         const projects = b.projects.filter(function (p) {
             if (q && !(
                 p.name.toLowerCase().includes(q)
@@ -921,8 +914,7 @@ function attachDrag(panel: HTMLElement, bar: HTMLElement, closeBtn: HTMLElement)
         e.preventDefault();
     };
     const onMove = function (e: MouseEvent): void {
-        const isMissingDragging = !dragging;
-        if (isMissingDragging) return;
+        if (!dragging) return;
         panel.style.left = (e.clientX - offX) + 'px';
         panel.style.top = (e.clientY - offY) + 'px';
         panel.style.right = 'auto';
@@ -998,8 +990,7 @@ function _buildExportRows(
 ): ExportRowsResult {
     const tasks: Array<{ ws: WorkspaceCredit; project: ProjectEntry }> = [];
     for (const b of blocks) {
-        const isMissingProjects = !b.projects;
-        if (isMissingProjects) continue;
+        if (!b.projects) continue;
         for (const p of b.projects) tasks.push({ ws: b.ws, project: p });
     }
     const rows: ExportRow[] = tasks.map(function(task) {
@@ -1166,8 +1157,7 @@ function downloadCsv(filename: string, csv: string): void {
 
 function setExportButtonDisabled(disabled: boolean): void {
     const btn = document.getElementById('marco-projects-export-btn') as HTMLButtonElement | null;
-    const isMissingBtn = !btn;
-    if (isMissingBtn) return;
+    if (!btn) return;
     btn.disabled = disabled;
     btn.style.opacity = disabled ? '0.5' : '1';
     btn.style.cursor = disabled ? 'wait' : 'pointer';

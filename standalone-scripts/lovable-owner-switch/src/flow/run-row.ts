@@ -16,7 +16,7 @@ import { runLogin } from "./run-login";
 import { runSignOut } from "./run-sign-out";
 import { runOwnerEmails } from "./run-owner-emails";
 import { finalizeRow } from "./row-finalize";
-import { RowOutcomeCode } from "./row-types";
+import { RowOutcomeCodeType } from "./row-types";
 import { LogPhaseType, LogSeverityType, buildEntry } from "./log-sink";
 import type { LogSink } from "./log-sink";
 import type { PromotedOwnerRecord, RowExecutionContext, RowExecutionResult } from "./row-types";
@@ -27,7 +27,7 @@ const resolvePassword = (ctx: RowExecutionContext): string | null => {
 };
 
 const failResult = (
-    ctx: RowExecutionContext, startedAt: number, outcome: RowOutcomeCode,
+    ctx: RowExecutionContext, startedAt: number, outcome: RowOutcomeCodeType,
     error: string, promotedOwners: ReadonlyArray<PromotedOwnerRecord>,
 ): RowExecutionResult => ({
     RowIndex: ctx.Row.RowIndex, Outcome: outcome,
@@ -39,7 +39,7 @@ const succeedResult = (
     ctx: RowExecutionContext, startedAt: number,
     promotedOwners: ReadonlyArray<PromotedOwnerRecord>,
 ): RowExecutionResult => ({
-    RowIndex: ctx.Row.RowIndex, Outcome: RowOutcomeCode.Succeeded,
+    RowIndex: ctx.Row.RowIndex, Outcome: RowOutcomeCodeType.Succeeded,
     IsDone: true, HasError: false, LastError: null,
     DurationMs: Date.now() - startedAt, PromotedOwners: promotedOwners,
 });
@@ -51,10 +51,10 @@ const noteSignOut = (ctx: RowExecutionContext, sink: LogSink, error: string | nu
     ));
 };
 
-const promoteOutcomeCode = (records: ReadonlyArray<PromotedOwnerRecord>): RowOutcomeCode => {
+const promoteOutcomeCode = (records: ReadonlyArray<PromotedOwnerRecord>): RowOutcomeCodeType => {
     const anyPromoted = records.some((r) => r.Promoted);
 
-    return anyPromoted ? RowOutcomeCode.PromoteFailedPartial : RowOutcomeCode.PromoteFailed;
+    return anyPromoted ? RowOutcomeCodeType.PromoteFailedPartial : RowOutcomeCodeType.PromoteFailed;
 };
 
 export const runRow = async (
@@ -65,7 +65,7 @@ export const runRow = async (
 
     if (password === null) {
         return finalizeRow(ctx, sink, store, failResult(
-            ctx, startedAt, RowOutcomeCode.PasswordMissing,
+            ctx, startedAt, RowOutcomeCodeType.PasswordMissing,
             "Password missing on row and no CommonPassword fallback", [],
         ));
     }
@@ -77,7 +77,7 @@ export const runRow = async (
 
     if (login.Error !== null) {
         return finalizeRow(ctx, sink, store, failResult(
-            ctx, startedAt, RowOutcomeCode.LoginFailed, login.Error, [],
+            ctx, startedAt, RowOutcomeCodeType.LoginFailed, login.Error, [],
         ));
     }
 

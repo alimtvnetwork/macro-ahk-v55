@@ -13,7 +13,7 @@
  */
 
 import { LovableApiClient } from "../../../lovable-common/src/api/lovable-api-client";
-import { StepBStepCode } from "./step-b-types";
+import { StepBStepCodeType } from "./step-b-types";
 import type { StepBRequest, StepBResult, StepBStepOutcome } from "./step-b-types";
 import type { MembershipSummary } from "../../../lovable-common/src/api/lovable-api-types";
 
@@ -34,7 +34,7 @@ const measurePromote = async (
 const buildOutcome = (
     request: StepBRequest, measured: MeasuredMembership,
 ): StepBStepOutcome => ({
-    Step: StepBStepCode.PromoteToOwner,
+    Step: StepBStepCodeType.PromoteToOwner,
     DurationMs: measured.DurationMs,
     WorkspaceId: request.WorkspaceId,
     UserId: request.UserId,

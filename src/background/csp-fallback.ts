@@ -241,8 +241,7 @@ async function executeInMainWorld(code: string): Promise<string> {
     staleScripts.forEach(function(element) { element.remove(); });
 
     const target = document.body ?? document.documentElement;
-    const isMissingTarget = !target;
-    if (isMissingTarget) {
+    if (!target) {
         URL.revokeObjectURL(url);
         throw new Error("No HTML target available for MAIN blob script injection");
     }
@@ -287,19 +286,16 @@ async function executeInMainWorld(code: string): Promise<string> {
                 Node.prototype.appendChild.call(target, node);
 
                 return true;
-            } catch (err) { logBgError("Automatically logged error:", err);
-                try {
+            } catch (err) {                 try {
                     Node.prototype.insertBefore.call(target, node, null);
 
                     return true;
-                } catch (err) { logBgError("Automatically logged error:", err);
-                    if (node.nodeType === Node.ELEMENT_NODE) {
+                } catch (err) {                     if (node.nodeType === Node.ELEMENT_NODE) {
                         try {
                             Element.prototype.insertAdjacentElement.call(target, "beforeend", node as Element);
 
                             return true;
-                        } catch (err) { logBgError("Automatically logged error:", err);
-
+                        } catch (err) { 
                             return false;
                         }
                     }
@@ -371,9 +367,7 @@ async function attemptUserScriptFallback(
     // Check if legacy injection is forced via settings
     const isForceLegacy = await isLegacyInjectionForced();
 
-    const isMissingIsForceLegacy = !isForceLegacy;
-
-    if (isMissingIsForceLegacy) {
+    if (!isForceLegacy) {
         // Ensure USER_SCRIPT world exists before execute() to avoid cold-start race.
         await configureUserScriptWorld();
 
@@ -558,8 +552,7 @@ async function executeBlobInjection(code: string): Promise<string> {
     staleScripts.forEach(function(element) { element.remove(); });
 
     const target = document.body ?? document.documentElement;
-    const isMissingTarget = !target;
-    if (isMissingTarget) {
+    if (!target) {
         URL.revokeObjectURL(url);
         throw new Error("No HTML target available for ISOLATED script tag injection");
     }
@@ -606,19 +599,16 @@ async function executeBlobInjection(code: string): Promise<string> {
                 Node.prototype.appendChild.call(target, node);
 
                 return true;
-            } catch (err) { logBgError("Automatically logged error:", err);
-                try {
+            } catch (err) {                 try {
                     Node.prototype.insertBefore.call(target, node, null);
 
                     return true;
-                } catch (err) { logBgError("Automatically logged error:", err);
-                    if (node.nodeType === Node.ELEMENT_NODE) {
+                } catch (err) {                     if (node.nodeType === Node.ELEMENT_NODE) {
                         try {
                             Element.prototype.insertAdjacentElement.call(target, "beforeend", node as Element);
 
                             return true;
-                        } catch (err) { logBgError("Automatically logged error:", err);
-
+                        } catch (err) { 
                             return false;
                         }
                     }

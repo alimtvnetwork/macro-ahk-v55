@@ -92,8 +92,7 @@ function hydrate(): void {
   try {
     if (typeof localStorage === 'undefined') return;
     const raw = localStorage.getItem(STORAGE_KEY);
-    const isMissingRaw = !raw;
-    if (isMissingRaw) return;
+    if (!raw) return;
     const o = JSON.parse(raw) as Partial<SplitterState>;
     if (typeof o.bigText === 'string') state.bigText = o.bigText;
     if (typeof o.stepCount === 'number') state.stepCount = clamp(o.stepCount, STEP_MIN, STEP_MAX);
@@ -260,8 +259,7 @@ async function waitForCompletion(maxMs: number): Promise<void> {
     if (state.cancelled) return;
     const btn = findAddToTasksButton();
     const processing = isReturnButtonVisible() || !btn || (btn as HTMLButtonElement).disabled;
-    const isMissingProcessing = !processing;
-    if (isMissingProcessing) return;
+    if (!processing) return;
     await sleep(POLL_MS);
   }
 }
@@ -271,8 +269,7 @@ async function waitForCompletion(maxMs: number): Promise<void> {
 function readEditorText(): string {
   try {
     const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
-    const isMissingTarget = !target;
-    if (isMissingTarget) return '';
+    if (!target) return '';
     if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) return target.value || '';
 
     return (target.textContent || '');
@@ -288,8 +285,7 @@ async function breakIntoSteps(): Promise<void> {
     return;
   }
   const text = readEditorText().trim();
-  const isMissingText = !text;
-  if (isMissingText) {
+  if (!text) {
     showPasteToast('❌ Task Splitter: type your instruction in the Lovable chat box first', true);
 
     return;
@@ -361,8 +357,7 @@ function reportSplitterParseFailure(caught: CaughtError, expectedN: number): voi
 
 async function sendOneStep(): Promise<boolean> {
   const perText = resolvePerStepPromptText();
-  const isMissingPerText = !perText;
-  if (isMissingPerText) {
+  if (!perText) {
     logError('TaskSplitter', 'per-step prompt not found (slug="' + state.perStepPromptSlug + '" / auto next-${N}-steps)');
     showPasteToast('❌ Task Splitter: per-step prompt not found', true);
 
@@ -423,8 +418,7 @@ async function runAuto(): Promise<void> {
 }
 
 function stopAuto(): void {
-  const isMissingRunning = !state.running;
-  if (isMissingRunning) return;
+  if (!state.running) return;
   state.cancelled = true;
   notify();
 }
@@ -478,8 +472,7 @@ function populatePromptSelect(sel: HTMLSelectElement, currentSlug: string, autoL
   const seenParents = new Set<string>();
   for (const e of entries) {
     const slug = e.slug || '';
-    const isMissingSlug = !slug;
-    if (isMissingSlug) continue;
+    if (!slug) continue;
     const o = document.createElement('option');
     o.value = slug;
     const label = e.parentTitle && e.variantValue

@@ -91,8 +91,7 @@ async function checkCookieCondition(
         });
 
         return cookie !== null;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return false;
     }
 }
@@ -123,8 +122,7 @@ async function checkElementCondition(
         const hasResult = results.length > 0;
 
         return hasResult ? (results[0].result as boolean) : false;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return false;
     }
 }
@@ -147,8 +145,7 @@ async function checkOnlineCondition(): Promise<boolean> {
         const status = result["marco_network_status"];
 
         return status === "offline";
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return false;
     }
 }

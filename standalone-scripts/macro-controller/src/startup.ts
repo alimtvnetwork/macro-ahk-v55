@@ -211,8 +211,7 @@ function registerPassiveAttachShortcut(deps: Parameters<typeof bootstrap>[0]): v
   w.__MARCO_PASSIVE_SHORTCUT__ = true;
 
   const handler = function (e: KeyboardEvent): void {
-    const isMissingModifiers = !e.ctrlKey || !e.altKey || e.shiftKey;
-    if (isMissingModifiers) return;
+    if (!e.ctrlKey || !e.altKey || e.shiftKey) return;
     const isNotH = e.key.toLowerCase() !== 'h';
     if (isNotH) return;
     // Bail out if the full panel is already up, let the in-panel handler run.
@@ -425,8 +424,7 @@ function tryCreateUiNow(mc: MacroController): boolean {
     return true;
   }
 
-  const isMissingUi = !mc.hasUI;
-  if (isMissingUi) {
+  if (!mc.hasUI) {
     ensureUiManagerRegistered(mc);
   }
 
@@ -510,8 +508,7 @@ function cancelTimeoutAndCreateUi(): void {
     window.clearTimeout(timeoutId);
     (state as unknown as Record<string, unknown>).__uiTimeoutId = undefined;
   }
-  const isMissingContainer = !document.getElementById(IDS.CONTAINER);
-  if (isMissingContainer) {
+  if (!document.getElementById(IDS.CONTAINER)) {
     createUiAndObserver();
   }
 }
@@ -557,8 +554,7 @@ function handleTokenFailure(tokenResult: { waitedMs: number; reason: string }): 
 function logAuthDiag(): void {
   try {
     const authDiag = window.marco?.auth?.getLastAuthDiag?.();
-    const isMissingAuthDiag = !authDiag;
-    if (isMissingAuthDiag) return;
+    if (!authDiag) return;
 
     const bridgeTag = authDiag.bridgeOutcome === 'hit' ? '✅ bridge hit'
       : authDiag.bridgeOutcome === 'timeout' ? '⏱ bridge timeout'
@@ -676,8 +672,7 @@ function fetchTier1Prefetch(projectId: string, _token: string): Promise<MarkView
   try {
     const workspaceApi = window.marco?.api?.workspace;
     const isMissingWorkspaceApi = !workspaceApi;
-    const isMissingMarkViewed = isMissingWorkspaceApi || typeof workspaceApi.markViewed !== 'function';
-    if (isMissingMarkViewed) {
+    if (isMissingWorkspaceApi || typeof workspaceApi.markViewed !== 'function') {
       log('Startup: Tier 1 prefetch skipped, marco-sdk workspace API unavailable', 'warn');
       timingEnd(LabelType.WsPrefetch, 'warn', 'SDK workspace API unavailable');
 
@@ -736,8 +731,7 @@ function resolveTier1Workspace(tier1Data: MarkViewedResponse): boolean {
   const perWs = loopCreditState.perWorkspace || [];
   let matched = wsById[wsId];
 
-  const isMissingMatch = !matched;
-  if (isMissingMatch) {
+  if (!matched) {
     for (const ws of perWs) {
       const isMatch = ws.id === wsId;
 
@@ -769,8 +763,7 @@ function resolveTier1Workspace(tier1Data: MarkViewedResponse): boolean {
 // ── Workspace Retry ──
 
 // Retry policy: first retry forces cookie refresh, second retry is the final pass.
-
-// eslint-disable-next-line max-lines-per-function
+ 
 function scheduleWorkspaceRetry(attempt: number): void {
   const isExhausted = attempt > STARTUP_WS_MAX_RETRIES;
   if (isExhausted) {
@@ -810,13 +803,11 @@ function scheduleWorkspaceRetry(attempt: number): void {
       }
     }
 
-    const isMissingRetryToken1 = !retryToken;
-    if (isMissingRetryToken1) {
+    if (!retryToken) {
       retryToken = resolveToken();
     }
 
-    const isMissingRetryToken2 = !retryToken;
-    if (isMissingRetryToken2) {
+    if (!retryToken) {
       log(LabelType.StartupRetry + attempt + ', no token available after cookie fallback, moving to next retry', 'warn');
       scheduleWorkspaceRetry(attempt + 1);
 

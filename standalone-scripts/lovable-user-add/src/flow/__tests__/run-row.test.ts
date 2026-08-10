@@ -12,10 +12,10 @@
 
 import { describe, expect, it, vi } from "vitest";
 import { runUserAddRow } from "../run-row";
-import { UserAddRowOutcomeCode } from "../row-types";
+import { UserAddRowOutcomeCodeType } from "../row-types";
 import { UserAddLogPhaseType, UserAddLogSeverityType } from "../log-sink";
-import { UserAddMembershipRoleCode } from "../../migrations/membership-role-seed";
-import { MembershipRoleApiCode } from "../../../../lovable-common/src/api/membership-role-api-code";
+import { UserAddMembershipRoleCodeType } from "../../migrations/membership-role-seed";
+import { MembershipRoleApiCodeType } from "../../../../lovable-common/src/api/membership-role-api-code";
 import type { UserAddLogEntry, UserAddLogSink } from "../log-sink";
 import type { UserAddRowContext } from "../row-types";
 import type { UserAddRowStateStore, UserAddRowStateUpdate } from "../row-state-store";
@@ -35,7 +35,7 @@ const collectingStore = (): { store: UserAddRowStateStore; updates: UserAddRowSt
     return { store: { update: (u) => updates.push(u) }, updates };
 };
 
-const buildRow = (roleCode: UserAddMembershipRoleCode): UserAddCsvRow => ({
+const buildRow = (roleCode: UserAddMembershipRoleCodeType): UserAddCsvRow => ({
     RowIndex: 1,
     WorkspaceUrl: "https://lovable.dev/projects/abc",
     MemberEmail: "[email protected]",
@@ -45,8 +45,8 @@ const buildRow = (roleCode: UserAddMembershipRoleCode): UserAddCsvRow => ({
     Notes: null,
 });
 
-const buildCtx = (roleCode: UserAddMembershipRoleCode): UserAddRowContext => ({
-    Task: { TaskId: "task-1", DefaultRoleCode: UserAddMembershipRoleCode.Member },
+const buildCtx = (roleCode: UserAddMembershipRoleCodeType): UserAddRowContext => ({
+    Task: { TaskId: "task-1", DefaultRoleCode: UserAddMembershipRoleCodeType.Member },
     Row: buildRow(roleCode),
     Api: {} as UserAddRowContext["Api"],
 });
@@ -58,7 +58,7 @@ describe("runUserAddRow — failure marking, no rollback", () => {
             WorkspaceId: "ws-123",
             Membership: {
                 UserId: "u-456", Email: "[email protected]",
-                Role: MembershipRoleApiCode.Member,
+                Role: MembershipRoleApiCodeType.Member,
             },
         });
         const stepBSpy = vi.spyOn(stepBModule, "runStepB").mockResolvedValue({
@@ -67,9 +67,9 @@ describe("runUserAddRow — failure marking, no rollback", () => {
 
         const { sink, entries } = collectingSink();
         const { store, updates } = collectingStore();
-        const result = await runUserAddRow(buildCtx(UserAddMembershipRoleCode.Owner), sink, store);
+        const result = await runUserAddRow(buildCtx(UserAddMembershipRoleCodeType.Owner), sink, store);
 
-        expect(result.Outcome).toBe(UserAddRowOutcomeCode.StepBFailedMemberAdded);
+        expect(result.Outcome).toBe(UserAddRowOutcomeCodeType.StepBFailedMemberAdded);
         expect(result.StepASucceeded).toBe(true);
         expect(result.WorkspaceId).toBe("ws-123");
         expect(result.UserId).toBe("u-456");
@@ -85,7 +85,7 @@ describe("runUserAddRow — failure marking, no rollback", () => {
 
         expect(updates).toHaveLength(1);
         expect(updates[0]).toMatchObject({
-            Outcome: UserAddRowOutcomeCode.StepBFailedMemberAdded,
+            Outcome: UserAddRowOutcomeCodeType.StepBFailedMemberAdded,
             StepASucceeded: true, WorkspaceId: "ws-123", UserId: "u-456",
             IsDone: false, HasError: true,
         });
@@ -101,9 +101,9 @@ describe("runUserAddRow — failure marking, no rollback", () => {
 
         const { sink, entries } = collectingSink();
         const { store, updates } = collectingStore();
-        const result = await runUserAddRow(buildCtx(UserAddMembershipRoleCode.Member), sink, store);
+        const result = await runUserAddRow(buildCtx(UserAddMembershipRoleCodeType.Member), sink, store);
 
-        expect(result.Outcome).toBe(UserAddRowOutcomeCode.StepAFailed);
+        expect(result.Outcome).toBe(UserAddRowOutcomeCodeType.StepAFailed);
         expect(result.StepASucceeded).toBe(false);
         expect(result.WorkspaceId).toBeNull();
         expect(result.UserId).toBeNull();
@@ -123,7 +123,7 @@ describe("runUserAddRow — failure marking, no rollback", () => {
             WorkspaceId: "ws-9",
             Membership: {
                 UserId: "u-9", Email: "[email protected]",
-                Role: MembershipRoleApiCode.Member,
+                Role: MembershipRoleApiCodeType.Member,
             },
         });
         const stepBSpy = vi.spyOn(stepBModule, "runStepB").mockResolvedValue({
@@ -132,9 +132,9 @@ describe("runUserAddRow — failure marking, no rollback", () => {
 
         const { sink } = collectingSink();
         const { store, updates } = collectingStore();
-        const result = await runUserAddRow(buildCtx(UserAddMembershipRoleCode.Owner), sink, store);
+        const result = await runUserAddRow(buildCtx(UserAddMembershipRoleCodeType.Owner), sink, store);
 
-        expect(result.Outcome).toBe(UserAddRowOutcomeCode.Succeeded);
+        expect(result.Outcome).toBe(UserAddRowOutcomeCodeType.Succeeded);
         expect(result.StepASucceeded).toBe(true);
         expect(result.StepBRan).toBe(true);
         expect(updates[0].WorkspaceId).toBe("ws-9");

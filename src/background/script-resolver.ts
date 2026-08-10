@@ -51,8 +51,7 @@ function isBuiltinScript(script: StoredScript): boolean {
  */
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity -- cache-check + multi-candidate fetch with diagnostics
 async function resolveScriptCode(script: StoredScript): Promise<ResolvedCode> {
-    const isMissingFilePath = !script.filePath;
-    if (isMissingFilePath) {
+    if (!script.filePath) {
         if (isBuiltinScript(script)) {
             throw new Error(`Built-in script "${script.name}" is missing filePath\n  Path: chrome.storage.local script entry id="${script.id}"\n  Missing: filePath field on StoredScript\n  Reason: Built-in scripts MUST have a filePath pointing to dist/ — refusing embedded fallback to prevent stale code injection`);
         }
@@ -217,8 +216,7 @@ async function resolveDependencies(
             if (resolvedIds.has(depId)) continue;
 
             const depScript = findScript(allScripts, depId);
-            const isMissingDepScript = !depScript;
-            if (isMissingDepScript) {
+            if (!depScript) {
                 logBgWarnError(BgLogTag.SCRIPT_RESOLVER, `Dependency not found\n  Path: chrome.storage.local["${STORAGE_KEY_ALL_SCRIPTS}"]\n  Missing: Script with id="${depId}" (required by "${script.name}")\n  Reason: Dependency declared in script.dependencies but no matching script exists in storage`);
                 continue;
             }
@@ -280,9 +278,7 @@ async function resolveOneBinding(
     configs: StoredConfig[],
 ): Promise<ResolveOutcome> {
     const script = findScript(scripts, binding.scriptId);
-    const isMissingScript = script === null;
-
-    if (isMissingScript) {
+    if (script === null) {
         // CODE RED: URL matched a project rule but the bound script is missing from the library.
         // Per "no silent failures" policy — escalate to ERROR (not warn). See mem://standards/no-silent-failures.
         logBgError(BgLogTag.INJECTION_RESOLVE, `Script not found in store\n  Path: chrome.storage.local["${STORAGE_KEY_ALL_SCRIPTS}"] → lookup by id/name="${binding.scriptId}"\n  Missing: StoredScript matching "${binding.scriptId}" (store has ${scripts.length} scripts)\n  Reason: Script ID from project config does not match any script entry by id, name, or normalized filename`);
@@ -475,9 +471,7 @@ function resolveConfig(
     configId: string | null,
     configs: StoredConfig[],
 ): string | null {
-    const isMissingConfigId = configId === null;
-
-    if (isMissingConfigId) {
+    if (configId === null) {
         return null;
     }
 

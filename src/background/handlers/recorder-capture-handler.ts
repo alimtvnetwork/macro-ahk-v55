@@ -172,8 +172,7 @@ async function resolveProjectSlug(override?: string): Promise<string> {
             "RECORDER_CAPTURE_PERSIST: no active recording session — start the recorder first",
         );
     }
-    const isMissingProjectSlug = !session.ProjectSlug;
-    if (isMissingProjectSlug) {
+    if (!session.ProjectSlug) {
         throw new Error(
             "RECORDER_CAPTURE_PERSIST: active session has empty ProjectSlug",
         );

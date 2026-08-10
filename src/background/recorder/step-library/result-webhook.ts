@@ -137,8 +137,7 @@ function safeLocalStorage(): Storage | null {
         if (typeof localStorage === "undefined") return null;
 
         return localStorage;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return null;
     }
 }
@@ -174,12 +173,10 @@ function asEvent(v: unknown): WebhookEventKind {
 
 export function loadWebhookConfig(): WebhookConfig {
     const ls = safeLocalStorage();
-    const isMissingLs = !ls;
-    if (isMissingLs) return { ...DEFAULT_WEBHOOK_CONFIG };
+    if (!ls) return { ...DEFAULT_WEBHOOK_CONFIG };
     try {
         const raw = ls.getItem(CONFIG_STORAGE_KEY);
-        const isMissingRaw = !raw;
-        if (isMissingRaw) return { ...DEFAULT_WEBHOOK_CONFIG };
+        if (!raw) return { ...DEFAULT_WEBHOOK_CONFIG };
         const parsed: unknown = JSON.parse(raw);
         if (!isPlainRecord(parsed)) return { ...DEFAULT_WEBHOOK_CONFIG };
         const headers: WebhookHeader[] = Array.isArray(parsed.Headers)
@@ -204,8 +201,7 @@ export function loadWebhookConfig(): WebhookConfig {
             Events: events,
             SecretToken: asString(parsed.SecretToken, ""),
         };
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return { ...DEFAULT_WEBHOOK_CONFIG };
     }
 }
@@ -325,25 +321,21 @@ function migrateFailure(input: Record<string, unknown>, c: CommonMigratedFields)
 
 function readLogRaw(): unknown[] {
     const ls = safeLocalStorage();
-    const isMissingLs = !ls;
-    if (isMissingLs) return [];
+    if (!ls) return [];
     try {
         const raw = ls.getItem(LOG_STORAGE_KEY);
-        const isMissingRaw = !raw;
-        if (isMissingRaw) return [];
+        if (!raw) return [];
         const parsed: unknown = JSON.parse(raw);
 
         return Array.isArray(parsed) ? parsed : [];
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return [];
     }
 }
 
 function writeLog(entries: ReadonlyArray<WebhookDeliveryResult>): void {
     const ls = safeLocalStorage();
-    const isMissingLs = !ls;
-    if (isMissingLs) return;
+    if (!ls) return;
     try {
         ls.setItem(LOG_STORAGE_KEY, JSON.stringify(entries.slice(0, LOG_MAX_ENTRIES)));
     }catch (err) {
@@ -357,8 +349,7 @@ export function getDeliveryLog(): ReadonlyArray<WebhookDeliveryResult> {
 
 export function clearDeliveryLog(): void {
     const ls = safeLocalStorage();
-    const isMissingLs = !ls;
-    if (isMissingLs) return;
+    if (!ls) return;
     try { ls.removeItem(LOG_STORAGE_KEY); }catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); }
  // allow-swallow: clearing the delivery log is best-effort cleanup
@@ -509,8 +500,7 @@ function recordEntry<T extends WebhookDeliveryResult>(entry: T): T {
 }
 
 function checkSkipReason(config: WebhookConfig, event: WebhookEventKind): string | null {
-    const isMissingEnabled = !config.Enabled;
-    if (isMissingEnabled) return "Webhook disabled";
+    if (!config.Enabled) return "Webhook disabled";
     if (!config.Url || config.Url.trim().length === 0) return "URL empty";
     if (config.Events.length > 0 && !config.Events.includes(event)) {
         return `Event ${event} not subscribed`;
@@ -540,8 +530,7 @@ function buildHeaders(
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     for (const h of config.Headers) {
         const name = (h.Name ?? "").trim();
-        const isMissingName = !name;
-        if (isMissingName) continue;
+        if (!name) continue;
         headers[name] = substitute(h.Value ?? "", payload, event);
     }
     if (config.SecretToken && config.SecretToken.trim().length > 0) {

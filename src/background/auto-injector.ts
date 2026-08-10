@@ -71,9 +71,7 @@ function isProjectPageUrl(url: string): boolean {
         const isTargetDomain = parsed.hostname === DomainConstants.PRIMARY_DOMAIN
             || parsed.hostname.endsWith(DomainConstants.PRIMARY_DOMAIN_DOT);
 
-        const isMissingIsTargetDomain = !isTargetDomain;
-
-        if (isMissingIsTargetDomain) {
+        if (!isTargetDomain) {
             return true; // Non-platform URLs are handled by project URL rules
         }
 
@@ -90,8 +88,7 @@ function isProjectPageUrl(url: string): boolean {
 
         // Only allow /projects/* paths on lovable.dev
         return path.startsWith("/projects/");
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return false;
     }
 }
@@ -234,9 +231,7 @@ export async function handleNavigationCompleted(
     // URL guard: skip non-project pages
     const isEligible = isProjectPageUrl(details.url);
 
-    const isMissingIsEligible = !isEligible;
-
-    if (isMissingIsEligible) {
+    if (!isEligible) {
         logUrlGuardSkip(details.tabId, details.url);
 
         return;

@@ -83,6 +83,7 @@ export async function installCreditBalanceStub(
                 contentType: 'application/json',
                 body: JSON.stringify({ error: `No fixture for workspace ${workspaceId}` }),
             });
+
             return;
         }
         await route.fulfill({
@@ -99,6 +100,7 @@ export async function installCreditBalanceStub(
         get counts() {
             let total = 0;
             for (const count of creditBalanceCounts.values()) total += count;
+
             return {
                 userWorkspaces: userWorkspacesCount,
                 creditBalanceByWorkspaceId: new Map(creditBalanceCounts),

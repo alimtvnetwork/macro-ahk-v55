@@ -150,8 +150,7 @@ export function parseWithRecovery(content: string): unknown {
 
 function _getOrCreateToastContainer(): HTMLElement {
   let container = document.getElementById(DomIdType.ToastStack);
-  const isMissingContainer = !container;
-  if (isMissingContainer) {
+  if (!container) {
     container = document.createElement('div');
     container.id = DomIdType.ToastStack;
     container.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);' +
@@ -519,8 +518,7 @@ export async function resolveDynamicVariables(text: string): Promise<string | nu
 
   // Show input modal
   const values = await showVariableInputModal(uniqueVars);
-  const isMissingValues = !values;
-  if (isMissingValues) return null; // User cancelled
+  if (!values) return null; // User cancelled
 
   let resolvedText = text;
   uniqueVars.forEach(v => {
@@ -622,9 +620,7 @@ export async function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, g
 
   const target = findPasteTarget(promptsCfg, getByXPath) as HTMLElement | null;
 
-  const isMissingTarget = !target;
-
-  if (isMissingTarget) {
+  if (!target) {
     log('Prompt paste: No editor target found — copying to clipboard instead', 'warn');
     navigator.clipboard.writeText(text).then(function() {
       log('Prompt copied to clipboard (no paste target)', 'success');
@@ -681,8 +677,7 @@ export function setupPromptCapture(promptsCfg: PromptsCfg, getByXPath: (xpath: s
     if (timer) clearTimeout(timer);
     timer = window.setTimeout(async () => {
       const projectId = extractProjectIdFromUrl();
-      const isMissingProjectId = !projectId;
-      if (isMissingProjectId) return;
+      if (!projectId) return;
 
       // 1. Save to IndexedDB
       const store = getProjectKvStore('macro-controller');

@@ -229,8 +229,7 @@ export function getSessionCookieNames(): string[] {
     const names: string[] = [];
     for (const projectKey of Object.keys(root.Projects)) {
       const project = root.Projects[projectKey];
-      const isMissingProject = !project;
-      if (isMissingProject) {
+      if (!project) {
         continue;
       }
       names.push(...extractSessionNamesFromProject(project));
@@ -285,8 +284,7 @@ export function getBearerTokenFromCookie(): string {
 
     const now = Date.now();
     const shouldLogDiagnostics = (now - cookieDiagState.lastAt) >= COOKIE_DIAGNOSTIC_COOLDOWN_MS;
-    const isMissingShouldLogDiagnostics = !shouldLogDiagnostics;
-    if (isMissingShouldLogDiagnostics) {
+    if (!shouldLogDiagnostics) {
       return '';
     }
 
@@ -318,9 +316,7 @@ function logCookieDiagnostics(
   log(fn + ': Cookie names visible: [' + cookieNames.join(', ') + ']', 'info');
   log(fn + ': Raw cookie string length: ' + rawCookie.length + ' chars', 'info');
 
-  const isMissingHasTargetCookie = !hasTargetCookie;
-
-  if (isMissingHasTargetCookie) {
+  if (!hasTargetCookie) {
     log(fn + ': Session cookie NOT found in document.cookie (expected: HttpOnly)', 'info');
     log(fn + ': Auth should resolve via Supabase localStorage scan or extension bridge', 'info');
   }
@@ -392,8 +388,7 @@ export function persistResolvedBearerToken(token: string): boolean {
 
 export function updateAuthBadge(hasToken: boolean, source: string): void {
   const badge = document.getElementById('loop-auth-badge');
-  const isMissingBadge = !badge;
-  if (isMissingBadge) {
+  if (!badge) {
     return;
   }
 
@@ -413,9 +408,7 @@ export function updateAuthBadge(hasToken: boolean, source: string): void {
 export function resolveToken(): string {
   const sessionToken = getBearerTokenFromSessionBridge();
 
-  const isMissingSessionToken = !sessionToken;
-
-  if (isMissingSessionToken) {
+  if (!sessionToken) {
     tokenSourceState.value = 'none';
 
     return '';

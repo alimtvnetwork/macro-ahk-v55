@@ -278,8 +278,7 @@ function handleHighlighterMouseMove(
     if (host.contains(target)) { return; }
     if (state.HoverTarget !== target) {
         state.HoverTarget = target;
-        const isMissingAltHeld = !state.AltHeld;
-        if (isMissingAltHeld) { state.AncestorOffset = 0; }
+        if (!state.AltHeld) { state.AncestorOffset = 0; }
     }
     schedulePaint();
 }
@@ -296,8 +295,7 @@ function handleHighlighterKeyDown(
 function handleHighlighterWheel(
     event: WheelEvent, state: InternalState, schedulePaint: () => void,
 ): void {
-    const isMissingAltHeld = !state.AltHeld;
-    if (isMissingAltHeld) { return; }
+    if (!state.AltHeld) { return; }
     const direction = event.deltaY < 0 ? 1 : -1;
     state.AncestorOffset = Math.max(0, state.AncestorOffset + direction);
     schedulePaint();

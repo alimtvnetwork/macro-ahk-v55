@@ -12,8 +12,7 @@ const makeMemoryStorage = (): QueueStorage => {
     return {
         read: async (projectId) => {
             const rec = store.get(projectId);
-            const isMissingRec = !rec;
-            if (isMissingRec) return null;
+            if (!rec) return null;
 
             // deep clone to mimic IndexedDB serialisation
             return JSON.parse(JSON.stringify(rec)) as TaskQueueRecord;

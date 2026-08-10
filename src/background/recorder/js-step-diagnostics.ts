@@ -198,8 +198,7 @@ function jsStepReasonDetail(err: unknown, body: string): string {
     }
     try {
         return `Runtime: ${JSON.stringify(err)}`;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return `Runtime: ${String(err)}`;
     }
 }

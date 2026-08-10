@@ -35,8 +35,7 @@ export function sessionsHasTextPk(db: SqlJsDatabase): boolean {
         }
 
         return false;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return false;
     }
 }

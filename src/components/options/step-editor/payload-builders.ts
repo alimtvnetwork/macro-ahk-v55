@@ -64,8 +64,7 @@ export function hydrateUrlTabClickForm(payloadJson: string | null): UrlTabClickF
             DirectOpen:   parsed.DirectOpen === true,
             Url:          typeof parsed.Url === "string" ? parsed.Url : "",
         };
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
         return { ...URL_TAB_CLICK_DEFAULTS };
     }
 }

@@ -67,9 +67,7 @@ function findCurrentWorkspaceIndex(
     }
   }
 
-  const isMissingCurrentName = !currentName;
-
-  if (isMissingCurrentName) {
+  if (!currentName) {
     return 0;
   }
 
@@ -199,9 +197,7 @@ async function handleAdjacentAuthFailure(
   const recoveredToken = await recoverAuthOnce();
   const refreshedToken = recoveredToken || resolveToken();
 
-  const isMissingRefreshedToken = !refreshedToken;
-
-  if (isMissingRefreshedToken) {
+  if (!refreshedToken) {
     handleNoTokenFailure();
 
     return;
@@ -231,9 +227,7 @@ async function doFetchWorkspacesForMove(
     const recoveredToken = await recoverAuthOnce();
     const refreshedToken = recoveredToken || resolveToken();
 
-    const isMissingRefreshedToken = !refreshedToken;
-
-    if (isMissingRefreshedToken) {
+    if (!refreshedToken) {
       handleNoTokenFailure();
 
       return;
@@ -260,9 +254,7 @@ async function doFetchWorkspacesForMove(
   const data = resp.data as Record<string, unknown>;
   const isParseOk = parseLoopApiResponse(data);
 
-  const isMissingIsParseOk = !isParseOk;
-
-  if (isMissingIsParseOk) {
+  if (!isParseOk) {
     logError('moveToAdjacentWorkspace', 'Failed to parse workspace data');
     updateLoopMoveStatus('error', 'Failed to parse workspaces');
     clearDelegationState();

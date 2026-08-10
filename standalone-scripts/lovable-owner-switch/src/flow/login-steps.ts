@@ -1,23 +1,23 @@
 /**
  * Lovable login flow — per-step executor.
  *
- * One narrow function per `LoginStepCode`. Each measures its own
+ * One narrow function per `LoginStepCodeType`. Each measures its own
  * duration and returns a `LoginStepOutcome`; throws bubble up to
  * `run-login` which records the failed step + XPath in the row's
  * `LastError`.
  */
 
-import { XPathKeyCode } from "../../../lovable-common/src/xpath/xpath-key-code";
+import { XPathKeyCodeType } from "../../../lovable-common/src/xpath/xpath-key-code";
 import { fillInput, clickButton } from "./dom-actions";
 import { waitForXPath } from "./wait-for-xpath";
 import { resolveXPath } from "./xpath-resolver";
-import { LoginStepCode } from "./login-types";
+import { LoginStepCodeType } from "./login-types";
 import type { LoginStepOutcome, LoginCredentials } from "./login-types";
 import type { XPathSettingSeed } from "../migrations/xpath-setting-seed";
 
 const NAVIGATE_DELAY_MS = 50;
 
-const measure = async (step: LoginStepCode, run: () => Promise<void> | void): Promise<LoginStepOutcome> => {
+const measure = async (step: LoginStepCodeType, run: () => Promise<void> | void): Promise<LoginStepOutcome> => {
     const startedAt = Date.now();
     await Promise.resolve(run());
 
@@ -25,7 +25,7 @@ const measure = async (step: LoginStepCode, run: () => Promise<void> | void): Pr
 };
 
 export const stepNavigate = (loginUrl: string): Promise<LoginStepOutcome> => {
-    return measure(LoginStepCode.NavigateToLogin, (): void => {
+    return measure(LoginStepCodeType.NavigateToLogin, (): void => {
         if (globalThis.location.href !== loginUrl) {
             globalThis.location.assign(loginUrl);
         }
@@ -40,9 +40,9 @@ export const stepFillEmail = (
     credentials: LoginCredentials,
     overrides: ReadonlyArray<XPathSettingSeed>,
 ): Promise<LoginStepOutcome> => {
-    const resolved = resolveXPath(XPathKeyCode.LoginEmailInput, overrides);
+    const resolved = resolveXPath(XPathKeyCodeType.LoginEmailInput, overrides);
 
-    return measure(LoginStepCode.FillEmail, async (): Promise<void> => {
+    return measure(LoginStepCodeType.FillEmail, async (): Promise<void> => {
         await waitForXPath(resolved.XPath);
         fillInput(resolved.XPath, credentials.LoginEmail);
         await new Promise<void>((r) => globalThis.setTimeout(r, resolved.DelayMs));
@@ -50,8 +50,8 @@ export const stepFillEmail = (
 };
 
 export const stepClick = (
-    key: XPathKeyCode,
-    stepCode: LoginStepCode,
+    key: XPathKeyCodeType,
+    stepCode: LoginStepCodeType,
     overrides: ReadonlyArray<XPathSettingSeed>,
 ): Promise<LoginStepOutcome> => {
     const resolved = resolveXPath(key, overrides);
@@ -67,9 +67,9 @@ export const stepFillPassword = (
     credentials: LoginCredentials,
     overrides: ReadonlyArray<XPathSettingSeed>,
 ): Promise<LoginStepOutcome> => {
-    const resolved = resolveXPath(XPathKeyCode.PasswordInput, overrides);
+    const resolved = resolveXPath(XPathKeyCodeType.PasswordInput, overrides);
 
-    return measure(LoginStepCode.FillPassword, async (): Promise<void> => {
+    return measure(LoginStepCodeType.FillPassword, async (): Promise<void> => {
         await waitForXPath(resolved.XPath);
         fillInput(resolved.XPath, credentials.Password);
         await new Promise<void>((r) => globalThis.setTimeout(r, resolved.DelayMs));
@@ -79,9 +79,9 @@ export const stepFillPassword = (
 export const stepAwaitWorkspace = (
     overrides: ReadonlyArray<XPathSettingSeed>,
 ): Promise<LoginStepOutcome> => {
-    const resolved = resolveXPath(XPathKeyCode.WorkspaceButton, overrides);
+    const resolved = resolveXPath(XPathKeyCodeType.WorkspaceButton, overrides);
 
-    return measure(LoginStepCode.AwaitWorkspace, async (): Promise<void> => {
+    return measure(LoginStepCodeType.AwaitWorkspace, async (): Promise<void> => {
         await waitForXPath(resolved.XPath, { TimeoutMs: 30000 });
     });
 };

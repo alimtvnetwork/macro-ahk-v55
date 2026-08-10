@@ -56,8 +56,7 @@ function readSnippetByName(
         [name],
     );
     const values = result[0]?.values[0];
-    const isMissingValues = !values;
-    if (isMissingValues) {
+    if (!values) {
         throw new Error(`JsSnippet "${name}" not found after upsert`);
     }
 

@@ -85,8 +85,7 @@ async function readOpfsFile(
         const hasContent = buffer.byteLength > 0;
 
         return hasContent ? buffer : null;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return null;
     }
 }

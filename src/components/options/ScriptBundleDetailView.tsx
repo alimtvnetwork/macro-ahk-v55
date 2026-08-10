@@ -73,19 +73,16 @@ interface Props {
 function validateJson(raw: string): boolean {
   try { JSON.parse(raw);
 
- return true; } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+ return true; } catch (err) { /* swallowed */
  return false; }
 }
 
 function formatJson(input: JsonValue): string {
   if (typeof input === "string") {
-    try { return JSON.stringify(JSON.parse(input), null, 2); } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    try { return JSON.stringify(JSON.parse(input), null, 2); } catch (err) { /* swallowed */
  return input; }
   }
-  try { return JSON.stringify(input ?? {}, null, 2); } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+  try { return JSON.stringify(input ?? {}, null, 2); } catch (err) { /* swallowed */
  return "{}"; }
 }
 

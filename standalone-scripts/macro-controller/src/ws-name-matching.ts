@@ -35,9 +35,7 @@ export function isValidWorkspaceCandidateName(name: string, projectName?: string
   const normalizedName = normalizeWorkspaceName(name);
   const normalizedProjectName = normalizeWorkspaceName(projectName || '');
 
-  const isMissingNormalizedName = !normalizedName;
-
-  if (isMissingNormalizedName) {
+  if (!normalizedName) {
     return false;
   }
 
@@ -74,13 +72,11 @@ export function matchWorkspaceByName(rawName: string, perWs: WorkspaceCredit[]):
 
 export function pushWorkspaceNameCandidate(target: Array<{ name: string; selected: boolean }>, name: string, selected: boolean): void {
   const cleaned = (name || '').replace(/\u00a0/g, ' ').trim();
-  const isMissingCleaned = !cleaned;
-  if (isMissingCleaned) {
+  if (!cleaned) {
     return;
   }
   const normalized = normalizeWorkspaceName(cleaned);
-  const isMissingNormalized = !normalized;
-  if (isMissingNormalized) {
+  if (!normalized) {
     return;
   }
 
@@ -98,8 +94,7 @@ export function pushWorkspaceNameCandidate(target: Array<{ name: string; selecte
 
 export function expandWorkspaceNameCandidates(rawText: string, selected: boolean, target: Array<{ name: string; selected: boolean }>): void {
   const base = (rawText || '').replace(/\u00a0/g, ' ').trim();
-  const isMissingBase = !base;
-  if (isMissingBase) {
+  if (!base) {
     return;
   }
 
@@ -108,8 +103,7 @@ export function expandWorkspaceNameCandidates(rawText: string, selected: boolean
   const lines = base.split(/\r?\n+/);
   for (const line of lines) {
     const trimmedLine = line.trim();
-    const isMissingTrimmedLine = !trimmedLine;
-    if (isMissingTrimmedLine) {
+    if (!trimmedLine) {
       continue;
     }
     pushWorkspaceNameCandidate(target, trimmedLine, selected);
@@ -122,8 +116,7 @@ export function expandWorkspaceNameCandidates(rawText: string, selected: boolean
     const tokens = trimmedLine.split(/\s*[|•·→]\s*/);
     for (const token of tokens) {
       const trimmedToken = token.trim();
-      const isMissingTrimmedToken = !trimmedToken;
-      if (isMissingTrimmedToken) {
+      if (!trimmedToken) {
         continue;
       }
       pushWorkspaceNameCandidate(target, trimmedToken, selected);

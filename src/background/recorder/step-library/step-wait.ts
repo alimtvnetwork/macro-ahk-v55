@@ -199,8 +199,7 @@ function safeReadStore(): RawStore {
         }
 
         return out;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return {};
     }
 }

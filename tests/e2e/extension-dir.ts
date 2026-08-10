@@ -30,6 +30,7 @@ export function resolveExtensionDir(): string {
   for (const candidate of EXTENSION_CANDIDATES) {
     if (hasBuiltExtension(candidate)) return candidate;
   }
+
   return EXTENSION_CANDIDATES[0];
 }
 

@@ -125,8 +125,7 @@ export function safeBind(
     for (let i = 0; i < params.length; i++) {
         const v = params[i];
         if (v === undefined) {
-            const isMissingAllowUndefined = !allowUndefined;
-            if (isMissingAllowUndefined) throw new SqliteBindError(i, op);
+            if (!allowUndefined) throw new SqliteBindError(i, op);
             out.push(null);
             continue;
         }

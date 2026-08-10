@@ -241,8 +241,7 @@ async function safeGetFocusedWindowId(): Promise<number | null> {
         const w = await chrome.windows.getLastFocused();
 
         return typeof w.id === "number" ? w.id : null;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return null;
     }
 }

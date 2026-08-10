@@ -9,7 +9,7 @@
  * `LogSink`.
  */
 
-import type { PromotedOwnerRecord, RowOutcomeCode } from "./row-types";
+import type { PromotedOwnerRecord, RowOutcomeCodeType } from "./row-types";
 
 export interface RowStateUpdate {
     RowIndex: number;
@@ -22,7 +22,7 @@ export interface RowStateUpdate {
      * the UI can distinguish PromoteFailedPartial from PromoteFailed
      * without re-parsing `LastError`.
      */
-    Outcome: RowOutcomeCode;
+    Outcome: RowOutcomeCodeType;
     /**
      * JSON-serializable per-OwnerEmail breakdown. The runtime SQLite
      * adapter writes this as a TEXT column (JSON). Empty array means

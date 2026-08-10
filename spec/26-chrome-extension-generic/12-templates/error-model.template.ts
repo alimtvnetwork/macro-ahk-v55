@@ -85,6 +85,7 @@ export class AppError extends Error {
     /** Filter chunk-*.js / assets/*.js noise from the stack — useless frames. */
     private static filterStack(raw: string | undefined): string | null {
         if (!raw) return null;
+
         return raw
             .split("\n")
             .filter((line) => !/\/(?:chunks?|assets)\/[^/]+-[a-z0-9]+\.js/i.test(line))
@@ -117,6 +118,7 @@ export class AppError extends Error {
         });
         if (json.stack !== null) (restored as unknown as { stack: string }).stack = json.stack;
         (restored as unknown as { timestamp: string }).timestamp = json.timestamp;
+
         return restored;
     }
 

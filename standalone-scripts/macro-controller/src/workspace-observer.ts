@@ -36,8 +36,7 @@ function mc() { return MacroController.getInstance(); }
  * See: spec/22-app-issues/workspace-name-binding-bug.md (RCA-3)
  */
 export function isKnownWorkspaceName(name: string): boolean {
-  const isMissingName = !name;
-  if (isMissingName) return false;
+  if (!name) return false;
   const perWs = loopCreditState.perWorkspace || [];
   // Issue 84 Fix 1: When workspace list is not yet loaded, allow the name through
   // so that fetchWorkspaceNameFromNav() and the observer can set an early workspace
@@ -191,8 +190,7 @@ export function fetchWorkspaceNameFromNav(): boolean {
   try {
     let el: Node | null = null;
     if (hasXpath) el = getByXPath(navXpath);
-    const isMissingEl = !el;
-    if (isMissingEl) el = autoDiscoverWorkspaceNavElement();
+    if (!el) el = autoDiscoverWorkspaceNavElement();
 
     if (el) {
       const name = (el.textContent || '').trim();
@@ -295,9 +293,7 @@ const wsObserverState = new WorkspaceObserverState();
 export function startWorkspaceObserver(): void {
   const navEl = resolveNavElement();
 
-  const isMissingNavEl = !navEl;
-
-  if (isMissingNavEl) {
+  if (!navEl) {
     scheduleObserverRetry();
 
     return;
@@ -335,9 +331,7 @@ function resolveNavElement(): Node | Element | null {
     if (navEl) logSub('Workspace nav element found via XPath', 1);
   }
 
-  const isMissingNavEl = !navEl;
-
-  if (isMissingNavEl) {
+  if (!navEl) {
     if (hasXpath) {
       log('WorkspaceNavXPath configured but element not found — trying auto-discovery', 'warn');
     } else {
@@ -367,8 +361,7 @@ function scheduleObserverRetry(): void {
 
 /** Apply the workspace name read during observer initialization. */
 function applyInitialObserverName(name: string): void {
-  const isMissingName = !name;
-  if (isMissingName) return;
+  if (!name) return;
   if (name === state.workspaceName) {
     logSub('Workspace name already set: ' + name, 1);
 
@@ -467,8 +460,7 @@ export function triggerCreditCheckOnWorkspaceChange(): void {
   }
 
   const opened = ensureProjectDialogOpen();
-  const isMissingOpened = !opened;
-  if (isMissingOpened) {
+  if (!opened) {
     log('Could not open project dialog for credit check', 'warn');
 
     return;

@@ -33,8 +33,7 @@ export type OpfsRootResult = OpfsUnavailableReason | OpfsAvailableRoot;
 
 async function resolveRoot(): Promise<OpfsRootResult> {
   const hasStorage = typeof navigator !== 'undefined' && !!navigator.storage?.getDirectory;
-  const isMissingHasStorage = !hasStorage;
-  if (isMissingHasStorage) return { isAvailable: false, reason: 'navigator.storage.getDirectory unavailable' };
+  if (!hasStorage) return { isAvailable: false, reason: 'navigator.storage.getDirectory unavailable' };
   try {
     const root = await navigator.storage.getDirectory();
 
@@ -46,8 +45,7 @@ async function resolveRoot(): Promise<OpfsRootResult> {
 
 async function getProjectDir(projectId: string, isCreate: boolean): Promise<FileSystemDirectoryHandle | null> {
   const rootResult = await resolveRoot();
-  const isMissingIsAvailable = !rootResult.isAvailable;
-  if (isMissingIsAvailable) {
+  if (!rootResult.isAvailable) {
     logError(SCOPE, `OPFS root unavailable (projectId=${projectId}): ${rootResult.reason}`);
 
     return null;
@@ -67,8 +65,7 @@ function generateFileId(): ChatSubmitFileId {
 export async function saveEntry(projectId: string, text: string): Promise<ChatSubmitFileId | null> {
   try {
     const dir = await getProjectDir(projectId, true);
-    const isMissingDir = !dir;
-    if (isMissingDir) return null;
+    if (!dir) return null;
     const fileId = generateFileId();
     const handle = await dir.getFileHandle(`${fileId}${FILE_EXT}`, { create: true });
     const writable = await handle.createWritable();
@@ -86,8 +83,7 @@ export async function saveEntry(projectId: string, text: string): Promise<ChatSu
 export async function readEntry(projectId: string, fileId: ChatSubmitFileId): Promise<string | null> {
   try {
     const dir = await getProjectDir(projectId, false);
-    const isMissingDir = !dir;
-    if (isMissingDir) return null;
+    if (!dir) return null;
     const handle = await dir.getFileHandle(`${fileId}${FILE_EXT}`, { create: false });
     const file = await handle.getFile();
 
@@ -102,8 +98,7 @@ export async function readEntry(projectId: string, fileId: ChatSubmitFileId): Pr
 export async function deleteEntry(projectId: string, fileId: ChatSubmitFileId): Promise<boolean> {
   try {
     const dir = await getProjectDir(projectId, false);
-    const isMissingDir = !dir;
-    if (isMissingDir) return false;
+    if (!dir) return false;
     await dir.removeEntry(`${fileId}${FILE_EXT}`);
 
     return true;
@@ -128,8 +123,7 @@ async function collectFileIds(dir: FileSystemDirectoryHandle): Promise<ChatSubmi
 export async function listProject(projectId: string): Promise<ChatSubmitFileId[]> {
   try {
     const dir = await getProjectDir(projectId, false);
-    const isMissingDir = !dir;
-    if (isMissingDir) return [];
+    if (!dir) return [];
 
     return await collectFileIds(dir);
   } catch (e) {
@@ -141,8 +135,7 @@ export async function listProject(projectId: string): Promise<ChatSubmitFileId[]
 
 export async function deleteProject(projectId: string): Promise<boolean> {
   const rootResult = await resolveRoot();
-  const isMissingIsAvailable = !rootResult.isAvailable;
-  if (isMissingIsAvailable) {
+  if (!rootResult.isAvailable) {
     logError(SCOPE, `deleteProject: OPFS unavailable (projectId=${projectId}): ${rootResult.reason}`);
 
     return false;

@@ -17,12 +17,12 @@ import { LogPhaseType, LogSeverityType, buildEntry } from "./log-sink";
 import type { LogSink } from "./log-sink";
 import type { RowExecutionContext } from "./row-types";
 import type { PromotedOwnerRecord } from "./row-types";
-import { PromoteStepCode } from "./promote-types";
+import { PromoteStepCodeType } from "./promote-types";
 
 export interface OwnerEmailFailure {
     Email: string;
     Error: string;
-    FailedStep: PromoteStepCode | null;
+    FailedStep: PromoteStepCodeType | null;
 }
 
 export interface OwnerEmailsResult {

@@ -104,8 +104,7 @@ function getExtensionVersion(): string {
     const g = globalThis as { chrome?: { runtime?: { getManifest?: () => { version?: string } } } };
 
     return g.chrome?.runtime?.getManifest?.().version ?? "?";
-  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+  } catch (err) { /* swallowed */
  return "?"; }
 }
 
@@ -181,8 +180,7 @@ export function SessionCopyButton() {
           ...(sessionIdParam ? { sessionId: sessionIdParam } : {}),
         });
         report = fileReport.report;
-      } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+      } catch (err) { /* swallowed */
         // Fallback to legacy SQLite-only report (no session selection)
         const data = await sendMessage<SessionLogsResponse>({
           type: "GET_SESSION_LOGS",

@@ -96,9 +96,7 @@ async function handleCookieChange(
     const isRefreshCookie = REFRESH_COOKIE_NAMES.includes(cookieName as (typeof REFRESH_COOKIE_NAMES)[number]);
     const isRelevantCookie = isTargetDomain && (isSessionCookie || isRefreshCookie);
 
-    const isMissingIsRelevantCookie = !isRelevantCookie;
-
-    if (isMissingIsRelevantCookie) {
+    if (!isRelevantCookie) {
         return;
     }
 
@@ -257,9 +255,7 @@ async function broadcastToTargetTabs(
         const tabs = await chrome.tabs.query({ url: TARGET_TAB_PATTERNS });
         const hasTargetTabs = tabs.length > 0;
 
-        const isMissingHasTargetTabs = !hasTargetTabs;
-
-        if (isMissingHasTargetTabs) {
+        if (!hasTargetTabs) {
             return;
         }
 

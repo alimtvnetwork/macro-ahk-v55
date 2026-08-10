@@ -90,6 +90,7 @@ function pickExtensionDir(): string {
   for (const dir of EXTENSION_CANDIDATES) {
     if (fs.existsSync(path.join(dir, 'manifest.json'))) return dir;
   }
+
   return EXTENSION_CANDIDATES[0];
 }
 
@@ -98,6 +99,7 @@ function readManifest(extDir: string): { raw: string; parsed: BuiltManifest | nu
   if (!fs.existsSync(manifestPath)) return { raw: '', parsed: null };
   try {
     const raw = fs.readFileSync(manifestPath, 'utf8');
+
     return { raw, parsed: JSON.parse(raw) as BuiltManifest };
   } catch {
     return { raw: '', parsed: null };
@@ -114,6 +116,7 @@ function sanitizeTestId(test: TestCase): string {
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '')
     .slice(0, 180);
+
   return slug || `test-${test.id}`;
 }
 
@@ -133,11 +136,13 @@ function listDirectoryRecursive(root: string): string {
       entries = fs.readdirSync(dir, { withFileTypes: true });
     } catch (err) {
       out.push(`${'  '.repeat(depth)}[unreadable: ${(err as Error).message}]`);
+
       return;
     }
     // Sort directories first, then files, both alphabetical.
     entries.sort((a, b) => {
       if (a.isDirectory() !== b.isDirectory()) return a.isDirectory() ? -1 : 1;
+
       return a.name.localeCompare(b.name);
     });
     for (const ent of entries) {
@@ -158,6 +163,7 @@ function listDirectoryRecursive(root: string): string {
     }
   }
   walk(root, 0);
+
   return out.join('\n') + '\n';
 }
 
@@ -173,6 +179,7 @@ function parseAttemptedUrl(errorMessage: string): {
   if (!match) return { url: null, filePath: null };
   const url = match[1];
   const filePath = url.replace(/^chrome-extension:\/\/[^/]+\//, '');
+
   return { url, filePath };
 }
 
@@ -362,6 +369,7 @@ export default class ExtensionArtifactsReporter implements Reporter {
     if (optionsDeclared && expectedFilePath !== optionsDeclared && /options\.html$/i.test(expectedFilePath)) {
       return `Test navigated to "${expectedFilePath}" but manifest declares options at "${optionsDeclared}". Spec/test path drift — update the test or fixture to use the manifest-declared path.`;
     }
+
     return `File "${expectedFilePath}" not present in build dir — likely missing from vite extension build output. Check vite.config.extension.ts inputs and copyProjectScripts() plugin.`;
   }
 }

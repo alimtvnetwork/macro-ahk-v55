@@ -35,8 +35,7 @@ export async function copyFailureReportToClipboard(
         await target.writeText(blob);
 
         return true;
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
         return false;
     }
 }

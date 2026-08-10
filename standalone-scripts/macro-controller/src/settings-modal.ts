@@ -194,8 +194,7 @@ function ensureModalEl(): HTMLDivElement {
 
 function detachKeyHandler(): void {
   const el = document.getElementById(MODAL_ID);
-  const isMissingEl = !el;
-  if (isMissingEl) return;
+  if (!el) return;
   const store = el as HTMLElement & ModalHandlerStore;
   if (store._marcoSettingsKey) {
     document.removeEventListener('keydown', store._marcoSettingsKey, true);
@@ -263,11 +262,9 @@ export function showSettingsModal(): void {
   function attach(): void {
     el.onclick = function (e: MouseEvent): void {
       const t = e.target as HTMLElement | null;
-      const isMissingT = !t;
-      if (isMissingT) return;
+      if (!t) return;
       const action = t.getAttribute('data-marco-action');
-      const isMissingAction = !action;
-      if (isMissingAction) return;
+      if (!action) return;
       e.stopPropagation();
       if (state.submitting) return;
       if (action === 'close' || action === 'cancel') hideSettingsModal();
@@ -275,8 +272,7 @@ export function showSettingsModal(): void {
       else if (action === 'reset') void doReset();
     };
     bd.onclick = function (): void {
-      const isMissingSubmitting = !state.submitting;
-      if (isMissingSubmitting) hideSettingsModal();
+      if (!state.submitting) hideSettingsModal();
     };
   }
 

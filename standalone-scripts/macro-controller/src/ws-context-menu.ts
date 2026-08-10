@@ -218,8 +218,7 @@ function buildCreditRefreshItem(wsId: string, wsName: string): HTMLElement {
 function appendRemixAndGithubItems(menu: HTMLElement, wsId: string): void {
   const projectId = extractProjectIdFromUrl();
   const projectName = getDisplayProjectName();
-  const isMissingProjectId = !projectId;
-  if (isMissingProjectId) { return; }
+  if (!projectId) { return; }
   menu.appendChild(buildCtxMenuItem('🔀 Remix Project…', function () {
     removeWsContextMenu();
     actionRemixManual({ projectId, workspaceId: wsId, currentProjectName: projectName });
@@ -466,8 +465,7 @@ function buildRenameInput(currentName: string): HTMLInputElement {
 }
 
 function commitRename(wsId: string, currentName: string, newName: string): void {
-  const isMissingNewName = !newName;
-  if (isMissingNewName) {
+  if (!newName) {
     log('[Rename] Empty name — cancelled', 'warn');
     populateLoopWorkspaceDropdown();
 
@@ -501,8 +499,7 @@ function commitRename(wsId: string, currentName: string, newName: string): void 
 
 function findNameDiv(wsId: string): HTMLElement | null {
   const listEl = document.getElementById(DomIdType.LoopWsList);
-  const isMissingListEl = !listEl;
-  if (isMissingListEl) return null;
+  if (!listEl) return null;
   const items = listEl.querySelectorAll(CSS_WS_ITEM);
   for (const item of Array.from(items)) {
     if (item.getAttribute(DataAttrType.WsId) !== wsId) continue;
@@ -519,8 +516,7 @@ function findNameDiv(wsId: string): HTMLElement | null {
  */
 export function startInlineRename(wsId: string, currentName: string): void {
   const nameDiv = findNameDiv(wsId);
-  const isMissingNameDiv = !nameDiv;
-  if (isMissingNameDiv) return;
+  if (!nameDiv) return;
 
   const wrap = document.createElement('div');
   wrap.style.cssText = 'display:flex;align-items:center;gap:3px;width:100%;';

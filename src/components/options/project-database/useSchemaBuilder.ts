@@ -164,7 +164,7 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
         }));
         setTables(imported);
         toast.success(`Imported ${imported.length} table(s)`);
-      } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+      } catch (err) { /* swallowed */
         toast.error("Failed to parse schema file");
       }
     };

@@ -41,9 +41,7 @@ export function safeSetItem(key: string, value: string): boolean {
       (e.code === 22 || e.code === 1014 || e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED')
     );
 
-    const isMissingIsQuotaError = !isQuotaError;
-
-    if (isMissingIsQuotaError) {
+    if (!isQuotaError) {
       return false;
     }
 
@@ -66,9 +64,7 @@ function purgeBloatedKeys(): number {
   for (let i = localStorage.length - 1; i >= 0; i--) {
     const k = localStorage.key(i);
 
-    const isMissingK = !k;
-
-    if (isMissingK) {
+    if (!k) {
       continue;
     }
 
@@ -180,8 +176,7 @@ export function getDisplayProjectName(): string {
   // project UUID as a name (v3.93.1). Logging once per page so we can see which
   // upstream source is broken (almost always a stale PROJECT_NAME_XPATH).
   const pid = getProjectIdFromUrl();
-  const isMissing_projectNameFallbackLogged = !state._projectNameFallbackLogged;
-  if (isMissing_projectNameFallbackLogged) {
+  if (!state._projectNameFallbackLogged) {
     state._projectNameFallbackLogged = true;
     log(
       'getDisplayProjectName: no name resolved — customDisplayName=' + (state.customDisplayName ? 'set' : 'empty')
@@ -320,8 +315,7 @@ export function clearAllLogs(): void {
 function readSeedTelemetryBlock(): string[] {
   try {
     const raw = localStorage.getItem(StorageKeyType.LastSeedTelemetry);
-    const isMissingRaw = !raw;
-    if (isMissingRaw) return ['Seed Telemetry: (not run this session)', '---'];
+    if (!raw) return ['Seed Telemetry: (not run this session)', '---'];
 
     return ['=== Seed Telemetry ===', raw, '---'];
   } catch (e) {

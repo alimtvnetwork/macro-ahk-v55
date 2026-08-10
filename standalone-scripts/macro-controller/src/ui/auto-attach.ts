@@ -50,13 +50,11 @@ function autoAttachDelay(ms: number) {
 }
 
 export function clickByXPath(xpath: string, label: string): boolean {
-  const isMissingXpath = !xpath;
-  if (isMissingXpath) { log('Auto-Attach: No XPath for ' + label, 'warn');
+  if (!xpath) { log('Auto-Attach: No XPath for ' + label, 'warn');
 
  return false; }
   const el = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-  const isMissingEl = !el;
-  if (isMissingEl) { log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn');
+  if (!el) { log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn');
 
  return false; }
   (el as HTMLElement).click();
@@ -68,8 +66,7 @@ export function clickByXPath(xpath: string, label: string): boolean {
 export function insertTextIntoElement(xpath: string, text: string, label: string): boolean {
   if (!xpath || !text) return false;
   const el = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as HTMLElement;
-  const isMissingEl = !el;
-  if (isMissingEl) { log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn');
+  if (!el) { log('Auto-Attach: Element not found for ' + label + ': ' + xpath, 'warn');
 
  return false; }
   el.focus();

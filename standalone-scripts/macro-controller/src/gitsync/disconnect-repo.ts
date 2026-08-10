@@ -68,8 +68,7 @@ export async function disconnectGithubRepo(
     return { status: 'error', message: 'missing wsId or projectId' };
   }
   const sdk = getSdk();
-  const isMissingSdk = !sdk;
-  if (isMissingSdk) {
+  if (!sdk) {
     logError('GitsyncDisconnect', 'marco.api.call unavailable for ws=' + wsId + ' pid=' + pid);
 
     return { status: 'error', message: 'sdk_unavailable' };
@@ -124,8 +123,7 @@ export async function confirmAndDisconnectGithubRepo(
     ?? (typeof window !== 'undefined' && typeof window.confirm === 'function'
       ? window.confirm.bind(window)
       : null);
-  const isMissingAskFn = !askFn;
-  if (isMissingAskFn) {
+  if (!askFn) {
     logError('GitsyncDisconnect.confirm', 'window.confirm unavailable — refusing to disconnect ws='
       + wsId + ' pid=' + pid);
 

@@ -36,8 +36,7 @@ class FakeDir {
 
   async getDirectoryHandle(name: string, opts?: { create?: boolean }): Promise<FakeDir> {
     let child = this.dirs.get(name);
-    const isMissingChild = !child;
-    if (isMissingChild) {
+    if (!child) {
       if (!opts?.create) throw new Error(`NotFoundError: ${name}`);
       child = new FakeDir(name);
       this.dirs.set(name, child);
@@ -48,8 +47,7 @@ class FakeDir {
 
   async getFileHandle(name: string, opts?: { create?: boolean }) {
     let file = this.files.get(name);
-    const isMissingFile = !file;
-    if (isMissingFile) {
+    if (!file) {
       if (!opts?.create) throw new Error(`NotFoundError: ${name}`);
       file = { name, contents: '' };
       this.files.set(name, file);
@@ -70,8 +68,7 @@ class FakeDir {
   async removeEntry(name: string, opts?: { recursive?: boolean }): Promise<void> {
     if (this.files.delete(name)) return;
     const hadDir = this.dirs.delete(name);
-    const isMissingHadDir = !hadDir;
-    if (isMissingHadDir) throw new Error(`NotFoundError: ${name}`);
+    if (!hadDir) throw new Error(`NotFoundError: ${name}`);
     if (!opts?.recursive && (this.dirs.get(name)?.files.size ?? 0) > 0) {
       throw new Error('InvalidModificationError');
     }

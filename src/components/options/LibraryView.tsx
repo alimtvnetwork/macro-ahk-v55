@@ -592,8 +592,7 @@ function AssetDetailPanel({ asset, links, onBack, onSync, onDelete, onLinkStateC
           <ScrollArea className="h-[200px]">
             <pre className="text-xs font-mono whitespace-pre-wrap text-muted-foreground p-2 bg-muted/30 rounded-md">
               {(() => {
-                try { return JSON.stringify(JSON.parse(asset.ContentJson), null, 2); } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+                try { return JSON.stringify(JSON.parse(asset.ContentJson), null, 2); } catch (err) { /* swallowed */
  return asset.ContentJson; }
               })()}
             </pre>

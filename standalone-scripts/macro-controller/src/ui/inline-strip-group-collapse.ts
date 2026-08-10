@@ -40,8 +40,7 @@ function hydrate(): void {
   try {
     if (typeof localStorage === 'undefined') return;
     const raw = localStorage.getItem(STORAGE_KEY);
-    const isMissingRaw = !raw;
-    if (isMissingRaw) return;
+    if (!raw) return;
     const prefs = JSON.parse(raw) as InlineStripGroupPrefs;
     if (typeof prefs.collapsed === 'boolean') state.collapsed = prefs.collapsed;
     // NOTE: `removed` is intentionally NOT hydrated. × is a session-only hide
@@ -118,8 +117,7 @@ function applyPlanCollapse(plan: HTMLElement, collapsed: boolean): void {
   plan.style.display = 'flex';
   const body = plan.querySelector<HTMLElement>(SEL_PLAN_BODY);
   if (body) body.style.display = collapsed ? 'none' : 'flex';
-  const isMissingCollapsed = !collapsed;
-  if (isMissingCollapsed) return;
+  if (!collapsed) return;
   const dropup = plan.querySelector<HTMLElement>(SEL_PLAN_DROPUP);
   if (dropup) dropup.style.display = 'none';
 }

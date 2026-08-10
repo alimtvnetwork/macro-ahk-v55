@@ -47,8 +47,7 @@ async function readProjectStorageKey(storage: ProjectStorageLocal): Promise<Reco
 
 export async function readProjectsDirectFromChromeStorage(): Promise<StoredProject[]> {
   const storage = getProjectStorageLocal();
-  const isMissingStorage = !storage;
-  if (isMissingStorage) {
+  if (!storage) {
     return [];
   }
 

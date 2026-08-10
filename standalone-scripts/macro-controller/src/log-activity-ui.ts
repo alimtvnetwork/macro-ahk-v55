@@ -67,8 +67,7 @@ function _buildLogEntryHtml(entry: ActivityLogEntry): string {
 
 export function updateActivityLogUI(didTrim: boolean): void {
   const logContainer = document.getElementById('loop-activity-log-content');
-  const isMissingLogContainer = !logContainer;
-  if (isMissingLogContainer) return;
+  if (!logContainer) return;
 
   const total = activityLogLines.length;
   if (total === 0) {

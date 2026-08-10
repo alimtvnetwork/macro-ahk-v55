@@ -99,6 +99,7 @@ function logLibraryImportFailure(key: string, detail: string, cause?: unknown): 
     if (prev && (now - prev.lastAt) < IMPORT_LOG_DEDUPE_WINDOW_MS) {
         prev.suppressed += 1;
         prev.lastAt = now;
+
         return;
     }
     const suffix = prev && prev.suppressed > 0
@@ -111,7 +112,6 @@ function logLibraryImportFailure(key: string, detail: string, cause?: unknown): 
     }
     _libraryImportFailureDedupe.set(key, { lastAt: now, suppressed: 0 });
 }
-
 
 interface ViewState {
     filterRole: PromptRole | 'all';
@@ -161,8 +161,6 @@ interface ModalRefs {
     partialErrorsPanel?: HTMLDivElement;
 }
 
-
-
 /**
  * Human-readable byte size (B/KB/MB) with a single decimal for KB+. Used to
  * preview the selected import file so users can confirm name + size before
@@ -173,6 +171,7 @@ function formatFileSize(bytes: number): string {
     if (bytes < 1024) return bytes + ' B';
     const kb = bytes / 1024;
     if (kb < 1024) return kb.toFixed(1) + ' KB';
+
     return (kb / 1024).toFixed(1) + ' MB';
 }
 
@@ -206,6 +205,7 @@ export async function openPromptLibraryModal(): Promise<void> {
 function focusableNodesIn(root: HTMLElement): HTMLElement[] {
     const sel = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
     const all = Array.from(root.querySelectorAll<HTMLElement>(sel));
+
     return all.filter((node) => !node.hasAttribute('disabled') && node.tabIndex !== -1);
 }
 
@@ -326,7 +326,6 @@ function buildShell(): ModalRefs {
     actions.appendChild(sampleBtn);
     actions.appendChild(fileInput);
     actions.appendChild(closeBtn);
-
 
     header.appendChild(title);
     header.appendChild(actions);
@@ -489,7 +488,6 @@ function buildShell(): ModalRefs {
     panel.appendChild(body);
     root.appendChild(panel);
 
-
     // Click on scrim (not panel) closes.
     root.addEventListener('click', (e) => { if (e.target === root) closeExisting(); });
 
@@ -577,6 +575,7 @@ async function computeAndRenderPreview(
         renderImportErrorBanner(refs, invalid.headline, invalid.hint);
         showToast(PREVIEW_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
         try { previewFileInput.value = ''; } catch { /* ignore */ }
+
         return;
     }
     refs.status.textContent = 'Previewing ' + file.name + ' ...';
@@ -588,6 +587,7 @@ async function computeAndRenderPreview(
             refs.status.textContent = 'Preview parse failed: ' + friendly.headline;
             renderImportErrorBanner(refs, friendly.headline, friendly.hint);
             showToast(PREVIEW_FAILED_PREFIX + friendly.headline, TOAST_ERROR);
+
             return;
         }
         const roleSel = refs.importRoleSelect?.value;
@@ -648,6 +648,7 @@ function buildPreviewList(preview: PromptImportPreview, skipped: number): HTMLUL
         li.textContent = label + String(count);
         list.appendChild(li);
     }
+
     return list;
 }
 
@@ -658,6 +659,7 @@ function buildPreviewButton(text: string, testid: string, css: string, onClick: 
     btn.dataset.testid = testid;
     btn.style.cssText = css;
     btn.addEventListener('click', onClick);
+
     return btn;
 }
 
@@ -668,6 +670,7 @@ function buildPreviewButtons(onConfirm: () => void, onCancel: () => void): HTMLD
     const cancelCss = 'background:#2b3648;color:#e6edf7;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:12px;';
     btnRow.appendChild(buildPreviewButton('Confirm import', 'library-import-preview-confirm', confirmCss, onConfirm));
     btnRow.appendChild(buildPreviewButton('Cancel', 'library-import-preview-cancel', cancelCss, onCancel));
+
     return btnRow;
 }
 
@@ -691,7 +694,6 @@ function renderPreviewPanel(
     panel.style.display = 'block';
     void refs;
 }
-
 
 /**
  * Drag-and-drop upload: the whole modal root acts as a drop zone. Dropping a
@@ -745,7 +747,6 @@ function wireDropZoneKeyboard(
         activate();
     });
 }
-
 
 async function handleExport(refs: ModalRefs): Promise<void> {
     refs.status.textContent = 'Exporting ...';
@@ -848,6 +849,7 @@ function buildPartialErrorsDetails(
     for (const m of parseErrors) appendRow('parse', m);
     for (const m of entryErrors) appendRow('entry', m);
     details.appendChild(list);
+
     return details;
 }
 
@@ -863,6 +865,7 @@ function renderPartialImportErrors(
     if (total === 0) {
         panel.hidden = true;
         panel.style.display = 'none';
+
         return;
     }
     const header = document.createElement('div');
@@ -897,7 +900,6 @@ function clearPartialImportErrors(refs: ModalRefs): void {
     panel.style.display = 'none';
 }
 
-
 /**
  * Pull a human-readable reason from an unknown thrown value. We prefer
  * `Error.message` when present, fall back to a stringified primitive, and
@@ -907,6 +909,7 @@ function clearPartialImportErrors(refs: ModalRefs): void {
 function extractImportErrorReason(err: unknown): string {
     if (err instanceof Error && err.message) return err.message.split('\n')[0]!.slice(0, 240);
     if (typeof err === 'string' && err.length > 0) return err.split('\n')[0]!.slice(0, 240);
+
     return 'Unknown error';
 }
 
@@ -923,6 +926,7 @@ function validateImportFile(file: File): { headline: string; hint: string } | nu
     }
     if (file.size > IMPORT_MAX_BYTES) {
         const mb = (file.size / (1024 * 1024)).toFixed(1);
+
         return {
             headline: 'File is too large (' + mb + ' MB)',
             hint: 'Maximum allowed is ' + (IMPORT_MAX_BYTES / (1024 * 1024)) + ' MB. Split the file or export a smaller subset.',
@@ -938,6 +942,7 @@ function validateImportFile(file: File): { headline: string; hint: string } | nu
             hint: 'Choose a .json file exported from the Prompt Library.',
         };
     }
+
     return null;
 }
 
@@ -977,6 +982,7 @@ async function handleImportFile(
         refs.lastImportFailed = true;
         try { fileInput.value = ''; } catch { /* ignore */ }
         focusErrorBanner(refs);
+
         return;
     }
     importBtn.disabled = true;
@@ -1002,6 +1008,7 @@ async function handleImportFile(
             showToast(IMPORT_FAILED_PREFIX + friendly.headline, TOAST_ERROR);
             refs.lastImportFailed = true;
             focusAfter = 'banner';
+
             return;
         }
         const roleSel = refs.importRoleSelect?.value;
@@ -1151,6 +1158,7 @@ function buildImportProgressElement(): {
 
     wrap.appendChild(row);
     wrap.appendChild(track);
+
     return { wrap, label, bar, counter };
 }
 
@@ -1186,6 +1194,7 @@ function updateImportProgress(refs: ModalRefs, progress: ImportProgress): void {
         p.bar.style.width = String(pct) + '%';
         p.bar.setAttribute(ATTR_ARIA_VALUENOW, String(pct));
         p.bar.setAttribute(ATTR_ARIA_VALUETEXT, p.label.textContent);
+
         return;
     }
     if (progress.phase === 'revisions') {
@@ -1202,6 +1211,7 @@ function updateImportProgress(refs: ModalRefs, progress: ImportProgress): void {
                 + String(progress.totalRevisions) + ' revisions'
                 + ' (' + String(progress.groupsDone) + '/' + String(progress.totalGroups) + ' prompts)',
         );
+
         return;
     }
     // done
@@ -1211,8 +1221,6 @@ function updateImportProgress(refs: ModalRefs, progress: ImportProgress): void {
     p.bar.setAttribute(ATTR_ARIA_VALUENOW, '100');
     p.bar.setAttribute(ATTR_ARIA_VALUETEXT, 'Import complete');
 }
-
-
 
 /**
  * After a rejected import the modal stays open (nothing calls closeExisting).
@@ -1238,23 +1246,27 @@ function focusErrorBanner(refs: ModalRefs): void {
     try { banner.focus(); } catch { /* ignore */ }
 }
 
-
 function handleModalKey(refs: ModalRefs, e: KeyboardEvent): void {
     // Guard against stale handlers from a previous modal instance (e.g. test resets).
     if (!refs.root.isConnected) {
         if (refs.keyHandler) document.removeEventListener('keydown', refs.keyHandler, true);
+
         return;
     }
     if (e.key === 'Escape') {
-        if (refs.activeEditor) { e.preventDefault(); refs.activeEditor.cancel(); return; }
+        if (refs.activeEditor) { e.preventDefault(); refs.activeEditor.cancel();
+
+ return; }
         e.preventDefault();
         closeExisting();
+
         return;
     }
     const saveCombo = (e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S');
     if (saveCombo && refs.activeEditor) {
         e.preventDefault();
         refs.activeEditor.save();
+
         return;
     }
     if (e.key === 'Tab') applyTabTrap(refs.root, e);
@@ -1268,8 +1280,12 @@ function applyTabTrap(root: HTMLElement, e: KeyboardEvent): void {
     const last = nodes[nodes.length - 1]!;
     const active = document.activeElement as HTMLElement | null;
     const insideModal = active !== null && root.contains(active);
-    if (!insideModal) { e.preventDefault(); first.focus(); return; }
-    if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); return; }
+    if (!insideModal) { e.preventDefault(); first.focus();
+
+ return; }
+    if (e.shiftKey && active === first) { e.preventDefault(); last.focus();
+
+ return; }
     if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
 }
 
@@ -1279,6 +1295,7 @@ function buildControlsBar(refs: ModalRefs): HTMLElement {
     bar.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;padding:6px 8px;background:#0f1522;border:1px solid #2b3648;border-radius:6px;';
     bar.appendChild(buildFilterChips(refs));
     bar.appendChild(buildSortSelect(refs));
+
     return bar;
 }
 
@@ -1303,6 +1320,7 @@ function buildFilterChips(refs: ModalRefs): HTMLElement {
         });
         wrap.appendChild(chip);
     }
+
     return wrap;
 }
 
@@ -1328,12 +1346,14 @@ function buildSortSelect(refs: ModalRefs): HTMLElement {
     });
     wrap.appendChild(label);
     wrap.appendChild(select);
+
     return wrap;
 }
 
 function chipCss(isActive: boolean): string {
     const bg = isActive ? '#3a2f6b' : '#243050';
     const fg = isActive ? '#ffe08a' : '#e6edf7';
+
     return [
         'background:' + bg, 'color:' + fg,
         'border:1px solid #3a465c', 'border-radius:999px',
@@ -1352,6 +1372,7 @@ function btnCss(bg: string, fg: string): string {
 
 function rolesToRender(view: ViewState): PromptRole[] {
     if (view.filterRole === 'all') return ROLES;
+
     return [view.filterRole];
 }
 
@@ -1359,6 +1380,7 @@ function sortRows(rows: readonly PromptRow[], mode: SortMode): PromptRow[] {
     const copy = rows.slice();
     if (mode === 'name') return copy.sort((a, b) => a.Name.localeCompare(b.Name));
     if (mode === 'length') return copy.sort((a, b) => b.Body.length - a.Body.length);
+
     return copy.sort((a, b) => (b.IsDefault - a.IsDefault) || a.Name.localeCompare(b.Name));
 }
 
@@ -1395,6 +1417,7 @@ async function buildRoleSection(refs: ModalRefs, role: PromptRole): Promise<HTML
         err.textContent = 'Load error: ' + (result.error ?? 'unknown');
         err.style.cssText = 'color:#f5a3a3;font-size:11px;';
         wrap.appendChild(err);
+
         return wrap;
     }
     const rows = result.value;
@@ -1403,10 +1426,12 @@ async function buildRoleSection(refs: ModalRefs, role: PromptRole): Promise<HTML
         empty.textContent = '(no rows)';
         empty.style.cssText = 'color:#7a8699;font-size:11px;font-style:italic;';
         wrap.appendChild(empty);
+
         return wrap;
     }
     const sortedRows = sortRows(rows, refs.view.sortMode);
     for (const row of sortedRows) wrap.appendChild(buildRowContainer(refs, row));
+
     return wrap;
 }
 
@@ -1417,6 +1442,7 @@ function buildRowContainer(refs: ModalRefs, row: PromptRow): HTMLElement {
     if (refs.view.expandedIds.has(row.Id)) {
         container.appendChild(buildPreviewEl(row));
     }
+
     return container;
 }
 
@@ -1429,6 +1455,7 @@ function buildPreviewEl(row: PromptRow): HTMLElement {
         : row.Body;
     pre.textContent = body;
     pre.style.cssText = 'margin:0 4px 6px 4px;padding:6px 8px;background:#0b1220;color:#c9d5ea;border:1px solid #1c2536;border-radius:6px;font-family:ui-monospace,monospace;font-size:10px;white-space:pre-wrap;max-height:180px;overflow:auto;';
+
     return pre;
 }
 
@@ -1447,6 +1474,7 @@ function buildRowLeft(refs: ModalRefs, row: PromptRow, container: HTMLElement): 
     slug.style.cssText = 'font-size:10px;color:#7a8699;margin-top:2px;';
     left.appendChild(name);
     left.appendChild(slug);
+
     return left;
 }
 
@@ -1505,6 +1533,7 @@ function buildRowRight(refs: ModalRefs, row: PromptRow, rowEl: HTMLElement): HTM
         right.appendChild(resetBtn);
     }
     right.appendChild(delBtn);
+
     return right;
 }
 
@@ -1515,6 +1544,7 @@ function buildRowEl(refs: ModalRefs, row: PromptRow, container: HTMLElement): HT
     rowEl.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 4px;border-top:1px solid #1c2536;font-size:12px;';
     rowEl.appendChild(buildRowLeft(refs, row, container));
     rowEl.appendChild(buildRowRight(refs, row, rowEl));
+
     return rowEl;
 }
 
@@ -1529,10 +1559,12 @@ async function handleResetToDefault(refs: ModalRefs, row: PromptRow): Promise<vo
     if (seedBody === null) {
         logError(LOG_SCOPE, 'reset-to-default called for non-seeded slug=' + row.Slug, new Error('no seed body'));
         refs.status.textContent = 'Reset unavailable: ' + row.Slug + ' is not a seeded prompt.';
+
         return;
     }
     if (seedBody === row.Body) {
         refs.status.textContent = 'Already at default: ' + row.Slug;
+
         return;
     }
     const ok = window.confirm('Reset "' + row.Name + '" (' + row.Slug + ') to its shipped default body?\n\nThis discards the current edits to the body.');
@@ -1549,6 +1581,7 @@ async function handleResetToDefault(refs: ModalRefs, row: PromptRow): Promise<vo
             logError(LOG_SCOPE, 'reset-to-default upsertPrompt failed for slug=' + row.Slug, new Error(result.error ?? 'unknown'));
             refs.status.textContent = 'Reset failed: ' + (result.error ?? 'unknown error');
             showToast('Γ¥î Reset failed for ' + row.Slug, TOAST_ERROR);
+
             return;
         }
         log('PromptLibraryModal: reset-to-default slug=' + row.Slug, 'info');
@@ -1612,6 +1645,7 @@ function buildTokenRow(initialKey: string): TokenRowEls {
     input.addEventListener('input', update);
     update();
     row.appendChild(label); row.appendChild(input); row.appendChild(preview); row.appendChild(error);
+
     return { row, input, preview, error };
 }
 
@@ -1636,6 +1670,7 @@ function buildValuesRow(initialValues: string[]): ValuesRowEls {
     input.addEventListener('input', update);
     update();
     row.appendChild(label); row.appendChild(input); row.appendChild(error);
+
     return { row, input, error };
 }
 
@@ -1663,6 +1698,7 @@ function buildEditorEl(row: PromptRow): EditorEls {
     saveBtn.style.cssText = btnCss('#2f4a2f', '#d6f5d6');
     bar.appendChild(cancelBtn); bar.appendChild(saveBtn);
     wrap.appendChild(nameInput); wrap.appendChild(tokenEls.row); wrap.appendChild(valuesEls.row); wrap.appendChild(bodyInput); wrap.appendChild(bar);
+
     return {
         wrap, nameInput, bodyInput,
         tokenInput: tokenEls.input, tokenPreview: tokenEls.preview, tokenError: tokenEls.error,
@@ -1670,7 +1706,6 @@ function buildEditorEl(row: PromptRow): EditorEls {
         saveBtn, cancelBtn,
     };
 }
-
 
 function openInlineEditor(refs: ModalRefs, rowEl: HTMLElement, row: PromptRow): void {
     const ed = buildEditorEl(row);
@@ -1681,12 +1716,14 @@ function openInlineEditor(refs: ModalRefs, rowEl: HTMLElement, row: PromptRow): 
         if (ed.tokenError.textContent) {
             refs.status.textContent = 'Invalid Token: ' + ed.tokenError.textContent;
             ed.tokenInput.focus();
+
             return;
         }
         // Task 11: block save on invalid N options.
         if (ed.valuesError.textContent) {
             refs.status.textContent = 'Invalid N options: ' + ed.valuesError.textContent;
             ed.valuesInput.focus();
+
             return;
         }
         const parsedValues = ed.valuesInput.value.split(',').map((s) => s.trim()).filter((s) => s.length > 0);
@@ -1725,6 +1762,7 @@ async function handleEditSave(refs: ModalRefs, row: PromptRow, payload: EditSave
         if (res.isFail) {
             refs.status.textContent = 'Save failed: ' + (res.error ?? 'unknown');
             logError(LOG_SCOPE, 'edit save failed', res);
+
             return;
         }
         log('PromptLibraryModal: edited id=' + row.Id + ' slug=' + row.Slug
@@ -1743,6 +1781,7 @@ async function handleSetDefault(refs: ModalRefs, row: PromptRow): Promise<void> 
         if (res.isFail) {
             refs.status.textContent = 'Set-default failed: ' + (res.error ?? 'unknown');
             logError(LOG_SCOPE, 'setDefault failed', res);
+
             return;
         }
         log('PromptLibraryModal: set default id=' + row.Id + ' role=' + row.Role, 'info');
@@ -1766,6 +1805,7 @@ async function handleDuplicate(refs: ModalRefs, row: PromptRow): Promise<void> {
         if (res.isFail) {
             refs.status.textContent = 'Duplicate failed: ' + (res.error ?? 'unknown');
             logError(LOG_SCOPE, 'duplicate failed', res);
+
             return;
         }
         log('PromptLibraryModal: duplicated ' + row.Slug + ' -> ' + dupSlug, 'info');
@@ -1789,6 +1829,7 @@ async function handleDelete(refs: ModalRefs, row: PromptRow): Promise<void> {
             logError(LOG_SCOPE, 'delete blocked', res);
             try { showToast(msgText, 'error'); } catch { /* jsdom: no-op */ }
             try { window.alert(msgText); } catch { /* jsdom: no-op */ }
+
             return;
         }
         log('PromptLibraryModal: deleted id=' + row.Id + ' slug=' + row.Slug, 'info');
@@ -1804,7 +1845,6 @@ async function handleDelete(refs: ModalRefs, row: PromptRow): Promise<void> {
                 logError(LOG_SCOPE, 'post-delete cache refresh failed', cacheErr);
             }
         })();
-
     } catch (err) {
         logError(LOG_SCOPE, 'delete threw', err);
         const detail = err instanceof Error ? err.message : String(err);
@@ -1812,7 +1852,6 @@ async function handleDelete(refs: ModalRefs, row: PromptRow): Promise<void> {
         try { showToast('Delete failed: ' + detail, 'error'); } catch { /* jsdom: no-op */ }
     }
 }
-
 
 /**
  * Generate a `<original>-copy`, `<original>-copy-2`, ... slug. Slug
@@ -1826,5 +1865,6 @@ export function uniqueDupSlug(baseSlug: string, existing: readonly string[] = []
         const candidate = baseSlug + '-copy-' + i;
         if (!existing.includes(candidate)) return candidate;
     }
+
     return baseSlug + '-copy-' + Date.now();
 }

@@ -31,7 +31,7 @@ export interface UserAddRowContext {
     Api: LovableApiClient;
 }
 
-export enum UserAddRowOutcomeCode {
+export enum UserAddRowOutcomeCodeType {
     Succeeded = "Succeeded",
     StepAFailed = "StepAFailed",
     StepBFailed = "StepBFailed",
@@ -49,7 +49,7 @@ export enum UserAddRowOutcomeCode {
 
 export interface UserAddRowResult {
     RowIndex: number;
-    Outcome: UserAddRowOutcomeCode;
+    Outcome: UserAddRowOutcomeCodeType;
     IsDone: boolean;
     HasError: boolean;
     LastError: string | null;

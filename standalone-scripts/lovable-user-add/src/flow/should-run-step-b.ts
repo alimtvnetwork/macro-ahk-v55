@@ -7,8 +7,8 @@
  * promotion of Admin/Member rows and keeps the policy in one place.
  */
 
-import { UserAddMembershipRoleCode } from "../migrations/membership-role-seed";
+import { UserAddMembershipRoleCodeType } from "../migrations/membership-role-seed";
 
-export const shouldRunStepB = (roleCode: UserAddMembershipRoleCode): boolean => {
-    return roleCode === UserAddMembershipRoleCode.Owner;
+export const shouldRunStepB = (roleCode: UserAddMembershipRoleCodeType): boolean => {
+    return roleCode === UserAddMembershipRoleCodeType.Owner;
 };

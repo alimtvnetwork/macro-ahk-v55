@@ -9,21 +9,21 @@
  * Severity codes already match (`Info`/`Warn`/`Error`).
  */
 
-import { LogViewerSeverityCode } from "../../../lovable-common/src/ui/log-viewer-types";
+import { LogViewerSeverityCodeType } from "../../../lovable-common/src/ui/log-viewer-types";
 import type { LogViewerEntry } from "../../../lovable-common/src/ui/log-viewer-types";
 import { LogSeverityType } from "./log-sink";
 import type { LogEntry } from "./log-sink";
 
-const mapSeverity = (severity: LogSeverityType): LogViewerSeverityCode => {
+const mapSeverity = (severity: LogSeverityType): LogViewerSeverityCodeType => {
     if (severity === LogSeverityType.Error) {
-        return LogViewerSeverityCode.Error;
+        return LogViewerSeverityCodeType.Error;
     }
 
     if (severity === LogSeverityType.Warn) {
-        return LogViewerSeverityCode.Warn;
+        return LogViewerSeverityCodeType.Warn;
     }
 
-    return LogViewerSeverityCode.Info;
+    return LogViewerSeverityCodeType.Info;
 };
 
 export const toLogViewerEntries = (

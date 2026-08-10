@@ -150,13 +150,11 @@ export async function reseedPromptsOnDemand(opts: ReseedOptions = {}): Promise<R
  */
 export function installReseedCommandGlobal(): void {
   const w = window;
-  const isMissing__marcoReseedPrompts = !w.__marcoReseedPrompts;
-  if (isMissing__marcoReseedPrompts) {
+  if (!w.__marcoReseedPrompts) {
     w.__marcoReseedPrompts = reseedPromptsOnDemand;
     log('[ReseedCommand] window.__marcoReseedPrompts installed', 'info');
   }
-  const isMissing__marcoCheckPromptHealth = !w.__marcoCheckPromptHealth;
-  if (isMissing__marcoCheckPromptHealth) {
+  if (!w.__marcoCheckPromptHealth) {
     w.__marcoCheckPromptHealth = async () => {
       const { runPromptHealthCheck } = await import('./prompt-health-check');
 

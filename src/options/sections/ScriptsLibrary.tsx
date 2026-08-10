@@ -31,8 +31,7 @@ export function ScriptsLibrary() {
                 type: "GET_ALL_SCRIPTS",
             });
             setScripts(response.scripts ?? []);
-        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+        } catch (err) { /* swallowed */
             setScripts([]);
         } finally {
             setIsLoading(false);

@@ -108,8 +108,7 @@ export class DiagnosticError extends Error {
 
   constructor(code: string, context: DiagnosticContext, cause?: unknown) {
     const entry = getErrorCodeEntry(code);
-    const isMissingEntry = !entry;
-    if (isMissingEntry) {
+    if (!entry) {
       throw new DiagnosticMetaError(
         `Unknown error code "${code}". Add it to ERROR_CODES before throwing.`,
       );

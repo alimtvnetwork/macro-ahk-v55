@@ -32,8 +32,7 @@ export function bindKvDbManager(manager: DbManager): void {
 }
 
 function getDb(): SqlJsDatabase {
-    const isMissingDbManager = !dbManager;
-    if (isMissingDbManager) throw new Error("[kv] DbManager not bound");
+    if (!dbManager) throw new Error("[kv] DbManager not bound");
 
     return dbManager.getLogsDb();
 }
@@ -48,10 +47,8 @@ export async function handleKvGet(
     const raw = message as MessageRequest & { projectId?: unknown; key?: unknown };
     const projectId = requireProjectId(raw.projectId);
     const key = requireKey(raw.key);
-    const isMissingProjectId = !projectId;
-    if (isMissingProjectId) return missingFieldError("projectId", "kv:get");
-    const isMissingKey = !key;
-    if (isMissingKey) return missingFieldError("key", "kv:get");
+    if (!projectId) return missingFieldError("projectId", "kv:get");
+    if (!key) return missingFieldError("key", "kv:get");
 
     const db = getDb();
     const result = db.exec(
@@ -71,10 +68,8 @@ export async function handleKvSet(
     const raw = message as MessageRequest & { projectId?: unknown; key?: unknown; value?: unknown };
     const projectId = requireProjectId(raw.projectId);
     const key = requireKey(raw.key);
-    const isMissingProjectId = !projectId;
-    if (isMissingProjectId) return missingFieldError("projectId", "kv:set");
-    const isMissingKey = !key;
-    if (isMissingKey) return missingFieldError("key", "kv:set");
+    if (!projectId) return missingFieldError("projectId", "kv:set");
+    if (!key) return missingFieldError("key", "kv:set");
 
     const value = raw.value;
     const stringified = typeof value === "string" ? value : JSON.stringify(value ?? null);
@@ -95,10 +90,8 @@ export async function handleKvDelete(
     const raw = message as MessageRequest & { projectId?: unknown; key?: unknown };
     const projectId = requireProjectId(raw.projectId);
     const key = requireKey(raw.key);
-    const isMissingProjectId = !projectId;
-    if (isMissingProjectId) return missingFieldError("projectId", "kv:delete");
-    const isMissingKey = !key;
-    if (isMissingKey) return missingFieldError("key", "kv:delete");
+    if (!projectId) return missingFieldError("projectId", "kv:delete");
+    if (!key) return missingFieldError("key", "kv:delete");
 
     const db = getDb();
     db.run("DELETE FROM ProjectKv WHERE ProjectId = ? AND Key = ?", [projectId, key]);
@@ -112,8 +105,7 @@ export async function handleKvList(
 ): Promise<{ entries: Array<{ key: string; value: string }> } | HandlerErrorResponse> {
     const raw = message as MessageRequest & { projectId?: unknown };
     const projectId = requireProjectId(raw.projectId);
-    const isMissingProjectId = !projectId;
-    if (isMissingProjectId) return missingFieldError("projectId", "kv:list");
+    if (!projectId) return missingFieldError("projectId", "kv:list");
 
     const db = getDb();
     const stmt = db.prepare(

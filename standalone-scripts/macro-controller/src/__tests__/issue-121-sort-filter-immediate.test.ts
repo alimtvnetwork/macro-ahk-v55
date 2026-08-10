@@ -94,8 +94,7 @@ describe('v3.32.1 — populate dirty-hash includes creditSortMode + refillSoon',
 
   function rowOrder(): string[] {
     const listEl = document.getElementById('loop-ws-list');
-    const isMissingListEl = !listEl;
-    if (isMissingListEl) return [];
+    if (!listEl) return [];
 
     return Array.from(listEl.querySelectorAll<HTMLElement>('[data-ws-id]'))
       .map((el) => el.getAttribute('data-ws-id') || '');

@@ -252,9 +252,7 @@ async function processTier1Response(
 
   const data = resp.data as Record<string, unknown> | null;
 
-  const isMissingData = !data;
-
-  if (isMissingData) {
+  if (!data) {
     log(fn + ': Tier 1 — empty response body — falling to passive fallback', 'warn');
     await fallbackDetect(fn, perWs, skipDialog);
 
@@ -267,9 +265,7 @@ async function processTier1Response(
   logSub('Tier 1 response keys: ' + Object.keys(data).join(', '), 1);
   logSub('Extracted workspace_id: "' + wsId + '"', 1);
 
-  const isMissingWsId = !wsId;
-
-  if (isMissingWsId) {
+  if (!wsId) {
     log(fn + ': Tier 1 — no workspace_id in response — falling to passive fallback', 'warn');
     logSub('Response (first 400 chars): ' + JSON.stringify(data).substring(0, 400), 1);
     await fallbackDetect(fn, perWs, skipDialog);
@@ -296,8 +292,7 @@ async function processTier1Response(
 /** Handle single-workspace case. Returns true if resolved. */
 function handleSingleWorkspace(fn: string, perWs: import('./types').WorkspaceCredit[]): boolean {
   if (perWs.length !== 1) return false;
-  const isMissingWorkspaceName = !state.workspaceName;
-  if (isMissingWorkspaceName) {
+  if (!state.workspaceName) {
     state.workspaceName = perWs[0].fullName || perWs[0].name;
     state.workspaceFromApi = true;
     loopCreditState.currentWs = perWs[0];
@@ -352,9 +347,7 @@ export async function autoDetectLoopCurrentWorkspace(
   const projectId = extractProjectIdFromUrl();
   const token = bearerToken || resolveToken();
 
-  const isMissingProjectId = !projectId;
-
-  if (isMissingProjectId) {
+  if (!projectId) {
     log(fn + ': No projectId in URL — skipping Tier 1, falling to passive fallback', 'info');
     await fallbackDetect(fn, perWs, skipDialog);
 

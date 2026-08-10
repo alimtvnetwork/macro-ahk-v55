@@ -271,9 +271,7 @@ async function executeRename(
   if (isUnauthorized) {
     const newToken = await handleRenameAuthRecovery(token, wsId);
 
-    const isMissingNewToken = !newToken;
-
-    if (isMissingNewToken) {
+    if (!newToken) {
       throw rejectNoBearerToken(wsId);
     }
 

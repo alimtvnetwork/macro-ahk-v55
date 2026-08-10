@@ -36,8 +36,7 @@ class DomCache {
 
   /** Get a single node by XPath, using cache if fresh */
   getByXPath(xpath: string): Node | null {
-    const isMissingXpath = !xpath;
-    if (isMissingXpath) return null;
+    if (!xpath) return null;
 
     const cached = this._cache.get(xpath);
     if (cached && Date.now() - cached.timestamp < this._ttlMs) {
@@ -66,8 +65,7 @@ class DomCache {
 
   /** Get all nodes by XPath, using cache if fresh */
   getAllByXPath(xpath: string): Node[] {
-    const isMissingXpath = !xpath;
-    if (isMissingXpath) return [];
+    if (!xpath) return [];
 
     const cached = this._cacheMulti.get(xpath);
     if (cached && Date.now() - cached.timestamp < this._ttlMs) {

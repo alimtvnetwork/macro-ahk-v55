@@ -82,8 +82,7 @@ async function readSnapshot(): Promise<SdkSelfTestSnapshot> {
             gkv: normalizeRow(raw.gkv),
             updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : null,
         };
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return { ...EMPTY_SNAPSHOT };
     }
 }

@@ -527,9 +527,7 @@ function setupDrag(handle: HTMLElement, overlay: HTMLElement): void {
 function renderErrorList(): void {
   const list = overlayState.listEl;
 
-  const isMissingList = !list;
-
-  if (isMissingList) {
+  if (!list) {
     return;
   }
 
@@ -692,9 +690,7 @@ function handleClearAll(): void {
 function handleMinimize(): void {
   const overlay = overlayState.overlayEl;
 
-  const isMissingOverlay = !overlay;
-
-  if (isMissingOverlay) {
+  if (!overlay) {
     return;
   }
 

@@ -92,8 +92,7 @@ export async function cacheGet<T>(category: CacheCategory, subKey = ""): Promise
 
             request.onsuccess = () => {
                 const entry = request.result as CacheEntry<T> | undefined;
-                const isMissingEntry = !entry;
-                if (isMissingEntry) {
+                if (!entry) {
                     resolve(null);
 
                     return;
@@ -114,8 +113,7 @@ export async function cacheGet<T>(category: CacheCategory, subKey = ""): Promise
                 resolve(null);
             };
         });
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return null;
     }
 }
@@ -194,8 +192,7 @@ export async function cacheClearAll(): Promise<{ cleared: number }> {
             };
             countReq.onerror = () => resolve({ cleared: 0 });
         });
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return { cleared: 0 };
     }
 }
@@ -224,8 +221,7 @@ export async function cacheStats(): Promise<{ entryCount: number; categories: Re
 
             request.onerror = () => resolve({ entryCount: 0, categories: {} });
         });
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return { entryCount: 0, categories: {} };
     }
 }
@@ -327,8 +323,7 @@ export async function purgeStaleEntries(): Promise<number> {
 
             request.onerror = () => resolve(0);
         });
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return 0;
     }
 }

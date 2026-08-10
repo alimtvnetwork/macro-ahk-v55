@@ -32,8 +32,7 @@ export function timingEnd(
   detail?: string,
 ): void {
   const p = _pending.get(phase);
-  const isMissingP = !p;
-  if (isMissingP) return;
+  if (!p) return;
   _pending.delete(phase);
   _entries.push({
     phase,

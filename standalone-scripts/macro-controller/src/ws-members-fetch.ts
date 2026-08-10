@@ -38,8 +38,7 @@ interface MarcoSdkShape {
 function getMemberships(op: string) {
   const sdk = (window as unknown as { marco?: MarcoSdkShape }).marco;
   const api = sdk?.api?.memberships;
-  const isMissingApi = !api;
-  if (isMissingApi) throwDiagnostic('WS_MEMBERS_FETCH_E001', { op });
+  if (!api) throwDiagnostic('WS_MEMBERS_FETCH_E001', { op });
 
   return api;
 }

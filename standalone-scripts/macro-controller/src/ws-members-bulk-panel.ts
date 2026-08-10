@@ -122,8 +122,7 @@ function attachRowListeners(body: HTMLElement, union: AggregatedMember[]): void 
   body.querySelectorAll('.bulk-member-row').forEach(row => {
     const userId = row.getAttribute('data-user-id')!;
     const member = union.find(m => m.userId === userId);
-    const isMissingMember = !member;
-    if (isMissingMember) return;
+    if (!member) return;
 
     row.addEventListener('contextmenu', (e: Event) => {
         const mouseEvent = e as MouseEvent;
@@ -218,8 +217,7 @@ function renderMemberRow(m: AggregatedMember, totalWs: number): string {
 
 function renderFooter(): void {
   const footer = document.getElementById('bulk-members-footer');
-  const isMissingFooter = !footer;
-  if (isMissingFooter) return;
+  if (!footer) return;
 
   footer.innerHTML = `
     <div style="display: flex; flex-direction: column; gap: 8px;">

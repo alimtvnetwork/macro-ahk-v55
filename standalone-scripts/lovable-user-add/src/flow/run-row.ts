@@ -23,7 +23,7 @@ import { runStepB } from "./run-step-b";
 import { shouldRunStepB } from "./should-run-step-b";
 import { finalizeUserAddRow } from "./row-finalize";
 import { buildRowFailure, buildRowSuccess } from "./row-result-builders";
-import { UserAddRowOutcomeCode } from "./row-types";
+import { UserAddRowOutcomeCodeType } from "./row-types";
 import { UserAddLogPhaseType, UserAddLogSeverityType, buildUserAddEntry } from "./log-sink";
 import type { UserAddLogSink } from "./log-sink";
 import type { UserAddRowContext, UserAddRowResult } from "./row-types";
@@ -68,7 +68,7 @@ const handleStepAFailure = async (
 
     return finalizeUserAddRow(ctx, sink, store, buildRowFailure({
         rowIndex: ctx.Row.RowIndex, startedAt,
-        outcome: UserAddRowOutcomeCode.StepAFailed,
+        outcome: UserAddRowOutcomeCodeType.StepAFailed,
         error: errorMessage,
         stepBRan: false, stepASucceeded: false, workspaceId: null, userId: null,
     }));
@@ -86,7 +86,7 @@ const runStepBPhase = async (
 
         return finalizeUserAddRow(ctx, sink, store, buildRowFailure({
             rowIndex: ctx.Row.RowIndex, startedAt,
-            outcome: UserAddRowOutcomeCode.StepBFailedMemberAdded,
+            outcome: UserAddRowOutcomeCodeType.StepBFailedMemberAdded,
             error: stepB.Error, stepBRan: true, stepASucceeded: true,
             workspaceId, userId,
         }));

@@ -87,6 +87,7 @@ async function seedCrossProjectSyncState(context: BrowserContext): Promise<void>
   while (Date.now() < deadline) {
     const ready = await serviceWorker.evaluate(() => {
       const c = (globalThis as { chrome?: { storage?: { local?: unknown } } }).chrome;
+
       return Boolean(c?.storage?.local);
     });
     if (ready) break;
@@ -112,6 +113,7 @@ async function seedCrossProjectSyncStateFromPage(page: Page): Promise<void> {
       });
       const result = await chrome.storage.local.get([onboardingKey, projectsKey]);
       const storedProjects = result[projectsKey];
+
       return result[onboardingKey] === true
         && Array.isArray(storedProjects)
         && storedProjects.some((project: { id?: string }) => project.id === expectedProjectId);
@@ -140,6 +142,7 @@ function buildSeedProjects(): StoredProjectSeed[] {
 
 function makeProject(id: string, slug: string, codeName: string, name: string): StoredProjectSeed {
   const timestamp = '2026-06-04T00:00:00.000Z';
+
   return {
     id,
     schemaVersion: 1,
@@ -183,6 +186,7 @@ async function readGroupMembers(page: Page, groupName: string): Promise<string[]
     const group = groupsResponse.groups.find((candidate: { Name: string }) => candidate.Name === name);
     if (!group) return [];
     const membersResponse = await chrome.runtime.sendMessage({ type: 'LIBRARY_GET_GROUP_MEMBERS', groupId: group.Id });
+
     return membersResponse.members.map((member: { ProjectIdUuid: string }) => member.ProjectIdUuid);
   }, groupName);
 }
@@ -191,6 +195,7 @@ async function readGroupId(page: Page, groupName: string): Promise<number | null
   return await page.evaluate(async (name) => {
     const groupsResponse = await chrome.runtime.sendMessage({ type: 'LIBRARY_GET_GROUPS' });
     const group = groupsResponse.groups.find((candidate: { Name: string }) => candidate.Name === name);
+
     return group?.Id ?? null;
   }, groupName);
 }

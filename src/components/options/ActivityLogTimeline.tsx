@@ -266,8 +266,7 @@ function SessionHistoryPicker({
         type: "GET_SESSION_REPORT",
       });
       setSessions(result.sessions ?? []);
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
       setSessions([]);
     } finally {
       setLoading(false);
@@ -286,7 +285,7 @@ function SessionHistoryPicker({
       });
       await navigator.clipboard.writeText(result.report);
       toast.success(`Session #${sid} report copied`);
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Failed to copy session report");
     }
   };
@@ -451,7 +450,7 @@ export function ActivityLogTimeline() {
           type: "GET_SESSION_REPORT",
         });
         report = result.report;
-      } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+      } catch (err) { /* swallowed */
         // Fallback: build from in-memory entries
         const lines = entries.map((e) => {
           const ts = e.timestamp;
@@ -469,8 +468,7 @@ export function ActivityLogTimeline() {
             const g = globalThis as { chrome?: { runtime?: { getManifest?: () => { version?: string } } } };
 
             return g.chrome?.runtime?.getManifest?.().version ?? "?";
-          } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+          } catch (err) { /* swallowed */
  return "?"; }
         })();
 
@@ -489,7 +487,7 @@ export function ActivityLogTimeline() {
 
       await navigator.clipboard.writeText(report);
       toast.success("Full session report copied to clipboard");
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Failed to copy");
     } finally {
       setCopyLoading(false);
@@ -503,7 +501,7 @@ export function ActivityLogTimeline() {
       if (result.ok) {
         toast.success("ZIP bundle downloaded");
       }
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Export failed");
     } finally {
       setExportLoading(false);
@@ -543,7 +541,7 @@ export function ActivityLogTimeline() {
                 ]);
                 toast.success("All logs and errors cleared");
                 refresh();
-              } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+              } catch (err) { /* swallowed */
                 toast.error("Failed to clear logs");
               }
             }}

@@ -24,8 +24,7 @@ let hydrated = false;
 function safeOrigin(url: string): string {
     try {
         return new URL(url).origin;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return "";
     }
 }

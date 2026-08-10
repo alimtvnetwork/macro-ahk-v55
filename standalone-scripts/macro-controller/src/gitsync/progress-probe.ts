@@ -113,17 +113,13 @@ export async function probeProgress(
 ): Promise<GitsyncProgressBody | null> {
     if (!wsId || !projectId || !jobId) {
         const missing: string[] = [];
-        const isMissingWsId = !wsId;
-        if (isMissingWsId) missing.push('wsId');
-        const isMissingProjectId = !projectId;
-        if (isMissingProjectId) missing.push('projectId');
-        const isMissingJobId = !jobId;
-        if (isMissingJobId) missing.push('jobId');
+        if (!wsId) missing.push('wsId');
+        if (!projectId) missing.push('projectId');
+        if (!jobId) missing.push('jobId');
         throwDiagnostic('GITSYNC_PROBE_E001', { missingArgs: missing.join(',') });
     }
     const sdk = getSdk();
-    const isMissingSdk = !sdk;
-    if (isMissingSdk) {
+    if (!sdk) {
         const reason = 'marco.api.call unavailable (SDK not injected)';
         logError('GitsyncProbe', 'probeProgress: ' + reason
             + ' [ws=' + wsId + ' pid=' + projectId + ' job=' + jobId + ']');
@@ -167,8 +163,7 @@ export async function probeProgress(
 /* ------------------------------------------------------------------ */
 
 function isTerminal(body: GitsyncProgressBody | null): boolean {
-    const isMissingBody = !body;
-    if (isMissingBody) return false;
+    if (!body) return false;
     const s = body.status;
 
     return s === 'completed' || s === 'failed';

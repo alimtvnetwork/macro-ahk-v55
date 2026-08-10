@@ -1,4 +1,4 @@
-import type { MembershipRoleApiCode } from "./membership-role-api-code";
+import type { MembershipRoleApiCodeType } from "./membership-role-api-code";
 
 /**
  * Typed contracts for Lovable membership REST payloads (PascalCase fields
@@ -13,14 +13,14 @@ export interface WorkspaceSummary {
 export interface MembershipSummary {
     UserId: string;
     Email: string;
-    Role: MembershipRoleApiCode;
+    Role: MembershipRoleApiCodeType;
 }
 
 export interface AddMembershipRequest {
     Email: string;
-    Role: MembershipRoleApiCode;
+    Role: MembershipRoleApiCodeType;
 }
 
 export interface UpdateMembershipRoleRequest {
-    Role: MembershipRoleApiCode;
+    Role: MembershipRoleApiCodeType;
 }

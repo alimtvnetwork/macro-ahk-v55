@@ -8,7 +8,7 @@ const project = new Project({
 project.addSourceFilesAtPaths("d:/work/macro-ahk/**/*.ts");
 project.addSourceFilesAtPaths("d:/work/macro-ahk/**/*.tsx");
 
-let modifiedFiles = new Set<string>();
+const modifiedFiles = new Set<string>();
 const wrapperTypes = new Set(['ServiceResult', 'SqlBridgeResp', 'ApiResponse', 'MarcoSDKApiResponse']);
 
 for (const sourceFile of project.getSourceFiles()) {
@@ -27,11 +27,10 @@ for (const sourceFile of project.getSourceFiles()) {
             
             // Is it negated? i.e. !x.ok or x.isFail
             if (parent && parent.getKind() === SyntaxKind.PrefixUnaryExpression && parent.getOperatorToken() === SyntaxKind.ExclamationToken) {
-                
                 // Let's get the type of the expression `x`
                 const expression = access.getExpression();
                 const type = expression.getType();
-                let typeText = type.getText(undefined, TypeFormatFlags.NoTruncation | TypeFormatFlags.RemoveComments);
+                const typeText = type.getText(undefined, TypeFormatFlags.NoTruncation | TypeFormatFlags.RemoveComments);
                 
                 // TypeText might be complex, e.g. `import("...").SqlBridgeResp` or `Promise<ApiResponse>`
                 // We just check if it contains one of our wrapper names
@@ -52,7 +51,7 @@ for (const sourceFile of project.getSourceFiles()) {
                 // If it's x.ok (not negated), we can replace it with x.isSuccess for our wrappers
                 const expression = access.getExpression();
                 const type = expression.getType();
-                let typeText = type.getText(undefined, TypeFormatFlags.NoTruncation | TypeFormatFlags.RemoveComments);
+                const typeText = type.getText(undefined, TypeFormatFlags.NoTruncation | TypeFormatFlags.RemoveComments);
                 const isWrapper = Array.from(wrapperTypes).some(wt => typeText.includes(wt));
                 
                 if (isWrapper) {

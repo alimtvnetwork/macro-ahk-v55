@@ -320,8 +320,7 @@ async function runRepairAndOpen(role: PromptRole): Promise<void> {
   const { buildRepairReport, stashRepairReport, showRepairReportModal } = await import('./repair-report-modal');
   const report = buildRepairReport(result);
   stashRepairReport(report);
-  const isMissingIsHealthy = !result.isHealthy;
-  if (isMissingIsHealthy) {
+  if (!result.isHealthy) {
     const durationMs = Date.now() - startedAt;
     reportGearFailure(
       'REPAIR_RUN_E001',
@@ -345,15 +344,13 @@ async function runRepairAndOpen(role: PromptRole): Promise<void> {
 
 async function editSpecific(role: PromptRole, roleLabel: string): Promise<void> {
   const picked = await pickPromptFromRole({ role, roleLabel, title: 'Edit which ' + roleLabel + ' prompt?', confirmLabel: 'Edit' });
-  const isMissingPicked = !picked;
-  if (isMissingPicked) return;
+  if (!picked) return;
   await openPromptEditor({ role, promptId: picked.Id });
 }
 
 async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
   const picked = await pickPromptFromRole({ role, roleLabel, title: 'Set active ' + roleLabel + ' prompt', confirmLabel: 'Set active' });
-  const isMissingPicked = !picked;
-  if (isMissingPicked) return;
+  if (!picked) return;
   if (picked.IsDefault === 1) { showToast('Already active', 'info');
 
  return; }
@@ -380,8 +377,7 @@ async function setActive(role: PromptRole, roleLabel: string): Promise<void> {
 
 async function deleteCustom(role: PromptRole, roleLabel: string): Promise<void> {
   const picked = await pickPromptFromRole({ role, roleLabel, title: 'Delete which custom ' + roleLabel + ' prompt?', excludeDefault: true, confirmLabel: 'Delete' });
-  const isMissingPicked = !picked;
-  if (isMissingPicked) return;
+  if (!picked) return;
   const { confirmDialog } = await import('./confirm-dialog');
   const ok = await confirmDialog({
     title: 'Delete prompt?',

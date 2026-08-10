@@ -353,8 +353,7 @@ function parseBundleEnvelope(raw: unknown, valid: CachedPromptEntry[], errors: s
     if (Array.isArray(rawEntries)) {
       rawEntries.forEach((entry, index) => {
         const detail = validatePromptEntryDetailed(entry);
-        const isMissingEntry = !detail.entry;
-        if (isMissingEntry) {
+        if (!detail.entry) {
           const ptr = detail.field ? `/entries/${index}/${detail.field}` : `/entries/${index}`;
           errors.push(`${ptr}: ${detail.reason ?? 'invalid'} (requires name and text)`);
         }
@@ -478,8 +477,7 @@ export function applyRoleFilter(
   entries: readonly CachedPromptEntry[],
   roleFilter: PromptRole | undefined,
 ): { kept: CachedPromptEntry[]; droppedCount: number } {
-  const isMissingRoleFilter = !roleFilter;
-  if (isMissingRoleFilter) return { kept: [...entries], droppedCount: 0 };
+  if (!roleFilter) return { kept: [...entries], droppedCount: 0 };
   const kept: CachedPromptEntry[] = [];
   let droppedCount = 0;
   for (const e of entries) {
@@ -536,8 +534,7 @@ export async function performPromptImport(
 ): Promise<PromptImportResults> {
   const totalRevisionsInput = options.revisions?.length ?? 0;
   const emit = (progress: ImportProgress): void => {
-    const isMissingOnProgress = !options.onProgress;
-    if (isMissingOnProgress) return;
+    if (!options.onProgress) return;
     try { options.onProgress(progress); }
     catch (err) { log('[PromptIO] onProgress listener threw: ' + String(err), 'warn'); }
   };

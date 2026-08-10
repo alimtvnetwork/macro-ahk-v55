@@ -43,8 +43,7 @@ describe('Workspace refetch policy (regression)', () => {
         const line = lines[i];
         const isTimerLine = /\b(set|tracked)Interval\s*\(/.test(line)
           || /\bsetTimeout\s*\(.*fetchLoopCredits/.test(line);
-        const isMissingIsTimerLine = !isTimerLine;
-        if (isMissingIsTimerLine) continue;
+        if (!isTimerLine) continue;
         // Look at this line + next 8 lines for a fetcher name (covers
         // multi-line `setInterval(function () { fetchLoopCredits(...) }, ms)`).
         const slice = lines.slice(i, i + 9).join('\n');

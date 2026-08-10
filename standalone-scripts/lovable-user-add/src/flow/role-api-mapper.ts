@@ -1,5 +1,5 @@
 /**
- * User Add — UserAddMembershipRoleCode → MembershipRoleApiCode mapper.
+ * User Add — UserAddMembershipRoleCodeType → MembershipRoleApiCodeType mapper.
  *
  * Project-internal enum (PascalCase) → wire enum (lowercase). Owner is
  * mapped to Member at this layer because Step A creates the membership
@@ -10,13 +10,13 @@
  * decides whether to invoke Step B based on `RowRoleCode === Owner`.
  */
 
-import { UserAddMembershipRoleCode } from "../migrations/membership-role-seed";
-import { MembershipRoleApiCode } from "../../../lovable-common/src/api/membership-role-api-code";
+import { UserAddMembershipRoleCodeType } from "../migrations/membership-role-seed";
+import { MembershipRoleApiCodeType } from "../../../lovable-common/src/api/membership-role-api-code";
 
-export const toStepAApiRole = (role: UserAddMembershipRoleCode): MembershipRoleApiCode => {
-    if (role === UserAddMembershipRoleCode.Admin) {
-        return MembershipRoleApiCode.Admin;
+export const toStepAApiRole = (role: UserAddMembershipRoleCodeType): MembershipRoleApiCodeType => {
+    if (role === UserAddMembershipRoleCodeType.Admin) {
+        return MembershipRoleApiCodeType.Admin;
     }
 
-    return MembershipRoleApiCode.Member;
+    return MembershipRoleApiCodeType.Member;
 };

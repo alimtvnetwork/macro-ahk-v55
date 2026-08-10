@@ -254,8 +254,7 @@ function buildPanel(): HTMLElement {
 
 async function renderBody(panel: HTMLElement, refresh: () => Promise<void>): Promise<void> {
   const body = panel.querySelector<HTMLElement>('[data-role="body"]');
-  const isMissingBody = !body;
-  if (isMissingBody) return;
+  if (!body) return;
   body.replaceChildren(buildLoadingState());
   const rows = await fetchReadMemoryRows();
   const parts: HTMLElement[] = [buildSubtitle(rows.length)];

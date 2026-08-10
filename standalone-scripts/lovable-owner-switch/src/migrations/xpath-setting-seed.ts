@@ -8,10 +8,10 @@
 
 import { DefaultXPaths } from "../../../lovable-common/src/xpath/default-xpaths";
 import { DefaultDelaysMs } from "../../../lovable-common/src/xpath/default-delays";
-import { XPathKeyCode } from "../../../lovable-common/src/xpath/xpath-key-code";
+import { XPathKeyCodeType } from "../../../lovable-common/src/xpath/xpath-key-code";
 
 export interface XPathSettingSeed {
-    KeyCode: XPathKeyCode;
+    KeyCode: XPathKeyCodeType;
     XPath: string;
     DelayMs: number;
 }
@@ -19,7 +19,7 @@ export interface XPathSettingSeed {
 const buildSeeds = (): ReadonlyArray<XPathSettingSeed> => {
     const out: XPathSettingSeed[] = [];
 
-    for (const key of Object.values(XPathKeyCode)) {
+    for (const key of Object.values(XPathKeyCodeType)) {
         out.push({
             KeyCode: key,
             XPath: DefaultXPaths[key],

@@ -58,9 +58,7 @@ function isOnProjectPageForShortcut(): boolean {
       || host.endsWith('.lovableproject.com')
     );
 
-    const isMissingIsSupportedHost = !isSupportedHost;
-
-    if (isMissingIsSupportedHost) return false;
+    if (!isSupportedHost) return false;
 
     const isSettings = path.includes('/settings');
     const isProjectPath = path.includes('/projects/');
@@ -188,8 +186,7 @@ function handleCtrlAltShortcut(e: KeyboardEvent, deps: KeyboardHandlerDeps): boo
 export function registerKeyboardHandlers(deps: KeyboardHandlerDeps): void {
   document.addEventListener('keydown', function(e: KeyboardEvent) {
     if (handleTaskNextShortcut(e, deps.taskNextDeps)) return;
-    const isMissingCtrlKey = !e.ctrlKey;
-    if (isMissingCtrlKey) return;
+    if (!e.ctrlKey) return;
     if (!e.altKey && !e.shiftKey) { handleCtrlOnlyShortcut(e, deps);
 
  return; }

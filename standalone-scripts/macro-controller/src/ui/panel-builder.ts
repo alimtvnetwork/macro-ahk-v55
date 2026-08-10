@@ -134,8 +134,7 @@ function wireSummaryBarSubscription(summaryBar: SummaryBarHandle): void {
       config = null;
     }
     const resolver: DisplayKindResolver = function (ws) {
-      const isMissingConfig = !config;
-      if (isMissingConfig) { return 'normal'; }
+      if (!config) { return 'normal'; }
       try { return classifyWorkspaceDisplayStatus(ws, config).kind; }
       catch (_e: unknown) { return 'normal'; }
     };
@@ -176,8 +175,7 @@ function assemblePanelChildren(ui: HTMLElement, c: PanelChildren): void {
 
 export function createUI(deps: PanelBuilderDeps): void {
   let container = getByXPath(CONFIG.CONTROLS_XPATH);
-  const isMissingContainer = !container;
-  if (isMissingContainer) {
+  if (!container) {
     createUIState.increment();
     log('UI container not found at XPath: ' + CONFIG.CONTROLS_XPATH + ' — using immediate BODY fallback (floating panel)', 'warn');
     container = document.body;

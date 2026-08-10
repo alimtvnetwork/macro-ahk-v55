@@ -79,6 +79,7 @@ async function callEndpoint<T = unknown>(
     }
 
     const isOk = response.status >= 200 && response.status < 300;
+
     return new ApiResponse<T>(isOk, response.status, response.data, responseHeaders);
 }
 

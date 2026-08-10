@@ -80,8 +80,7 @@ export interface EmitDiagnosticToastInput {
 }
 
 function redactRequestDetail(rd: RequestDetail | undefined): RequestDetailSnapshot | undefined {
-  const isMissingRd = !rd;
-  if (isMissingRd) return undefined;
+  if (!rd) return undefined;
   const snap: RequestDetailSnapshot = {};
   if (rd.op !== undefined) snap.op = rd.op;
   if (rd.method !== undefined) snap.method = rd.method;
@@ -208,8 +207,7 @@ export function emitDiagnosticToastEvent(input: EmitDiagnosticToastInput): Diagn
 export function readDiagnosticToastTrace(): DiagnosticToastEvent[] {
   try {
     const raw = localStorage.getItem(StorageKeyType.DiagnosticToastTrace);
-    const isMissingRaw = !raw;
-    if (isMissingRaw) return [];
+    if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
 
     return Array.isArray(parsed) ? (parsed as DiagnosticToastEvent[]) : [];

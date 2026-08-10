@@ -532,8 +532,7 @@ function extractLabelFromUrl(url: string): string {
     const u = new URL(url);
 
     return u.hostname.replace(/^www\./, "").split(".")[0] || url;
-  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+  } catch (err) { /* swallowed */
     return url.substring(0, 30);
   }
 }

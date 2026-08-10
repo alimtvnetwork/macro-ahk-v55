@@ -40,8 +40,7 @@ async function mount(): Promise<HTMLElement> {
         },
     );
     const toolbar = document.querySelector<HTMLElement>('[data-role="history-toolbar"]');
-    const isMissingToolbar = !toolbar;
-    if (isMissingToolbar) throw new Error('toolbar not rendered');
+    if (!toolbar) throw new Error('toolbar not rendered');
 
     return toolbar;
 }

@@ -41,6 +41,7 @@ test.describe('Macro-controller content-script harness', () => {
                         tabs?: { query?: unknown };
                     };
                 }).chrome;
+
                 return {
                     hasChrome: typeof c !== 'undefined',
                     runtimeId: c?.runtime?.id ?? null,

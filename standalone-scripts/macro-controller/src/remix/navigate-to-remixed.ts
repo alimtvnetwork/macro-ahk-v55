@@ -37,11 +37,9 @@ export function normalizeRedirectUrl(
     redirectUrl: string,
     origin: string,
 ): string | null {
-    const isMissingRedirectUrl = !redirectUrl;
-    if (isMissingRedirectUrl) return null;
+    if (!redirectUrl) return null;
     const trimmed = redirectUrl.trim();
-    const isMissingTrimmed = !trimmed;
-    if (isMissingTrimmed) return null;
+    if (!trimmed) return null;
     try {
         const url = new URL(trimmed, origin);
         if (ALLOWED_PROTOCOLS.indexOf(url.protocol) === -1) return null;
@@ -79,8 +77,7 @@ export function navigateActiveTabToRemixedProject(
     }
     const origin = w.location.origin || DomainConstants.PRIMARY_URL;
     const absolute = normalizeRedirectUrl(redirectUrl, origin);
-    const isMissingAbsolute = !absolute;
-    if (isMissingAbsolute) {
+    if (!absolute) {
         logError('RemixNav',
             'navigate refused: rejected URL "' + redirectUrl + '" (origin=' + origin + ')');
 

@@ -179,8 +179,7 @@ function _cloneActivePreset(
   }
 
   store.loadPreset(sourceName).then(function (src) {
-    const isMissingSrc = !src;
-    if (isMissingSrc) {
+    if (!src) {
       showToast('Source preset "' + sourceName + '" not found', 'warn');
 
       return;
@@ -338,8 +337,7 @@ function _createRenameTitleBar(panel: HTMLElement, count: number): HTMLElement {
     e.preventDefault();
   };
   const onDragMouseMove = function(e: MouseEvent) {
-    const isMissingIsDragging = !isDragging;
-    if (isMissingIsDragging) return;
+    if (!isDragging) return;
     panel.style.left = (e.clientX - dragOffX) + 'px';
     panel.style.top = (e.clientY - dragOffY) + 'px';
     panel.style.right = 'auto';
@@ -527,8 +525,7 @@ function _wireStartNumInput(
   updatePreview: () => void,
 ): void {
   const el = document.getElementById(id) as HTMLInputElement | null;
-  const isMissingEl = !el;
-  if (isMissingEl) { return; }
+  if (!el) { return; }
   // v2.192.0: clamp on every keystroke so preview + persistence never see
   // NaN, negatives, or decimals. Empty string is treated as 0 in-memory but
   // not echoed back during typing — the user keeps typing freely. On blur

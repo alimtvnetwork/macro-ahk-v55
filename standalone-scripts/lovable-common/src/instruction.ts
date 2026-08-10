@@ -5,7 +5,7 @@
  *   - lovable-owner-switch
  *   - lovable-user-add
  *
- * Phase: P1 — exposes XPathKeyCode + DefaultXPaths + DefaultDelaysMs only.
+ * Phase: P1 — exposes XPathKeyCodeType + DefaultXPaths + DefaultDelaysMs only.
  * Future phases add LovableApiClient (P2/P3) and the shared XPath editor (P18).
  *
  * All keys PascalCase per `mem://standards/pascalcase-json-keys`.

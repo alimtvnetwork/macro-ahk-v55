@@ -577,12 +577,10 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
                         // Priority 1: Supabase auth token (sb-*-auth-token)
                         for (let i = 0; i < len; i++) {
                             const key = localStorage.key(i);
-                            const isMissingKey = !key;
-                            if (isMissingKey) continue;
+                            if (!key) continue;
                             if (key.startsWith("sb-") && key.includes("-auth-token")) {
                                 const raw = localStorage.getItem(key);
-                                const isMissingRaw = !raw;
-                                if (isMissingRaw) continue;
+                                if (!raw) continue;
                                 try {
                                     const parsed = JSON.parse(raw);
                                     const token = parsed?.access_token
@@ -591,8 +589,7 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
                                     if (typeof token === "string" && token.startsWith("eyJ") && token.split(".").length === 3) {
                                         return token;
                                     }
-                                } catch (err) { logBgError("Automatically logged error:", err);
-                                    if (raw.startsWith("eyJ") && raw.split(".").length === 3) {
+                                } catch (err) {                                     if (raw.startsWith("eyJ") && raw.split(".").length === 3) {
                                         return raw;
                                     }
                                 }
@@ -602,8 +599,7 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
                         const lovableKeys = ["lovable-auth-token", "lovable:token", "auth-token", "supabase.auth.token"];
                         for (let j = 0; j < lovableKeys.length; j++) {
                             const storedToken = localStorage.getItem(lovableKeys[j]);
-                            const isMissingStoredToken = !storedToken;
-                            if (isMissingStoredToken) continue;
+                            if (!storedToken) continue;
                             try {
                                 const p2 = JSON.parse(storedToken);
                                 const t2 = p2?.access_token ?? p2?.currentSession?.access_token ?? p2?.token;
@@ -648,9 +644,7 @@ async function getActiveTabProjectId(tabUrlHint?: string): Promise<string | null
     const tabUrl = await getActiveTabUrl();
     const hasUrl = tabUrl !== null && tabUrl.length > 0;
 
-    const isMissingHasUrl = !hasUrl;
-
-    if (isMissingHasUrl) {
+    if (!hasUrl) {
         return null;
     }
 
@@ -668,8 +662,7 @@ async function resolvePrimaryUrl(tabUrlHint?: string): Promise<string> {
 }
 
 function extractSignedUrlTokenFromUrl(url: string | null | undefined): string | null {
-    const isMissingUrl = !url;
-    if (isMissingUrl) return null;
+    if (!url) return null;
 
     try {
         const parsed = new URL(url);
@@ -843,9 +836,7 @@ async function discoverAuthCookieNames(primaryUrl: string): Promise<CookieDiscov
     const authLikeCookieNames = new Set<string>();
     const canListCookies = typeof chrome.cookies?.getAll === "function";
 
-    const isMissingCanListCookies = !canListCookies;
-
-    if (isMissingCanListCookies) {
+    if (!canListCookies) {
         return { checkedUrls, authLikeCookieNames: [] };
     }
 

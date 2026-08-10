@@ -38,6 +38,7 @@ interface BundleBrowserIifeOptions {
 
 function findDirectEsbuildEntry(repoRoot: string): string | undefined {
     const directEntry = path.join(repoRoot, ESBUILD_MAIN_PATH);
+
     return fs.existsSync(directEntry) ? directEntry : undefined;
 }
 
@@ -62,6 +63,7 @@ function resolveEsbuildEntry(repoRoot: string): string {
 
 async function loadEsbuild(repoRoot: string): Promise<EsbuildModule> {
     const esbuildEntry = resolveEsbuildEntry(repoRoot);
+
     return import(pathToFileURL(esbuildEntry).href) as Promise<EsbuildModule>;
 }
 

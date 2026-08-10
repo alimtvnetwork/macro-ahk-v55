@@ -286,8 +286,7 @@ function _importOverridesJson(
   input.accept = 'application/json,.json';
   input.onchange = function() {
     const file = input.files && input.files[0];
-    const isMissingFile = !file;
-    if (isMissingFile) return;
+    if (!file) return;
     file.text().then(function(text: string) {
       const parsed = JSON.parse(text) as { kind?: string; overrides?: Record<string, unknown> };
       if (parsed.kind !== 'macro-controller.settings-overrides' || !parsed.overrides) {

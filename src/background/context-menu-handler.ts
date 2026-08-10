@@ -212,9 +212,7 @@ async function doRebuildProjectSubmenu(): Promise<void> {
     const projects = projectData?.allProjects ?? [];
     const hasProjects = projects.length > 0;
 
-    const isMissingHasProjects = !hasProjects;
-
-    if (isMissingHasProjects) {
+    if (!hasProjects) {
         createNoProjectsMenuItem();
 
         return;
@@ -330,8 +328,7 @@ async function handleMenuClick(
 
 async function handleRunScripts(tabId: number, forceReload = false): Promise<void> {
     const hasValidTab = tabId > 0;
-    const isMissingHasValidTab = !hasValidTab;
-    if (isMissingHasValidTab) return;
+    if (!hasValidTab) return;
 
     const scriptsData = await sendInternalMessage<{ scripts: Array<{ id: string; isEnabled: boolean; code?: string }> }>({
         type: MessageType.GET_ALL_SCRIPTS,
@@ -340,9 +337,7 @@ async function handleRunScripts(tabId: number, forceReload = false): Promise<voi
     const enabledScripts = (scriptsData?.scripts ?? []).filter((s) => s.isEnabled !== false);
     const hasScripts = enabledScripts.length > 0;
 
-    const isMissingHasScripts = !hasScripts;
-
-    if (isMissingHasScripts) return;
+    if (!hasScripts) return;
 
     await sendInternalMessage({
         type: MessageType.INJECT_SCRIPTS,
@@ -358,8 +353,7 @@ async function handleRunScripts(tabId: number, forceReload = false): Promise<voi
 
 async function handleReinjectScripts(tabId: number): Promise<void> {
     const hasValidTab = tabId > 0;
-    const isMissingHasValidTab = !hasValidTab;
-    if (isMissingHasValidTab) return;
+    if (!hasValidTab) return;
 
     // Remove existing markers before re-injecting
     try {
@@ -415,8 +409,7 @@ async function handleCopyLogs(tabId: number): Promise<void> {
                 },
                 args: [logText],
             });
-        } catch (err) { logBgError("Automatically logged error:", err);
-            logCaughtError(BgLogTag.MARCO, "Could not inject clipboard script", new Error("injection failed"));
+        } catch (err) {             logCaughtError(BgLogTag.MARCO, "Could not inject clipboard script", new Error("injection failed"));
         }
     }
 }
@@ -439,8 +432,7 @@ async function handleShowStatus(tabId: number): Promise<void> {
                 },
                 args: [statusText],
             });
-        } catch (err) { logBgError("Automatically logged error:", err);
-            logCaughtError(BgLogTag.MARCO, "Could not show status", new Error("injection failed"));
+        } catch (err) {             logCaughtError(BgLogTag.MARCO, "Could not show status", new Error("injection failed"));
         }
     }
 }

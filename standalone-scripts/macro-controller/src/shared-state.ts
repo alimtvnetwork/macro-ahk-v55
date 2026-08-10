@@ -97,8 +97,7 @@ try {
   const hasProjects = hasRoot && root!.Projects !== null && root!.Projects !== undefined;
   const hasMacroController = hasProjects && !!root!.Projects.MacroController;
   if (hasMacroController) {
-    const isMissingMeta = !root.Projects.MacroController.meta;
-    if (isMissingMeta) root.Projects.MacroController.meta = {};
+    if (!root.Projects.MacroController.meta) root.Projects.MacroController.meta = {};
     root.Projects.MacroController.meta.version = VERSION;
   }
 } catch (_e) {

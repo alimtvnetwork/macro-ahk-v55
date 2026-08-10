@@ -35,9 +35,7 @@ export function isOnProjectPage(): boolean {
       || host.endsWith('.lovableproject.com')
     );
 
-    const isMissingIsSupportedHost = !isSupportedHost;
-
-    if (isMissingIsSupportedHost) {
+    if (!isSupportedHost) {
       return false;
     }
 
@@ -58,26 +56,20 @@ export function isUserTypingInPrompt(): boolean {
   const promptXpath = CONFIG.PROMPT_ACTIVE_XPATH;
   const isEnabled = promptXpath && promptXpath.indexOf('__') !== 0;
 
-  const isMissingIsEnabled = !isEnabled;
-
-  if (isMissingIsEnabled) {
+  if (!isEnabled) {
     return false;
   }
 
   try {
     const promptEl = getByXPath(promptXpath);
 
-    const isMissingPromptEl = !promptEl;
-
-    if (isMissingPromptEl) {
+    if (!promptEl) {
       return false;
     }
 
     const activeEl = document.activeElement;
 
-    const isMissingActiveEl = !activeEl;
-
-    if (isMissingActiveEl) {
+    if (!activeEl) {
       return false;
     }
 
@@ -101,9 +93,7 @@ export function isUserTypingInPrompt(): boolean {
 export function checkSystemBusy(): boolean {
   const progressEl = findElement(ML_ELEMENTS.PROGRESS);
 
-  const isMissingProgressEl = !progressEl;
-
-  if (isMissingProgressEl) {
+  if (!progressEl) {
     logSub('Progress bar element NOT found in DOM', 1);
 
     return false;
@@ -123,9 +113,7 @@ export function checkSystemBusy(): boolean {
     return false;
   }
 
-  const isMissingIsVisible = !isVisible;
-
-  if (isMissingIsVisible) {
+  if (!isVisible) {
     logSub('Progress bar exists but has 0 size — treating as NO credit', 1);
 
     return false;
@@ -162,9 +150,7 @@ export function pollForDialogReady(): Promise<void> {
       function () {
         const mainEl = getByXPath(mainXpath);
 
-        const isMissingMainEl = !mainEl;
-
-        if (isMissingMainEl) {
+        if (!mainEl) {
           return null;
         }
 
@@ -198,9 +184,7 @@ export function pollForDialogReady(): Promise<void> {
 export function closeProjectDialog(): void {
   let btn = getByXPath(CONFIG.PROJECT_BUTTON_XPATH);
 
-  const isMissingBtn = !btn;
-
-  if (isMissingBtn) {
+  if (!btn) {
     const fallbackBtn = findElement(ML_ELEMENTS.PROJECT_BUTTON);
 
     if (fallbackBtn) {
@@ -270,9 +254,7 @@ function tryClickVisibleButton(btn: Element, buttonIndex: number): boolean | nul
                   computedStyle.visibility !== 'hidden' &&
                   computedStyle.display !== 'none';
 
-  const isMissingIsVisible = !isVisible;
-
-  if (isMissingIsVisible) {
+  if (!isVisible) {
     log('Button ' + buttonIndex + ' is not visible, skipping...', 'skip');
 
     return null;
@@ -317,8 +299,7 @@ export function clickProjectButton(): boolean {
  * Highlight an element with a temporary CSS outline.
  */
 export function highlightElement(el: HTMLElement, color: string): void {
-  const isMissingEl = !el;
-  if (isMissingEl) {
+  if (!el) {
     return;
   }
 

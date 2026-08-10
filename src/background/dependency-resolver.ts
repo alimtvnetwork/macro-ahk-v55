@@ -44,8 +44,7 @@ interface SemverParts {
 
 function parseSemver(version: string): SemverParts | null {
     const match = version.match(/^(\d+)\.(\d+)\.(\d+)/);
-    const isMissingMatch = !match;
-    if (isMissingMatch) return null;
+    if (!match) return null;
 
     return {
         major: parseInt(match[1], 10),
@@ -75,9 +74,7 @@ export function satisfiesVersion(actual: string, range: string): boolean {
         (actualParts.major === rangeParts.major && actualParts.minor > rangeParts.minor) ||
         (actualParts.major === rangeParts.major && actualParts.minor === rangeParts.minor && actualParts.patch >= rangeParts.patch);
 
-    const isMissingIsGteRange = !isGteRange;
-
-    if (isMissingIsGteRange) return false;
+    if (!isGteRange) return false;
 
     if (isCaretRange) {
         return actualParts.major === rangeParts.major;
@@ -118,8 +115,7 @@ export function resolveInjectionOrder(projects: ProjectNode[]): ResolutionResult
 
         for (const dep of p.dependencies) {
             const depProject = projectMap.get(dep.projectId);
-            const isMissingDepProject = !depProject;
-            if (isMissingDepProject) {
+            if (!depProject) {
                 return {
                     order: [],
                     isSuccess: false,
@@ -128,8 +124,7 @@ export function resolveInjectionOrder(projects: ProjectNode[]): ResolutionResult
             }
 
             const isVersionSatisfied = satisfiesVersion(depProject.version, dep.version);
-            const isMissingIsVersionSatisfied = !isVersionSatisfied;
-            if (isMissingIsVersionSatisfied) {
+            if (!isVersionSatisfied) {
                 return {
                     order: [],
                     isSuccess: false,

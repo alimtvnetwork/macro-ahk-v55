@@ -7,21 +7,21 @@
  * unchanged into the viewer's filter dropdown — no text parsing.
  */
 
-import { LogViewerSeverityCode } from "../../../lovable-common/src/ui/log-viewer-types";
+import { LogViewerSeverityCodeType } from "../../../lovable-common/src/ui/log-viewer-types";
 import type { LogViewerEntry } from "../../../lovable-common/src/ui/log-viewer-types";
 import { UserAddLogSeverityType } from "./log-sink";
 import type { UserAddLogEntry } from "./log-sink";
 
-const mapSeverity = (severity: UserAddLogSeverityType): LogViewerSeverityCode => {
+const mapSeverity = (severity: UserAddLogSeverityType): LogViewerSeverityCodeType => {
     if (severity === UserAddLogSeverityType.Error) {
-        return LogViewerSeverityCode.Error;
+        return LogViewerSeverityCodeType.Error;
     }
 
     if (severity === UserAddLogSeverityType.Warn) {
-        return LogViewerSeverityCode.Warn;
+        return LogViewerSeverityCodeType.Warn;
     }
 
-    return LogViewerSeverityCode.Info;
+    return LogViewerSeverityCodeType.Info;
 };
 
 export const toUserAddLogViewerEntries = (

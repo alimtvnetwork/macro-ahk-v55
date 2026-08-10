@@ -99,8 +99,7 @@ interface NextPromptEntry {
 
 function readEditorText(): string {
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
-  const isMissingTarget = !target;
-  if (isMissingTarget) return '';
+  if (!target) return '';
   if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) return target.value || '';
 
   return (target as HTMLElement).innerText || (target as HTMLElement).textContent || '';
@@ -194,8 +193,7 @@ export async function stageNextPrompt(deps: TaskNextDeps, n: number): Promise<vo
     return;
   }
   const text = await resolveNextTextDbFirst(deps, n);
-  const isMissingText = !text;
-  if (isMissingText) {
+  if (!text) {
     showPasteToast('❌ Next ' + n + ': prompt not found in library', true);
     logError('NextInline', 'next-' + n + '-steps prompt missing');
 
@@ -293,8 +291,7 @@ function announcePopover(message: string): void {
   setTimeout(() => { announcerElement.textContent = message; }, 20);
 }
 function itemLabel(element: HTMLElement | null): string {
-  const isMissingElement = !element;
-  if (isMissingElement) return '';
+  if (!element) return '';
 
   return (
     element.getAttribute(ATTR_ARIA_LABEL)
@@ -677,8 +674,7 @@ function collectHiddenChipPresets(body: HTMLElement, chips: HTMLElement[]): Hidd
   const hiddenPresets: HiddenChipPreset[] = [];
   for (let index = chips.length - 1; index >= 0; index--) {
     const chip = chips[index];
-    const isMissingChip = !chip;
-    if (isMissingChip) continue;
+    if (!chip) continue;
     chip.style.display = STYLE_DISPLAY_NONE;
     const n = Number(chip.dataset['n'] || '0');
     const hi = chip.dataset['highlighted'] === '1';
@@ -762,8 +758,7 @@ function collectOverflowActions(body: HTMLElement, actions: HTMLElement[]): HTML
   const hiddenActions: HTMLElement[] = [];
   for (let index = actions.length - 1; index >= 0; index--) {
     const actionElement = actions[index];
-    const isMissingActionElement = !actionElement;
-    if (isMissingActionElement) continue;
+    if (!actionElement) continue;
     actionElement.style.display = STYLE_DISPLAY_NONE;
     hiddenActions.unshift(actionElement);
     if (body.scrollWidth <= body.clientWidth + 1) break;
@@ -1090,24 +1085,21 @@ const INLINE_ID = 'marco-next-inline';
 const SPLIT_ID = 'marco-split-inline';
 
 function tryMountInline(deps: TaskNextDeps): boolean {
-  const isMissingINLINE_AUTOCHAIN_DISABLED = !INLINE_AUTOCHAIN_DISABLED;
-  if (isMissingINLINE_AUTOCHAIN_DISABLED) {
+  if (!INLINE_AUTOCHAIN_DISABLED) {
     logError('NextInline', 'INLINE_AUTOCHAIN_DISABLED flipped — refusing to mount');
 
     return true;
   }
   if (document.getElementById(INLINE_ID) && document.getElementById(SPLIT_ID)) return true;
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
-  const isMissingTarget = !target;
-  if (isMissingTarget) return false;
+  if (!target) return false;
   const host = (target.closest && target.closest('form')) || target.parentElement;
   if (!host || !host.parentElement) return false;
 
   // v4.16+: mount into shared frame so PlanTierType/Next/Repeat share one visual unit
   // and one minimize/maximize control. See inline-strips-frame.ts.
   const framed = ensureInlineStripsFrame(host as HTMLElement);
-  const isMissingFramed = !framed;
-  if (isMissingFramed) return false;
+  if (!framed) return false;
   const body = framed.body;
 
   // Order top→bottom inside the frame: PlanTierType → Next → (Repeat appended after).
@@ -1151,8 +1143,7 @@ function registerPointerPopoverCloser(handler: (ev: Event) => void): void {
 function _teardownPointerPopoverClosers(): void {
   while (_pointerPopoverClosers.length) {
     const handler = _pointerPopoverClosers.pop();
-    const isMissingHandler = !handler;
-    if (isMissingHandler) continue;
+    if (!handler) continue;
     document.removeEventListener('mousedown', handler, true);
     document.removeEventListener('touchstart', handler, true);
   }

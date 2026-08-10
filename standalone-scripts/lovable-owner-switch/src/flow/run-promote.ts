@@ -15,7 +15,7 @@
 import { LovableApiClient } from "../../../lovable-common/src/api/lovable-api-client";
 import { resolveUserId, resolveWorkspaceId } from "./promote-resolvers";
 import { TtlCache } from "./ttl-cache";
-import { PromoteStepCode } from "./promote-types";
+import { PromoteStepCodeType } from "./promote-types";
 import type { PromoteRowOutcome, PromoteRowRequest, PromoteRowResult } from "./promote-types";
 
 export interface PromoteCaches {
@@ -49,18 +49,18 @@ interface ChainState {
 }
 
 interface StepTaggedError extends Error {
-    step: PromoteStepCode;
+    step: PromoteStepCodeType;
 }
 
-const failingStep = (caught: unknown, fallback: PromoteStepCode): PromoteStepCode => {
+const failingStep = (caught: unknown, fallback: PromoteStepCodeType): PromoteStepCodeType => {
     if (caught instanceof Error && "step" in caught && typeof (caught as { step?: unknown }).step === "string") {
-        return (caught as { step: PromoteStepCode }).step;
+        return (caught as { step: PromoteStepCodeType }).step;
     }
 
     return fallback;
 };
 
-const tagAndThrow = (caught: unknown, fallback: PromoteStepCode): never => {
+const tagAndThrow = (caught: unknown, fallback: PromoteStepCodeType): never => {
     throw Object.assign(
         new Error(caught instanceof Error ? caught.message : String(caught)),
         { step: failingStep(caught, fallback) },
@@ -78,7 +78,7 @@ const runChain = async (
         ws = await measureString(() =>
             resolveWorkspaceId(api, caches.WorkspaceByLoginEmail, request.LoginEmail));
     } catch (caught: unknown) {
-        return tagAndThrow(caught, PromoteStepCode.ResolveWorkspace);
+        return tagAndThrow(caught, PromoteStepCodeType.ResolveWorkspace);
     }
 
     let uid: MeasuredString;
@@ -87,7 +87,7 @@ const runChain = async (
         uid = await measureString(() =>
             resolveUserId(api, caches.UserIdByEmail, ws.Value, request.OwnerEmail));
     } catch (caught: unknown) {
-        return tagAndThrow(caught, PromoteStepCode.ResolveUserId);
+        return tagAndThrow(caught, PromoteStepCodeType.ResolveUserId);
     }
 
     let promoMs: number;
@@ -95,14 +95,14 @@ const runChain = async (
     try {
         promoMs = await measureVoid(() => api.promoteToOwner(ws.Value, uid.Value));
     } catch (caught: unknown) {
-        return tagAndThrow(caught, PromoteStepCode.PromoteToOwner);
+        return tagAndThrow(caught, PromoteStepCodeType.PromoteToOwner);
     }
 
     return {
         Outcomes: [
-            { Step: PromoteStepCode.ResolveWorkspace, DurationMs: ws.DurationMs, WorkspaceId: ws.Value, UserId: null },
-            { Step: PromoteStepCode.ResolveUserId, DurationMs: uid.DurationMs, WorkspaceId: ws.Value, UserId: uid.Value },
-            { Step: PromoteStepCode.PromoteToOwner, DurationMs: promoMs, WorkspaceId: ws.Value, UserId: uid.Value },
+            { Step: PromoteStepCodeType.ResolveWorkspace, DurationMs: ws.DurationMs, WorkspaceId: ws.Value, UserId: null },
+            { Step: PromoteStepCodeType.ResolveUserId, DurationMs: uid.DurationMs, WorkspaceId: ws.Value, UserId: uid.Value },
+            { Step: PromoteStepCodeType.PromoteToOwner, DurationMs: promoMs, WorkspaceId: ws.Value, UserId: uid.Value },
         ],
         WorkspaceId: ws.Value,
         UserId: uid.Value,
@@ -111,7 +111,7 @@ const runChain = async (
 
 const failureFrom = (caught: unknown): PromoteRowResult => {
     const step = caught instanceof Error && "step" in caught
-        ? (caught as { step: PromoteStepCode }).step
+        ? (caught as { step: PromoteStepCodeType }).step
         : null;
 
     return {

@@ -46,7 +46,7 @@ export function ErrorModal({ error, open, onOpenChange }: ErrorModalProps) {
       setCopied(true);
       toast.success("Error details copied to clipboard");
       setTimeout(() => setCopied(false), Timings.TIMEOUT_NORMAL);
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Failed to copy to clipboard");
     }
   };
@@ -186,8 +186,7 @@ function formatTimestamp(iso: string): string {
     return new Date(iso).toLocaleString(undefined, {
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
-  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+  } catch (err) { /* swallowed */
     return iso;
   }
 }
@@ -195,8 +194,7 @@ function formatTimestamp(iso: string): string {
 function tryFormatJson(raw: string): string {
   try {
     return JSON.stringify(JSON.parse(raw), null, 2);
-  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+  } catch (err) { /* swallowed */
     return raw;
   }
 }

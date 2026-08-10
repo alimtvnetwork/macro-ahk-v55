@@ -1,7 +1,7 @@
 /**
  * User Add — Role normalizer (Q3).
  *
- * Maps free-text CSV `Role` cell to `UserAddMembershipRoleCode`:
+ * Maps free-text CSV `Role` cell to `UserAddMembershipRoleCodeType`:
  *   - case-insensitive match against canonical Owner/Admin/Member
  *   - `Editor` (any case) → `Member` + `WasEditorNormalized: true`
  *   - null → null (caller applies task default at creation time)
@@ -11,18 +11,18 @@
  * signal; P19 logs viewer surfaces these as info-level entries.
  */
 
-import { UserAddMembershipRoleCode } from "../migrations/membership-role-seed";
+import { UserAddMembershipRoleCodeType } from "../migrations/membership-role-seed";
 
 export interface RoleNormalizeResult {
-    RoleCode: UserAddMembershipRoleCode | null;
+    RoleCode: UserAddMembershipRoleCodeType | null;
     WasEditorNormalized: boolean;
     Error: string | null;
 }
 
-const KNOWN_ROLES: ReadonlyMap<string, UserAddMembershipRoleCode> = new Map([
-    ["owner", UserAddMembershipRoleCode.Owner],
-    ["admin", UserAddMembershipRoleCode.Admin],
-    ["member", UserAddMembershipRoleCode.Member],
+const KNOWN_ROLES: ReadonlyMap<string, UserAddMembershipRoleCodeType> = new Map([
+    ["owner", UserAddMembershipRoleCodeType.Owner],
+    ["admin", UserAddMembershipRoleCodeType.Admin],
+    ["member", UserAddMembershipRoleCodeType.Member],
 ]);
 
 const EDITOR_KEY = "editor";
@@ -36,7 +36,7 @@ export const normalizeRole = (raw: string | null): RoleNormalizeResult => {
 
     if (key === EDITOR_KEY) {
         return {
-            RoleCode: UserAddMembershipRoleCode.Member,
+            RoleCode: UserAddMembershipRoleCodeType.Member,
             WasEditorNormalized: true, Error: null,
         };
     }

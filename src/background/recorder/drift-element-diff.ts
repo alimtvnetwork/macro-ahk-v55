@@ -117,8 +117,7 @@ function classifyVerdict(
     fields: ReadonlyArray<DriftFieldDiff>,
     hasChanges: boolean,
 ): DriftVerdict {
-    const isMissingHasChanges = !hasChanges;
-    if (isMissingHasChanges) return "Identical";
+    if (!hasChanges) return "Identical";
     if (primary.TagName !== fallback.TagName) return "DifferentElement";
 
     const idChanged = fields.find((f) => f.Field === "Id")?.Change !== "Unchanged";

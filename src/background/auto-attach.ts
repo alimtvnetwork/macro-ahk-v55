@@ -112,8 +112,7 @@ function checkAlreadyAttached(
     const isAlreadyAttached = project.scripts.some(
         (s) => s.path === script.id || s.path === script.name,
     );
-    const isMissingIsAlreadyAttached = !isAlreadyAttached;
-    if (isMissingIsAlreadyAttached) return null;
+    if (!isAlreadyAttached) return null;
 
     return {
         ok: false,
@@ -125,8 +124,7 @@ function checkAlreadyAttached(
 function checkRunContext(script: LibraryScriptForAttach): AttachDecision | null {
     const declaredWorld = script.instruction.World;
     const isIncompatibleWorld = declaredWorld !== undefined && declaredWorld !== "MAIN";
-    const isMissingIsIncompatibleWorld = !isIncompatibleWorld;
-    if (isMissingIsIncompatibleWorld) return null;
+    if (!isIncompatibleWorld) return null;
 
     return {
         ok: false,
@@ -171,8 +169,7 @@ function checkInjectionConditions(
 ): AttachDecision | null {
     const cond = script.instruction.InjectionConditions;
     const hasCookieRequirement = cond !== undefined && cond.requireCookie != null;
-    const isMissingHasCookieRequirement = !hasCookieRequirement;
-    if (isMissingHasCookieRequirement) return null;
+    if (!hasCookieRequirement) return null;
     const cookieName = cond!.requireCookie as string;
     if (projectCookieNames.has(cookieName)) return null;
 

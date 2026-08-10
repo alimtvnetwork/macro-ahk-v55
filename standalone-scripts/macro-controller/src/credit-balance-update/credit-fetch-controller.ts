@@ -215,8 +215,7 @@ async function requestCreditsUncached(ws: WorkspaceCredit, plan: PlanTierType): 
 }
 
 export async function requestCredits(ws: WorkspaceCredit): Promise<CreditFetchResult> {
-    const isMissingId = !ws.id;
-    if (isMissingId) {
+    if (!ws.id) {
         return buildResult(CreditFetchOutcomeType.Skipped, null, 'Missing workspace id');
     }
 

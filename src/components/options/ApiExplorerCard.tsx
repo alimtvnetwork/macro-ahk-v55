@@ -41,8 +41,7 @@ type ApiStatus = {
 function toPrettyJson(value: JsonValue): string {
   try {
     return JSON.stringify(value, null, 2);
-  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+  } catch (err) { /* swallowed */
     return String(value);
   }
 }
@@ -79,7 +78,7 @@ export function ApiExplorerCard() {
         endpointCount: result.endpointCount,
         persistenceMode: result.persistenceMode,
       });
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Failed to load API status");
     }
   };
@@ -96,7 +95,7 @@ export function ApiExplorerCard() {
         setSelectedType(initialType);
         applyEndpointRequestTemplate(initialType, docs);
       }
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Failed to load API endpoint docs");
     }
   };
@@ -109,7 +108,7 @@ export function ApiExplorerCard() {
     let parsedBody: JsonValue = {};
     try {
       parsedBody = requestJson.trim() ? JSON.parse(requestJson) : {};
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Request JSON is invalid");
 
       return;

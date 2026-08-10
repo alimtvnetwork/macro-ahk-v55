@@ -6,7 +6,7 @@
  * project-scoped `TaskStatus` table.
  */
 
-export enum UserAddTaskStatusCode {
+export enum UserAddTaskStatusCodeType {
     Pending = "Pending",
     Running = "Running",
     Completed = "Completed",
@@ -15,15 +15,15 @@ export enum UserAddTaskStatusCode {
 }
 
 export interface TaskStatusSeed {
-    Code: UserAddTaskStatusCode;
+    Code: UserAddTaskStatusCodeType;
     DisplayLabel: string;
     SortOrder: number;
 }
 
 export const TASK_STATUS_SEEDS: ReadonlyArray<TaskStatusSeed> = Object.freeze([
-    { Code: UserAddTaskStatusCode.Pending, DisplayLabel: "Pending", SortOrder: 1 },
-    { Code: UserAddTaskStatusCode.Running, DisplayLabel: "Running", SortOrder: 2 },
-    { Code: UserAddTaskStatusCode.Completed, DisplayLabel: "Completed", SortOrder: 3 },
-    { Code: UserAddTaskStatusCode.Failed, DisplayLabel: "Failed", SortOrder: 4 },
-    { Code: UserAddTaskStatusCode.Cancelled, DisplayLabel: "Cancelled", SortOrder: 5 },
+    { Code: UserAddTaskStatusCodeType.Pending, DisplayLabel: "Pending", SortOrder: 1 },
+    { Code: UserAddTaskStatusCodeType.Running, DisplayLabel: "Running", SortOrder: 2 },
+    { Code: UserAddTaskStatusCodeType.Completed, DisplayLabel: "Completed", SortOrder: 3 },
+    { Code: UserAddTaskStatusCodeType.Failed, DisplayLabel: "Failed", SortOrder: 4 },
+    { Code: UserAddTaskStatusCodeType.Cancelled, DisplayLabel: "Cancelled", SortOrder: 5 },
 ]);

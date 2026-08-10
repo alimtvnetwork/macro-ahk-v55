@@ -435,9 +435,7 @@ function runRenameStatementsIfSourceColumnsExist(db: SqlJsDatabase, statements: 
         const sql = pending.shift()!;
         const renameMatch = sql.match(/^ALTER TABLE\s+(\w+)\s+RENAME COLUMN\s+(\w+)\s+TO\s+(\w+)$/i);
 
-        const isMissingRenameMatch = !renameMatch;
-
-        if (isMissingRenameMatch) {
+        if (!renameMatch) {
             runIgnoringDuplicates(db, [sql]);
             continue;
         }
@@ -491,8 +489,7 @@ function getExistingTables(db: SqlJsDatabase): Set<string> {
         }
 
         return new Set(result[0].values.map((row) => String(row[0])));
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return new Set<string>();
     }
 }
@@ -511,8 +508,7 @@ function getTableColumns(db: SqlJsDatabase, tableName: string): Set<string> {
         }
 
         return new Set(result[0].values.map((row) => String(row[nameIndex])));
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return new Set<string>();
     }
 }

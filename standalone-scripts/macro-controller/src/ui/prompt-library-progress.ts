@@ -48,8 +48,7 @@ export function buildImportProgressElement(): {
 
 export function showImportProgress(refs: ModalRefs): void {
   const p = refs.importProgress;
-  const isMissingP = !p;
-  if (isMissingP) return;
+  if (!p) return;
   p.wrap.hidden = false;
   p.wrap.style.display = 'block';
   p.label.textContent = 'Preparing import…';
@@ -61,16 +60,14 @@ export function showImportProgress(refs: ModalRefs): void {
 
 export function hideImportProgress(refs: ModalRefs): void {
   const p = refs.importProgress;
-  const isMissingP = !p;
-  if (isMissingP) return;
+  if (!p) return;
   p.wrap.hidden = true;
   p.wrap.style.display = 'none';
 }
 
 export function updateImportProgress(refs: ModalRefs, progress: ImportProgress): void {
   const p = refs.importProgress;
-  const isMissingP = !p;
-  if (isMissingP) return;
+  if (!p) return;
   if (progress.phase === 'entries') {
     p.label.textContent = 'Committed ' + String(progress.entriesCommitted)
       + '/' + String(progress.totalEntries) + ' entries';

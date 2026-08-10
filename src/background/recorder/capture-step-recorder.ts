@@ -87,8 +87,7 @@ function locateCaptureTarget(xpathFull: string): Element | null {
         const node = r.singleNodeValue;
 
         return node instanceof Element ? node : null;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return null;
     }
 }

@@ -491,8 +491,7 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
     const { getCommunicationHistory } = await import('../db/macro-db');
     const { extractProjectIdFromUrl } = await import('../workspace-detection');
     const projectId = extractProjectIdFromUrl();
-    const isMissingProjectId = !projectId;
-    if (isMissingProjectId) return;
+    if (!projectId) return;
 
     const rows = await getCommunicationHistory(projectId, 100);
     const filtered = filter 
@@ -554,8 +553,7 @@ function _mountSubmitHistoryPanel(panel: HTMLElement): void {
     try {
       const { extractProjectIdFromUrl } = await import('../workspace-detection');
       const activeProjectId = extractProjectIdFromUrl();
-      const isMissingActiveProjectId = !activeProjectId;
-      if (isMissingActiveProjectId) {
+      if (!activeProjectId) {
         const empty = document.createElement('div');
         empty.style.cssText = 'color:#64748b;font-size:11px;text-align:center;padding:12px;';
         empty.textContent = 'Open a Lovable project to see chat submit history.';
@@ -767,8 +765,7 @@ function _buildPerWsAddRow(onAdded: () => void): HTMLElement {
     + 'padding:3px 10px;border-radius:4px;cursor:pointer;font-weight:600;';
   addBtn.onclick = function (): void {
     const wsId = idInp.value.trim();
-    const isMissingWsId = !wsId;
-    if (isMissingWsId) { showToast('Enter a workspace id first', 'warn');
+    if (!wsId) { showToast('Enter a workspace id first', 'warn');
 
  return; }
     const grace = graceInp.value.trim() === '' ? undefined : Number(graceInp.value);

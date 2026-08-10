@@ -85,8 +85,7 @@ export function DiagnosticsPanel() {
 
             setData(statusRes);
             setMessages(msgRes.messages ?? []);
-        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+        } catch (err) { /* swallowed */
             setData(null);
         }
     }, [platform]);

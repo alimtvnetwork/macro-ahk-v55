@@ -22,8 +22,7 @@ export function bindStorageDbManager(manager: DbManager): void {
 }
 
 function getManager(): DbManager {
-    const isMissingDb = dbManager === null;
-    if (isMissingDb) {
+    if (dbManager === null) {
         throw new Error("[storage] DbManager not bound. Call bindStorageDbManager() first.");
     }
 

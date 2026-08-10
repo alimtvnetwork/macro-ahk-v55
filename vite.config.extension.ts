@@ -216,6 +216,7 @@ function verifyWasmAsset(): Plugin {
                 mkdirSync(resolve(DIST_DIR, "wasm"), { recursive: true });
                 copyFileSync(sourcePath, wasmPath);
                 console.log(`[verify-wasm-asset] Self-healed: copied sql-wasm.wasm to ${wasmPath}`);
+
                 return;
             }
 
@@ -346,6 +347,7 @@ function validateNoBackgroundDynamicImport(): Plugin {
                     out += ch;
                     i++;
                 }
+
                 return out;
             };
 

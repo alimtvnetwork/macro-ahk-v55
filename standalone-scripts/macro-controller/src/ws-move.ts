@@ -79,9 +79,7 @@ function clearDelegationState(): void {
 export function updateLoopMoveStatus(statusState: string, message: string): void {
   const el = document.getElementById('loop-move-status');
 
-  const isMissingEl = !el;
-
-  if (isMissingEl) {
+  if (!el) {
     return;
   }
 
@@ -147,9 +145,7 @@ export async function verifyWorkspaceSessionAfterFailure(context: string): Promi
     const recoveredToken = await recoverAuthOnce();
     const fallbackToken = recoveredToken || resolveToken();
 
-    const isMissingFallbackToken = !fallbackToken;
-
-    if (isMissingFallbackToken) {
+    if (!fallbackToken) {
       logError('unknown', LabelType.LogSessionCheck + context + '] Recovery failed — skipping unauthenticated session probe');
       showToast(context + ' failed — no bearer token available for session check', 'error', { noStop: true });
 
@@ -282,9 +278,7 @@ async function handleMoveAuthFailure(
     const recoveredToken = await recoverAuthOnce();
     const refreshedToken = recoveredToken || resolveToken();
 
-    const isMissingRefreshedToken = !refreshedToken;
-
-    if (isMissingRefreshedToken) {
+    if (!refreshedToken) {
       handleMoveNoToken();
 
       return;
@@ -368,8 +362,7 @@ async function executeMove(
  return; }
 
   const currentUserId = extractUserIdFromBearer(token);
-  const isMissingCurrentUserId = !currentUserId;
-  if (isMissingCurrentUserId) {
+  if (!currentUserId) {
     logError('Move aborted', 'unable to extract user id (sub) from bearer for v2 endpoint');
     updateLoopMoveStatus('error', 'User id missing from token');
     showToast('Cannot move workspace: user id missing from token.', 'error', { noStop: true });
@@ -513,9 +506,7 @@ async function executeSwitchContext(
 export async function moveToWorkspace(targetWorkspaceId: string, targetWorkspaceName: string): Promise<void> {
   const isConfirmed = await confirmMove(targetWorkspaceName);
 
-  const isMissingIsConfirmed = !isConfirmed;
-
-  if (isMissingIsConfirmed) {
+  if (!isConfirmed) {
     log('Move cancelled by user', 'info');
     updateLoopMoveStatus('error', 'Move cancelled');
 

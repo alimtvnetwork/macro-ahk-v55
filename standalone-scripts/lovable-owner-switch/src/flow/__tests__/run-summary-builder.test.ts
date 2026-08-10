@@ -12,17 +12,17 @@
 
 import { describe, expect, it } from "vitest";
 import { buildOwnerSwitchRunSummary } from "../run-summary-builder";
-import { RowOutcomeCode } from "../row-types";
+import { RowOutcomeCodeType } from "../row-types";
 import { LogPhaseType, LogSeverityType } from "../log-sink";
 import {
-    RunSummaryRowStatus, RunSummaryScriptCode,
+    RunSummaryRowStatus, RunSummaryScriptCodeType,
     renderRunSummaryAsJson, renderRunSummaryAsText,
 } from "../../../../lovable-common/src/report/run-summary-types";
 import type { RowExecutionResult } from "../row-types";
 import type { LogEntry } from "../log-sink";
 
 const okRow: RowExecutionResult = {
-    RowIndex: 1, Outcome: RowOutcomeCode.Succeeded,
+    RowIndex: 1, Outcome: RowOutcomeCodeType.Succeeded,
     IsDone: true, HasError: false, LastError: null, DurationMs: 120,
     PromotedOwners: [
         { OwnerEmail: "[email protected]", Promoted: true, FailedStep: null, Error: null },
@@ -30,7 +30,7 @@ const okRow: RowExecutionResult = {
 };
 
 const partialRow: RowExecutionResult = {
-    RowIndex: 2, Outcome: RowOutcomeCode.PromoteFailedPartial,
+    RowIndex: 2, Outcome: RowOutcomeCodeType.PromoteFailedPartial,
     IsDone: false, HasError: true, LastError: "[email protected]: PUT 500", DurationMs: 200,
     PromotedOwners: [
         { OwnerEmail: "[email protected]", Promoted: true, FailedStep: null, Error: null },
@@ -39,7 +39,7 @@ const partialRow: RowExecutionResult = {
 };
 
 const loginFailedRow: RowExecutionResult = {
-    RowIndex: 3, Outcome: RowOutcomeCode.LoginFailed,
+    RowIndex: 3, Outcome: RowOutcomeCodeType.LoginFailed,
     IsDone: false, HasError: true, LastError: "bad password", DurationMs: 50,
     PromotedOwners: [],
 };
@@ -55,7 +55,7 @@ describe("buildOwnerSwitchRunSummary", () => {
             TaskId: "t1", Results: [okRow, partialRow, loginFailedRow], LogEntries: [warnEntry],
         });
 
-        expect(summary.Script).toBe(RunSummaryScriptCode.OwnerSwitch);
+        expect(summary.Script).toBe(RunSummaryScriptCodeType.OwnerSwitch);
         expect(summary.Counts).toEqual({
             Total: 3, Succeeded: 1, Failed: 1, PartiallySucceeded: 1,
         });

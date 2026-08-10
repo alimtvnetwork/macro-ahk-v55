@@ -94,8 +94,7 @@ function readFile(): ImportAuditFile {
 
     return emptyFile();
   }
-  const isMissingRaw = !raw;
-  if (isMissingRaw) return emptyFile();
+  if (!raw) return emptyFile();
   try {
     const parsed = JSON.parse(raw) as unknown;
     if (!parsed || typeof parsed !== 'object') throwDiagnostic('PROMPT_IO_AUDIT_E001', { actualType: parsed === null ? 'null' : typeof parsed });
@@ -179,8 +178,7 @@ export function finalizeImportAuditEntry(
 ): void {
   const file = readFile();
   const entry = file.entries.find((e) => e.id === id);
-  const isMissingEntry = !entry;
-  if (isMissingEntry) {
+  if (!entry) {
     log('[ImportAudit] finalize: entry not found id=' + id
       + ' (evicted?) status=' + outcome.status, 'warn');
 

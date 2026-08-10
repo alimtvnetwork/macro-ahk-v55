@@ -75,8 +75,7 @@ function saveStateBeforeReinject(): void {
 export function restoreReinjectState(): { restored: boolean; loopWasRunning: boolean } {
   try {
     const tsStr = localStorage.getItem(REINJECT_KEYS.timestamp);
-    const isMissingTsStr = !tsStr;
-    if (isMissingTsStr) return { restored: false, loopWasRunning: false };
+    if (!tsStr) return { restored: false, loopWasRunning: false };
 
     const ts = parseInt(tsStr, 10);
     const age = Date.now() - ts;
@@ -111,8 +110,7 @@ export function restoreReinjectState(): { restored: boolean; loopWasRunning: boo
 export function checkAndRestoreReinjectState(): { restored: boolean; loopWasRunning: boolean; wsName: string; wsId: string } {
   try {
     const tsStr = localStorage.getItem(REINJECT_KEYS.timestamp);
-    const isMissingTsStr = !tsStr;
-    if (isMissingTsStr) return { restored: false, loopWasRunning: false, wsName: '', wsId: '' };
+    if (!tsStr) return { restored: false, loopWasRunning: false, wsName: '', wsId: '' };
 
     const ts = parseInt(tsStr, 10);
     const age = Date.now() - ts;
@@ -379,9 +377,7 @@ function _handleReinject(reinjectBtn: HTMLElement, statusRow: HTMLElement): void
     return;
   }
 
-  const isMissing__marcoRelayActive = !window.__marcoRelayActive;
-
-  if (isMissing__marcoRelayActive) {
+  if (!window.__marcoRelayActive) {
     showToast('Message relay inactive — cannot re-inject', 'error');
 
     return;

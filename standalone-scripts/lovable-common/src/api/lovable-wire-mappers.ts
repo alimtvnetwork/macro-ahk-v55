@@ -1,4 +1,4 @@
-import { MembershipRoleApiCode } from "./membership-role-api-code";
+import { MembershipRoleApiCodeType } from "./membership-role-api-code";
 import type { MembershipSummary, WorkspaceSummary } from "./lovable-api-types";
 
 /**
@@ -8,10 +8,10 @@ import type { MembershipSummary, WorkspaceSummary } from "./lovable-api-types";
  * no `unknown`, no `any`.
  */
 
-const ROLE_BY_WIRE: Readonly<Record<string, MembershipRoleApiCode>> = Object.freeze({
-    owner: MembershipRoleApiCode.Owner,
-    admin: MembershipRoleApiCode.Admin,
-    member: MembershipRoleApiCode.Member,
+const ROLE_BY_WIRE: Readonly<Record<string, MembershipRoleApiCodeType>> = Object.freeze({
+    owner: MembershipRoleApiCodeType.Owner,
+    admin: MembershipRoleApiCodeType.Admin,
+    member: MembershipRoleApiCodeType.Member,
 });
 
 const collectStringFields = (source: object): Record<string, string> => {
@@ -36,7 +36,7 @@ const requireString = (fields: Record<string, string>, key: string): string => {
     return value;
 };
 
-const requireRole = (fields: Record<string, string>): MembershipRoleApiCode => {
+const requireRole = (fields: Record<string, string>): MembershipRoleApiCodeType => {
     const raw = requireString(fields, "role");
     const role = ROLE_BY_WIRE[raw];
 

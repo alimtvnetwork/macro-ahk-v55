@@ -32,8 +32,7 @@ export function bindErrorDbManager(manager: DbManager): void {
 /* ------------------------------------------------------------------ */
 
 function getErrorsDb() {
-    const isMissingDb = dbManager === null;
-    if (isMissingDb) {
+    if (dbManager === null) {
         throw new Error(
             "[error-handler] DbManager not bound — boot may still be in progress or failed. " +
             "Check service worker console for boot errors.",

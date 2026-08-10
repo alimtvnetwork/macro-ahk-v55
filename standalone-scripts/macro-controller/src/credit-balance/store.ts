@@ -94,19 +94,16 @@ export function buildRow(
 export async function readCreditBalanceCache(
     workspaceId: string,
 ): Promise<CreditBalanceCacheRow | null> {
-    const isMissingWorkspaceId = !workspaceId;
-    if (isMissingWorkspaceId) {
+    if (!workspaceId) {
         return null;
     }
     const kv = getKv();
-    const isMissingKv = !kv;
-    if (isMissingKv) {
+    if (!kv) {
         return null;
     }
     try {
         const raw = await kv.get(buildKey(workspaceId));
-        const isMissingRaw = !raw;
-        if (isMissingRaw) {
+        if (!raw) {
             return null;
         }
         const parsed = JSON.parse(raw) as Partial<CreditBalanceCacheRow>;
@@ -114,8 +111,7 @@ export async function readCreditBalanceCache(
             typeof parsed.WorkspaceId === 'string' &&
             typeof parsed.FetchedAtMs === 'number' &&
             typeof parsed.TotalRemaining === 'number';
-        const isMissingHasShape = !hasShape;
-        if (isMissingHasShape) {
+        if (!hasShape) {
             return null;
         }
 
@@ -136,13 +132,11 @@ export async function readCreditBalanceCache(
  * the SQLite write happens in the background.
  */
 export function writeCreditBalanceCache(row: CreditBalanceCacheRow): void {
-    const isMissingWorkspaceId = !row.WorkspaceId;
-    if (isMissingWorkspaceId) {
+    if (!row.WorkspaceId) {
         return;
     }
     const kv = getKv();
-    const isMissingKv = !kv;
-    if (isMissingKv) {
+    if (!kv) {
         logError(
             'CreditBalanceCache.write',
             'marco.kv unavailable — skipping SQLite upsert for ws=' + row.WorkspaceId,
@@ -170,13 +164,11 @@ export function writeCreditBalanceCache(row: CreditBalanceCacheRow): void {
 
 /** Drop one workspace's cache row (debug / future "clear cache" UX). */
 export function clearCreditBalanceCache(workspaceId: string): void {
-    const isMissingWorkspaceId = !workspaceId;
-    if (isMissingWorkspaceId) {
+    if (!workspaceId) {
         return;
     }
     const kv = getKv();
-    const isMissingKv = !kv;
-    if (isMissingKv) {
+    if (!kv) {
         return;
     }
     kv.delete(buildKey(workspaceId)).catch(function (caught: unknown): void {

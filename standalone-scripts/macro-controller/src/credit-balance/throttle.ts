@@ -72,8 +72,7 @@ export function shouldFetch(
 
 /** Record a successful fetch. Updates both per-ws and global timestamps. */
 export function recordFetch(workspaceId: string, nowMs: number = Date.now()): void {
-    const isMissingWorkspaceId = !workspaceId;
-    if (isMissingWorkspaceId) {
+    if (!workspaceId) {
         return;
     }
     lastFetchedAt.set(workspaceId, nowMs);

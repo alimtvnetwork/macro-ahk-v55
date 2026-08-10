@@ -35,15 +35,13 @@ const STATE_KEY = 'queue_state';
  */
 export async function loadTaskQueue(): Promise<TaskQueueState> {
   const projectId = extractProjectIdFromUrl();
-  const isMissingProjectId = !projectId;
-  if (isMissingProjectId) return { tasks: [], history: [], isPaused: false };
+  if (!projectId) return { tasks: [], history: [], isPaused: false };
 
   const store = getProjectKvStore('macro-controller');
   const stateData = await store.get<TaskQueueState>(SECTION, `${STATE_KEY}_${projectId}`);
 
   if (stateData) {
-    const isMissingHistory = !stateData.history;
-    if (isMissingHistory) stateData.history = [];
+    if (!stateData.history) stateData.history = [];
     log(`[TaskQueue] Loaded ${stateData.tasks.length} tasks and ${stateData.history.length} history items for project ${projectId}`, 'info');
 
     return stateData;
@@ -57,8 +55,7 @@ export async function loadTaskQueue(): Promise<TaskQueueState> {
  */
 export async function saveTaskQueue(queueState: TaskQueueState): Promise<void> {
   const projectId = extractProjectIdFromUrl();
-  const isMissingProjectId = !projectId;
-  if (isMissingProjectId) return;
+  if (!projectId) return;
 
   const store = getProjectKvStore('macro-controller');
   await store.set(SECTION, `${STATE_KEY}_${projectId}`, queueState);
@@ -74,8 +71,7 @@ export async function saveTaskQueue(queueState: TaskQueueState): Promise<void> {
  */
 export async function addTaskToQueue(prompt: string, projectName: string): Promise<MacroTask | null> {
   const projectId = extractProjectIdFromUrl();
-  const isMissingProjectId = !projectId;
-  if (isMissingProjectId) return null;
+  if (!projectId) return null;
 
   const queueState = await loadTaskQueue();
   const newTask: MacroTask = {
@@ -108,8 +104,7 @@ export async function updateTaskStatus(taskId: string, status: MacroTask['status
     
     // Move completed/failed to history
     if (status === 'completed' || status === 'failed') {
-      const isMissingHistory = !queueState.history;
-      if (isMissingHistory) queueState.history = [];
+      if (!queueState.history) queueState.history = [];
       queueState.history.unshift(task);
       if (queueState.history.length > 50) queueState.history.pop();
       queueState.tasks.splice(index, 1);

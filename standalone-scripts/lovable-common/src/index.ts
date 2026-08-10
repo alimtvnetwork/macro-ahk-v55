@@ -5,7 +5,7 @@
  * Consumed at runtime by lovable-owner-switch and lovable-user-add.
  */
 
-export { XPathKeyCode } from "./xpath/xpath-key-code";
+export { XPathKeyCodeType } from "./xpath/xpath-key-code";
 export { DefaultXPaths } from "./xpath/default-xpaths";
 export { DefaultDelaysMs } from "./xpath/default-delays";
 export type { XPathEntry } from "./xpath/xpath-entry";
@@ -13,7 +13,7 @@ export type { XPathEntry } from "./xpath/xpath-entry";
 export { LovableApiClient } from "./api/lovable-api-client";
 export { LovableApiEndpoint } from "./api/lovable-api-endpoint";
 export { LovableApiError } from "./api/lovable-api-error";
-export { MembershipRoleApiCode } from "./api/membership-role-api-code";
+export { MembershipRoleApiCodeType } from "./api/membership-role-api-code";
 export type {
     BearerTokenProvider,
 } from "./api/lovable-api-client";
@@ -35,7 +35,7 @@ export {
     mountLogViewer, buildLogTable, copyEntriesToClipboard,
     formatEntriesAsText, formatTimestampLocal, formatRowIndex,
     buildFilterSelect, collectUniquePhases, filterEntries, FILTER_ALL_VALUE,
-    LogViewerSeverityCode,
+    LogViewerSeverityCodeType,
     TITLE_VIEWER, LABEL_COPY, LABEL_COPIED, LABEL_COPY_FAILED, LABEL_FILTER_ALL, LABEL_EMPTY,
 } from "./ui";
 export type { LogViewerEntry, LogViewerOptions } from "./ui";
@@ -43,7 +43,7 @@ export type { LogViewerEntry, LogViewerOptions } from "./ui";
 export { logLovableStandaloneError } from "./logger";
 
 export {
-    RunSummaryScriptCode, RunSummaryRowStatus,
+    RunSummaryScriptCodeType, RunSummaryRowStatus,
     renderRunSummaryAsJson, renderRunSummaryAsText,
 } from "./report/run-summary-types";
 export type {

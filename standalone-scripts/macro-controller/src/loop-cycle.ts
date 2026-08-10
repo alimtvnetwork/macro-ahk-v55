@@ -33,9 +33,7 @@ function handleDelegateTimeout(): boolean {
   const elapsed = state.delegateStartTime ? (Date.now() - state.delegateStartTime) / 1000 : 0;
   const isTimedOut = elapsed > 60;
 
-  const isMissingIsTimedOut = !isTimedOut;
-
-  if (isMissingIsTimedOut) {
+  if (!isTimedOut) {
     releaseCycleLock();
     log('SKIP: Waiting for API move (' + Math.floor(elapsed) + 's)', 'skip');
 
@@ -79,8 +77,7 @@ export function runCycle(): void {
 }
 
 function _checkLoopPreconditions(): boolean {
-  const isMissingRunning = !state.running;
-  if (isMissingRunning) {
+  if (!state.running) {
     state.__cycleInFlight = false;
     state.__cycleRetryPending = false;
     log('SKIP: Loop not running', 'skip');
@@ -125,9 +122,7 @@ function _performCycleTasks(): void {
       return;
     }
 
-    const isMissingFallbackToXPath = !BALANCE_CONFIG.fallbackToXPath;
-
-    if (isMissingFallbackToXPath) {
+    if (!BALANCE_CONFIG.fallbackToXPath) {
       log('Step 1: Credit balance API failed and XPath fallback disabled - skipping', 'warn');
       releaseCycleLock();
 
@@ -140,9 +135,7 @@ function _performCycleTasks(): void {
     .catch(function (err: Error) {
     logError('runCycle', 'Credit balance check error - falling back to workspace API', err);
 
-    const isMissingFallbackToXPath = !BALANCE_CONFIG.fallbackToXPath;
-
-    if (isMissingFallbackToXPath) {
+    if (!BALANCE_CONFIG.fallbackToXPath) {
       releaseCycleLock();
 
       return;

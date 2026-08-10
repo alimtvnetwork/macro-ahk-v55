@@ -99,8 +99,7 @@ async function handleCommitted(
         return;
     }
     const isReload = details.transitionType === "reload";
-    const isMissingIsReload = !isReload;
-    if (isMissingIsReload) {
+    if (!isReload) {
         return;
     }
     // Force re-eval on refresh — user explicitly requested a fresh page.
@@ -125,8 +124,7 @@ async function handleActivated(
     }
     const url = tab.url ?? "";
     const hasUrl = url.length > 0;
-    const isMissingHasUrl = !hasUrl;
-    if (isMissingHasUrl) {
+    if (!hasUrl) {
         return;
     }
     await runGate(info.tabId, url, "activate");

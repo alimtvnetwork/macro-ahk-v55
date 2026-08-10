@@ -202,8 +202,7 @@ function classifyEntry(entry: RawEntry, index: number): Classified {
     // Inline injectable shape: needs id + code + order.
     const missing: string[] = [];
     if (fields.rawId === null) missing.push("id");
-    const isMissingHasCodeKey = !fields.hasCodeKey;
-    if (isMissingHasCodeKey) missing.push("code");
+    if (!fields.hasCodeKey) missing.push("code");
     if (fields.rawOrder === null) missing.push("order");
     if (missing.length > 0) {
         return { kind: "malformed", id: fields.displayId, name: fields.displayName, missing: missing.join(", ") };

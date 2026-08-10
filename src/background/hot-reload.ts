@@ -42,8 +42,7 @@ function isDevBuild(): boolean {
         const versionName = manifest.version_name ?? "";
 
         return versionName.toLowerCase().includes("dev");
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         // If we cannot read the manifest, fail safe and treat as production.
         return false;
     }
@@ -103,9 +102,7 @@ async function pollBuildMeta(): Promise<void> {
         const currentBuildId = meta.buildId ?? null;
         const hasBuildId = currentBuildId !== null;
 
-        const isMissingHasBuildId = !hasBuildId;
-
-        if (isMissingHasBuildId) {
+        if (!hasBuildId) {
             return;
         }
 

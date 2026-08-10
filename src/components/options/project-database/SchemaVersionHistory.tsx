@@ -56,15 +56,13 @@ export function SchemaVersionHistory({
         try {
           const parsed = JSON.parse(resp.value);
           setVersions(Array.isArray(parsed) ? parsed : []);
-        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+        } catch (err) { /* swallowed */
           setVersions([]);
         }
       } else {
         setVersions([]);
       }
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
       setVersions([]);
     } finally {
       setLoading(false);
@@ -117,7 +115,7 @@ export function SchemaVersionHistory({
       });
       setVersions(updated);
       toast.success("Version deleted");
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Failed to delete version");
     }
   };

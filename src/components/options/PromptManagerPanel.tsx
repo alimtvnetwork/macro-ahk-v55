@@ -481,7 +481,7 @@ export function PromptManagerPanel() {
                     await save({ name, text, category: typeof entry.category === "string" ? entry.category : undefined });
                     created++;
                 }
-            } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+            } catch (err) { /* swallowed */
                 toast.error(`Failed to parse ${file.name} as JSON`);
             }
         }
@@ -493,7 +493,7 @@ export function PromptManagerPanel() {
                 const name = file.name.replace(/\.(txt|md|prompt)$/i, "").replace(/[-_]+/g, " ").trim() || "Untitled";
                 await save({ name, text });
                 created++;
-            } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+            } catch (err) { /* swallowed */
                 toast.error(`Failed to read ${file.name}`);
             }
         }

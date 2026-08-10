@@ -93,9 +93,7 @@ export async function seedTokensIntoTab(tabId: number): Promise<void> {
     const tabUrl = await getTabUrl(tabId);
     const isSupportedTab = tabUrl !== null && isSupportedTargetUrl(tabUrl);
 
-    const isMissingIsSupportedTab = !isSupportedTab;
-
-    if (isMissingIsSupportedTab) {
+    if (!isSupportedTab) {
         return;
     }
 
@@ -105,9 +103,7 @@ export async function seedTokensIntoTab(tabId: number): Promise<void> {
 
     const hasTabAccess = await canAccessTabContents(tabId, tabUrl);
 
-    const isMissingHasTabAccess = !hasTabAccess;
-
-    if (isMissingHasTabAccess) {
+    if (!hasTabAccess) {
         return;
     }
 
@@ -235,13 +231,11 @@ function scanSupabaseLocalStorageForJwt(): string | null {
 
         for (let i = 0; i < len; i++) {
             const key = localStorage.key(i);
-            const isMissingKey = !key;
-            if (isMissingKey) continue;
+            if (!key) continue;
 
             // Match Supabase auth token keys: sb-<ref>-auth-token
             const isSupabaseKey = key.startsWith("sb-") && key.includes("-auth-token");
-            const isMissingIsSupabaseKey = !isSupabaseKey;
-            if (isMissingIsSupabaseKey) continue;
+            if (!isSupabaseKey) continue;
 
             const raw = localStorage.getItem(key);
             if (!raw || raw.length < 20) continue;
@@ -259,8 +253,7 @@ function scanSupabaseLocalStorageForJwt(): string | null {
                 if (session?.access_token && typeof session.access_token === "string" && session.access_token.startsWith("eyJ")) {
                     return session.access_token;
                 }
-            } catch (err) { logBgError("Automatically logged error:", err);
-                // Not JSON — check if raw value is a JWT
+            } catch (err) {                 // Not JSON — check if raw value is a JWT
                 if (raw.startsWith("eyJ") && raw.split(".").length === 3) {
                     return raw;
                 }
@@ -306,9 +299,7 @@ async function canAccessTabContents(tabId: number, tabUrl: string): Promise<bool
     try {
         const hasPermission = await chrome.permissions.contains({ origins: [originPattern] });
 
-        const isMissingHasPermission = !hasPermission;
-
-        if (isMissingHasPermission) {
+        if (!hasPermission) {
             warnInaccessibleTabOnce(tabId, tabUrl, `Host permission is not granted for ${originPattern}.`, "PERMISSION_NOT_GRANTED");
 
             return false;
@@ -316,9 +307,7 @@ async function canAccessTabContents(tabId: number, tabUrl: string): Promise<bool
 
         const canExecuteScript = await probeTabScriptingAccess(tabId, tabUrl);
 
-        const isMissingCanExecuteScript = !canExecuteScript;
-
-        if (isMissingCanExecuteScript) {
+        if (!canExecuteScript) {
             return false;
         }
 
@@ -341,8 +330,7 @@ function toOriginPermissionPattern(url: string): string | null {
         const parsedUrl = new URL(url);
 
         return `${parsedUrl.origin}/*`;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return null;
     }
 }
@@ -489,8 +477,7 @@ async function getTabUrl(tabId: number): Promise<string | null> {
         const tab = await chrome.tabs.get(tabId);
 
         return tab.url ?? null;
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return null;
     }
 }
@@ -499,8 +486,7 @@ async function getTabUrl(tabId: number): Promise<string | null> {
  *  Supports editor URLs and preview hostnames on lovable.app/lovableproject.com.
  */
 function extractProjectIdFromTabUrl(url: string | null): string | null {
-    const isMissingUrl = !url;
-    if (isMissingUrl) return null;
+    if (!url) return null;
 
     // Pattern 1: /projects/{id} (editor URL)
     const pathMatch = url.match(/\/projects\/([^/?#]+)/);
@@ -574,8 +560,7 @@ async function resolveSessionCookieNamesFromProjects(): Promise<readonly string[
             .filter((cookieName): cookieName is string => typeof cookieName === "string" && cookieName.length > 0);
 
         return [...new Set([...names, ...SESSION_COOKIE_NAME_FALLBACKS])];
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return SESSION_COOKIE_NAME_FALLBACKS;
     }
 }

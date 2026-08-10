@@ -61,8 +61,7 @@ const ZIP_MIME = "application/zip";
 function formatTime(iso: string): string {
     try {
         return new Date(iso).toLocaleTimeString();
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
         return iso;
     }
 }

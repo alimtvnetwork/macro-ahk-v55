@@ -117,8 +117,7 @@ export function TokenSeederDiagnosticsPanel() {
             setData(res);
             saveDiagnosticsCache(res);
             setNow(Date.now());
-        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+        } catch (err) { /* swallowed */
             setData(null);
         } finally {
             setLoading(false);

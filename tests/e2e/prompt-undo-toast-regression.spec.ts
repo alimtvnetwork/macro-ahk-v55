@@ -39,6 +39,7 @@ let browser: Browser | undefined;
 function resolveChromiumExecutable(): string | undefined {
     const candidates = ['/usr/bin/chromium', '/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'];
     for (const candidate of candidates) if (fs.existsSync(candidate)) return candidate;
+
     return undefined;
 }
 
@@ -89,6 +90,7 @@ async function newHarnessPage(): Promise<Page> {
     });
     await page.goto('https://prompt-undo-toast-harness.test/');
     await page.addScriptTag({ content: bundleSource });
+
     return page;
 }
 
@@ -143,6 +145,7 @@ test.describe('undo toast round trip', () => {
         // First UPDATE = the user save.
         await expect.poll(async () => {
             const calls = await page.evaluate(() => (globalThis as typeof globalThis & { __calls: FakeMessageCall[] }).__calls);
+
             return calls.filter((c) => c.type === 'PROJECT_API' && (c.sql ?? '').startsWith('UPDATE Prompt')).length;
         }).toBe(1);
 
@@ -151,6 +154,7 @@ test.describe('undo toast round trip', () => {
         // Second UPDATE = the undo. Must carry the original body.
         await expect.poll(async () => {
             const calls = await page.evaluate(() => (globalThis as typeof globalThis & { __calls: FakeMessageCall[] }).__calls);
+
             return calls.filter((c) => c.type === 'PROJECT_API' && (c.sql ?? '').startsWith('UPDATE Prompt')).length;
         }).toBe(2);
 

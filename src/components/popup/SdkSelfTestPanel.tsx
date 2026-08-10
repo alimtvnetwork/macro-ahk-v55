@@ -91,8 +91,7 @@ export function SdkSelfTestPanel() {
                 type: "GET_SDK_SELFTEST",
             });
             setSnapshot(res?.snapshot ?? null);
-        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+        } catch (err) { /* swallowed */
             setSnapshot(null);
         } finally {
             setLoading(false);

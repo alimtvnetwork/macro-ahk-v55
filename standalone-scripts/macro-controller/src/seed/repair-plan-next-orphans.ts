@@ -63,8 +63,7 @@ async function repairSingleOrphan(seedRow: typeof PLAN_NEXT_SEED_ROWS[number]): 
     return { slug: seedRow.slug, fromRole: 'unknown', toRole: seedRow.role, outcome: 'skipped-lookup-failed', reason: lookup.error ?? 'lookup failed' };
   }
   const existing = lookup.value;
-  const isMissingExisting = !existing;
-  if (isMissingExisting) return { slug: seedRow.slug, fromRole: 'absent', toRole: seedRow.role, outcome: 'skipped-missing' };
+  if (!existing) return { slug: seedRow.slug, fromRole: 'absent', toRole: seedRow.role, outcome: 'skipped-missing' };
   if (existing.Role === seedRow.role) return { slug: seedRow.slug, fromRole: existing.Role, toRole: seedRow.role, outcome: 'skipped-role-ok' };
   const saved = await upsertPrompt({
     id: existing.Id, slug: seedRow.slug, name: existing.Name || seedRow.name,

@@ -151,9 +151,7 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
 
     const dt = e.dataTransfer;
     const isFolder = hasFolderEntry(dt);
-    const isMissingFolder = !isFolder;
-
-    if (isMissingFolder) {
+    if (!isFolder) {
       toast.error("Please drop a folder containing marco-project.json");
 
       return;
@@ -328,8 +326,7 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
                 Injection Variables
                 {form.variables !== "{}" && (
                   <Badge variant="secondary" className="text-[9px] ml-1 px-1 py-0">
-                    {(() => { try { return Object.keys(JSON.parse(form.variables)).length; } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+                    {(() => { try { return Object.keys(JSON.parse(form.variables)).length; } catch (err) { /* swallowed */
  return 0; } })()}
                   </Badge>
                 )}
@@ -360,8 +357,7 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
                     {(() => {
                       try { JSON.parse(form.variables);
 
- return null; } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+ return null; } catch (err) { /* swallowed */
                         return (
                           <p className="text-[10px] text-destructive mt-1">Invalid JSON</p>
                         );
@@ -497,8 +493,7 @@ function VariablesBadge({ variables }: { variables?: string }) {
         {count} var{count !== 1 ? "s" : ""}
       </Badge>
     );
-  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+  } catch (err) { /* swallowed */
     return null;
   }
 }

@@ -55,8 +55,7 @@ const ROLES_TO_CHECK: PromptRole[] = ['plan', 'next'];
  * Pure function: no I/O, no side effects beyond mutating the passed array.
  */
 function inspectRow(role: PromptRole, slug: string, row: PromptRow | undefined, issues: PromptHealthIssue[]): void {
-  const isMissingRow = !row;
-  if (isMissingRow) {
+  if (!row) {
     issues.push({ role, slug, code: 'row-missing', detail: 'no default row for role=' + role });
 
     return;

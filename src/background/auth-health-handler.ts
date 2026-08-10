@@ -152,8 +152,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
 
     // ── Strategy 3: Signed URL token scan ──
     const s3 = await timedStrategy("Signed URL token", 3, async () => {
-        const isMissingTabUrl = !tabUrl;
-        if (isMissingTabUrl) {
+        if (!tabUrl) {
             return { isSuccess: false, detail: "No active tab URL" };
         }
 
@@ -298,8 +297,7 @@ async function getActivePlatformTabs(): Promise<PlatformTab[]> {
 }
 
 function extractProjectId(url: string | null): string | null {
-    const isMissingUrl = !url;
-    if (isMissingUrl) return null;
+    if (!url) return null;
     const match = url.match(/\/projects\/([a-f0-9-]{36})/);
 
     return match?.[1] ?? null;

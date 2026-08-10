@@ -25,12 +25,10 @@ export function aggregateMembers(perWs: PerWsMembers[]): {
     
     for (const m of wsResult.members) {
       const userId = m.user_id || m.id || m.email; // Fallback to email if no ID
-      const isMissingUserId = !userId;
-      if (isMissingUserId) continue;
+      if (!userId) continue;
 
       let agg = unionMap.get(userId);
-      const isMissingAgg = !agg;
-      if (isMissingAgg) {
+      if (!agg) {
         agg = {
           userId,
           email: m.email,

@@ -329,9 +329,7 @@ export async function injectSingleScript(
 export async function executeInTab(tabId: number, code: string): Promise<{ path: string; domTarget?: string }> {
     const result = await injectWithCspFallback(tabId, code, "MAIN");
 
-    const isMissingIsSuccess = result.isFail;
-
-    if (isMissingIsSuccess) {
+    if (result.isFail) {
         throw new Error(result.errorMessage ?? "Injection failed in MAIN and ISOLATED worlds.");
     }
 

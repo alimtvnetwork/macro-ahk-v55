@@ -191,8 +191,7 @@ export function PopupFooter({
       const result = await sendMessage<{ isOk: boolean; cleared?: number }>({ type: "INVALIDATE_CACHE" });
       setCacheCleared(result.cleared ?? 0);
       setTimeout(() => setCacheCleared(null), 3000);
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
       setCacheCleared(-1);
       setTimeout(() => setCacheCleared(null), 3000);
     } finally {

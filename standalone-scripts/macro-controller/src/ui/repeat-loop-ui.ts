@@ -103,8 +103,7 @@ function hydrate(): void {
   try {
     if (typeof localStorage === 'undefined') return;
     const raw = localStorage.getItem(STORAGE_KEY);
-    const isMissingRaw = !raw;
-    if (isMissingRaw) return;
+    if (!raw) return;
     const parsed: unknown = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return;
     const o = parsed as { count?: unknown; waitMode?: unknown; delaySec?: unknown; collapsed?: unknown };
@@ -133,16 +132,14 @@ function notify(): void {
 
 function readEditorText(): string {
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
-  const isMissingTarget = !target;
-  if (isMissingTarget) return '';
+  if (!target) return '';
 
   return extractEditorPlainText(target);
 }
 
 function setEditorText(text: string): boolean {
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
-  const isMissingTarget = !target;
-  if (isMissingTarget) return false;
+  if (!target) return false;
 
   return replaceEditorText(target, text);
 }
@@ -173,8 +170,7 @@ async function waitForCompletion(maxMs: number): Promise<void> {
     if (repeatLoopState.cancelled) return;
     const btn = findAddToTasksButton();
     const processing = isReturnButtonVisible() || !btn || (btn as HTMLButtonElement).disabled;
-    const isMissingProcessing = !processing;
-    if (isMissingProcessing) return;
+    if (!processing) return;
     await sleep(POLL_MS);
   }
 }
@@ -295,10 +291,8 @@ async function submitOneIteration(): Promise<boolean> {
     return false;
   }
   const btn = await waitForSubmitReady(MAX_WAIT_MS);
-  const isMissingBtn = !btn;
-  if (isMissingBtn) {
-    const isMissingCancelled = !repeatLoopState.cancelled;
-    if (isMissingCancelled) {
+  if (!btn) {
+    if (!repeatLoopState.cancelled) {
       showPasteToast('❌ Repeat: submit button never ready — stopped at ' + repeatLoopState.completed + '/' + repeatLoopState.count, true);
     }
 
@@ -358,8 +352,7 @@ export function startRepeatLoop(): void {
     return;
   }
   const text = readEditorText().trim();
-  const isMissingText = !text;
-  if (isMissingText) {
+  if (!text) {
     showPasteToast('❌ Repeat: chat box is empty — type or paste something first', true);
 
     return;
@@ -377,8 +370,7 @@ export function startRepeatLoop(): void {
 }
 
 export function stopRepeatLoop(): void {
-  const isMissingRunning = !repeatLoopState.running;
-  if (isMissingRunning) return;
+  if (!repeatLoopState.running) return;
   repeatLoopState.cancelled = true;
   log('Repeat: stop requested', 'warn');
   notify();
@@ -1045,8 +1037,7 @@ const INLINE_WRAP_ID = 'marco-repeat-inline-wrap';
 function tryMountInline(): boolean {
   if (document.getElementById(INLINE_WRAP_ID)) return true;
   const target = findPasteTarget(getPromptsConfig(), (xp) => getByXPath(xp) as Element | null);
-  const isMissingTarget = !target;
-  if (isMissingTarget) return false;
+  if (!target) return false;
   // Mount above the closest form, falling back to the editor's parent.
   const host = (target.closest && target.closest('form')) || target.parentElement;
   if (!host || !host.parentElement) return false;
@@ -1054,8 +1045,7 @@ function tryMountInline(): boolean {
   // v4.16+: mount into shared frame body so PlanTierType/Next/Repeat share one visual
   // unit and one minimize control. See inline-strips-frame.ts.
   const framed = ensureInlineStripsFrame(host as HTMLElement);
-  const isMissingFramed = !framed;
-  if (isMissingFramed) return false;
+  if (!framed) return false;
 
   const wrap = document.createElement('div');
   wrap.id = INLINE_WRAP_ID;

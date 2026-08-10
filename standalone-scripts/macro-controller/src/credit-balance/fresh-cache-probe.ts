@@ -21,8 +21,7 @@ import type { FreshCacheProbe } from './wire-workspace-mapper';
 export const hasFreshCreditBalanceCache: FreshCacheProbe = function hasFreshCreditBalanceCache(
   workspaceId: string,
 ): boolean {
-  const isMissingWorkspaceId = !workspaceId;
-  if (isMissingWorkspaceId) return false;
+  if (!workspaceId) return false;
 
   return readCreditBalanceUpdateCacheSync(workspaceId) !== null;
 };

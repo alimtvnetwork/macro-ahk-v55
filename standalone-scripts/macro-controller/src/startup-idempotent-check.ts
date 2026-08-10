@@ -49,8 +49,7 @@ export function runIdempotentCheck(): IdempotentResult {
   nsWrite('_internal.destroyed', false);
 
   const existingMarker = document.getElementById(IDS.SCRIPT_MARKER);
-  const isMissingExistingMarker = !existingMarker;
-  if (isMissingExistingMarker) return 'proceed';
+  if (!existingMarker) return 'proceed';
 
   const existingVersion = existingMarker.getAttribute('data-version') || '';
   const isVersionMismatch = existingVersion !== VERSION;
@@ -143,8 +142,7 @@ function attemptUiRecovery(marker: HTMLElement): IdempotentResult {
 }
 
 function healAllManagers(existingController: RecoverableController | null): void {
-  const isMissingExistingController = !existingController;
-  if (isMissingExistingController) return;
+  if (!existingController) return;
 
   const isMissingUi = !existingController.ui;
 
@@ -189,8 +187,7 @@ function healManager(
     logError('MacroController', 'Unknown error');
     logSub('Self-heal getter threw for ' + label + ': ' + (_e instanceof Error ? _e.message : String(_e)), 1);
   }
-  const isMissingHas = !has;
-  if (isMissingHas) {
+  if (!has) {
     const factory = nsReadTyped(nsKey as keyof import('./api-namespace').NsPathMap) as (() => unknown) | undefined;
     if (factory) {
       console.warn(LabelType.LogMacroloopV + VERSION + '] Self-healing: auto-registering ' + label + ' from persisted factory');

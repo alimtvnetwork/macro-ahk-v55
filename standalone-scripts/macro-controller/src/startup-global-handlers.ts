@@ -60,8 +60,7 @@ export function setupGlobalErrorHandlers(): void {
   window.addEventListener('keydown', function (e) {
     if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'r') {
       e.preventDefault();
-      const isMissingRunning = !state.running;
-      if (isMissingRunning) {
+      if (!state.running) {
         log('Hotkey: Loop is not running — cannot resume queue', 'warn');
         showToast('Loop must be ON to resume queue', 'warn');
 

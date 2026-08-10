@@ -17,7 +17,7 @@
  * operator can re-run idempotently without rolling back.
  */
 
-export enum RunSummaryScriptCode {
+export enum RunSummaryScriptCodeType {
     OwnerSwitch = "OwnerSwitch",
     UserAdd = "UserAdd",
 }
@@ -60,7 +60,7 @@ export interface RunSummaryCounts {
 }
 
 export interface RunSummary {
-    Script: RunSummaryScriptCode;
+    Script: RunSummaryScriptCodeType;
     TaskId: string;
     GeneratedAtUtc: string;
     Counts: RunSummaryCounts;

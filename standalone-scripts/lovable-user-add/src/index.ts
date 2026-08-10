@@ -13,18 +13,18 @@
 export { LovableUserAdd } from "./lovable-user-add";
 export { default as instruction } from "./instruction";
 export { USER_ADD_MIGRATION_V1 } from "./migrations";
-export { UserAddMembershipRoleCode } from "./migrations/membership-role-seed";
-export { UserAddTaskStatusCode } from "./migrations/task-status-seed";
+export { UserAddMembershipRoleCodeType } from "./migrations/membership-role-seed";
+export { UserAddTaskStatusCodeType } from "./migrations/task-status-seed";
 export { parseUserAddCsv, normalizeRole, UserAddCsvColumnType } from "./csv";
 export type { UserAddCsvRow, UserAddCsvParseResult, RoleNormalizeResult } from "./csv";
 export { mountPopup, DEFAULT_ROLE_OPTIONS, DEFAULT_ROLE_VALUE } from "./ui";
 export type { RoleOption } from "./ui";
-export { runStepA, StepAStepCode, extractWorkspaceId, toStepAApiRole } from "./flow";
+export { runStepA, StepAStepCodeType, extractWorkspaceId, toStepAApiRole } from "./flow";
 export type { StepARequest, StepAResult, StepAStepOutcome } from "./flow";
-export { runStepB, StepBStepCode, shouldRunStepB } from "./flow";
+export { runStepB, StepBStepCodeType, shouldRunStepB } from "./flow";
 export type { StepBRequest, StepBResult, StepBStepOutcome } from "./flow";
 export {
-    runUserAddRow, UserAddRowOutcomeCode, finalizeUserAddRow,
+    runUserAddRow, UserAddRowOutcomeCodeType, finalizeUserAddRow,
     buildRowFailure, buildRowSuccess,
     UserAddLogPhaseType, UserAddLogSeverityType, buildUserAddEntry,
     runTaskSignOut,

@@ -91,8 +91,7 @@ export function VariablesEditor({ json, onChange }: VariablesEditorProps) {
     const parsedJson = useMemo(() => {
         try {
             return JSON.parse(json || "{}");
-        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+        } catch (err) { /* swallowed */
             return null;
         }
     }, [json]);

@@ -30,6 +30,7 @@ let browser: Browser | undefined;
 function resolveChromiumExecutable(): string | undefined {
     const candidates = ['/usr/bin/chromium', '/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'];
     for (const c of candidates) if (fs.existsSync(c)) return c;
+
     return undefined;
 }
 
@@ -80,6 +81,7 @@ async function newPage(): Promise<Page> {
         if (!host) throw new Error('host missing');
         host.appendChild(api.buildCountPresets());
     });
+
     return page;
 }
 
@@ -90,6 +92,7 @@ async function newClippedPage(): Promise<Page> {
         if (!host) throw new Error('host missing');
         host.style.cssText = 'width:520px;height:30px;overflow:hidden;position:relative;padding:0;';
     });
+
     return page;
 }
 
@@ -97,6 +100,7 @@ async function isPanelHitTestable(page: Page): Promise<boolean> {
     return page.locator('[data-testid="repeat-more-popover"]').evaluate((panel) => {
         const rect = panel.getBoundingClientRect();
         const target = document.elementFromPoint(rect.left + 8, rect.top + 8);
+
         return target instanceof Node && panel.contains(target);
     });
 }

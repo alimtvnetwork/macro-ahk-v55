@@ -10,14 +10,14 @@
  * substitution occurred (Q3); P19 logs viewer surfaces these as info.
  */
 
-import type { UserAddMembershipRoleCode } from "../migrations/membership-role-seed";
+import type { UserAddMembershipRoleCodeType } from "../migrations/membership-role-seed";
 
 export interface UserAddCsvRow {
     RowIndex: number;
     WorkspaceUrl: string;
     MemberEmail: string;
     RawRole: string | null;
-    RoleCode: UserAddMembershipRoleCode | null;
+    RoleCode: UserAddMembershipRoleCodeType | null;
     WasEditorNormalized: boolean;
     Notes: string | null;
 }

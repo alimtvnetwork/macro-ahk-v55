@@ -1,6 +1,6 @@
 import { LovableApiEndpoint } from "./lovable-api-endpoint";
 import { lovableHttpJson, type LovableHttpMethod } from "./lovable-http";
-import { MembershipRoleApiCode } from "./membership-role-api-code";
+import { MembershipRoleApiCodeType } from "./membership-role-api-code";
 import {
     mapMembership,
     mapMembershipArray,
@@ -67,7 +67,7 @@ export class LovableApiClient {
     }
 
     public async promoteToOwner(workspaceId: string, userId: string): Promise<MembershipSummary> {
-        return this.updateMembershipRole(workspaceId, userId, { Role: MembershipRoleApiCode.Owner });
+        return this.updateMembershipRole(workspaceId, userId, { Role: MembershipRoleApiCodeType.Owner });
     }
 
     private async send(method: LovableHttpMethod, endpoint: string, jsonBody?: object): Promise<object> {

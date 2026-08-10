@@ -55,8 +55,7 @@ export function InjectionDiagnosticsPanel() {
         (l: LogEntry) => l.Category === "INJECTION",
       );
       setEvents(injectionLogs.slice(0, 30));
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
       setEvents([]);
     } finally {
       setLoading(false);

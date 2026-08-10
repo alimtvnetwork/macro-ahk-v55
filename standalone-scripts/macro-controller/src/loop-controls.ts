@@ -93,9 +93,7 @@ function verifyControllerInjection(): boolean {
     return false;
   }
 
-  const isMissingUiContainer = !uiContainer;
-
-  if (isMissingUiContainer) {
+  if (!uiContainer) {
     logError('unknown', '❌ Controller UI container NOT found in DOM (id=\' + IDS.CONTAINER + \') — aborting');
     state.running = false;
     nsCallTyped(NS_UPDATE_START_STOP, false);
@@ -119,8 +117,7 @@ function logInjectionPosition(xpathTarget: Node | null, uiContainer: HTMLElement
 }
 
 function startLoopTimers(): void {
-  const isMissingRunning = !state.running;
-  if (isMissingRunning) {
+  if (!state.running) {
     log('Loop was stopped during initial check — not starting timers', 'warn');
 
     return;
@@ -147,8 +144,7 @@ async function handleAuthAndStartCheck(): Promise<void> {
 
   refreshBearerTokenFromBestSource(function(authToken: string, authSource: string) {
     logAuthResult(authToken, authSource);
-    const isMissingRunning = !state.running;
-    if (isMissingRunning) { log('Loop was stopped during auth resolution — aborting', 'warn');
+    if (!state.running) { log('Loop was stopped during auth resolution — aborting', 'warn');
 
  return; }
 
@@ -211,8 +207,7 @@ export function startLoop(direction: LoopDirectionType | string): boolean {
 // stopLoop
 // ============================================
 export function stopLoop(): boolean {
-  const isMissingRunning = !state.running;
-  if (isMissingRunning) return false;
+  if (!state.running) return false;
 
   state.running = false;
   state.isDelegating = false;
@@ -277,8 +272,7 @@ function refreshStatusRunning(): void {
 
   logSub('Workspace auto-check: opening dialog for credit check...', 1);
   const opened = ensureProjectDialogOpen();
-  const isMissingOpened = !opened;
-  if (isMissingOpened) {
+  if (!opened) {
     logSub('Workspace auto-check: could not open project dialog', 1);
     mc().updateUILight();
 
@@ -291,8 +285,7 @@ function refreshStatusRunning(): void {
 }
 
 function readDialogCreditStatus(gotNavName: boolean): void {
-  const isMissingGotNavName = !gotNavName;
-  if (isMissingGotNavName) {
+  if (!gotNavName) {
     const oldName = state.workspaceName;
     mc().workspaces.fetchName();
     const nameChanged = oldName && state.workspaceName && oldName !== state.workspaceName;
@@ -314,8 +307,7 @@ function readDialogCreditStatus(gotNavName: boolean): void {
 // refreshStatus — Workspace auto-check
 // ============================================
 export function refreshStatus(): void {
-  const isMissingRunning = !state.running;
-  if (isMissingRunning) {
+  if (!state.running) {
     refreshStatusStopped();
     emitCreditPollTick();
 

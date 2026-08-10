@@ -126,8 +126,7 @@ export async function handleGetScriptInfo(
     const scriptName = request.scriptName;
 
     const folder = resolveScriptFolder(scriptName);
-    const isMissingFolder = !folder;
-    if (isMissingFolder) {
+    if (!folder) {
         return { isOk: false, errorMessage: `Unknown script: ${scriptName}` };
     }
 
@@ -135,9 +134,7 @@ export async function handleGetScriptInfo(
         const instruction = await fetchInstruction(folder);
         const outputFile = getPrimaryOutputFile(instruction);
 
-        const isMissingOutputFile = !outputFile;
-
-        if (isMissingOutputFile) {
+        if (!outputFile) {
             return { isOk: false, errorMessage: `No scripts declared in instruction.json for ${folder}` };
         }
 
@@ -181,8 +178,7 @@ export async function handleHotReloadScript(
     const scriptName = request.scriptName;
 
     const folder = resolveScriptFolder(scriptName);
-    const isMissingFolder = !folder;
-    if (isMissingFolder) {
+    if (!folder) {
         return { isOk: false, errorMessage: `Unknown script: ${scriptName}` };
     }
 
@@ -190,9 +186,7 @@ export async function handleHotReloadScript(
         const instruction = await fetchInstruction(folder);
         const outputFile = getPrimaryOutputFile(instruction);
 
-        const isMissingOutputFile = !outputFile;
-
-        if (isMissingOutputFile) {
+        if (!outputFile) {
             return { isOk: false, errorMessage: `No scripts declared in instruction.json for ${folder}` };
         }
 

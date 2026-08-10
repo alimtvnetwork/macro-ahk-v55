@@ -58,8 +58,7 @@ export class BulkRenameManager {
   }
 
   static getInstance(): BulkRenameManager {
-    const isMissingInstance = !BulkRenameManager.instance;
-    if (isMissingInstance) {
+    if (!BulkRenameManager.instance) {
       BulkRenameManager.instance = new BulkRenameManager();
     }
 
@@ -152,9 +151,7 @@ export class BulkRenameManager {
   private saveHistoryEntry(successEntries: BulkRenameResults['successEntries']): void {
     const hasEntries = successEntries.length > 0;
 
-    const isMissingHasEntries = !hasEntries;
-
-    if (isMissingHasEntries) {
+    if (!hasEntries) {
       return;
     }
 
@@ -176,9 +173,7 @@ export class BulkRenameManager {
     const undoBtn = document.getElementById('loop-ws-undo-btn');
     const isPresent = undoBtn !== null;
 
-    const isMissingIsPresent = !isPresent;
-
-    if (isMissingIsPresent) {
+    if (!isPresent) {
       return;
     }
 

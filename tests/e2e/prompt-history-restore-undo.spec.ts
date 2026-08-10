@@ -42,6 +42,7 @@ let browser: Browser | undefined;
 function resolveChromiumExecutable(): string | undefined {
     const candidates = ['/usr/bin/chromium', '/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'];
     for (const candidate of candidates) if (fs.existsSync(candidate)) return candidate;
+
     return undefined;
 }
 
@@ -88,6 +89,7 @@ async function newHarnessPage(): Promise<Page> {
     });
     await page.goto('https://prompt-history-restore-undo-harness.test/');
     await page.addScriptTag({ content: bundleSource });
+
     return page;
 }
 
@@ -142,6 +144,7 @@ test.describe('prompt history restore undo round-trip', () => {
                 state.currentBody = args.body;
                 state.currentReplaceKey = args.replaceKey;
                 state.currentReplaceValues = args.replaceValues.slice();
+
                 return { ok: true, value: args.id ?? state.currentId };
             };
             const confirmFn = (): boolean => true;

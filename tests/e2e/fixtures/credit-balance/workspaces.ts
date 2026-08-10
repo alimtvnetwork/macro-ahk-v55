@@ -132,6 +132,7 @@ export function makeCreditBalance(opts: {
     const dailyRemaining = opts.dailyRemaining ?? dailyLimit;
     const totalGranted = opts.totalGranted ?? dailyLimit;
     const totalRemaining = opts.totalRemaining ?? dailyRemaining;
+
     return {
         total_remaining: totalRemaining,
         total_granted: totalGranted,

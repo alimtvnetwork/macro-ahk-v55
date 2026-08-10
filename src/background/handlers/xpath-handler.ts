@@ -38,9 +38,7 @@ export async function handleToggleXPathRecorder(
     _sender: chrome.runtime.MessageSender,
 ): Promise<{ isRecording: boolean }> {
     const tabId = await resolveTargetTabId();
-    const isMissingTab = tabId === null;
-
-    if (isMissingTab) {
+    if (tabId === null) {
         return { isRecording: false };
     }
 

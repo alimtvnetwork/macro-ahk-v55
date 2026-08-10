@@ -15,22 +15,22 @@
  */
 
 import {
-    RunSummaryRowStatus, RunSummaryScriptCode,
+    RunSummaryRowStatus, RunSummaryScriptCodeType,
 } from "../../../lovable-common/src/report/run-summary-types";
 import type {
     RunSummary, RunSummaryAction, RunSummaryCounts, RunSummaryRow,
 } from "../../../lovable-common/src/report/run-summary-types";
-import { RowOutcomeCode } from "./row-types";
+import { RowOutcomeCodeType } from "./row-types";
 import { LogSeverityType } from "./log-sink";
 import type { PromotedOwnerRecord, RowExecutionResult } from "./row-types";
 import type { LogEntry } from "./log-sink";
 
-const statusFor = (outcome: RowOutcomeCode): RunSummaryRowStatus => {
-    if (outcome === RowOutcomeCode.Succeeded) {
+const statusFor = (outcome: RowOutcomeCodeType): RunSummaryRowStatus => {
+    if (outcome === RowOutcomeCodeType.Succeeded) {
         return RunSummaryRowStatus.Succeeded;
     }
 
-    if (outcome === RowOutcomeCode.PromoteFailedPartial) {
+    if (outcome === RowOutcomeCodeType.PromoteFailedPartial) {
         return RunSummaryRowStatus.PartiallySucceeded;
     }
 
@@ -99,7 +99,7 @@ export const buildOwnerSwitchRunSummary = (input: OwnerSwitchSummaryInput): RunS
     const rows = input.Results.map(buildRow);
 
     return {
-        Script: RunSummaryScriptCode.OwnerSwitch,
+        Script: RunSummaryScriptCodeType.OwnerSwitch,
         TaskId: input.TaskId,
         GeneratedAtUtc: new Date().toISOString(),
         Counts: countRows(rows),

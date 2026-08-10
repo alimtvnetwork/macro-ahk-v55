@@ -38,8 +38,7 @@ export function hideImportSpinner(importBtn: HTMLButtonElement, originalLabel: s
 }
 
 export function restoreFocusToImportButton(refs: ModalRefs): void {
-  const isMissingIsConnected = !refs.root.isConnected;
-  if (isMissingIsConnected) return;
+  if (!refs.root.isConnected) return;
   const btn = refs.root.querySelector<HTMLButtonElement>('[data-testid="library-import"]');
   if (btn) btn.focus();
 }
@@ -159,8 +158,7 @@ export async function handleImportFile(
   try {
     const text = await file.text();
     const parsed = await executeImportParse(refs, text, file);
-    const isMissingParsed = !parsed;
-    if (isMissingParsed) {
+    if (!parsed) {
       focusAfter = 'banner';
 
       return;

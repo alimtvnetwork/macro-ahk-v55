@@ -19,8 +19,7 @@ function closeExisting(): void {
 }
 
 function handleModalKey(refs: ModalRefs, e: KeyboardEvent): void {
-  const isMissingIsConnected = !refs.root.isConnected;
-  if (isMissingIsConnected) {
+  if (!refs.root.isConnected) {
     if (refs.keyHandler) document.removeEventListener('keydown', refs.keyHandler, true);
 
     return;
@@ -51,8 +50,7 @@ function applyTabTrap(root: HTMLElement, e: KeyboardEvent): void {
   const last = nodes[nodes.length - 1]!;
   const active = document.activeElement as HTMLElement | null;
   const insideModal = active !== null && root.contains(active);
-  const isMissingInsideModal = !insideModal;
-  if (isMissingInsideModal) { e.preventDefault(); first.focus();
+  if (!insideModal) { e.preventDefault(); first.focus();
 
  return; }
   if (e.shiftKey && active === first) { e.preventDefault(); last.focus();

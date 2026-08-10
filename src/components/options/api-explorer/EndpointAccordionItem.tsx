@@ -59,7 +59,7 @@ export function EndpointAccordionItem({ endpoint }: Props) {
     let parsed: unknown;
     try {
       parsed = requestJson.trim() ? JSON.parse(requestJson) : {};
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Invalid JSON in request body");
 
       return;

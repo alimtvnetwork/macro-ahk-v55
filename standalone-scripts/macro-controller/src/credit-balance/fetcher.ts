@@ -92,21 +92,18 @@ export async function fetchAndPersist(
     workspaceId: string,
     options: FetchAndPersistOptions,
 ): Promise<FetchAndPersistResult> {
-    const isMissingWorkspaceId = !workspaceId;
-    if (isMissingWorkspaceId) {
+    if (!workspaceId) {
         return { workspaceId: '', outcome: 'failed', response: null, row: null, waitMs: 0 };
     }
 
     const decision = shouldFetch(workspaceId, Date.now(), options.force === true);
-    const isMissingAllowed = !decision.allowed;
-    if (isMissingAllowed) {
+    if (!decision.allowed) {
         return buildThrottledResult(workspaceId, decision.reason, decision.waitMs);
     }
 
     try {
         const response = await fetchCreditBalance(workspaceId);
-        const isMissingResponse = !response;
-        if (isMissingResponse) {
+        if (!response) {
             const cached = await readCreditBalanceCache(workspaceId);
             logError(
                 'CreditBalance.fetchAndPersist',

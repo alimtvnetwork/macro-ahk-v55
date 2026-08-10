@@ -5,7 +5,7 @@
  * No magic strings elsewhere — code paths must reference this enum.
  */
 
-export enum OwnerSwitchTaskStatusCode {
+export enum OwnerSwitchTaskStatusCodeType {
     Pending = "Pending",
     Running = "Running",
     Completed = "Completed",
@@ -14,15 +14,15 @@ export enum OwnerSwitchTaskStatusCode {
 }
 
 export interface TaskStatusSeed {
-    Code: OwnerSwitchTaskStatusCode;
+    Code: OwnerSwitchTaskStatusCodeType;
     DisplayLabel: string;
     SortOrder: number;
 }
 
 export const TASK_STATUS_SEEDS: ReadonlyArray<TaskStatusSeed> = Object.freeze([
-    { Code: OwnerSwitchTaskStatusCode.Pending, DisplayLabel: "Pending", SortOrder: 1 },
-    { Code: OwnerSwitchTaskStatusCode.Running, DisplayLabel: "Running", SortOrder: 2 },
-    { Code: OwnerSwitchTaskStatusCode.Completed, DisplayLabel: "Completed", SortOrder: 3 },
-    { Code: OwnerSwitchTaskStatusCode.Failed, DisplayLabel: "Failed", SortOrder: 4 },
-    { Code: OwnerSwitchTaskStatusCode.Cancelled, DisplayLabel: "Cancelled", SortOrder: 5 },
+    { Code: OwnerSwitchTaskStatusCodeType.Pending, DisplayLabel: "Pending", SortOrder: 1 },
+    { Code: OwnerSwitchTaskStatusCodeType.Running, DisplayLabel: "Running", SortOrder: 2 },
+    { Code: OwnerSwitchTaskStatusCodeType.Completed, DisplayLabel: "Completed", SortOrder: 3 },
+    { Code: OwnerSwitchTaskStatusCodeType.Failed, DisplayLabel: "Failed", SortOrder: 4 },
+    { Code: OwnerSwitchTaskStatusCodeType.Cancelled, DisplayLabel: "Cancelled", SortOrder: 5 },
 ]);

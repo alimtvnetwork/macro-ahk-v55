@@ -10,14 +10,14 @@ import { describe, it, expect } from "vitest";
 import { validateRow, validateFile } from "../csv-validator";
 import { UserAddCsvColumnType } from "../csv-column";
 import type { UserAddCsvRow } from "../csv-types";
-import { UserAddMembershipRoleCode } from "../../migrations/membership-role-seed";
+import { UserAddMembershipRoleCodeType } from "../../migrations/membership-role-seed";
 
 const baseRow = (overrides: Partial<UserAddCsvRow> = {}): UserAddCsvRow => ({
     RowIndex: 1,
     WorkspaceUrl: "https://lovable.dev/projects/abc-123",
     MemberEmail: "user@example.com",
     RawRole: "Member",
-    RoleCode: UserAddMembershipRoleCode.Member,
+    RoleCode: UserAddMembershipRoleCodeType.Member,
     WasEditorNormalized: false,
     Notes: null,
     ...overrides,

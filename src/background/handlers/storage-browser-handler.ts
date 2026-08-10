@@ -30,15 +30,13 @@ export function bindStorageBrowserDbManager(manager: DbManager): void {
 }
 
 function getDb(): SqlJsDatabase {
-    const isMissingDbManager = !dbManager;
-    if (isMissingDbManager) throw new Error("[storage-browser] DbManager not bound");
+    if (!dbManager) throw new Error("[storage-browser] DbManager not bound");
 
     return dbManager.getLogsDb();
 }
 
 function getErrorsDb(): SqlJsDatabase {
-    const isMissingDbManager = !dbManager;
-    if (isMissingDbManager) throw new Error("[storage-browser] DbManager not bound");
+    if (!dbManager) throw new Error("[storage-browser] DbManager not bound");
 
     return dbManager.getErrorsDb();
 }

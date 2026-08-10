@@ -37,8 +37,7 @@ export function formatCount(n: number): string {
 
 /** Convert an ISO timestamp into a short local clock string ("Tue 00:00"). */
 export function formatLocalReset(iso: string): string {
-  const isMissingIso = !iso;
-  if (isMissingIso) return '—';
+  if (!iso) return '—';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '—';
   const weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()];
@@ -224,11 +223,9 @@ export interface FilterState {
 }
 
 function wsMatchesQuery(ws: WorkspaceCredit, q: string): boolean {
-  const isMissingQ = !q;
-  if (isMissingQ) return true;
+  if (!q) return true;
   const needle = q.trim().toLowerCase();
-  const isMissingNeedle = !needle;
-  if (isMissingNeedle) return true;
+  if (!needle) return true;
   const hay = (
     (ws.fullName || '') + ' ' +
     (ws.name || '') + ' ' +
@@ -250,8 +247,7 @@ export function applyFilters(
 
   return workspaces.filter((ws) => {
     if (hasQuery && !wsMatchesQuery(ws, filters.query)) return false;
-    const isMissingAnyChipActive = !anyChipActive;
-    if (isMissingAnyChipActive) return true;
+    if (!anyChipActive) return true;
     const rem = resolveCreditSummary(ws).available;
     if (filters.low && rem < 100 && rem > 0) return true;
     if (filters.empty && rem <= 0) return true;
@@ -278,12 +274,10 @@ function buildChip(
     ';color:' + fg +
     ';padding:2px 8px;border-radius:10px;font-size:10px;cursor:pointer;font-family:monospace;transition:background 120ms,color 120ms;';
   btn.onmouseover = function () {
-    const isMissingActive = !active;
-    if (isMissingActive) btn.style.background = 'rgba(124,58,237,0.15)';
+    if (!active) btn.style.background = 'rgba(124,58,237,0.15)';
   };
   btn.onmouseout = function () {
-    const isMissingActive = !active;
-    if (isMissingActive) btn.style.background = 'transparent';
+    if (!active) btn.style.background = 'transparent';
   };
   btn.onclick = function () { onToggle(); };
 
@@ -394,8 +388,7 @@ function attachDragHandlers(ctx: TableCtx, row: HTMLElement, dispIdx: number): v
   row.draggable = isManualOrder;
   row.style.cursor = isManualOrder ? 'grab' : 'default';
   row.setAttribute('data-row-index', String(dispIdx));
-  const isMissingIsManualOrder = !isManualOrder;
-  if (isMissingIsManualOrder) return;
+  if (!isManualOrder) return;
 
   row.addEventListener('dragstart', (e: DragEvent) => {
     row.style.opacity = '0.4';

@@ -13,11 +13,11 @@
 export { LovableOwnerSwitch } from "./lovable-owner-switch";
 export { default as instruction } from "./instruction";
 export { OWNER_SWITCH_MIGRATION_V1 } from "./migrations";
-export { OwnerSwitchTaskStatusCode } from "./migrations/task-status-seed";
+export { OwnerSwitchTaskStatusCodeType } from "./migrations/task-status-seed";
 export { parseOwnerSwitchCsv, OwnerSwitchCsvColumnType } from "./csv";
 export type { OwnerSwitchCsvRow, OwnerSwitchCsvParseResult } from "./csv";
 export { mountPopup } from "./ui";
-export { runLogin, LoginStepCode, runPromote, PromoteStepCode, TtlCache } from "./flow";
+export { runLogin, LoginStepCodeType, runPromote, PromoteStepCodeType, TtlCache } from "./flow";
 export type {
     LoginFlowOptions,
     LoginRunResult,

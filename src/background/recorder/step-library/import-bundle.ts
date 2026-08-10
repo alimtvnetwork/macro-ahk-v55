@@ -344,8 +344,7 @@ function orderByAncestry(rows: ReadonlyArray<StepGroupRow>): StepGroupRow[] {
                 break;
             }
         }
-        const isMissingProgressed = !progressed;
-        if (isMissingProgressed) {
+        if (!progressed) {
             for (const r of remaining.values()) out.push(r);
             break;
         }
@@ -540,8 +539,7 @@ function resolveNameConflicts(input: ResolveNameConflictsInput): NameConflictPla
     const collisions: string[] = [];
     for (const g of sourceGroups) {
         const isRoot = g.ParentStepGroupId === null || !sourceIdSet.has(g.ParentStepGroupId);
-        const isMissingIsRoot = !isRoot;
-        if (isMissingIsRoot) continue;
+        if (!isRoot) continue;
         const outcome = resolveRootNameConflict(g, destSiblingNamesLower, conflict);
         if ("Reason" in outcome) { return outcome; }
         applyRootOutcome(outcome, g, effectiveName, destSiblingNamesLower, renamedRoots, collisions);

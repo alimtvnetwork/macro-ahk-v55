@@ -221,8 +221,7 @@ export function readConfigFromDb(manager: ProjectDbManager): StoredConfigRow[] {
             valueType: String(row[4]),
             updatedAt: String(row[5]),
         }));
-    } catch (err) { logBgError("Automatically logged error:", err);
-
+    } catch (err) { 
         return [];
     }
 }
@@ -296,8 +295,7 @@ function deserializeValue(value: string, valueType: string): JsonValue {
         case "null": return null;
         case "array":
         case "object":
-            try { return JSON.parse(value); } catch (err) { logBgError("Automatically logged error:", err);
-
+            try { return JSON.parse(value); } catch (err) { 
  return value; }
         default: return value;
     }

@@ -128,8 +128,7 @@ export async function actionBulkRemixNext(hint: BulkRemixSourceHint = {}): Promi
     try {
       const projects = await fetchProjects(wsId);
       const target = pickTargetProject(projects, sourceBase);
-      const isMissingTarget = !target;
-      if (isMissingTarget) {
+      if (!target) {
         throwDiagnostic('REMIX_BULK_E002', { wsId, sourceBase: sourceBase || '(none)' });
       }
       const existing = await fetchWorkspaceProjectNames(wsId);

@@ -275,8 +275,7 @@ function sanitizeDiagnosticValue(name: string, value: JsonValue): JsonValue {
 }
 
 function safeStringify(v: JsonValue): string {
-    try { return JSON.stringify(v) ?? "undefined"; } catch (err) { logBgError("Automatically logged error:", err);
-
+    try { return JSON.stringify(v) ?? "undefined"; } catch (err) { 
  return String(v); }
 }
 

@@ -9,10 +9,10 @@
  * no retry per `mem://constraints/no-retry-policy`.
  */
 
-import type { UserAddMembershipRoleCode } from "../migrations/membership-role-seed";
+import type { UserAddMembershipRoleCodeType } from "../migrations/membership-role-seed";
 import type { MembershipSummary } from "../../../lovable-common/src/api/lovable-api-types";
 
-export enum StepAStepCode {
+export enum StepAStepCodeType {
     ResolveWorkspaceId = "ResolveWorkspaceId",
     PostMembership = "PostMembership",
 }
@@ -20,11 +20,11 @@ export enum StepAStepCode {
 export interface StepARequest {
     WorkspaceUrl: string;
     MemberEmail: string;
-    RoleCode: UserAddMembershipRoleCode;
+    RoleCode: UserAddMembershipRoleCodeType;
 }
 
 export interface StepAStepOutcome {
-    Step: StepAStepCode;
+    Step: StepAStepCodeType;
     DurationMs: number;
     WorkspaceId: string;
     UserId: string | null;

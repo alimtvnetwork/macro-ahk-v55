@@ -169,8 +169,7 @@ function validateEntries(rawEntries: unknown[]): { entries: PromptEntry[]; error
       return;
     }
     const entry = coercePromptEntry(raw);
-    const isMissingEntry = !entry;
-    if (isMissingEntry) {
+    if (!entry) {
       errors.push(`entries[${index}] missing required name/text`);
 
       return;

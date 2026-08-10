@@ -90,9 +90,7 @@ export async function resolveWorkspaceId(): Promise<string | null> {
 
   const projectId = extractProjectIdFromUrl();
 
-  const isMissingProjectId = !projectId;
-
-  if (isMissingProjectId) {
+  if (!projectId) {
     log('CreditBalance: No projectId in URL — cannot resolve workspace', 'warn');
 
     return null;
@@ -179,14 +177,10 @@ export async function fetchCreditBalance(
 ): Promise<CreditBalanceResponse | null> {
   const wsId = workspaceId || creditBalanceState.resolvedWorkspaceId;
 
-  const isMissingWsId = !wsId;
-
-  if (isMissingWsId) {
+  if (!wsId) {
     const resolved = await resolveWorkspaceId();
 
-    const isMissingResolved = !resolved;
-
-    if (isMissingResolved) {
+    if (!resolved) {
       log('CreditBalance: No workspace ID — skipping API, will use fallback', 'warn');
 
       return null;
@@ -289,8 +283,7 @@ export async function fetchCreditBalance(
 // checkAndActOnCreditBalance — The main free-credit detection function
 // ============================================
 export async function checkAndActOnCreditBalance(): Promise<boolean> {
-  const isMissingEnableApiDetection = !BALANCE_CONFIG.enableApiDetection;
-  if (isMissingEnableApiDetection) {
+  if (!BALANCE_CONFIG.enableApiDetection) {
     log('CreditBalance: API detection disabled in config', 'skip');
 
     return false;
@@ -298,9 +291,7 @@ export async function checkAndActOnCreditBalance(): Promise<boolean> {
 
   const response = await fetchCreditBalance();
 
-  const isMissingResponse = !response;
-
-  if (isMissingResponse) {
+  if (!response) {
     log('CreditBalance: API failed — fallback to XPath if enabled', 'warn');
 
     return false;

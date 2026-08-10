@@ -72,8 +72,7 @@ export function toPascalCaseKeys(source: Record<string, unknown>): Record<string
 export function toPrettyJson(value: unknown): string {
   try {
     return JSON.stringify(value, null, 2);
-  } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+  } catch (err) { /* swallowed */
     return String(value);
   }
 }

@@ -16,6 +16,7 @@ import {
  */
 function hasInlineCreditsWire(ws: { billing_period_credits_limit: number; grant_type_balances: ReadonlyArray<unknown> }): boolean {
     if (Number(ws.billing_period_credits_limit || 0) > 0) return true;
+
     return Array.isArray(ws.grant_type_balances) && ws.grant_type_balances.length > 0;
 }
 

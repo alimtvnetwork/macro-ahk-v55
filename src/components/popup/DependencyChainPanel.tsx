@@ -80,8 +80,7 @@ export function DependencyChainPanel() {
         type: "GET_INJECTION_CHAIN",
       });
       setSnapshot(result?.latest ?? null);
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
       setSnapshot(null);
     } finally {
       setLoading(false);
@@ -135,7 +134,7 @@ export function DependencyChainPanel() {
       setCopied(true);
       setTimeout(() => setCopied(false), Timings.TIMEOUT_NORMAL);
       toast.success("Chain diagnostics copied to clipboard");
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Failed to copy to clipboard");
     }
   }, [snapshot, formatChainText]);

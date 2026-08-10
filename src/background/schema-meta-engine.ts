@@ -311,9 +311,7 @@ function migrateTable(
     const { TableName, Description, Columns, Relations } = tableDef;
     const tableExists = existingTables.has(TableName);
 
-    const isMissingTableExists = !tableExists;
-
-    if (isMissingTableExists) {
+    if (!tableExists) {
         // Build CREATE TABLE statement
         const colDefs: string[] = [
             "Id INTEGER PRIMARY KEY AUTOINCREMENT",

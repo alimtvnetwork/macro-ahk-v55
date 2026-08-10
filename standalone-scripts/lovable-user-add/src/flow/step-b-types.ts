@@ -12,7 +12,7 @@
 
 import type { MembershipSummary } from "../../../lovable-common/src/api/lovable-api-types";
 
-export enum StepBStepCode {
+export enum StepBStepCodeType {
     PromoteToOwner = "PromoteToOwner",
 }
 
@@ -22,7 +22,7 @@ export interface StepBRequest {
 }
 
 export interface StepBStepOutcome {
-    Step: StepBStepCode;
+    Step: StepBStepCodeType;
     DurationMs: number;
     WorkspaceId: string;
     UserId: string;

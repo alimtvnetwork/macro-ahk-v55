@@ -5,7 +5,7 @@
  * the shared logger never deal in magic strings.
  */
 
-export enum PromoteStepCode {
+export enum PromoteStepCodeType {
     ResolveWorkspace = "ResolveWorkspace",
     ResolveUserId = "ResolveUserId",
     PromoteToOwner = "PromoteToOwner",
@@ -17,7 +17,7 @@ export interface PromoteRowRequest {
 }
 
 export interface PromoteRowOutcome {
-    Step: PromoteStepCode;
+    Step: PromoteStepCodeType;
     DurationMs: number;
     WorkspaceId: string | null;
     UserId: string | null;
@@ -25,6 +25,6 @@ export interface PromoteRowOutcome {
 
 export interface PromoteRowResult {
     Outcomes: ReadonlyArray<PromoteRowOutcome>;
-    FailedStep: PromoteStepCode | null;
+    FailedStep: PromoteStepCodeType | null;
     Error: string | null;
 }

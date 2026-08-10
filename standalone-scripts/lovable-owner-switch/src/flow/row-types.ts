@@ -31,7 +31,7 @@ export interface RowExecutionContext {
     XPathOverrides: ReadonlyArray<XPathSettingSeed>;
 }
 
-export enum RowOutcomeCode {
+export enum RowOutcomeCodeType {
     Succeeded = "Succeeded",
     LoginFailed = "LoginFailed",
     PromoteFailed = "PromoteFailed",
@@ -62,7 +62,7 @@ export interface PromotedOwnerRecord {
 
 export interface RowExecutionResult {
     RowIndex: number;
-    Outcome: RowOutcomeCode;
+    Outcome: RowOutcomeCodeType;
     IsDone: boolean;
     HasError: boolean;
     LastError: string | null;

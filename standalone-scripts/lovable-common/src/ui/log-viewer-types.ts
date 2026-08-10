@@ -9,7 +9,7 @@
  * (P17 contract) is preserved as the literal phase string "StepA"/"StepB".
  */
 
-export enum LogViewerSeverityCode {
+export enum LogViewerSeverityCodeType {
     Info = "Info",
     Warn = "Warn",
     Error = "Error",
@@ -19,7 +19,7 @@ export interface LogViewerEntry {
     TimestampUtc: string;
     Phase: string;
     RowIndex: number | null;
-    Severity: LogViewerSeverityCode;
+    Severity: LogViewerSeverityCodeType;
     Message: string;
 }
 

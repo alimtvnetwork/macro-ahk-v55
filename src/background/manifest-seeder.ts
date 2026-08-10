@@ -72,8 +72,7 @@ const SUPPORTED_SCHEMA_VERSIONS = { min: 2, max: 2 };
 export async function seedFromManifest(): Promise<SeedResult> {
     console.log("[manifest-seeder] Fetching seed-manifest.json from extension dist...");
     const manifest = await fetchManifest();
-    const isMissingManifest = !manifest;
-    if (isMissingManifest) {
+    if (!manifest) {
         logBgWarnError(BgLogTag.MANIFEST_SEEDER, "seed-manifest.json not found or invalid — skipping. " +
             "Ensure the build pipeline runs compile-instruction + generate-seed-manifest.");
 
@@ -220,8 +219,7 @@ async function seedScriptsFromManifest(
     const errors: string[] = [];
 
     for (const project of manifest.Projects) {
-        const isMissingSeedOnInstall = !project.SeedOnInstall;
-        if (isMissingSeedOnInstall) {
+        if (!project.SeedOnInstall) {
             console.log("[manifest-seeder:scripts] Skipping %s (seedOnInstall=false)", project.Name);
             continue;
         }
@@ -388,8 +386,7 @@ async function seedConfigsFromManifest(
     const errors: string[] = [];
 
     for (const project of manifest.Projects) {
-        const isMissingSeedOnInstall = !project.SeedOnInstall;
-        if (isMissingSeedOnInstall) continue;
+        if (!project.SeedOnInstall) continue;
 
         for (const configDef of project.Configs) {
             try {
@@ -473,8 +470,7 @@ function resolveConfigSeedId(
     key: string | undefined,
     project: SeedProjectEntry,
 ): string | undefined {
-    const isMissingKey = !key;
-    if (isMissingKey) return undefined;
+    if (!key) return undefined;
     const config = project.Configs.find((c) => c.Key === key);
 
     return config?.SeedId;

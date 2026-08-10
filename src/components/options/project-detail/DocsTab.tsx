@@ -40,7 +40,7 @@ export function DocsTab({ namespace, slug, targetUrls }: DocsTabProps) {
       } else {
         toast.error(resp.errorMessage ?? "Failed to generate docs");
       }
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
+    } catch (err) { /* swallowed */
       toast.error("Failed to generate docs");
     } finally {
       setGenerating(false);

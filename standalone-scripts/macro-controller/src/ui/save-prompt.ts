@@ -308,8 +308,7 @@ function buildPromptsButton(deps: SavePromptDeps): HTMLElement {
 
 function renderToolbarPromptsDropdown(dropdown: HTMLElement, deps: SavePromptDeps): void {
   const taskNextDeps = deps.taskNextDeps;
-  const isMissingTaskNextDeps = !taskNextDeps;
-  if (isMissingTaskNextDeps) {
+  if (!taskNextDeps) {
     renderChatboxPromptsDropdown(dropdown, deps);
 
     return;

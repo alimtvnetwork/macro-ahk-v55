@@ -35,8 +35,7 @@ interface Envelope { entries: PromptEditE005Entry[]; }
 function safeRead(): Envelope {
   try {
     const raw = localStorage.getItem(StorageKeyType.PromptEditE005Store);
-    const isMissingRaw = !raw;
-    if (isMissingRaw) return { entries: [] };
+    if (!raw) return { entries: [] };
     const parsed = JSON.parse(raw) as Envelope;
     if (!parsed || !Array.isArray(parsed.entries)) return { entries: [] };
 
@@ -114,8 +113,7 @@ export function summarizeLatestByRole(): PromptEditE005Summary[] {
   const out: PromptEditE005Summary[] = [];
   for (const role of Object.keys(latest)) {
     const entry = latest[role];
-    const isMissingEntry = !entry;
-    if (isMissingEntry) continue;
+    if (!entry) continue;
     const context = entry.context;
     out.push({
       role: entry.role,

@@ -173,8 +173,7 @@ export function formatRetryTimestamp(ts: number): string {
             second: "2-digit",
             hour12: false,
         }).format(new Date(ts));
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
         return new Date(ts).toISOString();
     }
 }
@@ -185,8 +184,7 @@ export function formatOrigin(url: string): string {
         const u = new URL(url);
 
         return u.origin;
-    } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+    } catch (err) { /* swallowed */
         return url.length > 48 ? `${url.slice(0, 48)}...` : url;
     }
 }

@@ -11,32 +11,32 @@
 
 import { describe, expect, it } from "vitest";
 import { buildUserAddRunSummary } from "../run-summary-builder";
-import { UserAddRowOutcomeCode } from "../row-types";
+import { UserAddRowOutcomeCodeType } from "../row-types";
 import { UserAddLogPhaseType, UserAddLogSeverityType } from "../log-sink";
-import { RunSummaryRowStatus, RunSummaryScriptCode } from "../../../../lovable-common/src/report/run-summary-types";
+import { RunSummaryRowStatus, RunSummaryScriptCodeType } from "../../../../lovable-common/src/report/run-summary-types";
 import type { UserAddRowResult } from "../row-types";
 import type { UserAddLogEntry } from "../log-sink";
 
 const ownerOk: UserAddRowResult = {
-    RowIndex: 1, Outcome: UserAddRowOutcomeCode.Succeeded,
+    RowIndex: 1, Outcome: UserAddRowOutcomeCodeType.Succeeded,
     IsDone: true, HasError: false, LastError: null, DurationMs: 90,
     StepBRan: true, StepASucceeded: true, WorkspaceId: "ws-9", UserId: "u-9",
 };
 
 const memberOk: UserAddRowResult = {
-    RowIndex: 2, Outcome: UserAddRowOutcomeCode.Succeeded,
+    RowIndex: 2, Outcome: UserAddRowOutcomeCodeType.Succeeded,
     IsDone: true, HasError: false, LastError: null, DurationMs: 60,
     StepBRan: false, StepASucceeded: true, WorkspaceId: "ws-9", UserId: "u-10",
 };
 
 const stepBFailed: UserAddRowResult = {
-    RowIndex: 3, Outcome: UserAddRowOutcomeCode.StepBFailedMemberAdded,
+    RowIndex: 3, Outcome: UserAddRowOutcomeCodeType.StepBFailedMemberAdded,
     IsDone: false, HasError: true, LastError: "PUT 500 server error", DurationMs: 110,
     StepBRan: true, StepASucceeded: true, WorkspaceId: "ws-123", UserId: "u-456",
 };
 
 const stepAFailed: UserAddRowResult = {
-    RowIndex: 4, Outcome: UserAddRowOutcomeCode.StepAFailed,
+    RowIndex: 4, Outcome: UserAddRowOutcomeCodeType.StepAFailed,
     IsDone: false, HasError: true, LastError: "POST 409 conflict", DurationMs: 40,
     StepBRan: false, StepASucceeded: false, WorkspaceId: null, UserId: null,
 };
@@ -53,7 +53,7 @@ describe("buildUserAddRunSummary", () => {
             TaskId: "t1", Results: [ownerOk, memberOk, stepBFailed, stepAFailed], LogEntries: [warn],
         });
 
-        expect(summary.Script).toBe(RunSummaryScriptCode.UserAdd);
+        expect(summary.Script).toBe(RunSummaryScriptCodeType.UserAdd);
         expect(summary.Counts).toEqual({
             Total: 4, Succeeded: 2, Failed: 1, PartiallySucceeded: 1,
         });

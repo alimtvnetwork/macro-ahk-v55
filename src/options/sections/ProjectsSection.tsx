@@ -51,8 +51,7 @@ export function ProjectsSection() {
                 type: "GET_ALL_PROJECTS",
             });
             setProjects(response.projects ?? []);
-        } catch (err) { logError("AutoCatch", "Swallowed error", "Automatically logged error:", err);
-
+        } catch (err) { /* swallowed */
             setProjects([]);
         } finally {
             setIsLoading(false);

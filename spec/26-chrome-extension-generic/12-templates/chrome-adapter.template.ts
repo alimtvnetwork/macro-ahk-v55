@@ -28,10 +28,12 @@ function makeChromeStorage(area: chrome.storage.StorageArea): KeyValueStore {
     return {
         async get<T>(key: string): Promise<T | undefined> {
             const result = await area.get(key);
+
             return result[key] as T | undefined;
         },
         async getMany<T extends Record<string, unknown>>(keys: readonly string[]): Promise<Partial<T>> {
             const result = await area.get([...keys]);
+
             return result as Partial<T>;
         },
         async set(key: string, value: unknown): Promise<void> {
@@ -67,6 +69,7 @@ const scripting: ScriptingApi = {
                 context: { tabId: target.tabId },
             });
         }
+
         return first.result as never;
     },
     async executeFile(target: ScriptingTarget, files: readonly string[]): Promise<void> {
@@ -100,12 +103,15 @@ const runtime: RuntimeApi = {
                 result.then(sendResponse).catch((err: unknown) => {
                     sendResponse({ error: AppError.isAppError(err) ? err.toJSON() : String(err) });
                 });
+
                 return true; // keep channel open for async response
             }
             sendResponse(result);
+
             return false;
         };
         chrome.runtime.onMessage.addListener(listener);
+
         return () => chrome.runtime.onMessage.removeListener(listener);
     },
     getURL(path: string): string {
@@ -121,6 +127,7 @@ function toSummary(tab: chrome.tabs.Tab): TabSummary | null {
     if (tab.url) {
         try { origin = new URL(tab.url).origin; } catch { origin = null; }
     }
+
     return {
         id: tab.id,
         url: tab.url ?? "",
@@ -137,6 +144,7 @@ const tabs: TabsApi = {
             currentWindow: filter.currentWindow,
             url: filter.url as string | string[] | undefined,
         });
+
         return result.map(toSummary).filter((t): t is TabSummary => t !== null);
     },
     async get(tabId) {
@@ -152,11 +160,13 @@ const tabs: TabsApi = {
             if (summary) handler(summary);
         };
         chrome.tabs.onUpdated.addListener(listener);
+
         return () => chrome.tabs.onUpdated.removeListener(listener);
     },
     onRemoved(handler) {
         const listener = (id: number) => handler(id);
         chrome.tabs.onRemoved.addListener(listener);
+
         return () => chrome.tabs.onRemoved.removeListener(listener);
     },
 };
@@ -173,6 +183,7 @@ const alarms: AlarmsApi = {
     onAlarm(handler) {
         const listener = (alarm: chrome.alarms.Alarm) => handler(alarm.name);
         chrome.alarms.onAlarm.addListener(listener);
+
         return () => chrome.alarms.onAlarm.removeListener(listener);
     },
 };
