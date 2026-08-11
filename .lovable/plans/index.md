@@ -18,7 +18,7 @@ Statuses: `pending` (in `pending/`), `in-progress`, `completed` (moved to `compl
 | 10 | [unified-billing-all-workspaces](./pending/10-unified-billing-all-workspaces.md) | [subtasks](./subtasks/10-unified-billing-all-workspaces/) | in-progress | 2026-07-15 |
 | 11 | [prompts-import-export-section](./pending/11-prompts-import-export-section.md) | - | superseded-by-12 | 2026-07-15 |
 | 12 | [prompts-import-export-menu](./completed/12-prompts-import-export-menu.md) | - | completed | 2026-07-15 |
-| 13 | [per-project-chat-submit-tracker](./pending/13-per-project-chat-submit-tracker.md) | - | pending | 2026-07-15 |
+| 13 | [per-project-chat-submit-tracker](./completed/13-per-project-chat-submit-tracker.md) | - | completed | 2026-07-15 |
 | 14 | [editable-plan-next-prompt-library](./completed/14-editable-plan-next-prompt-library.md) | [subtasks](./subtasks/14-editable-plan-next-prompt-library/) | completed | 2026-07-25 |
 | 102 | [ci-cd-bug-and-guidelines](./completed/102-ci-cd-bug-and-guidelines.md) | - | completed | 2026-08-08 |
 

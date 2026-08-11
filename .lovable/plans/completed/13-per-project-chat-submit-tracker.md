@@ -1,5 +1,5 @@
 Slug: per-project-chat-submit-tracker
-Status: pending
+Status: completed
 Created: 2026-07-17
 
 # Plan 13: Per-Project Chat-Submit Tracker (OPFS-backed, 300-cap rolling)
