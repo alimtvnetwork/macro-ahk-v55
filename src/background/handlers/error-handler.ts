@@ -15,6 +15,7 @@ import { setHealthState } from "../state-manager";
 import { getCurrentSessionId } from "./logging-handler";
 import type { SqlRow } from "./handler-types";
 import { bindOpt, bindReq } from "./handler-guards";
+import { ServiceResult } from '@/utils/result-wrapper';
 
 let dbManager: DbManager | null = null;
 
@@ -78,7 +79,7 @@ function queryUnresolvedErrors(db: ReturnType<typeof getErrorsDb>): SqlRow[] {
     return [];
   }
 
-  const stmt = db.prepare(
+  const stmtResult = ServiceResult.wrapDb(() => db.prepare(
     `SELECT
             Id as id,
             Timestamp as timestamp,
@@ -100,7 +101,12 @@ function queryUnresolvedErrors(db: ReturnType<typeof getErrorsDb>): SqlRow[] {
            AND SessionId = ?
          ORDER BY Timestamp DESC
          LIMIT 100`,
-  );
+  ));
+  if (stmtResult.isFail) {
+    return [];
+  }
+
+  const stmt = stmtResult.data!;
   stmt.bind([currentSessionId]);
 
   return collectRows(stmt);
@@ -140,7 +146,12 @@ export async function handleUserScriptError(
 function broadcastErrorCountChange(): void {
   try {
     const db = getErrorsDb();
-    const stmt = db.prepare("SELECT COUNT(*) as cnt FROM Errors WHERE Resolved = 0");
+    const stmtResult = ServiceResult.wrapDb(() => db.prepare("SELECT COUNT(*) as cnt FROM Errors WHERE Resolved = 0"));
+    if (stmtResult.isFail) {
+      return;
+    }
+
+    const stmt = stmtResult.data!;
     let count = 0;
     if (stmt.step()) {
       const row = stmt.getAsObject() as { cnt: number };
@@ -168,7 +179,11 @@ function broadcastErrorCountChange(): void {
 /** Marks all unresolved errors as resolved. */
 export async function handleClearErrors(): Promise<OkResponse> {
   const db = getErrorsDb();
-  db.run("UPDATE Errors SET Resolved = 1 WHERE Resolved = 0");
+  const res = ServiceResult.wrapDb(() => db.run("UPDATE Errors SET Resolved = 1 WHERE Resolved = 0"));
+  if (res.isFail) {
+    return { isOk: false, errorMessage: String(res.error) };
+  }
+
     dbManager!.markDirty();
     setHealthState("HEALTHY");
     broadcastErrorCountChange();
@@ -189,7 +204,7 @@ function insertUserScriptError(request: {
   const version = chrome.runtime.getManifest().version;
   const codeSnippet = request.scriptCode?.slice(0, 500) ?? null;
 
-  db.run(
+  const res = ServiceResult.wrapDb(() => db.run(
     `INSERT INTO Errors (SessionId, Timestamp, Level, Source, Category, ErrorCode, Message, StackTrace, ScriptId, ProjectId, ScriptFile, ExtVersion)
          VALUES ('', ?, 'ERROR', 'user-script', 'INJECTION', 'USER_SCRIPT_ERROR', ?, ?, ?, ?, ?, ?)`,
     [
@@ -201,5 +216,8 @@ function insertUserScriptError(request: {
       codeSnippet,
       bindReq(version, "0.0.0"),
     ],
-  );
+  ));
+  if (res.isFail) {
+    throw res.error;
+  }
 }

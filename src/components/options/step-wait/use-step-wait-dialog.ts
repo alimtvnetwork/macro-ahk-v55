@@ -139,7 +139,7 @@ export function useStepWaitDialog(args: Args) {
       return; 
     }
 
-    if (!validation.Ok) {
+    if (validation.Ok === false) {
       toast.error(validation.Reason);
 
       return; 
@@ -164,7 +164,7 @@ export function useStepWaitDialog(args: Args) {
       return; 
     }
 
-    if (!validation.Ok) {
+    if (validation.Ok === false) {
       setTestResult({ Kind: effectiveKind, TotalCount: 0, VisibleCount: 0, DurationMs: 0, Error: validation.Reason });
 
       return;

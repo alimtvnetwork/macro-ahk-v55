@@ -90,7 +90,7 @@ export function SelectorField(props: SelectorFieldProps) {
         onChange={(e) => setSelector(e.target.value)}
         className="font-mono text-sm"
       />
-      {!validation.Ok && <p className="text-xs text-destructive">{validation.Reason}</p>}
+      {validation.Ok === false && <p className="text-xs text-destructive">{validation.Reason}</p>}
       <p className="text-xs text-muted-foreground">
                 Auto-detect picks XPath when the expression starts with <code>/</code>,
         <code> ./</code>, <code>(/</code>, <code>(./</code>, or contains <code>//</code>.

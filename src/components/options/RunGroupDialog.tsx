@@ -60,7 +60,7 @@ export default function RunGroupDialog(props: RunGroupDialogProps): JSX.Element 
         <LiveModeToggle liveMode={liveMode} running={running} setLiveMode={setLiveMode} />
         {result === null && !running && <IdleBanner />}
         {running && <RunningBanner />}
-        {result !== null && !result.Ok && <FailureCard result={result} groupName={groupName} />}
+        {result !== null && result.Ok === false && <FailureCard result={result} groupName={groupName} />}
         {result !== null && summaryReports.length > 0 && (
           <RunResultsSummaryPanel
             reports={summaryReports}

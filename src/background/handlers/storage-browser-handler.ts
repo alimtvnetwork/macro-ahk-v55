@@ -18,6 +18,7 @@ import { collectRows } from "./logging-queries";
 import { reseedPrompts } from "./prompt-handler";
 import { logSampledDebug, BgLogTag } from "../bg-logger";
 import { DatabaseType } from "../../../standalone-scripts/macro-controller/src/types/enums";
+import { ServiceResult } from "@/utils/result-wrapper";
 
 /* ------------------------------------------------------------------ */
 /*  DbManager binding                                                  */
@@ -127,7 +128,7 @@ function probeTableEntry(name: string, isView: boolean): TableEntry {
   const primaryKeys = isView ? [] : (PRIMARY_KEYS[name] ?? ["id"]);
   try {
     const db = getDbForTable(name);
-    const result = db.exec(`SELECT COUNT(*) as cnt FROM ${name}`);
+    const result = ServiceResult.wrapDb(() => db.exec(`SELECT COUNT(*) as cnt FROM ${name}`));
     const rowCount = result.length > 0 && result[0].values.length > 0
       ? (result[0].values[0][0] as number)
       : 0;
@@ -195,7 +196,7 @@ export async function handleStorageGetSchema(
   // For views, use PRAGMA table_xinfo which works on views too
   const isView = BROWSABLE_VIEWS.has(table);
   const pragmaCmd = isView ? `PRAGMA table_xinfo(${table})` : `PRAGMA table_info(${table})`;
-  const result = db.exec(pragmaCmd);
+  const result = ServiceResult.wrapDb(() => db.exec(pragmaCmd));
 
   if (result.length === 0) {
     return { columns: [] };
@@ -222,17 +223,17 @@ export async function handleStorageQueryTable(
 
   const db = getDbForTable(table);
 
-  const countResult = db.exec(`SELECT COUNT(*) FROM ${table}`);
+  const countResult = ServiceResult.wrapDb(() => db.exec(`SELECT COUNT(*) FROM ${table}`));
   const total = countResult.length > 0 ? (countResult[0].values[0][0] as number) : 0;
 
-  const stmt = db.prepare(`SELECT * FROM ${table} LIMIT ? OFFSET ?`);
+  const stmt = ServiceResult.wrapDb(() => db.prepare(`SELECT * FROM ${table} LIMIT ? OFFSET ?`));
   stmt.bind([limit, offset]);
   const rows = collectRows(stmt);
 
   // For views, get columns from the query result or table_xinfo
   const isView = BROWSABLE_VIEWS.has(table);
   const pragmaCmd = isView ? `PRAGMA table_xinfo(${table})` : `PRAGMA table_info(${table})`;
-  const pragmaResult = db.exec(pragmaCmd);
+  const pragmaResult = ServiceResult.wrapDb(() => db.exec(pragmaCmd));
   const columns = pragmaResult.length > 0
     ? pragmaResult[0].values.map((r) => r[1] as string)
     : [];
@@ -276,7 +277,7 @@ export async function handleStorageUpdateRow(
   }
 
   const sql = `UPDATE ${table} SET ${setClauses.join(", ")} WHERE ${wheresClauses.join(" AND ")}`;
-  db.run(sql, params);
+  ServiceResult.wrapDb(() => db.run(sql, params));
   markDirty();
 
   return { isOk: true };
@@ -310,7 +311,7 @@ export async function handleStorageDeleteRow(
   }
 
   const sql = `DELETE FROM ${table} WHERE ${wheresClauses.join(" AND ")}`;
-  db.run(sql, params);
+  ServiceResult.wrapDb(() => db.run(sql, params));
   markDirty();
 
   return { isOk: true };
@@ -328,10 +329,10 @@ export async function handleStorageClearTable(
   assertValidTableOrView(table);
 
   const db = getDbForTable(table);
-  const countResult = db.exec(`SELECT COUNT(*) FROM ${table}`);
+  const countResult = ServiceResult.wrapDb(() => db.exec(`SELECT COUNT(*) FROM ${table}`));
   const deleted = countResult.length > 0 ? (countResult[0].values[0][0] as number) : 0;
 
-  db.run(`DELETE FROM ${table}`);
+  ServiceResult.wrapDb(() => db.run(`DELETE FROM ${table}`));
   markDirty();
 
   return { isOk: true, table, deleted };
@@ -344,7 +345,7 @@ export async function handleStorageClearAll(): Promise<{ isOk: true; cleared: st
   for (const table of BROWSABLE_TABLES) {
     try {
       const db = getDbForTable(table);
-      db.run(`DELETE FROM ${table}`);
+      ServiceResult.wrapDb(() => db.run(`DELETE FROM ${table}`));
       cleared.push(table);
     } catch (tableErr) {
       // Table may not exist in this schema version. Debug-only because

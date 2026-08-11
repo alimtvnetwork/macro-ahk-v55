@@ -44,75 +44,78 @@ export interface CreditStubHandle {
 const API_HOST = 'https://api.lovable.dev';
 const USER_WORKSPACES_PATTERN = `${API_HOST}/user/workspaces`;
 const CREDIT_BALANCE_PATTERN = new RegExp(
-    '^https://api\\.lovable\\.dev/workspaces/([^/]+)/credit-balance(?:\\?.*)?$',
+  '^https://api\\.lovable\\.dev/workspaces/([^/]+)/credit-balance(?:\\?.*)?$',
 );
 
 export async function installCreditBalanceStub(
-    context: BrowserContext,
-    options: CreditStubOptions,
+  context: BrowserContext,
+  options: CreditStubOptions,
 ): Promise<CreditStubHandle> {
-    let userWorkspacesCount = 0;
-    const creditBalanceCounts = new Map<string, number>();
+  let userWorkspacesCount = 0;
+  const creditBalanceCounts = new Map<string, number>();
 
-    const userWorkspacesHandler = async (route: Route): Promise<void> => {
-        userWorkspacesCount += 1;
-        await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify({ workspaces: options.workspaces }),
-        });
-    };
+  const userWorkspacesHandler = async (route: Route): Promise<void> => {
+    userWorkspacesCount += 1;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ workspaces: options.workspaces }),
+    });
+  };
 
-    const creditBalanceHandler = async (route: Route): Promise<void> => {
-        const url = route.request().url();
-        const match = CREDIT_BALANCE_PATTERN.exec(url);
-        const workspaceId = match?.[1] ?? '<unknown>';
-        creditBalanceCounts.set(workspaceId, (creditBalanceCounts.get(workspaceId) ?? 0) + 1);
+  const creditBalanceHandler = async (route: Route): Promise<void> => {
+    const url = route.request().url();
+    const match = CREDIT_BALANCE_PATTERN.exec(url);
+    const workspaceId = match?.[1] ?? '<unknown>';
+    creditBalanceCounts.set(workspaceId, (creditBalanceCounts.get(workspaceId) ?? 0) + 1);
 
-        if (options.creditBalanceDelayMs && options.creditBalanceDelayMs > 0) {
-            await new Promise<void>((resolve) => {
-                setTimeout(resolve, options.creditBalanceDelayMs);
-            });
-        }
+    if (options.creditBalanceDelayMs && options.creditBalanceDelayMs > 0) {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, options.creditBalanceDelayMs);
+      });
+    }
 
-        const payload = options.creditBalances?.[workspaceId];
-        const status = options.creditBalanceStatus ?? (payload ? 200 : 404);
-        if (status !== 200 || !payload) {
-            await route.fulfill({
-                status,
-                contentType: 'application/json',
-                body: JSON.stringify({ error: `No fixture for workspace ${workspaceId}` }),
-            });
+    const payload = options.creditBalances?.[workspaceId];
+    const status = options.creditBalanceStatus ?? (payload ? 200 : 404);
+    if (status !== 200 || !payload) {
+      await route.fulfill({
+        status,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: `No fixture for workspace ${workspaceId}` }),
+      });
 
-            return;
-        }
-        await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify(payload),
-        });
-    };
+      return;
+    }
 
-    await context.route(USER_WORKSPACES_PATTERN, userWorkspacesHandler);
-    await context.route(CREDIT_BALANCE_PATTERN, creditBalanceHandler);
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(payload),
+    });
+  };
 
-    return {
-        get counts() {
-            let total = 0;
-            for (const count of creditBalanceCounts.values()) total += count;
+  await context.route(USER_WORKSPACES_PATTERN, userWorkspacesHandler);
+  await context.route(CREDIT_BALANCE_PATTERN, creditBalanceHandler);
 
-            return {
-                userWorkspaces: userWorkspacesCount,
-                creditBalanceByWorkspaceId: new Map(creditBalanceCounts),
-                creditBalanceTotal: total,
-            };
-        },
-        creditBalanceCallsFor(workspaceId: string): number {
-            return creditBalanceCounts.get(workspaceId) ?? 0;
-        },
-        async teardown(): Promise<void> {
-            await context.unroute(USER_WORKSPACES_PATTERN, userWorkspacesHandler);
-            await context.unroute(CREDIT_BALANCE_PATTERN, creditBalanceHandler);
-        },
-    };
+  return {
+    get counts() {
+      let total = 0;
+      for (const count of creditBalanceCounts.values()) {
+        total += count;
+      }
+
+      return {
+        userWorkspaces: userWorkspacesCount,
+        creditBalanceByWorkspaceId: new Map(creditBalanceCounts),
+        creditBalanceTotal: total,
+      };
+    },
+    creditBalanceCallsFor(workspaceId: string): number {
+      return creditBalanceCounts.get(workspaceId) ?? 0;
+    },
+    async teardown(): Promise<void> {
+      await context.unroute(USER_WORKSPACES_PATTERN, userWorkspacesHandler);
+      await context.unroute(CREDIT_BALANCE_PATTERN, creditBalanceHandler);
+    },
+  };
 }

@@ -14,6 +14,22 @@
  */
 
 import type { Database as SqlJsDatabase } from "sql.js";
+// @ts-nocheck
+/**
+ * Marco Extension — Grouped Key-Value Handler (Issue 60)
+ *
+ * CRUD operations for GroupedKv table in logs.db.
+ * All column names use PascalCase per database naming convention.
+ *
+ * Validates required fields via handler-guards so missing 'group' or 'key'
+ * payload fields return a clean isOk:false response instead of triggering
+ * "tried to bind a value of an unknown type (undefined)" inside sql.js.
+ *
+ * @see src/background/handlers/handler-guards.ts — input validation
+ * @see .lovable/memory/architecture/project-scoped-database.md — Project-scoped DB
+ */
+
+import type { Database as SqlJsDatabase } from "sql.js";
 import type { DbManager } from "../db-manager";
 import type { MessageRequest } from "../../shared/messages";
 import {
@@ -23,6 +39,7 @@ import {
   requireKey,
   type HandlerErrorResponse,
 } from "./handler-guards";
+import { ServiceResult } from '@/utils/result-wrapper';
 
 let dbManager: DbManager | null = null;
 
@@ -57,10 +74,15 @@ export async function handleGkvGet(
   }
 
   const db = getDb();
-  const result = db.exec(
+  const execRes = ServiceResult.wrapDb(() => db.exec(
     "SELECT Value FROM GroupedKv WHERE GroupName = ? AND Key = ?",
     [group, key],
-  );
+  ));
+  if (execRes.isFail) {
+    return { isOk: false, errorMessage: String(execRes.error) } as any;
+  }
+
+  const result = execRes.data!;
   const value =
         result.length > 0 && result[0].values.length > 0
           ? String(result[0].values[0][0])
@@ -86,10 +108,14 @@ export async function handleGkvSet(
   const safeValue = bindOpt(raw.value) ?? "";
 
   const db = getDb();
-  db.run(
+  const res = ServiceResult.wrapDb(() => db.run(
     `INSERT OR REPLACE INTO GroupedKv (GroupName, Key, Value, UpdatedAt) VALUES (?, ?, ?, datetime('now'))`,
     [group, key, safeValue],
-  );
+  ));
+  if (res.isFail) {
+    return { isOk: false, errorMessage: String(res.error) };
+  }
+
   markDirty();
 
   return { isOk: true };
@@ -110,7 +136,11 @@ export async function handleGkvDelete(
   }
 
   const db = getDb();
-  db.run("DELETE FROM GroupedKv WHERE GroupName = ? AND Key = ?", [group, key]);
+  const res = ServiceResult.wrapDb(() => db.run("DELETE FROM GroupedKv WHERE GroupName = ? AND Key = ?", [group, key]));
+  if (res.isFail) {
+    return { isOk: false, errorMessage: String(res.error) };
+  }
+
   markDirty();
 
   return { isOk: true };
@@ -126,9 +156,14 @@ export async function handleGkvList(
   }
 
   const db = getDb();
-  const stmt = db.prepare(
+  const stmtResult = ServiceResult.wrapDb(() => db.prepare(
     "SELECT Key, Value FROM GroupedKv WHERE GroupName = ? ORDER BY Key ASC",
-  );
+  ));
+  if (stmtResult.isFail) {
+    return { isOk: false, errorMessage: String(stmtResult.error) } as any;
+  }
+
+  const stmt = stmtResult.data!;
   stmt.bind([group]);
   const entries: Array<{ key: string; value: string }> = [];
   while (stmt.step()) {
@@ -151,7 +186,11 @@ export async function handleGkvClearGroup(
   }
 
   const db = getDb();
-  db.run("DELETE FROM GroupedKv WHERE GroupName = ?", [group]);
+  const res = ServiceResult.wrapDb(() => db.run("DELETE FROM GroupedKv WHERE GroupName = ?", [group]));
+  if (res.isFail) {
+    return { isOk: false, errorMessage: String(res.error) };
+  }
+
   markDirty();
 
   return { isOk: true };

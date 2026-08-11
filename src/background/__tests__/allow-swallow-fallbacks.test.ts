@@ -216,8 +216,8 @@ describe("service-worker-main chrome.action fallback", () => {
     }).not.toThrow();
 
     expect((console.error as Mock).mock.calls.length).toBeGreaterThanOrEqual(1);
-    const firstCall = (console.error as Mock).mock.calls[0];
-    expect(String(firstCall[0])).toContain("[Marco]");
-    expect(String(firstCall[0])).toContain("chrome.action.setTitle failed");
+    const call = (console.error as Mock).mock.calls.find(c => String(c[0]).includes("chrome.action.setTitle failed"));
+    expect(call).toBeDefined();
+    expect(String(call![0])).toContain("[Marco]");
   });
 });

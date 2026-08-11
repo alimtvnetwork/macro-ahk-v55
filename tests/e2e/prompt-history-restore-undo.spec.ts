@@ -29,8 +29,8 @@ const __dirname = path.dirname(__filename);
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
 const HISTORY_PANEL_ENTRY = path.join(
-    REPO_ROOT,
-    'standalone-scripts/macro-controller/src/ui/prompt-history-panel.ts',
+  REPO_ROOT,
+  'standalone-scripts/macro-controller/src/ui/prompt-history-panel.ts',
 );
 
 const SLUG = 'plan-default';
@@ -40,64 +40,73 @@ let bundleSource = '';
 let browser: Browser | undefined;
 
 function resolveChromiumExecutable(): string | undefined {
-    const candidates = ['/usr/bin/chromium', '/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'];
-    for (const candidate of candidates) if (fs.existsSync(candidate)) return candidate;
+  const candidates = ['/usr/bin/chromium', '/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
 
-    return undefined;
+  return undefined;
 }
 
 test.beforeAll(async () => {
-    bundleSource = await bundleBrowserIife(REPO_ROOT, {
-        entryPoint: HISTORY_PANEL_ENTRY,
-        globalName: 'PromptHistoryPanelBundle',
-        footerJs: 'window.__promptHistoryPanel = PromptHistoryPanelBundle;',
-    });
-    browser = await chromium.launch({
-        headless: true,
-        executablePath: resolveChromiumExecutable(),
-    });
+  bundleSource = await bundleBrowserIife(REPO_ROOT, {
+    entryPoint: HISTORY_PANEL_ENTRY,
+    globalName: 'PromptHistoryPanelBundle',
+    footerJs: 'window.__promptHistoryPanel = PromptHistoryPanelBundle;',
+  });
+  browser = await chromium.launch({
+    headless: true,
+    executablePath: resolveChromiumExecutable(),
+  });
 });
 
 test.afterAll(async () => {
-    if (browser) await browser.close();
+  if (browser) {
+    await browser.close();
+  }
 });
 
 async function newHarnessPage(): Promise<Page> {
-    if (!browser) throw new Error('browser not initialized');
-    const context = await browser.newContext();
-    const page = await context.newPage();
+  if (!browser) {
+    throw new Error('browser not initialized');
+  }
 
-    await page.addInitScript(() => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  await page.addInitScript(() => {
         interface RuntimeMessage { type?: string; method?: string; params?: { sql?: string } }
         interface RuntimeResponse { isOk: boolean; rows?: Array<Record<string, unknown>>; lastInsertId?: number }
         const calls: Array<{ type: string; method?: string; sql?: string }> = [];
         (globalThis as typeof globalThis & { __calls: typeof calls }).__calls = calls;
         (globalThis as typeof globalThis & { chrome: unknown }).chrome = {
-            runtime: {
-                lastError: null,
-                sendMessage: (message: RuntimeMessage, callback: (response: RuntimeResponse) => void) => {
-                    const sql = message.params?.sql ?? '';
-                    calls.push({ type: String(message.type ?? ''), method: message.method, sql });
-                    setTimeout(() => callback({ isOk: true, rows: [], lastInsertId: 999 }), 0);
-                },
+          runtime: {
+            lastError: null,
+            sendMessage: (message: RuntimeMessage, callback: (response: RuntimeResponse) => void) => {
+              const sql = message.params?.sql ?? '';
+              calls.push({ type: String(message.type ?? ''), method: message.method, sql });
+              setTimeout(() => callback({ isOk: true, rows: [], lastInsertId: 999 }), 0);
             },
+          },
         };
-    });
+  });
 
-    await page.route('**/*', (route) => {
-        route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><html><body></body></html>' });
-    });
-    await page.goto('https://prompt-history-restore-undo-harness.test/');
-    await page.addScriptTag({ content: bundleSource });
+  await page.route('**/*', (route) => {
+    route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><html><body></body></html>' });
+  });
+  await page.goto('https://prompt-history-restore-undo-harness.test/');
+  await page.addScriptTag({ content: bundleSource });
 
-    return page;
+  return page;
 }
 
 test.describe('prompt history restore undo round-trip', () => {
-    test('Restore then Undo returns list to prior row count and imported badges', async () => {
-        const page = await newHarnessPage();
+  test('Restore then Undo returns list to prior row count and imported badges', async () => {
+    const page = await newHarnessPage();
 
-        await page.evaluate(async ({ slug, role }) => {
+    await page.evaluate(async ({ slug, role }) => {
             interface RevRow {
                 Id: number; PromptId: number; Slug: string; Name: string; Body: string;
                 Role: string; ReplaceKey: string; ReplaceValues: string; CreatedAt: number; Reason: string;
@@ -105,11 +114,11 @@ test.describe('prompt history restore undo round-trip', () => {
             interface DbOk<T> { ok: boolean; value?: T; error?: string }
 
             const revisions: RevRow[] = [
-                { Id: 92, PromptId: 7, Slug: slug, Name: 'PlanTierType default', Body: 'v2 body', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_100_000, Reason: 'upsert' },
-                { Id: 91, PromptId: 7, Slug: slug, Name: 'PlanTierType default', Body: 'v1 body', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_000_000, Reason: 'upsert' },
-                { Id: 103, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'imported C', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_400_000, Reason: 'import' },
-                { Id: 102, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'imported B', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_300_000, Reason: 'import' },
-                { Id: 101, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'imported A', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_200_000, Reason: 'import' },
+              { Id: 92, PromptId: 7, Slug: slug, Name: 'PlanTierType default', Body: 'v2 body', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_100_000, Reason: 'upsert' },
+              { Id: 91, PromptId: 7, Slug: slug, Name: 'PlanTierType default', Body: 'v1 body', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_000_000, Reason: 'upsert' },
+              { Id: 103, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'imported C', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_400_000, Reason: 'import' },
+              { Id: 102, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'imported B', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_300_000, Reason: 'import' },
+              { Id: 101, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'imported A', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_200_000, Reason: 'import' },
             ];
 
             interface UpsertArgs {
@@ -118,44 +127,45 @@ test.describe('prompt history restore undo round-trip', () => {
                 previousBody?: string; previousReplaceKey?: string;
             }
             const state = {
-                upsertCalls: [] as UpsertArgs[],
-                currentBody: 'live body BEFORE restore',
-                currentReplaceKey: 'n',
-                currentReplaceValues: ['1', '2', '3'] as string[],
-                currentId: 7,
+              upsertCalls: [] as UpsertArgs[],
+              currentBody: 'live body BEFORE restore',
+              currentReplaceKey: 'n',
+              currentReplaceValues: ['1', '2', '3'] as string[],
+              currentId: 7,
             };
             (window as unknown as { __state: typeof state }).__state = state;
 
             const listRevisions = async (): Promise<DbOk<RevRow[]>> => ({ ok: true, value: revisions.slice() });
             const listByRole = async (): Promise<DbOk<Array<Record<string, unknown>>>> => ({
-                ok: true,
-                value: [{
-                    Id: state.currentId,
-                    Slug: slug,
-                    Name: 'PlanTierType default',
-                    Body: state.currentBody,
-                    Role: role,
-                    ReplaceKey: state.currentReplaceKey,
-                    ReplaceValues: state.currentReplaceValues.slice(),
-                }],
+              ok: true,
+              value: [{
+                Id: state.currentId,
+                Slug: slug,
+                Name: 'PlanTierType default',
+                Body: state.currentBody,
+                Role: role,
+                ReplaceKey: state.currentReplaceKey,
+                ReplaceValues: state.currentReplaceValues.slice(),
+              }],
             });
             const upsert = async (args: UpsertArgs): Promise<DbOk<number>> => {
-                state.upsertCalls.push(args);
-                state.currentBody = args.body;
-                state.currentReplaceKey = args.replaceKey;
-                state.currentReplaceValues = args.replaceValues.slice();
+              state.upsertCalls.push(args);
+              state.currentBody = args.body;
+              state.currentReplaceKey = args.replaceKey;
+              state.currentReplaceValues = args.replaceValues.slice();
 
-                return { ok: true, value: args.id ?? state.currentId };
+              return { ok: true, value: args.id ?? state.currentId };
             };
+
             const confirmFn = (): boolean => true;
 
             (window as unknown as { __deps: unknown }).__deps = {
-                listRevisions,
-                listByRole,
-                upsert,
-                confirmFn,
-                // Deliberately do NOT stub `undoToast` so the real
-                // showUndoToast renders and we can click the DOM button.
+              listRevisions,
+              listByRole,
+              upsert,
+              confirmFn,
+              // Deliberately do NOT stub `undoToast` so the real
+              // showUndoToast renders and we can click the DOM button.
             };
 
             interface HistoryApi {
@@ -166,68 +176,68 @@ test.describe('prompt history restore undo round-trip', () => {
             }
             const api = (window as unknown as { __promptHistoryPanel: HistoryApi }).__promptHistoryPanel;
             await api.openPromptHistoryPanel({ role, slug }, (window as unknown as { __deps: unknown }).__deps);
-        }, { slug: SLUG, role: ROLE });
+    }, { slug: SLUG, role: ROLE });
 
-        const panel = page.locator('#marco-prompt-history-panel');
+    const panel = page.locator('#marco-prompt-history-panel');
 
-        // Prior state: capture row count + imported badge count.
-        const rowsBefore = await panel.locator('[data-role="revision-row"]').count();
-        const badgesBefore = await panel.locator('[data-role="imported-badge"]').count();
-        expect(rowsBefore).toBe(5);
-        expect(badgesBefore).toBe(3);
+    // Prior state: capture row count + imported badge count.
+    const rowsBefore = await panel.locator('[data-role="revision-row"]').count();
+    const badgesBefore = await panel.locator('[data-role="imported-badge"]').count();
+    expect(rowsBefore).toBe(5);
+    expect(badgesBefore).toBe(3);
 
-        // Click Restore on the row for revision Id=92 ("v2 body"). Selecting
-        // an explicit row keeps the assertion stable regardless of default
-        // sort order (newest CreatedAt first).
-        await panel.locator('[data-role="revision-row"][data-revision-id="92"]')
-            .locator('button[data-action="restore-revision"]').click();
+    // Click Restore on the row for revision Id=92 ("v2 body"). Selecting
+    // an explicit row keeps the assertion stable regardless of default
+    // sort order (newest CreatedAt first).
+    await panel.locator('[data-role="revision-row"][data-revision-id="92"]')
+      .locator('button[data-action="restore-revision"]').click();
 
-        // Undo toast is present with the id chip and Undo button.
-        const undoToast = page.locator('[data-testid="undo-toast"]');
-        await expect(undoToast).toBeVisible();
-        await expect(undoToast.locator('[data-testid="undo-toast-restored-id"]')).toHaveText('#7');
-        const undoBtn = undoToast.locator('[data-testid="undo-toast-action"]');
-        await expect(undoBtn).toHaveText('Undo restore');
+    // Undo toast is present with the id chip and Undo button.
+    const undoToast = page.locator('[data-testid="undo-toast"]');
+    await expect(undoToast).toBeVisible();
+    await expect(undoToast.locator('[data-testid="undo-toast-restored-id"]')).toHaveText('#7');
+    const undoBtn = undoToast.locator('[data-testid="undo-toast-action"]');
+    await expect(undoBtn).toHaveText('Undo restore');
 
-        // Restore issued exactly one upsert with the revision body.
-        await expect.poll(async () =>
-            page.evaluate(() => (window as unknown as {
+    // Restore issued exactly one upsert with the revision body.
+    await expect.poll(async () =>
+      page.evaluate(() => (window as unknown as {
                 __state: { upsertCalls: Array<{ body: string }> };
             }).__state.upsertCalls.length),
-        ).toBe(1);
-        const afterRestore = await page.evaluate(() => (window as unknown as {
+    ).toBe(1);
+    const afterRestore = await page.evaluate(() => (window as unknown as {
             __state: { upsertCalls: Array<{ body: string }>; currentBody: string };
         }).__state);
-        expect(afterRestore.upsertCalls[0]?.body).toBe('v2 body');
-        expect(afterRestore.currentBody).toBe('v2 body');
+    expect(afterRestore.upsertCalls[0]?.body).toBe('v2 body');
+    expect(afterRestore.currentBody).toBe('v2 body');
 
-        // Click Undo. The onUndo wires a revert upsert back to the pre-image.
-        await undoBtn.click();
+    // Click Undo. The onUndo wires a revert upsert back to the pre-image.
+    await undoBtn.click();
 
-        await expect.poll(async () =>
-            page.evaluate(() => (window as unknown as {
+    await expect.poll(async () =>
+      page.evaluate(() => (window as unknown as {
                 __state: { upsertCalls: Array<unknown> };
             }).__state.upsertCalls.length),
-        ).toBe(2);
-        const afterUndo = await page.evaluate(() => (window as unknown as {
+    ).toBe(2);
+    const afterUndo = await page.evaluate(() => (window as unknown as {
             __state: { upsertCalls: Array<{ body: string }>; currentBody: string };
         }).__state);
-        expect(afterUndo.upsertCalls[1]?.body).toBe('live body BEFORE restore');
-        expect(afterUndo.currentBody).toBe('live body BEFORE restore');
+    expect(afterUndo.upsertCalls[1]?.body).toBe('live body BEFORE restore');
+    expect(afterUndo.currentBody).toBe('live body BEFORE restore');
 
-        // Reopen the panel and confirm prior state is preserved.
-        await page.evaluate(async ({ slug, role }) => {
+    // Reopen the panel and confirm prior state is preserved.
+    await page.evaluate(async ({ slug, role }) => {
             interface HistoryApi {
                 openPromptHistoryPanel: (input: { role: string; slug: string }, deps: unknown) => Promise<void>;
             }
             const api = (window as unknown as { __promptHistoryPanel: HistoryApi }).__promptHistoryPanel;
             await api.openPromptHistoryPanel({ role, slug }, (window as unknown as { __deps: unknown }).__deps);
-        }, { slug: SLUG, role: ROLE });
+    }, { slug: SLUG, role: ROLE });
 
-        const panelAfter = page.locator('#marco-prompt-history-panel');
-        await expect(panelAfter.locator('[data-role="revision-row"]')).toHaveCount(rowsBefore);
-        await expect(panelAfter.locator('[data-role="imported-badge"]')).toHaveCount(badgesBefore);
+    const panelAfter = page.locator('#marco-prompt-history-panel');
+    await expect(panelAfter.locator('[data-role="revision-row"]')).toHaveCount(rowsBefore);
+    await expect(panelAfter.locator('[data-role="imported-badge"]')).toHaveCount(badgesBefore);
 
-        await page.context().close();
-    });
+    await page.context().close();
+  });
 });

@@ -151,7 +151,7 @@ describe("fetchInputSource, network paths", () => {
     );
     const r = await fetchInputSource({ config: config, fetchImpl });
     expect(r.Ok).toBe(false);
-    if (!r.Ok) {
+    if (r.Ok === false) {
       expect(r.Error).toContain("Expected a JSON object");
     }
   });
@@ -162,7 +162,7 @@ describe("fetchInputSource, network paths", () => {
     );
     const r = await fetchInputSource({ config: config, fetchImpl });
     expect(r.Ok).toBe(false);
-    if (!r.Ok) {
+    if (r.Ok === false) {
       expect(r.Error).toContain("not valid JSON");
     }
   });
@@ -176,7 +176,7 @@ describe("fetchInputSource, network paths", () => {
       fetchImpl,
     });
     expect(r.Ok).toBe(false);
-    if (!r.Ok) {
+    if (r.Ok === false) {
       expect(r.Status).toBe(500);
       expect(r.Continue).toBe(true);
     }
@@ -193,7 +193,7 @@ describe("fetchInputSource, network paths", () => {
       fetchImpl,
     });
     expect(r.Ok).toBe(false);
-    if (!r.Ok) {
+    if (r.Ok === false) {
       expect(r.Error).toContain("timed out after 1500");
     }
   });

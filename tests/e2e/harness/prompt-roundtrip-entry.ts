@@ -7,9 +7,9 @@
  * `page.addScriptTag`.
  */
 export {
-    exportPromptsToJson,
-    performPromptImport,
-    parsePromptsText,
+  exportPromptsToJson,
+  performPromptImport,
+  parsePromptsText,
 } from '../../../standalone-scripts/macro-controller/src/ui/prompt-io';
 export { writeJsonCopy, readJsonCopy } from '../../../standalone-scripts/macro-controller/src/ui/prompt-cache';
 export { openPromptHistoryPanel } from '../../../standalone-scripts/macro-controller/src/ui/prompt-history-panel';

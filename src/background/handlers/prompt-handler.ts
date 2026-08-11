@@ -15,6 +15,7 @@
  */
 
 import type { Database as SqlJsDatabase } from "sql.js";
+import { ServiceResult } from "../../utils/result-wrapper";
 import type { DbManager } from "../db-manager";
 import { logBgError, logCaughtError, logSampledDebug, BgLogTag} from "../bg-logger";
 import { bindOpt, missingFieldError, requireField, type HandlerErrorResponse } from "./handler-guards";
@@ -77,14 +78,14 @@ function markDirty(): void {
 
 function runOptionalSchemaUpdate(db: SqlJsDatabase, sql: string, message: string): void {
   try {
-    db.run(sql);
+    ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run(sql)));
   } catch (error) {
     console.debug(message, error);
   }
 }
 
 function ensurePromptCoreTables(db: SqlJsDatabase): void {
-  db.run(`
+  ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run(`
         CREATE TABLE IF NOT EXISTS Prompts (
             Id         INTEGER PRIMARY KEY AUTOINCREMENT,
             Slug       TEXT UNIQUE,
@@ -97,16 +98,16 @@ function ensurePromptCoreTables(db: SqlJsDatabase): void {
             CreatedAt  TEXT NOT NULL,
             UpdatedAt  TEXT NOT NULL
         )
-    `);
-  db.run(`
+    `)));
+  ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run(`
         CREATE TABLE IF NOT EXISTS PromptsCategory (
             Id        INTEGER PRIMARY KEY AUTOINCREMENT,
             Name      TEXT NOT NULL UNIQUE,
             SortOrder INTEGER DEFAULT 0,
             CreatedAt TEXT NOT NULL
         )
-    `);
-  db.run(`
+    `)));
+  ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run(`
         CREATE TABLE IF NOT EXISTS PromptsToCategory (
             Id         INTEGER PRIMARY KEY AUTOINCREMENT,
             PromptId   INTEGER NOT NULL,
@@ -115,11 +116,11 @@ function ensurePromptCoreTables(db: SqlJsDatabase): void {
             FOREIGN KEY (CategoryId) REFERENCES PromptsCategory(Id) ON DELETE CASCADE,
             UNIQUE (PromptId, CategoryId)
         )
-    `);
+    `)));
 }
 
 function createPromptsDetailsView(db: SqlJsDatabase): void {
-  db.run(`CREATE VIEW IF NOT EXISTS PromptsDetails AS
+  ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run(`CREATE VIEW IF NOT EXISTS PromptsDetails AS
         SELECT
             p.Id AS PromptId, p.Slug AS Slug, p.Name AS Title, p.Text AS Content,
             p.Version AS Version, p.SortOrder AS SortOrder,
@@ -129,7 +130,7 @@ function createPromptsDetailsView(db: SqlJsDatabase): void {
         FROM Prompts p
         LEFT JOIN PromptsToCategory ptc ON ptc.PromptId = p.Id
         LEFT JOIN PromptsCategory pc ON pc.Id = ptc.CategoryId
-        GROUP BY p.Id`);
+        GROUP BY p.Id`)));
 }
 
 function ensurePromptSchemaMigrations(db: SqlJsDatabase): void {
@@ -141,7 +142,7 @@ function ensurePromptSchemaMigrations(db: SqlJsDatabase): void {
 
 function recreatePromptsDetailsView(db: SqlJsDatabase): void {
   try {
-    db.run("DROP VIEW IF EXISTS PromptsDetails");
+    ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run("DROP VIEW IF EXISTS PromptsDetails")));
     createPromptsDetailsView(db);
   } catch (error) {
     console.debug("[prompts] recreate PromptsDetails view skipped:", error);
@@ -163,17 +164,17 @@ function ensureCategoryId(categoryName: string): string {
     return "";
   }
 
-  const existing = db.exec("SELECT Id FROM PromptsCategory WHERE Name = ?", [trimmed]);
+  const existing = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.exec("SELECT Id FROM PromptsCategory WHERE Name = ?", [trimmed])).data!).data!;
   if (existing.length > 0 && existing[0].values.length > 0) {
     return String(existing[0].values[0][0]);
   }
 
   const now = new Date().toISOString();
-  db.run(
+  ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run(
     "INSERT INTO PromptsCategory (Name, SortOrder, CreatedAt) VALUES (?, 0, ?)",
     [trimmed, now],
-  );
-  const result = db.exec("SELECT last_insert_rowid()");
+  )));
+  const result = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.exec("SELECT last_insert_rowid()")).data!).data!;
 
   return String(result[0].values[0][0]);
 }
@@ -199,10 +200,10 @@ function linkPromptToCategory(promptId: string, categoryId: string): void {
 
   const db = getDb();
   try {
-    db.run(
+    ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run(
       "INSERT OR IGNORE INTO PromptsToCategory (PromptId, CategoryId) VALUES (?, ?)",
       [Number(promptId), Number(categoryId)],
-    );
+    )));
   } catch (linkErr) {
     // Already linked — INSERT OR IGNORE should prevent this, but log debug
     // so unexpected SQL failures (FK violation, schema drift) are recoverable.
@@ -246,7 +247,7 @@ function rowToPrompt(row: Record<string, unknown>): PromptEntry {
 function queryAllPromptsViaView(): PromptEntry[] {
   const db = getDb();
   try {
-    const stmt = db.prepare("SELECT * FROM PromptsDetails ORDER BY SortOrder ASC");
+    const stmt = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.prepare("SELECT * FROM PromptsDetails ORDER BY SortOrder ASC")).data!).data!;
     const results: PromptEntry[] = [];
     while (stmt.step()) {
       results.push(rowToPrompt(stmt.getAsObject()));
@@ -270,7 +271,7 @@ function queryAllPromptsViaView(): PromptEntry[] {
 
 function queryAllPromptsDirect(): PromptEntry[] {
   const db = getDb();
-  const stmt = db.prepare("SELECT * FROM Prompts ORDER BY SortOrder ASC");
+  const stmt = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.prepare("SELECT * FROM Prompts ORDER BY SortOrder ASC")).data!).data!;
   const results: PromptEntry[] = [];
   while (stmt.step()) {
     results.push(rowToPrompt(stmt.getAsObject()));
@@ -283,7 +284,7 @@ function queryAllPromptsDirect(): PromptEntry[] {
 
 function queryAllCustomPrompts(): PromptEntry[] {
   const db = getDb();
-  const stmt = db.prepare("SELECT * FROM Prompts WHERE IsDefault = 0 ORDER BY SortOrder ASC");
+  const stmt = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.prepare("SELECT * FROM Prompts WHERE IsDefault = 0 ORDER BY SortOrder ASC")).data!).data!;
   const results: PromptEntry[] = [];
   while (stmt.step()) {
     results.push(rowToPrompt(stmt.getAsObject()));
@@ -310,7 +311,7 @@ async function migrateFromStorageIfNeeded(): Promise<void> {
     await seedDefaultPromptsIfEmpty();
 
     const db = getDb();
-    const countResult = db.exec("SELECT COUNT(*) as cnt FROM Prompts WHERE IsDefault = 0");
+    const countResult = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.exec("SELECT COUNT(*) as cnt FROM Prompts WHERE IsDefault = 0")).data!).data!;
     const existingCount = countResult.length > 0 ? Number(countResult[0].values[0][0]) : 0;
     if (existingCount > 0) {
       return;
@@ -365,10 +366,10 @@ function insertPromptRow(prompt: PromptEntry): void {
   const existingId = findExistingDefaultPromptId(slug, legacySlug);
   if (existingId !== null) {
     // Already seeded — update instead
-    db.run(
+    ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run(
       `UPDATE Prompts SET Slug = ?, Name = ?, Text = ?, Version = ?, SortOrder = ?, IsDefault = ?, IsFavorite = ?, UpdatedAt = ? WHERE Id = ?`,
       [bindOpt(slug), bindOpt(prompt.name) ?? "Untitled", bindOpt(prompt.text) ?? "", bindOpt(prompt.version) ?? "1.0.0", prompt.order ?? 0, prompt.isDefault ? 1 : 0, prompt.isFavorite ? 1 : 0, bindOpt(prompt.updatedAt) ?? now, existingId],
-    );
+    )));
     const promptId = String(existingId);
     const category = prompt.category || "";
     if (category) {
@@ -379,7 +380,7 @@ function insertPromptRow(prompt: PromptEntry): void {
     return;
   }
 
-  db.run(
+  ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run(
     `INSERT INTO Prompts (Slug, Name, Text, Version, SortOrder, IsDefault, IsFavorite, CreatedAt, UpdatedAt)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
@@ -393,9 +394,9 @@ function insertPromptRow(prompt: PromptEntry): void {
       bindOpt(prompt.createdAt) ?? now,
       bindOpt(prompt.updatedAt) ?? now,
     ],
-  );
+  )));
 
-  const result = db.exec("SELECT last_insert_rowid()");
+  const result = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.exec("SELECT last_insert_rowid()")).data!).data!;
   const promptId = String(result[0].values[0][0]);
 
   // Handle category via junction table
@@ -423,7 +424,7 @@ const PROMPTS_SEED_VERSION_KEY = "marco_prompts_seed_version";
  */
 async function seedDefaultPromptsIfEmpty(): Promise<void> {
   const db = getDb();
-  const countResult = db.exec("SELECT COUNT(*) FROM Prompts");
+  const countResult = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.exec("SELECT COUNT(*) FROM Prompts")).data!).data!;
   const count = countResult.length > 0 ? Number(countResult[0].values[0][0]) : 0;
 
   const defaults = (await loadBundledDefaultPrompts()) ?? getFallbackDefaultPrompts();
@@ -621,7 +622,7 @@ export async function handleSavePrompt(payload: { prompt: Partial<PromptEntry> }
   let promptId = input.prompt.id;
   let exists = false;
   if (promptId) {
-    const existingResult = db.exec("SELECT Id FROM Prompts WHERE Id = ?", [Number(promptId)]);
+    const existingResult = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.exec("SELECT Id FROM Prompts WHERE Id = ?", [Number(promptId)])).data!).data!;
     exists = existingResult.length > 0 && existingResult[0].values.length > 0;
   }
 
@@ -652,18 +653,18 @@ export async function handleSavePrompt(payload: { prompt: Partial<PromptEntry> }
     setClauses.push("UpdatedAt = ?"); values.push(now);
     values.push(Number(promptId));
 
-    db.run(`UPDATE Prompts SET ${setClauses.join(", ")} WHERE Id = ?`, values);
+    ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run(`UPDATE Prompts SET ${setClauses.join(", ")} WHERE Id = ?`, values)));
 
     // Update category via junction table if provided
     if (input.prompt.category !== undefined) {
-      db.run("DELETE FROM PromptsToCategory WHERE PromptId = ?", [Number(promptId)]);
+      ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run("DELETE FROM PromptsToCategory WHERE PromptId = ?", [Number(promptId)])));
       if (input.prompt.category) {
         const categoryId = ensureCategoryId(input.prompt.category);
         linkPromptToCategory(promptId, categoryId);
       }
     }
   } else {
-    db.run(
+    ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run(
       `INSERT INTO Prompts (Name, Text, Version, SortOrder, IsDefault, IsFavorite, Tags, CreatedAt, UpdatedAt)
              VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?)`,
       [
@@ -676,10 +677,14 @@ export async function handleSavePrompt(payload: { prompt: Partial<PromptEntry> }
         now,
         now,
       ],
-    );
+    )));
 
-    const result = db.exec("SELECT last_insert_rowid()");
-    promptId = String(result[0].values[0][0]);
+    const result = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.exec("SELECT last_insert_rowid()")).data!).data!);
+    if (result.Ok === false) {
+      throw new Error(String(result.error));
+    }
+
+    promptId = String(result.data![0].values[0][0]);
 
     // Link category
     if (input.prompt.category) {
@@ -690,7 +695,7 @@ export async function handleSavePrompt(payload: { prompt: Partial<PromptEntry> }
 
   markDirty();
 
-  const saved = db.exec("SELECT * FROM Prompts WHERE Id = ?", [Number(promptId)]);
+  const saved = ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.exec("SELECT * FROM Prompts WHERE Id = ?", [Number(promptId)])).data!).data!;
   const row = saved.length > 0 && saved[0].values.length > 0
     ? Object.fromEntries(saved[0].columns.map((col, i) => [col, saved[0].values[0][i]]))
     : { Id: Number(promptId), Name: input.prompt.name ?? "Untitled", Text: input.prompt.text ?? "", SortOrder: 0, IsDefault: 0, IsFavorite: 0, CreatedAt: now, UpdatedAt: now };
@@ -721,8 +726,8 @@ export async function handleDeletePrompt(payload: { promptId: string }): Promise
   }
 
   const db = getDb();
-  db.run("DELETE FROM PromptsToCategory WHERE PromptId = ?", [numId]);
-  db.run("DELETE FROM Prompts WHERE Id = ?", [numId]);
+  ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run("DELETE FROM PromptsToCategory WHERE PromptId = ?", [numId])));
+  ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run("DELETE FROM Prompts WHERE Id = ?", [numId])));
   if (db.getRowsModified() < 1) {
     return promptDeleteError(numId, "no rows deleted", candidate.name);
   }
@@ -771,7 +776,7 @@ export async function handleReorderPrompts(payload: { promptIds: string[] }): Pr
       continue;
     }
 
-    db.run("UPDATE Prompts SET SortOrder = ? WHERE Id = ?", [i, numId]);
+    ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run("UPDATE Prompts SET SortOrder = ? WHERE Id = ?", [i, numId])));
   }
 
   markDirty();
@@ -783,9 +788,9 @@ export async function handleReorderPrompts(payload: { promptIds: string[] }): Pr
 export async function reseedPrompts(): Promise<void> {
   ensurePromptsTable();
   const db = getDb();
-  db.run("DELETE FROM PromptsToCategory");
-  db.run("DELETE FROM Prompts");
-  db.run("DELETE FROM PromptsCategory");
+  ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run("DELETE FROM PromptsToCategory")));
+  ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run("DELETE FROM Prompts")));
+  ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run("DELETE FROM PromptsCategory")));
 
   bundledDefaultsCache = null;
   const defaults = (await loadBundledDefaultPrompts()) ?? getFallbackDefaultPrompts();

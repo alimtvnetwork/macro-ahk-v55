@@ -8,6 +8,7 @@
  */
 
 import type { SqlRow } from "./handler-types";
+import { ServiceResult } from "../../utils/result-wrapper";
 
 /* ------------------------------------------------------------------ */
 /*  Row Collection                                                     */
@@ -50,7 +51,12 @@ export function countTable(
     throw new Error(`[SQL safety] Table name "${table}" not in allowlist`);
   }
 
-  const result = db.exec(`SELECT COUNT(*) as cnt FROM ${table}`);
+  const resultWrap = ServiceResult.wrapDb(() => db.exec(`SELECT COUNT(*) as cnt FROM ${table}`));
+  if (resultWrap.ok === false) {
+    throw resultWrap.error;
+  }
+
+  const result = resultWrap.data ?? [];
   const hasResult = result.length > 0 && result[0].values.length > 0;
 
   return hasResult ? (result[0].values[0][0] as number) : 0;
@@ -72,9 +78,9 @@ interface PreparedDb {
 
 /** Queries logs filtered by source. */
 export function queryWithSource(db: PreparedDb, source: string, limit: number): SqlRow[] {
-  const stmt = db.prepare(
+  const stmt = ServiceResult.wrapDb(() => db.prepare(
     "SELECT * FROM Logs WHERE Source = ? ORDER BY Timestamp DESC LIMIT ?",
-  );
+  )).data!;
   stmt.bind([source, limit]);
 
   return collectRows(stmt);
@@ -82,7 +88,7 @@ export function queryWithSource(db: PreparedDb, source: string, limit: number): 
 
 /** Queries all logs without filter. */
 export function queryAll(db: PreparedDb, limit: number): SqlRow[] {
-  const stmt = db.prepare("SELECT * FROM Logs ORDER BY Timestamp DESC LIMIT ?");
+  const stmt = ServiceResult.wrapDb(() => db.prepare("SELECT * FROM Logs ORDER BY Timestamp DESC LIMIT ?")).data!;
   stmt.bind([limit]);
 
   return collectRows(stmt);

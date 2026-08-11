@@ -147,7 +147,9 @@ interface CaptureResult {
 async function capture(page: Page, selector: string): Promise<CaptureResult> {
   return page.evaluate((sel) => {
     const el = document.querySelector(sel);
-    if (!el) throw new Error('Fixture element missing: ' + sel);
+    if (!el) {
+      throw new Error('Fixture element missing: ' + sel);
+    }
 
     return (window as unknown as { __XPathStrategies: { generate: (e: Element) => CaptureResult } })
       .__XPathStrategies.generate(el);
@@ -162,7 +164,9 @@ async function captureRelative(
   return page.evaluate(({ sel, anc }) => {
     const el = document.querySelector(sel);
     const an = document.querySelector(anc);
-    if (!el || !an) throw new Error('Fixture element missing');
+    if (!el || !an) {
+      throw new Error('Fixture element missing');
+    }
 
     return (window as unknown as { __XPathStrategies: { generateRelative: (e: Element, a: Element) => CaptureResult } })
       .__XPathStrategies.generateRelative(el, an);
@@ -172,7 +176,10 @@ async function captureRelative(
 async function captureVariableName(page: Page, selector: string): Promise<string> {
   return page.evaluate((sel) => {
     const el = document.querySelector(sel);
-    if (!el) throw new Error('Fixture element missing: ' + sel);
+    if (!el) {
+      throw new Error('Fixture element missing: ' + sel);
+    }
+
     const api = (window as unknown as { __XPathStrategies: { deriveLabel: (e: Element) => string; pascalCase: (s: string) => string } })
       .__XPathStrategies;
 

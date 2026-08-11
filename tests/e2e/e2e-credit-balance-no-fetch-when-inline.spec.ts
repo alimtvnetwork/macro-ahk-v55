@@ -2,9 +2,9 @@ import { test, expect, chromium } from '@playwright/test';
 import { launchExtension, getExtensionId, openOptions } from './fixtures';
 import { installCreditBalanceStub } from './utils/credit-balance-stub';
 import {
-    INLINE_PRO_WORKSPACE,
-    KTLO_WORKSPACE,
-    KTLO_CREDIT_BALANCE,
+  INLINE_PRO_WORKSPACE,
+  KTLO_WORKSPACE,
+  KTLO_CREDIT_BALANCE,
 } from './fixtures/credit-balance/workspaces';
 
 /**
@@ -15,9 +15,11 @@ import {
  * `credit-balance-network-count.test.ts`.
  */
 function hasInlineCreditsWire(ws: { billing_period_credits_limit: number; grant_type_balances: ReadonlyArray<unknown> }): boolean {
-    if (Number(ws.billing_period_credits_limit || 0) > 0) return true;
+  if (Number(ws.billing_period_credits_limit || 0) > 0) {
+    return true;
+  }
 
-    return Array.isArray(ws.grant_type_balances) && ws.grant_type_balances.length > 0;
+  return Array.isArray(ws.grant_type_balances) && ws.grant_type_balances.length > 0;
 }
 
 /**
@@ -36,32 +38,32 @@ function hasInlineCreditsWire(ws: { billing_period_credits_limit: number; grant_
  *       spec/21-app/01-chrome-extension/credit-balance-update/18-tests-e2e.md
  */
 test.describe('E2E-Credit-Balance — no fetch when inline credits present', () => {
-    test('inline-credit workspace skips /credit-balance; Ktlo still fetches', async () => {
-        // Sanity-check the predicate the SUT uses to gate the network call.
-        expect(hasInlineCreditsWire(INLINE_PRO_WORKSPACE)).toBe(true);
-        expect(hasInlineCreditsWire(KTLO_WORKSPACE)).toBe(false);
+  test('inline-credit workspace skips /credit-balance; Ktlo still fetches', async () => {
+    // Sanity-check the predicate the SUT uses to gate the network call.
+    expect(hasInlineCreditsWire(INLINE_PRO_WORKSPACE)).toBe(true);
+    expect(hasInlineCreditsWire(KTLO_WORKSPACE)).toBe(false);
 
-        const context = await launchExtension(chromium);
-        try {
-            const stub = await installCreditBalanceStub(context, {
-                workspaces: [INLINE_PRO_WORKSPACE, KTLO_WORKSPACE],
-                creditBalances: { [KTLO_WORKSPACE.id]: KTLO_CREDIT_BALANCE },
-            });
+    const context = await launchExtension(chromium);
+    try {
+      const stub = await installCreditBalanceStub(context, {
+        workspaces: [INLINE_PRO_WORKSPACE, KTLO_WORKSPACE],
+        creditBalances: { [KTLO_WORKSPACE.id]: KTLO_CREDIT_BALANCE },
+      });
 
-            const extensionId = await getExtensionId(context);
-            const options = await openOptions(context, extensionId);
-            await expect(options).toHaveURL(/options\.html/);
+      const extensionId = await getExtensionId(context);
+      const options = await openOptions(context, extensionId);
+      await expect(options).toHaveURL(/options\.html/);
 
-            // Drive only the Ktlo fetch from the page (mirrors trigger-logic.md).
-            await options.evaluate(async (wsId) => {
-                await fetch(`https://api.lovable.dev/workspaces/${wsId}/credit-balance`);
-            }, KTLO_WORKSPACE.id);
+      // Drive only the Ktlo fetch from the page (mirrors trigger-logic.md).
+      await options.evaluate(async (wsId) => {
+        await fetch(`https://api.lovable.dev/workspaces/${wsId}/credit-balance`);
+      }, KTLO_WORKSPACE.id);
 
-            expect(stub.creditBalanceCallsFor(INLINE_PRO_WORKSPACE.id)).toBe(0);
-            expect(stub.creditBalanceCallsFor(KTLO_WORKSPACE.id)).toBe(1);
-            expect(stub.counts.creditBalanceTotal).toBe(1);
-        } finally {
-            await context.close();
-        }
-    });
+      expect(stub.creditBalanceCallsFor(INLINE_PRO_WORKSPACE.id)).toBe(0);
+      expect(stub.creditBalanceCallsFor(KTLO_WORKSPACE.id)).toBe(1);
+      expect(stub.counts.creditBalanceTotal).toBe(1);
+    } finally {
+      await context.close();
+    }
+  });
 });

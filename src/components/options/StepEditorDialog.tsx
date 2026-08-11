@@ -220,7 +220,7 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
       result = buildGenericPayload(kind, label, payloadJson, targetGroupId);
     }
 
-    if (!result.Ok) {
+    if (result.Ok === false) {
       if (result.ErrorDescription !== undefined) {
         toast.error(result.ErrorMessage, { description: result.ErrorDescription });
       } else {

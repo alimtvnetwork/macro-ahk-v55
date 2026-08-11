@@ -14,6 +14,7 @@ import type { MessageRequest } from "../../shared/messages";
 import type { DbManager } from "../db-manager";
 import { DatabaseType } from "../../../standalone-scripts/macro-controller/src/types/enums";
 import { logCaughtError, BgLogTag } from "../bg-logger";
+import { ServiceResult } from "@/utils/result-wrapper";
 
 let dbManager: DbManager | null = null;
 
@@ -57,7 +58,7 @@ function countTable(db: ReturnType<typeof resolveDb>, table: string): number {
     throw new Error(`[SQL safety] Table name "${table}" not in allowlist`);
   }
 
-  const result = db.exec(`SELECT COUNT(*) as cnt FROM ${table}`);
+  const result = ServiceResult.wrapDb(() => db.exec(`SELECT COUNT(*) as cnt FROM ${table}`));
   const hasResult = result.length > 0 && result[0].values.length > 0;
 
   return hasResult ? (result[0].values[0][0] as number) : 0;
@@ -136,7 +137,7 @@ export async function handleQueryLogs(
     ? ` WHERE ${conditions.join(" AND ")}`
     : "";
 
-  const countStmt = db.prepare(`SELECT COUNT(*) as cnt FROM ${table}${whereClause}`);
+  const countStmt = ServiceResult.wrapDb(() => db.prepare(`SELECT COUNT(*) as cnt FROM ${table}${whereClause}`));
   if (params.length > 0) {
     countStmt.bind(params);
   }
@@ -145,9 +146,9 @@ export async function handleQueryLogs(
   const total = (countStmt.getAsObject() as { cnt: number }).cnt;
   countStmt.free();
 
-  const queryStmt = db.prepare(
+  const queryStmt = ServiceResult.wrapDb(() => db.prepare(
     `SELECT * FROM ${table}${whereClause} ORDER BY timestamp DESC LIMIT ? OFFSET ?`,
-  );
+  ));
   queryStmt.bind([...params, payload.limit, payload.offset]);
   const rows = collectRows(queryStmt);
 
@@ -165,7 +166,7 @@ export async function handleGetLogDetail(
   const db = resolveDb(payload.database);
   const table = resolveTable(payload.database);
 
-  const stmt = db.prepare(`SELECT * FROM ${table} WHERE id = ?`);
+  const stmt = ServiceResult.wrapDb(() => db.prepare(`SELECT * FROM ${table} WHERE id = ?`));
   stmt.bind([payload.rowId]);
   const hasRow = stmt.step();
   const row = hasRow ? stmt.getAsObject() : null;

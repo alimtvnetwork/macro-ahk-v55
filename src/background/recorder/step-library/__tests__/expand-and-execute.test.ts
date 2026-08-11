@@ -47,7 +47,7 @@ function freshDb(): StepLibraryDb {
 }
 
 function asExpansionSuccess(r: ExpansionResult): ExpansionSuccess {
-  if (!r.Ok) {
+  if (r.Ok === false) {
     throw new Error(`Expected expansion success, got ${r.Reason}: ${r.ReasonDetail}`);
   }
 

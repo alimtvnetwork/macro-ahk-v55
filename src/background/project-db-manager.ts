@@ -7,6 +7,7 @@
  */
 
 import type { Database as SqlJsDatabase } from "sql.js";
+import { ServiceResult } from "@/utils/result-wrapper";
 import initSqlJs from "./sqljs-loader";
 import { loadOrCreateFromOpfs, saveToOpfs, loadFromStorage } from "./db-persistence";
 import { ensureMetaTables, META_TABLES_SCHEMA } from "./schema-meta-engine";

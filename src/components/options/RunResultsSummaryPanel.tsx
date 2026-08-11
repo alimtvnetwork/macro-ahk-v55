@@ -110,8 +110,8 @@ export default function RunResultsSummaryPanel(props: RunResultsSummaryPanelProp
           <ul className="space-y-1 text-xs">
             {failedReports.map((r) => {
               const result = r.Result;
-              const reason = result !== null && !result.Ok ? result.Reason : "Unknown";
-              const detail = result !== null && !result.Ok ? result.ReasonDetail : "";
+              const reason = result !== null && result.Ok === false ? result.Reason : "Unknown";
+              const detail = result !== null && result.Ok === false ? result.ReasonDetail : "";
               const name = groupName?.(r.StepGroupId) ?? `Group #${r.StepGroupId}`;
 
               return (

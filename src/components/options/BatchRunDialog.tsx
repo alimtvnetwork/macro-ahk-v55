@@ -36,8 +36,8 @@ import {
   runBatch,
   type BatchFailurePolicy,
   type BatchGroupReport,
-  type BatchGroupStatusType,
 } from "@/background/recorder/step-library/run-batch";
+import { BatchGroupStatusType } from "@/types/enums";
 import type { StepGroupRow, StepLibraryDb } from "@/background/recorder/step-library/db";
 import type { LeafStepExecutor, RunStepTraceEntry } from "@/background/recorder/step-library/run-group-runner";
 import { createLiveReplayExecutor } from "@/background/recorder/step-library/replay-bridge";
@@ -155,8 +155,8 @@ function emitGroupWebhook(
 
   const groupRow = groupsById.get(report.StepGroupId);
   const runResult = report.Result;
-  const failureReason = runResult !== null && !runResult.Ok ? runResult.Reason : undefined;
-  const failedStepId = runResult !== null && !runResult.Ok && runResult.FailedStepId !== null
+  const failureReason = runResult !== null && runResult.Ok === false ? runResult.Reason : undefined;
+  const failedStepId = runResult !== null && runResult.Ok === false && runResult.FailedStepId !== null
     ? runResult.FailedStepId
     : undefined;
   void dispatchWebhook(
@@ -552,7 +552,7 @@ function StatusBadge({ status }: { status: BatchGroupStatusType }) {
 }
 
 function emptyReport(id: number): BatchGroupReport {
-  return { StepGroupId: id, Status: "Pending", StartedAt: null, EndedAt: null, DurationMs: 0, Result: null };
+  return { StepGroupId: id, Status: BatchGroupStatusType.PENDING, StartedAt: null, EndedAt: null, DurationMs: 0, Result: null };
 }
 
 /**

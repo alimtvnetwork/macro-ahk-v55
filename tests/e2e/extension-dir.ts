@@ -28,7 +28,9 @@ export function hasBuiltExtension(dir: string): boolean {
 /** First candidate containing a manifest, else the canonical build dir. */
 export function resolveExtensionDir(): string {
   for (const candidate of EXTENSION_CANDIDATES) {
-    if (hasBuiltExtension(candidate)) return candidate;
+    if (hasBuiltExtension(candidate)) {
+      return candidate;
+    }
   }
 
   return EXTENSION_CANDIDATES[0];

@@ -202,3 +202,6 @@ These rules are summarized from project memory and `spec/02-coding-guidelines/`.
 - `scripts/audit-logger-compliance.mjs` (Batch C) fails CI on `console.error` outside the Logger file.
 - `scripts/audit-timer-teardown.mjs` (Batch D) fails CI on un-paired timers/observers.
 - ESLint `no-restricted-syntax` (Batch C) bans `console.error` lexically.
+
+### Part 8 - Agent Etiquette & Workspace Cleanliness
+- **Temporary Scripts:** If an AI agent creates temporary scripts (e.g., `.cjs` or `.mjs` scripts for refactoring or AST manipulation), they MUST NEVER be placed in the repository root. All temporary scratch scripts must be placed in `.lovable/tmp/` (or the agent's native scratch directory) to keep the repository clean.

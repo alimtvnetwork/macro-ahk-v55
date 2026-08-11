@@ -34,8 +34,8 @@ const REPO_ROOT = path.resolve(__dirname, '../../..');
 
 const SHELL_HTML_PATH = path.resolve(__dirname, '../fixtures/lovable-shell.html');
 const BUNDLE_PATH = path.resolve(
-    REPO_ROOT,
-    'standalone-scripts/macro-controller/dist/macro-looping.js',
+  REPO_ROOT,
+  'standalone-scripts/macro-controller/dist/macro-looping.js',
 );
 
 export interface HarnessOptions {
@@ -70,8 +70,8 @@ export interface HarnessHandle {
  * any other code, matching how Chrome itself exposes `chrome`.
  */
 function buildChromeStubSource(extensionId: string): string {
-    // NOTE: This source executes inside the page — no closures over harness state.
-    return `(() => {
+  // NOTE: This source executes inside the page — no closures over harness state.
+  return `(() => {
         if (window.chrome && window.chrome.runtime && window.chrome.runtime.id) return;
         const storageBacking = new Map();
         const wrap = (area) => ({
@@ -132,7 +132,7 @@ function buildChromeStubSource(extensionId: string): string {
 }
 
 function buildPageStubSource(projectId: string): string {
-    return `(() => {
+  return `(() => {
         const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlMmUtaGFybmVzcyJ9.signature';
         localStorage.setItem('marco_bearer_token', token);
         localStorage.setItem('lovable-session-id', token);
@@ -160,64 +160,70 @@ function buildPageStubSource(projectId: string): string {
  * having run `npm run build:macro-controller` before tests execute.
  */
 export async function mountMacroControllerHarness(
-    context: BrowserContext,
-    opts: HarnessOptions = {},
+  context: BrowserContext,
+  opts: HarnessOptions = {},
 ): Promise<HarnessHandle> {
-    const projectId = opts.projectId ?? 'e2e-harness-project';
-    const bundlePath = opts.bundlePath ?? BUNDLE_PATH;
-    const skipBundle = opts.skipBundle === true;
+  const projectId = opts.projectId ?? 'e2e-harness-project';
+  const bundlePath = opts.bundlePath ?? BUNDLE_PATH;
+  const skipBundle = opts.skipBundle === true;
 
-    let bundleSource = '';
-    if (!skipBundle) {
-        // Code-Red: surface the exact missing path + reason per
-        // `mem://constraints/file-path-error-logging-code-red.md`.
-        try {
-            await fs.access(bundlePath);
-        } catch (cause) {
-            throw new Error(
-                `[macro-controller-harness] Missing IIFE bundle.\n` +
+  let bundleSource = '';
+  if (!skipBundle) {
+    // Code-Red: surface the exact missing path + reason per
+    // `mem://constraints/file-path-error-logging-code-red.md`.
+    try {
+      await fs.access(bundlePath);
+    } catch (cause) {
+      throw new Error(
+        `[macro-controller-harness] Missing IIFE bundle.\n` +
                 `  path: ${bundlePath}\n` +
                 `  reason: file not found — run \`npm run build:macro-controller\` first.\n` +
                 `  cause: ${(cause as Error)?.message ?? String(cause)}`,
-            );
-        }
-        bundleSource = await fs.readFile(bundlePath, 'utf8');
+      );
     }
 
-    const shellHtml = await fs.readFile(SHELL_HTML_PATH, 'utf8');
+    bundleSource = await fs.readFile(bundlePath, 'utf8');
+  }
 
-    const targetUrl = `https://lovable.dev/projects/${encodeURIComponent(projectId)}`;
-    // Use any installed extension id if Chromium exposes one — falls back to a
-    // stable fake id so chrome.runtime.getURL stays deterministic in logs.
-    const extensionId = context.serviceWorkers()[0]?.url().split('/')[2] ?? 'e2eharnessextensionid000000000000';
+  const shellHtml = await fs.readFile(SHELL_HTML_PATH, 'utf8');
 
-    // 1. Inject chrome.*, auth, and minimal marco-sdk stubs before *any* document scripts run.
-    await context.addInitScript(buildChromeStubSource(extensionId));
-    await context.addInitScript(buildPageStubSource(projectId));
+  const targetUrl = `https://lovable.dev/projects/${encodeURIComponent(projectId)}`;
+  // Use any installed extension id if Chromium exposes one — falls back to a
+  // stable fake id so chrome.runtime.getURL stays deterministic in logs.
+  const extensionId = context.serviceWorkers()[0]?.url().split('/')[2] ?? 'e2eharnessextensionid000000000000';
 
-    // 2. Route the simulated lovable.dev URL to our local shell.
-    await context.route(targetUrl, async (route) => {
-        await route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: shellHtml });
+  // 1. Inject chrome.*, auth, and minimal marco-sdk stubs before *any* document scripts run.
+  await context.addInitScript(buildChromeStubSource(extensionId));
+  await context.addInitScript(buildPageStubSource(projectId));
+
+  // 2. Route the simulated lovable.dev URL to our local shell.
+  await context.route(targetUrl, async (route) => {
+    await route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: shellHtml });
+  });
+
+  // 3. Navigate and (optionally) inject the bundle. addScriptTag with
+  //    `content` keeps the script's origin as the page (not file://), so
+  //    MAIN-world guards see `location.hostname === 'lovable.dev'`.
+  const page = await context.newPage();
+  await page.goto(targetUrl, { waitUntil: 'domcontentloaded' });
+
+  let bundleError: Error | null = null;
+  if (!skipBundle) {
+    // Capture page-script errors thrown during bundle boot WITHOUT failing
+    // the harness — the calling test decides whether bundleError is fatal.
+    const errorPromise = new Promise<Error | null>((resolve) => {
+      const onPageError = (err: Error): void => {
+        resolve(err); 
+      };
+
+      page.once('pageerror', onPageError);
+      setTimeout(() => {
+        page.off('pageerror', onPageError); resolve(null); 
+      }, 250);
     });
+    await page.addScriptTag({ content: bundleSource });
+    bundleError = await errorPromise;
+  }
 
-    // 3. Navigate and (optionally) inject the bundle. addScriptTag with
-    //    `content` keeps the script's origin as the page (not file://), so
-    //    MAIN-world guards see `location.hostname === 'lovable.dev'`.
-    const page = await context.newPage();
-    await page.goto(targetUrl, { waitUntil: 'domcontentloaded' });
-
-    let bundleError: Error | null = null;
-    if (!skipBundle) {
-        // Capture page-script errors thrown during bundle boot WITHOUT failing
-        // the harness — the calling test decides whether bundleError is fatal.
-        const errorPromise = new Promise<Error | null>((resolve) => {
-            const onPageError = (err: Error): void => { resolve(err); };
-            page.once('pageerror', onPageError);
-            setTimeout(() => { page.off('pageerror', onPageError); resolve(null); }, 250);
-        });
-        await page.addScriptTag({ content: bundleSource });
-        bundleError = await errorPromise;
-    }
-
-    return { page, bundlePath: skipBundle ? null : bundlePath, bundleError };
+  return { page, bundlePath: skipBundle ? null : bundlePath, bundleError };
 }

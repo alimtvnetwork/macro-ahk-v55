@@ -166,13 +166,13 @@ async function iterateGroups(
     }
 
     const outcome = await runOneGroup(opts, reports, i, now);
-    if (outcome.ok) {
+    if (outcome.ok === true) {
       succeeded++;
     } else {
       failed++;
     }
 
-    if (!outcome.ok && policy === 'StopOnFailure') {
+    if (outcome.ok === false && policy === 'StopOnFailure') {
       aborted = true;
     }
   }

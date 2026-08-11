@@ -14,6 +14,7 @@ import type { MessageRequest, OkResponse } from "../../shared/messages";
 import { getLogsDb, getErrorsDb, getCurrentSessionId, markLoggingDirty, startSession } from "./logging-handler";
 import { bindOpt, bindReq } from "./handler-guards";
 import { logBgError } from "@/background/bg-logger";
+import { ServiceResult } from "@/utils/result-wrapper";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -115,7 +116,7 @@ function insertUserScriptLogRow(
   const version = chrome.runtime.getManifest().version;
 
   return resolveCurrentSessionId(version).then((sessionId) => {
-    db.run(
+    ServiceResult.wrapDb(() => db.run(
       `INSERT INTO Logs (SessionId, Timestamp, Level, Source, Category, Action, Detail, Metadata, ProjectId, UrlRuleId, ScriptId, ConfigId, ExtVersion)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
@@ -133,7 +134,7 @@ function insertUserScriptLogRow(
         bindOpt(payload.configId),
         bindReq(version, "0.0.0"),
       ],
-    );
+    ));
   });
 }
 
@@ -146,7 +147,7 @@ function insertUserScriptErrorRow(
   const version = chrome.runtime.getManifest().version;
 
   return resolveCurrentSessionId(version).then((sessionId) => {
-    db.run(
+    ServiceResult.wrapDb(() => db.run(
       `INSERT INTO Errors (SessionId, Timestamp, Level, Source, Category, ErrorCode, Message, Context, ProjectId, UrlRuleId, ScriptId, ConfigId, ExtVersion)
              VALUES (?, ?, 'ERROR', 'user-script', ?, 'USER_SCRIPT_LOG_ERROR', ?, ?, ?, ?, ?, ?, ?)`,
       [
@@ -161,7 +162,7 @@ function insertUserScriptErrorRow(
         bindOpt(payload.configId),
         bindReq(version, "0.0.0"),
       ],
-    );
+    ));
   });
 }
 

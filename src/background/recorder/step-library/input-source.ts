@@ -353,12 +353,12 @@ function handleResponse(
   durationMs: number,
   continueOnFail: boolean,
 ): FetchInputResult {
-  if (!res.ok) {
+  if (res.Ok === false) {
     return buildErrorResult({ url: config.Url, status: res.status, error: `HTTP ${res.status} ${res.statusText}`, durationMs, continueOnFail });
   }
 
   const parsed = parseResponseBag(text);
-  if (!parsed.Ok) {
+  if (parsed.Ok === false) {
     return buildErrorResult({ url: config.Url, status: res.status, error: parsed.Reason, durationMs, continueOnFail });
   }
 

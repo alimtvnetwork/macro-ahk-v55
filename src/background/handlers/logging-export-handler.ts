@@ -1,3 +1,4 @@
+import { ServiceResult } from '@/utils/result-wrapper';
 /**
  * Marco Extension — Logging Export & Purge Handlers
  *
@@ -43,10 +44,10 @@ function purgeOldLogs(days: number): number {
   const before = countTable(db, "Logs");
 
   if (days === 0) {
-    db.run("DELETE FROM Logs");
+    ServiceResult.wrapDb(() => db.run("DELETE FROM Logs"));
   } else {
     const cutoff = new Date(Date.now() - days * 86400000).toISOString();
-    db.run("DELETE FROM Logs WHERE Timestamp < ?", [cutoff]);
+    ServiceResult.wrapDb(() => db.run("DELETE FROM Logs WHERE Timestamp < ?", [cutoff]));
   }
 
   const after = countTable(db, "Logs");
@@ -268,7 +269,7 @@ function exportTableRows(
     throw new Error(`[SQL safety] Export table name "${table}" not in allowlist`);
   }
 
-  const result = db.exec(`SELECT * FROM ${table} ORDER BY Timestamp ASC`);
+  const result = (ServiceResult.wrapDb(() => db.exec(`SELECT * FROM ${table} ORDER BY Timestamp ASC`)).data ?? []);
   const hasRows = result.length > 0;
 
   const rows = hasRows ? result[0].values : [];

@@ -88,7 +88,9 @@ interface BuiltManifest {
 
 function pickExtensionDir(): string {
   for (const dir of EXTENSION_CANDIDATES) {
-    if (fs.existsSync(path.join(dir, 'manifest.json'))) return dir;
+    if (fs.existsSync(path.join(dir, 'manifest.json'))) {
+      return dir;
+    }
   }
 
   return EXTENSION_CANDIDATES[0];
@@ -96,7 +98,10 @@ function pickExtensionDir(): string {
 
 function readManifest(extDir: string): { raw: string; parsed: BuiltManifest | null } {
   const manifestPath = path.join(extDir, 'manifest.json');
-  if (!fs.existsSync(manifestPath)) return { raw: '', parsed: null };
+  if (!fs.existsSync(manifestPath)) {
+    return { raw: '', parsed: null };
+  }
+
   try {
     const raw = fs.readFileSync(manifestPath, 'utf8');
 
@@ -125,6 +130,7 @@ function listDirectoryRecursive(root: string): string {
   if (!fs.existsSync(root)) {
     return `[reporter] directory does not exist: ${root}\n`;
   }
+
   const out: string[] = [];
   out.push(`# Recursive listing of: ${root}`);
   out.push(`# Generated: ${new Date().toISOString()}`);
@@ -139,9 +145,12 @@ function listDirectoryRecursive(root: string): string {
 
       return;
     }
+
     // Sort directories first, then files, both alphabetical.
     entries.sort((a, b) => {
-      if (a.isDirectory() !== b.isDirectory()) return a.isDirectory() ? -1 : 1;
+      if (a.isDirectory() !== b.isDirectory()) {
+        return a.isDirectory() ? -1 : 1;
+      }
 
       return a.name.localeCompare(b.name);
     });
@@ -158,10 +167,12 @@ function listDirectoryRecursive(root: string): string {
         } catch {
           /* ignore */
         }
+
         out.push(`${'  '.repeat(depth)}📄 ${ent.name}  (${size} bytes)  [${rel}]`);
       }
     }
   }
+
   walk(root, 0);
 
   return out.join('\n') + '\n';
@@ -176,7 +187,10 @@ function parseAttemptedUrl(errorMessage: string): {
   filePath: string | null;
 } {
   const match = errorMessage.match(EXT_URL_RE);
-  if (!match) return { url: null, filePath: null };
+  if (!match) {
+    return { url: null, filePath: null };
+  }
+
   const url = match[1];
   const filePath = url.replace(/^chrome-extension:\/\/[^/]+\//, '');
 
@@ -209,6 +223,7 @@ export default class ExtensionArtifactsReporter implements Reporter {
       if (fs.existsSync(this.rootDir)) {
         fs.rmSync(this.rootDir, { recursive: true, force: true });
       }
+
       ensureDir(this.rootDir);
     } catch {
       // Non-fatal: reporter will still try to write per-test dirs below.
@@ -216,14 +231,18 @@ export default class ExtensionArtifactsReporter implements Reporter {
   }
 
   onTestEnd(test: TestCase, result: TestResult): void {
-    if (result.status !== 'failed' && result.status !== 'timedOut') return;
+    if (result.status !== 'failed' && result.status !== 'timedOut') {
+      return;
+    }
 
     // Aggregate every error/attachment message; bail early if no
     // ERR_FILE_NOT_FOUND signal anywhere.
     const errorMessages = result.errors
       .map((e) => `${e.message ?? ''}\n${e.stack ?? ''}`)
       .join('\n');
-    if (!ERR_PATTERN.test(errorMessages)) return;
+    if (!ERR_PATTERN.test(errorMessages)) {
+      return;
+    }
 
     // ─── Resolve the same extension dir the fixture would have used ────────
     const extDir = pickExtensionDir();
@@ -326,7 +345,9 @@ export default class ExtensionArtifactsReporter implements Reporter {
   }
 
   async onEnd(_result: FullResult): Promise<void> {
-    if (this.captured.length === 0) return;
+    if (this.captured.length === 0) {
+      return;
+    }
 
     const indexPath = path.join(this.rootDir, 'index.json');
     safeWrite(
@@ -359,13 +380,18 @@ export default class ExtensionArtifactsReporter implements Reporter {
     optionsDeclared: string | null,
     expectedExists: boolean | null,
   ): string {
-    if (!expectedFilePath) return 'No chrome-extension URL parsed from error.';
+    if (!expectedFilePath) {
+      return 'No chrome-extension URL parsed from error.';
+    }
+
     if (expectedExists) {
       return `File EXISTS in build dir — failure cause is unrelated to missing file (check permissions or service-worker readiness).`;
     }
+
     if (popupDeclared && expectedFilePath !== popupDeclared && /popup\.html$/i.test(expectedFilePath)) {
       return `Test navigated to "${expectedFilePath}" but manifest declares popup at "${popupDeclared}". Spec/test path drift — update the test or fixture to use the manifest-declared path.`;
     }
+
     if (optionsDeclared && expectedFilePath !== optionsDeclared && /options\.html$/i.test(expectedFilePath)) {
       return `Test navigated to "${expectedFilePath}" but manifest declares options at "${optionsDeclared}". Spec/test path drift — update the test or fixture to use the manifest-declared path.`;
     }

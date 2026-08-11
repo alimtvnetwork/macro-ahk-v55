@@ -18,23 +18,23 @@ import path from "node:path";
 const isProd = process.env.NODE_ENV === "production";
 
 export default defineConfig({
-    build: {
-        target: "es2022",
-        outDir: "dist",
-        emptyOutDir: false,
-        sourcemap: isProd ? false : "inline",
-        minify: isProd ? "esbuild" : false,
-        lib: {
-            entry: path.resolve(__dirname, "standalone-scripts/sdk/src/index.ts"),
-            name: "<ROOT_NAMESPACE>",
-            formats: ["iife"],
-            fileName: () => "sdk.iife.js",
-        },
-        rollupOptions: {
-            output: {
-                extend: true, // attach to existing window.<ROOT_NAMESPACE> if present
-                banner: "/* <ROOT_NAMESPACE> SDK v<VERSION> — built " + new Date().toISOString() + " */",
-            },
-        },
+  build: {
+    target: "es2022",
+    outDir: "dist",
+    emptyOutDir: false,
+    sourcemap: isProd ? false : "inline",
+    minify: isProd ? "esbuild" : false,
+    lib: {
+      entry: path.resolve(__dirname, "standalone-scripts/sdk/src/index.ts"),
+      name: "<ROOT_NAMESPACE>",
+      formats: ["iife"],
+      fileName: () => "sdk.iife.js",
     },
+    rollupOptions: {
+      output: {
+        extend: true, // attach to existing window.<ROOT_NAMESPACE> if present
+        banner: "/* <ROOT_NAMESPACE> SDK v<VERSION> — built " + new Date().toISOString() + " */",
+      },
+    },
+  },
 });

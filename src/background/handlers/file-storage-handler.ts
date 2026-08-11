@@ -25,6 +25,7 @@ import {
   requireProjectId,
   type HandlerErrorResponse,
 } from "./handler-guards";
+import { ServiceResult } from '@/utils/result-wrapper';
 
 let dbManager: DbManager | null = null;
 let onFilesChanged: ((projectId: string) => void) | null = null;
@@ -89,12 +90,21 @@ export async function handleFileSave(
   const db = getDb();
   const size = Math.round((dataBase64.length * 3) / 4);
 
-  db.run(
+  const runRes = ServiceResult.wrapDb(() => db.run(
     `INSERT INTO ProjectFiles (ProjectId, Filename, MimeType, Data, Size, CreatedAt)
          VALUES (?, ?, ?, ?, ?, datetime('now'))`,
     [projectId, filename, bindOpt(raw.mimeType), dataBase64, size],
-  );
-  const result = db.exec("SELECT last_insert_rowid()");
+  ));
+  if (runRes.isFail) {
+    return { isOk: false, errorMessage: String(runRes.error) };
+  }
+
+  const execRes = ServiceResult.wrapDb(() => db.exec("SELECT last_insert_rowid()"));
+  if (execRes.isFail) {
+    return { isOk: false, errorMessage: String(execRes.error) };
+  }
+
+  const result = execRes.data!;
   const id = String(result[0].values[0][0]);
   markDirty();
   onFilesChanged?.(projectId);
@@ -112,10 +122,15 @@ export async function handleFileGet(
   }
 
   const db = getDb();
-  const result = db.exec(
+  const execRes = ServiceResult.wrapDb(() => db.exec(
     "SELECT Id, ProjectId, Filename, MimeType, Data, Size, CreatedAt FROM ProjectFiles WHERE Id = ?",
     [fileId],
-  );
+  ));
+  if (execRes.isFail) {
+    return { isOk: false, errorMessage: String(execRes.error) } as any;
+  }
+
+  const result = execRes.data!;
 
   if (result.length === 0 || result[0].values.length === 0) {
     return { file: null };
@@ -146,9 +161,14 @@ export async function handleFileList(
   }
 
   const db = getDb();
-  const stmt = db.prepare(
+  const stmtResult = ServiceResult.wrapDb(() => db.prepare(
     "SELECT Id, ProjectId, Filename, MimeType, Size, CreatedAt FROM ProjectFiles WHERE ProjectId = ? ORDER BY CreatedAt DESC",
-  );
+  ));
+  if (stmtResult.isFail) {
+    return { isOk: false, errorMessage: String(stmtResult.error) } as any;
+  }
+
+  const stmt = stmtResult.data!;
   stmt.bind([projectId]);
   const files: FileEntry[] = [];
   while (stmt.step()) {
@@ -178,7 +198,11 @@ export async function handleFileDelete(
   }
 
   const db = getDb();
-  db.run("DELETE FROM ProjectFiles WHERE Id = ?", [fileId]);
+  const res = ServiceResult.wrapDb(() => db.run("DELETE FROM ProjectFiles WHERE Id = ?", [fileId]));
+  if (res.isFail) {
+    return { isOk: false, errorMessage: String(res.error) };
+  }
+
   markDirty();
 
   return { isOk: true };
@@ -199,9 +223,14 @@ export function getFilesByProject(
   }
 
   const db = getDb();
-  const stmt = db.prepare(
+  const stmtResult = ServiceResult.wrapDb(() => db.prepare(
     "SELECT Filename, Data FROM ProjectFiles WHERE ProjectId = ? ORDER BY CreatedAt DESC LIMIT ?",
-  );
+  ));
+  if (stmtResult.isFail) {
+    return [];
+  }
+
+  const stmt = stmtResult.data!;
   stmt.bind([projectId, Math.max(1, Math.min(1000, limit))]);
   const files: Array<{ name: string; data: string }> = [];
   while (stmt.step()) {

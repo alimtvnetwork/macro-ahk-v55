@@ -42,7 +42,10 @@ interface BuiltManifest {
 
 function readBuiltManifest(): BuiltManifest {
   const manifestPath = path.join(EXTENSION_PATH, 'manifest.json');
-  if (!fs.existsSync(manifestPath)) return {};
+  if (!fs.existsSync(manifestPath)) {
+    return {};
+  }
+
   try {
     return JSON.parse(fs.readFileSync(manifestPath, 'utf8')) as BuiltManifest;
   } catch {
@@ -89,10 +92,15 @@ export async function launchExtension(
 /** Resolve the extension's internal ID from the service worker. */
 export async function getExtensionId(context: BrowserContext): Promise<string> {
   let [sw] = context.serviceWorkers();
-  if (!sw) sw = await context.waitForEvent('serviceworker');
+  if (!sw) {
+    sw = await context.waitForEvent('serviceworker');
+  }
+
   const url = sw.url();
   const match = url.match(/chrome-extension:\/\/([^/]+)/);
-  if (!match) throw new Error('Could not resolve extension ID from service worker URL');
+  if (!match) {
+    throw new Error('Could not resolve extension ID from service worker URL');
+  }
 
   return match[1];
 }

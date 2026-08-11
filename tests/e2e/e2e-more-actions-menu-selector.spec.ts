@@ -13,29 +13,29 @@ import { mountMacroControllerHarness } from './utils/macro-controller-harness';
 import { KTLO_WORKSPACE, KTLO_CREDIT_BALANCE } from './fixtures/credit-balance/workspaces';
 
 test.describe('More actions menu — stable data-testid selector', () => {
-    test('opens the hamburger menu via getByTestId', async () => {
-        const context = await launchExtension(chromium);
-        try {
-            await installCreditBalanceStub(context, {
-                workspaces: [KTLO_WORKSPACE],
-                creditBalances: { [KTLO_WORKSPACE.id]: KTLO_CREDIT_BALANCE },
-            });
+  test('opens the hamburger menu via getByTestId', async () => {
+    const context = await launchExtension(chromium);
+    try {
+      await installCreditBalanceStub(context, {
+        workspaces: [KTLO_WORKSPACE],
+        creditBalances: { [KTLO_WORKSPACE.id]: KTLO_CREDIT_BALANCE },
+      });
 
-            const { page, bundleError } = await mountMacroControllerHarness(context, {
-                projectId: 'more-actions-selector-e2e',
-            });
-            expect(bundleError, `macro-controller bundle threw on inject: ${bundleError?.message}`).toBeNull();
+      const { page, bundleError } = await mountMacroControllerHarness(context, {
+        projectId: 'more-actions-selector-e2e',
+      });
+      expect(bundleError, `macro-controller bundle threw on inject: ${bundleError?.message}`).toBeNull();
 
-            const menuButton = page.getByTestId('marco-hamburger-menu');
-            await expect(menuButton).toHaveCount(1);
-            await expect(menuButton).toBeVisible();
+      const menuButton = page.getByTestId('marco-hamburger-menu');
+      await expect(menuButton).toHaveCount(1);
+      await expect(menuButton).toBeVisible();
 
-            await menuButton.click();
-            // The Credit Totals entry lives only in the hamburger dropdown,
-            // so its visibility confirms the menu actually opened.
-            await expect(page.getByText('Credit Totals')).toBeVisible();
-        } finally {
-            await context.close();
-        }
-    });
+      await menuButton.click();
+      // The Credit Totals entry lives only in the hamburger dropdown,
+      // so its visibility confirms the menu actually opened.
+      await expect(page.getByText('Credit Totals')).toBeVisible();
+    } finally {
+      await context.close();
+    }
+  });
 });

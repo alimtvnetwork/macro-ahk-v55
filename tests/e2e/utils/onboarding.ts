@@ -221,6 +221,7 @@ export async function advanceToReadyStep(page: Page): Promise<void> {
       await throwIfOnboardingErrorVisible(page);
       throw err;
     }
+
     await continueBtn.click();
     await waitForOnboardingStep(page, toStep);
   }

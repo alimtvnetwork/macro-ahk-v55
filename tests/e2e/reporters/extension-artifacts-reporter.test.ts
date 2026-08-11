@@ -40,8 +40,13 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  if (createdExt) fs.rmSync(EXT_DIR, { recursive: true, force: true });
-  if (fs.existsSync(ARTIFACTS_DIR)) fs.rmSync(ARTIFACTS_DIR, { recursive: true, force: true });
+  if (createdExt) {
+    fs.rmSync(EXT_DIR, { recursive: true, force: true });
+  }
+
+  if (fs.existsSync(ARTIFACTS_DIR)) {
+    fs.rmSync(ARTIFACTS_DIR, { recursive: true, force: true });
+  }
 });
 
 describe('ExtensionArtifactsReporter', () => {

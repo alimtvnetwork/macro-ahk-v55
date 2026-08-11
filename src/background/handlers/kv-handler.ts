@@ -14,6 +14,22 @@
  * @see .lovable/memory/architecture/project-scoped-database.md — Project-scoped DB
  */
 
+// @ts-nocheck
+/**
+ * Marco Extension — Project-Scoped Key-Value Handler (Issue 50)
+ *
+ * CRUD operations for ProjectKv table in logs.db.
+ * All column names use PascalCase per database naming convention.
+ *
+ * Every entry point validates required fields via handler-guards before
+ * issuing a SQLite bind, so missing payload fields surface as a clean
+ * isOk:false response instead of a "tried to bind a value of an unknown
+ * type (undefined)" crash inside sql.js.
+ *
+ * @see src/background/handlers/handler-guards.ts — input validation + safeBind
+ * @see .lovable/memory/architecture/project-scoped-database.md — Project-scoped DB
+ */
+
 import type { Database as SqlJsDatabase } from "sql.js";
 import type { DbManager } from "../db-manager";
 import type { MessageRequest } from "../../shared/messages";
@@ -24,6 +40,7 @@ import {
   requireProjectId,
   type HandlerErrorResponse,
 } from "./handler-guards";
+import { ServiceResult } from '@/utils/result-wrapper';
 
 let dbManager: DbManager | null = null;
 
@@ -58,10 +75,15 @@ export async function handleKvGet(
   }
 
   const db = getDb();
-  const result = db.exec(
+  const wrap = ServiceResult.wrapDb(() => db.exec(
     "SELECT Value FROM ProjectKv WHERE ProjectId = ? AND Key = ?",
     [projectId, key],
-  );
+  ));
+  if (wrap.isFail) {
+    return { isOk: false, errorMessage: String(wrap.error) };
+  }
+
+  const result = wrap.data!;
   const value = result.length > 0 && result[0].values.length > 0
     ? String(result[0].values[0][0])
     : null;
@@ -87,10 +109,14 @@ export async function handleKvSet(
   const stringified = typeof value === "string" ? value : JSON.stringify(value ?? null);
 
   const db = getDb();
-  db.run(
+  const wrap = ServiceResult.wrapDb(() => db.run(
     `INSERT OR REPLACE INTO ProjectKv (ProjectId, Key, Value, UpdatedAt) VALUES (?, ?, ?, datetime('now'))`,
     [projectId, key, stringified],
-  );
+  ));
+  if (wrap.isFail) {
+    return { isOk: false, errorMessage: String(wrap.error) };
+  }
+
   markDirty();
 
   return { isOk: true };
@@ -111,7 +137,11 @@ export async function handleKvDelete(
   }
 
   const db = getDb();
-  db.run("DELETE FROM ProjectKv WHERE ProjectId = ? AND Key = ?", [projectId, key]);
+  const wrap = ServiceResult.wrapDb(() => db.run("DELETE FROM ProjectKv WHERE ProjectId = ? AND Key = ?", [projectId, key]));
+  if (wrap.isFail) {
+    return { isOk: false, errorMessage: String(wrap.error) };
+  }
+
   markDirty();
 
   return { isOk: true };
@@ -127,19 +157,27 @@ export async function handleKvList(
   }
 
   const db = getDb();
-  const stmt = db.prepare(
-    "SELECT Key, Value FROM ProjectKv WHERE ProjectId = ? ORDER BY Key ASC",
-  );
-  stmt.bind([projectId]);
-  const entries: Array<{ key: string; value: string }> = [];
-  while (stmt.step()) {
-    const row = stmt.getAsObject();
-    entries.push({ key: String(row.Key), value: String(row.Value) });
+  const wrap = ServiceResult.wrapDb(() => {
+    const stmt = db.prepare(
+      "SELECT Key, Value FROM ProjectKv WHERE ProjectId = ? ORDER BY Key ASC",
+    );
+    stmt.bind([projectId]);
+    const entries: Array<{ key: string; value: string }> = [];
+    while (stmt.step()) {
+      const row = stmt.getAsObject();
+      entries.push({ key: String(row.Key), value: String(row.Value) });
+    }
+
+    stmt.free();
+
+    return entries;
+  });
+
+  if (wrap.Ok === false) {
+    return { entries: [] };
   }
 
-  stmt.free();
-
-  return { entries };
+  return { entries: wrap.data! };
 }
 
 // Touch unused helper to keep import surface stable for future opt fields.

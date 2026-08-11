@@ -101,11 +101,14 @@ async function navigateToSection(page: Page, sectionName: string) {
   let attempts = 0;
   while (attempts < 10) {
     const branch = await marker.getAttribute('data-branch');
-    if (branch === 'ready') break;
+    if (branch === 'ready') {
+      break;
+    }
+
     if (branch === 'loading') {
-       await page.waitForTimeout(500);
-       attempts++;
-       continue;
+      await page.waitForTimeout(500);
+      attempts++;
+      continue;
     }
 
     console.log(`[Nav] Bypassing onboarding step ${attempts + 1} (current branch: ${branch})...`);
@@ -118,6 +121,7 @@ async function navigateToSection(page: Page, sectionName: string) {
       console.log('[Nav] Onboarding CTA not visible, waiting...');
       await page.waitForTimeout(1000);
     }
+
     attempts++;
   }
 

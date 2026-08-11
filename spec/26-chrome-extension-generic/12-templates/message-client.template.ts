@@ -41,21 +41,21 @@ interface MessageReply<TResult> {
 }
 
 function isEnvelope(value: unknown): value is MessageEnvelope<unknown> {
-    return typeof value === "object" && value !== null &&
+  return typeof value === "object" && value !== null &&
         (value as { tag?: unknown }).tag === ENVELOPE_TAG &&
         typeof (value as { id?: unknown }).id === "string" &&
         typeof (value as { type?: unknown }).type === "string";
 }
 
 function isReply(value: unknown): value is MessageReply<unknown> {
-    return typeof value === "object" && value !== null &&
+  return typeof value === "object" && value !== null &&
         (value as { tag?: unknown }).tag === ENVELOPE_TAG &&
         typeof (value as { id?: unknown }).id === "string" &&
         typeof (value as { ok?: unknown }).isSuccess === "boolean";
 }
 
 function nextId(): string {
-    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
 /* ─────────────────── typed message catalogue ──────────────────────────── */
@@ -67,7 +67,7 @@ export interface MessageDef<TReq, TRes> {
 }
 
 export function defineMessage<TReq, TRes>(type: string): MessageDef<TReq, TRes> {
-    return { type };
+  return { type };
 }
 
 /* ───────────────────────── background registry ─────────────────────────── */
@@ -80,83 +80,87 @@ type Handler<TReq, TRes> = (
 const handlers = new Map<string, Handler<unknown, unknown>>();
 
 export const messageRegistry = {
-    register<TReq, TRes>(def: MessageDef<TReq, TRes>, handler: Handler<TReq, TRes>): () => void {
-        if (handlers.has(def.type)) {
-            throw new AppError({
-                code: "DUPLICATE_MESSAGE_HANDLER",
-                reason: `Handler for ${def.type} already registered`,
-            });
-        }
-        handlers.set(def.type, handler as Handler<unknown, unknown>);
+  register<TReq, TRes>(def: MessageDef<TReq, TRes>, handler: Handler<TReq, TRes>): () => void {
+    if (handlers.has(def.type)) {
+      throw new AppError({
+        code: "DUPLICATE_MESSAGE_HANDLER",
+        reason: `Handler for ${def.type} already registered`,
+      });
+    }
 
-        return () => handlers.delete(def.type);
-    },
+    handlers.set(def.type, handler as Handler<unknown, unknown>);
 
-    /** Mount the chrome.runtime.onMessage listener. Call once in the SW. */
-    mount(): void {
-        chrome.runtime.onMessage.addListener((raw, sender, sendResponse) => {
-            if (!isEnvelope(raw)) return false;
+    return () => handlers.delete(def.type);
+  },
 
-            const handler = handlers.get(raw.type);
-            if (!handler) {
-                const err = new AppError({
-                    code: "UNKNOWN_MESSAGE_TYPE",
-                    reason: `No handler registered for ${raw.type}`,
-                });
-                logger.error("Unknown message type", err, { type: raw.type });
-                sendResponse({ tag: ENVELOPE_TAG, id: raw.id, ok: false, error: err.toJSON() } satisfies MessageReply<never>);
+  /** Mount the chrome.runtime.onMessage listener. Call once in the SW. */
+  mount(): void {
+    chrome.runtime.onMessage.addListener((raw, sender, sendResponse) => {
+      if (!isEnvelope(raw)) {
+        return false;
+      }
 
-                return false;
-            }
-
-            void Promise.resolve()
-                .then(() => handler(raw.payload, {
-                    tabId: sender.tab?.id ?? null,
-                    frameId: sender.frameId ?? null,
-                }))
-                .then((result) => {
-                    sendResponse({ tag: ENVELOPE_TAG, id: raw.id, ok: true, result } satisfies MessageReply<unknown>);
-                })
-                .catch((err: unknown) => {
-                    const appErr = AppError.isAppError(err)
-                        ? (err as AppError)
-                        : new AppError({ code: "HANDLER_THREW", reason: String(err), cause: err });
-                    logger.error(`Handler ${raw.type} failed`, appErr);
-                    sendResponse({ tag: ENVELOPE_TAG, id: raw.id, ok: false, error: appErr.toJSON() } satisfies MessageReply<never>);
-                });
-
-            return true; // async response
+      const handler = handlers.get(raw.type);
+      if (!handler) {
+        const err = new AppError({
+          code: "UNKNOWN_MESSAGE_TYPE",
+          reason: `No handler registered for ${raw.type}`,
         });
-    },
+        logger.error("Unknown message type", err, { type: raw.type });
+        sendResponse({ tag: ENVELOPE_TAG, id: raw.id, ok: false, error: err.toJSON() } satisfies MessageReply<never>);
+
+        return false;
+      }
+
+      void Promise.resolve()
+        .then(() => handler(raw.payload, {
+          tabId: sender.tab?.id ?? null,
+          frameId: sender.frameId ?? null,
+        }))
+        .then((result) => {
+          sendResponse({ tag: ENVELOPE_TAG, id: raw.id, ok: true, result } satisfies MessageReply<unknown>);
+        })
+        .catch((err: unknown) => {
+          const appErr = AppError.isAppError(err)
+            ? (err as AppError)
+            : new AppError({ code: "HANDLER_THREW", reason: String(err), cause: err });
+          logger.error(`Handler ${raw.type} failed`, appErr);
+          sendResponse({ tag: ENVELOPE_TAG, id: raw.id, ok: false, error: appErr.toJSON() } satisfies MessageReply<never>);
+        });
+
+      return true; // async response
+    });
+  },
 };
 
 /* ──────────────────── client (extension contexts) ──────────────────────── */
 
 export const messageClient = {
-    async send<TReq, TRes>(def: MessageDef<TReq, TRes>, payload: TReq): Promise<TRes> {
-        const envelope: MessageEnvelope<TReq> = {
-            tag: ENVELOPE_TAG,
-            id: nextId(),
-            type: def.type,
-            payload,
-        };
-        const reply = (await chrome.runtime.sendMessage(envelope)) as MessageReply<TRes>;
-        if (!isReply(reply)) {
-            throw new AppError({
-                code: "MALFORMED_REPLY",
-                reason: `Reply for ${def.type} was not a valid envelope`,
-                context: { type: def.type },
-            });
-        }
-        if (reply.isFail) {
-            throw reply.error ? AppError.fromJSON(reply.error) : new AppError({
-                code: "UNKNOWN_REPLY_ERROR",
-                reason: `Handler ${def.type} returned ok=false without an error body`,
-            });
-        }
+  async send<TReq, TRes>(def: MessageDef<TReq, TRes>, payload: TReq): Promise<TRes> {
+    const envelope: MessageEnvelope<TReq> = {
+      tag: ENVELOPE_TAG,
+      id: nextId(),
+      type: def.type,
+      payload,
+    };
+    const reply = (await chrome.runtime.sendMessage(envelope)) as MessageReply<TRes>;
+    if (!isReply(reply)) {
+      throw new AppError({
+        code: "MALFORMED_REPLY",
+        reason: `Reply for ${def.type} was not a valid envelope`,
+        context: { type: def.type },
+      });
+    }
 
-        return reply.result as TRes;
-    },
+    if (reply.isFail) {
+      throw reply.error ? AppError.fromJSON(reply.error) : new AppError({
+        code: "UNKNOWN_REPLY_ERROR",
+        reason: `Handler ${def.type} returned ok=false without an error body`,
+      });
+    }
+
+    return reply.result as TRes;
+  },
 };
 
 /* ──────────────────── page-bridge (MAIN world) ─────────────────────────── */
@@ -167,30 +171,40 @@ export const messageClient = {
  * Use `pageBridge.send(...)` from inside the SDK.
  */
 export const pageBridge = {
-    async send<TReq, TRes>(def: MessageDef<TReq, TRes>, payload: TReq): Promise<TRes> {
-        const envelope: MessageEnvelope<TReq> = {
-            tag: ENVELOPE_TAG,
-            id: nextId(),
-            type: def.type,
-            payload,
-        };
+  async send<TReq, TRes>(def: MessageDef<TReq, TRes>, payload: TReq): Promise<TRes> {
+    const envelope: MessageEnvelope<TReq> = {
+      tag: ENVELOPE_TAG,
+      id: nextId(),
+      type: def.type,
+      payload,
+    };
 
-        return await new Promise<TRes>((resolve, reject) => {
-            const listener = (event: MessageEvent<unknown>) => {
-                if (event.source !== window) return;
-                const data = event.data;
-                if (!isReply(data) || data.id !== envelope.id) return;
-                window.removeEventListener("message", listener);
-                if (data.isSuccess) resolve(data.result as TRes);
-                else reject(data.error ? AppError.fromJSON(data.error) : new AppError({
-                    code: "PAGE_BRIDGE_NO_ERROR",
-                    reason: `Reply ok=false without error body for ${def.type}`,
-                }));
-            };
-            window.addEventListener("message", listener);
-            window.postMessage(envelope, window.location.origin);
-        });
-    },
+    return await new Promise<TRes>((resolve, reject) => {
+      const listener = (event: MessageEvent<unknown>) => {
+        if (event.source !== window) {
+          return;
+        }
+
+        const data = event.data;
+        if (!isReply(data) || data.id !== envelope.id) {
+          return;
+        }
+
+        window.removeEventListener("message", listener);
+        if (data.isSuccess) {
+          resolve(data.result as TRes);
+        } else {
+          reject(data.error ? AppError.fromJSON(data.error) : new AppError({
+            code: "PAGE_BRIDGE_NO_ERROR",
+            reason: `Reply ok=false without error body for ${def.type}`,
+          }));
+        }
+      };
+
+      window.addEventListener("message", listener);
+      window.postMessage(envelope, window.location.origin);
+    });
+  },
 };
 
 /**
@@ -198,24 +212,32 @@ export const pageBridge = {
  * Mount once at the top of `src/content/index.ts`.
  */
 export function mountContentBridge(): void {
-    // page → background
-    window.addEventListener("message", (event) => {
-        if (event.source !== window) return;
-        const data = event.data;
-        if (!isEnvelope(data)) return;
-        chrome.runtime
-            .sendMessage(data)
-            .then((reply: unknown) => {
-                if (isReply(reply)) window.postMessage(reply, window.location.origin);
-            })
-            .catch((err: unknown) => {
-                const appErr = AppError.isAppError(err)
-                    ? (err as AppError).toJSON()
-                    : new AppError({ code: "CONTENT_FORWARD_FAILED", reason: String(err) }).toJSON();
-                window.postMessage(
+  // page → background
+  window.addEventListener("message", (event) => {
+    if (event.source !== window) {
+      return;
+    }
+
+    const data = event.data;
+    if (!isEnvelope(data)) {
+      return;
+    }
+
+    chrome.runtime
+      .sendMessage(data)
+      .then((reply: unknown) => {
+        if (isReply(reply)) {
+          window.postMessage(reply, window.location.origin);
+        }
+      })
+      .catch((err: unknown) => {
+        const appErr = AppError.isAppError(err)
+          ? (err as AppError).toJSON()
+          : new AppError({ code: "CONTENT_FORWARD_FAILED", reason: String(err) }).toJSON();
+        window.postMessage(
                     { tag: ENVELOPE_TAG, id: data.id, ok: false, error: appErr } satisfies MessageReply<never>,
                     window.location.origin,
-                );
-            });
-    });
+        );
+      });
+  });
 }

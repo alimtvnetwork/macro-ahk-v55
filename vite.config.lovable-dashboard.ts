@@ -16,27 +16,27 @@ import { resolve } from "path";
  * Prod mode: no sourcemaps, esbuild-minified.
  */
 export default defineConfig(({ mode }) => ({
-    publicDir: false,
-    build: {
-        outDir: "standalone-scripts/lovable-dashboard/dist",
-        emptyOutDir: false,
-        sourcemap: mode === "development" ? "inline" : false,
-        minify: mode !== "development" ? "esbuild" : false,
-        lib: {
-            entry: resolve(__dirname, "standalone-scripts/lovable-dashboard/src/index.ts"),
-            name: "LovableDashboard",
-            formats: ["iife"],
-            fileName: () => "lovable-dashboard.js",
-        },
-        rollupOptions: {
-            output: {
-                inlineDynamicImports: true,
-            },
-        },
+  publicDir: false,
+  build: {
+    outDir: "standalone-scripts/lovable-dashboard/dist",
+    emptyOutDir: false,
+    sourcemap: mode === "development" ? "inline" : false,
+    minify: mode !== "development" ? "esbuild" : false,
+    lib: {
+      entry: resolve(__dirname, "standalone-scripts/lovable-dashboard/src/index.ts"),
+      name: "LovableDashboard",
+      formats: ["iife"],
+      fileName: () => "lovable-dashboard.js",
     },
-    resolve: {
-        alias: {
-            "@lovable-dashboard": resolve(__dirname, "standalone-scripts/lovable-dashboard/src"),
-        },
+    rollupOptions: {
+      output: {
+        inlineDynamicImports: true,
+      },
     },
+  },
+  resolve: {
+    alias: {
+      "@lovable-dashboard": resolve(__dirname, "standalone-scripts/lovable-dashboard/src"),
+    },
+  },
 }));

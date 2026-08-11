@@ -23,6 +23,7 @@
  */
 
 import type { Database as SqlJsDatabase, Statement } from "sql.js";
+import { ServiceResult } from "@/utils/result-wrapper";
 
 /* ------------------------------------------------------------------ */
 /*  BindError — precise, typed diagnostic                              */
@@ -152,7 +153,7 @@ export function wrapDatabaseWithBindSafety(db: SqlJsDatabase): SqlJsDatabase {
             assertBindable(sql, params as ReadonlyArray<unknown>);
           }
 
-          target.run(sql, params);
+          ServiceResult.wrapDb(() => target.run(sql, params));
 
           return receiver as SqlJsDatabase;
         };
@@ -166,13 +167,23 @@ export function wrapDatabaseWithBindSafety(db: SqlJsDatabase): SqlJsDatabase {
 
           // sql.js Database.exec accepts an optional params array even
           // though our typings only declare the single-arg form.
-          return (target.exec as unknown as (s: string, p?: BindParams) => ReturnType<SqlJsDatabase["exec"]>)(sql, params);
+          const res = ServiceResult.wrapDb(() => (target.exec as unknown as (s: string, p?: BindParams) => ReturnType<SqlJsDatabase["exec"]>)(sql, params));
+          if (res.isFail) {
+            throw res.error;
+          }
+
+          return res.data!;
         };
       }
 
       if (prop === "prepare") {
         return function wrappedPrepare(sql: string): Statement {
-          const stmt = target.prepare(sql);
+          const stmtRes = ServiceResult.wrapDb(() => target.prepare(sql));
+          if (stmtRes.isFail) {
+            throw stmtRes.error;
+          }
+
+          const stmt = stmtRes.data!;
 
           return wrapStatementWithBindSafety(stmt, sql);
         };

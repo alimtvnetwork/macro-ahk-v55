@@ -274,7 +274,7 @@ function TestFetchResultView({ result, previewKeys }: ResultViewProps) {
 }
 
 function TestFetchSuccess({ result, previewKeys }: ResultViewProps) {
-  if (result === null || !result.Ok || result.Skipped) {
+  if (result === null || result.Ok === false || result.Skipped) {
     return null;
   }
 

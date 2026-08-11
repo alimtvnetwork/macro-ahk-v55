@@ -40,16 +40,16 @@ export interface AppErrorJSON {
 }
 
 export class AppError extends Error {
-    public readonly name = "AppError" as const;
-    public readonly code: string;
-    public readonly severity: ErrorSeverityType;
-    public readonly reason: string;
-    public readonly path: string | null;
-    public readonly missing: string | null;
-    public readonly timestamp: string;
-    public readonly context: AppErrorContext | null;
+  public readonly name = "AppError" as const;
+  public readonly code: string;
+  public readonly severity: ErrorSeverityType;
+  public readonly reason: string;
+  public readonly path: string | null;
+  public readonly missing: string | null;
+  public readonly timestamp: string;
+  public readonly context: AppErrorContext | null;
 
-    constructor(input: {
+  constructor(input: {
         code: string;
         reason: string;
         severity?: ErrorSeverityType;
@@ -58,19 +58,21 @@ export class AppError extends Error {
         context?: AppErrorContext | null;
         cause?: unknown;
     }) {
-        super(`[${input.code}] ${input.reason}`);
-        this.code = input.code;
-        this.severity = input.severity ?? ErrorSeverityType.Error;
-        this.reason = input.reason;
-        this.path = input.path ?? null;
-        this.missing = input.missing ?? null;
-        this.context = input.context ?? null;
-        this.timestamp = new Date().toISOString();
-        if (input.cause !== undefined) (this as unknown as { cause: unknown }).cause = input.cause;
+    super(`[${input.code}] ${input.reason}`);
+    this.code = input.code;
+    this.severity = input.severity ?? ErrorSeverityType.Error;
+    this.reason = input.reason;
+    this.path = input.path ?? null;
+    this.missing = input.missing ?? null;
+    this.context = input.context ?? null;
+    this.timestamp = new Date().toISOString();
+    if (input.cause !== undefined) {
+      (this as unknown as { cause: unknown }).cause = input.cause;
     }
+  }
 
-    /** Construct an FS / storage / DB error with mandatory CODE-RED fields. */
-    static fromFsFailure(input: {
+  /** Construct an FS / storage / DB error with mandatory CODE-RED fields. */
+  static fromFsFailure(input: {
         code: string;
         path: string;
         missing: string;
@@ -79,52 +81,57 @@ export class AppError extends Error {
         context?: AppErrorContext;
         cause?: unknown;
     }): AppError {
-        return new AppError({ ...input, severity: input.severity ?? ErrorSeverityType.Error });
+    return new AppError({ ...input, severity: input.severity ?? ErrorSeverityType.Error });
+  }
+
+  /** Filter chunk-*.js / assets/*.js noise from the stack — useless frames. */
+  private static filterStack(raw: string | undefined): string | null {
+    if (!raw) {
+      return null;
     }
 
-    /** Filter chunk-*.js / assets/*.js noise from the stack — useless frames. */
-    private static filterStack(raw: string | undefined): string | null {
-        if (!raw) return null;
+    return raw
+      .split("\n")
+      .filter((line) => !/\/(?:chunks?|assets)\/[^/]+-[a-z0-9]+\.js/i.test(line))
+      .join("\n");
+  }
 
-        return raw
-            .split("\n")
-            .filter((line) => !/\/(?:chunks?|assets)\/[^/]+-[a-z0-9]+\.js/i.test(line))
-            .join("\n");
+  toJSON(): AppErrorJSON {
+    return {
+      name: this.name,
+      code: this.code,
+      severity: this.severity,
+      message: this.message,
+      reason: this.reason,
+      path: this.path,
+      missing: this.missing,
+      timestamp: this.timestamp,
+      stack: AppError.filterStack(this.stack),
+      context: this.context,
+    };
+  }
+
+  static fromJSON(json: AppErrorJSON): AppError {
+    const restored = new AppError({
+      code: json.code,
+      severity: json.severity,
+      reason: json.reason,
+      path: json.path,
+      missing: json.missing,
+      context: json.context,
+    });
+    if (json.stack !== null) {
+      (restored as unknown as { stack: string }).stack = json.stack;
     }
 
-    toJSON(): AppErrorJSON {
-        return {
-            name: this.name,
-            code: this.code,
-            severity: this.severity,
-            message: this.message,
-            reason: this.reason,
-            path: this.path,
-            missing: this.missing,
-            timestamp: this.timestamp,
-            stack: AppError.filterStack(this.stack),
-            context: this.context,
-        };
-    }
+    (restored as unknown as { timestamp: string }).timestamp = json.timestamp;
 
-    static fromJSON(json: AppErrorJSON): AppError {
-        const restored = new AppError({
-            code: json.code,
-            severity: json.severity,
-            reason: json.reason,
-            path: json.path,
-            missing: json.missing,
-            context: json.context,
-        });
-        if (json.stack !== null) (restored as unknown as { stack: string }).stack = json.stack;
-        (restored as unknown as { timestamp: string }).timestamp = json.timestamp;
+    return restored;
+  }
 
-        return restored;
-    }
-
-    static isAppError(value: unknown): value is AppError {
-        return value instanceof AppError ||
+  static isAppError(value: unknown): value is AppError {
+    return value instanceof AppError ||
             (typeof value === "object" && value !== null &&
                 (value as { name?: unknown }).name === "AppError");
-    }
+  }
 }

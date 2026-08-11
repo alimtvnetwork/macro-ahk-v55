@@ -19,11 +19,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig({
-    testDir: __dirname,
-    testMatch: /seed-plan-next-regression\.spec\.ts$/,
-    fullyParallel: false,
-    workers: 1,
-    reporter: 'list',
-    retries: 0,
-    timeout: 60_000,
+  testDir: __dirname,
+  testMatch: /seed-plan-next-regression\.spec\.ts$/,
+  fullyParallel: false,
+  workers: 1,
+  reporter: 'list',
+  retries: 0,
+  timeout: 60_000,
 });

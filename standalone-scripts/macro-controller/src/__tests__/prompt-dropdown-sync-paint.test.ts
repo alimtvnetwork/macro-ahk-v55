@@ -28,7 +28,7 @@ describe('Prompts dropdown — synchronous paint (Issue 129 Step 2)', () => {
 
   it('hydrates the mirror exactly once from IndexedDB', () => {
     expect(source).toContain('function _hydrateMemSnapshotOnce()');
-    expect(source).toMatch(/if \(_memHydrated\) return;/);
+    expect(source).toMatch(/if\s*\(_memHydrated\)\s*\{\s*return;\s*\}/);
   });
 
   it('paints from the in-memory snapshot synchronously when hashes match', () => {

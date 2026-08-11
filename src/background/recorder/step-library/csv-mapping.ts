@@ -112,7 +112,7 @@ export function buildBagFromRow(opts: BuildBagOptions): BuildBagResult {
     }
 
     const outcome = applyMapping(m, Row, headerToIdx, seenVars);
-    if (!outcome.Ok) {
+    if (outcome.Ok === false) {
       return outcome;
     }
 
@@ -169,7 +169,7 @@ function applyMapping(
 
   seenVars.add(m.Variable);
   const coerced = coerceValue(row[idx] ?? "", m.Coerce);
-  if (!coerced.Ok) {
+  if (coerced.Ok === false) {
     return {
       Ok: false,
       Reason: `Column "${m.Column}" -> ${m.Variable}: ${coerced.Reason}`,

@@ -30,9 +30,14 @@ class SlowStepReporter implements Reporter {
   private readonly slowEntries: SlowEntry[] = [];
 
   onStepEnd(test: TestCase, _result: TestResult, step: TestStep): void {
-    if (step.duration < THRESHOLD_MS) return;
+    if (step.duration < THRESHOLD_MS) {
+      return;
+    }
+
     // Skip the synthetic root step that wraps the whole test.
-    if (!step.parent && step.category === 'test.step') return;
+    if (!step.parent && step.category === 'test.step') {
+      return;
+    }
 
     const entry: SlowEntry = {
       testTitle: test.titlePath().slice(1).join(' › '),
@@ -59,12 +64,14 @@ class SlowStepReporter implements Reporter {
 
       return;
     }
+
     process.stdout.write(
       `\n──────── [slow-step-reporter] ${this.slowEntries.length} step(s) exceeded ${THRESHOLD_MS}ms ────────\n`,
     );
     for (const e of this.slowEntries) {
       process.stdout.write(`  • ${e.durationMs}ms  [${e.category}]  ${e.stepTitle}\n      ↳ ${e.testTitle}\n`);
     }
+
     process.stdout.write('────────────────────────────────────────────────────────────────────\n');
   }
 }

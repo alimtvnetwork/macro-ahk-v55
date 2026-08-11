@@ -100,7 +100,7 @@ function useCsvParseState(open: boolean): ParseState {
   const acceptText = useCallback((text: string, fileName: string | null): void => {
     const result = parseCsv(text);
 
-    if (!result.Ok) {
+    if (result.Ok === false) {
       setParsed(null);
       setMappings([]);
       setParseError(result.Reason);
@@ -219,7 +219,7 @@ function useCsvApplyHandler(options: UseApplyOptions): ApplyHandler {
   }, [parsed, mappings, rowIndex]);
 
   const handleApply = useCallback(() => {
-    if (groupId === null || buildResult === null || !buildResult.Ok) {
+    if (groupId === null || buildResult === null || buildResult.Ok === false) {
       return;
     }
 

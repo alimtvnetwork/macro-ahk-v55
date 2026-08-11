@@ -14,27 +14,27 @@ import { resolve } from "path";
  *        pnpm run build:lovable-common -- --mode development
  */
 export default defineConfig(({ mode }) => ({
-    publicDir: false,
-    build: {
-        outDir: "standalone-scripts/lovable-common/dist",
-        emptyOutDir: false,
-        sourcemap: mode === "development" ? "inline" : false,
-        minify: mode !== "development" ? "esbuild" : false,
-        lib: {
-            entry: resolve(__dirname, "standalone-scripts/lovable-common/src/index.ts"),
-            name: "LovableCommon",
-            formats: ["iife"],
-            fileName: () => "lovable-common.js",
-        },
-        rollupOptions: {
-            output: {
-                inlineDynamicImports: true,
-            },
-        },
+  publicDir: false,
+  build: {
+    outDir: "standalone-scripts/lovable-common/dist",
+    emptyOutDir: false,
+    sourcemap: mode === "development" ? "inline" : false,
+    minify: mode !== "development" ? "esbuild" : false,
+    lib: {
+      entry: resolve(__dirname, "standalone-scripts/lovable-common/src/index.ts"),
+      name: "LovableCommon",
+      formats: ["iife"],
+      fileName: () => "lovable-common.js",
     },
-    resolve: {
-        alias: {
-            "@lovable-common": resolve(__dirname, "standalone-scripts/lovable-common/src"),
-        },
+    rollupOptions: {
+      output: {
+        inlineDynamicImports: true,
+      },
     },
+  },
+  resolve: {
+    alias: {
+      "@lovable-common": resolve(__dirname, "standalone-scripts/lovable-common/src"),
+    },
+  },
 }));

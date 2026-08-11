@@ -32,8 +32,8 @@ const __dirname = path.dirname(__filename);
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
 const DB_ENTRY = path.join(
-    REPO_ROOT,
-    'standalone-scripts/macro-controller/src/db/prompt-db.ts',
+  REPO_ROOT,
+  'standalone-scripts/macro-controller/src/db/prompt-db.ts',
 );
 
 interface FakeSqlCall { method: string; sql: string }
@@ -43,152 +43,161 @@ let bundleSource = '';
 let browser: Browser | undefined;
 
 function resolveChromiumExecutable(): string | undefined {
-    const candidates = ['/usr/bin/chromium', '/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'];
-    for (const c of candidates) if (fs.existsSync(c)) return c;
+  const candidates = ['/usr/bin/chromium', '/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) {
+      return c;
+    }
+  }
 
-    return undefined;
+  return undefined;
 }
 
 test.beforeAll(async () => {
-    bundleSource = await bundleBrowserIife(REPO_ROOT, {
-        entryPoint: DB_ENTRY,
-        globalName: 'PromptDb',
-        footerJs: 'window.__promptDb = PromptDb;',
-    });
+  bundleSource = await bundleBrowserIife(REPO_ROOT, {
+    entryPoint: DB_ENTRY,
+    globalName: 'PromptDb',
+    footerJs: 'window.__promptDb = PromptDb;',
+  });
 
-    browser = await chromium.launch({
-        headless: true,
-        executablePath: resolveChromiumExecutable(),
-    });
+  browser = await chromium.launch({
+    headless: true,
+    executablePath: resolveChromiumExecutable(),
+  });
 });
 
 test.afterAll(async () => {
-    if (browser) await browser.close();
+  if (browser) {
+    await browser.close();
+  }
 });
 
 async function newHarnessPage(responses: FakeSqlResp[]): Promise<Page> {
-    if (!browser) throw new Error('browser not initialized');
-    const context = await browser.newContext();
-    const page = await context.newPage();
+  if (!browser) {
+    throw new Error('browser not initialized');
+  }
 
-    await page.addInitScript((seededResponses: FakeSqlResp[]) => {
-        (globalThis as unknown as { __calls: FakeSqlCall[] }).__calls = [];
-        const queue = seededResponses.slice();
-        (globalThis as unknown as { chrome: unknown }).chrome = {
-            runtime: {
-                lastError: null,
-                sendMessage: (
-                    message: { type: string; method?: string; params?: { sql?: string } },
-                    callback: (r: unknown) => void,
-                ) => {
-                    const sql = (message?.params?.sql ?? '') as string;
-                    (globalThis as unknown as { __calls: FakeSqlCall[] }).__calls.push({
-                        method: String(message?.method ?? ''),
-                        sql,
-                    });
-                    const resp = queue.shift() ?? { isOk: true, rows: [], lastInsertId: 1 };
-                    setTimeout(() => callback(resp), 0);
-                },
-            },
-        };
-    }, responses);
+  const context = await browser.newContext();
+  const page = await context.newPage();
 
-    await context.route('**/*', (route) => {
-        route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><html><body></body></html>' });
-    });
-    await page.goto('https://rename-harness.test/');
-    await page.addScriptTag({ content: bundleSource });
+  await page.addInitScript((seededResponses: FakeSqlResp[]) => {
+    (globalThis as unknown as { __calls: FakeSqlCall[] }).__calls = [];
+    const queue = seededResponses.slice();
+    (globalThis as unknown as { chrome: unknown }).chrome = {
+      runtime: {
+        lastError: null,
+        sendMessage: (
+          message: { type: string; method?: string; params?: { sql?: string } },
+          callback: (r: unknown) => void,
+        ) => {
+          const sql = (message?.params?.sql ?? '') as string;
+          (globalThis as unknown as { __calls: FakeSqlCall[] }).__calls.push({
+            method: String(message?.method ?? ''),
+            sql,
+          });
+          const resp = queue.shift() ?? { isOk: true, rows: [], lastInsertId: 1 };
+          setTimeout(() => callback(resp), 0);
+        },
+      },
+    };
+  }, responses);
 
-    return page;
+  await context.route('**/*', (route) => {
+    route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><html><body></body></html>' });
+  });
+  await page.goto('https://rename-harness.test/');
+  await page.addScriptTag({ content: bundleSource });
+
+  return page;
 }
 
 interface UpsertResult { ok: boolean; value?: number; error?: string }
 
 test.describe('prompt rename regression (plan-15)', () => {
-    test('accepts {{n}} -> {{count}} rename and writes ReplaceKey/ReplaceValues in the UPDATE', async () => {
-        const page = await newHarnessPage([
-            // Single SCHEMA ack for the UPDATE.
-            { isOk: true, lastInsertId: 1 },
-        ]);
+  test('accepts {{n}} -> {{count}} rename and writes ReplaceKey/ReplaceValues in the UPDATE', async () => {
+    const page = await newHarnessPage([
+      // Single SCHEMA ack for the UPDATE.
+      { isOk: true, lastInsertId: 1 },
+    ]);
 
-        const result = await page.evaluate(async () => {
-            const api = (window as unknown as { __promptDb: { upsertPrompt: (i: unknown) => Promise<UpsertResult> } }).__promptDb;
+    const result = await page.evaluate(async () => {
+      const api = (window as unknown as { __promptDb: { upsertPrompt: (i: unknown) => Promise<UpsertResult> } }).__promptDb;
 
-            return api.upsertPrompt({
-                id: 1, slug: 'plan-default', name: 'PlanTierType default',
-                body: 'Give me the next {{count}} steps',
-                role: 'plan',
-                previousBody: 'Give me the next {{n}} steps',
-                previousReplaceKey: 'n',
-                replaceKey: 'count',
-                replaceValues: ['3', '5', '8'],
-            });
-        }) as UpsertResult;
+      return api.upsertPrompt({
+        id: 1, slug: 'plan-default', name: 'PlanTierType default',
+        body: 'Give me the next {{count}} steps',
+        role: 'plan',
+        previousBody: 'Give me the next {{n}} steps',
+        previousReplaceKey: 'n',
+        replaceKey: 'count',
+        replaceValues: ['3', '5', '8'],
+      });
+    }) as UpsertResult;
 
-        expect(result.isSuccess).toBe(true);
-        expect(result.error).toBeUndefined();
+    expect(result.isSuccess).toBe(true);
+    expect(result.error).toBeUndefined();
 
-        const calls = await page.evaluate(() => (globalThis as unknown as { __calls: FakeSqlCall[] }).__calls);
-        const schemaCalls = calls.filter(c => c.method === 'SCHEMA');
-        expect(schemaCalls).toHaveLength(1);
-        expect(schemaCalls[0].sql).toMatch(/^UPDATE Prompt/);
-        expect(schemaCalls[0].sql).toContain("ReplaceKey = 'count'");
-        expect(schemaCalls[0].sql).toContain('"3","5","8"');
+    const calls = await page.evaluate(() => (globalThis as unknown as { __calls: FakeSqlCall[] }).__calls);
+    const schemaCalls = calls.filter(c => c.method === 'SCHEMA');
+    expect(schemaCalls).toHaveLength(1);
+    expect(schemaCalls[0].sql).toMatch(/^UPDATE Prompt/);
+    expect(schemaCalls[0].sql).toContain("ReplaceKey = 'count'");
+    expect(schemaCalls[0].sql).toContain('"3","5","8"');
 
-        await page.context().close();
-    });
+    await page.context().close();
+  });
 
-    test('rejects a plan edit that drops {{n}} entirely with ParamTokenMismatch and NO write', async () => {
-        const page = await newHarnessPage([]);
+  test('rejects a plan edit that drops {{n}} entirely with ParamTokenMismatch and NO write', async () => {
+    const page = await newHarnessPage([]);
 
-        const result = await page.evaluate(async () => {
-            const api = (window as unknown as { __promptDb: { upsertPrompt: (i: unknown) => Promise<UpsertResult> } }).__promptDb;
+    const result = await page.evaluate(async () => {
+      const api = (window as unknown as { __promptDb: { upsertPrompt: (i: unknown) => Promise<UpsertResult> } }).__promptDb;
 
-            return api.upsertPrompt({
-                id: 1, slug: 'plan-default', name: 'PlanTierType default',
-                body: 'Give me the next steps',
-                role: 'plan',
-                previousBody: 'Give me the next {{n}} steps',
-            });
-        }) as UpsertResult;
+      return api.upsertPrompt({
+        id: 1, slug: 'plan-default', name: 'PlanTierType default',
+        body: 'Give me the next steps',
+        role: 'plan',
+        previousBody: 'Give me the next {{n}} steps',
+      });
+    }) as UpsertResult;
 
-        expect(result.isSuccess).toBe(false);
-        expect(result.error ?? '').toContain('ParamTokenMismatch');
-        expect(result.error ?? '').toContain('removed');
+    expect(result.isSuccess).toBe(false);
+    expect(result.error ?? '').toContain('ParamTokenMismatch');
+    expect(result.error ?? '').toContain('removed');
 
-        const calls = await page.evaluate(() => (globalThis as unknown as { __calls: FakeSqlCall[] }).__calls);
-        const schemaCalls = calls.filter(c => c.method === 'SCHEMA');
-        expect(schemaCalls, 'no write should have fired').toHaveLength(0);
+    const calls = await page.evaluate(() => (globalThis as unknown as { __calls: FakeSqlCall[] }).__calls);
+    const schemaCalls = calls.filter(c => c.method === 'SCHEMA');
+    expect(schemaCalls, 'no write should have fired').toHaveLength(0);
 
-        await page.context().close();
-    });
+    await page.context().close();
+  });
 
-    test('fresh insert (no previousBody) writes ReplaceValues and returns lastInsertId', async () => {
-        const page = await newHarnessPage([
-            { isOk: true, lastInsertId: 42 },
-        ]);
+  test('fresh insert (no previousBody) writes ReplaceValues and returns lastInsertId', async () => {
+    const page = await newHarnessPage([
+      { isOk: true, lastInsertId: 42 },
+    ]);
 
-        const result = await page.evaluate(async () => {
-            const api = (window as unknown as { __promptDb: { upsertPrompt: (i: unknown) => Promise<UpsertResult> } }).__promptDb;
+    const result = await page.evaluate(async () => {
+      const api = (window as unknown as { __promptDb: { upsertPrompt: (i: unknown) => Promise<UpsertResult> } }).__promptDb;
 
-            return api.upsertPrompt({
-                slug: 'plan-custom', name: 'PlanTierType custom',
-                body: 'Do the next {{n}} tasks',
-                role: 'plan',
-                replaceKey: 'n',
-                replaceValues: ['2', '4', '6'],
-            });
-        }) as UpsertResult;
+      return api.upsertPrompt({
+        slug: 'plan-custom', name: 'PlanTierType custom',
+        body: 'Do the next {{n}} tasks',
+        role: 'plan',
+        replaceKey: 'n',
+        replaceValues: ['2', '4', '6'],
+      });
+    }) as UpsertResult;
 
-        expect(result.isSuccess).toBe(true);
-        expect(result.value).toBe(42);
+    expect(result.isSuccess).toBe(true);
+    expect(result.value).toBe(42);
 
-        const calls = await page.evaluate(() => (globalThis as unknown as { __calls: FakeSqlCall[] }).__calls);
-        const schemaCalls = calls.filter(c => c.method === 'SCHEMA');
-        expect(schemaCalls).toHaveLength(1);
-        expect(schemaCalls[0].sql).toMatch(/^INSERT INTO Prompt/);
-        expect(schemaCalls[0].sql).toContain('"2","4","6"');
+    const calls = await page.evaluate(() => (globalThis as unknown as { __calls: FakeSqlCall[] }).__calls);
+    const schemaCalls = calls.filter(c => c.method === 'SCHEMA');
+    expect(schemaCalls).toHaveLength(1);
+    expect(schemaCalls[0].sql).toMatch(/^INSERT INTO Prompt/);
+    expect(schemaCalls[0].sql).toContain('"2","4","6"');
 
-        await page.context().close();
-    });
+    await page.context().close();
+  });
 });

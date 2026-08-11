@@ -83,7 +83,7 @@ describe("waitForElement", () => {
       { Doc: document, Sleep: sleep, Now: now },
     );
     expect(out.Ok).toBe(false);
-    if (!out.Ok) {
+    if (out.Ok === false) {
       expect(out.Reason).toBe("Timeout");
       expect(out.Detail).toContain("#missing");
     }

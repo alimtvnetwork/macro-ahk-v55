@@ -181,8 +181,8 @@ describe('E2E — Summary totals always match backend catalog', () => {
  * `publishVisibleWorkspaces()` is always invoked with the FULL catalog.
  */
 describe('E2E — filter combinations keep totals synced with backend', () => {
-    type SortKey = 'name' | 'available' | 'totalCredits' | 'numProjects';
-    type WsTypeFilter = 'all' | 'pro' | 'free' | 'expiring';
+    enum SortKeyType { Name = 'Name', Available = 'Available', TotalCredits = 'TotalCredits', NumProjects = 'NumProjects' }
+    enum WsTypeFilterType { All = 'All', Pro = 'Pro', Free = 'Free', Expiring = 'Expiring' }
 
     function applySearch(rows: ReadonlyArray<WorkspaceCredit>, q: string): WorkspaceCredit[] {
       const needle = q.trim().toLowerCase();
@@ -193,29 +193,29 @@ describe('E2E — filter combinations keep totals synced with backend', () => {
       return rows.filter((r) => r.fullName.toLowerCase().includes(needle));
     }
 
-    function applyType(rows: ReadonlyArray<WorkspaceCredit>, t: WsTypeFilter): WorkspaceCredit[] {
-      if (t === 'all') {
+    function applyType(rows: ReadonlyArray<WorkspaceCredit>, t: WsTypeFilterType): WorkspaceCredit[] {
+      if (t === WsTypeFilterType.All) {
         return rows.slice(); 
       }
 
-      if (t === 'pro') {
+      if (t === WsTypeFilterType.Pro) {
         return rows.filter((r) => r.plan.startsWith('pro_')); 
       }
 
-      if (t === 'free') {
+      if (t === WsTypeFilterType.Free) {
         return rows.filter((r) => r.plan === 'free' || r.hasFree); 
       }
 
       return rows.filter((r) => r.subscriptionStatus !== 'active');
     }
 
-    function applySort(rows: WorkspaceCredit[], key: SortKey): WorkspaceCredit[] {
+    function applySort(rows: WorkspaceCredit[], key: SortKeyType): WorkspaceCredit[] {
       const out = rows.slice();
-      if (key === 'name') {
+      if (key === SortKeyType.Name) {
         out.sort((a, b) => a.fullName.localeCompare(b.fullName));
-      } else if (key === 'available') {
+      } else if (key === SortKeyType.Available) {
         out.sort((a, b) => b.available - a.available);
-      } else if (key === 'totalCredits') {
+      } else if (key === SortKeyType.TotalCredits) {
         out.sort((a, b) => b.totalCredits - a.totalCredits);
       } else {
         out.sort((a, b) => b.numProjects - a.numProjects);
@@ -253,8 +253,8 @@ describe('E2E — filter combinations keep totals synced with backend', () => {
     }
 
     const SEARCH_QUERIES = ['', 'ws', 'acme', 'zeta', 'no-match-xyz'];
-    const SORT_KEYS: SortKey[] = ['name', 'available', 'totalCredits', 'numProjects'];
-    const TYPE_FILTERS: WsTypeFilter[] = ['all', 'pro', 'free', 'expiring'];
+    const SORT_KEYS: SortKeyType[] = [SortKeyType.Name, SortKeyType.Available, SortKeyType.TotalCredits, SortKeyType.NumProjects];
+    const TYPE_FILTERS: WsTypeFilterType[] = [WsTypeFilterType.All, WsTypeFilterType.Pro, WsTypeFilterType.Free, WsTypeFilterType.Expiring];
     const PAGE_SIZES = [2, 3, BACKEND_CATALOG.length];
 
     it('Combo 1 — every search × sort × type combination still reports backend totals', () => {

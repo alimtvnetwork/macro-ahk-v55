@@ -44,34 +44,43 @@ let bundleSource = '';
 let browser: Browser | undefined;
 
 function resolveChromiumExecutable(): string | undefined {
-    const candidates = ['/usr/bin/chromium', '/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'];
-    for (const candidate of candidates) if (fs.existsSync(candidate)) return candidate;
+  const candidates = ['/usr/bin/chromium', '/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
 
-    return undefined;
+  return undefined;
 }
 
 test.beforeAll(async () => {
-    bundleSource = await bundleBrowserIife(REPO_ROOT, {
-        entryPoint: HARNESS_ENTRY,
-        globalName: 'PromptRoundtripBundle',
-        footerJs: 'window.__roundtrip = PromptRoundtripBundle;',
-    });
-    browser = await chromium.launch({
-        headless: true,
-        executablePath: resolveChromiumExecutable(),
-    });
+  bundleSource = await bundleBrowserIife(REPO_ROOT, {
+    entryPoint: HARNESS_ENTRY,
+    globalName: 'PromptRoundtripBundle',
+    footerJs: 'window.__roundtrip = PromptRoundtripBundle;',
+  });
+  browser = await chromium.launch({
+    headless: true,
+    executablePath: resolveChromiumExecutable(),
+  });
 });
 
 test.afterAll(async () => {
-    if (browser) await browser.close();
+  if (browser) {
+    await browser.close();
+  }
 });
 
 async function newHarnessPage(): Promise<Page> {
-    if (!browser) throw new Error('browser not initialized');
-    const context = await browser.newContext({ acceptDownloads: true });
-    const page = await context.newPage();
+  if (!browser) {
+    throw new Error('browser not initialized');
+  }
 
-    await page.addInitScript(() => {
+  const context = await browser.newContext({ acceptDownloads: true });
+  const page = await context.newPage();
+
+  await page.addInitScript(() => {
         interface RuntimeMessage {
             type?: string;
             method?: string;
@@ -88,91 +97,95 @@ async function newHarnessPage(): Promise<Page> {
         // Track INSERTS into PromptRevision so the test can wait for them.
         let insertSeq = 1000;
         (globalThis as typeof globalThis & { chrome: unknown }).chrome = {
-            runtime: {
-                lastError: null,
-                sendMessage: (message: RuntimeMessage, callback: (response: RuntimeResponse) => void) => {
-                    const sql = message.params?.sql ?? '';
-                    calls.push({ type: String(message.type ?? ''), method: message.method, sql });
-                    let rows: Array<Record<string, unknown>> = [];
-                    // Export path: listPromptsByRole is empty (no pre-existing DB rows),
-                    // so mergeDbIntoExport keeps the cache entries verbatim.
-                    if (/SELECT\s+MAX\(Id\)\s+AS\s+MaxId\s+FROM\s+PromptRevision/i.test(sql)) {
-                        rows = [{ MaxId: 100 }];
-                    }
-                    insertSeq += 1;
-                    setTimeout(() => callback({ isOk: true, rows, lastInsertId: insertSeq }), 0);
-                },
+          runtime: {
+            lastError: null,
+            sendMessage: (message: RuntimeMessage, callback: (response: RuntimeResponse) => void) => {
+              const sql = message.params?.sql ?? '';
+              calls.push({ type: String(message.type ?? ''), method: message.method, sql });
+              let rows: Array<Record<string, unknown>> = [];
+              // Export path: listPromptsByRole is empty (no pre-existing DB rows),
+              // so mergeDbIntoExport keeps the cache entries verbatim.
+              if (/SELECT\s+MAX\(Id\)\s+AS\s+MaxId\s+FROM\s+PromptRevision/i.test(sql)) {
+                rows = [{ MaxId: 100 }];
+              }
+
+              insertSeq += 1;
+              setTimeout(() => callback({ isOk: true, rows, lastInsertId: insertSeq }), 0);
             },
+          },
         };
-    });
+  });
 
-    await page.route('**/*', (route) => {
-        route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><html><body></body></html>' });
-    });
-    await page.goto('https://prompt-roundtrip-harness.test/');
-    await page.addScriptTag({ content: bundleSource });
+  await page.route('**/*', (route) => {
+    route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><html><body></body></html>' });
+  });
+  await page.goto('https://prompt-roundtrip-harness.test/');
+  await page.addScriptTag({ content: bundleSource });
 
-    return page;
+  return page;
 }
 
 test.describe('prompt export -> import round trip', () => {
-    test('preserves row counts and surfaces imported badge in history panel', async () => {
-        const page = await newHarnessPage();
+  test('preserves row counts and surfaces imported badge in history panel', async () => {
+    const page = await newHarnessPage();
 
-        // ---- Stage 1: seed JsonCopy with two role-scoped entries ----
-        // IMPORTANT: seeds must use `isDefault: false`. Export is scoped to
-        // user-added entries (v5.9.0 `filterUserAddedEntries`), so default
-        // rows would be filtered out and the download would never fire.
-        await page.evaluate(async ({ slugA, slugB }) => {
+    // ---- Stage 1: seed JsonCopy with two role-scoped entries ----
+    // IMPORTANT: seeds must use `isDefault: false`. Export is scoped to
+    // user-added entries (v5.9.0 `filterUserAddedEntries`), so default
+    // rows would be filtered out and the download would never fire.
+    await page.evaluate(async ({ slugA, slugB }) => {
             interface Api {
                 writeJsonCopy: (entries: unknown[]) => Promise<void>;
             }
             const api = (window as unknown as { __roundtrip: Api }).__roundtrip;
             await api.writeJsonCopy([
-                { name: 'PlanTierType default', text: 'plan body v2', category: 'plan', slug: slugA, role: 'plan', isFavorite: false, isDefault: false },
-                { name: 'Next default', text: 'next body v2', category: 'next', slug: slugB, role: 'next', isFavorite: false, isDefault: false },
+              { name: 'PlanTierType default', text: 'plan body v2', category: 'plan', slug: slugA, role: 'plan', isFavorite: false, isDefault: false },
+              { name: 'Next default', text: 'next body v2', category: 'next', slug: slugB, role: 'next', isFavorite: false, isDefault: false },
             ]);
-        }, { slugA: SLUG_A, slugB: SLUG_B });
+    }, { slugA: SLUG_A, slugB: SLUG_B });
 
-        // ---- Stage 2: trigger export and capture the download JSON ----
-        const downloadPromise = page.waitForEvent('download');
-        await page.evaluate(async () => {
+    // ---- Stage 2: trigger export and capture the download JSON ----
+    const downloadPromise = page.waitForEvent('download');
+    await page.evaluate(async () => {
             interface Api {
                 exportPromptsToJson: (opts: { includeRevisions?: boolean }) => Promise<void>;
             }
             const api = (window as unknown as { __roundtrip: Api }).__roundtrip;
             await api.exportPromptsToJson({ includeRevisions: true });
-        });
-        const download = await downloadPromise;
-        const downloadPath = await download.path();
-        if (!downloadPath) throw new Error('download.path() returned null');
-        const exportedJson = fs.readFileSync(downloadPath, 'utf8');
-        const exportedBundle = JSON.parse(exportedJson) as {
+    });
+    const download = await downloadPromise;
+    const downloadPath = await download.path();
+    if (!downloadPath) {
+      throw new Error('download.path() returned null');
+    }
+
+    const exportedJson = fs.readFileSync(downloadPath, 'utf8');
+    const exportedBundle = JSON.parse(exportedJson) as {
             schemaVersion: number;
             entryCount: number;
             entries: Array<{ slug?: string; role?: string }>;
             revisions?: Array<{ Slug: string }>;
         };
-        expect(exportedBundle.schemaVersion).toBe(1);
-        expect(exportedBundle.entryCount).toBe(2);
-        expect(exportedBundle.entries.map((e) => e.slug).sort()).toEqual([SLUG_A, SLUG_B].sort());
+    expect(exportedBundle.schemaVersion).toBe(1);
+    expect(exportedBundle.entryCount).toBe(2);
+    expect(exportedBundle.entries.map((e) => e.slug).sort()).toEqual([SLUG_A, SLUG_B].sort());
 
-        // The DB layer returns 0 rows for listPromptRevisions in this harness,
-        // so the export won't include a revisions array. Synthesise 4 revisions
-        // (2 per slug) for the import leg so the round-trip validates the
-        // `revisionsImported` count end-to-end.
-        const synthesised = {
-            ...exportedBundle,
-            revisions: [
-                { Slug: SLUG_A, Name: 'PlanTierType default', Body: 'plan body v1', Role: 'plan', ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_000_000, Reason: 'import' },
-                { Slug: SLUG_A, Name: 'PlanTierType default', Body: 'plan body v2', Role: 'plan', ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_100_000, Reason: 'import' },
-                { Slug: SLUG_B, Name: 'Next default', Body: 'next body v1', Role: 'next', ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_200_000, Reason: 'import' },
-                { Slug: SLUG_B, Name: 'Next default', Body: 'next body v2', Role: 'next', ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_300_000, Reason: 'import' },
-            ],
-        };
+    // The DB layer returns 0 rows for listPromptRevisions in this harness,
+    // so the export won't include a revisions array. Synthesise 4 revisions
+    // (2 per slug) for the import leg so the round-trip validates the
+    // `revisionsImported` count end-to-end.
+    const synthesised = {
+      ...exportedBundle,
+      revisions: [
+        { Slug: SLUG_A, Name: 'PlanTierType default', Body: 'plan body v1', Role: 'plan', ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_000_000, Reason: 'import' },
+        { Slug: SLUG_A, Name: 'PlanTierType default', Body: 'plan body v2', Role: 'plan', ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_100_000, Reason: 'import' },
+        { Slug: SLUG_B, Name: 'Next default', Body: 'next body v1', Role: 'next', ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_200_000, Reason: 'import' },
+        { Slug: SLUG_B, Name: 'Next default', Body: 'next body v2', Role: 'next', ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_300_000, Reason: 'import' },
+      ],
+    };
 
-        // ---- Stage 3: import the synthesised bundle back ----
-        const results = await page.evaluate(async (payload: string) => {
+    // ---- Stage 3: import the synthesised bundle back ----
+    const results = await page.evaluate(async (payload: string) => {
             interface Api {
                 parsePromptsText: (json: string) => { valid: unknown[]; errors: string[]; revisions?: unknown[] };
                 performPromptImport: (
@@ -184,47 +197,47 @@ test.describe('prompt export -> import round trip', () => {
             const parsed = api.parsePromptsText(payload);
 
             return api.performPromptImport(parsed.valid, {
-                overwrite: true,
-                revisions: parsed.revisions,
+              overwrite: true,
+              revisions: parsed.revisions,
             });
-        }, JSON.stringify(synthesised));
+    }, JSON.stringify(synthesised));
 
-        // ---- Stage 4: assert imported row counts ----
-        expect(results.total).toBe(2);
-        expect(results.added).toBe(0);
-        expect(results.updated).toBe(2);
-        expect(results.revisionsImported).toBe(4);
-        expect(results.errors).toEqual([]);
+    // ---- Stage 4: assert imported row counts ----
+    expect(results.total).toBe(2);
+    expect(results.added).toBe(0);
+    expect(results.updated).toBe(2);
+    expect(results.revisionsImported).toBe(4);
+    expect(results.errors).toEqual([]);
 
-        // ---- Stage 5: open history panel and confirm imported badges ----
-        // The listRevisions stub reflects two `PromptId=0` (imported) rows for
-        // slug A so the badge count assertion is deterministic.
-        await page.evaluate(async ({ slug, role }) => {
+    // ---- Stage 5: open history panel and confirm imported badges ----
+    // The listRevisions stub reflects two `PromptId=0` (imported) rows for
+    // slug A so the badge count assertion is deterministic.
+    await page.evaluate(async ({ slug, role }) => {
             interface RevRow {
                 Id: number; PromptId: number; Slug: string; Name: string; Body: string;
                 Role: string; ReplaceKey: string; ReplaceValues: string; CreatedAt: number; Reason: string;
             }
             const importedRows: RevRow[] = [
-                { Id: 501, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'plan body v1', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_000_000, Reason: 'import' },
-                { Id: 502, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'plan body v2', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_100_000, Reason: 'import' },
+              { Id: 501, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'plan body v1', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_000_000, Reason: 'import' },
+              { Id: 502, PromptId: 0, Slug: slug, Name: 'PlanTierType default', Body: 'plan body v2', Role: role, ReplaceKey: 'n', ReplaceValues: '["1","2","3"]', CreatedAt: 1_700_000_100_000, Reason: 'import' },
             ];
             interface DbOk<T> { ok: boolean; value?: T; error?: string }
             const deps = {
-                listRevisions: async (): Promise<DbOk<RevRow[]>> => ({ ok: true, value: importedRows }),
-                toast: () => { /* swallow */ },
-                undoToast: () => { /* swallow */ },
+              listRevisions: async (): Promise<DbOk<RevRow[]>> => ({ ok: true, value: importedRows }),
+              toast: () => { /* swallow */ },
+              undoToast: () => { /* swallow */ },
             };
             interface HistoryApi {
                 openPromptHistoryPanel: (input: { role: string; slug: string }, deps: unknown) => Promise<void>;
             }
             const api = (window as unknown as { __roundtrip: HistoryApi }).__roundtrip;
             await api.openPromptHistoryPanel({ role, slug }, deps);
-        }, { slug: SLUG_A, role: 'plan' });
+    }, { slug: SLUG_A, role: 'plan' });
 
-        const panel = page.locator('#marco-prompt-history-panel');
-        await expect(panel.locator('[data-role="revision-row"]')).toHaveCount(2);
-        await expect(panel.locator('[data-role="imported-badge"]')).toHaveCount(2);
+    const panel = page.locator('#marco-prompt-history-panel');
+    await expect(panel.locator('[data-role="revision-row"]')).toHaveCount(2);
+    await expect(panel.locator('[data-role="imported-badge"]')).toHaveCount(2);
 
-        await page.context().close();
-    });
+    await page.context().close();
+  });
 });

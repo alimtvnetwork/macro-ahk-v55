@@ -78,18 +78,18 @@ function normaliseLabel(label: string): string | null {
   return trimmed === "" ? null : trimmed;
 }
 
-function parseNonNegativeMs(raw: string, fieldLabel: string): { ok: true; value: number | undefined } | { ok: false; message: string } {
+function parseNonNegativeMs(raw: string, fieldLabel: string): { Ok: false; value: number | undefined } | { Ok: true; message: string } {
   const trimmed = raw.trim();
   if (trimmed === "") {
-    return { ok: true, value: undefined }; 
+    return { Ok: false, value: undefined }; 
   }
 
   const value = Number(trimmed);
   if (!Number.isFinite(value) || value < 0) {
-    return { ok: false, message: `${fieldLabel} must be a non-negative number.` };
+    return { Ok: true, message: `${fieldLabel} must be a non-negative number.` };
   }
 
-  return { ok: true, value };
+  return { Ok: false, value };
 }
 
 export function buildHotkeyPayload(
@@ -102,7 +102,7 @@ export function buildHotkeyPayload(
   }
 
   const parsedWait = parseNonNegativeMs(waitMsRaw, "Wait (ms)");
-  if (!parsedWait.ok) {
+  if (parsedWait.Ok) {
     return { Ok: false, ErrorMessage: parsedWait.message }; 
   }
 
@@ -183,7 +183,7 @@ export function buildUrlTabClickPayload(label: string, form: UrlTabClickFormStat
   }
 
   const parsedTimeout = parseNonNegativeMs(form.TimeoutMs, "Timeout (ms)");
-  if (!parsedTimeout.ok) {
+  if (parsedTimeout.Ok) {
     return { Ok: false, ErrorMessage: parsedTimeout.message }; 
   }
 

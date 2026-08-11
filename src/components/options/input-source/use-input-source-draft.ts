@@ -51,7 +51,7 @@ export function useInputSourceDraft(
   const handleSave = useSaveHandler(draft, setDraft, onOpenChange);
   const handleTest = useTestHandler(draft, setBusy, setLastResult);
   const previewKeys = useMemo<ReadonlyArray<string>>(
-    () => (lastResult === null || !lastResult.Ok || lastResult.Skipped ? [] : Object.keys(lastResult.Bag)),
+    () => (lastResult === null || lastResult.Ok === false || lastResult.Skipped ? [] : Object.keys(lastResult.Bag)),
     [lastResult],
   );
 

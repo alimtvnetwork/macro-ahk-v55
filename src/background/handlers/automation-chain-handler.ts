@@ -17,6 +17,7 @@ import {
 import { type MessageRequest } from "../../shared/messages";
 import type { SqlRow } from "./handler-types";
 import { logBgError } from "@/background/bg-logger";
+import { ServiceResult } from '@/utils/result-wrapper';
 
 /* ------------------------------------------------------------------ */
 /*  Schema                                                             */
@@ -98,7 +99,10 @@ async function getProjectChainDb(projectSlug: string) {
   }
 
   const db = getProjectDb(projectSlug);
-  db.run(CHAIN_TABLE_DDL);
+  const result = ServiceResult.wrapDb(() => db.run(CHAIN_TABLE_DDL));
+  if (result.isFail) {
+    throw result.error;
+  }
 
   return db;
 }
@@ -138,10 +142,15 @@ function rowToChain(r: SqlRow): ChainOutput {
 /*  GET_AUTOMATION_CHAINS                                              */
 /* ------------------------------------------------------------------ */
 
-export async function handleGetAutomationChains(request?: MessageRequest): Promise<{ isOk: true; chains: ChainOutput[] }> {
+export async function handleGetAutomationChains(request?: MessageRequest): Promise<{ isOk: boolean; chains?: ChainOutput[]; errorMessage?: string }> {
   const project = resolveProject((request ?? {}) as ChainMessage);
   const db = await getProjectChainDb(project);
-  const stmt = db.prepare("SELECT * FROM AutomationChains ORDER BY Id");
+  const stmtResult = ServiceResult.wrapDb(() => db.prepare("SELECT * FROM AutomationChains ORDER BY Id"));
+  if (stmtResult.isFail) {
+    return { isOk: false, errorMessage: String(stmtResult.error) };
+  }
+
+  const stmt = stmtResult.data!;
   const chains: ChainOutput[] = [];
   while (stmt.step()) {
     chains.push(rowToChain(stmt.getAsObject() as SqlRow));
@@ -173,21 +182,27 @@ export async function handleSaveAutomationChain(request: MessageRequest): Promis
 
   if (chain.id) {
     // Update
-    db.run(
+    const res = ServiceResult.wrapDb(() => db.run(
       `UPDATE AutomationChains
              SET Name = ?, Slug = ?, StepsJson = ?, TriggerType = ?,
                  TriggerConfigJson = ?, Enabled = ?, ProjectId = ?,
                  UpdatedAt = datetime('now')
              WHERE Id = ?`,
       [chain.name, chain.slug, stepsJson, triggerType, triggerConfigJson, enabled, projectId, Number(chain.id)],
-    );
+    ));
+    if (res.isFail) {
+      return { isOk: false, errorMessage: String(res.error) };
+    }
   } else {
     // Insert
-    db.run(
+    const res = ServiceResult.wrapDb(() => db.run(
       `INSERT INTO AutomationChains (ProjectId, Name, Slug, StepsJson, TriggerType, TriggerConfigJson, Enabled)
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [projectId, chain.name, chain.slug, stepsJson, triggerType, triggerConfigJson, enabled],
-    );
+    ));
+    if (res.isFail) {
+      return { isOk: false, errorMessage: String(res.error) };
+    }
   }
 
   await flushProjectDb(project);
@@ -208,7 +223,11 @@ export async function handleDeleteAutomationChain(request: MessageRequest): Prom
   }
 
   const db = await getProjectChainDb(project);
-  db.run("DELETE FROM AutomationChains WHERE Id = ?", [Number(chainId)]);
+  const res = ServiceResult.wrapDb(() => db.run("DELETE FROM AutomationChains WHERE Id = ?", [Number(chainId)]));
+  if (res.isFail) {
+    return { isOk: false, errorMessage: String(res.error) };
+  }
+
   await flushProjectDb(project);
 
   return { isOk: true };
@@ -227,10 +246,14 @@ export async function handleToggleAutomationChain(request: MessageRequest): Prom
   }
 
   const db = await getProjectChainDb(project);
-  db.run(
+  const res = ServiceResult.wrapDb(() => db.run(
     "UPDATE AutomationChains SET Enabled = CASE WHEN Enabled = 1 THEN 0 ELSE 1 END, UpdatedAt = datetime('now') WHERE Id = ?",
     [Number(chainId)],
-  );
+  ));
+  if (res.isFail) {
+    return { isOk: false, errorMessage: String(res.error) };
+  }
+
   await flushProjectDb(project);
 
   return { isOk: true };
@@ -260,11 +283,15 @@ export async function handleImportAutomationChains(request: MessageRequest): Pro
     const enabled = c.enabled !== false ? 1 : 0;
     const projectId = c.projectId || "default";
 
-    db.run(
+    const res = ServiceResult.wrapDb(() => db.run(
       `INSERT INTO AutomationChains (ProjectId, Name, Slug, StepsJson, TriggerType, TriggerConfigJson, Enabled)
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [projectId, name, slug, stepsJson, triggerType, triggerConfigJson, enabled],
-    );
+    ));
+    if (res.isFail) {
+      return { isOk: false, errorMessage: String(res.error) };
+    }
+
     imported++;
   }
 

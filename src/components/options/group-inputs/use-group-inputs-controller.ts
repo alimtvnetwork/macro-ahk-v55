@@ -94,7 +94,7 @@ export function useGroupInputsController(args: UseGroupInputsControllerArgs) {
   }, [handleFile]);
 
   const handleApply = useCallback(() => {
-    if (groupId === null || !parseResult.Ok) {
+    if (groupId === null || parseResult.Ok === false) {
       return;
     }
 

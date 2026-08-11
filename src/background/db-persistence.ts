@@ -6,6 +6,7 @@
  */
 
 import type { Database as SqlJsDatabase } from "sql.js";
+import { ServiceResult } from "@/utils/result-wrapper";
 import { logCaughtError, BgLogTag } from "./bg-logger";
 import { logBgError } from "@/background/bg-logger";
 

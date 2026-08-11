@@ -39,18 +39,18 @@ export default defineConfig({
   /* Reporters */
   reporter: process.env.CI
     ? [
-        ['html', { open: 'never', outputFolder: 'test-results/html' }],
-        ['junit', { outputFile: 'test-results/junit.xml' }],
-        ['github'],
-        // Captures chrome-extension/ dir + resolved manifest fields whenever
-        // a test fails with ERR_FILE_NOT_FOUND while navigating chrome-extension://…
-        ['./tests/e2e/reporters/extension-artifacts-reporter.ts'],
-      ]
+      ['html', { open: 'never', outputFolder: 'test-results/html' }],
+      ['junit', { outputFile: 'test-results/junit.xml' }],
+      ['github'],
+      // Captures chrome-extension/ dir + resolved manifest fields whenever
+      // a test fails with ERR_FILE_NOT_FOUND while navigating chrome-extension://…
+      ['./tests/e2e/reporters/extension-artifacts-reporter.ts'],
+    ]
     : [
-        ['list'],
-        ['html', { open: 'on-failure', outputFolder: 'test-results/html' }],
-        ['./tests/e2e/reporters/extension-artifacts-reporter.ts'],
-      ],
+      ['list'],
+      ['html', { open: 'on-failure', outputFolder: 'test-results/html' }],
+      ['./tests/e2e/reporters/extension-artifacts-reporter.ts'],
+    ],
 
   /* Output directories */
   outputDir: 'test-results/artifacts',

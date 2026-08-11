@@ -75,7 +75,7 @@ describe("parseCsv, failures", () => {
   it("fails on duplicate headers", () => {
     const r = parseCsv("A,A\n1,2");
     expect(r.Ok).toBe(false);
-    if (!r.Ok) {
+    if (r.Ok === false) {
       expect(r.Reason).toMatch(/Duplicate column/);
     }
   });
@@ -83,7 +83,7 @@ describe("parseCsv, failures", () => {
   it("fails on empty header cell", () => {
     const r = parseCsv("A,,B\n1,2,3");
     expect(r.Ok).toBe(false);
-    if (!r.Ok) {
+    if (r.Ok === false) {
       expect(r.Reason).toMatch(/empty column name/);
     }
   });
@@ -91,7 +91,7 @@ describe("parseCsv, failures", () => {
   it("fails on unterminated quote with line number", () => {
     const r = parseCsv(`A,B\n"oops,2`);
     expect(r.Ok).toBe(false);
-    if (!r.Ok) {
+    if (r.Ok === false) {
       expect(r.Reason).toMatch(/Unterminated/);
     }
   });
@@ -102,7 +102,7 @@ describe("parseCsv, failures", () => {
     if (big.length > MAX_BYTES) {
       const r = parseCsv(big);
       expect(r.Ok).toBe(false);
-      if (!r.Ok) {
+      if (r.Ok === false) {
         expect(r.Reason).toMatch(/in-memory limit/);
       }
     }
@@ -116,7 +116,7 @@ describe("parseCsv, failures", () => {
 
     const r = parseCsv(lines.join("\n"));
     expect(r.Ok).toBe(false);
-    if (!r.Ok) {
+    if (r.Ok === false) {
       expect(r.Reason).toMatch(/limit is 10000/);
     }
   });

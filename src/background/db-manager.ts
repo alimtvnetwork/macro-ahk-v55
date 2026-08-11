@@ -1,4 +1,5 @@
 import { HttpCodes } from "../constants/http";
+import { ServiceResult } from "@/utils/result-wrapper";
 /**
  * Marco Extension — Database Manager
  *

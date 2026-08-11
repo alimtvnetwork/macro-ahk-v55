@@ -110,7 +110,9 @@ type InjectionResponse = InjectScriptsResponse;
  * `errorMessage` and `skipReason` for each entry.
  */
 function formatResultsForFailure(results: readonly InjectionScriptResult[]): string {
-  if (results.length === 0) return '(no results returned)';
+  if (results.length === 0) {
+    return '(no results returned)';
+  }
 
   return results
     .map((r) => {

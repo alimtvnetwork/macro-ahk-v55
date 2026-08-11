@@ -21,23 +21,23 @@ import { fileURLToPath } from "node:url";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 const REQUIRED_ENTRIES: ReadonlyArray<string> = [
-    "manifest.json",
-    "src/popup/popup.html",
-    "src/options/options.html",
+  "manifest.json",
+  "src/popup/popup.html",
+  "src/options/options.html",
 ];
 
 let failed = false;
 for (const rel of REQUIRED_ENTRIES) {
-    const abs = resolve(ROOT, rel);
-    if (!existsSync(abs)) {
-        process.stderr.write(`smoke: missing required entry ${rel}\n`);
-        failed = true;
-        break; // fail-fast per no-retry policy
-    }
+  const abs = resolve(ROOT, rel);
+  if (!existsSync(abs)) {
+    process.stderr.write(`smoke: missing required entry ${rel}\n`);
+    failed = true;
+    break; // fail-fast per no-retry policy
+  }
 }
 
 if (failed) {
-    process.exit(1);
+  process.exit(1);
 }
 
 console.log(`smoke: OK — ${REQUIRED_ENTRIES.length} required entries present`);

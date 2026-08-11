@@ -24,6 +24,7 @@ import { getFilesByProject } from "./file-storage-handler";
 import { logCaughtError, BgLogTag} from "../bg-logger";
 import { RequireStatusType } from "../../types/enums";
 import { logBgError } from "@/background/bg-logger";
+import { ServiceResult } from '@/utils/result-wrapper';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -222,11 +223,15 @@ function logDynamicLoad(
       logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
     }
 
-    db.run(
+    const res = ServiceResult.wrapDb(() => db.run(
       `INSERT INTO DynamicLoadLog (Timestamp, Requester, Target, Status, Detail, ExtVersion)
              VALUES (?, ?, ?, ?, ?, ?)`,
       [now, requester, target, status, detail, version],
-    );
+    ));
+    if (res.isFail) {
+      throw res.error;
+    }
+
     markLoggingDirty();
   } catch (err) {
     logCaughtError(BgLogTag.DYNAMIC_REQUIRE, "Failed to log dynamic load", err);

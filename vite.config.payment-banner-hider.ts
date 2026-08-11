@@ -16,27 +16,27 @@ import { resolve } from "path";
  * Prod mode: no sourcemaps, esbuild-minified.
  */
 export default defineConfig(({ mode }) => ({
-    publicDir: false,
-    build: {
-        outDir: "standalone-scripts/payment-banner-hider/dist",
-        emptyOutDir: false,
-        sourcemap: mode === "development" ? "inline" : false,
-        minify: mode !== "development" ? "esbuild" : false,
-        lib: {
-            entry: resolve(__dirname, "standalone-scripts/payment-banner-hider/src/index.ts"),
-            name: "PaymentBannerHider",
-            formats: ["iife"],
-            fileName: () => "payment-banner-hider.js",
-        },
-        rollupOptions: {
-            output: {
-                inlineDynamicImports: true,
-            },
-        },
+  publicDir: false,
+  build: {
+    outDir: "standalone-scripts/payment-banner-hider/dist",
+    emptyOutDir: false,
+    sourcemap: mode === "development" ? "inline" : false,
+    minify: mode !== "development" ? "esbuild" : false,
+    lib: {
+      entry: resolve(__dirname, "standalone-scripts/payment-banner-hider/src/index.ts"),
+      name: "PaymentBannerHider",
+      formats: ["iife"],
+      fileName: () => "payment-banner-hider.js",
     },
-    resolve: {
-        alias: {
-            "@payment-banner-hider": resolve(__dirname, "standalone-scripts/payment-banner-hider/src"),
-        },
+    rollupOptions: {
+      output: {
+        inlineDynamicImports: true,
+      },
     },
+  },
+  resolve: {
+    alias: {
+      "@payment-banner-hider": resolve(__dirname, "standalone-scripts/payment-banner-hider/src"),
+    },
+  },
 }));

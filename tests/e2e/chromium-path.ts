@@ -26,7 +26,9 @@ const SYSTEM_CHROMIUM_CANDIDATES = [
 /** Scan the Playwright browser registry for any installed chromium build. */
 function resolveFromPlaywrightRegistry(): string | undefined {
   const registry = process.env.PLAYWRIGHT_BROWSERS_PATH || '/opt/ms-playwright';
-  if (!fs.existsSync(registry)) return undefined;
+  if (!fs.existsSync(registry)) {
+    return undefined;
+  }
 
   let entries: string[];
   try {
@@ -42,7 +44,9 @@ function resolveFromPlaywrightRegistry(): string | undefined {
   for (const build of builds) {
     for (const layout of ['chrome-linux64/chrome', 'chrome-linux/chrome']) {
       const candidate = path.join(registry, build, layout);
-      if (fs.existsSync(candidate)) return candidate;
+      if (fs.existsSync(candidate)) {
+        return candidate;
+      }
     }
   }
 
@@ -59,7 +63,9 @@ export function resolveChromiumExecutablePath(): string | undefined {
   }
 
   for (const candidate of SYSTEM_CHROMIUM_CANDIDATES) {
-    if (fs.existsSync(candidate)) return candidate;
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
   }
 
   return resolveFromPlaywrightRegistry();

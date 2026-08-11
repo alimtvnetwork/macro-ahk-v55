@@ -1,3 +1,4 @@
+import { ServiceResult } from "@/utils/result-wrapper";
 /**
  * Marco Extension — Recorder DB Schema
  *

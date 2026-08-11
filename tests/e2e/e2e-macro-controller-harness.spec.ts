@@ -20,21 +20,21 @@ import { launchExtension } from './fixtures';
 import { mountMacroControllerHarness } from './utils/macro-controller-harness';
 
 test.describe('Macro-controller content-script harness', () => {
-    test('bootstraps a simulated lovable.dev page with chrome.* stubs (no bundle)', async () => {
-        const context = await launchExtension(chromium);
-        try {
-            const { page, bundlePath } = await mountMacroControllerHarness(context, {
-                projectId: 'harness-smoke',
-                skipBundle: true,
-            });
+  test('bootstraps a simulated lovable.dev page with chrome.* stubs (no bundle)', async () => {
+    const context = await launchExtension(chromium);
+    try {
+      const { page, bundlePath } = await mountMacroControllerHarness(context, {
+        projectId: 'harness-smoke',
+        skipBundle: true,
+      });
 
-            // URL surface — content-script gates check location.hostname.
-            expect(page.url()).toMatch(/^https:\/\/lovable\.dev\/projects\/harness-smoke/);
-            expect(bundlePath).toBeNull();
+      // URL surface — content-script gates check location.hostname.
+      expect(page.url()).toMatch(/^https:\/\/lovable\.dev\/projects\/harness-smoke/);
+      expect(bundlePath).toBeNull();
 
-            // chrome.* stubs installed before page scripts (addInitScript).
-            const chromeShape = await page.evaluate(() => {
-                const c = (window as unknown as {
+      // chrome.* stubs installed before page scripts (addInitScript).
+      const chromeShape = await page.evaluate(() => {
+        const c = (window as unknown as {
                     chrome?: {
                         runtime?: { id?: string };
                         storage?: { local?: { get?: unknown } };
@@ -42,40 +42,40 @@ test.describe('Macro-controller content-script harness', () => {
                     };
                 }).chrome;
 
-                return {
-                    hasChrome: typeof c !== 'undefined',
-                    runtimeId: c?.runtime?.id ?? null,
-                    storageLocalGet: typeof c?.storage?.local?.get === 'function',
-                    tabsQuery: typeof c?.tabs?.query === 'function',
-                };
-            });
-            expect(chromeShape.hasChrome).toBe(true);
-            expect(chromeShape.runtimeId).toBeTruthy();
-            expect(chromeShape.storageLocalGet).toBe(true);
-            expect(chromeShape.tabsQuery).toBe(true);
+        return {
+          hasChrome: typeof c !== 'undefined',
+          runtimeId: c?.runtime?.id ?? null,
+          storageLocalGet: typeof c?.storage?.local?.get === 'function',
+          tabsQuery: typeof c?.tabs?.query === 'function',
+        };
+      });
+      expect(chromeShape.hasChrome).toBe(true);
+      expect(chromeShape.runtimeId).toBeTruthy();
+      expect(chromeShape.storageLocalGet).toBe(true);
+      expect(chromeShape.tabsQuery).toBe(true);
 
-            // Shell DOM rendered.
-            await expect(page.getByTestId('project-title')).toHaveText('Harness Project');
-            await expect(page.getByTestId('workspace-sidebar')).toBeVisible();
-        } finally {
-            await context.close();
-        }
-    });
+      // Shell DOM rendered.
+      await expect(page.getByTestId('project-title')).toHaveText('Harness Project');
+      await expect(page.getByTestId('workspace-sidebar')).toBeVisible();
+    } finally {
+      await context.close();
+    }
+  });
 
-    test(
-        'injects the production IIFE without page-script errors',
-        async () => {
-            const context = await launchExtension(chromium);
-            try {
-                const { page, bundleError } = await mountMacroControllerHarness(context, {
-                    projectId: 'harness-bundle-smoke',
-                });
-                expect(page.url()).toMatch(/^https:\/\/lovable\.dev\/projects\/harness-bundle-smoke/);
-                expect(bundleError, `bundle threw: ${bundleError?.message}`).toBeNull();
-                await expect(page.locator('#ahk-loop-container')).toBeVisible({ timeout: 7000 });
-            } finally {
-                await context.close();
-            }
-        },
-    );
+  test(
+    'injects the production IIFE without page-script errors',
+    async () => {
+      const context = await launchExtension(chromium);
+      try {
+        const { page, bundleError } = await mountMacroControllerHarness(context, {
+          projectId: 'harness-bundle-smoke',
+        });
+        expect(page.url()).toMatch(/^https:\/\/lovable\.dev\/projects\/harness-bundle-smoke/);
+        expect(bundleError, `bundle threw: ${bundleError?.message}`).toBeNull();
+        await expect(page.locator('#ahk-loop-container')).toBeVisible({ timeout: 7000 });
+      } finally {
+        await context.close();
+      }
+    },
+  );
 });

@@ -20,6 +20,7 @@
  * @see .lovable/memory/features/projects/configuration-seeding.md — Hash-based seeding strategy
  */
 
+import { ServiceResult } from '@/utils/result-wrapper';
 import type { JsonValue } from "./handlers/handler-types";
 import type { ProjectDbManager } from "./project-db-manager";
 import { logCaughtError, BgLogTag} from "./bg-logger";

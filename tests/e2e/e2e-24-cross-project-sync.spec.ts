@@ -80,6 +80,7 @@ async function seedCrossProjectSyncState(context: BrowserContext): Promise<void>
   if (!serviceWorker) {
     serviceWorker = await context.waitForEvent('serviceworker', { timeout: 30_000 });
   }
+
   const projects = buildSeedProjects();
   // Wait for chrome.storage to be available in the service worker context.
   // On cold start, the SW may evaluate before chrome.* APIs are exposed.
@@ -90,9 +91,13 @@ async function seedCrossProjectSyncState(context: BrowserContext): Promise<void>
 
       return Boolean(c?.storage?.local);
     });
-    if (ready) break;
+    if (ready) {
+      break;
+    }
+
     await new Promise((r) => setTimeout(r, 100));
   }
+
   await serviceWorker.evaluate(
     async ({ onboardingKey, projectsKey, seededProjects }) => {
       await chrome.storage.local.set({
@@ -173,6 +178,7 @@ async function dragProjectIntoMembers(page: Page, projectId: string): Promise<vo
     if (!source || !target) {
       throw new Error(`CODE RED: Cross-Project Sync drag failed. Path: tests/e2e/e2e-24-cross-project-sync.spec.ts. Missing: ${!source ? sourceId : 'project-group-member-drop-target'}. Reason: drag source/drop target not rendered.`);
     }
+
     const dataTransfer = new DataTransfer();
     source.dispatchEvent(new DragEvent('dragstart', { bubbles: true, cancelable: true, dataTransfer }));
     target.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer }));
@@ -184,7 +190,10 @@ async function readGroupMembers(page: Page, groupName: string): Promise<string[]
   return await page.evaluate(async (name) => {
     const groupsResponse = await chrome.runtime.sendMessage({ type: 'LIBRARY_GET_GROUPS' });
     const group = groupsResponse.groups.find((candidate: { Name: string }) => candidate.Name === name);
-    if (!group) return [];
+    if (!group) {
+      return [];
+    }
+
     const membersResponse = await chrome.runtime.sendMessage({ type: 'LIBRARY_GET_GROUP_MEMBERS', groupId: group.Id });
 
     return membersResponse.members.map((member: { ProjectIdUuid: string }) => member.ProjectIdUuid);

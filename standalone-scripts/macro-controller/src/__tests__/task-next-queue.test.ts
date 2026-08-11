@@ -83,9 +83,9 @@ describe('Task Next sequential queue (Issue 01)', () => {
   it('multi-cycle runner mixes queue dequeue with legacy fallback per cycle', () => {
     // resolveCyclePrompt: queue first, legacy only when queue empty + not failed.
     expect(taskNextSrc).toMatch(/async function resolveCyclePrompt\(/);
-    expect(taskNextSrc).toMatch(/if \(dequeued\.failed\) return \{ text: '', source: 'queue', remaining: -1 \};/);
-    expect(taskNextSrc).toMatch(/if \(dequeued\.selection\) return \{ text: dequeued\.selection\.text, source: 'queue'/);
-    expect(taskNextSrc).toMatch(/return \{ text: legacyText, source: 'legacy', remaining: 0 \};/);
+    expect(taskNextSrc).toMatch(/if\s*\(dequeued\.failed\)\s*\{\s*return\s*\{\s*text:\s*'',\s*source:\s*'queue',\s*remaining:\s*-1\s*\};\s*\}/);
+    expect(taskNextSrc).toMatch(/if\s*\(dequeued\.selection\)\s*\{\s*return\s*\{\s*text:\s*dequeued\.selection\.text,\s*source:\s*'queue'/);
+    expect(taskNextSrc).toMatch(/return\s*\{\s*text:\s*legacyText,\s*source:\s*'legacy',\s*remaining:\s*0\s*\};\s*/);
   });
 
   it('cycle runner calls resolveCyclePrompt with the legacy text per iteration', () => {
@@ -105,13 +105,13 @@ describe('Submenu wiring routes count > 1 to the queue (prompt-dropdown.ts)', ()
 
   it('preset row: count <= 1 → runTaskNextLoop, count > 1 → runTaskNextQueue', () => {
     expect(dropdownSrc).toMatch(
-      /if \(count <= 1\) runTaskNextLoop\(taskNextDeps, count\);\s*else void runTaskNextQueue\(taskNextDeps, count\);/,
+      /if\s*\(count\s*<=\s*1\)\s*\{\s*runTaskNextLoop\(taskNextDeps,\s*count\);\s*\}\s*else\s*\{\s*void\s*runTaskNextQueue\(taskNextDeps,\s*count\);\s*\}/,
     );
   });
 
   it('custom-count row: n <= 1 → runTaskNextLoop, n > 1 → runTaskNextQueue', () => {
     expect(dropdownSrc).toMatch(
-      /if \(n <= 1\) runTaskNextLoop\(taskNextDeps, n\);\s*else void runTaskNextQueue\(taskNextDeps, n\);/,
+      /if\s*\(n\s*<=\s*1\)\s*\{\s*runTaskNextLoop\(taskNextDeps,\s*n\);\s*\}\s*else\s*\{\s*void\s*runTaskNextQueue\(taskNextDeps,\s*n\);\s*\}/,
     );
   });
 

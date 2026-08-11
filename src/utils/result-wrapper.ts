@@ -24,4 +24,16 @@ export class ServiceResult<T = unknown, E = unknown> {
   static wrap<T extends { ok: boolean; error?: unknown }>(res: T): ServiceResult<T, unknown> {
     return new ServiceResult(res.ok, res, res.error);
   }
+
+  static wrapDb<T>(dbAction: () => T): ServiceResult<T, unknown> {
+    try {
+      const result = dbAction();
+
+      return new ServiceResult(true, result);
+    } catch (e) {
+      console.error("[Marco] DB Error", e);
+
+      return new ServiceResult(false, undefined, e);
+    }
+  }
 }

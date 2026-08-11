@@ -42,6 +42,7 @@ import {
 } from "./handler-guards";
 import { RawSqlKindType } from "../../types/enums";
 import { logBgError } from "@/background/bg-logger";
+import { ServiceResult } from "@/utils/result-wrapper";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -300,7 +301,12 @@ function handleRawSqlRead(
     throw new Error(`rawSql: method ${method} cannot execute ${describeStatement(unsafe)}`);
   }
 
-  const rows = rowsFromExecResults(db.exec(sql));
+  const execRes = ServiceResult.wrapDb(() => db.exec(sql));
+  if (execRes.isFail) {
+    throw execRes.error;
+  }
+
+  const rows = rowsFromExecResults(execRes.data!);
 
   return { rows };
 }
@@ -317,7 +323,7 @@ function handleRawSqlWrite(
     throw new Error(`rawSql: method ${method} cannot execute ${describeStatement(unsafe)}`);
   }
 
-  db.exec(sql);
+  ServiceResult.wrapDb(() => db.exec(sql));
   const changes = getRowsModified(db);
   const lastInsertId = readLastInsertId(db);
   void markAndFlush(slug);
@@ -487,7 +493,12 @@ function rowsFromExecResults(results: ReturnType<ProjectDb["exec"]>): Array<Reco
 
 function readLastInsertId(db: ProjectDb): number | undefined {
   try {
-    const rows = rowsFromExecResults(db.exec("SELECT last_insert_rowid() AS lastInsertId"));
+    const execRes = ServiceResult.wrapDb(() => db.exec("SELECT last_insert_rowid() AS lastInsertId"));
+    if (execRes.isFail) {
+      return undefined;
+    }
+
+    const rows = rowsFromExecResults(execRes.data!);
     const value = rows[0]?.lastInsertId;
     const n = typeof value === "number" ? value : Number(value);
 

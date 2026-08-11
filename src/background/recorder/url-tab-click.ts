@@ -119,7 +119,7 @@ export function validateUrlTabClickParams(
   }
 
   const compiled = compileUrlPattern(params.UrlPattern, params.UrlMatch);
-  if (!compiled.Ok) {
+  if (compiled.Ok === false) {
     return { Reason: "InvalidUrlPattern", Detail: compiled.Detail };
   }
 
@@ -358,7 +358,7 @@ function precheck(base: ResultBase): { readonly test?: (url: string) => boolean;
   }
 
   const compiled = compileUrlPattern(base.params.UrlPattern, base.params.UrlMatch);
-  const isCompileFailed = !compiled.Ok;
+  const isCompileFailed = compiled.Ok === false;
   if (isCompileFailed) {
     return { error: buildResult(base, "InvalidUrlPattern", { Detail: compiled.Detail }) };
   }

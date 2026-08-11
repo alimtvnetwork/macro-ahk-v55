@@ -81,7 +81,7 @@ describe("compileUrlPattern", () => {
   it("Exact: trailing slash insensitive (case-sensitive path)", () => {
     const c = compileUrlPattern("https://app.example.com/orders/", "Exact");
     expect(c.Ok).toBe(true);
-    if (!c.Ok) {
+    if (c.Ok === false) {
       return;
     }
 
@@ -92,7 +92,7 @@ describe("compileUrlPattern", () => {
   it("Exact: scheme + host case-insensitive (AC-19.1.9)", () => {
     const c = compileUrlPattern("HTTPS://APP.EXAMPLE.COM/orders", "Exact");
     expect(c.Ok).toBe(true);
-    if (!c.Ok) {
+    if (c.Ok === false) {
       return;
     }
 
@@ -103,7 +103,7 @@ describe("compileUrlPattern", () => {
   it("Prefix matches startsWith with case-folded host", () => {
     const c = compileUrlPattern("https://APP.example.com/orders/", "Prefix");
     expect(c.Ok).toBe(true);
-    if (!c.Ok) {
+    if (c.Ok === false) {
       return;
     }
 
@@ -114,14 +114,14 @@ describe("compileUrlPattern", () => {
   it("Glob: * is non-slash, ** is any", () => {
     const c = compileUrlPattern("https://app.example.com/orders/*/edit", "Glob");
     expect(c.Ok).toBe(true);
-    if (!c.Ok) {
+    if (c.Ok === false) {
       return;
     }
 
     expect(c.Test("https://app.example.com/orders/42/edit")).toBe(true);
     expect(c.Test("https://app.example.com/orders/42/sub/edit")).toBe(false);
     const cc = compileUrlPattern("https://app.example.com/**/edit", "Glob");
-    if (!cc.Ok) {
+    if (cc.Ok === false) {
       throw new Error("compile failed");
     }
 
@@ -140,7 +140,7 @@ describe("compileUrlPattern", () => {
 
   it("Regex: valid pattern matches", () => {
     const c = compileUrlPattern("^https://app\\.example\\.com/orders/\\d+$", "Regex");
-    if (!c.Ok) {
+    if (c.Ok === false) {
       throw new Error("compile failed");
     }
 
