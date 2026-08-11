@@ -157,16 +157,16 @@ describe('open-tabs-section', () => {
     expect(html).toContain('Project Gamma');
 
     // Injected project => green label
-    expect(html).toContain('color:#10b981');
+    expect(html).toContain('color:hsl(var(--success))');
     expect(html).toContain('Alpha');
 
     // Probed workspace => amber label + source tag
-    expect(html).toContain('color:#fbbf24');
+    expect(html).toContain('color:hsl(var(--warning))');
     expect(html).toContain('Beta Workspace');
     expect(html).toContain('(cache)');
 
     // Error row => gray italic + truncated reason
-    expect(html).toContain('color:#9ca3af');
+    expect(html).toContain('color:hsl(var(--muted-foreground))');
     expect(html).toContain('no controller');
     expect(html).toContain('Receiving end does not exist');
 

@@ -52,8 +52,5 @@ export function substituteToken(body: string, key: string, value: string | numbe
 
   const valueText = String(value);
   const primary = body.replace(buildTokenRegex(key), valueText);
-  // n/N alias substitution (case-insensitive) for legacy DB rows.
-  const alternateKey = key === 'n' ? 'N' : key === 'N' ? 'n' : '';
-
-  return alternateKey ? primary.replace(buildTokenRegex(alternateKey), valueText) : primary;
+  return primary;
 }

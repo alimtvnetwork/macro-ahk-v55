@@ -23,24 +23,16 @@ Do it for all the bump-version prompts in the macro-controller.
 
 ## Pre-Bump Checklist (mandatory, in order)
 
-1. **Bump minor version** (semver `MAJOR.MINOR.PATCH` → increment `MINOR`, reset `PATCH` to `0`) across all unified-version sites:
-   a. `manifest.json` (`version` field)
-   b. `src/shared/constants.ts` (`EXTENSION_VERSION` or equivalent)
-   c. `standalone-scripts/macro-controller/src/shared-state.ts`
-   d. Every `standalone-scripts/*/src/instruction.ts` manifest (`macro-controller`, `xpath`, `marco-sdk`, `lovable-user-add`, `lovable-common`, `lovable-owner-switch`, …)
-   e. Run `node scripts/check-version-sync.mjs` and confirm exit 0
-2. **Add changelog entry** to root `changelog.md`:
+1. **Follow the Canonical Checklist**: You MUST strictly adhere to the checklist in `.lovable/how-to-release.md`.
+2. **Do NOT propagate version literals**: Do NOT manually edit `version.json`, `manifest.json`, `constants.ts`, `shared-state.ts`, or any instructions files. The release version lives ONLY in the git tag `vX.Y.Z`.
+3. **Add changelog entry** to root `changelog.md`:
    a. New `## vX.Y.0 - {YYYY-MM-DD}` heading
    b. Bullets grouped by `Added`, `Changed`, `Fixed`, `Removed` as applicable
    c. Reference the workstream / spec / plan section that triggered the bump
-3. **Pin version in root `README.md`**:
+4. **Pin version in root `README.md`**:
    a. Update the version badge (or inline `**Version:** vX.Y.0` line) at the top of the README
    b. If a "Latest release" or "Current build" callout exists, update it too
    c. Keep the install snippet's version reference in sync if hard-coded
-4. **Verify**:
-   a. `bunx tsc --noEmit` (root + macro-controller workspace) - exit 0
-   b. `node scripts/check-version-sync.mjs` - exit 0
-   c. `rg "vX\.Y\.(Z|0)" README.md changelog.md manifest.json` shows all sites pinned to the new version
 
 ## Coding Guidelines Reminder
 

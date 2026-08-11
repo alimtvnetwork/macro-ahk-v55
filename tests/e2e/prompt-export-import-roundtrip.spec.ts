@@ -30,6 +30,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { bundleBrowserIife } from './utils/esbuild-loader';
+import { seedUserAddedEntries } from './harness/seed-user-added-entries';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -133,16 +134,10 @@ test.describe('prompt export -> import round trip', () => {
     // IMPORTANT: seeds must use `isDefault: false`. Export is scoped to
     // user-added entries (v5.9.0 `filterUserAddedEntries`), so default
     // rows would be filtered out and the download would never fire.
-    await page.evaluate(async ({ slugA, slugB }) => {
-            interface Api {
-                writeJsonCopy: (entries: unknown[]) => Promise<void>;
-            }
-            const api = (window as unknown as { __roundtrip: Api }).__roundtrip;
-            await api.writeJsonCopy([
-              { name: 'PlanTierType default', text: 'plan body v2', category: 'plan', slug: slugA, role: 'plan', isFavorite: false, isDefault: false },
-              { name: 'Next default', text: 'next body v2', category: 'next', slug: slugB, role: 'next', isFavorite: false, isDefault: false },
-            ]);
-    }, { slugA: SLUG_A, slugB: SLUG_B });
+    await seedUserAddedEntries(page, [
+      { name: 'PlanTierType default', text: 'plan body v2', category: 'plan', slug: SLUG_A, role: 'plan', isFavorite: false },
+      { name: 'Next default', text: 'next body v2', category: 'next', slug: SLUG_B, role: 'next', isFavorite: false },
+    ]);
 
     // ---- Stage 2: trigger export and capture the download JSON ----
     const downloadPromise = page.waitForEvent('download');

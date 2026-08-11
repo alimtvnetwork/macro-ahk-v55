@@ -25,7 +25,7 @@ export function getTitleBarDisplayState(): TitleBarDisplayState {
     return {
       text: projectName,
       title: 'Project: ' + projectName + (wsName ? ' | Workspace: ' + wsName : ' (workspace not yet detected)') + ' — click to re-detect workspace',
-      color: '#fbbf24',
+      color: 'hsl(var(--warning))',
       opacity: '1',
       fontSize: '16px',
       fontWeight: '600',
@@ -36,7 +36,7 @@ export function getTitleBarDisplayState(): TitleBarDisplayState {
     return {
       text: wsName,
       title: 'Workspace: ' + wsName + ' (project name not yet detected) — click to re-detect workspace',
-      color: '#fbbf24',
+      color: 'hsl(var(--warning))',
       opacity: '0.85',
       fontSize: '14px',
       fontWeight: '500',
@@ -46,7 +46,7 @@ export function getTitleBarDisplayState(): TitleBarDisplayState {
   return {
     text: '⟳ detecting…',
     title: 'Project name not detected — click to re-detect workspace',
-    color: '#9ca3af',
+    color: 'hsl(var(--muted-foreground))',
     opacity: '1',
     fontSize: '10px',
     fontWeight: '500',

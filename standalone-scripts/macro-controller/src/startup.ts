@@ -11,6 +11,7 @@ import { ServiceResult } from './utils/result-wrapper';
  *
  * @see spec/04-macro-controller/ts-migration-v2/01-initialization-fix.md, Init spec
  * @see .lovable/memory/features/macro-controller/startup-initialization.md, UI-first strategy
+ * Passive attach, no visible UI
  */
 
 import { log, getProjectNameFromDom } from './logger';

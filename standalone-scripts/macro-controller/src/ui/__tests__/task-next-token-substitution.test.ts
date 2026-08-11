@@ -51,9 +51,5 @@ describe('Task Next token substitution', () => {
     expect(pasted).not.toContain('{{n}}');
   });
 
-  it('replaces legacy uppercase tokens and dollar tokens through the exported queue helper', () => {
-    const text = substituteTaskNextPromptText({ text: 'Next {{N}} and ${n}', replaceKey: 'n' }, 3);
 
-    expect(text).toBe('Next 3 and 3');
-  });
 });

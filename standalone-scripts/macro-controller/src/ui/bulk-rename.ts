@@ -351,7 +351,7 @@ function _createRenameTitleBar(panel: HTMLElement, count: number): HTMLElement {
   titleText.textContent = '✏️ Bulk Rename — ' + count + ' workspace' + (count > 1 ? 's' : '');
 
   const closeBtnTitle = document.createElement('span');
-  closeBtnTitle.style.cssText = 'cursor:pointer;color:#94a3b8;font-size:14px;padding:0 4px;';
+  closeBtnTitle.style.cssText = 'cursor:pointer;color:hsl(var(--muted-foreground));font-size:14px;padding:0 4px;';
   closeBtnTitle.textContent = '✕';
   closeBtnTitle.onclick = function () {
     if (_currentInputs) {
@@ -470,10 +470,10 @@ function _buildRenameInputs(body: HTMLElement, selected: WorkspaceCredit[]): Ren
     for (const [j, ws] of selected.entries()) {
       const origName = ws.fullName || ws.name || '';
       const newName = applyRenameTemplate(template, prefix, suffix, starts, j, origName);
-      html += '<div style="display:flex;gap:6px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05);"><span style="color:#94a3b8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + origName.replace(/"/g, '&quot;') + '">' + origName + '</span><span style="color:#64748b;">→</span><span style="color:#67e8f9;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;" title="' + newName.replace(/"/g, '&quot;') + '">' + newName + '</span></div>';
+      html += '<div style="display:flex;gap:6px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05);"><span style="color:hsl(var(--muted-foreground));flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + origName.replace(/"/g, '&quot;') + '">' + origName + '</span><span style="color:hsl(var(--muted-foreground));">→</span><span style="color:#67e8f9;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;" title="' + newName.replace(/"/g, '&quot;') + '">' + newName + '</span></div>';
     }
 
-    previewList.innerHTML = html || '<div style="color:#64748b;">No changes</div>';
+    previewList.innerHTML = html || '<div style="color:hsl(var(--muted-foreground));">No changes</div>';
   };
 
   tmplRow.input.oninput = updatePreview;
@@ -490,7 +490,7 @@ function _buildRenameInputs(body: HTMLElement, selected: WorkspaceCredit[]): Ren
 
 function _appendVarHintAndStartNums(body: HTMLElement): HTMLElement {
   const varHint = document.createElement('div');
-  varHint.style.cssText = 'font-size:8px;color:#64748b;margin-bottom:6px;padding:2px 4px;background:rgba(0,0,0,.2);border-radius:2px;';
+  varHint.style.cssText = 'font-size:8px;color:hsl(var(--muted-foreground));margin-bottom:6px;padding:2px 4px;background:rgba(0,0,0,.2);border-radius:2px;';
   varHint.innerHTML = 'Variables: <span style="color:#facc15">$$$</span> <span style="color:' + cPrimaryLight + '">###</span> <span style="color:#34d399">***</span> — zero-padded by count ($$$ → 001). Works in prefix, template, suffix.';
   body.appendChild(varHint);
 
@@ -505,7 +505,7 @@ function _appendVarHintAndStartNums(body: HTMLElement): HTMLElement {
 function _appendPreviewSection(body: HTMLElement): HTMLElement {
   body.appendChild(buildTokenRow());
   const previewLabel = document.createElement('div');
-  previewLabel.style.cssText = 'font-size:9px;color:#94a3b8;margin-bottom:3px;';
+  previewLabel.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));margin-bottom:3px;';
   previewLabel.textContent = 'Preview:';
   body.appendChild(previewLabel);
   const previewList = document.createElement('div');
@@ -541,7 +541,7 @@ function _detectVarsAndRenderStarts(
 
   let html = '';
   if (hasDollar || hasHash || hasStar) {
-    html += '<div style="font-size:8px;color:#94a3b8;margin-bottom:3px;">Start Numbers:</div><div style="display:flex;gap:8px;flex-wrap:wrap;">';
+    html += '<div style="font-size:8px;color:hsl(var(--muted-foreground));margin-bottom:3px;">Start Numbers:</div><div style="display:flex;gap:8px;flex-wrap:wrap;">';
     if (hasDollar) {
       html += buildStartNumInput('$', 'rename-start-dollar', startNums.dollar, '#facc15');
     }
@@ -635,7 +635,7 @@ function _appendDelayAndEta(body: HTMLElement, count: number): { delaySlider: HT
   const delayRow = document.createElement('div');
   delayRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:6px;';
   const delayLabel = document.createElement('span');
-  delayLabel.style.cssText = 'font-size:9px;color:#94a3b8;min-width:52px;';
+  delayLabel.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));min-width:52px;';
   delayLabel.textContent = 'Delay (ms)';
   delayRow.appendChild(delayLabel);
   delayRow.appendChild(delaySlider);
@@ -644,14 +644,14 @@ function _appendDelayAndEta(body: HTMLElement, count: number): { delaySlider: HT
 
   const etaRow = document.createElement('div');
   etaRow.id = 'rename-eta-row';
-  etaRow.style.cssText = 'font-size:8px;color:#64748b;margin-bottom:6px;display:none;';
+  etaRow.style.cssText = 'font-size:8px;color:hsl(var(--muted-foreground));margin-bottom:6px;display:none;';
   body.appendChild(etaRow);
 
   const updateStaticEta = function(): void {
     if (count > 0) {
       const etaMs = count * getRenameDelayMs();
       etaRow.style.display = 'block';
-      etaRow.innerHTML = '⏱ Est. total: <span style="color:#94a3b8;">' + formatEta(etaMs) + '</span> for ' + count + ' items @ ' + getRenameDelayMs() + 'ms delay';
+      etaRow.innerHTML = '⏱ Est. total: <span style="color:hsl(var(--muted-foreground));">' + formatEta(etaMs) + '</span> for ' + count + ' items @ ' + getRenameDelayMs() + 'ms delay';
     }
   };
 
@@ -681,7 +681,7 @@ function _buildRenameButtons(
 
   const cancelBtn = document.createElement('button');
   cancelBtn.textContent = 'Cancel';
-  cancelBtn.style.cssText = 'padding:4px 12px;background:rgba(100,116,139,0.3);color:#94a3b8;border:1px solid #475569;border-radius:4px;font-size:10px;cursor:pointer;';
+  cancelBtn.style.cssText = 'padding:4px 12px;background:rgba(100,116,139,0.3);color:hsl(var(--muted-foreground));border:1px solid hsl(var(--muted-foreground));border-radius:4px;font-size:10px;cursor:pointer;';
   cancelBtn.onclick = function () {
     _autoSave(inputs);
     removeBulkRenameDialog(); 
@@ -690,7 +690,7 @@ function _buildRenameButtons(
   const stopBtn = document.createElement('button');
   stopBtn.textContent = '⏹ Stop';
   stopBtn.id = 'rename-stop-btn';
-  stopBtn.style.cssText = 'display:none;padding:4px 12px;background:rgba(239,68,68,0.3);color:#f87171;border:1px solid rgba(239,68,68,0.4);border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;';
+  stopBtn.style.cssText = 'display:none;padding:4px 12px;background:rgba(239,68,68,0.3);color:hsl(var(--destructive));border:1px solid rgba(239,68,68,0.4);border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;';
   stopBtn.onclick = function () {
     cancelRename();
     log('[Rename] Stop requested by user', 'warn'); 
@@ -699,7 +699,7 @@ function _buildRenameButtons(
   const applyBtn = document.createElement('button');
   applyBtn.id = 'ahk-loop-rename-apply';
   applyBtn.textContent = '✅ Apply';
-  applyBtn.style.cssText = 'padding:4px 12px;background:#059669;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;';
+  applyBtn.style.cssText = 'padding:4px 12px;background:#059669;color:hsl(var(--foreground));border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;';
   applyBtn.onclick = function () {
     _autoSave(inputs);
     _executeRenameApply(selected, tmplRow, prefixRow, suffixRow, getStartNums, applyBtn, stopBtn, cancelBtn, etaRow);
@@ -747,7 +747,7 @@ function _executeRenameApply(
 
   (applyBtn as HTMLButtonElement).disabled = true;
   applyBtn.textContent = 'Renaming... 0/' + entries.length;
-  applyBtn.style.background = '#64748b';
+  applyBtn.style.background = 'hsl(var(--muted-foreground))';
   stopBtn.style.display = 'inline-block';
   cancelBtn.style.display = 'none';
 
@@ -786,7 +786,7 @@ function handleRenameDone(
     ? '⏹ Stopped: ' + results.success + '/' + results.total
     : '✅ ' + results.success + '/' + results.total + (results.failed > 0 ? ' (' + results.failed + ' failed)' : ' done');
   applyBtn.textContent = statusText;
-  applyBtn.style.background = results.cancelled || results.failed > 0 ? '#d97706' : '#059669';
+  applyBtn.style.background = results.cancelled || results.failed > 0 ? 'hsl(var(--warning))' : '#059669';
   stopBtn.style.display = 'none';
   etaRow.style.display = 'none';
   setTimeout(function () {

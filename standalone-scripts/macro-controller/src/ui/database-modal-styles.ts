@@ -82,7 +82,7 @@ function buildModalLayoutStyles(): string {
     }
     .marco-db-close {
       font-size: 18px;
-      color: #64748b;
+      color: hsl(var(--muted-foreground));
       cursor: pointer;
       padding: 4px 8px;
       border-radius: 6px;
@@ -91,7 +91,7 @@ function buildModalLayoutStyles(): string {
       background: none;
     }
     .marco-db-close:hover {
-      color: #e2e8f0;
+      color: hsl(var(--foreground));
       background: rgba(255,255,255,0.1);
     }
     .marco-db-body {
@@ -124,7 +124,7 @@ function buildSidebarStyles(): string {
       padding: 6px 12px;
       font-size: 12px;
       cursor: pointer;
-      color: #94a3b8;
+      color: hsl(var(--muted-foreground));
       transition: all 0.12s;
       display: flex;
       align-items: center;
@@ -132,7 +132,7 @@ function buildSidebarStyles(): string {
     }
     .marco-db-table-item:hover {
       background: rgba(255,255,255,0.05);
-      color: #e2e8f0;
+      color: hsl(var(--foreground));
     }
     .marco-db-table-item.active {
       background: ${cPrimaryBgAS};
@@ -156,7 +156,7 @@ function buildContentStyles(): string {
       min-width: 0;
     }
     .marco-db-empty {
-      color: #64748b;
+      color: hsl(var(--muted-foreground));
       font-size: 12px;
       padding: 32px 0;
       text-align: center;
@@ -165,7 +165,7 @@ function buildContentStyles(): string {
       overflow-x: auto;
     }
     .marco-db-loading {
-      color: #64748b;
+      color: hsl(var(--muted-foreground));
       font-size: 12px;
       padding: 24px 0;
       text-align: center;
@@ -174,7 +174,7 @@ function buildContentStyles(): string {
       padding: 8px 16px;
       border-top: 1px solid ${cPrimaryBgAL};
       font-size: 10px;
-      color: #475569;
+      color: hsl(var(--muted-foreground));
       display: flex;
       align-items: center;
       gap: 12px;
@@ -227,7 +227,7 @@ function buildPaginationStyles(): string {
       justify-content: space-between;
       padding: 8px 0;
       font-size: 11px;
-      color: #64748b;
+      color: hsl(var(--muted-foreground));
     }
     .marco-db-page-btn {
       padding: 4px 10px;
@@ -261,12 +261,12 @@ function buildTabStyles(): string {
       padding: 8px 16px;
       font-size: 12px;
       font-weight: 600;
-      color: #64748b;
+      color: hsl(var(--muted-foreground));
       cursor: pointer;
       border-bottom: 2px solid transparent;
       transition: all 0.15s;
     }
-    .marco-db-tab:hover { color: #94a3b8; }
+    .marco-db-tab:hover { color: hsl(var(--muted-foreground)); }
     .marco-db-tab.active {
       color: ${cPrimaryLight};
       border-bottom-color: ${cPrimary};
@@ -332,8 +332,8 @@ function buildFilterStyles(): string {
     .marco-db-filter-clear {
       cursor: pointer;
       font-size: 12px;
-      color: #94a3b8;
+      color: hsl(var(--muted-foreground));
     }
-    .marco-db-filter-clear:hover { color: #f87171; }
+    .marco-db-filter-clear:hover { color: hsl(var(--destructive)); }
   `;
 }

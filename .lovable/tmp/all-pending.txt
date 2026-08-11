@@ -1,0 +1,800 @@
+Slug: prompts-import-export-section
+Status: pending
+Created: 2026-07-17
+
+# Prompts Import/Export Section
+
+**Slug:** prompts-import-export-section
+**Status:** pending
+**Created:** 2026-07-17
+
+## Context
+
+The prompts dropdown in the macro-controller inline UI currently supports only
+runtime editing. The user wants a dedicated Import / Export section so full
+prompt libraries can be shared across machines and browsers, exchanged with
+teammates, and version-controlled outside the extension. Requirements will be
+detailed by the user in a follow-up message. This plan captures the intent so
+it is not lost; step content stays high-level until the user pins the scope.
+
+Related existing modules:
+
+- `standalone-scripts/macro-controller/src/ui/prompt-io.ts` (existing exporter
+  helpers, respects `excludeFromExport` flag from ambiguity note 64)
+- `standalone-scripts/macro-controller/src/ui/prompt-io-dialog.ts`
+- `standalone-scripts/macro-controller/src/ui/prompt-manager.ts`
+- `schemas/prompts-bundle.schema.json` (JSON schema for round-trip bundles)
+
+## Steps (draft, awaiting user detail)
+
+1. Confirm scope with the user: dropdown-only, options-page-only, or both.
+2. Design the section layout inside the prompts dropdown (Import row, Export
+   row, and a small preview of the last bundle).
+3. Wire the Export button to `prompt-io.ts` and offer JSON download plus a
+   copy-to-clipboard fallback.
+4. Wire the Import button to a file picker + drop zone, validate against
+   `prompts-bundle.schema.json`, and merge with conflict resolution
+   (replace vs. skip vs. rename).
+5. Persist last-imported metadata (source filename, entry count, timestamp)
+   in the prompts config so the UI can surface it.
+6. Add a per-prompt "exclude from export" checkbox that flips the
+   `excludeFromExport` flag (already supported in the type per ambiguity 64).
+7. Ship tests: unit for the merger, one E2E that round-trips a bundle.
+
+## Verification
+
+- Import a known-good bundle, confirm entry count matches.
+- Export, delete a prompt, re-import, confirm restoration.
+- Toggle `excludeFromExport` on one entry, export, confirm it is absent.
+
+## Evidence
+
+- Before: pending (no import/export surface in the dropdown).
+- After: pending until execution.
+- Proof: pending.
+Slug: per-project-chat-submit-tracker
+Status: pending
+Created: 2026-07-17
+
+# Plan 13: Per-Project Chat-Submit Tracker (OPFS-backed, 300-cap rolling)
+
+**Slug:** per-project-chat-submit-tracker
+**Status:** pending
+**Created:** 2026-07-17
+**Version target:** v4.49.0 (foundation) -> v4.50.x-v4.55.x (stepwise delivery)
+
+## Context
+
+User wants every chat-box submission on lovable.dev to be captured per
+project (extracted from `/projects/<uuid>/` URL), stored on disk (OPFS) so
+the SQLite bundle stays lean, and rotated at a per-project cap of 300
+entries (customizable). Sources include the main chat textarea, Repeat
+Loop submissions, the Next chip, and the Plan chip.
+
+Answered ambiguities (see chat 2026-07-17):
+- **File store:** OPFS (origin private file system).
+- **Retention:** 300 entries per project, customizable, rolling.
+- **Rename policy:** backfill old rows when the project name changes.
+- **Verbose gate:** respect existing `verboseLogging` toggle for full text;
+  metadata row (id, project, source, timestamp, char count) always written.
+- **Char limit:** up to 8000-10000 chars per entry.
+- **Guide download format:** .md (single file); import accepts .md, .json,
+  .db/.sqlite, .zip.
+
+## Steps (10)
+
+1. **LLM authoring guide (v4.49.0, this turn).** Ship `docs/prompts/llm-
+   authoring-guide.md` plus inline bundle in `prompt-llm-guide-download.ts`
+   with a "📘 LLM Guide" button in the Prompts IO dialog. Wire the file
+   input `accept` list to `.md,.json,.db,.sqlite,.zip`.
+2. **UI polish for merged Plan+Next in prompts dropdown.** Tighten
+   spacing, chip alignment, hover states. Behavior unchanged.
+3. **OPFS store module** `standalone-scripts/macro-controller/src/storage/
+   chat-submit-opfs-store.ts` with `saveEntry(projectId, text): fileId`,
+   `readEntry(projectId, fileId): text`, `deleteEntry(projectId, fileId)`,
+   `listProject(projectId): fileId[]`. Directory layout:
+   `chat-submits/<projectId>/<uuid>.txt`.
+4. **SQLite table** `ProjectChatSubmit(Id, ProjectId, ProjectName,
+   Source, FileId, CharCount, CreatedAt, MetaJson)` + migration.
+5. **Project ID + name extractor** `standalone-scripts/macro-controller/
+   src/util/project-id-from-url.ts` (regex `/\/projects\/([0-9a-f-]{36})/i`)
+   with DOM fallback for name (`document.title`, `<header>` scrape).
+6. **Capture hooks** in `paste-flow.ts`, `repeat-loop-ui.ts`,
+   `next-inline-ui.ts`, `plan-task-ui.ts`. Each writes one row + one
+   OPFS file. Full text only when `verboseLogging` is ON.
+7. **Rolling-window enforcer** on every insert: if per-project row count
+   > cap (default 300, `Project.ChatSubmitCap` config), delete oldest
+   row AND its OPFS file atomically.
+8. **Rename backfill.** When the extractor detects a name change for a
+   known projectId, run `UPDATE ProjectChatSubmit SET ProjectName=? WHERE
+   ProjectId=?` on the same transaction.
+9. **Panel "Project history"** section: per-project row count, most
+   recent 20 with source badges, open-file action (reads OPFS), export
+   button (reuses plan-12 JSON exporter, wraps entries into the
+   prompts-export-bundle envelope with `format:"json"` and a `Source`
+   tag preserved in `MetaJson`).
+10. **Tests + docs + release.** Unit tests for rotation and rename
+    backfill; integration test for one submit-capture path;
+    `standalone-scripts/macro-controller/readme.md` section documenting
+    OPFS layout and cap tuning; changelog + release notes; version bump.
+
+## Verification
+
+- Submit 305 prompts on a project; count stays at 300, first 5 are gone.
+- Rename project in Lovable UI; historical rows show new name.
+- Toggle verbose OFF; new rows have `CharCount>0` but the referenced
+  OPFS file contains a redacted placeholder or is absent (TBD in step 6).
+- Delete project; OPFS directory + rows purge together.
+- Round-trip exported bundle re-imports via Prompts IO dialog.
+
+## Evidence
+
+- Before: pending (only foundation in v4.49.0).
+- After: pending until step 10 lands.
+- Proof: pending.
+# Prompt Library Test Coverage (Plan/Next/Defaults) - 50 steps
+
+Slug: prompt-library-test-coverage-50
+Steps: 50
+Status: pending
+Created: 2026-07-17
+
+## Context
+
+Recently landed work (Plan-14 editable prompt library, Plan-15 configurable Replace token + N options) added
+DB-backed Plan/Next prompt storage, seeding, IO bridge, token substitution, drift guard, and UI wiring. Test
+coverage exists but is uneven: some methods only have happy-path coverage, some have no negative-path tests,
+and integration between DB -> substitution -> UI is thin. This plan writes positive, negative, and
+integration tests for the main methods only (not every helper), across:
+
+- `standalone-scripts/macro-controller/src/db/` (schema, role-scope, CRUD, token-parity)
+- `standalone-scripts/macro-controller/src/prompt-defaults.ts` (ReplaceKey / ReplaceValues / defaults)
+- `standalone-scripts/macro-controller/src/token-substitute.ts`
+- `standalone-scripts/macro-controller/src/prompt-io.ts` + `prompt-io-db-bridge.ts`
+- `standalone-scripts/macro-controller/src/ui/plan-task-ui.ts` + `task-next-ui.ts`
+- `standalone-scripts/macro-controller/src/seed-plan-next.ts`
+
+Prior commands: `.lovable/spec/commands/01-standalone-scripts-must-follow-coding-guidelines.md`
+Prior related plans: completed 14, 15; pending 11 (prompts import-export section) stays independent.
+
+## Steps
+
+1. Inventory public methods in `db/schema.ts`, `db/role-scope.ts`, `db/prompt-crud.ts`, `db/token-parity.ts` and list which already have tests.
+2. Inventory public methods in `prompt-defaults.ts`, `token-substitute.ts`, `prompt-io.ts`, `prompt-io-db-bridge.ts`, `seed-plan-next.ts` and list existing test files.
+3. Inventory UI entry points in `plan-task-ui.ts`, `task-next-ui.ts`, `prompt-library-modal.ts` and list existing tests.
+4. Write the target matrix (method x {positive, negative, integration}) into `.lovable/plans/subtasks/22-prompt-library-test-coverage-50/01-matrix.md`.
+5. Confirm vitest config picks up any new `__tests__/*.test.ts` file under `standalone-scripts/macro-controller/src/`.
+6. db/schema: positive - creates Prompt table with expected columns and unique (Role, Slug) index.
+7. db/schema: negative - second create is idempotent (no throw, no duplicate index).
+8. db/schema: integration - after schema init, CRUD insert+read round-trips a row.
+9. db/role-scope: positive - accepts `plan`, `next`, `generic`.
+10. db/role-scope: negative - rejects unknown role (`foo`) with typed error.
+11. db/role-scope: negative - rejects empty string and undefined.
+12. db/prompt-crud.create: positive - inserts and returns row with generated Id and timestamps.
+13. db/prompt-crud.create: negative - duplicate (Role, Slug) rejected with clear error code.
+14. db/prompt-crud.update: positive - updates Body, bumps UpdatedAt, keeps Slug.
+15. db/prompt-crud.update: negative - updating non-existent Id returns not-found error, no partial write.
+16. db/prompt-crud.delete: positive - deletes row, subsequent read returns null.
+17. db/prompt-crud.delete: negative - deleting non-existent Id is a no-op with logged warning.
+18. db/prompt-crud.listByRole: positive - filters by role, ordered by Slug.
+19. db/prompt-crud.listByRole: negative - unknown role rejected before query.
+20. db/token-parity: positive - body preserving all `{{token}}` placeholders passes.
+21. db/token-parity: negative - body missing a placeholder from baseline is rejected with the missing token name in the error.
+22. db/token-parity: negative - body with an extra placeholder not in baseline is rejected.
+23. db/token-parity: integration - CRUD.update rejects when parity check fails, row unchanged.
+24. prompt-defaults: positive - `ReplaceKey` default is the documented token; `ReplaceValues` default list non-empty and unique.
+25. prompt-defaults: negative - mutating exported defaults at runtime does not affect a second import (frozen or cloned).
+26. token-substitute: positive - replaces every `{{ReplaceKey}}` occurrence with the provided value.
+27. token-substitute: positive - supports N-way expansion when values list has multiple entries.
+28. token-substitute: negative - empty value collapses token to empty string without throwing.
+29. token-substitute: negative - missing key in template returns template unchanged.
+30. token-substitute: negative - malformed token `{{ unclosed` left as literal, logged once.
+31. token-substitute: integration - feeding a DB-loaded Plan prompt through substitute yields the exact string the UI would submit.
+32. prompt-io export: positive - exports all Prompt rows into JSON matching the versioned schema.
+33. prompt-io export: negative - empty DB exports an envelope with `items: []`, still schema-valid.
+34. prompt-io import: positive - imports well-formed JSON, upserts rows, returns counts.
+35. prompt-io import: negative - invalid JSON returns typed error, DB untouched.
+36. prompt-io import: negative - schema-version mismatch rejected with expected/actual versions in message.
+37. prompt-io-db-bridge: positive - maps DB row -> IO record with conditional optional keys (no `undefined` values leaked).
+38. prompt-io-db-bridge: negative - row missing a required column surfaces a validation error naming the column.
+39. prompt-io-db-bridge: integration - export then re-import yields byte-identical rows (round-trip).
+40. seed-plan-next: positive - first boot inserts baseline Plan + Next prompts and sets the `seeded` flag.
+41. seed-plan-next: negative - second boot with flag set is a no-op (no writes, no toast).
+42. seed-plan-next: integration - after seed, `listByRole('plan')` and `listByRole('next')` return the documented slugs.
+43. plan-task-ui: positive - chip click loads Plan prompt from DB, substitutes token, submits.
+44. plan-task-ui: negative - DB empty for `plan` role triggers a one-shot logged error and does not submit.
+45. task-next-ui: positive - Next chip click loads Next prompt, applies N options, submits once.
+46. task-next-ui: negative - teardown on `pagehide` removes listener; second dispatch after teardown is a no-op (regression guard).
+47. Integration - full flow: seed on fresh DB, open Plan Library modal, edit body preserving tokens, save, chip submits updated body.
+48. Integration - full flow: import external JSON via Prompt Library, chip submits imported body with substitution.
+49. Run vitest for the new suites only and confirm all green. Commit test files. Do not touch production source unless a test uncovers a real bug - if so, capture that as a new issue under `.lovable/issues/` and stop.
+50. Bump minor version, add changelog entry, update RELEASE_NOTES.md, pin version in root readme.md.
+
+## Verification
+
+- `bunx vitest run` under `standalone-scripts/macro-controller` - all new files green.
+- `npx tsc --noEmit -p tsconfig.macro.build.json` clean.
+- `npx eslint standalone-scripts --max-warnings=0` clean.
+- Coverage delta report shows every method listed in step 4 has >= 1 positive AND >= 1 negative test.
+- Integration tests (steps 47, 48) exercise DB + substitution + UI dispatch, not just isolated units.
+
+## Appended from prior pending tasks
+
+- pending/10 unified-billing-all-workspaces - unrelated, remains pending.
+- pending/11 prompts-import-export-section - related but scoped to UI section, remains pending.
+- pending/13 per-project-chat-submit-tracker - unrelated, remains pending.
+# Prompt Library relocate to Plan/Next chips, AI guideline export, Repeat More popover, light-mode repair
+
+Slug: prompt-library-relocate-and-light-mode
+Steps: 20
+Status: pending
+Created: 2026-07-18
+
+## Context
+
+The current prompt library UX buries prompt selection/editing inside the Library modal. The user wants per-role (Plan / Next) chip-level controls that reuse the existing Add/Edit prompt editor and surface the required `{{token}}` contract, plus a downloadable AI guideline explaining the token rules. In parallel, the Repeat row overflows past 50 presets and the light theme is visually broken.
+
+Captured artifacts this turn:
+- Issue: `.lovable/issues/open/04-prompt-library-ux-misplaced.md`
+- Issue: `.lovable/issues/open/06-repeat-row-overflow-needs-more-dropdown.md`
+- Issue: `.lovable/issues/open/07-light-mode-ui-broken.md`
+- Command: `.lovable/spec/commands/03-capture-request-as-issue-before-planning.md`
+
+Prior pending plans pulled into scope for verification (must remain non-regressed):
+- `.lovable/plans/pending/11-prompts-import-export-section.md`
+- `.lovable/plans/pending/22-prompt-library-test-coverage-50.md`
+
+Files most likely touched: `standalone-scripts/macro-controller/src/ui/plan-task-ui.ts`, `strip-frame.ts`, `prompt-manager.ts`, `prompt-io.ts`, `prompt-library-modal.*`, `index.css`, `schemas/prompts-export-bundle.schema.json`.
+
+## Steps
+
+1. Read issues 04/06/07 and confirm scope against the existing prompt-editor component; document the reuse contract (props, save handler, drift-guard hook) in `spec/33-missing-coding-guideline/prompt-editor-reuse.md`.
+2. Add a per-role selector control (`⚙ Plan prompt ▾`) to the Plan row of the strip frame with menu items: `Choose default`, `Edit current`, `Add new plan prompt`, `Manage library…`.
+3. Add the mirror control (`⚙ Next prompt ▾`) to the Next row of the strip frame with the same four menu items scoped to role=next.
+4. Extract the existing Add/Edit prompt modal into a reusable `PromptEditor` component with props `{ role, initial, requiredTokens, onSave, onCancel }`; keep the current dropdown flow calling into it unchanged.
+5. Render a persistent "Required tokens" chip strip inside `PromptEditor` sourced from the drift-guard token list; disable Save with a clear inline error if any required token is missing on blur.
+6. Add a "Download AI guideline" button to `PromptEditor` that generates a markdown file (`prompt-token-contract-<role>-<slug>.md`) listing every required `{{token}}`, its meaning, and rules ("do not rename", "do not translate", "case-sensitive").
+7. In the Prompt Library modal, add a per-row Edit button that opens the same `PromptEditor`, and add a tooltip on the Generic role chip explaining "applies to any dropdown prompt not scoped to plan or next".
+8. Add a "Download sample JSON" button next to Import in the Library modal that exports a minimal valid bundle conforming to `schemas/prompts-export-bundle.schema.json`; link the schema from the tooltip.
+9. Wire Import to run the JSON through the schema validator first and surface each schema violation with the JSON pointer path in the error banner (no silent skips).
+10. Replace every hardcoded color literal (`bg-black`, `text-white`, `bg-[#…]`, inline `#hex` in CSS) in `standalone-scripts/macro-controller/src/ui/**` with semantic tokens from `index.css`; add tokens for `--strip-frame-bg`, `--chip-bg`, `--chip-border`, `--editor-callout-bg` if missing.
+11. Add light-theme values for every new token so the strip frame, dropdown, library, editor, and popovers render readable in light mode; verify against the user-supplied light-mode screenshot when it arrives.
+12. Convert the Repeat row to the same "inline ≤ 50, overflow under `More ▾`" pattern already used by Plan; share the popover component (`plan-more-popover.ts`) via a role prop.
+13. Add a "Reset to default" action inside `PromptEditor` that restores the seeded content for the current role/slug and re-runs the drift guard; guarded by a confirm dialog.
+14. Update `seed-plan-next.ts` so the seeded default carries the required-tokens list as data (not a runtime regex) and `PromptEditor` reads from that manifest - single source of truth.
+15. Add integration tests: (a) Plan chip → editor open → save with token removed → rejected; (b) Next chip → add new → appears in dropdown; (c) Import invalid JSON → schema errors shown with pointer; (d) AI guideline markdown contains every required token.
+16. Add a Playwright E2E `tests/e2e/prompt-chip-editor.spec.ts` that clicks the Plan gear, edits the body, saves, closes the strip, reopens, and verifies persistence via the DB bridge.
+17. Add a Playwright E2E for light-theme readability: navigate with `?theme=light`, screenshot strip + dropdown + library + editor, run pixelmatch against dark baseline to confirm contrast token switch (no visual regressions in dark).
+18. Add a Playwright E2E for the Repeat `More ▾` popover: assert overflow presets are absent from the row and present in the popover, and that selecting one persists via `plan-task-ui`.
+19. Update `.lovable/issues/open/04`, `06`, `07` to `closed/` once each corresponding integration + E2E test is green; move this plan file to `completed/` in the same commit.
+20. Bump minor version, add changelog entries for the four themes (chip editor, AI guideline export, Repeat More popover, light-mode repair), update `RELEASE_NOTES.md`, and pin the new version in the root `readme.md`.
+
+## Verification
+
+- Manual walk-through of every DoD bullet in issues 04 / 06 / 07.
+- `bun test` green for new integration tests in step 15.
+- `bunx playwright test tests/e2e/prompt-chip-editor.spec.ts tests/e2e/prompt-light-theme.spec.ts tests/e2e/repeat-more-popover.spec.ts` all green.
+- `rg -n "bg-black|text-white|bg-\[#" standalone-scripts/macro-controller/src` returns zero hits.
+- `node scripts/check-changelog-entry.mjs` exits 0 for the new version.
+- Screenshot review against user-supplied light-mode capture once provided.
+
+## Appended from prior pending tasks
+
+- Plan 11 (prompts-import-export-section): step 8/9 above satisfy the "sample JSON + schema link" gap raised there; that plan can close once this ships.
+- Plan 22 (prompt-library-test-coverage-50): step 15/16/17/18 add the missing chip-editor and light-mode coverage; remaining 46 test cases stay tracked under plan 22.
+- Plan 10 (unified-billing-all-workspaces) and Plan 13 (per-project-chat-submit-tracker): unrelated, left pending.
+# ESLint Warnings & Errors Cleanup (30 steps)
+
+Slug: eslint-warnings-cleanup-30
+Steps: 30
+Status: pending
+Created: 2026-07-19
+
+## Context
+
+CI `pnpm lint` on macro-ahk-v55 reports ~265 issues across 107 files (see user-uploads://file-27):
+- 157 `max-lines-per-function` (limit 40)
+- 47 `id-denylist` (`arr`, `cb`, `fn`, `el`, `msg`, etc.)
+- 31 `sonarjs/cognitive-complexity` (limit 15)
+- 9 `sonarjs/no-duplicate-string`
+- 2 `sonarjs/no-collapsible-if`
+- 1 `@typescript-eslint/no-explicit-any`
+
+Hot zones: `src/background/recorder/**` (26), `src/components/options/**` (30), `src/components/recorder/**` (20), plus `src/ui/**`, `src/hooks/**`, `src/lib/**`.
+
+Goal: land `pnpm lint --max-warnings=0` clean without behavior changes. Refactor by extracting helpers, renaming denylisted identifiers, extracting constants for duplicate strings, and reducing branching depth. No baseline regressions on P0-10 double-cast or `noUncheckedIndexedAccess`.
+
+Related captured input: none new this turn (planning-only).
+
+## Steps
+
+1. Snapshot baseline: run `pnpm lint --format=json > .lovable/audits/eslint-baseline-24.json`, commit counts per rule + per file.
+2. Add helper doc `.lovable/plans/subtasks/24-eslint-warnings-cleanup-30/01-refactor-recipes.md` describing the four refactor recipes (extract helper, rename identifier, extract constant, flatten branches) with before/after examples. See ./subtasks/24-eslint-warnings-cleanup-30/01-refactor-recipes.md
+3. Fix `src/background/auto-attach.ts` `evaluateAutoAttach` (101 lines): split into `resolveAttachTarget`, `checkAttachGuards`, `dispatchAttach`.
+4. Fix `src/background/first-attach-toast.ts` `toastPagePayload` (76 lines): extract `buildToastMarkup`, `mountToastRoot`, `scheduleToastDismiss`.
+5. Fix `src/background/handlers/injection-request-resolver.ts` `classifyEntry` (45 lines) + `logging-handler.test.ts` arrow (48 lines): extract classifier helpers and per-case test setup.
+6. Fix `src/background/recorder/dropzone-overlay.ts` `mountDropZoneOverlay` (71 lines): split mount / listeners / teardown helpers.
+7. Fix `src/background/recorder/failure-logger.ts`: `buildFailureReport` (42), `classifyReason` (55), `formatFailureReport` (69, cognitive 65). See ./subtasks/24-eslint-warnings-cleanup-30/02-failure-logger.md
+8. Fix `src/background/recorder/field-binding-overlay.ts` (`mountFieldBindingOverlay` 266 lines, `renderColumns` 78). See ./subtasks/24-eslint-warnings-cleanup-30/03-field-binding-overlay.md
+9. Fix `src/background/recorder/field-reference-resolver.ts` `classifyVariable` (54): table-driven classifier.
+10. Fix `src/background/recorder/hover-highlighter.ts` `mountHoverHighlighter` (134): split into overlay build, event wiring, teardown.
+11. Sweep remaining `src/background/recorder/**` `max-lines-per-function` warnings (recorder-panel, selector-scorer, snapshot-writer, verbose-store): extract per-concern helpers.
+12. Sweep `src/background/handlers/**` remaining warnings (message-bus, project-api-relay, credit-refresh): split by message kind.
+13. Sweep `src/components/options/**` (30 hits) part 1: split large tab/panel components into subcomponents (Audit, Prompt Library, Credits panels).
+14. Sweep `src/components/options/**` part 2: extract row/renderer helpers, memoized selectors.
+15. Sweep `src/components/recorder/**` (20 hits): split modal/step-editor components into presentational + container.
+16. Fix `src/ui/prompt-history-panel.ts`, `prompt-io.ts`, `prompt-injection.ts`, `prompt-bundle-types.ts` residual line/complexity warnings via already-established modular helpers pattern.
+17. Fix `src/hooks/use-step-group-{import,export,batch-actions}.ts` and `use-step-library.ts` `use-visibility-paused-interval.ts`: extract pure reducers out of hook body.
+18. Fix `src/lib/keyword-event-bulk-actions.ts` line/complexity: split per-action branch into named handlers.
+19. `id-denylist` sweep pass 1 (background/**): rename `arr`→`bucket|items`, `cb`→`callback|checkbox`, `fn`→`handler|task`, `el`→`node|host`, `msg`→`payload|messageNode`. Update tests in same commit.
+20. `id-denylist` sweep pass 2 (components/**, hooks/**, lib/**, ui/**): same renames; verify no shadowed globals.
+21. `sonarjs/cognitive-complexity` sweep: for each of the 31 sites, apply guard-clause flattening + extract predicates (`isFoo(x)`) to reach ≤15.
+22. `sonarjs/no-duplicate-string` sweep: extract 9 offenders into `const` (module-scoped) or shared constants module (e.g. `src/shared/lint-constants.ts` if cross-file).
+23. `sonarjs/no-collapsible-if` (2 sites): merge nested `if` into single conditional.
+24. Fix the 1 `@typescript-eslint/no-explicit-any`: replace with proper type; if genuinely unknown, use `unknown` + narrow (respect No Explicit Unknown policy: only if in `CaughtError`-shaped position).
+25. Add ESLint override guard: no new `max-lines-per-function` regressions by adding a `scripts/check-eslint-baseline.mjs` that fails CI if warning count exceeds 0.
+26. Wire the guard into `.github/workflows/ci.yml` after `lint` step (bare `on: push:` unchanged per core rule).
+27. Update `.lovable/rules.md` and `spec/coding-guidelines/` to document the four refactor recipes and the "≤40 lines / ≤15 cognitive complexity / no id-denylist" ceiling.
+28. Run full test suite (`bun test` + Vitest + Playwright smoke); ensure no baselines regressed (P0-10 double-cast ≤71, unchecked-indexed-access unchanged).
+29. Run `pnpm lint --max-warnings=0`; capture green output to `.lovable/audits/eslint-final-24.txt`.
+30. Bump minor version, add changelog entry `eslint: clear 265 warnings across 107 files`, update release notes and root README version pin; move this plan file to `.lovable/plans/completed/24-eslint-warnings-cleanup-30.md` with `Status: completed`.
+
+## Verification
+
+- `pnpm lint --max-warnings=0` exits 0.
+- `scripts/check-eslint-baseline.mjs` returns 0 in CI.
+- Test suites remain green: `bun test`, `vitest run`, Playwright E2E smoke.
+- P0-10 double-cast count ≤ 71; `noUncheckedIndexedAccess` unchanged.
+- Git diff shows no behavioral changes: only extractions, renames, constant hoists.
+- Version bumped in `manifest.json`, `src/constants.ts`, root `readme.md` version pin; changelog entry present.
+
+## Appended from prior pending tasks
+
+Existing pending plans left in place (not folded here; scope is lint-only):
+- 10-unified-billing-all-workspaces
+- 11-prompts-import-export-section
+- 13-per-project-chat-submit-tracker
+- 22-prompt-library-test-coverage-50
+- 23-prompt-library-relocate-and-light-mode
+# ESLint Cleanup Continuation - Second 30-Step Sweep
+
+Slug: eslint-cleanup-continuation-30
+Steps: 30
+Status: pending
+Created: 2026-07-19
+
+## Context
+
+Plan 24 (`.lovable/plans/pending/24-eslint-warnings-cleanup-30.md`) resolved SS-01..SS-09 (Steps 1-15) and shipped through v4.220.0. The ESLint baseline in `.lovable/audits/eslint-baseline-24.md` still shows 193 warnings + 8 errors, dominated by `max-lines-per-function` (151) and `sonarjs/cognitive-complexity` (27). This plan continues that cleanup: re-baseline the offenders on the current tree, decompose the next 20 largest, then re-lock `--max-warnings=0` in CI so drift cannot return.
+
+No new commands or user-reported issues were surfaced in this turn's prompt, so nothing was appended to `.lovable/spec/commands/` or `.lovable/issues/`.
+
+## Steps
+
+1. Re-run `npx eslint . -f json > .lovable/audits/eslint-baseline-25.json` and generate a fresh markdown summary at `.lovable/audits/eslint-baseline-25.md` with totals by rule and per-file offender ranking. See ./subtasks/25-eslint-cleanup-continuation-30/01-rebaseline.md
+2. Resolve the 2 parse errors flagged in baseline-24 (they mask further linting); confirm baseline-25 shows 0 parse errors.
+3. Fix the 8 remaining `id-denylist` errors surfaced by baseline-25 (rename `arr`/`cb`/`fn`/`el`/`msg` -> descriptive names) across whatever files still trip it.
+4. Fix the 7 `sonarjs/no-duplicate-string` warnings by extracting constants near the top of each offender module.
+5. Fix the 2 `sonarjs/no-collapsible-if` warnings by flattening nested conditionals.
+6. Fix the 2 `react-refresh/only-export-components` warnings by moving non-component exports into sibling files.
+7. Fix the 2 `react-hooks/exhaustive-deps` warnings by either adding the missing dep or extracting a stable callback with `useCallback`.
+8. Collapse `LibraryDialogs` prop surface into grouped bags (06 Phase 4 carry-over from Plan 24). See ./subtasks/25-eslint-cleanup-continuation-30/08-library-dialogs-props.md
+9. 10: decompose the #1 remaining `max-lines-per-function` offender identified by baseline-25 (extract controller hook + leaf children, keep host <120 lines). See ./subtasks/25-eslint-cleanup-continuation-30/10-offender-1.md
+10. 11: decompose the #2 offender using the same recipe.
+11. 12: decompose the #3 offender.
+12. 13: decompose the #4 offender.
+13. 14: decompose the #5 offender.
+14. 15: decompose the #6 offender.
+15. 16: decompose the #7 offender.
+16. 17: decompose the #8 offender.
+17. 18: decompose the #9 offender.
+18. 19: decompose the #10 offender.
+19. 20: decompose the #11 offender.
+20. 21: decompose the #12 offender.
+21. 22: decompose the #13 offender.
+22. 23: decompose the #14 offender.
+23. 24: decompose the #15 offender (last of the `max-lines-per-function` big-15 batch).
+24. 25: tackle the top 5 `sonarjs/cognitive-complexity` offenders by extracting predicate helpers and early-returns. See ./subtasks/25-eslint-cleanup-continuation-30/25-complexity-top5.md
+25. 26: tackle the remaining `sonarjs/cognitive-complexity` offenders (rank 6..27 or whatever survives).
+26. Add a Vitest regression that mounts/unmounts each newly decomposed host component and asserts no interval/listener leak (extend the pattern from `macro-ui-mount-unmount-leaks.test.ts`).
+27. Run `npx tsgo --noEmit` and confirm 0 diagnostics; fix any type fallout from the decompositions in place.
+28. Run `npx eslint . --max-warnings=0` locally and confirm exit code 0; save the clean output as `.lovable/audits/eslint-clean-25.txt`.
+29. Update `.github/workflows/spec-gates.yml` (or the ESLint gate workflow) to run `eslint . --max-warnings=0` on every push with no `paths:` filter; add a canary test asserting the workflow trigger stays unfiltered (mirror the `ci-workflow-trigger-policy.test.mjs` pattern).
+30. Release ceremony: bump minor to v4.221.0 across `manifest.json`, `version.json`, `src/shared/constants.ts`, `readme.md`, `marco-sdk` (`index.ts` + `prompts.ts` `CACHE_SCHEMA_VERSION`), `macro-controller/shared-state.ts`, `payment-banner-hider/index.ts`, every `standalone-scripts/*/src/instruction.ts`; append `changelog.md` entry; update `RELEASE_NOTES.md`; run `scripts/update-stale-version-refs.mjs` and confirm clean; move this plan file to `.lovable/plans/completed/25-eslint-cleanup-continuation-30.md` with `Status: completed`.
+
+## Verification
+
+- Steps 1-2: baseline-25.md exists, 0 parse errors, offender ranking present.
+- Steps 3-7: `npx eslint .` shows 0 hits for the targeted rule families.
+- Steps 8-23: each host file <120 lines; `npx tsgo --noEmit` stays green after each step.
+- Step 24-25: cognitive-complexity count drops to 0.
+- Step 26: new Vitest suite passes; subscriber/interval registries return to baseline.
+- Step 27: `npx tsgo --noEmit` returns 0 diagnostics.
+- Step 28: `npx eslint . --max-warnings=0` exits 0; artifact saved.
+- Step 29: workflow file diff shows unfiltered `on: push:`; canary test passes.
+- Step 30: `scripts/update-stale-version-refs.mjs` reports clean; `changelog.md` head entry matches v4.221.0; plan file physically located under `completed/`.
+
+## Appended from prior pending tasks
+
+Carry-overs from `.lovable/plans/pending/24-eslint-warnings-cleanup-30.md` folded into Steps 8, 9-23, 24-25, 28:
+- SS-06 Phase 4 (LibraryDialogs prop bags) → Step 8
+- SS-10..SS-29 (remaining decompositions) → Steps 9-25 (rescoped against a fresh baseline instead of the stale baseline-24 ranking)
+- SS-30 (re-baseline `--max-warnings=0`) → Steps 28-29
+
+Other pending plans (10, 11, 13, 22, 23) are unrelated scope and remain independent.
+# 27-fix-coding-guideline-violations
+
+## Objective
+Revert syntax and style regressions introduced by the automated scripts and strictly enforce the codebase's coding standard guidelines (explicit boolean checks, strict Enum naming, newline guidelines, and query wrapper architecture).
+
+## Subtasks & Execution Routing
+The orchestrator must spawn sub-agents to tackle these steps sequentially and concurrently as permitted.
+
+### Step 1: Revert "isMissing" Boolean Assignments
+- **Target**: All `*.ts`, `*.tsx`, `*.js`, `*.jsx` files
+- **Task**: A previous script expanded `if (!variable)` into `const isMissingVariable = !variable; if (isMissingVariable)`. This occurred across 1400+ locations. Revert these to `if (!variable)` to remove overhead.
+
+### Step 2: Enforce Strict Boolean "isFail" Logic
+- **Target**: Entire codebase
+- **Task**: The usage of `!response.isSuccess` or `!response.ok` violates strict boolean property rules. Replace all inverted success logic with explicit `.isFail` calls.
+
+### Step 3: Strict Enum Naming Validation
+- **Target**: `src/types/enums.ts` and all other files declaring `enum`
+- **Task**:
+  - Replace garbage names (e.g., `Enum_76ebb585`, `SemanticSemantic*`) with meaningful context-aware names.
+  - Ensure EVERY Enum ends with `Type` (e.g., `RowOutcomeCode` -> `RowOutcomeCodeType`).
+  - Ensure PascalCase usage for enum values.
+
+### Step 4: Query Error Wrapper Implementation
+- **Target**: Database interaction layers and error handlers.
+- **Task**:
+  - Remove scattered `logError('AutoCatch', ...)` statements.
+  - Implement a generic TS query wrapper (`QueryExecutor` or `withQueryLogging`) that automatically handles catching and logging failures based on the Error Management guidelines.
+
+### Step 5: Newline Style Fixes
+- **Target**: Codebase functions
+- **Task**:
+  - Enforce R4: Blank line before `return` (in multi-line functions).
+  - Enforce R5: Blank line after `}`.
+  - Enforce R12/R13: No blank lines at the start of functions and no double blank lines.
+  - Use `constants.NewLineUnix` instead of hardcoded `\r\n`.
+
+## Agent Protocol
+Subagents MUST check off their tasks in `.lovable/spec/tasks/27-fix-coding-guideline-violations.md` and this file.
+- `[ ]` Step 1
+- `[ ]` Step 2
+- `[ ]` Step 3
+- `[ ]` Step 4
+- `[ ]` Step 5
+# Version.json as the single source of truth, CI/CD propagates everywhere
+
+Slug: version-json-single-source-of-truth
+Steps: 10
+Status: pending
+Created: 2026-07-20
+
+## Context
+
+Releases currently require a human to hand-edit or locally-run scripts against
+~14 files to keep the version in sync. This has caused repeated CI failures
+(release-readiness, audit-releases, latest.json vs version.json, asset manifest
+diffs) and user frustration. This plan makes `version.json` the ONLY file a
+human edits for a release, and moves ALL propagation into CI/CD.
+
+Captured command: ../../spec/commands/05-version-json-single-source-of-truth.md
+Captured issue:   ../../issues/open/09-version-scattered-across-many-files.md
+
+Related prior work now superseded / to be simplified:
+- `scripts/update-stale-version-refs.mjs` (becomes CI-only)
+- `scripts/check-version-sync.mjs` (becomes CI-only, non-blocking locally)
+- `.github/workflows/release.yml`, `ci.yml`
+
+## Steps
+
+1. Inventory every file that currently embeds the version literal. Produce
+   `.lovable/plans/subtasks/29-version-json-single-source-of-truth/01-inventory.md`
+   listing each path, the exact pattern, and whether it should be (a) rewritten
+   by CI, or (b) refactored to read `version.json` at build/runtime.
+   See ./subtasks/29-version-json-single-source-of-truth/01-inventory.md
+2. Refactor runtime consumers to import from a single module
+   `src/shared/version.ts` that re-exports `version` from `version.json`
+   (`import pkg from "../../version.json"`). Remove hardcoded strings in
+   `src/shared/constants.ts` and equivalents.
+3. Generate `manifest.json`'s `version` field at build time from `version.json`
+   via a Vite plugin (or a `prebuild` script that writes `manifest.json`
+   `version` in place). Manifest version pin is no longer human-edited.
+4. Convert `scripts/update-stale-version-refs.mjs` into a CI-only propagator:
+   it rewrites readmes, install scripts, prompt bodies, and any doc pins from
+   `version.json`. Add a `--check` mode for CI verification only; developers
+   never run it locally.
+5. Add `.github/workflows/version-propagate.yml`: on push to any branch that
+   modifies `version.json`, run the propagator, commit the rewritten files
+   back with `[skip ci]`, and push. This is the ONLY writer of downstream
+   version pins.
+   See ./subtasks/29-version-json-single-source-of-truth/02-propagate-workflow.md
+6. Rework `.gitmap/release/latest.json` and `.gitmap/release/v<VER>.json` to be
+   CI-generated from `version.json` during the release workflow. Remove the
+   requirement for a human to author them; delete any check that fails when
+   they drift from `version.json`.
+7. Remove every remaining CI gate that fails on version drift, missing asset
+   manifests, or latest.json mismatch. Replace with best-effort auto-repair
+   inside the release workflow (already partly done); ensure NO workflow
+   exits non-zero for these categories.
+   See ./subtasks/29-version-json-single-source-of-truth/03-ci-gate-removal.md
+8. Update the release ceremony docs (`.lovable/memory/workflow/release-ceremony.md`,
+   `19-release-runbook-and-failure-modes.md`, root readme "Release" section) to
+   the new one-step flow: "Edit `version.json`. Commit. Push. Done." Remove all
+   references to running local scripts.
+9. Add `mem://workflow/version-json-single-source-of-truth` memory entry and a
+   Core rule in `mem://index.md` so future turns never reintroduce hand-edited
+   downstream pins or local-run propagators.
+10. Verification pass: bump `version.json` to a throwaway patch in a test
+    branch, push, observe CI propagates every file, generates release
+    descriptors, and produces a green build with no manual intervention.
+    Document the observed run in
+    `.lovable/plans/subtasks/29-version-json-single-source-of-truth/04-dry-run.md`
+    before moving the plan to `completed/`.
+
+## Verification
+
+- `git grep` for the current version literal returns only `version.json` and
+  CI-generated artifacts (or files rewritten by the propagator on the same
+  commit).
+- Bumping `version.json` alone, with no other file changes, produces a green
+  CI run and a valid release.
+- No workflow references `check-release-readiness.mjs` or fails on
+  latest.json / asset-manifest drift.
+- New memory rule present and indexed.
+
+## Appended from prior pending tasks
+
+Existing pending plans remain independent and are NOT rolled into this plan:
+- 11-prompts-import-export-section
+- 13-per-project-chat-submit-tracker
+- 22-prompt-library-test-coverage-50
+- 23-prompt-library-relocate-and-light-mode
+- 24-eslint-warnings-cleanup-30
+- 25-eslint-cleanup-continuation-30
+# Refactor oversized functions to 15-line cap
+
+Slug: refactor-oversized-functions-15-line-cap
+Steps: 20
+Status: pending
+Created: 2026-07-20
+
+## Context
+
+`pnpm run lint` reports many functions exceeding the current 40/60 `max-lines-per-function` threshold across `src/background/recorder/**`, `src/background/handlers/**`, and adjacent modules. User standard is stricter: 15 lines max per function. This plan refactors every offender, tightens the ESLint config to enforce 15 lines repo-wide, preserves behavior via tests, and updates memory so this class of drift never recurs.
+
+Captured inputs:
+- Command: `.lovable/spec/commands/06-function-size-cap-15-lines.md`
+- Issue: `.lovable/issues/open/10-eslint-max-lines-per-function-regressions.md`
+- Uploaded lint excerpt: `user-uploads://file-51` (lines 1-37 shown; 38-346 truncated, enumerated in SS-01).
+
+Related memory to update: `.lovable/memory/standards/restricted-identifiers-and-function-size.md` (tighten cap from 60 to 15).
+
+## Steps
+
+1. Enumerate every offender under the 15-line rule (not the current 40/60 log). See ./subtasks/30-refactor-oversized-functions-15-line-cap/01-inventory-and-baseline.md
+2. Document the reusable refactor patterns applied everywhere. See ./subtasks/30-refactor-oversized-functions-15-line-cap/02-refactor-patterns-catalog.md
+3. Update `.lovable/memory/standards/restricted-identifiers-and-function-size.md` to set the hard cap at 15 lines, add the Shell+Wire and async-pipeline patterns, and reference command 06.
+4. Update `.lovable/coding-guidelines.md` (bump to v1.0.3) with the 15-line rule and refactor patterns.
+5. Update `standalone-scripts/prompts/18-coding-guidelines/prompt.md` (bump to v1.4.2) with the 15-line rule so downstream agents inherit it.
+6. Refactor `src/background/recorder/live-dom-replay.ts` (`executeStep`, `finalize`). See ./subtasks/30-refactor-oversized-functions-15-line-cap/03-live-dom-replay-executeStep.md
+7. Refactor `src/background/recorder/recorder-toolbar.ts` (`mountRecorderToolbar`), `dropzone-overlay.ts` (`mountDropZoneOverlay`), `hover-highlighter.ts` (`mountHoverHighlighter`). See ./subtasks/30-refactor-oversized-functions-15-line-cap/04-recorder-toolbar-and-overlays.md
+8. Refactor `src/background/recorder/http-request-step.ts`, `selector-comparison.ts`, `selector-history.ts`, `selector-tester.ts`, and `handlers/logging-handler.test.ts`. See ./subtasks/30-refactor-oversized-functions-15-line-cap/05-http-step-and-selectors.md
+9. Refactor any remaining offenders from lint lines 38-346 (uploaded excerpt) using the SS-02 pattern catalog; append each to the SS-01 inventory as it is completed.
+10. Add JSDOM/Vitest unit tests for every extracted helper touched in Steps 6-9 (Shell+Wire + async pipeline), following `mem://preferences/test-with-features`.
+11. Preserve diagnostic contracts: every extracted helper propagates `correlationId` and emits `Reason` + `ReasonDetail` on failure via existing `DiagnosticError` (per `mem://standards/verbose-logging-and-failure-diagnostics`).
+12. Tighten repo ESLint: set `max-lines-per-function` to `{ max: 15, skipBlankLines: true, skipComments: true, IIFEs: true }` at the root config and remove per-folder overrides that raise the ceiling.
+13. Extend ESLint config for test files: same 15-line cap (no separate laxer test rule).
+14. Add a CI script `scripts/check-function-length.mjs` that fails the build if any function in `src/**` or `standalone-scripts/**` exceeds 15 non-blank/non-comment body lines, as a belt-and-braces guard independent of ESLint.
+15. Wire `scripts/check-function-length.mjs` into `pnpm run ci:checks` (or the equivalent aggregate task) so the guard runs on every push.
+16. Run `pnpm run lint --max-warnings=0` and `pnpm run typecheck` and `pnpm test`; fix any residual regressions surfaced by the tightened rules.
+17. Run the existing strict-flag ratchet (`scripts/check-strict-flag-fallout.mjs --strict`) to ensure the refactor did not regress `noPropertyAccessFromIndexSignature` or `noUncheckedIndexedAccess` baselines.
+18. Manual smoke: launch the recorder in the preview, exercise drop-zone overlay, hover highlighter, toolbar, and a full replay session; capture screenshots to `/tmp/browser/plan-30/`.
+19. Update `changelog.md` and execute release ceremony per `mem://workflow/release-ceremony` (minor bump; edit `version.json` only, propagate via existing tooling).
+20. Move this plan file to `.lovable/plans/completed/30-refactor-oversized-functions-15-line-cap.md` and flip `Status:` to `completed`; mark all subtasks completed in place.
+
+## Verification
+
+- `pnpm run lint --max-warnings=0` passes with the 15-line rule enabled at the root config.
+- `scripts/check-function-length.mjs` reports zero offenders in `src/**` and `standalone-scripts/**`.
+- `pnpm run typecheck` clean; `scripts/check-strict-flag-fallout.mjs --strict` still under baselines.
+- All Vitest suites pass; new tests for extracted helpers included.
+- Recorder smoke screenshots in `/tmp/browser/plan-30/` show unchanged UI and behavior.
+- `changelog.md` entry and version bump landed; release-ceremony memory followed.
+
+## Appended from prior pending tasks
+
+Prior pending plans remain owned by their own files and are NOT rolled into Plan 30:
+- 11-prompts-import-export-section
+- 13-per-project-chat-submit-tracker
+- 22-prompt-library-test-coverage-50
+- 23-prompt-library-relocate-and-light-mode
+- 24-eslint-warnings-cleanup-30
+- 25-eslint-cleanup-continuation-30
+- 29-version-json-single-source-of-truth
+
+Overlap note: Plans 24 and 25 are ESLint cleanup plans predating this stricter 15-line command. When Plan 30 executes Step 12 (tighten root config), Plans 24/25 remaining items become subsumed; close them out in their own files rather than duplicating here.
+# Lint cleanup: `ctx` id-denylist + oversized functions (hooks + handlers)
+
+Slug: lint-cleanup-ctx-denylist-and-15-line-cap
+Steps: 10
+Status: pending
+Created: 2026-07-20
+
+## Context
+
+`pnpm run lint` regressed to 142 problems (36 errors, 106 warnings). Two root causes:
+(1) 36 `id-denylist` errors for `ctx` in `src/background/recorder/http-request-step.ts` (never included in prior sweeps for `msg`/`fn`/`el`/`arr`/`cb`),
+(2) `max-lines-per-function` breaches across `src/hooks/**`, `src/background/handlers/**`, and `src/background/recorder/http-request-step.ts` that Plan 30 did not touch.
+
+Captured this turn:
+- Issue: `.lovable/issues/open/11-lint-ctx-denylist-and-oversized-functions.md`
+- Existing command already governs the cap: `.lovable/spec/commands/06-function-size-cap-15-lines.md`
+- Existing memory: `.lovable/memory/standards/restricted-identifiers-and-function-size.md` (extend `ctx` into denylist docs).
+
+## Steps
+
+1. Run `pnpm run lint --no-fix > /tmp/lint-full.log 2>&1` and enumerate every `ctx` occurrence and every `max-lines-per-function` offender across the whole repo (not just the uploaded excerpt). Write the inventory to `.lovable/plans/subtasks/31-lint-cleanup-ctx-denylist-and-15-line-cap/01-full-inventory.md`.
+2. Add `ctx` to the ESLint `id-denylist` array in `eslint.config.js` (root) so the rule catches it repo-wide going forward; update `.lovable/memory/standards/restricted-identifiers-and-function-size.md` to list `ctx` alongside `msg`/`fn`/`el`/`arr`/`cb` with the approved replacements (`context`, `requestContext`, `stepContext`).
+3. Refactor `src/background/recorder/http-request-step.ts`: rename all 36 `ctx` sites to `requestContext` (or a scoped name per helper), then split `buildReplayTrace` (44L) and any other >15L function under the 15-line cap using the Shell+Wire pattern from `mem://standards/restricted-identifiers-and-function-size`. See `.lovable/plans/subtasks/31-lint-cleanup-ctx-denylist-and-15-line-cap/02-http-request-step-refactor.md`.
+4. Refactor `src/hooks/use-step-library.ts` (`useStepLibrary` 278L, inner arrow 70L, `seedExampleData` 44L). Extract per-operation helpers (load, seed, mutate) into `src/hooks/step-library/*.ts` sub-modules. See `.lovable/plans/subtasks/31-lint-cleanup-ctx-denylist-and-15-line-cap/03-use-step-library-refactor.md`.
+5. Refactor `src/hooks/use-step-group-import.ts` (69L + 46L async arrow) and `src/hooks/use-visibility-paused-interval.ts` (43L) into <=15L helpers, preserving `correlationId` and `DiagnosticError` propagation.
+6. Refactor `src/background/handlers/logging-handler.test.ts` (48L arrow) by extracting a `buildLoggingHandlerHarness()` helper; apply the same pattern to any sibling test that trips the cap.
+7. Sweep every remaining offender surfaced in Step 1 that is not in Steps 3-6, using the pattern catalog in `.lovable/plans/subtasks/30-refactor-oversized-functions-15-line-cap/02-refactor-patterns-catalog.md`. Append each fixed function to the Step 1 inventory as done.
+8. Tighten ESLint root config: `max-lines-per-function: { max: 15, skipBlankLines: true, skipComments: true, IIFEs: true }`, remove per-folder overrides that raise the ceiling, and align `sonarjs/cognitive-complexity` at 15. Extend `scripts/check-function-length.mjs` (from Plan 30) to also scan `src/hooks/**` and `src/background/handlers/**` if not already included.
+9. Add Vitest coverage for every extracted helper touched in Steps 3-7 (per `mem://preferences/test-with-features`). Run `pnpm run lint --max-warnings=0`, `pnpm run typecheck`, `pnpm test`, and `scripts/check-strict-flag-fallout.mjs --strict`; fix any residual regressions.
+10. Execute the release ceremony per `mem://workflow/release-ceremony` (minor bump), update `changelog.md` and `RELEASE_NOTES.md`, then `mv .lovable/plans/pending/31-lint-cleanup-ctx-denylist-and-15-line-cap.md .lovable/plans/completed/` and flip `Status: completed` in the same turn as Step 10 lands.
+
+## Verification
+
+- `pnpm run lint --max-warnings=0` exits 0 (was 36 errors + 106 warnings).
+- `rg -n "\\bctx\\b" src/ standalone-scripts/` returns zero identifier hits (comments / string literals excluded via review).
+- `scripts/check-function-length.mjs` reports zero offenders in `src/**` and `standalone-scripts/**`.
+- `pnpm run typecheck` and `pnpm test` clean; strict-flag ratchet unchanged.
+- Manual smoke: recorder HTTP step still executes end-to-end; hooks in options page render without regressions.
+- New plan file lives only in `.lovable/plans/completed/`; no duplicate under `pending/`.
+
+## Appended from prior pending tasks
+
+Not rolled into Plan 31 (each stays under its own plan file):
+- 11-prompts-import-export-section
+- 13-per-project-chat-submit-tracker
+- 22-prompt-library-test-coverage-50
+- 23-prompt-library-relocate-and-light-mode
+- 24-eslint-warnings-cleanup-30 (subsumed once Step 8 lands the 15-line root rule)
+- 25-eslint-cleanup-continuation-30 (same)
+- 29-version-json-single-source-of-truth
+- 30-refactor-oversized-functions-15-line-cap (Plan 31 completes the `src/hooks/**` + `handlers/**` slice Plan 30 did not reach)
+# Plan 10 - Drive ESLint baseline 31 to zero
+
+Slug: plan-10
+Steps: 10
+Status: pending
+Created: 2026-07-20
+
+## Context
+
+Plan 31 (`31-lint-cleanup-ctx-denylist-and-15-line-cap.md`) captured a 142-problem ESLint baseline in `.lovable/audits/eslint-baseline-31.md`. Steps 1-3 landed (http-request-step.ts ctx rename, use-step-library hooks split, background modules split), but the audit file still shows 36 `ctx` id-denylist hits and 7 cognitive-complexity offenders. This plan finishes the sweep to 0/0 and locks a regression gate so the counters cannot rise again.
+
+Guidelines applied:
+- `.lovable/coding-guidelines.md` (present, followed)
+- `spec/coding-guidelines/` (not present, skipped)
+- `coding-guidelines/` (not present, skipped)
+- Error-management folder locations (`spec/XX-error-manage/`, `coding-guidelines/XX-error-manage/`): not present, skipped.
+- Memory: `mem://architecture/linting-policy` (zero warnings/errors), `mem://standards/formatting-and-logic` (CQ14/CQ15), `mem://preferences/test-with-features`.
+
+No new user commands or issues captured this turn (the trigger message is a planning request only).
+
+## Steps
+
+1. Re-run `pnpm lint --format=json > /tmp/eslint-33.json 2>&1` (or `npm run lint` if pnpm unavailable) and regenerate `.lovable/audits/eslint-baseline-31.md` in place with the current counts. Commit the refreshed audit so the delta is auditable. See ./subtasks/33-plan-10/01-refresh-baseline.md.
+2. Finish the `ctx` id-denylist rename in `src/background/recorder/http-request-step.ts` (the 36 remaining sites are all in this one file per the baseline). Rename every `ctx` binding to `context` or a more specific name (`httpContext`, `stepContext`) where scope is ambiguous. Zero identifier collisions permitted; verify with `rg -n '\\bctx\\b' src/background/recorder/http-request-step.ts` returning 0.
+3. Refactor `csv-parse.ts:49` from cognitive complexity 53 to <=15 by extracting parsing branches into named helpers (`parseHeaderRow`, `parseBodyRow`, `classifyRowFailure`), each under the 15-line function cap. See ./subtasks/33-plan-10/02-csv-parse-split.md.
+4. Refactor `url-matches-backfill.ts:54` (CC 21 -> <=15) and `url-trigger.ts:141` (CC 16 -> <=15). Extract URL-matcher predicates into a shared `url-match-predicates.ts` helper module so both call sites share the same reduced-complexity path.
+5. Refactor `hotkey-executor.ts:41` (CC 16 -> <=15) and `payload-builders.ts:100` (CC 20 -> <=15). Payload builder splits into `buildInputPayload` / `buildSelectorPayload` / `buildMetaPayload` composed by a top-level dispatcher under 15 lines.
+6. Refactor `ProjectDetailView.tsx:119` (CC 19 -> <=15) and `SelectorTesterPanel.tsx:47` (CC 21 -> <=15). For each React component, hoist branch conditions into typed helper hooks (`useProjectDetailBranches`, `useSelectorTesterState`) placed under `src/components/*/hooks/`.
+7. Add unit coverage for every extracted helper (Steps 3-6): one happy-path test and one failure-branch test per new named export. Enforces `mem://preferences/test-with-features`. Target file names mirror the module (`<module>.test.ts` next to the source).
+8. Install a CI ratchet: `scripts/check-eslint-baseline.mjs` that runs `pnpm lint --format=json`, counts `id-denylist` + `sonarjs/cognitive-complexity` + `max-lines-per-function` occurrences, and exits non-zero if any counter exceeds the value stored in `.lovable/audits/eslint-baseline-31.json`. Wire into `npm run test:preflight` and `.github/workflows/ci.yml` (fast preflight job).
+9. After Steps 2-6 land, write `.lovable/audits/eslint-baseline-31.json` with `{ "ctx": 0, "cognitiveComplexity": 0, "maxLinesPerFunction": 0 }`. This is the ratchet floor from Step 8; any future PR that regresses fails CI.
+10. Release ceremony (MINOR bump; new gate + user-visible reliability improvements), then `mv .lovable/plans/pending/33-plan-10.md .lovable/plans/completed/33-plan-10.md` and flip `Status: pending` -> `Status: completed` in the same move. Update `changelog.md`, `RELEASE_NOTES.md`, and root `readme.md` version pins.
+
+## Verification
+
+- `pnpm lint --max-warnings=0` exits 0 after Steps 2-6.
+- `rg -n "\\bctx\\b" src/ --type ts` returns 0 code hits (comments and JSDoc still permitted).
+- `node scripts/check-eslint-baseline.mjs` exits 0 against a clean tree, exits 1 when the fixture regression file is temporarily added.
+- Every helper introduced in Steps 3-6 has a paired `.test.ts` with >=2 assertions.
+- `.lovable/audits/eslint-baseline-31.md` shows `Totals: 0 ctx, 0 max-lines-per-function, 0 cognitive-complexity` after Step 9.
+- Plan file lives only in `.lovable/plans/completed/33-plan-10.md`; `pending/` has no `33-*` duplicate.
+- `npm run test:preflight` exit 0 after Step 8 wiring.
+
+## Appended from prior pending tasks
+
+Scanned `.lovable/plans/pending/`, memory index, `.lovable/issues/`, `.lovable/spec/commands/`, and `.lovable/plans/subtasks/`. Prior pending plans that are NOT rolled into this one (they own their own scope; do not fold in):
+
+- `11-prompts-import-export-section.md`
+- `13-per-project-chat-submit-tracker.md`
+- `22-prompt-library-test-coverage-50.md`
+- `23-prompt-library-relocate-and-light-mode.md`
+- `24-eslint-warnings-cleanup-30.md`
+- `25-eslint-cleanup-continuation-30.md`
+- `29-version-json-single-source-of-truth.md` (Plan 29 shipped v4.312.0; file still in `pending/` and needs a status-flip + move as separate housekeeping, not part of Plan 10)
+- `30-refactor-oversized-functions-15-line-cap.md`
+- `31-lint-cleanup-ctx-denylist-and-15-line-cap.md` (this plan is the executable continuation; Plan 31 stays open as the umbrella until Step 10 here moves it)
+
+No new commands or issues logged this turn.
+# 35-fix-remaining-lint-issues
+Status: pending
+Created: 2026-08-11
+
+## Goal
+Methodically fix the remaining 681 ESLint violations across 298 files in the repository.
+
+## Strategy
+This plan is broken into 60 subtasks, each handling 5 files at a time.
+Sub-agents will be dispatched to execute these tasks concurrently in batches.
+
+## Subtasks
+- [ ] [01-lint-fixes-batch-01](./../subtasks/35-fix-remaining-lint-issues/01-lint-fixes-batch-01.md)
+- [ ] [02-lint-fixes-batch-02](./../subtasks/35-fix-remaining-lint-issues/02-lint-fixes-batch-02.md)
+- [ ] [03-lint-fixes-batch-03](./../subtasks/35-fix-remaining-lint-issues/03-lint-fixes-batch-03.md)
+- [ ] [04-lint-fixes-batch-04](./../subtasks/35-fix-remaining-lint-issues/04-lint-fixes-batch-04.md)
+- [ ] [05-lint-fixes-batch-05](./../subtasks/35-fix-remaining-lint-issues/05-lint-fixes-batch-05.md)
+- [ ] [06-lint-fixes-batch-06](./../subtasks/35-fix-remaining-lint-issues/06-lint-fixes-batch-06.md)
+- [ ] [07-lint-fixes-batch-07](./../subtasks/35-fix-remaining-lint-issues/07-lint-fixes-batch-07.md)
+- [ ] [08-lint-fixes-batch-08](./../subtasks/35-fix-remaining-lint-issues/08-lint-fixes-batch-08.md)
+- [ ] [09-lint-fixes-batch-09](./../subtasks/35-fix-remaining-lint-issues/09-lint-fixes-batch-09.md)
+- [ ] [10-lint-fixes-batch-10](./../subtasks/35-fix-remaining-lint-issues/10-lint-fixes-batch-10.md)
+- [ ] [11-lint-fixes-batch-11](./../subtasks/35-fix-remaining-lint-issues/11-lint-fixes-batch-11.md)
+- [ ] [12-lint-fixes-batch-12](./../subtasks/35-fix-remaining-lint-issues/12-lint-fixes-batch-12.md)
+- [ ] [13-lint-fixes-batch-13](./../subtasks/35-fix-remaining-lint-issues/13-lint-fixes-batch-13.md)
+- [ ] [14-lint-fixes-batch-14](./../subtasks/35-fix-remaining-lint-issues/14-lint-fixes-batch-14.md)
+- [ ] [15-lint-fixes-batch-15](./../subtasks/35-fix-remaining-lint-issues/15-lint-fixes-batch-15.md)
+- [ ] [16-lint-fixes-batch-16](./../subtasks/35-fix-remaining-lint-issues/16-lint-fixes-batch-16.md)
+- [ ] [17-lint-fixes-batch-17](./../subtasks/35-fix-remaining-lint-issues/17-lint-fixes-batch-17.md)
+- [ ] [18-lint-fixes-batch-18](./../subtasks/35-fix-remaining-lint-issues/18-lint-fixes-batch-18.md)
+- [ ] [19-lint-fixes-batch-19](./../subtasks/35-fix-remaining-lint-issues/19-lint-fixes-batch-19.md)
+- [ ] [20-lint-fixes-batch-20](./../subtasks/35-fix-remaining-lint-issues/20-lint-fixes-batch-20.md)
+- [ ] [21-lint-fixes-batch-21](./../subtasks/35-fix-remaining-lint-issues/21-lint-fixes-batch-21.md)
+- [ ] [22-lint-fixes-batch-22](./../subtasks/35-fix-remaining-lint-issues/22-lint-fixes-batch-22.md)
+- [ ] [23-lint-fixes-batch-23](./../subtasks/35-fix-remaining-lint-issues/23-lint-fixes-batch-23.md)
+- [ ] [24-lint-fixes-batch-24](./../subtasks/35-fix-remaining-lint-issues/24-lint-fixes-batch-24.md)
+- [ ] [25-lint-fixes-batch-25](./../subtasks/35-fix-remaining-lint-issues/25-lint-fixes-batch-25.md)
+- [ ] [26-lint-fixes-batch-26](./../subtasks/35-fix-remaining-lint-issues/26-lint-fixes-batch-26.md)
+- [ ] [27-lint-fixes-batch-27](./../subtasks/35-fix-remaining-lint-issues/27-lint-fixes-batch-27.md)
+- [ ] [28-lint-fixes-batch-28](./../subtasks/35-fix-remaining-lint-issues/28-lint-fixes-batch-28.md)
+- [ ] [29-lint-fixes-batch-29](./../subtasks/35-fix-remaining-lint-issues/29-lint-fixes-batch-29.md)
+- [ ] [30-lint-fixes-batch-30](./../subtasks/35-fix-remaining-lint-issues/30-lint-fixes-batch-30.md)
+- [ ] [31-lint-fixes-batch-31](./../subtasks/35-fix-remaining-lint-issues/31-lint-fixes-batch-31.md)
+- [ ] [32-lint-fixes-batch-32](./../subtasks/35-fix-remaining-lint-issues/32-lint-fixes-batch-32.md)
+- [ ] [33-lint-fixes-batch-33](./../subtasks/35-fix-remaining-lint-issues/33-lint-fixes-batch-33.md)
+- [ ] [34-lint-fixes-batch-34](./../subtasks/35-fix-remaining-lint-issues/34-lint-fixes-batch-34.md)
+- [ ] [35-lint-fixes-batch-35](./../subtasks/35-fix-remaining-lint-issues/35-lint-fixes-batch-35.md)
+- [ ] [36-lint-fixes-batch-36](./../subtasks/35-fix-remaining-lint-issues/36-lint-fixes-batch-36.md)
+- [ ] [37-lint-fixes-batch-37](./../subtasks/35-fix-remaining-lint-issues/37-lint-fixes-batch-37.md)
+- [ ] [38-lint-fixes-batch-38](./../subtasks/35-fix-remaining-lint-issues/38-lint-fixes-batch-38.md)
+- [ ] [39-lint-fixes-batch-39](./../subtasks/35-fix-remaining-lint-issues/39-lint-fixes-batch-39.md)
+- [ ] [40-lint-fixes-batch-40](./../subtasks/35-fix-remaining-lint-issues/40-lint-fixes-batch-40.md)
+- [ ] [41-lint-fixes-batch-41](./../subtasks/35-fix-remaining-lint-issues/41-lint-fixes-batch-41.md)
+- [ ] [42-lint-fixes-batch-42](./../subtasks/35-fix-remaining-lint-issues/42-lint-fixes-batch-42.md)
+- [ ] [43-lint-fixes-batch-43](./../subtasks/35-fix-remaining-lint-issues/43-lint-fixes-batch-43.md)
+- [ ] [44-lint-fixes-batch-44](./../subtasks/35-fix-remaining-lint-issues/44-lint-fixes-batch-44.md)
+- [ ] [45-lint-fixes-batch-45](./../subtasks/35-fix-remaining-lint-issues/45-lint-fixes-batch-45.md)
+- [ ] [46-lint-fixes-batch-46](./../subtasks/35-fix-remaining-lint-issues/46-lint-fixes-batch-46.md)
+- [ ] [47-lint-fixes-batch-47](./../subtasks/35-fix-remaining-lint-issues/47-lint-fixes-batch-47.md)
+- [ ] [48-lint-fixes-batch-48](./../subtasks/35-fix-remaining-lint-issues/48-lint-fixes-batch-48.md)
+- [ ] [49-lint-fixes-batch-49](./../subtasks/35-fix-remaining-lint-issues/49-lint-fixes-batch-49.md)
+- [ ] [50-lint-fixes-batch-50](./../subtasks/35-fix-remaining-lint-issues/50-lint-fixes-batch-50.md)
+- [ ] [51-lint-fixes-batch-51](./../subtasks/35-fix-remaining-lint-issues/51-lint-fixes-batch-51.md)
+- [ ] [52-lint-fixes-batch-52](./../subtasks/35-fix-remaining-lint-issues/52-lint-fixes-batch-52.md)
+- [ ] [53-lint-fixes-batch-53](./../subtasks/35-fix-remaining-lint-issues/53-lint-fixes-batch-53.md)
+- [ ] [54-lint-fixes-batch-54](./../subtasks/35-fix-remaining-lint-issues/54-lint-fixes-batch-54.md)
+- [ ] [55-lint-fixes-batch-55](./../subtasks/35-fix-remaining-lint-issues/55-lint-fixes-batch-55.md)
+- [ ] [56-lint-fixes-batch-56](./../subtasks/35-fix-remaining-lint-issues/56-lint-fixes-batch-56.md)
+- [ ] [57-lint-fixes-batch-57](./../subtasks/35-fix-remaining-lint-issues/57-lint-fixes-batch-57.md)
+- [ ] [58-lint-fixes-batch-58](./../subtasks/35-fix-remaining-lint-issues/58-lint-fixes-batch-58.md)
+- [ ] [59-lint-fixes-batch-59](./../subtasks/35-fix-remaining-lint-issues/59-lint-fixes-batch-59.md)
+- [ ] [60-lint-fixes-batch-60](./../subtasks/35-fix-remaining-lint-issues/60-lint-fixes-batch-60.md)

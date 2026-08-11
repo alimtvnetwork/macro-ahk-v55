@@ -95,7 +95,7 @@ function focusCurrentWorkspaceInList(): void {
   const currentItem = listEl.querySelector('.loop-ws-item[data-ws-current="true"]');
   if (currentItem) {
     currentItem.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    (currentItem as HTMLElement).style.outline = '2px solid #F59E0B';
+    (currentItem as HTMLElement).style.outline = '2px solid hsl(var(--warning))';
     setTimeout(function() {
       (currentItem as HTMLElement).style.outline = ''; 
     }, Timings.TIMEOUT_NORMAL);
@@ -218,7 +218,7 @@ function buildStartStopButton(deps: PanelBuilderDeps, btnStyle: string): { wrap:
   startStopBtn.id = IDS.START_BTN;
   startStopBtn.textContent = '▶';
   startStopBtn.title = 'Start loop';
-  startStopBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnStartGrad + ';color:#fff;border-radius:8px;min-width:36px;width:36px;font-size:14px;text-align:center;padding:6px 0;box-shadow:' + cBtnStartGlow + CssFragmentType.Border1pxSolidRgba + ';position:relative;';
+  startStopBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnStartGrad + ';color:hsl(var(--foreground));border-radius:8px;min-width:36px;width:36px;font-size:14px;text-align:center;padding:6px 0;box-shadow:' + cBtnStartGlow + CssFragmentType.Border1pxSolidRgba + ';position:relative;';
   startStopBtn.onmouseenter = function() {
     startStopBtn.style.filter = 'brightness(1.12)';
     startStopBtn.style.boxShadow = '0 2px 8px rgba(0,200,83,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; 
@@ -241,7 +241,7 @@ function buildStartStopButton(deps: PanelBuilderDeps, btnStyle: string): { wrap:
   // Countdown badge
   const countdownBadge = document.createElement('span');
   countdownBadge.id = 'loop-countdown-badge';
-  countdownBadge.style.cssText = 'display:none;align-items:center;justify-content:center;font-size:9px;font-family:' + tFont + ';font-weight:700;color:#fbbf24;background:rgba(0,0,0,0.6);padding:2px 6px;height:34px;border-radius:8px;border:1px solid rgba(251,191,36,0.3);margin-left:3px;min-width:28px;text-align:center;pointer-events:none;';
+  countdownBadge.style.cssText = 'display:none;align-items:center;justify-content:center;font-size:9px;font-family:' + tFont + ';font-weight:700;color:hsl(var(--warning));background:rgba(0,0,0,0.6);padding:2px 6px;height:34px;border-radius:8px;border:1px solid rgba(251,191,36,0.3);margin-left:3px;min-width:28px;text-align:center;pointer-events:none;';
   countdownBadge.textContent = '';
 
   startStopWrap.appendChild(startStopBtn);
@@ -335,7 +335,7 @@ function buildCreditButton(deps: PanelBuilderDeps, btnStyle: string): HTMLElemen
   const creditBtn = document.createElement('button');
   creditBtn.textContent = '💰 Credits';
   creditBtn.title = 'Fetch credit status via API and refresh workspace bars';
-  creditBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnCreditGrad + ';color:#1a1a2e;font-size:' + tFontTiny + ';padding:6px 12px;box-shadow:' + cBtnCreditGlow + CssFragmentType.Border1pxSolidRgba;
+  creditBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnCreditGrad + ';color:hsl(var(--background));font-size:' + tFontTiny + ';padding:6px 12px;box-shadow:' + cBtnCreditGlow + CssFragmentType.Border1pxSolidRgba;
   creditBtn.onmouseenter = function() {
     creditBtn.style.filter = 'brightness(1.12)';
     creditBtn.style.boxShadow = '0 2px 8px rgba(245,158,11,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; 
@@ -391,7 +391,7 @@ function buildPromptsDropdown(_deps: PanelBuilderDeps, btnStyle: string): Prompt
   const promptsBtn = document.createElement('button');
   promptsBtn.textContent = '📋 Prompts';
   promptsBtn.title = 'Select a prompt to paste or copy';
-  promptsBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnPromptGrad + ';color:#fff;font-size:' + tFontTiny + ';padding:6px 12px;box-shadow:' + cBtnPromptGlow + CssFragmentType.Border1pxSolidRgba;
+  promptsBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnPromptGrad + ';color:hsl(var(--foreground));font-size:' + tFontTiny + ';padding:6px 12px;box-shadow:' + cBtnPromptGlow + CssFragmentType.Border1pxSolidRgba;
   promptsBtn.onmouseenter = function() {
     promptsBtn.style.filter = 'brightness(1.15)';
     promptsBtn.style.boxShadow = '0 0 20px rgba(0,198,255,0.55)'; 
@@ -438,7 +438,7 @@ function showPromptsErrorState(
 ): void {
   promptsDropdown.innerHTML = '';
   const errEl = document.createElement('div');
-  errEl.style.cssText = 'padding:16px 12px;text-align:center;color:#ef4444;font-size:11px;';
+  errEl.style.cssText = 'padding:16px 12px;text-align:center;color:hsl(var(--destructive));font-size:11px;';
   errEl.textContent = '❌ Failed to load prompts. Click to retry.';
   errEl.style.cursor = 'pointer';
   errEl.onclick = function(ev: Event) {
@@ -592,7 +592,7 @@ function buildErrorToggleButton(btnStyle: string): HTMLElement {
   const btn = document.createElement('button');
   btn.setAttribute('data-panel-action', 'error-overlay-toggle');
   btn.title = 'Show/hide error overlay';
-  btn.style.cssText = btnStyle + 'background:' + cBtnUtilBg + ';color:#fff;font-size:13px;min-width:36px;width:36px;padding:6px 0;border:1px solid ' + cBtnUtilBorder + ';position:relative;';
+  btn.style.cssText = btnStyle + 'background:' + cBtnUtilBg + ';color:hsl(var(--foreground));font-size:13px;min-width:36px;width:36px;padding:6px 0;border:1px solid ' + cBtnUtilBorder + ';position:relative;';
 
   const icon = document.createElement('span');
   icon.textContent = '⚠';
@@ -602,7 +602,7 @@ function buildErrorToggleButton(btnStyle: string): HTMLElement {
   // Error count badge (hidden when 0)
   const badge = document.createElement('span');
   badge.setAttribute('data-error-badge', 'true');
-  badge.style.cssText = 'display:none;position:absolute;top:-4px;right:-4px;background:' + cError + ';color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;padding:0 4px;line-height:16px;text-align:center;pointer-events:none;';
+  badge.style.cssText = 'display:none;position:absolute;top:-4px;right:-4px;background:' + cError + ';color:hsl(var(--foreground));font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;padding:0 4px;line-height:16px;text-align:center;pointer-events:none;';
   btn.appendChild(badge);
 
   btn.onclick = function () {

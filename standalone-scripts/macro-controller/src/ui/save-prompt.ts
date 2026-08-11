@@ -333,7 +333,7 @@ function renderToolbarPromptsDropdown(dropdown: HTMLElement, deps: SavePromptDep
     return;
   }
 
-  dropdown.innerHTML = '<div style="padding:10px 14px;color:#9ca3af;font-size:12px;text-align:center;">⏳ Loading prompts…</div>';
+  dropdown.innerHTML = '<div style="padding:10px 14px;color:hsl(var(--muted-foreground));font-size:12px;text-align:center;">⏳ Loading prompts…</div>';
   loadPromptsFromJson().then(function () {
     renderPromptsDropdown({ promptsDropdown: dropdown }, taskNextDeps);
   }).catch(function (caught: unknown) {

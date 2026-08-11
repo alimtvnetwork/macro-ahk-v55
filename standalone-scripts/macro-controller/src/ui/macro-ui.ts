@@ -48,7 +48,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
 
   const bulkRetry = document.createElement('button');
   bulkRetry.textContent = '🔄 Re-queue';
-  bulkRetry.style.cssText = 'padding:2px 6px;font-size:9px;background:#1d4ed8;border:none;border-radius:3px;color:#fff;cursor:pointer;';
+  bulkRetry.style.cssText = 'padding:2px 6px;font-size:9px;background:hsl(var(--primary));border:none;border-radius:3px;color:hsl(var(--foreground));cursor:pointer;';
   bulkRetry.onclick = async () => {
     const { bulkRetryTasks } = await import('../task-queue');
     await bulkRetryTasks(Array.from(_selectedTaskIds));
@@ -61,7 +61,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
 
   const bulkDel = document.createElement('button');
   bulkDel.textContent = '🗑️ Delete';
-  bulkDel.style.cssText = 'padding:2px 6px;font-size:9px;background:#b91c1c;border:none;border-radius:3px;color:#fff;cursor:pointer;';
+  bulkDel.style.cssText = 'padding:2px 6px;font-size:9px;background:hsl(var(--destructive));border:none;border-radius:3px;color:hsl(var(--foreground));cursor:pointer;';
   bulkDel.onclick = async () => {
     if (confirm(`Delete ${_selectedTaskIds.size} selected tasks?`)) {
       const { bulkDeleteTasks } = await import('../task-queue');
@@ -76,7 +76,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
   
   const bulkCancel = document.createElement('button');
   bulkCancel.textContent = '✕';
-  bulkCancel.style.cssText = 'padding:2px 6px;font-size:9px;background:transparent;border:none;color:#94a3b8;cursor:pointer;';
+  bulkCancel.style.cssText = 'padding:2px 6px;font-size:9px;background:transparent;border:none;color:hsl(var(--muted-foreground));cursor:pointer;';
   bulkCancel.onclick = () => {
     _selectedTaskIds.clear();
     _selectionMode = false;
@@ -93,7 +93,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
   settingsRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 6px;background:rgba(255,255,255,0.03);border-radius:4px;margin-bottom:4px;';
   
   const pauseOnErrorWrap = document.createElement('label');
-  pauseOnErrorWrap.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:9px;color:#94a3b8;cursor:pointer;user-select:none;';
+  pauseOnErrorWrap.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:9px;color:hsl(var(--muted-foreground));cursor:pointer;user-select:none;';
   
   const pauseOnErrorCheck = document.createElement('input');
   pauseOnErrorCheck.type = 'checkbox';
@@ -121,7 +121,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
   settingsRow.appendChild(pauseOnErrorWrap);
 
   const retriesWrap = document.createElement('div');
-  retriesWrap.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:9px;color:#94a3b8;';
+  retriesWrap.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:9px;color:hsl(var(--muted-foreground));';
   retriesWrap.innerHTML = 'Retries: ';
   
   const retriesInput = document.createElement('input');
@@ -129,7 +129,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
   retriesInput.min = '0';
   retriesInput.max = '10';
   retriesInput.value = String(initialSettings.maxTaskRetries ?? 3);
-  retriesInput.style.cssText = `width:28px;background:${cPanelBgAlt};border:1px solid ${cPanelBorder};color:#fff;font-size:9px;padding:1px 2px;border-radius:2px;`;
+  retriesInput.style.cssText = `width:28px;background:${cPanelBgAlt};border:1px solid ${cPanelBorder};color:hsl(var(--foreground));font-size:9px;padding:1px 2px;border-radius:2px;`;
   retriesInput.onchange = () => {
     import('../settings-store').then(mod => {
       const s = mod.getSettingsOverrides();
@@ -149,46 +149,46 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
   
   const activeTab = document.createElement('div');
   activeTab.textContent = 'Active';
-  activeTab.style.cssText = `flex:1;text-align:center;padding:4px;font-size:9px;font-weight:700;cursor:pointer;border-radius:4px;background:${_activeQueueTab === 'active' ? cPrimary : cPanelBgAlt};color:${_activeQueueTab === 'active' ? '#fff' : '#64748b'};`;
+  activeTab.style.cssText = `flex:1;text-align:center;padding:4px;font-size:9px;font-weight:700;cursor:pointer;border-radius:4px;background:${_activeQueueTab === 'active' ? cPrimary : cPanelBgAlt};color:${_activeQueueTab === 'active' ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))'};`;
   
   const historyTab = document.createElement('div');
   historyTab.textContent = 'History';
-  historyTab.style.cssText = `flex:1;text-align:center;padding:4px;font-size:9px;font-weight:700;cursor:pointer;border-radius:4px;background:${_activeQueueTab === 'history' ? cPrimary : cPanelBgAlt};color:${_activeQueueTab === 'history' ? '#fff' : '#64748b'};`;
+  historyTab.style.cssText = `flex:1;text-align:center;padding:4px;font-size:9px;font-weight:700;cursor:pointer;border-radius:4px;background:${_activeQueueTab === 'history' ? cPrimary : cPanelBgAlt};color:${_activeQueueTab === 'history' ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))'};`;
 
   const liveTab = document.createElement('div');
   liveTab.textContent = 'Live';
-  liveTab.style.cssText = `flex:1;text-align:center;padding:4px;font-size:9px;font-weight:700;cursor:pointer;border-radius:4px;background:${_activeQueueTab === 'live' ? cPrimary : cPanelBgAlt};color:${_activeQueueTab === 'live' ? '#fff' : '#64748b'};`;
+  liveTab.style.cssText = `flex:1;text-align:center;padding:4px;font-size:9px;font-weight:700;cursor:pointer;border-radius:4px;background:${_activeQueueTab === 'live' ? cPrimary : cPanelBgAlt};color:${_activeQueueTab === 'live' ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))'};`;
   
   activeTab.onclick = () => {
     _activeQueueTab = 'active';
     activeTab.style.background = cPrimary;
-    activeTab.style.color = '#fff';
+    activeTab.style.color = 'hsl(var(--foreground))';
     historyTab.style.background = cPanelBgAlt;
-    historyTab.style.color = '#64748b';
+    historyTab.style.color = 'hsl(var(--muted-foreground))';
     liveTab.style.background = cPanelBgAlt;
-    liveTab.style.color = '#64748b';
+    liveTab.style.color = 'hsl(var(--muted-foreground))';
     refreshTaskQueueUI(listContainer);
   };
   
   historyTab.onclick = () => {
     _activeQueueTab = 'history';
     historyTab.style.background = cPrimary;
-    historyTab.style.color = '#fff';
+    historyTab.style.color = 'hsl(var(--foreground))';
     activeTab.style.background = cPanelBgAlt;
-    activeTab.style.color = '#64748b';
+    activeTab.style.color = 'hsl(var(--muted-foreground))';
     liveTab.style.background = cPanelBgAlt;
-    liveTab.style.color = '#64748b';
+    liveTab.style.color = 'hsl(var(--muted-foreground))';
     refreshTaskQueueUI(listContainer);
   };
 
   liveTab.onclick = () => {
     _activeQueueTab = 'live';
     liveTab.style.background = cPrimary;
-    liveTab.style.color = '#fff';
+    liveTab.style.color = 'hsl(var(--foreground))';
     activeTab.style.background = cPanelBgAlt;
-    activeTab.style.color = '#64748b';
+    activeTab.style.color = 'hsl(var(--muted-foreground))';
     historyTab.style.background = cPanelBgAlt;
-    historyTab.style.color = '#64748b';
+    historyTab.style.color = 'hsl(var(--muted-foreground))';
     refreshTaskQueueUI(listContainer);
   };
   
@@ -221,7 +221,7 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
       const isStopped = mgr.isStopped();
       pauseBtn.textContent = isPaused || isStopped ? '▶ Resume' : '⏸ Pause';
       pauseBtn.style.background = isPaused || isStopped ? 'rgba(34,197,94,0.15)' : cPanelBgAlt;
-      pauseBtn.style.color = isPaused || isStopped ? '#4ade80' : '#9ca3af';
+      pauseBtn.style.color = isPaused || isStopped ? 'hsl(var(--success))' : 'hsl(var(--muted-foreground))';
     }
   }, Timings.TIMEOUT_SHORT);
 
@@ -259,7 +259,7 @@ function _buildQueueHeader(listContainer: HTMLElement): HTMLElement { // eslint-
   const isStopped = mgr.isStopped();
   pauseBtn.textContent = isPaused || isStopped ? '▶ Resume' : '⏸ Pause';
   pauseBtn.style.background = isPaused || isStopped ? 'rgba(34,197,94,0.15)' : cPanelBgAlt;
-  pauseBtn.style.color = isPaused || isStopped ? '#4ade80' : '#9ca3af';
+  pauseBtn.style.color = isPaused || isStopped ? 'hsl(var(--success))' : 'hsl(var(--muted-foreground))';
 
   pauseBtn.style.cssText += 'padding:2px 8px;font-size:9px;border:1px solid ' + cPanelBorder + ';border-radius:4px;cursor:pointer;transition:all 0.2s;';
   pauseBtn.onclick = async () => {
@@ -289,7 +289,7 @@ function _buildQueueHeader(listContainer: HTMLElement): HTMLElement { // eslint-
   const retryBtn = document.createElement('button');
   retryBtn.textContent = '🔄 Retry';
   retryBtn.title = 'Retry failed tasks';
-  retryBtn.style.cssText = 'padding:2px 6px;font-size:9px;background:' + cPanelBgAlt + ';border:1px solid ' + cPanelBorder + ';border-radius:4px;color:#9ca3af;cursor:pointer;';
+  retryBtn.style.cssText = 'padding:2px 6px;font-size:9px;background:' + cPanelBgAlt + ';border:1px solid ' + cPanelBorder + ';border-radius:4px;color:hsl(var(--muted-foreground));cursor:pointer;';
   retryBtn.onclick = async () => {
     const { retryFailedTasks } = await import('../task-queue');
     await retryFailedTasks();
@@ -301,7 +301,7 @@ function _buildQueueHeader(listContainer: HTMLElement): HTMLElement { // eslint-
   const clearBtn = document.createElement('button');
   clearBtn.textContent = '🧹 Clear';
   clearBtn.title = 'Clear completed tasks (Right-click to clear ALL)';
-  clearBtn.style.cssText = 'padding:2px 6px;font-size:9px;background:' + cPanelBgAlt + ';border:1px solid ' + cPanelBorder + ';border-radius:4px;color:#9ca3af;cursor:pointer;';
+  clearBtn.style.cssText = 'padding:2px 6px;font-size:9px;background:' + cPanelBgAlt + ';border:1px solid ' + cPanelBorder + ';border-radius:4px;color:hsl(var(--muted-foreground));cursor:pointer;';
   clearBtn.onclick = async () => {
     await clearCompletedTasks();
     refreshTaskQueueUI(listContainer);
@@ -365,7 +365,7 @@ async function refreshTaskQueueUI(container: HTMLElement): Promise<void> { // es
   }
 
   if (tasksToShow.length === 0) {
-    container.innerHTML = `<div style="padding:12px;text-align:center;color:#64748b;font-size:10px;">${_activeQueueTab === 'active' ? 'No active tasks' : 'History is empty'}</div>`;
+    container.innerHTML = `<div style="padding:12px;text-align:center;color:hsl(var(--muted-foreground));font-size:10px;">${_activeQueueTab === 'active' ? 'No active tasks' : 'History is empty'}</div>`;
 
     return;
   }
@@ -381,7 +381,7 @@ async function refreshTaskQueueUI(container: HTMLElement): Promise<void> { // es
     }
 
     if (isSelected) {
-      item.style.borderColor = '#3b82f6';
+      item.style.borderColor = 'hsl(var(--primary))';
     }
 
     const row1 = document.createElement('div');
@@ -416,7 +416,7 @@ async function refreshTaskQueueUI(container: HTMLElement): Promise<void> { // es
       const upBtn = document.createElement('span');
       upBtn.textContent = '▲';
       upBtn.title = 'Move Up';
-      upBtn.style.cssText = 'cursor:pointer;font-size:8px;color:#64748b;padding:0 2px;';
+      upBtn.style.cssText = 'cursor:pointer;font-size:8px;color:hsl(var(--muted-foreground));padding:0 2px;';
       upBtn.onclick = async (e) => {
         e.stopPropagation();
         const { reorderTask } = await import('../task-queue');
@@ -427,7 +427,7 @@ async function refreshTaskQueueUI(container: HTMLElement): Promise<void> { // es
       const downBtn = document.createElement('span');
       downBtn.textContent = '▼';
       downBtn.title = 'Move Down';
-      downBtn.style.cssText = 'cursor:pointer;font-size:8px;color:#64748b;padding:0 2px;';
+      downBtn.style.cssText = 'cursor:pointer;font-size:8px;color:hsl(var(--muted-foreground));padding:0 2px;';
       downBtn.onclick = async (e) => {
         e.stopPropagation();
         const { reorderTask } = await import('../task-queue');
@@ -499,7 +499,7 @@ function renderLiveStream(container: HTMLElement): void {
   container.style.background = 'rgba(0,0,0,0.4)';
   
   if (logs.length === 0) {
-    container.innerHTML = '<div style="padding:12px;text-align:center;color:#64748b;font-size:10px;">No active execution logs</div>';
+    container.innerHTML = '<div style="padding:12px;text-align:center;color:hsl(var(--muted-foreground));font-size:10px;">No active execution logs</div>';
 
     return;
   }
@@ -516,7 +516,7 @@ function renderLiveStream(container: HTMLElement): void {
     } else if (msg.includes('failed') || msg.includes('error')) {
       line.style.color = cError;
     } else {
-      line.style.color = '#94a3b8';
+      line.style.color = 'hsl(var(--muted-foreground))';
     }
 
     line.textContent = msg;
@@ -558,7 +558,7 @@ function showTaskDetailModal(task: MacroTask): void {
   
   const closeBtn = document.createElement('span');
   closeBtn.textContent = '✕';
-  closeBtn.style.cssText = 'cursor:pointer;color:#64748b;font-size:16px;';
+  closeBtn.style.cssText = 'cursor:pointer;color:hsl(var(--muted-foreground));font-size:16px;';
   closeBtn.onclick = () => overlay.remove();
   header.appendChild(closeBtn);
   modal.appendChild(header);
@@ -571,7 +571,7 @@ function showTaskDetailModal(task: MacroTask): void {
     wrap.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
     const l = document.createElement('div');
     l.textContent = label;
-    l.style.cssText = 'font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;';
+    l.style.cssText = 'font-size:10px;color:hsl(var(--muted-foreground));font-weight:600;text-transform:uppercase;';
     wrap.appendChild(l);
     const v = document.createElement('div');
     v.textContent = value;
@@ -597,12 +597,12 @@ function showTaskDetailModal(task: MacroTask): void {
 
 function getStatusColor(status: MacroTask['status']): string {
   switch (status) {
-    case 'pending': return '#9ca3af';
+    case 'pending': return 'hsl(var(--muted-foreground))';
     case 'processing': return cPrimary;
     case 'completed': return cSuccess;
     case 'failed': return cError;
     case 'hold': return cWarning;
-    default: return '#9ca3af';
+    default: return 'hsl(var(--muted-foreground))';
   }
 }
 
@@ -634,7 +634,7 @@ export function showTaskQueueModal(): void {
 
   const closeBtn = document.createElement('span');
   closeBtn.textContent = '✕';
-  closeBtn.style.cssText = 'cursor:pointer;color:#64748b;font-size:18px;';
+  closeBtn.style.cssText = 'cursor:pointer;color:hsl(var(--muted-foreground));font-size:18px;';
   closeBtn.onclick = () => overlay.remove();
   header.appendChild(closeBtn);
   modal.appendChild(header);

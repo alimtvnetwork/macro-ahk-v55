@@ -193,14 +193,14 @@ function promptPickerModal(rows: PromptRow[], opts: PickPromptOptions): Promise<
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:2147483647;display:flex;align-items:center;justify-content:center;';
     const dlg = document.createElement('div');
-    dlg.style.cssText = 'min-width:340px;max-width:520px;max-height:70vh;display:flex;flex-direction:column;gap:10px;padding:16px;background:#1a1a2e;border:1px solid rgba(124,58,237,0.6);border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,0.6);color:#e5e7eb;font:12px system-ui,-apple-system,sans-serif;';
+    dlg.style.cssText = 'min-width:340px;max-width:520px;max-height:70vh;display:flex;flex-direction:column;gap:10px;padding:16px;background:hsl(var(--background));border:1px solid rgba(124,58,237,0.6);border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,0.6);color:hsl(var(--foreground));font:12px system-ui,-apple-system,sans-serif;';
     const h = document.createElement('div');
     h.textContent = opts.title;
     h.style.cssText = 'font-size:13px;font-weight:700;color:#c4b5fd;';
     dlg.appendChild(h);
     const sel = document.createElement('select');
     sel.size = Math.min(8, Math.max(4, rows.length));
-    sel.style.cssText = 'width:100%;padding:6px 8px;background:#0f172a;border:1px solid rgba(148,163,184,0.35);border-radius:5px;color:#e5e7eb;font-size:12px;';
+    sel.style.cssText = 'width:100%;padding:6px 8px;background:#0f172a;border:1px solid rgba(148,163,184,0.35);border-radius:5px;color:hsl(var(--foreground));font-size:12px;';
     for (const r of rows) {
       const o = document.createElement('option');
       o.value = String(r.Id);
@@ -215,11 +215,11 @@ function promptPickerModal(rows: PromptRow[], opts: PickPromptOptions): Promise<
     const cancel = document.createElement('button');
     cancel.type = 'button';
     cancel.textContent = 'Cancel';
-    cancel.style.cssText = 'padding:6px 12px;background:transparent;border:1px solid rgba(148,163,184,0.35);border-radius:5px;color:#e5e7eb;cursor:pointer;font-size:12px;';
+    cancel.style.cssText = 'padding:6px 12px;background:transparent;border:1px solid rgba(148,163,184,0.35);border-radius:5px;color:hsl(var(--foreground));cursor:pointer;font-size:12px;';
     const ok = document.createElement('button');
     ok.type = 'button';
     ok.textContent = opts.confirmLabel ?? 'Select';
-    ok.style.cssText = 'padding:6px 14px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);border:none;border-radius:5px;color:#fff;cursor:pointer;font-size:12px;font-weight:600;';
+    ok.style.cssText = 'padding:6px 14px;background:linear-gradient(135deg,hsl(var(--primary)),hsl(var(--primary)));border:none;border-radius:5px;color:hsl(var(--foreground));cursor:pointer;font-size:12px;font-weight:600;';
     row.appendChild(cancel);
     row.appendChild(ok);
     dlg.appendChild(row);

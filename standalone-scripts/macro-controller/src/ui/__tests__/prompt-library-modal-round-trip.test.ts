@@ -87,16 +87,11 @@ describe('prompt-library-modal - Export -> Import round-trip', () => {
     bridge.partitionByRole.mockClear();
     bridge.commitDbEntries.mockClear();
 
-    capturedBlob = null;
-    // jsdom lacks URL.createObjectURL; stub it and capture the blob the
-    // exporter hands off for download.
-    (URL as unknown as { createObjectURL: (b: Blob) => string }).createObjectURL = (b: Blob) => {
-      capturedBlob = b;
-
-      return 'blob:mock';
-    };
-
-    (URL as unknown as { revokeObjectURL: (u: string) => void }).revokeObjectURL = () => undefined;
+    vi.stubGlobal('URL', {
+      ...URL,
+      createObjectURL: vi.fn().mockReturnValue('blob:mock'),
+      revokeObjectURL: vi.fn(),
+    });
 
     performSpy = vi.spyOn(promptIo, 'performPromptImport').mockResolvedValue({
       added: FIXTURE.length, updated: 0, total: FIXTURE.length, errors: [],
@@ -106,6 +101,7 @@ describe('prompt-library-modal - Export -> Import round-trip', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     performSpy?.mockRestore();
+    // Do not unstub globals here to avoid async timeout crashing on revokeObjectURL
     vi.restoreAllMocks();
   });
 
@@ -116,13 +112,16 @@ describe('prompt-library-modal - Export -> Import round-trip', () => {
     // 1. Trigger Export -> capture the Blob written to URL.createObjectURL.
     const exportBtn = document.querySelector<HTMLButtonElement>('[data-testid="library-export"]')!;
     exportBtn.click();
-    for (let i = 0; i < 20 && capturedBlob === null; i++) {
+    const createMock = vi.mocked(URL.createObjectURL);
+    for (let i = 0; i < 20 && createMock.mock.calls.length === 0; i++) {
       await flush();
     }
 
+    expect(createMock.mock.calls.length).toBeGreaterThan(0);
+    const capturedBlob = createMock.mock.calls[0][0] as Blob;
     expect(capturedBlob).not.toBeNull();
 
-    const json = await capturedBlob!.text();
+    const json = await capturedBlob.text();
     // 2. Sanity: the envelope parses locally and preserves the fixture bodies.
     const parsed = promptIo.parsePromptsText(json);
     expect(parsed.errors).toEqual([]);
@@ -161,15 +160,19 @@ describe('prompt-library-modal - Export -> Import round-trip', () => {
   it('produces a PromptsBundleV1 envelope (schemaVersion + entries) rather than a bare array', async () => {
     await openPromptLibraryModal();
     await flush();
-        document.querySelector<HTMLButtonElement>('[data-testid="library-export"]')!.click();
-        for (let i = 0; i < 20 && capturedBlob === null; i++) {
-          await flush();
-        }
+    document.querySelector<HTMLButtonElement>('[data-testid="library-export"]')!.click();
+    const createMock = vi.mocked(URL.createObjectURL);
+    for (let i = 0; i < 20 && createMock.mock.calls.length === 0; i++) {
+      await flush();
+    }
 
-        expect(capturedBlob).not.toBeNull();
-        const payload = JSON.parse(await capturedBlob!.text()) as Record<string, unknown>;
-        expect(payload).toMatchObject({ schemaVersion: expect.any(Number) });
-        expect(Array.isArray(payload.entries)).toBe(true);
-        expect((payload.entries as unknown[]).length).toBe(FIXTURE.length);
+    expect(createMock.mock.calls.length).toBeGreaterThan(0);
+    const capturedBlob = createMock.mock.calls[0][0] as Blob;
+    expect(capturedBlob).not.toBeNull();
+
+    const payload = JSON.parse(await capturedBlob!.text()) as Record<string, unknown>;
+    expect(payload).toMatchObject({ schemaVersion: expect.any(Number) });
+    expect(Array.isArray(payload.entries)).toBe(true);
+    expect((payload.entries as unknown[]).length).toBe(FIXTURE.length);
   });
 });

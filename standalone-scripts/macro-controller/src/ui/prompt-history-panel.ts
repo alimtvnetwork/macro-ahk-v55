@@ -203,7 +203,7 @@ function renderLastImportError(): void {
   host.style.display = 'flex';
   const label = doc.createElement('span');
   label.textContent = '⚠ Last import error:';
-  label.style.cssText = 'color:#f87171;font-weight:600;flex-shrink:0;';
+  label.style.cssText = 'color:hsl(var(--destructive));font-weight:600;flex-shrink:0;';
   const message = doc.createElement('span');
   message.setAttribute('data-role', 'last-import-error-message');
   message.textContent = err.key + ': ' + err.detail;
@@ -212,7 +212,7 @@ function renderLastImportError(): void {
   const when = doc.createElement('span');
   when.setAttribute('data-role', 'last-import-error-when');
   when.textContent = formatWhen(err.at);
-  when.style.cssText = 'color:#f87171;font-variant-numeric:tabular-nums;flex-shrink:0;';
+  when.style.cssText = 'color:hsl(var(--destructive));font-variant-numeric:tabular-nums;flex-shrink:0;';
   const clear = doc.createElement('button');
   clear.textContent = '✕';
   clear.setAttribute(ATTR_DATA_ACTION, 'clear-last-import-error');
@@ -357,7 +357,7 @@ function buildHeaderActions(
   exportBtn.textContent = '↓ Export JSON';
   exportBtn.setAttribute(ATTR_DATA_ACTION, 'export-history');
   exportBtn.setAttribute(ATTR_ARIA_LABEL, 'Export revision history as JSON');
-  exportBtn.style.cssText = 'background:#1f2937;border:1px solid #475569;color:#e5e7eb;font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;';
+  exportBtn.style.cssText = 'background:#1f2937;border:1px solid hsl(var(--muted-foreground));color:hsl(var(--foreground));font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;';
   exportBtn.onclick = () => downloadRevisionExport(doc, slug, role, revisions);
   actionsGroup.appendChild(exportBtn);
 
@@ -370,7 +370,7 @@ function buildHeaderActions(
   importBtn.textContent = '↑ Import JSON';
   importBtn.setAttribute(ATTR_DATA_ACTION, 'import-history');
   importBtn.setAttribute(ATTR_ARIA_LABEL, 'Import revision history from JSON');
-  importBtn.style.cssText = 'background:#1f2937;border:1px solid #475569;color:#e5e7eb;font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;';
+  importBtn.style.cssText = 'background:#1f2937;border:1px solid hsl(var(--muted-foreground));color:hsl(var(--foreground));font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;';
   importBtn.onclick = () => importInput.click();
   importInput.onchange = () => handleImportFile(importInput, slug, role, deps);
   actionsGroup.appendChild(importBtn);
@@ -379,7 +379,7 @@ function buildHeaderActions(
   const closeBtn = doc.createElement('button');
   closeBtn.textContent = '✕';
   closeBtn.setAttribute(ATTR_ARIA_LABEL, 'Close history panel');
-  closeBtn.style.cssText = 'background:transparent;border:1px solid #475569;color:#e5e7eb;padding:2px 8px;border-radius:4px;cursor:pointer;';
+  closeBtn.style.cssText = 'background:transparent;border:1px solid hsl(var(--muted-foreground));color:hsl(var(--foreground));padding:2px 8px;border-radius:4px;cursor:pointer;';
   closeBtn.onclick = () => removeExistingPanel(doc);
   actionsGroup.appendChild(closeBtn);
 
@@ -421,7 +421,7 @@ function _buildPanelContainer(doc: Document, slug: string): { overlay: HTMLEleme
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:2147483000;display:flex;align-items:center;justify-content:center;color-scheme:dark;';
 
   const card = doc.createElement('div');
-  card.style.cssText = 'background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;width:min(720px,92vw);max-height:82vh;display:flex;flex-direction:column;gap:10px;font-family:system-ui,sans-serif;color:#e5e7eb;';
+  card.style.cssText = 'background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;width:min(720px,92vw);max-height:82vh;display:flex;flex-direction:column;gap:10px;font-family:system-ui,sans-serif;color:hsl(var(--foreground));';
   overlay.appendChild(card);
 
   return { overlay, card };
@@ -440,7 +440,7 @@ function buildPanel(
 
   const subtitle = doc.createElement('div');
   subtitle.setAttribute('data-role', 'history-subtitle');
-  subtitle.style.cssText = 'font-size:11px;color:#94a3b8;';
+  subtitle.style.cssText = 'font-size:11px;color:hsl(var(--muted-foreground));';
   card.appendChild(subtitle);
 
   const lastErr = buildLastErrorArea(doc);
@@ -661,7 +661,7 @@ function buildClearFiltersButton(
   clear.setAttribute(ATTR_DATA_ACTION, 'clear-filters');
   clear.setAttribute(ATTR_ARIA_LABEL, 'Clear all history filters');
   clear.setAttribute('type', 'button');
-  clear.style.cssText = 'background:transparent;border:1px solid #475569;color:#e5e7eb;font-size:10px;padding:2px 8px;border-radius:10px;cursor:pointer;margin-left:2px;';
+  clear.style.cssText = 'background:transparent;border:1px solid hsl(var(--muted-foreground));color:hsl(var(--foreground));font-size:10px;padding:2px 8px;border-radius:10px;cursor:pointer;margin-left:2px;';
   clear.onclick = () => {
     state.selectedReasons.clear();
     state.importedFilter = 'all';
@@ -685,7 +685,7 @@ function renderToolbar(
   const sortLabel = doc.createElement('span');
   sortLabel.textContent = 'Sort:';
   sortLabel.setAttribute('aria-hidden', 'true');
-  sortLabel.style.cssText = 'color:#94a3b8;';
+  sortLabel.style.cssText = 'color:hsl(var(--muted-foreground));';
   toolbar.appendChild(sortLabel);
 
   const arrow = state.sortDir === 'asc' ? ' ↑' : ' ↓';
@@ -701,7 +701,7 @@ function renderToolbar(
   const filterLabel = doc.createElement('span');
   filterLabel.textContent = 'Filter:';
   filterLabel.setAttribute('aria-hidden', 'true');
-  filterLabel.style.cssText = 'color:#94a3b8;';
+  filterLabel.style.cssText = 'color:hsl(var(--muted-foreground));';
   toolbar.appendChild(filterLabel);
 
   renderReasonChips(doc, toolbar, rows, state, rerender);
@@ -825,7 +825,7 @@ function buildChip(doc: Document, label: string, active: boolean, dataRole: stri
   const base = 'font-size:10px;padding:2px 8px;border-radius:10px;cursor:pointer;font-weight:600;letter-spacing:0.02em;';
   chip.style.cssText = active
     ? base + 'background:#1e293b;border:1px solid #facc15;color:#facc15;'
-    : base + 'background:#111827;border:1px solid #334155;color:#94a3b8;';
+    : base + 'background:#111827;border:1px solid #334155;color:hsl(var(--muted-foreground));';
 
   return chip;
 }
@@ -842,7 +842,7 @@ function buildRevisionRow(
   row.style.cssText = 'border:1px solid #334155;border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:6px;background:#111827;';
 
   const meta = doc.createElement('div');
-  meta.style.cssText = 'display:flex;align-items:center;gap:10px;font-size:11px;color:#94a3b8;';
+  meta.style.cssText = 'display:flex;align-items:center;gap:10px;font-size:11px;color:hsl(var(--muted-foreground));';
   const when = doc.createElement('span');
   when.textContent = formatWhen(rev.CreatedAt);
   const reason = doc.createElement('span');
@@ -850,7 +850,7 @@ function buildRevisionRow(
   reason.style.cssText = 'color:#a78bfa;';
   const name = doc.createElement('span');
   name.textContent = rev.Name;
-  name.style.cssText = 'color:#e5e7eb;font-weight:600;';
+  name.style.cssText = 'color:hsl(var(--foreground));font-weight:600;';
   meta.appendChild(name);
   meta.appendChild(when);
   meta.appendChild(reason);
@@ -859,7 +859,7 @@ function buildRevisionRow(
     imported.textContent = 'imported';
     imported.setAttribute('data-role', 'imported-badge');
     imported.setAttribute('title', 'Restored from an off-device history archive (PromptId=0 sentinel).');
-    imported.style.cssText = 'background:#1e293b;border:1px solid #475569;color:#facc15;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:600;letter-spacing:0.02em;';
+    imported.style.cssText = 'background:#1e293b;border:1px solid hsl(var(--muted-foreground));color:#facc15;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:600;letter-spacing:0.02em;';
     meta.appendChild(imported);
   }
 
@@ -875,7 +875,7 @@ function buildRevisionRow(
   const restoreBtn = doc.createElement('button');
   restoreBtn.textContent = '↺ Restore this version';
   restoreBtn.setAttribute(ATTR_DATA_ACTION, 'restore-revision');
-  restoreBtn.style.cssText = 'background:#7c3aed;border:none;color:#fff;font-size:11px;padding:5px 10px;border-radius:4px;cursor:pointer;font-weight:600;';
+  restoreBtn.style.cssText = 'background:hsl(var(--primary));border:none;color:hsl(var(--foreground));font-size:11px;padding:5px 10px;border-radius:4px;cursor:pointer;font-weight:600;';
   restoreBtn.onclick = () => {
     void handleRestore(rev, role, deps);
   };

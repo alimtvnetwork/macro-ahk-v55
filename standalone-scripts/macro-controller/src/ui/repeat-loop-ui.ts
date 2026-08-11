@@ -599,7 +599,7 @@ function wireTogglePopover(
     trigger.setAttribute(ARIA_EXPANDED, 'true');
     document.addEventListener('click', onDocClick, true);
     document.addEventListener('keydown', onKey, true);
-    window.addEventListener('pagehide', close);
+    if (typeof window !== 'undefined') window.addEventListener('pagehide', close);
   }
 
   function close(): void {
@@ -608,7 +608,7 @@ function wireTogglePopover(
     trigger.setAttribute(ARIA_EXPANDED, 'false');
     document.removeEventListener('click', onDocClick, true);
     document.removeEventListener('keydown', onKey, true);
-    window.removeEventListener('pagehide', close);
+    if (typeof window !== 'undefined') window.removeEventListener('pagehide', close);
   }
 
   function onDocClick(e: Event): void {
@@ -961,8 +961,8 @@ function renderControl(refs: ControlRefs): void {
   refs.delayInput.value = String(repeatLoopState.delaySec);
   refs.delayInput.disabled = repeatLoopState.running || repeatLoopState.waitMode !== WAIT_MODE_FIXED_DELAY;
   refs.delayInput.style.opacity = repeatLoopState.waitMode === WAIT_MODE_FIXED_DELAY ? '1' : '0.45';
-  const startGradient = 'linear-gradient(135deg,#7c3aed 0%,#4f46e5 50%,#2563eb 100%)';
-  const stopGradient = 'linear-gradient(135deg,#dc2626 0%,#b91c1c 50%,#7f1d1d 100%)';
+  const startGradient = 'linear-gradient(135deg,hsl(var(--primary)) 0%,#4f46e5 50%,hsl(var(--primary)) 100%)';
+  const stopGradient = 'linear-gradient(135deg,hsl(var(--destructive)) 0%,hsl(var(--destructive)) 50%,#7f1d1d 100%)';
   const startShadow = '0 2px 6px rgba(79,70,229,0.45), inset 0 1px 0 rgba(255,255,255,0.18)';
   const stopShadow = '0 2px 6px rgba(220,38,38,0.45), inset 0 1px 0 rgba(255,255,255,0.18)';
   if (repeatLoopState.running) {
@@ -984,8 +984,8 @@ function renderControl(refs: ControlRefs): void {
 function buildActionButton(): HTMLButtonElement {
   const action = document.createElement('button');
   action.type = 'button';
-  const startGradient = 'linear-gradient(135deg,#7c3aed 0%,#4f46e5 50%,#2563eb 100%)';
-  action.style.cssText = 'padding:5px 14px;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;color:#fff;background:' + startGradient + ';margin-left:auto;box-shadow:0 2px 6px rgba(79,70,229,0.45), inset 0 1px 0 rgba(255,255,255,0.18);transition:transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;';
+  const startGradient = 'linear-gradient(135deg,hsl(var(--primary)) 0%,#4f46e5 50%,hsl(var(--primary)) 100%)';
+  action.style.cssText = 'padding:5px 14px;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;color:hsl(var(--foreground));background:' + startGradient + ';margin-left:auto;box-shadow:0 2px 6px rgba(79,70,229,0.45), inset 0 1px 0 rgba(255,255,255,0.18);transition:transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;';
   action.onmouseenter = function () {
     action.style.filter = 'brightness(1.08)';
     action.style.transform = 'translateY(-1px)';
@@ -1120,10 +1120,10 @@ function buildCollapsedPill(): HTMLButtonElement {
 }
 
 function applyRootStyle(root: HTMLElement, opts: { compact: boolean }): void {
-  const pad = opts.compact ? '4px 8px' : '6px 8px';
-  const rootBg = opts.compact ? 'rgba(124,58,237,0.10)' : cSectionBg;
+  const pad = opts.compact ? '0' : '6px 8px';
+  const rootBg = opts.compact ? 'transparent' : cSectionBg;
   const rootBorder = opts.compact ? 'none' : '1px solid rgba(124,58,237,0.25)';
-  const rootRadius = opts.compact ? '5px' : '6px';
+  const rootRadius = opts.compact ? '0' : '6px';
   root.style.cssText = 'display:flex;flex-direction:column;gap:4px;padding:' + pad + ';background:' + rootBg + ';border:' + rootBorder + ';border-radius:' + rootRadius + ';font-family:system-ui,-apple-system,sans-serif;color:' + cPanelFg + ';font-size:11px;flex:1;box-sizing:border-box;';
 }
 

@@ -128,7 +128,7 @@ export function buildWsDropdownSection(deps: WsDropdownDeps): WsDropdownResult {
 
   const wsSelected = document.createElement('div');
   wsSelected.id = 'loop-ws-selected';
-  wsSelected.style.cssText = 'font-size:9px;color:#9ca3af;margin-top:3px;min-height:12px;';
+  wsSelected.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));margin-top:3px;min-height:12px;';
   wsSelected.textContent = 'No workspace selected';
 
   const wsMoveRow = _buildMoveRow(triggerLoopMoveFromSelection);
@@ -246,7 +246,7 @@ function _buildUndoBtn(
   wsUndoBtn.id = 'loop-ws-undo-btn';
   wsUndoBtn.textContent = '↩️ Undo';
   wsUndoBtn.title = 'Undo last bulk rename';
-  wsUndoBtn.style.cssText = 'display:none;padding:1px 6px;background:rgba(239,68,68,0.2);color:#f87171;border:1px solid rgba(239,68,68,0.4);border-radius:3px;font-size:8px;cursor:pointer;font-weight:700;';
+  wsUndoBtn.style.cssText = 'display:none;padding:1px 6px;background:rgba(239,68,68,0.2);color:hsl(var(--destructive));border:1px solid rgba(239,68,68,0.4);border-radius:3px;font-size:8px;cursor:pointer;font-weight:700;';
   wsUndoBtn.onclick = function(e: Event) {
     e.preventDefault();
     e.stopPropagation();
@@ -337,7 +337,7 @@ function _buildMoveRow(triggerLoopMoveFromSelection: () => void): HTMLElement {
   const moveBtn = document.createElement('button');
   moveBtn.textContent = '🚀 Move';
   moveBtn.title = 'Move project to selected workspace';
-  moveBtn.style.cssText = 'flex:1;padding:4px 8px;background:#059669;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.15s;';
+  moveBtn.style.cssText = 'flex:1;padding:4px 8px;background:#059669;color:hsl(var(--foreground));border:none;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.15s;';
   moveBtn.onmouseover = function() {
     (this as HTMLElement).style.background = '#047857'; 
   };
@@ -354,7 +354,7 @@ function _buildMoveRow(triggerLoopMoveFromSelection: () => void): HTMLElement {
 
   const moveStatus = document.createElement('div');
   moveStatus.id = 'loop-move-status';
-  moveStatus.style.cssText = 'font-size:9px;min-height:12px;color:#9ca3af;';
+  moveStatus.style.cssText = 'font-size:9px;min-height:12px;color:hsl(var(--muted-foreground));';
 
   wsMoveRow.appendChild(moveBtn);
   wsMoveRow.appendChild(moveStatus);

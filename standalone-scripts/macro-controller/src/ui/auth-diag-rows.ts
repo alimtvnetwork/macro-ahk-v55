@@ -94,32 +94,32 @@ export function updateBridgeRow(deps: AuthDiagDeps, bridgeRow: DiagRowElements):
   if (bridge.isSuccess) {
     bridgeRow.iconEl.textContent = '✅';
     bridgeRow.valEl.textContent = 'OK via ' + bridge.source;
-    bridgeRow.valEl.style.color = '#4ade80';
+    bridgeRow.valEl.style.color = 'hsl(var(--success))';
     _removeHelpIcon(bridgeRow);
   } else if (_isServiceWorkerSuspended(bridge.error || '')) {
     // Auto-wake: show reconnecting state, then ping to wake service worker
     bridgeRow.iconEl.textContent = '🔄';
     bridgeRow.valEl.textContent = 'Reconnecting…';
-    bridgeRow.valEl.style.color = '#fbbf24';
+    bridgeRow.valEl.style.color = 'hsl(var(--warning))';
     _removeHelpIcon(bridgeRow);
 
     deps.wakeBridge().then(function (alive: boolean) {
       if (alive) {
         bridgeRow.iconEl.textContent = '✅';
         bridgeRow.valEl.textContent = 'OK — reconnected after idle';
-        bridgeRow.valEl.style.color = '#4ade80';
+        bridgeRow.valEl.style.color = 'hsl(var(--success))';
         _removeHelpIcon(bridgeRow);
       } else {
         bridgeRow.iconEl.textContent = '💤';
         bridgeRow.valEl.textContent = 'Idle — service worker suspended';
-        bridgeRow.valEl.style.color = '#fbbf24';
+        bridgeRow.valEl.style.color = 'hsl(var(--warning))';
         _appendHelpIcon(bridgeRow, _getBridgeErrorHelp(bridge.error || ''));
       }
     });
   } else {
     bridgeRow.iconEl.textContent = '❌';
     bridgeRow.valEl.textContent = 'FAILED' + (bridge.error ? ' — ' + bridge.error : '');
-    bridgeRow.valEl.style.color = '#f87171';
+    bridgeRow.valEl.style.color = 'hsl(var(--destructive))';
     _appendHelpIcon(bridgeRow, _getBridgeErrorHelp(bridge.error || ''));
   }
 }
@@ -165,7 +165,7 @@ function _appendHelpIcon(diagRow: DiagRowElements, helpText: string): void {
 
   const tooltip = document.createElement('div');
   tooltip.style.cssText = 'display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);' +
-    'width:280px;padding:8px 10px;background:#1a1a2e;color:#e2e8f0;font-size:9px;line-height:1.4;' +
+    'width:280px;padding:8px 10px;background:hsl(var(--background));color:hsl(var(--foreground));font-size:9px;line-height:1.4;' +
     'border:1px solid rgba(124,58,237,0.4);border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.5);' +
     'z-index:100020;pointer-events:none;white-space:normal;';
   tooltip.textContent = helpText;
@@ -218,11 +218,11 @@ export function updateJwtRow(deps: AuthDiagDeps, jwtRow: DiagRowElements, jwtDet
   if (info.valid) {
     jwtRow.iconEl.textContent = '✅';
     jwtRow.valEl.textContent = 'Valid · expires in ' + formatRemaining(info.remainingMs);
-    jwtRow.valEl.style.color = '#4ade80';
+    jwtRow.valEl.style.color = 'hsl(var(--success))';
   } else {
     jwtRow.iconEl.textContent = '❌';
     jwtRow.valEl.textContent = info.error || 'Invalid / expired';
-    jwtRow.valEl.style.color = '#f87171';
+    jwtRow.valEl.style.color = 'hsl(var(--destructive))';
   }
 
   jwtDetailVal.textContent = 'sub: ' + info.sub + ' · iat: ' + info.issuedAt + ' · exp: ' + info.expiresAt;
@@ -242,11 +242,11 @@ export function updateRefreshRow(refreshRow: DiagRowElements): void {
   if (outcome.isSuccess) {
     refreshRow.iconEl.textContent = '✅';
     refreshRow.valEl.textContent = 'OK @ ' + outcome.time + ' via ' + outcome.source;
-    refreshRow.valEl.style.color = '#4ade80';
+    refreshRow.valEl.style.color = 'hsl(var(--success))';
   } else {
     refreshRow.iconEl.textContent = '❌';
     refreshRow.valEl.textContent = 'FAILED @ ' + outcome.time + (outcome.error ? ' — ' + outcome.error : '');
-    refreshRow.valEl.style.color = '#f87171';
+    refreshRow.valEl.style.color = 'hsl(var(--destructive))';
   }
 }
 
@@ -256,11 +256,11 @@ export function updateWsCacheRow(wsCacheRow: DiagRowElements): void {
   if (state.workspaceFromCache) {
     wsCacheRow.iconEl.textContent = '📦';
     wsCacheRow.valEl.textContent = 'Cached: "' + (cachedName || state.workspaceName) + '"';
-    wsCacheRow.valEl.style.color = '#fbbf24';
+    wsCacheRow.valEl.style.color = 'hsl(var(--warning))';
   } else if (state.workspaceFromApi) {
     wsCacheRow.iconEl.textContent = '🌐';
     wsCacheRow.valEl.textContent = 'Fresh (API): "' + state.workspaceName + '"';
-    wsCacheRow.valEl.style.color = '#4ade80';
+    wsCacheRow.valEl.style.color = 'hsl(var(--success))';
   } else if (state.workspaceName) {
     wsCacheRow.iconEl.textContent = '🔍';
     wsCacheRow.valEl.textContent = 'Detected: "' + state.workspaceName + '"';
@@ -315,14 +315,14 @@ export function buildButtonRow(deps: AuthDiagDeps, onUpdate: () => void): HTMLEl
 
 function buildRefreshButton(deps: AuthDiagDeps, onUpdate: () => void): HTMLButtonElement {
   const button = document.createElement('button');
-  button.style.cssText = 'padding:2px 8px;background:#1e3a5f;color:' + cPrimaryLighter + ';border:1px solid #2563eb;border-radius:3px;font-size:9px;cursor:pointer;margin-top:2px;transition:background 0.15s;';
+  button.style.cssText = 'padding:2px 8px;background:hsl(var(--secondary));color:' + cPrimaryLighter + ';border:1px solid hsl(var(--primary));border-radius:3px;font-size:9px;cursor:pointer;margin-top:2px;transition:background 0.15s;';
   button.textContent = '🔄 Force Refresh Token';
   button.onmouseenter = function () {
-    button.style.background = '#2563eb'; 
+    button.style.background = 'hsl(var(--primary))'; 
   };
 
   button.onmouseleave = function () {
-    button.style.background = '#1e3a5f'; 
+    button.style.background = 'hsl(var(--secondary))'; 
   };
 
   button.onclick = function () {
@@ -343,15 +343,15 @@ function buildRefreshButton(deps: AuthDiagDeps, onUpdate: () => void): HTMLButto
 
 function buildReadCookieButton(deps: AuthDiagDeps, onUpdate: () => void): HTMLButtonElement {
   const button = document.createElement('button');
-  button.style.cssText = 'padding:2px 8px;background:#1e3a5f;color:' + cPrimaryLighter + ';border:1px solid #2563eb;border-radius:3px;font-size:9px;cursor:pointer;margin-top:2px;transition:background 0.15s;';
+  button.style.cssText = 'padding:2px 8px;background:hsl(var(--secondary));color:' + cPrimaryLighter + ';border:1px solid hsl(var(--primary));border-radius:3px;font-size:9px;cursor:pointer;margin-top:2px;transition:background 0.15s;';
   button.textContent = '🍪 Read Cookie';
   button.title = 'Read session token from extension bridge and save to localStorage';
   button.onmouseenter = function () {
-    button.style.background = '#2563eb'; 
+    button.style.background = 'hsl(var(--primary))'; 
   };
 
   button.onmouseleave = function () {
-    button.style.background = '#1e3a5f'; 
+    button.style.background = 'hsl(var(--secondary))'; 
   };
 
   button.onclick = function () {

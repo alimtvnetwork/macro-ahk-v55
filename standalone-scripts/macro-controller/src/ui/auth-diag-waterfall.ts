@@ -12,9 +12,9 @@ import { createSkeletonBar } from './skeleton';
 import { cPanelFgDim } from '../shared-state';
 import { CssFragmentType } from '../types';
 const STATUS_COLORS: Record<string, string> = {
-  ok: '#4ade80',
-  warn: '#fbbf24',
-  error: '#f87171',
+  ok: 'hsl(var(--success))',
+  warn: 'hsl(var(--warning))',
+  error: 'hsl(var(--destructive))',
   pending: '#60a5fa',
 };
 

@@ -136,7 +136,7 @@ function _buildJsExecutorSection(deps: ToolsSectionsDeps): { section: HTMLElemen
   const jsBtn = document.createElement('button');
   jsBtn.id = IDS.JS_EXECUTE_BTN;
   jsBtn.textContent = 'Run';
-  jsBtn.style.cssText = btnStyle + 'background:#8b5cf6;color:#fff;align-self:flex-end;';
+  jsBtn.style.cssText = btnStyle + 'background:hsl(var(--primary));color:hsl(var(--foreground));align-self:flex-end;';
   jsBtn.onclick = executeJs;
 
   jsRow.appendChild(jsTextbox);
@@ -151,7 +151,7 @@ function _buildJsExecutorSection(deps: ToolsSectionsDeps): { section: HTMLElemen
   const jsHistBox = document.createElement('div');
   jsHistBox.id = 'loop-js-history';
   jsHistBox.style.cssText = 'max-height:80px;overflow-y:auto;background:rgba(0,0,0,.3);border:1px solid ' + cPrimary + ';border-radius:3px;margin-top:2px;';
-  jsHistBox.innerHTML = '<span style="color:#64748b;font-size:10px;padding:4px;">No commands yet</span>';
+  jsHistBox.innerHTML = '<span style="color:hsl(var(--muted-foreground));font-size:10px;padding:4px;">No commands yet</span>';
   jsBody.appendChild(jsHistBox);
 
   return { section: jsCol.section, body: jsBody };
@@ -394,7 +394,7 @@ function _buildRecentErrorsSection(): HTMLElement {
 // Recent Errors helpers
 // ============================================
 function _renderRequestDetail(detail: { method?: string; url?: string; status?: number }): string {
-  let h = '<div style="font-size:9px;color:#94a3b8;margin-top:1px;margin-left:12px;">';
+  let h = '<div style="font-size:9px;color:hsl(var(--muted-foreground));margin-top:1px;margin-left:12px;">';
   if (detail.method) {
     h += detail.method + ' '; 
   }
@@ -414,7 +414,7 @@ function _renderRequestDetail(detail: { method?: string; url?: string; status?: 
 
 function _renderRecentErrorsList(container: HTMLElement): void {
   if (recentErrors.length === 0) {
-    container.innerHTML = '<div style="color:#64748b;font-size:10px;padding:4px;">No recent errors</div>';
+    container.innerHTML = '<div style="color:hsl(var(--muted-foreground));font-size:10px;padding:4px;">No recent errors</div>';
 
     return;
   }
@@ -424,7 +424,7 @@ function _renderRecentErrorsList(container: HTMLElement): void {
     const color = err.level === 'error' ? '#fca5a5' : '#fde68a';
     const icon = err.level === 'error' ? '❌' : '⚠️';
     html += '<div style="font-size:10px;font-family:monospace;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);color:' + color + ';">';
-    html += '<span style="color:#64748b;">[' + err.timestamp + ']</span> ' + icon + ' ' + _escHtml(err.message);
+    html += '<span style="color:hsl(var(--muted-foreground));">[' + err.timestamp + ']</span> ' + icon + ' ' + _escHtml(err.message);
     if (err.requestDetail) {
       html += _renderRequestDetail(err.requestDetail); 
     }

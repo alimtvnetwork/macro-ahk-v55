@@ -23,36 +23,12 @@ const OVERLAY_STYLE = 'position:fixed;inset:0;z-index:2147483647;background:rgba
 const PANEL_STYLE = 'width:420px;max-width:92vw;background:#1e1b2e;border:1px solid rgba(255,255,255,0.14);border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,0.7);color:#eee;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;';
 const HEADER_STYLE = 'padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.08);font-weight:700;font-size:13px;';
 const BODY_STYLE = 'padding:16px;font-size:12px;line-height:1.5;color:#ddd;white-space:pre-wrap;';
-/**
- * confirm-dialog: small themed replacement for `window.confirm` used by
- * destructive gear-menu actions (Delete custom, Force reset defaults).
- *
- * `window.confirm` blocks the event loop and looks foreign inside the
- * controller panel. This dialog matches `.marco-dialog` from the LESS
- * bundle, traps focus on the Cancel button by default (so an accidental
- * Enter never confirms deletion), and returns a Promise<boolean>.
- */
 
-export interface ConfirmOptions {
-  readonly title: string;
-  readonly message: string;
-  /** LabelType on the destructive button. Defaults to "Delete". */
-  readonly confirmLabel?: string;
-  /** LabelType on the safe button. Defaults to "Cancel". */
-  readonly cancelLabel?: string;
-  /** If true, the confirm button is styled red. Defaults to true. */
-  readonly destructive?: boolean;
-}
-
-const OVERLAY_STYLE = 'position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;';
-const PANEL_STYLE = 'width:420px;max-width:92vw;background:#1e1b2e;border:1px solid rgba(255,255,255,0.14);border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,0.7);color:#eee;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;';
-const HEADER_STYLE = 'padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.08);font-weight:700;font-size:13px;';
-const BODY_STYLE = 'padding:16px;font-size:12px;line-height:1.5;color:#ddd;white-space:pre-wrap;';
 const FOOTER_STYLE = 'display:flex;justify-content:flex-end;gap:8px;padding:10px 16px;border-top:1px solid rgba(255,255,255,0.08);';
 const BTN_BASE = 'padding:6px 14px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,0.15);';
 const BTN_CANCEL = 'background:rgba(255,255,255,0.06);color:#ddd;';
-const BTN_DESTRUCTIVE = 'background:#dc2626;color:#fff;border-color:#b91c1c;';
-const BTN_PRIMARY = 'background:rgba(124,58,237,0.9);color:#fff;';
+const BTN_DESTRUCTIVE = 'background:hsl(var(--destructive));color:hsl(var(--foreground));border-color:hsl(var(--destructive));';
+const BTN_PRIMARY = 'background:rgba(124,58,237,0.9);color:hsl(var(--foreground));';
 
 function buildConfirmDialogDOM(opts: ConfirmOptions) {
   const overlay = document.createElement('div');

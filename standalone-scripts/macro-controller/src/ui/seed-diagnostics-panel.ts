@@ -33,9 +33,9 @@ const RELEVANT_CODES = new Set<string>([
 const NOT_ACCEPTED = '(not yet accepted)';
 
 const STATUS_COLOR: Record<SeedStageStatusType, string> = {
-  ok: '#22c55e',
-  failed: '#ef4444',
-  skipped: '#9ca3af',
+  ok: 'hsl(var(--success))',
+  failed: 'hsl(var(--destructive))',
+  skipped: 'hsl(var(--muted-foreground))',
 };
 
 export function openSeedDiagnosticsPanel(): void {
@@ -69,7 +69,7 @@ function buildBackdrop(): HTMLDivElement {
 function buildModal(): HTMLDivElement {
   const modal = document.createElement('div');
   modal.style.cssText =
-    'width:min(720px,92vw);max-height:82vh;overflow:auto;background:#0f172a;color:#e5e7eb;'
+    'width:min(720px,92vw);max-height:82vh;overflow:auto;background:#0f172a;color:hsl(var(--foreground));'
     + 'border:1px solid #334155;border-radius:8px;padding:16px;font-family:system-ui,sans-serif;font-size:12px;';
   modal.appendChild(buildHeader());
   modal.appendChild(buildE005Section());
@@ -93,7 +93,7 @@ function buildE005Section(): HTMLDivElement {
   downloadBtn.textContent = '\u2B07 Download E005 diagnostics ZIP';
   downloadBtn.setAttribute('data-testid', 'marco-download-e005-zip');
   downloadBtn.style.cssText =
-    'background:#1d4ed8;color:#e5e7eb;border:0;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;';
+    'background:hsl(var(--primary));color:hsl(var(--foreground));border:0;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;';
   downloadBtn.onclick = () => {
     downloadE005DiagnosticsZip(); 
   };
@@ -117,15 +117,15 @@ function buildE005Section(): HTMLDivElement {
 
 function renderE005Summary(summary: PromptEditE005Summary): HTMLDivElement {
   const row = document.createElement('div');
-  row.style.cssText = 'padding:6px 8px;border-left:2px solid #f59e0b;background:#111827;border-radius:3px;margin:4px 0;';
+  row.style.cssText = 'padding:6px 8px;border-left:2px solid hsl(var(--warning));background:#111827;border-radius:3px;margin:4px 0;';
   const top = document.createElement('div');
   top.style.cssText = 'display:flex;justify-content:space-between;font-family:ui-monospace,monospace;';
   const codeSpan = document.createElement('span');
   codeSpan.textContent = 'role=' + summary.role + '  slug=' + summary.resolvedSlug;
-  codeSpan.style.color = '#fbbf24';
+  codeSpan.style.color = 'hsl(var(--warning))';
   const timeSpan = document.createElement('span');
   timeSpan.textContent = formatLocal(summary.at);
-  timeSpan.style.color = '#94a3b8';
+  timeSpan.style.color = 'hsl(var(--muted-foreground))';
   top.appendChild(codeSpan);
   top.appendChild(timeSpan);
   const detail = document.createElement('div');
@@ -138,7 +138,7 @@ function renderE005Summary(summary: PromptEditE005Summary): HTMLDivElement {
   row.appendChild(detail);
   if (summary.reason) {
     const reason = document.createElement('div');
-    reason.style.cssText = 'color:#f87171;margin-top:2px;white-space:pre-wrap;';
+    reason.style.cssText = 'color:hsl(var(--destructive));margin-top:2px;white-space:pre-wrap;';
     reason.textContent = summary.reason;
     row.appendChild(reason);
   }
@@ -284,7 +284,7 @@ function buildHeader(): HTMLDivElement {
   title.style.cssText = 'font-size:14px;font-weight:600;';
   const closeBtn = document.createElement('button');
   closeBtn.textContent = 'Close';
-  closeBtn.style.cssText = 'background:#334155;color:#e5e7eb;border:0;padding:4px 10px;border-radius:4px;cursor:pointer;';
+  closeBtn.style.cssText = 'background:#334155;color:hsl(var(--foreground));border:0;padding:4px 10px;border-radius:4px;cursor:pointer;';
   closeBtn.onclick = () => {
     document.getElementById('marco-seed-diag-panel')?.remove(); 
   };
@@ -307,7 +307,7 @@ function buildSnapshotSection(): HTMLDivElement {
 
   wrap.appendChild(sectionTitle('Last boot snapshot'));
   const meta = document.createElement('div');
-  meta.style.cssText = 'margin-bottom:8px;color:#94a3b8;';
+  meta.style.cssText = 'margin-bottom:8px;color:hsl(var(--muted-foreground));';
   meta.textContent = 'at ' + formatLocal(snap.at) + '  overall=' + snap.overall;
   meta.style.color = STATUS_COLOR[snap.overall];
   wrap.appendChild(meta);
@@ -319,7 +319,7 @@ function buildSnapshotSection(): HTMLDivElement {
     wrap.appendChild(sectionTitle('Orphan repair entries'));
     for (const entry of snap.orphanRepair.entries) {
       const row = document.createElement('div');
-      row.style.cssText = 'padding:3px 6px;border-left:2px solid #475569;margin:2px 0;font-family:ui-monospace,monospace;';
+      row.style.cssText = 'padding:3px 6px;border-left:2px solid hsl(var(--muted-foreground));margin:2px 0;font-family:ui-monospace,monospace;';
       row.textContent = entry.slug + '  ' + entry.fromRole + ' -> ' + entry.toRole
         + '  [' + entry.outcome + ']' + (entry.reason ? '  reason=' + entry.reason : '');
       wrap.appendChild(row);
@@ -384,7 +384,7 @@ function buildTraceSection(): HTMLDivElement {
 
 function renderTraceRow(evt: DiagnosticToastEvent): HTMLDivElement {
   const row = document.createElement('div');
-  row.style.cssText = 'padding:5px 6px;border-left:2px solid #475569;margin:3px 0;background:#111827;border-radius:3px;';
+  row.style.cssText = 'padding:5px 6px;border-left:2px solid hsl(var(--muted-foreground));margin:3px 0;background:#111827;border-radius:3px;';
   const top = document.createElement('div');
   top.style.cssText = 'display:flex;justify-content:space-between;gap:8px;';
   const codeSpan = document.createElement('span');
@@ -392,7 +392,7 @@ function renderTraceRow(evt: DiagnosticToastEvent): HTMLDivElement {
   codeSpan.style.cssText = 'font-family:ui-monospace,monospace;color:' + toastColor(evt.level) + ';';
   const timeSpan = document.createElement('span');
   timeSpan.textContent = formatLocal(evt.at);
-  timeSpan.style.cssText = 'color:#94a3b8;';
+  timeSpan.style.cssText = 'color:hsl(var(--muted-foreground));';
   top.appendChild(codeSpan);
   top.appendChild(timeSpan);
   const body = document.createElement('div');
@@ -406,15 +406,15 @@ function renderTraceRow(evt: DiagnosticToastEvent): HTMLDivElement {
 
 function toastColor(level: string): string {
   if (level === 'error') {
-    return '#ef4444';
+    return 'hsl(var(--destructive))';
   }
 
   if (level === 'warn') {
-    return '#f59e0b';
+    return 'hsl(var(--warning))';
   }
 
   if (level === 'success') {
-    return '#22c55e';
+    return 'hsl(var(--success))';
   }
 
   return '#93c5fd';
@@ -431,7 +431,7 @@ function sectionTitle(text: string): HTMLDivElement {
 function muted(text: string): HTMLDivElement {
   const node = document.createElement('div');
   node.textContent = text;
-  node.style.cssText = 'color:#94a3b8;padding:6px 0;';
+  node.style.cssText = 'color:hsl(var(--muted-foreground));padding:6px 0;';
 
   return node;
 }

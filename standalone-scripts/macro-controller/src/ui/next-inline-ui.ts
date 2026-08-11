@@ -832,7 +832,7 @@ function buildChipOverflowShell(accent: string): PopoverShell {
     panelLabel: 'Additional sizes',
     accent,
     wrapCss: 'position:relative;display:none;flex-shrink:0;',
-    panelCss: 'position:absolute;top:calc(100% + 4px);right:0;display:none;flex-wrap:wrap;gap:4px;padding:8px;background:#1a1a2e;border:1px solid ' + accent + ';border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.5);z-index:2147483646;max-width:320px;',
+    panelCss: 'position:absolute;top:calc(100% + 4px);right:0;display:none;flex-wrap:wrap;gap:4px;padding:8px;background:hsl(var(--background));border:1px solid ' + accent + ';border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.5);z-index:2147483646;max-width:320px;',
   });
 }
 
@@ -947,7 +947,7 @@ export function installActionOverflow(
     panelLabel: 'Additional actions',
     accent,
     wrapCss: 'position:relative;display:none;flex-shrink:0;margin-left:4px;',
-    panelCss: 'position:absolute;top:calc(100% + 4px);right:0;display:none;flex-direction:column;gap:4px;padding:8px;background:#1a1a2e;border:1px solid ' + accent + ';border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.5);z-index:2147483646;min-width:200px;max-width:360px;',
+    panelCss: 'position:absolute;top:calc(100% + 4px);right:0;display:none;flex-direction:column;gap:4px;padding:8px;background:hsl(var(--background));border:1px solid ' + accent + ';border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.5);z-index:2147483646;min-width:200px;max-width:360px;',
   });
   body.appendChild(shell.wrap);
   const a11y = enhancePopoverA11y(shell.panel, shell.button, () => setOpen(false), 'Actions menu');
@@ -1000,7 +1000,7 @@ function createPlanDropupPanel(): HTMLElement {
   panel.id = 'marco-plan-dropup-' + Math.random().toString(36).slice(2, 9);
   panel.setAttribute(ATTR_ROLE, MENU_ROLE);
   panel.setAttribute(ATTR_ARIA_LABEL, 'PlanTierType menu');
-  panel.style.cssText = 'position:fixed;display:none;flex-direction:column;gap:4px;padding:7px;background:#1a1a2e;border:1px solid rgba(245,158,11,0.6);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.5);z-index:2147483646;min-width:226px;max-width:300px;';
+  panel.style.cssText = 'position:fixed;display:none;flex-direction:column;gap:4px;padding:7px;background:hsl(var(--background));border:1px solid rgba(245,158,11,0.6);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.5);z-index:2147483646;min-width:226px;max-width:300px;';
   panel.dataset['role'] = 'plan-dropup';
 
   return panel;
@@ -1048,13 +1048,13 @@ function buildPlanDropup(anchor: HTMLElement, trigger: HTMLButtonElement): PlanD
 
 function buildSplitStrip(): HTMLElement {
   const root = document.createElement('div');
-  // v4.29.1: tinted background (no border) so each strip keeps its color identity
-  // while the outer frame owns the single visual boundary.
-  root.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 8px;background:rgba(124,58,237,0.10);border:none;border-radius:5px;font-family:system-ui,-apple-system,sans-serif;color:' + cPanelFg + ';font-size:11px;box-sizing:border-box;';
+  // v4.29.1: removed tinted background/padding so each strip is just a row
+  // inside the unified `marco-inline-strips-frame`.
+  root.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;border:none;font-family:system-ui,-apple-system,sans-serif;color:' + cPanelFg + ';font-size:11px;box-sizing:border-box;';
 
   const label = document.createElement('span');
   label.textContent = '📋 PlanTierType';
-  label.style.cssText = 'font-weight:600;color:#fbbf24;';
+  label.style.cssText = 'font-weight:600;color:hsl(var(--warning));';
   root.appendChild(label);
 
   const body = document.createElement('span');
@@ -1082,7 +1082,7 @@ function buildSplitStrip(): HTMLElement {
   moreBtn.textContent = 'More ▾';
   moreBtn.title = 'Show all plan sizes';
   moreBtn.dataset['role'] = 'plan-more-btn';
-  moreBtn.style.cssText = 'padding:4px 12px;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;color:#1a1a2e;background:linear-gradient(135deg,#fbbf24 0%,#f59e0b 60%,#d97706 100%);box-shadow:0 1px 4px rgba(245,158,11,0.35), inset 0 1px 0 rgba(255,255,255,0.2);' + CSS_CHIP_TRANSITION;
+  moreBtn.style.cssText = 'padding:4px 12px;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;color:hsl(var(--background));background:linear-gradient(135deg,hsl(var(--warning)) 0%,hsl(var(--warning)) 60%,hsl(var(--warning)) 100%);box-shadow:0 1px 4px rgba(245,158,11,0.35), inset 0 1px 0 rgba(255,255,255,0.2);' + CSS_CHIP_TRANSITION;
   moreWrap.appendChild(moreBtn);
   const { panel, setOpen } = buildPlanDropup(moreWrap, moreBtn);
   wirePopoverButton(moreBtn, panel, setOpen);
@@ -1141,7 +1141,7 @@ function makeNextPresetButton(deps: TaskNextDeps, n: number, highlighted: boolea
  */
 function buildNextMorePopover(anchor: HTMLElement): HTMLElement {
   const panel = document.createElement('div');
-  panel.style.cssText = 'position:absolute;top:calc(100% + 4px);right:0;display:none;flex-direction:column;gap:4px;padding:7px;background:#1a1a2e;border:1px solid rgba(124,58,237,0.6);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.5);z-index:2147483646;min-width:226px;max-width:300px;';
+  panel.style.cssText = 'position:absolute;top:calc(100% + 4px);right:0;display:none;flex-direction:column;gap:4px;padding:7px;background:hsl(var(--background));border:1px solid rgba(124,58,237,0.6);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.5);z-index:2147483646;min-width:226px;max-width:300px;';
   panel.dataset['role'] = 'next-dropup';
   panel.appendChild(buildChipGearActionSection({ role: 'next', roleLabel: 'Next', accent: 'rgba(124,58,237,0.85)' }));
   anchor.appendChild(panel);
@@ -1182,7 +1182,7 @@ function buildNextMoreWrap(): HTMLElement {
   moreBtn.textContent = 'More ▾';
   moreBtn.title = 'Edit / add / manage Next prompts';
   moreBtn.dataset['role'] = 'next-more-btn';
-  moreBtn.style.cssText = 'padding:4px 12px;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;color:#ffffff;background:linear-gradient(135deg,#8b5cf6 0%,#7c3aed 60%,#6d28d9 100%);box-shadow:0 1px 4px rgba(124,58,237,0.35), inset 0 1px 0 rgba(255,255,255,0.2);' + CSS_CHIP_TRANSITION;
+  moreBtn.style.cssText = 'padding:4px 12px;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;color:hsl(var(--foreground));background:linear-gradient(135deg,hsl(var(--primary)) 0%,hsl(var(--primary)) 60%,hsl(var(--primary)) 100%);box-shadow:0 1px 4px rgba(124,58,237,0.35), inset 0 1px 0 rgba(255,255,255,0.2);' + CSS_CHIP_TRANSITION;
   moreWrap.appendChild(moreBtn);
   const panel = buildNextMorePopover(moreWrap);
   moreBtn.onclick = function (ev) {
@@ -1226,7 +1226,7 @@ async function refreshNextChipsFromDb(deps: TaskNextDeps, body: HTMLElement, mor
 
 function buildNextStrip(deps: TaskNextDeps): HTMLElement {
   const root = document.createElement('div');
-  root.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 8px;background:rgba(124,58,237,0.10);border:none;border-radius:5px;font-family:system-ui,-apple-system,sans-serif;color:' + cPanelFg + ';font-size:11px;box-sizing:border-box;';
+  root.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;border:none;font-family:system-ui,-apple-system,sans-serif;color:' + cPanelFg + ';font-size:11px;box-sizing:border-box;';
   root.appendChild(buildNextStripLabel());
   const body = buildNextStripBody(deps);
   const moreWrap = buildNextMoreWrap();

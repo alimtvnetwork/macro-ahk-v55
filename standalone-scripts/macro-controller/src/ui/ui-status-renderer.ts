@@ -73,15 +73,15 @@ function _updateQueueStatusEl(): void {
           statusDotColor = '#f97316'; // orange
           statusText = 'Paused';
         } else if (isProcessing) {
-          statusDotColor = '#3b82f6'; // blue
+          statusDotColor = 'hsl(var(--primary))'; // blue
           statusText = 'Active';
         }
 
         queueStatusEl.innerHTML = `
-          <span style="color:#64748b;display:flex;align-items:center;gap:4px;">
+          <span style="color:hsl(var(--muted-foreground));display:flex;align-items:center;gap:4px;">
             <span style="color:${statusDotColor}; transition: opacity 0.5s; ${isProcessing ? 'animation: marco-blink 1s infinite;' : ''}">●</span> Queue (${statusText}):
           </span>
-          <span style="${pending > 0 ? `color:${cPrimaryLight};font-weight:700;` : 'color:#64748b;'}">${pending} Tasks</span>
+          <span style="${pending > 0 ? `color:${cPrimaryLight};font-weight:700;` : 'color:hsl(var(--muted-foreground));'}">${pending} Tasks</span>
         `;
       });
     });
@@ -113,7 +113,7 @@ function _ensureStatusElements(el: HTMLElement): { statusLine: HTMLElement, prog
 
     const badge = document.createElement('div');
     badge.id = 'loop-queue-badge';
-    badge.style.cssText = 'position:fixed;top:10px;right:10px;background:#ef4444;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;display:none;z-index:1000000;pointer-events:none;box-shadow:0 2px 4px rgba(0,0,0,0.3);';
+    badge.style.cssText = 'position:fixed;top:10px;right:10px;background:hsl(var(--destructive));color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;display:none;z-index:1000000;pointer-events:none;box-shadow:0 2px 4px rgba(0,0,0,0.3);';
     document.body.appendChild(badge);
   }
 
@@ -189,7 +189,7 @@ export function updateQueueBadge(): void {
         if (pending > 0) {
           badge.textContent = String(pending);
           badge.style.display = 'block';
-          badge.style.background = isProcessing ? '#3b82f6' : '#ef4444';
+          badge.style.background = isProcessing ? 'hsl(var(--primary))' : 'hsl(var(--destructive))';
           if (isProcessing) {
             badge.style.animation = 'marco-pulse 2s infinite';
           } else {
@@ -295,7 +295,7 @@ function buildDelegateText(): string {
 function buildRunningStatusParts(creditIcon: string, creditLabel: string, delegateText: string): Array<{ text: string; color?: string; bold?: boolean; id?: string }> {
   const parts: Array<{ text: string; color?: string; bold?: boolean; id?: string }> = [];
   if (state.workspaceName) {
-    parts.push({ text: state.workspaceName, color: '#fbbf24', bold: true });
+    parts.push({ text: state.workspaceName, color: 'hsl(var(--warning))', bold: true });
     if (state.workspaceJustChanged) {
       parts.push({ text: ' ⚡ WS Changed', color: '#f97316', bold: true });
     }
@@ -303,13 +303,13 @@ function buildRunningStatusParts(creditIcon: string, creditLabel: string, delega
     parts.push({ text: ' | ' });
   }
 
-  parts.push({ text: '● ', color: '#10b981' });
+  parts.push({ text: '● ', color: 'hsl(var(--success))' });
   parts.push({ text: state.direction.toUpperCase() + ' | #' + state.cycleCount + ' | ' });
-  parts.push({ text: creditIcon + ' ' + creditLabel, color: '#fbbf24' });
+  parts.push({ text: creditIcon + ' ' + creditLabel, color: 'hsl(var(--warning))' });
   parts.push({ text: ' | ' });
-  parts.push({ text: state.countdown + 's', color: '#fbbf24', bold: true, id: 'marco-countdown-text' });
+  parts.push({ text: state.countdown + 's', color: 'hsl(var(--warning))', bold: true, id: 'marco-countdown-text' });
   if (delegateText) {
-    const dColor = state.forceDirection ? '#f97316' : '#3b82f6';
+    const dColor = state.forceDirection ? '#f97316' : 'hsl(var(--primary))';
     parts.push({ text: delegateText, color: dColor, bold: !!state.forceDirection });
   }
 
@@ -320,7 +320,7 @@ function renderProgressBar(progressContainer: HTMLElement): void {
   // Progress bar
   const totalSec = Math.floor(TIMING.LOOP_INTERVAL / 1000);
   const pct = totalSec > 0 ? Math.max(0, Math.min(100, ((totalSec - state.countdown) / totalSec) * 100)) : 0;
-  const barColor = pct > 80 ? '#ef4444' : pct > 50 ? '#f59e0b' : '#10b981';
+  const barColor = pct > 80 ? 'hsl(var(--destructive))' : pct > 50 ? 'hsl(var(--warning))' : 'hsl(var(--success))';
   let barEl = document.getElementById('marco-progress-bar');
   if (!barEl) {
     progressContainer.innerHTML = '<div style="width:100%;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;">'
@@ -344,14 +344,14 @@ function renderStoppedStatus(statusLine: HTMLElement, progressContainer: HTMLEle
   if (wsName) {
     const wsSpan = document.createElement('span');
     wsSpan.textContent = wsName;
-    wsSpan.style.cssText = 'color:#fbbf24;font-weight:700;';
+    wsSpan.style.cssText = 'color:hsl(var(--warning));font-weight:700;';
     statusLine.appendChild(wsSpan);
     statusLine.appendChild(document.createTextNode(' | '));
   }
 
   const stopIcon = document.createElement('span');
   stopIcon.textContent = '[=]';
-  stopIcon.style.color = '#9ca3af';
+  stopIcon.style.color = 'hsl(var(--muted-foreground))';
   statusLine.appendChild(stopIcon);
   statusLine.appendChild(document.createTextNode(' Stopped | Cycles: ' + state.cycleCount));
   if (state.lastStatusCheck > 0) {
@@ -359,7 +359,7 @@ function renderStoppedStatus(statusLine: HTMLElement, progressContainer: HTMLEle
     const creditLabelStop = state.hasFreeCredit ? 'Free Credit' : 'No Credit';
     const creditSpan = document.createElement('span');
     creditSpan.textContent = ' | ' + creditIconStop + ' ' + creditLabelStop;
-    creditSpan.style.color = '#fbbf24';
+    creditSpan.style.color = 'hsl(var(--warning))';
     statusLine.appendChild(creditSpan);
   }
 
@@ -415,14 +415,14 @@ export function updateRecordIndicator(): void {
         label.textContent = ' FORCE ' + state.forceDirection.toUpperCase();
         el.style.background = '#c2410c';
       } else {
-        dot.style.background = '#3b82f6';
+        dot.style.background = 'hsl(var(--primary))';
         label.textContent = ' SWITCHING';
-        el.style.background = '#1d4ed8';
+        el.style.background = 'hsl(var(--primary))';
       }
     } else {
-      dot.style.background = '#fff';
+      dot.style.background = 'hsl(var(--foreground))';
       label.textContent = ' LOOP';
-      el.style.background = '#dc2626';
+      el.style.background = 'hsl(var(--destructive))';
     }
   } else {
     el.style.display = 'none';

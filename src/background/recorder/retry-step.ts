@@ -1,5 +1,5 @@
 /**
- * Marco Extension — Single-Step Retry
+ * Marco Extension - Single-Step Retry
  *
  * Re-runs one previously-failed Step against the live DOM using the **same**
  * persisted selectors. The new outcome is logged via the structured

@@ -112,7 +112,7 @@ function setSubmenuOpen(submenu: HTMLElement, trigger: HTMLButtonElement, open: 
 function buildPromptActionRow(item: GearMenuItem, role: PromptRole): HTMLButtonElement {
   const row = document.createElement('button');
   row.type = 'button';
-  row.style.cssText = 'width:100%;display:grid;grid-template-columns:16px minmax(0,1fr);align-items:center;gap:6px;padding:3px 7px;cursor:pointer;font-size:10.5px;line-height:1.25;color:#e5e7eb;border:0;background:transparent;border-radius:4px;text-align:left;font-family:inherit;';
+  row.style.cssText = 'width:100%;display:grid;grid-template-columns:16px minmax(0,1fr);align-items:center;gap:6px;padding:3px 7px;cursor:pointer;font-size:10.5px;line-height:1.25;color:hsl(var(--foreground));border:0;background:transparent;border-radius:4px;text-align:left;font-family:inherit;';
   const icon = document.createElement('span');
   icon.textContent = item.icon;
   icon.style.cssText = 'width:16px;text-align:center;font-size:11px;line-height:1;';
@@ -160,7 +160,7 @@ function buildPromptActionsSubmenu(
   submenu.hidden = true;
   submenu.setAttribute('role', 'menu');
   submenu.setAttribute('aria-label', label + ' prompt actions');
-  submenu.style.cssText = 'position:fixed;display:none;flex-direction:column;gap:1px;padding:5px;background:#1a1a2e;border:1px solid ' + input.accent + ';border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.55);z-index:2147483647;min-width:' + String(SUBMENU_MIN_WIDTH) + 'px;max-width:280px;';
+  submenu.style.cssText = 'position:fixed;display:none;flex-direction:column;gap:1px;padding:5px;background:hsl(var(--background));border:1px solid ' + input.accent + ';border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.55);z-index:2147483647;min-width:' + String(SUBMENU_MIN_WIDTH) + 'px;max-width:280px;';
   submenu.dataset.role = role + '-prompt-actions-submenu';
   for (const item of items) {
     submenu.appendChild(buildPromptActionRow(item, role));

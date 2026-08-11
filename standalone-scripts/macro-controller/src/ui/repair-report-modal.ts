@@ -219,7 +219,7 @@ export function showRepairReportModal(report: RepairReportSummary): HTMLElement 
   body.appendChild(renderIssueList('✅ Fixed / restored', report.fixed, cSuccess));
   body.appendChild(renderIssueList('⚠️ Still broken', report.stillBroken, '#f97316'));
   if (report.newlyFlagged.length > 0) {
-    body.appendChild(renderIssueList('➕ Newly flagged after repair', report.newlyFlagged, '#ef4444'));
+    body.appendChild(renderIssueList('➕ Newly flagged after repair', report.newlyFlagged, 'hsl(var(--destructive))'));
   }
 
   const footer = document.createElement('div');
@@ -242,7 +242,7 @@ export function showRepairReportModal(report: RepairReportSummary): HTMLElement 
   const doneBtn = document.createElement('button');
   doneBtn.type = 'button';
   doneBtn.textContent = 'Close';
-  doneBtn.style.cssText = 'background:' + cPrimary + ';border:0;color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;';
+  doneBtn.style.cssText = 'background:' + cPrimary + ';border:0;color:hsl(var(--foreground));padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;';
   footer.append(copyBtn, doneBtn);
 
   modal.append(header, body, footer);

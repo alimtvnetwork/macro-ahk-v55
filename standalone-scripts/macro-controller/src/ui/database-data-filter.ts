@@ -122,7 +122,7 @@ function buildModeSelect(filter: FilterState | null | undefined): HTMLSelectElem
 
 function buildCaseSensitiveCheckbox(filter: FilterState | null | undefined): HTMLLabelElement {
   const label = document.createElement('label');
-  label.style.cssText = 'font-size:10px;color:#94a3b8;display:flex;align-items:center;gap:3px;white-space:nowrap;';
+  label.style.cssText = 'font-size:10px;color:hsl(var(--muted-foreground));display:flex;align-items:center;gap:3px;white-space:nowrap;';
 
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';

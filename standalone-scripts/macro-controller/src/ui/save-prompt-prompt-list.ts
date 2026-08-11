@@ -30,7 +30,7 @@ export function buildSearchInput(
   input.placeholder = '🔍 Search prompts…';
   input.style.cssText = 'width:100%;box-sizing:border-box;padding:5px 10px;border-radius:6px;border:1px solid rgba(124,58,237,0.3);background:rgba(0,0,0,0.3);color:#e0e0e0;font-size:11px;outline:none;font-family:system-ui,sans-serif;';
   input.onfocus = function () {
-    input.style.borderColor = '#7c3aed'; 
+    input.style.borderColor = 'hsl(var(--primary))'; 
   };
 
   input.onblur = function () {
@@ -85,7 +85,7 @@ export function buildCategoryChips(
 
   const allChip = document.createElement('span');
   allChip.textContent = 'All';
-  allChip.style.cssText = 'padding:2px 8px;border-radius:10px;font-size:10px;cursor:pointer;background:#7c3aed;color:#fff;font-weight:600;';
+  allChip.style.cssText = 'padding:2px 8px;border-radius:10px;font-size:10px;cursor:pointer;background:hsl(var(--primary));color:hsl(var(--foreground));font-weight:600;';
   allChip.onclick = function (event) {
     event.stopPropagation();
     setActiveFilter(null);
@@ -117,8 +117,8 @@ export function buildCategoryChips(
       const isActive = isAllChip
         ? currentFilter === null
         : currentFilter === chip.textContent;
-      chip.style.background = isActive ? '#7c3aed' : 'rgba(124,58,237,0.2)';
-      chip.style.color = isActive ? '#fff' : '#a78bfa';
+      chip.style.background = isActive ? 'hsl(var(--primary))' : 'rgba(124,58,237,0.2)';
+      chip.style.color = isActive ? 'hsl(var(--foreground))' : '#a78bfa';
     }
   };
 
@@ -175,7 +175,7 @@ export function renderPromptItems(
 
   if (hasNoResults) {
     const empty = document.createElement('div');
-    empty.style.cssText = 'padding:10px 14px;color:#6b7280;font-size:11px;text-align:center;';
+    empty.style.cssText = 'padding:10px 14px;color:hsl(var(--muted-foreground));font-size:11px;text-align:center;';
     empty.textContent = 'No prompts found';
     container.appendChild(empty);
 

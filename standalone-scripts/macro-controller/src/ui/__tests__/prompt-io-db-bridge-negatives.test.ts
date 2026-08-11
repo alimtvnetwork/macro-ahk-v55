@@ -85,7 +85,7 @@ describe('collectDbEntriesForExport — driver failure per role', () => {
           ok: true, isFail: false, isSuccess: true,
           value: [{
             Id: 3, Slug: 'next-default', Name: 'Next default',
-            Body: 'N {{n}}', Role: 'next', IsDefault: 1,
+            Body: 'N {{n}}', Role: 'next', IsDefault: 0,
             CreatedAt: 0, UpdatedAt: 0,
           }],
         };

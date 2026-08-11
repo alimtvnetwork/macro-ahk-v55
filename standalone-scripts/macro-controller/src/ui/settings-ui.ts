@@ -87,7 +87,7 @@ function makeField(label: string, value: string, opts?: FieldOptions) {
   row.appendChild(inp);
   if (o.hint) {
     const h = document.createElement('div');
-    h.style.cssText = 'font-size:9px;color:#64748b;margin-top:2px;';
+    h.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));margin-top:2px;';
     h.textContent = o.hint;
     row.appendChild(h);
   }
@@ -99,7 +99,7 @@ function makeField(label: string, value: string, opts?: FieldOptions) {
 function switchSettingsTab(tabBtns: HTMLElement[], panels: HTMLElement[], idx: number): void {
   tabBtns.forEach(function(b, i) {
     b.style.borderBottom = i === idx ? '2px solid ' + cPrimary : '2px solid transparent';
-    b.style.color = i === idx ? cPrimaryLight : '#64748b';
+    b.style.color = i === idx ? cPrimaryLight : 'hsl(var(--muted-foreground))';
   });
   panels.forEach(function(p, i) {
     p.style.display = i === idx ? '' : 'none'; 
@@ -175,15 +175,15 @@ function _buildSettingsHeader(_fontSystem: string, overlay: HTMLElement): HTMLEl
   hdrTitle.style.cssText = 'font-size:16px;font-weight:700;color:' + cPrimaryLight + ';';
   hdrTitle.textContent = '⚙️ MacroLoop Settings';
   const hdrClose = document.createElement('span');
-  hdrClose.style.cssText = 'font-size:18px;color:#64748b;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all 0.15s;';
+  hdrClose.style.cssText = 'font-size:18px;color:hsl(var(--muted-foreground));cursor:pointer;padding:4px 8px;border-radius:6px;transition:all 0.15s;';
   hdrClose.textContent = '✕';
   hdrClose.onmouseenter = function() {
-    hdrClose.style.color = '#e2e8f0';
+    hdrClose.style.color = 'hsl(var(--foreground))';
     hdrClose.style.background = 'rgba(255,255,255,0.1)'; 
   };
 
   hdrClose.onmouseleave = function() {
-    hdrClose.style.color = '#64748b';
+    hdrClose.style.color = 'hsl(var(--muted-foreground))';
     hdrClose.style.background = 'none'; 
   };
 
@@ -208,7 +208,7 @@ function _buildSettingsTabs(deps: SettingsDeps, getPromptsConfig: () => Resolved
 
   tabs.forEach(function(name, i) {
     const btn = document.createElement('div');
-    btn.style.cssText = 'padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:color 0.15s;border-bottom:2px solid transparent;color:#64748b;';
+    btn.style.cssText = 'padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:color 0.15s;border-bottom:2px solid transparent;color:hsl(var(--muted-foreground));';
     btn.textContent = name;
     btn.onclick = function() {
       switchSettingsTab(tabBtns, panels, i); 
@@ -250,7 +250,7 @@ function _buildSettingsFooter(btnStyle: string, deps: SettingsDeps, _panels: HTM
   const resetBtn = document.createElement('button');
   resetBtn.textContent = '↺ Reset';
   resetBtn.title = 'Reset fields to current running values';
-  resetBtn.style.cssText = btnStyle + CssFragmentType.Background + cWarning + ';color:#1e1e2e;padding:6px 16px;font-size:12px;';
+  resetBtn.style.cssText = btnStyle + CssFragmentType.Background + cWarning + ';color:hsl(var(--background));padding:6px 16px;font-size:12px;';
   resetBtn.onclick = function() {
     showToast('Fields reset to current values', 'info');
   };
@@ -273,7 +273,7 @@ function _buildSettingsFooter(btnStyle: string, deps: SettingsDeps, _panels: HTM
 
   const saveBtn2 = document.createElement('button');
   saveBtn2.textContent = '💾 Save';
-  saveBtn2.style.cssText = btnStyle + CssFragmentType.Background + cSuccess + ';color:#1e1e2e;padding:6px 20px;font-size:12px;font-weight:600;';
+  saveBtn2.style.cssText = btnStyle + CssFragmentType.Background + cSuccess + ';color:hsl(var(--background));padding:6px 20px;font-size:12px;font-weight:600;';
   saveBtn2.onclick = function() {
     _persistOverrideToggles(generalResult, timingResult).then(function() {
       log('Settings saved', 'info');

@@ -178,7 +178,7 @@ export function showChangelogModal(): void {
 
   const closeBtn = document.createElement('button');
   closeBtn.textContent = 'Close';
-  closeBtn.style.cssText = 'margin-top:8px;padding:6px 16px;background:' + cPrimary + ';color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;';
+  closeBtn.style.cssText = 'margin-top:8px;padding:6px 16px;background:' + cPrimary + ';color:hsl(var(--foreground));border:none;border-radius:4px;cursor:pointer;font-size:12px;';
   closeBtn.onclick = function() {
     overlay.remove(); 
   };

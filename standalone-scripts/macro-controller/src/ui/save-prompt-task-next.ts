@@ -28,7 +28,7 @@ export function buildTaskNextSubmenu(
   taskNextItem.appendChild(arrow);
 
   const submenu = document.createElement('div');
-  submenu.style.cssText = 'display:none;position:fixed;min-width:180px;max-height:80vh;overflow-y:auto;background:#1e1e2e;border:1px solid #7c3aed;border-radius:8px;z-index:100010;box-shadow:0 8px 24px rgba(0,0,0,0.4);';
+  submenu.style.cssText = 'display:none;position:fixed;min-width:180px;max-height:80vh;overflow-y:auto;background:hsl(var(--background));border:1px solid hsl(var(--primary));border-radius:8px;z-index:100010;box-shadow:0 8px 24px rgba(0,0,0,0.4);';
   document.body.appendChild(submenu);
 
   submenu.onmouseover = function () {
@@ -147,7 +147,7 @@ function buildCustomCountRow(
   const goButton = document.createElement('span');
   goButton.textContent = '▶';
   goButton.title = 'Go';
-  goButton.style.cssText = 'cursor:pointer;font-size:11px;color:#7c3aed;';
+  goButton.style.cssText = 'cursor:pointer;font-size:11px;color:hsl(var(--primary));';
   goButton.onclick = function (event) {
     event.stopPropagation();
     const count = parseInt(input.value);

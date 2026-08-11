@@ -48,7 +48,7 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
   titleText.textContent = '📥 Prompts Import / Export';
 
   const closeBtn = document.createElement('span');
-  closeBtn.style.cssText = 'cursor:pointer;color:#94a3b8;font-size:14px;padding:0 4px;';
+  closeBtn.style.cssText = 'cursor:pointer;color:hsl(var(--muted-foreground));font-size:14px;padding:0 4px;';
   closeBtn.textContent = '✕';
   closeBtn.onclick = removePromptIODialog;
 
@@ -62,7 +62,7 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
 
   // Options row
   const optionsRow = document.createElement('div');
-  optionsRow.style.cssText = 'display:flex;align-items:center;gap:8px;font-size:10px;color:#94a3b8;';
+  optionsRow.style.cssText = 'display:flex;align-items:center;gap:8px;font-size:10px;color:hsl(var(--muted-foreground));';
   
   const overwriteLabel = document.createElement('label');
   overwriteLabel.style.cssText = 'display:flex;align-items:center;gap:6px;cursor:pointer;';
@@ -131,15 +131,15 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
   const dropZone = document.createElement('div');
   dropZone.id = 'prompt-io-drop-zone';
   const baseDropStyle = `
-    border:2px dashed #475569;border-radius:6px;padding:24px;
-    text-align:center;color:#94a3b8;background:rgba(0,0,0,0.2);
+    border:2px dashed hsl(var(--muted-foreground));border-radius:6px;padding:24px;
+    text-align:center;color:hsl(var(--muted-foreground));background:rgba(0,0,0,0.2);
     transition:all 0.15s;cursor:pointer;
   `;
   dropZone.style.cssText = baseDropStyle;
   dropZone.innerHTML = `
     <div style="font-size:24px;margin-bottom:8px;">📄</div>
     <div style="font-size:12px;">Drop .json, .md, .zip, or .db file here</div>
-    <div style="font-size:10px;margin-top:4px;color:#64748b;">or click to browse</div>
+    <div style="font-size:10px;margin-top:4px;color:hsl(var(--muted-foreground));">or click to browse</div>
   `;
   dropZone.onclick = () => fileInput.click();
 
@@ -170,7 +170,7 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
   
   const clearBtn = document.createElement('button');
   clearBtn.textContent = '🗑 Clear All Prompts';
-  clearBtn.style.cssText = 'background:transparent;border:none;color:#ef4444;font-size:10px;cursor:pointer;padding:4px 8px;border-radius:4px;opacity:0.7;';
+  clearBtn.style.cssText = 'background:transparent;border:none;color:hsl(var(--destructive));font-size:10px;cursor:pointer;padding:4px 8px;border-radius:4px;opacity:0.7;';
   clearBtn.onmouseenter = () => {
     clearBtn.style.opacity = '1';
     clearBtn.style.background = 'rgba(239,68,68,0.1)'; 

@@ -277,6 +277,21 @@ describe("formatFailureReport for JS-step reports", () => {
     expect(text).toMatch(/✓ \{\{Email}} = .* from Row/);
     expect(text).toMatch(/✓ \{\{Log\[0]}} = .* from JsLog/);
   });
+
+  it("never emits em dashes (U+2014) or en dashes (U+2013) in the output", () => {
+    const report = buildJsStepFailureReport({
+      Body: "return Ctx.Row.Missing;",
+      Error: new JsExecError("InlineJs execution failed: TypeError: cannot read 'Missing'"),
+      Context: { Vars: { Tenant: "acme" }, Row: { Email: "x@y.z" } },
+      LogLines: ["pre-throw log"],
+      StepId: 99, Index: 4,
+      SourceFile: SOURCE_FILE,
+      Verbose: false,
+      Now: FIXED_NOW,
+    });
+    const text = formatFailureReport(report);
+    expect(text).not.toMatch(/[\u2013\u2014]/);
+  });
 });
 
 /* ================================================================== */

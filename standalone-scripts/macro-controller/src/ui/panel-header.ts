@@ -167,7 +167,7 @@ function buildWorkspaceNameBadge(deps: PanelBuilderDeps): HTMLElement {
   const wsNameEl = document.createElement('div');
   wsNameEl.id = 'loop-title-ws-name';
   const titleBarState = getTitleBarDisplayState();
-  wsNameEl.style.cssText = 'font-size:' + titleBarState.fontSize + ';color:#fbbf24;font-weight:' + titleBarState.fontWeight + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px;cursor:pointer;border-bottom:1px dotted rgba(251,191,36,0.4);transition:color 0.15s,font-size 0.15s;margin-right:4px;line-height:1.2;';
+  wsNameEl.style.cssText = 'font-size:' + titleBarState.fontSize + ';color:hsl(var(--warning));font-weight:' + titleBarState.fontWeight + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px;cursor:pointer;border-bottom:1px dotted rgba(251,191,36,0.4);transition:color 0.15s,font-size 0.15s;margin-right:4px;line-height:1.2;';
   wsNameEl.title = titleBarState.title;
   wsNameEl.style.opacity = titleBarState.opacity;
 
@@ -186,13 +186,13 @@ function buildWorkspaceNameBadge(deps: PanelBuilderDeps): HTMLElement {
   };
 
   wsNameEl.onmouseleave = function() {
-    wsNameEl.style.color = '#fbbf24'; 
+    wsNameEl.style.color = 'hsl(var(--warning))'; 
   };
 
   wsNameEl.onclick = function(e: Event) {
     e.stopPropagation();
     wsNameEl.textContent = '⏳ detecting…';
-    wsNameEl.style.color = '#9ca3af';
+    wsNameEl.style.color = 'hsl(var(--muted-foreground))';
     const token = resolveToken();
     state.workspaceFromApi = false;
     deps.autoDetectLoopCurrentWorkspace(token).then(function() {
@@ -213,7 +213,7 @@ function buildWorkspaceNameBadge(deps: PanelBuilderDeps): HTMLElement {
     }).catch(function(e: unknown) {
       logError('switchWorkspace', 'Workspace switch failed', e);
       showToast('❌ Workspace switch failed', 'error');
-      wsNameEl.style.color = '#f87171';
+      wsNameEl.style.color = 'hsl(var(--destructive))';
       wsNameEl.textContent = '❌ failed';
       setTimeout(function() {
         const fallbackTitleBarState = getTitleBarDisplayState();

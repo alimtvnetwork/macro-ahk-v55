@@ -47,7 +47,7 @@ describe('collectDbEntriesForExport: ReplaceKey/ReplaceValues round-trip', () =>
         ok: true, isFail: false, isSuccess: true,
         value: [{
           Id: 1, Slug: 'plan-default', Name: 'PlanTierType default',
-          Body: 'P {{count}}', Role: 'plan', IsDefault: 1,
+          Body: 'P {{count}}', Role: 'plan', IsDefault: 0,
           ReplaceKey: 'count',
           ReplaceValues: ['3', '7', '11'],
           CreatedAt: 0, UpdatedAt: 0,
@@ -74,7 +74,7 @@ describe('collectDbEntriesForExport: ReplaceKey/ReplaceValues round-trip', () =>
         ok: true, isFail: false, isSuccess: true,
         value: [{
           Id: 2, Slug: 'next-default', Name: 'Next default',
-          Body: 'N {{n}}', Role: 'next', IsDefault: 1,
+          Body: 'N {{n}}', Role: 'next', IsDefault: 0,
           ReplaceKey: 'n',
           // ReplaceValues intentionally absent
           CreatedAt: 0, UpdatedAt: 0,

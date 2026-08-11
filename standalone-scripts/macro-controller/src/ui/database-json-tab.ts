@@ -52,23 +52,23 @@ function injectJsonStyles(): void {
       transition: all 0.12s;
     }
     .marco-json-btn:hover { background: ${cPrimaryBgAS}; border-color: ${cPrimaryBgAL}; }
-    .marco-json-btn-primary { background: ${cPrimary}; color: #fff; border-color: ${cPrimary}; }
+    .marco-json-btn-primary { background: ${cPrimary}; color: hsl(var(--foreground)); border-color: ${cPrimary}; }
     .marco-json-btn-primary:hover { opacity: 0.9; }
     .marco-json-log {
       margin-top: 12px; max-height: 200px; overflow-y: auto;
       padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px;
       font-size: 11px; font-family: monospace; line-height: 1.6;
     }
-    .marco-json-log-ok { color: #4ade80; }
-    .marco-json-log-err { color: #f87171; }
-    .marco-json-log-info { color: #94a3b8; }
-    .marco-json-log-warn { color: #fbbf24; }
+    .marco-json-log-ok { color: hsl(var(--success)); }
+    .marco-json-log-err { color: hsl(var(--destructive)); }
+    .marco-json-log-info { color: hsl(var(--muted-foreground)); }
+    .marco-json-log-warn { color: hsl(var(--warning)); }
     .marco-json-sample {
       margin-top: 8px; padding: 8px 10px; background: ${cPanelBgAlt};
-      border-radius: 4px; font-size: 10px; color: #64748b; cursor: pointer;
+      border-radius: 4px; font-size: 10px; color: hsl(var(--muted-foreground)); cursor: pointer;
       transition: background 0.15s;
     }
-    .marco-json-sample:hover { background: ${cPrimaryBgAS}; color: #94a3b8; }
+    .marco-json-sample:hover { background: ${cPrimaryBgAS}; color: hsl(var(--muted-foreground)); }
     .marco-json-doc-link {
       font-size: 10px; color: ${cPrimaryLight}; cursor: pointer;
       text-decoration: underline; margin-left: auto;

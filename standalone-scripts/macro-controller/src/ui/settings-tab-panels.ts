@@ -186,7 +186,7 @@ function _buildCreditFetchDelaySlider(initialValue: number): { row: HTMLDivEleme
   row.appendChild(sliderRow);
 
   const hint = document.createElement('div');
-  hint.style.cssText = 'font-size:9px;color:#64748b;margin-top:2px;';
+  hint.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));margin-top:2px;';
   hint.textContent = 'Timeout for /credit-balance fetch on Ktlo / Free / Cancelled workspaces.';
   row.appendChild(hint);
 
@@ -213,7 +213,7 @@ function _buildAutomationToggles(panel: HTMLElement, overrides: SettingsOverride
     lbl.style.cssText = 'font-size:11px;color:' + cPanelText + ';';
     lbl.textContent = item.label;
     const hint = document.createElement('span');
-    hint.style.cssText = 'font-size:9px;color:#64748b;';
+    hint.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));';
     hint.textContent = item.hint;
     labelWrap.appendChild(lbl);
     labelWrap.appendChild(hint);
@@ -264,7 +264,7 @@ function _buildDelaySlider(initialValue: number): { row: HTMLDivElement; input: 
   row.appendChild(sliderRow);
 
   const hint = document.createElement('div');
-  hint.style.cssText = 'font-size:9px;color:#64748b;margin-top:2px;';
+  hint.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));margin-top:2px;';
   hint.textContent = 'Seconds to wait between sending prompts from the queue.';
   row.appendChild(hint);
 
@@ -353,7 +353,7 @@ export function buildLoggingPanel(deps: SettingsDeps): LoggingPanelResult {
   const resetLogBtn = document.createElement('button');
   resetLogBtn.textContent = '↺ Reset Logging Defaults';
   
-  resetLogBtn.style.cssText = btnStyle + 'background:' + cWarning + ';color:#1e1e2e;padding:5px 12px;font-size:11px;margin-top:12px;';
+  resetLogBtn.style.cssText = btnStyle + 'background:' + cWarning + ';color:hsl(var(--background));padding:5px 12px;font-size:11px;margin-top:12px;';
   resetLogBtn.onclick = function() {
     resetLogConfig();
     const fresh = getLogConfig();
@@ -382,7 +382,7 @@ export function buildConfigDbPanel(
   const configInputs: Array<{ section: string; key: string; input: HTMLInputElement; valueType: string }> = [];
 
   const loading = document.createElement('div');
-  loading.style.cssText = 'color:#64748b;font-size:11px;padding:12px 0;';
+  loading.style.cssText = 'color:hsl(var(--muted-foreground));font-size:11px;padding:12px 0;';
   loading.textContent = '⏳ Loading config from database...';
   panel.appendChild(loading);
 
@@ -391,7 +391,7 @@ export function buildConfigDbPanel(
     const rows = resp.rows as Array<{ section: string; key: string; value: string; valueType: string }> | undefined;
     if (!resp || !resp.ok || !rows || rows.length === 0) {
       const empty = document.createElement('div');
-      empty.style.cssText = 'color:#64748b;font-size:11px;padding:12px 0;';
+      empty.style.cssText = 'color:hsl(var(--muted-foreground));font-size:11px;padding:12px 0;';
       empty.textContent = 'No config found in database. Config will be seeded on next injection.';
       panel.appendChild(empty);
 
@@ -413,7 +413,7 @@ export function buildConfigDbPanel(
     }
 
     const configInfo = document.createElement('div');
-    configInfo.style.cssText = 'margin-top:12px;padding:8px;background:' + cPanelBgAlt + ';border-radius:6px;font-size:9px;color:#64748b;';
+    configInfo.style.cssText = 'margin-top:12px;padding:8px;background:' + cPanelBgAlt + ';border-radius:6px;font-size:9px;color:hsl(var(--muted-foreground));';
     configInfo.textContent = rows.length + ' config entries loaded from project SQLite DB. Changes saved here persist across sessions.';
     panel.appendChild(configInfo);
   });
@@ -507,7 +507,7 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
 
   const listContainer = document.createElement('div');
   listContainer.style.cssText = 'flex:1;overflow-y:auto;background:' + cPanelBgAlt + ';border-radius:6px;padding:8px;border:1px solid ' + cPanelBorder + ';display:flex;flex-direction:column;gap:8px;min-height:200px;';
-  listContainer.innerHTML = '<div style="color:#64748b;font-size:11px;text-align:center;padding-top:40px;">Loading history...</div>';
+  listContainer.innerHTML = '<div style="color:hsl(var(--muted-foreground));font-size:11px;text-align:center;padding-top:40px;">Loading history...</div>';
 
   async function refreshHistory(filter: string = '') {
     const { getCommunicationHistory } = await import('../db/macro-db');
@@ -524,7 +524,7 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
 
     listContainer.innerHTML = '';
     if (filtered.length === 0) {
-      listContainer.innerHTML = '<div style="color:#64748b;font-size:11px;text-align:center;padding-top:40px;">No history found</div>';
+      listContainer.innerHTML = '<div style="color:hsl(var(--muted-foreground));font-size:11px;text-align:center;padding-top:40px;">No history found</div>';
 
       return;
     }
@@ -584,7 +584,7 @@ function _mountSubmitHistoryPanel(panel: HTMLElement): void {
       const activeProjectId = extractProjectIdFromUrl();
       if (!activeProjectId) {
         const empty = document.createElement('div');
-        empty.style.cssText = 'color:#64748b;font-size:11px;text-align:center;padding:12px;';
+        empty.style.cssText = 'color:hsl(var(--muted-foreground));font-size:11px;text-align:center;padding:12px;';
         empty.textContent = 'Open a Lovable project to see chat submit history.';
         submitMount.appendChild(empty);
 
@@ -638,7 +638,7 @@ function buildHistoryModalHeader(overlay: HTMLElement): HTMLElement {
   header.innerHTML = `<span style="font-size:14px;font-weight:700;color:${cPrimaryLight};">Prompt Detail</span>`;
   const closeBtn = document.createElement('span');
   closeBtn.textContent = '✕';
-  closeBtn.style.cssText = 'cursor:pointer;color:#64748b;font-size:18px;';
+  closeBtn.style.cssText = 'cursor:pointer;color:hsl(var(--muted-foreground));font-size:18px;';
   closeBtn.onclick = () => overlay.remove();
   header.appendChild(closeBtn);
 
@@ -658,7 +658,7 @@ function buildHistoryModalFooter(row: Record<string, unknown>): HTMLElement {
   footer.style.cssText = 'padding:12px 20px;border-top:1px solid ' + cPanelBorder + ';display:flex;justify-content:flex-end;gap:10px;';
   const copyBtn = document.createElement('button');
   copyBtn.textContent = '📋 Copy Prompt';
-  copyBtn.style.cssText = 'padding:8px 16px;background:' + cPrimary + ';color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;';
+  copyBtn.style.cssText = 'padding:8px 16px;background:' + cPrimary + ';color:hsl(var(--foreground));border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;';
   copyBtn.onclick = () => {
     navigator.clipboard.writeText((row as { Prompt?: string }).Prompt || '');
     showToast('✅ Prompt copied to clipboard', 'info');
@@ -684,7 +684,7 @@ function _buildPerWorkspaceEditor(): HTMLElement {
   section.appendChild(title);
 
   const hint = document.createElement('div');
-  hint.style.cssText = 'font-size:9px;color:#64748b;margin-bottom:6px;';
+  hint.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));margin-bottom:6px;';
   hint.textContent = 'Tune expiry grace + refill warning for individual workspaces. Leave a field empty to fall back to the global value.';
   section.appendChild(hint);
 
@@ -709,7 +709,7 @@ function _renderPerWsList(list: HTMLElement): void {
   const ids = Object.keys(map).sort();
   if (ids.length === 0) {
     const empty = document.createElement('div');
-    empty.style.cssText = 'font-size:10px;color:#64748b;padding:6px 0;font-style:italic;';
+    empty.style.cssText = 'font-size:10px;color:hsl(var(--muted-foreground));padding:6px 0;font-style:italic;';
     empty.textContent = 'No per-workspace overrides set.';
     list.appendChild(empty);
 
@@ -810,7 +810,7 @@ function _buildPerWsAddRow(onAdded: () => void): HTMLElement {
   const addBtn = document.createElement('button');
   addBtn.type = 'button';
   addBtn.textContent = '+ Add';
-  addBtn.style.cssText = 'background:' + cPrimary + ';border:none;color:#fff;font-size:11px;'
+  addBtn.style.cssText = 'background:' + cPrimary + ';border:none;color:hsl(var(--foreground));font-size:11px;'
     + 'padding:3px 10px;border-radius:4px;cursor:pointer;font-weight:600;';
   addBtn.onclick = function (): void {
     const wsId = idInp.value.trim();
@@ -904,7 +904,7 @@ function _buildOverrideToggles(panel: HTMLElement): Record<string, HTMLInputElem
     lbl.style.cssText = 'font-size:11px;color:' + cPanelText + ';';
     lbl.textContent = item.label;
     const hint = document.createElement('span');
-    hint.style.cssText = 'font-size:9px;color:#64748b;';
+    hint.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));';
     hint.textContent = item.hint;
     labelWrap.appendChild(lbl);
     labelWrap.appendChild(hint);
@@ -936,7 +936,7 @@ function _buildDbMaintenancePanel(): HTMLDivElement {
 
   const syncBtn = document.createElement('button');
   syncBtn.textContent = '🔄 Force Sync Queue to SQLite';
-  syncBtn.style.cssText = 'padding:6px 12px;background:' + cPrimary + ';color:#fff;border:none;border-radius:6px;font-size:10px;cursor:pointer;font-weight:600;';
+  syncBtn.style.cssText = 'padding:6px 12px;background:' + cPrimary + ';color:hsl(var(--foreground));border:none;border-radius:6px;font-size:10px;cursor:pointer;font-weight:600;';
   syncBtn.onclick = async function() {
     const { forceSyncQueueToDb } = await import('../db/macro-db');
     await forceSyncQueueToDb();
@@ -945,7 +945,7 @@ function _buildDbMaintenancePanel(): HTMLDivElement {
 
   const purgeBtn = document.createElement('button');
   purgeBtn.textContent = '🗑 Purge Old History (30d)';
-  purgeBtn.style.cssText = 'padding:6px 12px;background:' + cWarning + ';color:#1e1e2e;border:none;border-radius:6px;font-size:10px;cursor:pointer;font-weight:600;';
+  purgeBtn.style.cssText = 'padding:6px 12px;background:' + cWarning + ';color:hsl(var(--background));border:none;border-radius:6px;font-size:10px;cursor:pointer;font-weight:600;';
   purgeBtn.onclick = async function() {
     if (confirm('Delete all communication history older than 30 days?')) {
       const { purgeOldCommunications } = await import('../db/macro-db');
@@ -959,7 +959,7 @@ function _buildDbMaintenancePanel(): HTMLDivElement {
 
   const dumpBtn = document.createElement('button');
   dumpBtn.textContent = '💾 Export DB Dump';
-  dumpBtn.style.cssText = 'padding:6px 12px;background:#64748b;color:#fff;border:none;border-radius:6px;font-size:10px;cursor:pointer;font-weight:600;';
+  dumpBtn.style.cssText = 'padding:6px 12px;background:hsl(var(--muted-foreground));color:hsl(var(--foreground));border:none;border-radius:6px;font-size:10px;cursor:pointer;font-weight:600;';
   dumpBtn.onclick = async function() {
     const { exportDatabaseDump } = await import('../db/macro-db');
     await exportDatabaseDump();
@@ -1008,7 +1008,7 @@ function _buildBackdropSlider(): HTMLDivElement {
   bdRow.appendChild(bdSliderRow);
 
   const bdHint = document.createElement('div');
-  bdHint.style.cssText = 'font-size:9px;color:#64748b;margin-top:2px;';
+  bdHint.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));margin-top:2px;';
   bdHint.textContent = 'Dark overlay behind the floating panel. 0% = transparent, 100% = opaque.';
   bdRow.appendChild(bdHint);
 
@@ -1018,7 +1018,7 @@ function _buildBackdropSlider(): HTMLDivElement {
 /** Builds the version info footer. */
 function _buildVersionInfo(): HTMLDivElement {
   const verInfo = document.createElement('div');
-  verInfo.style.cssText = 'margin-top:16px;padding:10px;background:' + cPanelBgAlt + ';border-radius:6px;font-size:10px;color:#64748b;';
+  verInfo.style.cssText = 'margin-top:16px;padding:10px;background:' + cPanelBgAlt + ';border-radius:6px;font-size:10px;color:hsl(var(--muted-foreground));';
   verInfo.innerHTML = '<strong style="color:' + cPrimaryLight + '">MacroLoop</strong> v' + VERSION + '<br>Changes are saved to the running instance. For permanent changes, update the config JSON or extension settings.';
 
   return verInfo;

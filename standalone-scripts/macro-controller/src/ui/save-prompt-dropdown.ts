@@ -46,7 +46,7 @@ export function createPromptsDropdown(): HTMLElement {
 
   const dropdown = document.createElement('div');
   dropdown.id = 'marco-chatbox-prompts-dropdown';
-  dropdown.style.cssText = 'display:none;position:fixed;z-index:100002;min-width:260px;max-width:380px;max-height:60vh;overflow-y:auto;background:#1e1e2e;border:1px solid #7c3aed;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;';
+  dropdown.style.cssText = 'display:none;position:fixed;z-index:100002;min-width:260px;max-width:380px;max-height:60vh;overflow-y:auto;background:hsl(var(--background));border:1px solid hsl(var(--primary));border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.4);font-family:system-ui,sans-serif;';
   document.body.appendChild(dropdown);
   promptsDropdownState.element = dropdown;
 
@@ -103,7 +103,7 @@ function renderDropdownItems(
 /** Render the full chatbox prompts dropdown content. */
  
 export function renderChatboxPromptsDropdown(dropdown: HTMLElement, deps: SavePromptDeps): void {
-  dropdown.innerHTML = '<div style="padding:10px 14px;color:#9ca3af;font-size:12px;text-align:center;">⏳ Loading prompts…</div>';
+  dropdown.innerHTML = '<div style="padding:10px 14px;color:hsl(var(--muted-foreground));font-size:12px;text-align:center;">⏳ Loading prompts…</div>';
 
   loadPromptsFromJson().then(function (_loaded: PromptEntry[] | null) {
     const promptsCfg = getPromptsConfig();
@@ -111,7 +111,7 @@ export function renderChatboxPromptsDropdown(dropdown: HTMLElement, deps: SavePr
     const hasNoEntries = entries.length === 0;
 
     if (hasNoEntries) {
-      dropdown.innerHTML = '<div style="padding:10px 14px;color:#9ca3af;font-size:12px;text-align:center;">No prompts available</div>';
+      dropdown.innerHTML = '<div style="padding:10px 14px;color:hsl(var(--muted-foreground));font-size:12px;text-align:center;">No prompts available</div>';
 
       return;
     }
@@ -125,8 +125,8 @@ export function renderChatboxPromptsDropdown(dropdown: HTMLElement, deps: SavePr
 
     const editToggle = buildDropdownHeader(dropdown, () => {
       isEditMode = !isEditMode;
-      editToggle.style.background = isEditMode ? '#7c3aed' : 'rgba(0,0,0,0.2)';
-      editToggle.style.color = isEditMode ? '#fff' : '#a78bfa';
+      editToggle.style.background = isEditMode ? 'hsl(var(--primary))' : 'rgba(0,0,0,0.2)';
+      editToggle.style.color = isEditMode ? 'hsl(var(--foreground))' : '#a78bfa';
       doRender();
     });
 
@@ -159,8 +159,8 @@ export function renderChatboxPromptsDropdown(dropdown: HTMLElement, deps: SavePr
         event.preventDefault();
         event.stopPropagation();
         isEditMode = !isEditMode;
-        editToggle.style.background = isEditMode ? '#7c3aed' : 'rgba(0,0,0,0.2)';
-        editToggle.style.color = isEditMode ? '#fff' : '#a78bfa';
+        editToggle.style.background = isEditMode ? 'hsl(var(--primary))' : 'rgba(0,0,0,0.2)';
+        editToggle.style.color = isEditMode ? 'hsl(var(--foreground))' : '#a78bfa';
         doRender();
       }
     });

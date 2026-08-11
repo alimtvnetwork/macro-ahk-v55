@@ -82,11 +82,11 @@ function buildHistoryEntries(history: Array<Record<string, string>>): string {
   let html = '';
 
   for (const entry of [...history].reverse()) {
-    html += '<div style="font-size:10px;font-family:monospace;padding:2px 0;color:#fbbf24;">';
+    html += '<div style="font-size:10px;font-family:monospace;padding:2px 0;color:hsl(var(--warning));">';
     html += '<span style="color:' + cPanelFgDim + ';">[' + entry.display + ']</span> ';
-    html += '<span style="color:#ef4444;">' + entry.from + '</span>';
-    html += ' <span style="color:#9ca3af;">→</span> ';
-    html += '<span style="color:#10b981;">' + entry.to + '</span>';
+    html += '<span style="color:hsl(var(--destructive));">' + entry.from + '</span>';
+    html += ' <span style="color:hsl(var(--muted-foreground));">→</span> ';
+    html += '<span style="color:hsl(var(--success));">' + entry.to + '</span>';
     html += '</div>';
   }
 

@@ -79,7 +79,7 @@ export function createCheckButton(deps: CheckButtonDeps): CheckButtonResult {
   const checkBtn = document.createElement('button');
   checkBtn.textContent = '☑ Check';
   checkBtn.title = 'One-shot credit check';
-  checkBtn.style.cssText = btnStyle + 'background:' + cBtnCheckGrad + ';color:#fff;box-shadow:' + cBtnCheckGlow + ';border:1px solid rgba(255,255,255,0.08);';
+  checkBtn.style.cssText = btnStyle + 'background:' + cBtnCheckGrad + ';color:hsl(var(--foreground));box-shadow:' + cBtnCheckGlow + ';border:1px solid rgba(255,255,255,0.08);';
   checkBtn.onmouseenter = function() {
     checkBtn.style.filter = 'brightness(1.12)';
     checkBtn.style.boxShadow = '0 2px 8px rgba(232,71,95,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; 

@@ -169,10 +169,10 @@ function openOrderPopover(anchor: HTMLElement): void {
     'max-height:60vh',
     'overflow:auto',
     'background:#0f0720',
-    'border:1px solid #7c3aed',
+    'border:1px solid hsl(var(--primary))',
     'border-radius:6px',
     'box-shadow:0 8px 24px rgba(0,0,0,0.5)',
-    'color:#e5e7eb',
+    'color:hsl(var(--foreground))',
     'font-size:11px',
     'padding:8px 10px',
   ].join(';') + ';';
@@ -251,7 +251,7 @@ function statusPalette(status: ViolationKind): { bg: string; fg: string; icon: s
   }
 
   if (status === 'unknown') {
-    return { bg: 'rgba(107,114,128,0.18)', fg: '#e5e7eb', icon: '?' };
+    return { bg: 'rgba(107,114,128,0.18)', fg: 'hsl(var(--foreground))', icon: '?' };
   }
 
   return { bg: 'rgba(239,68,68,0.16)', fg: '#fecaca', icon: '×' };

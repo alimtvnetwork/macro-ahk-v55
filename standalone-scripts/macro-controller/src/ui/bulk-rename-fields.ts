@@ -58,7 +58,7 @@ export function buildPresetRow(
   row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(124,58,237,0.15);';
 
   const lbl = document.createElement('span');
-  lbl.style.cssText = 'font-size:9px;color:#94a3b8;min-width:40px;';
+  lbl.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));min-width:40px;';
   lbl.textContent = 'Preset';
   row.appendChild(lbl);
 
@@ -123,7 +123,7 @@ export function buildPresetRow(
   const deleteBtn = document.createElement('button');
   deleteBtn.textContent = '🗑';
   deleteBtn.title = 'Delete preset';
-  deleteBtn.style.cssText = 'padding:2px 6px;background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);border-radius:3px;font-size:10px;cursor:pointer;';
+  deleteBtn.style.cssText = 'padding:2px 6px;background:rgba(239,68,68,0.15);color:hsl(var(--destructive));border:1px solid rgba(239,68,68,0.3);border-radius:3px;font-size:10px;cursor:pointer;';
   deleteBtn.onclick = function () {
     onDelete(select.value); 
   };
@@ -177,7 +177,7 @@ export function buildInputRow(
   }
 
   const lbl = document.createElement('span');
-  lbl.style.cssText = 'font-size:9px;color:#94a3b8;min-width:40px;';
+  lbl.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));min-width:40px;';
   lbl.textContent = label;
   row.appendChild(lbl);
   const input = document.createElement('input');
@@ -196,7 +196,7 @@ export function buildTemplateRow(): { row: HTMLElement; input: HTMLInputElement 
   const row = document.createElement('div');
   row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:6px;';
   const lbl = document.createElement('span');
-  lbl.style.cssText = 'font-size:9px;color:#94a3b8;min-width:52px;';
+  lbl.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));min-width:52px;';
   lbl.textContent = 'Template';
   const input = document.createElement('input');
   input.type = 'text';
@@ -229,7 +229,7 @@ export function buildTokenRow(): HTMLElement {
   const tokenRow = document.createElement('div');
   tokenRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px;';
   const tokenLabel = document.createElement('span');
-  tokenLabel.style.cssText = 'font-size:8px;color:#64748b;';
+  tokenLabel.style.cssText = 'font-size:8px;color:hsl(var(--muted-foreground));';
   tokenLabel.textContent = 'Auth: ' + (getLastTokenSource() || 'none');
   tokenLabel.id = 'rename-auth-label';
   const tokenRefreshBtn = document.createElement('button');

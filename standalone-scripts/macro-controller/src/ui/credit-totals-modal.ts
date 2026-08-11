@@ -93,7 +93,7 @@ export function downloadCsv(filename: string, csvText: string): void {
 export type CreditTone = CreditToneType;
 const TONE_COLOR: Record<CreditTone, string> = {
   ok: '#86efac',      // green — remaining / healthy
-  warn: '#fbbf24',    // amber — alerts
+  warn: 'hsl(var(--warning))',    // amber — alerts
   used: '#fb923c',    // orange — consumption
   total: '#a78bfa',   // purple — totals / grants
   accent: '#67e8f9',  // cyan — plan / meta
@@ -153,8 +153,8 @@ function ensureRowStyles(): void {
   s.textContent =
     '[data-credit-totals-row]{transition:background-color 120ms ease,color 120ms ease;}'
     + '[data-credit-totals-row][data-zebra="1"]{background:rgba(124,58,237,0.04);}'
-    + '[data-credit-totals-row]:hover{background:rgba(124,58,237,0.18) !important;color:#ffffff;cursor:default;}'
-    + '[data-credit-totals-row]:hover [data-cell="name"]{color:#ffffff;}';
+    + '[data-credit-totals-row]:hover{background:rgba(124,58,237,0.18) !important;color:hsl(var(--foreground));cursor:default;}'
+    + '[data-credit-totals-row]:hover [data-cell="name"]{color:hsl(var(--foreground));}';
   document.head.appendChild(s);
 }
 
@@ -334,7 +334,7 @@ function buildChip(
   btn.textContent = label;
   btn.setAttribute('data-active', active ? 'true' : 'false');
   const bg = active ? 'rgba(124,58,237,0.35)' : 'transparent';
-  const fg = active ? '#ffffff' : cPanelFgDim;
+  const fg = active ? 'hsl(var(--foreground))' : cPanelFgDim;
   btn.style.cssText =
     'background:' + bg +
     ';border:1px solid ' + (active ? cPrimaryLighter : 'rgba(124,58,237,0.35)') +
@@ -411,7 +411,7 @@ function buildSearchBar(initialQuery: string, onChange: (q: string) => void): HT
     + 'font-family:monospace;outline:none;';
   input.addEventListener('focus', function (): void {
     input.style.borderColor = cPrimaryLighter;
-    input.style.color = '#ffffff';
+    input.style.color = 'hsl(var(--foreground))';
   });
   input.addEventListener('blur', function (): void {
     input.style.borderColor = 'rgba(124,58,237,0.35)';
@@ -452,7 +452,7 @@ function renderHeaderCells(ctx: TableCtx): void {
     const arrow = isActive ? (ctx.sortState.dir === 'asc' ? ' ▲' : ' ▼') : '';
     cell.textContent = col.label + arrow;
     if (isActive) {
-      cell.style.color = '#ffffff';
+      cell.style.color = 'hsl(var(--foreground))';
     }
 
     cell.onclick = function (): void {
@@ -616,7 +616,7 @@ function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
 
   const name = document.createElement('span');
   name.setAttribute('data-cell', 'name');
-  name.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e2e8f0;font-weight:600;';
+  name.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:hsl(var(--foreground));font-weight:600;';
   name.title = ws.fullName || ws.name;
   name.textContent = ws.fullName || ws.name || ws.id;
 
@@ -626,7 +626,7 @@ function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
 
   const projectsN = Number(ws.numProjects) || 0;
   const projects = document.createElement('span');
-  projects.style.cssText = 'text-align:right;color:#94a3b8;font-weight:600;font-size:10px;';
+  projects.style.cssText = 'text-align:right;color:hsl(var(--muted-foreground));font-weight:600;font-size:10px;';
   projects.textContent = projectsN > 0 ? String(projectsN) : '—';
 
   const summary = resolveCreditSummary(ws);
@@ -637,7 +637,7 @@ function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
 
   const remN = summary.available;
   const rem = document.createElement('span');
-  const remColor = remN <= 0 ? cPanelFgDim : remN < 100 ? '#fbbf24' : '#86efac';
+  const remColor = remN <= 0 ? cPanelFgDim : remN < 100 ? 'hsl(var(--warning))' : '#86efac';
   rem.style.cssText = 'text-align:right;color:' + remColor + ';font-weight:700;font-size:11px;';
   rem.textContent = formatCount(remN);
 
@@ -684,7 +684,7 @@ export function buildBody(totals: CreditTotals, workspaces: ReadonlyArray<Worksp
   if (totals.missingCount > 0) {
     const warn = document.createElement('div');
     warn.setAttribute('data-credit-totals-warning', '1');
-    warn.style.cssText = 'background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.35);border-radius:6px;padding:6px 10px;font-size:10px;color:#fbbf24;';
+    warn.style.cssText = 'background:rgba(251,191,36,0.10);border:1px solid rgba(251,191,36,0.35);border-radius:6px;padding:6px 10px;font-size:10px;color:hsl(var(--warning));';
     warn.textContent = '⚠️ ' + totals.missingCount + ' of ' + totals.totalCount + ' workspaces missing credit data — refresh to retry.';
     body.appendChild(warn);
   }
@@ -792,7 +792,7 @@ function buildTitleBar(): HTMLElement {
   title.style.cssText = 'font-size:11px;color:' + cPrimaryLighter + ';font-weight:700;';
   title.textContent = '💰 Credit Totals';
   const closeBtn = document.createElement('span');
-  closeBtn.style.cssText = 'cursor:pointer;color:#94a3b8;font-size:14px;padding:0 4px;';
+  closeBtn.style.cssText = 'cursor:pointer;color:hsl(var(--muted-foreground));font-size:14px;padding:0 4px;';
   closeBtn.textContent = '✕';
   closeBtn.setAttribute('role', 'button');
   closeBtn.setAttribute(ATTR_ARIA_LABEL, 'Close');

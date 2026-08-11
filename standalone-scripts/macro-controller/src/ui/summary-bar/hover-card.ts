@@ -77,7 +77,7 @@ function emptyHint(text: string): string {
 function renderProCard(d: SummaryDetails): string {
   const parts: string[] = [];
   parts.push(row('Total Pro workspaces', fmt(d.pro.count)));
-  parts.push(row('Expiring / canceled', fmt(d.pro.expiringCount), '#fbbf24'));
+  parts.push(row('Expiring / canceled', fmt(d.pro.expiringCount), 'hsl(var(--warning))'));
 
   const kinds = Object.keys(d.pro.expiringByKind);
   if (kinds.length > 0) {
@@ -108,7 +108,7 @@ function renderProCreditsCard(d: SummaryDetails): string {
   parts.push(sectionTitle('At risk'));
   parts.push(row('Expiring credits',
     fmt(d.pro.creditsExpiringAvailable),
-    d.pro.creditsExpiringAvailable > 0 ? '#fbbf24' : cPanelFgDim));
+    d.pro.creditsExpiringAvailable > 0 ? 'hsl(var(--warning))' : cPanelFgDim));
   if (d.pro.expiringCount === 0) {
     parts.push(emptyHint('No expiring pro workspaces.'));
   }

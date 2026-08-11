@@ -232,7 +232,7 @@ export function showPasteToast(message: string, isError: boolean): void {
   const isMultiline = message.indexOf('\n') !== -1;
   const toast = document.createElement('div');
   toast.style.cssText = 'display:flex;align-items:stretch;border-radius:6px;overflow:hidden;' +
-    'background:#1a1a2e;border:1px solid rgba(255,255,255,0.06);' +
+    'background:hsl(var(--background));border:1px solid rgba(255,255,255,0.06);' +
     'box-shadow:0 4px 16px rgba(0,0,0,0.4);' +
     'font-family:system-ui,-apple-system,sans-serif;pointer-events:auto;' +
     'transform:translateY(8px);opacity:0;transition:all .25s ease-out;' +
@@ -241,12 +241,12 @@ export function showPasteToast(message: string, isError: boolean): void {
   // Left accent bar
   const accent = document.createElement('div');
   accent.style.cssText = 'width:3px;flex-shrink:0;' +
-    (isError ? 'background:#ef4444;' : 'background:#22c55e;');
+    (isError ? 'background:hsl(var(--destructive));' : 'background:hsl(var(--success));');
   toast.appendChild(accent);
 
   // Content area
   const content = document.createElement('div');
-  content.style.cssText = 'padding:8px 14px;font-size:12px;line-height:1.4;color:#e2e8f0;' +
+  content.style.cssText = 'padding:8px 14px;font-size:12px;line-height:1.4;color:hsl(var(--foreground));' +
     'display:flex;' + (isMultiline ? 'align-items:flex-start;' : 'align-items:center;') + 'gap:6px;';
 
   // Icon
@@ -299,21 +299,21 @@ function _buildUndoToastShell(): { toast: HTMLDivElement; content: HTMLDivElemen
   const toast = document.createElement('div');
   toast.dataset.testid = 'undo-toast';
   toast.style.cssText = 'display:flex;align-items:stretch;border-radius:6px;overflow:hidden;' +
-    'background:#1a1a2e;border:1px solid rgba(255,255,255,0.06);' +
+    'background:hsl(var(--background));border:1px solid rgba(255,255,255,0.06);' +
     'box-shadow:0 4px 16px rgba(0,0,0,0.4);' +
     'font-family:system-ui,-apple-system,sans-serif;pointer-events:auto;' +
     'transform:translateY(8px);opacity:0;transition:all .25s ease-out;max-width:420px;' +
     'position:relative;';
 
   const accent = document.createElement('div');
-  accent.style.cssText = 'width:3px;flex-shrink:0;background:#22c55e;';
+  accent.style.cssText = 'width:3px;flex-shrink:0;background:hsl(var(--success));';
   toast.appendChild(accent);
 
   const body = document.createElement('div');
   body.style.cssText = 'display:flex;flex-direction:column;flex:1;min-width:0;';
 
   const content = document.createElement('div');
-  content.style.cssText = 'padding:8px 10px 8px 14px;font-size:12px;line-height:1.4;color:#e2e8f0;' +
+  content.style.cssText = 'padding:8px 10px 8px 14px;font-size:12px;line-height:1.4;color:hsl(var(--foreground));' +
     'display:flex;align-items:center;gap:10px;flex:1;';
 
   const icon = document.createElement('span');
@@ -360,7 +360,7 @@ function _buildCountdown(durationMs: number): {
 
   const label = document.createElement('span');
   label.dataset.testid = 'undo-toast-countdown-label';
-  label.style.cssText = 'font-size:10px;color:#94a3b8;font-variant-numeric:tabular-nums;min-width:22px;text-align:right;';
+  label.style.cssText = 'font-size:10px;color:hsl(var(--muted-foreground));font-variant-numeric:tabular-nums;min-width:22px;text-align:right;';
   label.textContent = Math.ceil(durationMs / 1000) + 's';
 
   wrap.appendChild(track);
@@ -641,13 +641,13 @@ function _createVariableInputRow(v: string, inputs: Record<string, HTMLInputElem
   
   const label = document.createElement('label');
   label.textContent = v;
-  label.style.cssText = 'font-size:11px;color:#94a3b8;font-weight:600;';
+  label.style.cssText = 'font-size:11px;color:hsl(var(--muted-foreground));font-weight:600;';
   row.appendChild(label);
   
   const input = document.createElement('input');
   input.type = 'text';
   input.placeholder = `Enter value for ${v}...`;
-  input.style.cssText = 'background:#252536;border:1px solid #313147;border-radius:6px;padding:8px 10px;color:#fff;font-size:12px;outline:none;';
+  input.style.cssText = 'background:#252536;border:1px solid #313147;border-radius:6px;padding:8px 10px;color:hsl(var(--foreground));font-size:12px;outline:none;';
   input.onfocus = () => input.style.borderColor = '#007acc';
   input.onblur = () => input.style.borderColor = '#313147';
   
@@ -665,7 +665,7 @@ function showVariableInputModal(vars: string[]): Promise<Record<string, string> 
     overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);font-family:system-ui,-apple-system,sans-serif;';
     
     const modal = document.createElement('div');
-    modal.style.cssText = 'background:#1e1e2e;border:1px solid #313147;border-radius:12px;width:400px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,0.5);display:flex;flex-direction:column;gap:12px;';
+    modal.style.cssText = 'background:hsl(var(--background));border:1px solid #313147;border-radius:12px;width:400px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,0.5);display:flex;flex-direction:column;gap:12px;';
     
     modal.appendChild(_createVariableModalHeader());
 
@@ -677,7 +677,7 @@ function showVariableInputModal(vars: string[]): Promise<Record<string, string> 
     
     const cancelBtn = document.createElement('button');
     cancelBtn.textContent = 'Cancel';
-    cancelBtn.style.cssText = 'padding:6px 12px;font-size:12px;background:transparent;border:1px solid #313147;color:#94a3b8;border-radius:6px;cursor:pointer;';
+    cancelBtn.style.cssText = 'padding:6px 12px;font-size:12px;background:transparent;border:1px solid #313147;color:hsl(var(--muted-foreground));border-radius:6px;cursor:pointer;';
     cancelBtn.onclick = () => {
       overlay.remove();
       resolve(null);
@@ -685,7 +685,7 @@ function showVariableInputModal(vars: string[]): Promise<Record<string, string> 
     
     const submitBtn = document.createElement('button');
     submitBtn.textContent = 'Inject Prompt';
-    submitBtn.style.cssText = 'padding:6px 16px;font-size:12px;background:#007acc;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;';
+    submitBtn.style.cssText = 'padding:6px 16px;font-size:12px;background:#007acc;color:hsl(var(--foreground));border:none;border-radius:6px;cursor:pointer;font-weight:600;';
     submitBtn.onclick = () => {
       const results: Record<string, string> = {};
       vars.forEach(v => results[v] = inputs[v].value.trim());

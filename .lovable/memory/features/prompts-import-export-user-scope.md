@@ -46,3 +46,8 @@ breaking the `{{n}}` substitution + validator guards documented in
 - Not a schema change (`IsDefault` column already exists).
 - Does not alter the re-seed pipeline or `upsertPrompt`'s hard-coded
   `IsDefault=0` on insert.
+
+## Two Drag-Drop Import UIs
+The macro-controller provides two distinct drag-and-drop import surfaces:
+- **Library Modal** (`prompt-library-modal.ts`): The root-level "Prompt Library" view supports drag-and-dropping JSON files directly onto the library. This offers a fast, boolean overwrite path exclusively for JSON.
+- **Import Modal** (`prompt-import-modal.ts`): The dedicated "Import" action provides a detailed six-stage state machine (idle -> parsing -> preview -> committing -> done -> error). It supports ZIP, SQLite, and JSON formats, giving the user per-row merge resolution (add/overwrite/skip/rename).

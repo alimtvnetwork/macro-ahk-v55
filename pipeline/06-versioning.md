@@ -11,30 +11,16 @@
 ## Policy
 
 - **Every code change** must bump at least the minor version
-- **version.json is the release source of truth**
-
-## Files That Carry the Version
-
-| # | File | Format | Example |
-|---|------|--------|---------|
-| 1 | `chrome-extension/manifest.json` | `"version": "X.Y.Z"` | `"version": "2.119.0"` |
-| 2 | `chrome-extension/manifest.json` | `"version_name": "X.Y.Z"` | `"version_name": "2.119.0"` |
-| 3 | `src/shared/constants.ts` | `EXTENSION_VERSION = "X.Y.Z"` | `export const EXTENSION_VERSION = "2.119.0"` |
-| 4 | `standalone-scripts/macro-controller/src/shared-state.ts` | `VERSION = 'X.Y.Z'` | `export const VERSION = '2.119.0'` |
-| 5 | `standalone-scripts/macro-controller/src/instruction.ts` | `version: "X.Y.Z"` | `version: "2.119.0"` |
-| 6 | `standalone-scripts/marco-sdk/src/instruction.ts` | `version: "X.Y.Z"` | `version: "2.119.0"` |
-| 7 | `standalone-scripts/xpath/src/instruction.ts` | `version: "X.Y.Z"` | `version: "2.119.0"` |
+- **The git tag (`vX.Y.Z`) is the sole source of truth for the release version.**
 
 ## How to Bump
 
-Edit `version.json` only. Do not run stale-version propagation scripts.
+Do NOT edit `version.json` manually. Do NOT edit `manifest.json` or constants manually.
 
-## Release Tag Convention
-
-To trigger a release build:
+To trigger a release build and declare the version:
 ```bash
-git tag v2.119.0
-git push origin v2.119.0
+git tag vX.Y.Z
+git push origin vX.Y.Z
 ```
 
-The release workflow reads the version from `version.json`.
+The release workflow (`.github/workflows/release.yml`) automatically regenerates `version.json` from the tag using `scripts/write-version-from-tag.mjs`, and the build pipeline propagates it to all required files. See `.lovable/how-to-release.md` for the full canonical checklist.

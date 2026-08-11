@@ -50,14 +50,14 @@ export function renderLoopJsHistory(): void {
   }
 
   if (loopJsHistory.length === 0) {
-    el.innerHTML = '<span style="color:#64748b;font-size:10px;">No commands yet</span>';
+    el.innerHTML = '<span style="color:hsl(var(--muted-foreground));font-size:10px;">No commands yet</span>';
 
     return;
   }
 
   let html = '';
   for (const [histIndex, e] of loopJsHistory.entries()) {
-    const statusColor = e.success ? '#4ade80' : '#ef4444';
+    const statusColor = e.success ? 'hsl(var(--success))' : 'hsl(var(--destructive))';
     const statusIcon = e.success ? '✓' : '✗';
     html += '<div class="loop-js-hist-item" data-hist-idx="' + histIndex + '" style="display:flex;gap:4px;align-items:flex-start;padding:3px 4px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);font-size:10px;font-family:monospace;"'
       + ' onmouseover="(this as HTMLElement).style.background=\'rgba(139,92,246,0.15)\'"'

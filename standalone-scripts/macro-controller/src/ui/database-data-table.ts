@@ -141,7 +141,7 @@ function buildTableCell(value: unknown): HTMLTableCellElement {
   if (isNullish) {
     cell.textContent = truncate('NULL', 100);
     cell.title = 'NULL';
-    cell.style.color = '#64748b';
+    cell.style.color = 'hsl(var(--muted-foreground))';
     cell.style.fontStyle = 'italic';
 
     return cell;

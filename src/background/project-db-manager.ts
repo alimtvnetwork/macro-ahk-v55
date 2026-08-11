@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS ProjectSchema (
     CreatedAt    TEXT NOT NULL DEFAULT (datetime('now')),
     UpdatedAt    TEXT NOT NULL DEFAULT (datetime('now'))
 );
-` + META_TABLES_SCHEMA;
+`;
 
 /* ------------------------------------------------------------------ */
 /*  Module state                                                       */

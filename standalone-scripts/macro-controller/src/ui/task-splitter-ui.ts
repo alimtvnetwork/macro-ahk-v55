@@ -566,12 +566,12 @@ function makeBtn(label: string, primary: boolean): HTMLButtonElement {
   b.type = 'button';
   b.textContent = label;
   const bg = primary
-    ? 'linear-gradient(135deg,#7c3aed 0%,#4f46e5 50%,#2563eb 100%)'
+    ? 'linear-gradient(135deg,hsl(var(--primary)) 0%,#4f46e5 50%,hsl(var(--primary)) 100%)'
     : 'rgba(124,58,237,0.18)';
   const shadow = primary
     ? '0 2px 6px rgba(79,70,229,0.4), inset 0 1px 0 rgba(255,255,255,0.18)'
     : 'none';
-  b.style.cssText = 'padding:4px 10px;border:1px solid rgba(124,58,237,0.3);border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;color:#fff;background:' + bg + ';box-shadow:' + shadow + ';';
+  b.style.cssText = 'padding:4px 10px;border:1px solid rgba(124,58,237,0.3);border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;color:hsl(var(--foreground));background:' + bg + ';box-shadow:' + shadow + ';';
 
   return b;
 }

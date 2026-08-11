@@ -143,7 +143,8 @@ describe("Version alignment", () => {
 
     const extensionConfig = readFile("vite.config.extension.ts");
     expect(extensionConfig).toContain('resolve(EXT_DIR, "version.json")');
-    expect(extensionConfig).toMatch(/manifest\.version\s*=\s*rootVersion/);
+    const extMatch = extensionConfig.match(/manifest\.version\s*=\s*rootVersion/);
+    expect(extMatch).not.toBeNull();
 
     const builtManifestCheck = readFile("scripts/check-built-manifest-csp.mjs");
     expect(builtManifestCheck).toContain("Built manifest version matches version.json");

@@ -28,7 +28,7 @@ export function buildDropdownHeader(
   rerender: Rerender,
 ): HTMLElement {
   const header = document.createElement('div');
-  header.style.cssText = 'position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:4px 8px;border-bottom:1px solid #7c3aed;background:#1a0b2e;';
+  header.style.cssText = 'position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:4px 8px;border-bottom:1px solid hsl(var(--primary));background:#1a0b2e;';
   const left = document.createElement('div');
   left.style.cssText = 'display:flex;align-items:center;gap:2px;';
   left.appendChild(buildPlanTabMarker());
@@ -134,7 +134,7 @@ function buildLoadButton(rerender: Rerender): HTMLElement {
   const btn = document.createElement('span');
   btn.textContent = '↻ Load';
   btn.title = 'Reload prompts from database';
-  btn.style.cssText = 'cursor:pointer;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600;color:#fff;background:' + cPrimary + ';border:1px solid rgba(255,255,255,0.1);';
+  btn.style.cssText = 'cursor:pointer;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600;color:hsl(var(--foreground));background:' + cPrimary + ';border:1px solid rgba(255,255,255,0.1);';
   btn.onmouseover = function() {
     btn.style.background = cPrimaryLight;
     btn.style.transform = 'scale(1.05)'; 

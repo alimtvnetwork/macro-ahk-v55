@@ -190,7 +190,7 @@ function _buildVersionBadge(
   getReinjectSection: () => HTMLElement | null,
 ): HTMLSpanElement {
   const badge = document.createElement('span');
-  badge.style.cssText = 'display:none;font-size:9px;background:#e94560;color:#fff;padding:1px 5px;border-radius:8px;margin-left:6px;font-weight:700;line-height:1.2;animation:pulse 2s ease-in-out infinite;cursor:pointer;';
+  badge.style.cssText = 'display:none;font-size:9px;background:#e94560;color:hsl(var(--foreground));padding:1px 5px;border-radius:8px;margin-left:6px;font-weight:700;line-height:1.2;animation:pulse 2s ease-in-out infinite;cursor:pointer;';
   badge.onclick = function(e: Event) {
     e.stopPropagation();
     if (toolsMasterBody.style.display === 'none') {
@@ -316,8 +316,8 @@ export function createRecordIndicator(): HTMLElement {
   const record = document.createElement('div');
   record.id = IDS.RECORD_INDICATOR;
   record.className = 'loop-pulse';
-  record.style.cssText = 'display:none;position:fixed;top:15px;right:15px;padding:8px 12px;background:#dc2626;border-radius:20px;color:#fff;font-size:12px;font-weight:bold;z-index:99999;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(220,38,38,.4);';
-  record.innerHTML = '<span style="width:10px;height:10px;background:#fff;border-radius:50%;display:inline-block;"></span> LOOP';
+  record.style.cssText = 'display:none;position:fixed;top:15px;right:15px;padding:8px 12px;background:hsl(var(--destructive));border-radius:20px;color:hsl(var(--foreground));font-size:12px;font-weight:bold;z-index:99999;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(220,38,38,.4);';
+  record.innerHTML = '<span style="width:10px;height:10px;background:hsl(var(--foreground));border-radius:50%;display:inline-block;"></span> LOOP';
 
   return record;
 }

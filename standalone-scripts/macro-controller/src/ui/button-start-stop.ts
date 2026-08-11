@@ -14,7 +14,7 @@ export function buildStartStopButton(deps: PanelBuilderDeps, btnStyle: string): 
   startStopBtn.id = IDS.START_BTN;
   startStopBtn.textContent = '▶';
   startStopBtn.title = 'Start loop';
-  startStopBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnStartGrad + ';color:#fff;border-radius:8px;min-width:36px;width:36px;font-size:14px;text-align:center;padding:6px 0;box-shadow:' + cBtnStartGlow + CssFragmentType.Border1pxSolidRgba + ';position:relative;';
+  startStopBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnStartGrad + ';color:hsl(var(--foreground));border-radius:8px;min-width:36px;width:36px;font-size:14px;text-align:center;padding:6px 0;box-shadow:' + cBtnStartGlow + CssFragmentType.Border1pxSolidRgba + ';position:relative;';
   
   startStopBtn.onmouseenter = function() { 
     startStopBtn.style.filter = 'brightness(1.12)'; 
@@ -40,7 +40,7 @@ export function buildStartStopButton(deps: PanelBuilderDeps, btnStyle: string): 
 
   const countdownBadge = document.createElement('span');
   countdownBadge.id = 'loop-countdown-badge';
-  countdownBadge.style.cssText = 'display:none;align-items:center;justify-content:center;font-size:9px;font-family:' + tFont + ';font-weight:700;color:#fbbf24;background:rgba(0,0,0,0.6);padding:2px 6px;height:34px;border-radius:8px;border:1px solid rgba(251,191,36,0.3);margin-left:3px;min-width:28px;text-align:center;pointer-events:none;';
+  countdownBadge.style.cssText = 'display:none;align-items:center;justify-content:center;font-size:9px;font-family:' + tFont + ';font-weight:700;color:hsl(var(--warning));background:rgba(0,0,0,0.6);padding:2px 6px;height:34px;border-radius:8px;border:1px solid rgba(251,191,36,0.3);margin-left:3px;min-width:28px;text-align:center;pointer-events:none;';
   countdownBadge.textContent = '';
 
   startStopWrap.appendChild(startStopBtn);

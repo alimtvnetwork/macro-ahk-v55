@@ -112,9 +112,9 @@ export function summarizeDiff(lines: readonly DiffLine[]): DiffStats {
 }
 
 const COLOR_ADD_BG = 'rgba(34,197,94,0.14)';
-const COLOR_ADD_FG = '#4ade80';
+const COLOR_ADD_FG = 'hsl(var(--success))';
 const COLOR_REMOVE_BG = 'rgba(239,68,68,0.14)';
-const COLOR_REMOVE_FG = '#f87171';
+const COLOR_REMOVE_FG = 'hsl(var(--destructive))';
 
 /** Build a unified-diff pane. Pure DOM; caller mounts it. */
 export function renderDiffPane(before: string, after: string): HTMLElement {

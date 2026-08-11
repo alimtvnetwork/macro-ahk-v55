@@ -15,7 +15,7 @@ vi.mock('../../xpath-utils', () => ({
   isReturnButtonVisible: () => false,
 }));
 vi.mock('../../shared-state', () => ({
-  cPanelFg: '#fff', cPrimaryLight: '#fff', cSectionBg: '#111',
+  cPanelFg: 'hsl(var(--foreground))', cPrimaryLight: 'hsl(var(--foreground))', cSectionBg: 'hsl(var(--background))',
 }));
 vi.mock('../../queue-control/task-queue-project-store', () => ({
   getPersistentTaskQueue: () => ({ enqueueMany: vi.fn() }),

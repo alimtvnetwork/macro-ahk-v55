@@ -260,7 +260,7 @@ export function openPromptCreationModal(
   titleEl.style.cssText = 'font-size:15px;font-weight:600;color:' + cPanelFg + ';';
   const closeBtn = document.createElement('button');
   closeBtn.textContent = '✕';
-  closeBtn.style.cssText = 'background:none;border:none;color:#9ca3af;font-size:18px;cursor:pointer;padding:0 4px;';
+  closeBtn.style.cssText = 'background:none;border:none;color:hsl(var(--muted-foreground));font-size:18px;cursor:pointer;padding:0 4px;';
   closeBtn.onclick = function() {
     overlay.remove(); 
   };
@@ -503,7 +503,7 @@ function _buildVariableReference(body: HTMLElement): void {
   varToggle.style.cssText = 'cursor:pointer;font-size:11px;color:' + cPrimaryLight + ';margin-bottom:4px;user-select:none;';
   varToggle.textContent = '▸ Template Variables';
   const varList = document.createElement('div');
-  varList.style.cssText = 'display:none;padding:6px 10px;background:rgba(124,58,237,0.08);border-radius:6px;font-size:10px;color:#9ca3af;margin-bottom:12px;line-height:1.8;';
+  varList.style.cssText = 'display:none;padding:6px 10px;background:rgba(124,58,237,0.08);border-radius:6px;font-size:10px;color:hsl(var(--muted-foreground));margin-bottom:12px;line-height:1.8;';
   varList.innerHTML = '<code style="color:#c4b5fd;">{{date}}</code> — current date<br><code style="color:#c4b5fd;">{{time}}</code> — current time<br><code style="color:#c4b5fd;">{{date:FORMAT}}</code> — e.g. dd-MMM-YYYY<br><code style="color:#c4b5fd;">{{time:FORMAT}}</code> — e.g. 12 hr clock';
   varToggle.onclick = function() {
     const isOpen = varList.style.display !== 'none';
@@ -1028,16 +1028,16 @@ function _buildPromptModalFooter(
   // Save button — drift-guarded via required-tokens chip strip.
   const saveBtn = document.createElement('button');
   saveBtn.textContent = isEdit ? '💾 Update' : '💾 Save';
-  saveBtn.style.cssText = 'padding:8px 18px;background:' + cPrimary + ';border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;';
+  saveBtn.style.cssText = 'padding:8px 18px;background:' + cPrimary + ';border:none;border-radius:6px;color:hsl(var(--foreground));font-size:12px;font-weight:600;cursor:pointer;';
   saveBtn.onmouseover = function() {
     if (!(saveBtn as HTMLButtonElement).disabled) {
-      (this as HTMLElement).style.background = '#6d28d9';
+      (this as HTMLElement).style.background = 'hsl(var(--primary))';
     }
   };
 
   saveBtn.onmouseout = function() {
     if (!(saveBtn as HTMLButtonElement).disabled) {
-      (this as HTMLElement).style.background = '#7c3aed';
+      (this as HTMLElement).style.background = 'hsl(var(--primary))';
     }
   };
 

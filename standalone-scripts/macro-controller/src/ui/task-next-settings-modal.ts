@@ -73,7 +73,7 @@ export function openTaskNextSettingsModal(deps: TaskNextDeps) {
 
   const saveBtn = document.createElement('button');
   saveBtn.textContent = 'Save';
-  saveBtn.style.cssText = 'padding:6px 16px;border:none;border-radius:6px;background:' + cPrimary + ';color:#fff;cursor:pointer;font-size:11px;font-weight:600;';
+  saveBtn.style.cssText = 'padding:6px 16px;border:none;border-radius:6px;background:' + cPrimary + ';color:hsl(var(--foreground));cursor:pointer;font-size:11px;font-weight:600;';
   saveBtn.onclick = function() {
     taskNextState.settings.preClickDelayMs = parseInt(inputs.preClickDelayMs.value) || 500;
     taskNextState.settings.postClickDelayMs = parseInt(inputs.postClickDelayMs.value) || 2000;

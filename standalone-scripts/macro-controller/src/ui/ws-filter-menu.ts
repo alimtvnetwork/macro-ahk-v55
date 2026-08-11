@@ -82,7 +82,7 @@ function buildFilterRow(config: FilterRowConfig, populate: () => void): HTMLElem
   const row = document.createElement('div');
   row.style.cssText =
     'display:flex;align-items:center;gap:6px;padding:5px 8px;cursor:pointer;' +
-    'border-radius:3px;transition:background 0.12s;font-size:10px;color:#e2e8f0;';
+    'border-radius:3px;transition:background 0.12s;font-size:10px;color:hsl(var(--foreground));';
   row.setAttribute(DataAttrType.Active, config.initialActive ? 'true' : 'false');
 
   // The id-bearing chip is what readFilterState() queries — it must exist in
@@ -104,7 +104,7 @@ function buildFilterRow(config: FilterRowConfig, populate: () => void): HTMLElem
 
   const hintSpan = document.createElement('span');
   hintSpan.textContent = config.hint;
-  hintSpan.style.cssText = 'font-size:8px;color:#94a3b8;';
+  hintSpan.style.cssText = 'font-size:8px;color:hsl(var(--muted-foreground));';
 
   row.appendChild(checkChip);
   row.appendChild(iconSpan);
@@ -137,7 +137,7 @@ function buildFilterRow(config: FilterRowConfig, populate: () => void): HTMLElem
 function buildMinCreditsRow(populate: () => void): HTMLElement {
   const row = document.createElement('div');
   row.style.cssText =
-    'display:flex;align-items:center;gap:6px;padding:5px 8px;font-size:10px;color:#e2e8f0;';
+    'display:flex;align-items:center;gap:6px;padding:5px 8px;font-size:10px;color:hsl(var(--foreground));';
 
   const labelWrap = document.createElement('span');
   labelWrap.style.cssText = 'flex:1;display:flex;align-items:center;gap:4px;';
@@ -170,12 +170,12 @@ function buildLegendBlock(): HTMLElement {
     'display:flex;flex-wrap:wrap;gap:6px;padding:6px 8px;border-top:1px solid rgba(255,255,255,.1);' +
     'margin-top:2px;background:rgba(0,0,0,0.25);';
   legend.innerHTML =
-    '<span style="font-size:8px;color:#4ade80;" title="Billing credits from subscription">💰Billing</span>'
+    '<span style="font-size:8px;color:hsl(var(--success));" title="Billing credits from subscription">💰Billing</span>'
     + '<span style="font-size:8px;color:#c4b5fd;" title="Rollover from previous period">🔄Rollover</span>'
     + '<span style="font-size:8px;color:#facc15;" title="Daily free credits">📅Daily</span>'
     + '<span style="font-size:8px;color:#22d3ee;" title="Total available credits">⚡Total</span>'
-    + '<span style="font-size:8px;color:#4ade80;" title="Trial credits">🎁Trial</span>'
-    + '<span style="font-size:8px;color:#94a3b8;" title="📍=Current 🟢=OK 🟡=Low 🔴=Empty">📍🟢🟡🔴</span>';
+    + '<span style="font-size:8px;color:hsl(var(--success));" title="Trial credits">🎁Trial</span>'
+    + '<span style="font-size:8px;color:hsl(var(--muted-foreground));" title="📍=Current 🟢=OK 🟡=Low 🔴=Empty">📍🟢🟡🔴</span>';
 
   return legend;
 }
@@ -265,7 +265,7 @@ function buildFilterRowConfigs(deps: WsFilterMenuDeps): FilterRowConfig[] {
 function buildCreditSortHeader(): HTMLElement {
   const h = document.createElement('div');
   h.style.cssText =
-    'padding:6px 8px 2px 8px;font-size:9px;color:#94a3b8;font-weight:700;'
+    'padding:6px 8px 2px 8px;font-size:9px;color:hsl(var(--muted-foreground));font-weight:700;'
     + 'text-transform:uppercase;letter-spacing:0.5px;border-top:1px solid rgba(255,255,255,.1);'
     + 'margin-top:2px;';
   h.textContent = 'Credit sort';
@@ -312,7 +312,7 @@ function buildCreditSortRows(populate: () => void): HTMLElement[] {
     row.setAttribute(DataAttrType.Active, isActive ? 'true' : 'false');
     row.style.cssText =
       'display:flex;align-items:center;gap:6px;padding:5px 8px;cursor:pointer;' +
-      'border-radius:3px;transition:background 0.12s;font-size:10px;color:#e2e8f0;';
+      'border-radius:3px;transition:background 0.12s;font-size:10px;color:hsl(var(--foreground));';
 
     const chip = document.createElement('span');
     chip.className = 'marco-credit-sort-chip';
@@ -329,7 +329,7 @@ function buildCreditSortRows(populate: () => void): HTMLElement[] {
 
     const hintSpan = document.createElement('span');
     hintSpan.textContent = m.hint;
-    hintSpan.style.cssText = 'font-size:8px;color:#94a3b8;';
+    hintSpan.style.cssText = 'font-size:8px;color:hsl(var(--muted-foreground));';
 
     row.appendChild(chip);
     row.appendChild(iconSpan);

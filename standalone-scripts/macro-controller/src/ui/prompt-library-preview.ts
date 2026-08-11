@@ -84,7 +84,7 @@ function buildPreviewButton(text: string, testid: string, css: string, onClick: 
 function buildPreviewButtons(onConfirm: () => void, onCancel: () => void): HTMLDivElement {
   const btnRow = document.createElement('div');
   btnRow.style.cssText = 'display:flex;gap:6px;';
-  const confirmCss = 'background:#2b6cb0;color:#fff;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:12px;';
+  const confirmCss = 'background:#2b6cb0;color:hsl(var(--foreground));border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:12px;';
   const cancelCss = 'background:#2b3648;color:#e6edf7;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:12px;';
   btnRow.appendChild(buildPreviewButton('Confirm import', 'library-import-preview-confirm', confirmCss, onConfirm));
   btnRow.appendChild(buildPreviewButton('Cancel', 'library-import-preview-cancel', cancelCss, onCancel));

@@ -197,7 +197,7 @@ function buildColumnMainRow(
   main.appendChild(typeSelect);
 
   const nullableLabel = el('label');
-  nullableLabel.style.cssText = 'font-size:10px;color:#94a3b8;display:flex;align-items:center;gap:3px;';
+  nullableLabel.style.cssText = 'font-size:10px;color:hsl(var(--muted-foreground));display:flex;align-items:center;gap:3px;';
   const nullableCheckbox = el('input', 'marco-schema-checkbox') as HTMLInputElement;
   nullableCheckbox.type = 'checkbox';
   nullableCheckbox.checked = col.nullable;
@@ -431,7 +431,7 @@ function syncExistingTablesList(
 
 function renderEmptyTablesList(container: HTMLElement): void {
   const noTablesDiv = document.createElement('div');
-  noTablesDiv.style.cssText = 'font-size:11px;color:#64748b;padding:8px 0;';
+  noTablesDiv.style.cssText = 'font-size:11px;color:hsl(var(--muted-foreground));padding:8px 0;';
   noTablesDiv.textContent = 'No tables yet';
   container.appendChild(noTablesDiv);
 }

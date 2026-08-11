@@ -99,14 +99,14 @@ function _aboutModalStyles(): string {
     }
     .marco-about-close {
       font-size: 18px;
-      color: #64748b;
+      color: hsl(var(--muted-foreground));
       cursor: pointer;
       padding: 4px 8px;
       border-radius: 6px;
       transition: all 0.15s;
     }
     .marco-about-close:hover {
-      color: #e2e8f0;
+      color: hsl(var(--foreground));
       background: rgba(255,255,255,0.1);
     }
   `;
@@ -128,7 +128,7 @@ function _aboutHeaderStyles(): string {
     }
     .marco-about-description {
       font-size: 13px;
-      color: #94a3b8;
+      color: hsl(var(--muted-foreground));
       line-height: 1.6;
       margin: 0 0 20px 0;
     }
@@ -141,7 +141,7 @@ function _aboutHeaderStyles(): string {
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      color: #64748b;
+      color: hsl(var(--muted-foreground));
       font-weight: 600;
       margin-bottom: 10px;
     }
@@ -160,7 +160,7 @@ function _aboutAuthorStyles(): string {
       width: 44px;
       height: 44px;
       border-radius: 12px;
-      background: linear-gradient(135deg, #8b5cf6, #8b5cf6);
+      background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary)));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -172,7 +172,7 @@ function _aboutAuthorStyles(): string {
     .marco-about-author-name {
       font-size: 15px;
       font-weight: 700;
-      color: #e2e8f0;
+      color: hsl(var(--foreground));
     }
     .marco-about-author-title {
       font-size: 11px;
@@ -182,7 +182,7 @@ function _aboutAuthorStyles(): string {
     }
     .marco-about-author-bio {
       font-size: 12px;
-      color: #94a3b8;
+      color: hsl(var(--muted-foreground));
       line-height: 1.5;
       margin: 0 0 16px 0;
     }
@@ -215,7 +215,7 @@ function _aboutFooterStyles(): string {
       padding-top: 12px;
       border-top: 1px solid rgba(100,116,139,0.2);
       font-size: 10px;
-      color: #475569;
+      color: hsl(var(--muted-foreground));
       text-align: center;
     }
   `;

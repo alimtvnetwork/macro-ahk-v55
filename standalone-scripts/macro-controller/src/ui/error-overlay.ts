@@ -246,7 +246,7 @@ function getOverlayStyles(): string {
 
     #${OVERLAY_ID} .eo-badge {
       background: ${cError};
-      color: #fff;
+      color: hsl(var(--foreground));
       font-size: ${tFontTiny};
       font-weight: 700;
       padding: 1px 6px;

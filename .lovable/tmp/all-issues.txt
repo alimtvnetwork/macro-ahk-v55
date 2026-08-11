@@ -1,0 +1,776 @@
+
+
+--- ISSUE: 01-task-next-queue-sequential.md ---
+
+---
+Slug: task-next-queue-sequential
+Status: resolved
+Created: 2026-06-21
+Reporter: user
+Related-Files:
+  - standalone-scripts/macro-controller/src/ui/task-next-ui.ts (runTaskNextLoop, lines 185-219)
+  - standalone-scripts/macro-controller/src/ui/prompt-dropdown.ts (Task Next split-button label/arrow handlers)
+---
+
+# Issue: Task Next "next N tasks" pastes all prompts at once instead of queueing
+
+## Symptom
+When the user picks a count > 1 from the Task Next submenu (e.g. "Next 3 tasks"), the macro should paste prompt #1, wait for Lovable to finish generating, then paste #2, then #3. Instead, only one paste happens (current PASTE-ONLY guard at `task-next-ui.ts:204-206` blocks multi-run), OR - depending on which path the user actually invoked from the prompt dropdown - multiple prompts are stuffed into the editor back-to-back without waiting.
+
+## Expected
+- Count = N → exactly N sequential paste+submit cycles.
+- Cycle k starts ONLY after Lovable has finished generating for cycle k-1 (idle detection on the Submit/Stop button or response stream).
+- Remaining cycles sit in a visible queue (badge or toast: "2 of 3 queued").
+- Escape cancels the queue (already wired for `taskNextState.cancelled`).
+
+## Actual
+- `runTaskNextLoop()` short-circuits when `requested > 1` and pastes once with a warning log (v3.74.0 PASTE-ONLY guard).
+- No queue object, no idle gate, no per-cycle bookkeeping.
+
+## Repro
+1. Open Lovable project page with the macro injected.
+2. Open the Task Next split-button → submenu → pick "Next 3".
+3. Observe: single paste (or batched paste depending on entry point) - never a sequential 1→2→3 with waits.
+
+## Acceptance
+- Sequential queue with idle-gate; cancel-on-Escape; visible queue indicator; failure of cycle k aborts the rest with a clear toast and `Logger.error('TaskNextQueue.cycle', …)` entry.
+
+
+--- ISSUE: 02-strip-frame-and-persistence.md ---
+
+# Issue 02 - Plan/Next/Repeat strips scattered and lost on TS Macro close
+
+Status: open
+Created: 2026-07-16
+
+## Symptom
+- Plan, Next, and Repeat inline strips render as three separate frames stacked in the composer area (see user screenshot). User wants them unified into ONE frame with a single minimize/maximize control.
+- When the user closes the "TS Macro" (macro-controller floating UI / hamburger panel), the Plan / Next / Repeat strips disappear entirely. They should persist and remain functional until the user explicitly removes them.
+
+## Expected
+- Single container frame wrapping Plan row + Next row + Repeat row.
+- One minimize/maximize toggle on that unified frame collapses/expands all three at once.
+- Strips survive closing the macro-controller panel; only an explicit "remove strip" action tears them down.
+
+## Actual
+- Three independent frames, each with its own borders/padding.
+- Closing the TS Macro tears down the strips as if they were children of the panel.
+
+## Related files (candidates)
+- `standalone-scripts/macro-controller/src/ui/next-inline-ui.ts`
+- `standalone-scripts/macro-controller/src/ui/plan-inline-ui.ts` (if separate)
+- `standalone-scripts/macro-controller/src/ui/repeat-inline-ui.ts` (if separate)
+- `standalone-scripts/macro-controller/src/ui/*mount*` / composer-injection host
+- Macro-controller panel lifecycle (close handler tearing down strip DOM)
+
+## Scope
+UI + lifecycle only. No business logic changes to Plan / Next / Repeat behavior.
+
+
+--- ISSUE: 03-prompts-import-export-inert.md ---
+
+# Issue 03: Prompts menu Import / Export / IO / Load buttons are inert
+
+Status: closed (resolved in v4.47.0 via plan 12)
+Created: 2026-07-17
+Reported by: user (voice + screenshot)
+
+## Symptom
+
+In the prompts dropdown header (screenshot: file-9), the row of buttons
+`Export`, `Import`, `IO`, `Load` renders correctly but clicking Import or
+Export does nothing. No dialog, no toast, no console error visible.
+
+## Repro
+
+1. Open Lovable chat page with Marco extension mounted.
+2. Click the "Prompt" chip to open the prompts dropdown.
+3. Click `Import` or `Export` in the header row.
+4. Nothing happens.
+
+## Expected
+
+- Export: opens a small popover with 3 choices (JSON file, ZIP bundle,
+  SQLite DB) and downloads the selected format.
+- Import: opens a modal that accepts JSON, ZIP, or SQLite DB files
+  (file picker + drag/drop), validates, previews entries, then merges.
+
+## Files likely involved
+
+- `standalone-scripts/macro-controller/src/ui/prompt-io.ts`
+- `standalone-scripts/macro-controller/src/ui/prompt-io-dialog.ts`
+- `standalone-scripts/macro-controller/src/ui/prompt-dropdown.ts`
+- `standalone-scripts/macro-controller/src/ui/prompt-manager.ts`
+- `schemas/prompts-bundle.schema.json`
+
+## Related plan
+
+`.lovable/plans/pending/12-prompts-import-export-menu.md` (30-step plan).
+Supersedes the earlier stub `.lovable/plans/pending/11-prompts-import-export-section.md`.
+
+
+--- ISSUE: 04-prompt-library-ux-misplaced.md ---
+
+# Prompt Library UX misplaced - Plan/Next editing must live on the chips, not only in Library modal
+
+Status: open
+Created: 2026-07-18
+
+## Symptom (verbatim intent from user, 2026-07-18)
+
+> "You have put the prompt section in the library mode where the prompts should be modification and selection for the plan and the next. It should be similar to the position that I have selected. So for the next, there should be a button. I should click on it, and I should be able to select the default next prompt or edit the prompt, or add a new next prompt."
+>
+> "The edit screen should be same as like add a prompt or edit a prompt screen, what we have seen or created before. That should be reused, along with mentioning what is the text that would replace in programmatic way. That should be critically mentioned."
+>
+> "There should be a guideline for the AI, that could be downloaded and shared with AI so that if the prompt is modified, it would keep that template section for the replace."
+>
+> "If I go into the library, there is this plan, next and generic prompt. I don't know where the generic one is coming from, and I don't know how to edit it. So there is a JSON option that is there to import, but how this JSON will be created? There is no guideline."
+>
+> "Where is the edit screen for this prompt? I don't see it."
+
+## Expected
+
+1. On the inline Plan/Next/Repeat strip frame, each of Plan and Next rows exposes a per-row control (button/menu) to:
+   - select which prompt is the current default for that role,
+   - edit the currently selected prompt,
+   - add a new prompt scoped to that role.
+2. The edit screen reuses the existing "Add / Edit prompt" modal (the one used by the prompts dropdown), NOT a separate one buried inside the Library modal.
+3. The edit screen renders a prominent, non-dismissible callout listing every `{{token}}` placeholder that MUST be preserved (drift guard already exists - surface it in UI).
+4. A "Download AI guideline" button on the edit screen exports a markdown file explaining the token contract so the user can paste it into an AI chat before asking the AI to rewrite the prompt.
+5. Library modal keeps role filter (plan / next / generic) but every row has an inline Edit button that opens the same reused editor.
+6. "Generic" role documented in the UI (tooltip or subheading) - what it is, when it applies, how to create one.
+7. Import expects a JSON in the shape emitted by Export. Provide a "Download sample JSON" button next to Import, and link to `schemas/prompts-export-bundle.schema.json`.
+
+## Actual
+
+- Editing only reachable via Library modal.
+- No per-chip Plan / Next affordance for select / edit / add.
+- No visible token-preservation callout.
+- No downloadable AI guideline.
+- Generic role is unexplained and appears uneditable in the modal.
+- Import surface exists with no sample or schema link - user has no way to construct a valid JSON.
+
+## Related files
+
+- `standalone-scripts/macro-controller/src/ui/prompt-library-modal.ts` (or `.tsx`)
+- `standalone-scripts/macro-controller/src/ui/prompt-manager.ts`
+- `standalone-scripts/macro-controller/src/ui/prompt-io.ts`
+- `standalone-scripts/macro-controller/src/ui/plan-task-ui.ts`
+- `standalone-scripts/macro-controller/src/ui/strip-frame.ts` (Plan / Next / Repeat rows)
+- `schemas/prompts-export-bundle.schema.json`
+
+## Definition of done
+
+- Manual: Plan chip → click gear → pick default / edit / add new works. Same for Next.
+- Manual: Edit screen shows a "Required tokens" chip list; removing one blocks Save with the drift-guard error.
+- Manual: "Download AI guideline" produces a `.md` file mentioning every required token.
+- Manual: "Download sample JSON" from Import produces a file that Import round-trips without error.
+- Tests: integration test for chip → editor open, save-with-token-removed rejection, and JSON round-trip.
+- Light-mode screenshot check (see issue 07) shows the new editor readable in light theme.
+
+
+--- ISSUE: 05-future-pending-work.md ---
+
+Slug: future-pending-work
+Status: open
+Created: 2026-07-17
+
+# Pending Work - Deferred Items
+
+**Last Updated**: 2026-04-23
+**Extension Version**: v2.225.0
+
+---
+
+## Active Pending Items (actionable)
+
+_None - TS Migration V2 backlog cleared. See "Recently Completed" below._
+
+## Deferred - Do NOT Pick Automatically
+
+Per `mem://preferences/deferred-workstreams`, only the discuss-later marketplace workstream remains deferred. React component tests and manual Chrome E2E are allowed again as of 2026-05-25 and must not be treated as blockers.
+
+- **Exact path:** `spec/21-app/02-features/misc-features/pstore-marketplace.md`
+- **Missing item:** backend API/service contract and implementation for the marketplace workstream.
+- **Reason:** user preference keeps this in discuss-later mode; do not auto-pick, recommend, or surface it as a next action until explicitly reopened.
+
+This deferred item must NOT be surfaced as a recommended next action until the user explicitly reopens it.
+
+## Recently Completed (v2.225.0 - 2026-04-23)
+
+| Item | Reference |
+|------|-----------|
+| **TS Migration V2 Phase 03 - React Feasibility (S-051)** re-evaluated; decision **NOT PROCEEDING** (UIManager 58 lines, UI total 15,223 lines - under 20K-line revisit threshold) | `spec/21-app/02-features/macro-controller/ts-migration-v2/03-react-feasibility.md` (re-assessment appended) |
+| **TS Migration V2 Phase 05 - JSON Config Pipeline (S-048)** verified + activity-log routing + 7 unit tests | `standalone-scripts/macro-controller/src/config-validator.ts`, `shared-state.ts`, `__tests__/config-validator.test.ts` |
+| **TS Migration V2 Phase 02 - Class Architecture (S-046)** verified complete | `standalone-scripts/macro-controller/src/core/` (MacroController + 5 managers) |
+| **TS Migration V2 Phase 04 - Performance & Logging (S-047)** verified complete | `dom-cache.ts`, `log-manager.ts`, `CreditAsyncState`, `LogFlushState`, `ui/settings-tab-panels.ts` |
+| Installer spec §5 - deferred-delete + canonical-artifact-naming contract | `spec/14-update/01-generic-installer-behavior.md` |
+| Home-screen feature implementation (14 modules) | `src/content-scripts/home-screen/` |
+| Home-screen wired into content-script entry | `src/content-scripts/message-relay.ts` |
+| MacroController bridge: official `CreditsApi.getState()` exposed | `standalone-scripts/macro-controller/src/api-namespace.ts`, `macro-looping.ts` |
+| Bridge contract addendum spec | `spec/21-app/01-chrome-extension/home-screen-modification/11-macro-controller-bridge-contract.md` |
+| Home-screen test coverage: 24/24 (13 pure + 11 DOM-integration) | `src/content-scripts/home-screen/__tests__/` |
+| Version bump 2.224.0 → 2.225.0 across all 6 authoritative files | manifest, constants, shared-state, 3× instruction.ts |
+
+
+--- ISSUE: 06-repeat-row-overflow-needs-more-dropdown.md ---
+
+# Repeat row overflows - needs a "More" dropdown after 50
+
+Status: open
+Created: 2026-07-18
+
+## Symptom
+
+Repeat strip renders every option inline (1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 100, 125, 150, 200). After 50 the row wraps and pushes wait-mode controls down. See uploaded screenshots (file-17, file-18).
+
+## Expected
+
+Same pattern as Plan row: keep the common values inline (up to and including 50), collapse the rest under a `More ▾` popover button. Popover lists the overflow presets (60, 70, 75, 80, 100, 125, 150, 200) and any user-added values.
+
+## Actual
+
+All presets rendered inline; row is wider than the strip frame; visual crowding.
+
+## Related files
+
+- `standalone-scripts/macro-controller/src/ui/strip-frame.ts` (Repeat row)
+- `standalone-scripts/macro-controller/src/ui/plan-more-popover.ts` (reference implementation to copy)
+
+## Definition of done
+
+- Repeat row shows presets ≤ 50 inline plus a `More ▾` button.
+- Popover matches Plan `More ▾` visual + keyboard behavior.
+- No horizontal overflow at min supported width.
+- Regression test asserts overflow presets are hidden until `More` is clicked.
+
+
+--- ISSUE: 07-light-mode-ui-broken.md ---
+
+# Light mode UI broken across strip frame, prompt library, and editor
+
+Status: open
+Created: 2026-07-18
+
+## Symptom
+
+User reports the UI looks "broken" when the theme is switched to light. Dark theme is the default (mem://preferences/dark-only-theme) but the project ships a light theme surface (Lovable web preview + host page). Components use hardcoded dark colors or `bg-black` / low-contrast overlays, leading to unreadable text, invisible borders, and washed-out chips in light mode.
+
+Screenshot pending from user.
+
+## Expected
+
+Every surface (strip frame, prompts dropdown, prompt library modal, prompt editor, import/export section, More popovers) uses semantic tokens from `index.css` and remains readable and visually consistent in both dark and light. No `text-white`, `bg-black`, or `bg-[#…]` literals in components.
+
+## Actual
+
+Hardcoded colors / low-contrast overlays leak through in light theme.
+
+## Related files
+
+- `standalone-scripts/macro-controller/src/ui/*.css` and inline styles
+- `index.css` (root tokens)
+- Any component still using literal `text-white` / `bg-black` / `bg-[#…]`
+
+## Definition of done
+
+- Audit script (rg on the standalone-scripts + src trees) reports zero literal color utilities in components.
+- Screenshot diff: dark + light both readable for strip frame, dropdown, library, editor.
+- Regression test toggles theme and asserts contrast on key text nodes.
+
+
+--- ISSUE: 08-error-messages-not-diagnostic.md ---
+
+# Error messages are not professional or diagnostic
+
+Status: open
+Created: 2026-07-19
+
+## Symptom
+Toasts, console errors, and thrown Error messages across the macro-controller extension are inconsistent, sometimes generic ("Something went wrong", "Failed"), and rarely capture the full variable context needed to pinpoint where they went wrong. Error IDs are not unique, and the same message string is reused across multiple call sites so grep triage fails.
+
+## Expected
+Every user-visible or logged error must:
+- Carry a unique, stable error code (namespaced, e.g. `PROMPT_EDIT_E014`).
+- Include ALL relevant variables (role, slug, action, input length, expected vs actual tokens, rule id, DOM id, etc.).
+- Be professionally worded (no profanity, no "oops", no ambiguous "failed").
+- Be greppable back to exactly one throw/log site.
+
+## Actual
+- Duplicate strings ("Failed to save prompt") emitted from 3+ files.
+- Variable context missing (no role/slug/tokenCount).
+- No error-code registry.
+
+## Related files (initial)
+- `standalone-scripts/macro-controller/src/error-utils.ts`
+- `standalone-scripts/macro-controller/src/ui/prompt-editor.ts`
+- `standalone-scripts/macro-controller/src/ui/prompt-injection.ts`
+- `standalone-scripts/macro-controller/src/ui/prompt-utils.ts`
+- `standalone-scripts/macro-controller/src/ui/chip-gear-menu.ts`
+- `standalone-scripts/macro-controller/src/ui/repair-report-modal.ts`
+- `standalone-scripts/macro-controller/src/seed/*`
+- `standalone-scripts/macro-controller/src/db/*`
+
+
+--- ISSUE: 09-version-scattered-across-many-files.md ---
+
+# Issue 09: Version string duplicated across many files instead of read from version.json
+
+Status: open
+Created: 2026-07-20
+Related command: ../../spec/commands/05-version-json-single-source-of-truth.md
+
+## Symptom
+
+Releasing requires hand-editing (or running a local script that edits) the
+version pin in ~14 files: `manifest.json`, `src/shared/constants.ts`, root
+`readme.md`, `standalone-scripts/**/readme.md`, install scripts, prompt bodies,
+`.gitmap/release/*.json`, changelog headings, etc. Drift between these files
+causes repeated CI failures (audit-releases, release-readiness, manifest diff,
+latest.json mismatch) and user frustration.
+
+## Expected
+
+Editing `version.json` at the repo root is the ONLY step a human performs. All
+downstream references either:
+  a) read `version.json` at build/runtime, or
+  b) are rewritten by a CI/CD workflow whose sole input is `version.json`.
+
+## Actual
+
+- `scripts/update-stale-version-refs.mjs` exists but is run locally by humans.
+- Many files embed literal `4.301.0` strings.
+- CI has repeatedly failed on drift between `version.json`, `latest.json`,
+  and asset manifests.
+
+## Repro
+
+1. Bump `version.json` to a new MINOR.
+2. Push without running the local propagator.
+3. Observe multiple CI jobs fail with drift errors.
+
+## Files likely involved
+
+- `version.json`
+- `scripts/update-stale-version-refs.mjs`
+- `scripts/check-version-sync.mjs`
+- `.github/workflows/release.yml`, `ci.yml`, `audit-releases.yml`
+- `manifest.json`, `src/shared/constants.ts`, all `readme.md`
+- `.gitmap/release/latest.json`
+
+## Resolution
+
+Tracked by plan `.lovable/plans/pending/29-version-json-single-source-of-truth.md`.
+
+
+--- ISSUE: 10-eslint-max-lines-per-function-regressions.md ---
+
+---
+Slug: eslint-max-lines-per-function-regressions
+Status: open
+Created: 2026-07-20
+Related-Plan: 30-refactor-oversized-functions-15-line-cap
+---
+
+# ESLint `max-lines-per-function` and cognitive-complexity regressions
+
+## Symptom
+
+`pnpm run lint` emits many warnings for oversized functions and high cognitive complexity across `src/background/**` (recorder, handlers, live-dom-replay, http step, toolbar, overlay, selector-*). User states the standard is 15 lines max per function (stricter than current ESLint `max-lines-per-function: 40/60` config). Warnings are non-zero, violating the project's zero-warning policy.
+
+## Repro
+
+```
+pnpm run lint
+```
+
+## Expected vs actual
+
+- Expected: zero warnings, every function <= 15 lines.
+- Actual: 40+ warnings (samples): `mountDropZoneOverlay` 71, `mountHoverHighlighter` 134, `executeHttpStep` 95 (cc 20), `executeStep` in live-dom-replay 123 (cc 44), `finalize` 64, `mountRecorderToolbar` 167, `evaluateOne` 52, `summarise` 45 (cc 18), `testSelector` 49, `logging-handler.test.ts` arrow 48. Truncated log shows more in the same folders.
+
+## Files (from uploaded lint output, partial)
+
+- src/background/handlers/logging-handler.test.ts
+- src/background/recorder/dropzone-overlay.ts
+- src/background/recorder/hover-highlighter.ts
+- src/background/recorder/http-request-step.ts
+- src/background/recorder/live-dom-replay.ts
+- src/background/recorder/recorder-toolbar.ts
+- src/background/recorder/selector-comparison.ts
+- src/background/recorder/selector-history.ts
+- src/background/recorder/selector-tester.ts
+- (plus additional files beyond line 37 of the uploaded lint report - to be enumerated in Plan 30 Step 1)
+
+## Status
+
+open
+
+
+--- ISSUE: 11-lint-ctx-denylist-and-oversized-functions.md ---
+
+---
+Slug: lint-ctx-denylist-and-oversized-functions
+Status: open
+Created: 2026-07-20
+Related-Plan: 31-lint-cleanup-ctx-denylist-and-15-line-cap
+---
+
+# Lint regressions: `ctx` id-denylist + oversized functions
+
+## User verbatim (2026-07-20)
+
+> "Why I do see this error again? ... You have given several steps to reduce the code, write the code in a better way. Why you didn't do it? ... In the next 10 steps, can you fix all these warning issues"
+
+## Symptom
+
+`pnpm run lint` fails with 142 problems (36 errors, 106 warnings). Uploaded excerpt (`user-uploads://file-52`) shows two distinct classes:
+
+1. **36 `id-denylist` errors** for identifier `ctx` in `src/background/recorder/http-request-step.ts` (lines 119, 148, 162-168, 178, 214, 218-253).
+2. **106 `max-lines-per-function` warnings** across multiple files. Current ESLint threshold is still 40/25 (per Plan 30 Step 12, target is 15). Offenders in this excerpt:
+   - `src/background/handlers/logging-handler.test.ts:13` (48L, cap 40)
+   - `src/background/recorder/http-request-step.ts:87` `buildReplayTrace` (44L, cap 25)
+   - `src/hooks/use-step-group-import.ts:97` `useStepGroupImport` (69L), `:104` async arrow (46L)
+   - `src/hooks/use-step-library.ts:267` `useStepLibrary` (278L!), `:306` arrow (70L), `:631` `seedExampleData` (44L)
+   - `src/hooks/use-visibility-paused-interval.ts:31` `useVisibilityPausedInterval` (43L)
+
+## Root cause (recurrence)
+
+Plan 30 tightened function size for `src/background/recorder/**` but never reached `src/hooks/**` nor completed the `id-denylist` sweep for `ctx` (prior sweeps covered `msg`/`fn`/`el`/`arr`/`cb` only). ESLint root config `max-lines-per-function` was not yet dropped to 15 repo-wide.
+
+## Expected
+
+- `pnpm run lint --max-warnings=0` exits 0.
+- No `ctx` identifiers anywhere in `src/**`.
+- Every function <= 15 body lines (per `.lovable/spec/commands/06-function-size-cap-15-lines.md`).
+
+## Status
+
+open
+
+
+--- ISSUE: 12-vitest-act-warnings-and-js-step-format-drift.md ---
+
+# Vitest `act(...)` warnings and JS-step failure-report format drift
+
+Status: open
+Reported: 2026-07-20
+Reporter: user (CI log excerpt, `user-uploads://file-54`)
+
+## Symptom
+
+CI run of `vitest` on `standalone-scripts/**` + `src/**` produced:
+
+1. Hard failure at `src/background/recorder/__tests__/js-step-diagnostics.test.ts:272`
+   - assertion `expect(text).toContain("Reason: JsThrew -")` failed because
+   `formatFailureReport` emits `Reason: <code>, <detail>` (comma, no em dash).
+2. `Warning: An update to LiveRecordedActionsTree inside a test was not
+   wrapped in act(...)` fired from the pulse-clear test
+   (`src/components/recorder/__tests__/LiveRecordedActionsTree.scroll.test.tsx`)
+   because the 1300 ms real-timer wait let a state update fire outside `act()`.
+3. Console logs from `OptionsPage` render branches leaked into test stdout
+   (not fatal, but noisy).
+
+The em-dash usage in the test also violates the
+`mem://~user` rule "Never use em dashes".
+
+## Expected vs actual
+
+Expected: `pnpm test` green with zero `act(...)` warnings and zero em dashes
+in test assertions.
+
+Actual: 1 failing test + at least 1 act warning across the recorder + options
+snapshot suites. The excerpt only shows one file, but the same pattern
+(async mount effects, real-timer waits, timer-driven state clears) is
+likely present across other snapshot / scroll / pulse tests.
+
+## Related files
+
+- `src/background/recorder/__tests__/js-step-diagnostics.test.ts`
+- `src/background/recorder/failure-logger.ts` (`formatFailureReport`)
+- `src/components/recorder/__tests__/LiveRecordedActionsTree.scroll.test.tsx`
+- `src/components/recorder/LiveRecordedActionsTree.tsx`
+- `src/pages/__tests__/Options.test.tsx` (stdout leak)
+- `src/test/snapshots/Popup.snapshot.test.tsx` (precedent for `flushEffects` pattern)
+
+## Scope
+
+Repo-wide sweep: every Vitest file that renders a React component with an
+async mount effect, a controlled prop that triggers `setState`, or a
+`setTimeout`/`MutationObserver` that fires outside `act()`.
+
+
+--- ISSUE: 13-vitest-15-failures-em-dash-and-snapshots.md ---
+
+---
+Slug: vitest-15-failures-em-dash-and-snapshots
+Status: open
+Created: 2026-07-20
+Related-Plan: 34-fix-vitest-15-failures
+---
+
+# Vitest: 4 files / 15 tests failing on main (v4.358.0)
+
+## Symptom (from `user-uploads://file-55`, `pnpm run test` CI log)
+
+Summary line 3546-3547:
+
+```
+Test Files  4 failed | 482 passed (486)
+     Tests  15 failed | 5259 passed | 7 todo (5281)
+```
+
+## Failure clusters
+
+1. **Em-dash regression in retry notes** (1 test)
+   - `src/background/recorder/__tests__/retry-step.test.ts:99`
+   - Source emits `Retry of step #42 - from toast` (em dash).
+   - Test asserts `Retry of step #42, from toast` (ASCII comma).
+   - Violates `mem://~user` "Never use em dashes" + `.lovable/prompts/14-release.md` "No em dashes".
+   - Fix location: the note-builder that prefixes retry drafts (likely `src/background/recorder/retry-step.ts` or wherever the "Retry of step #N" string is composed).
+
+2. **FailureReport snapshot drift, UrlTabClick + Condition + XPath/CSS predicate** (11 tests)
+   - `src/background/recorder/__tests__/failure-report-snapshots.test.ts` at lines 119, 139, 186, 217, 239, 254, 269, 284.
+   - Canonical JSON snapshots no longer match the emitted `FailureReport` shape after recent recorder refactors (Plan 30/31/33).
+   - Either the snapshots are stale (regenerate after review) or the emitter added/renamed a field. Must diff before choosing.
+
+3. **`macro-controller-recovery.test.ts:132` extMatch null** (1 test)
+   - `src/test/regression/macro-controller-recovery.test.ts:132` - `expect(extMatch).not.toBeNull()` failed.
+   - Suggests the regex in that test no longer matches the current controller-recovery source (likely a comment or version string removed by a refactor).
+
+4. **Startup.ts "Passive attach, no visible UI" comment removed** (1 test)
+   - `expect('/**\n * MacroLoop Controller, Startu...').toContain('Passive attach, no visible UI')` failed.
+   - A doc comment was stripped from `standalone-scripts/macro-controller/src/startup.ts` (or its equivalent) during a refactor. Either restore the comment or update the assertion.
+
+Note lines 1843 + 2452: em dash appears in an unrelated stdout dump for `MacroLoop Controller - Startup` - that comment itself uses an em dash, which is a separate hygiene fix.
+
+## Expected
+
+`pnpm run test` -> `Test Files 486 passed`, `Tests 15 failed -> 0 failed`.
+
+## Related files
+
+- src/background/recorder/retry-step.ts (retry note builder)
+- src/background/recorder/failure-logger.ts (emitter for FailureReport shape)
+- src/background/recorder/__tests__/failure-report-snapshots.test.ts
+- src/background/recorder/__tests__/retry-step.test.ts
+- src/test/regression/macro-controller-recovery.test.ts (line 132 regex)
+- standalone-scripts/macro-controller/src/startup.ts (header comment)
+
+## Status
+
+open
+
+
+--- ISSUE: 14-tsc-macro-build-4-errors.md ---
+
+# 14 - tsc macro build: 4 type errors
+
+User request (verbatim):
+
+> Run npx tsc --noEmit -p tsconfig.macro.build.json ... 4 errors in database-json-migrate.ts (L196,211,222) and prompt-dropdown-io.ts (L62).
+
+## Errors
+
+- `ui/database-json-migrate.ts:196,211,222` - `.then((resp: ExtensionCallbackResponse) => ...)` incompatible with `runSqlBridge` return type `SqlBridgeResp` under `exactOptionalPropertyTypes`.
+- `ui/prompt-dropdown-io.ts:62` - `readUserAddedEntries` return type declares `entries` but returns `{ kept, defaultsSkipped }`.
+
+## DoD
+
+`npx tsc --noEmit -p tsconfig.macro.build.json` exits 0.
+
+## Fix
+
+- Annotated the three `.then` callbacks in `database-json-migrate.ts` with `SqlBridgeResp` (imported from `../db/sql-bridge`).
+- Mapped `{ kept, defaultsSkipped }` → `{ entries: kept, defaultsSkipped }` inside `readUserAddedEntries`.
+
+--- ISSUE: 15-vitest-55-failures-post-bridge-refactor.md ---
+
+# 15 - vitest: 55 failures across 6 files after sql-bridge + defaults-protection refactors
+
+User request (verbatim):
+
+> Refactor prompt-dropdown-io state building so the entries field is always present and validated, and add a small type-level test for it. Add a type-safe adapter for sql-bridge callback responses in database-json-migrate to prevent TS2345 mismatches from reappearing. You have to fix all these unit tests. First, make a plan where to fix it, how to fix it, make detailed plan and fix it, okay? So that the CI/CD does not remain broken, okay?
+
+## Failing suites
+
+1. `__tests__/regression-baseline.test.ts` @behavior-lock: `substituteToken('run {{n}}', 'steps', 42)` must return `'run {{n}}'`. Broken by the belt-and-suspenders residual-`{{n}}` guard in `utils/token-substitute.ts`.
+2. `db/__tests__/migrate-legacy-read-memory.test.ts` (2 timeouts): test mocks `../../ui/prompt-loader`, but `db/migrate-legacy-read-memory.ts` now reaches the backend via `db/sql-bridge.ts` -> `db/extension-bridge.ts`. Real `sendToExtension` never resolves in vitest, so both cases time out at 5s.
+3. `ui/__tests__/prompt-io-db-bridge.test.ts` (2 failures) + `prompt-io-db-bridge-replace-fields.test.ts` (1 failure): fixtures seed `plan-default` with `IsDefault: 1`, which the v4.400.0 defaults-protection short-circuits with `defaultsProtected += 1` before ever calling `upsertPrompt`. Tests still assert `upserted === 1` / an error surfaces.
+4. `ui/__tests__/prompt-io-db-bridge-negatives.test.ts`: `expect(result).toEqual({ upserted: 0, errors: [] })` no longer matches; the returned shape now includes `defaultsProtected: 0`.
+5. Unhandled `ReferenceError: window is not defined` from `ui/repeat-loop-ui.ts` teardown in `panel-builder.test.ts`. The tracked-interval fires after the vitest happy-dom env is torn down.
+
+## Plan
+
+A. `utils/token-substitute.ts`: delete the residual `{{n}}` force-substitute block. The behavior-lock test is the source of truth: an unrelated caller key must not touch `{{n}}`.
+
+B. `db/__tests__/migrate-legacy-read-memory.test.ts`: mock `../extension-bridge` (the module `sql-bridge` actually imports) instead of `../../ui/prompt-loader`. Drop the now-unused `buildPromptLoaderMock` import.
+
+C. `ui/__tests__/prompt-io-db-bridge*.test.ts`: change fixture rows expected to be updated from `IsDefault: 1` -> `IsDefault: 0` so `commitOneEntry` proceeds to `upsertPrompt`. Adjust the `collectDbEntriesForExport` assertion (`plan.isDefault`) accordingly. Extend the empty-list expectation to include `defaultsProtected: 0`.
+
+D. `ui/repeat-loop-ui.ts`: guard `window.addEventListener` + `window.removeEventListener` with `typeof window !== 'undefined'` so an interval firing after teardown cannot throw.
+
+E. Refactor `ui/prompt-dropdown-io.ts`: introduce an exported `UserAddedEntriesState` interface plus a `validateUserAddedEntriesState` normalizer so `entries` is always a defined array. Add a small type-level vitest (`prompt-dropdown-io-state.test.ts`) with an `@ts-expect-error` width check.
+
+F. Add a `schemaResp(onOk, onErr)` adapter in `ui/database-json-migrate.ts` that types the `.then` argument as `SqlBridgeResp` once. Route the three addColumn / dropColumn / renameColumn call sites through it so a future drift back to `ExtensionCallbackResponse` cannot compile.
+
+## DoD
+
+- `bunx vitest run` (or CI `npm run test:quiet`) exits 0 for these 6 files.
+- `npx tsc --noEmit -p tsconfig.macro.build.json` still exits 0.
+- `npx eslint standalone-scripts --max-warnings=0` stays green.
+
+--- ISSUE: 16-release-doc-conflict-version-only-vs-full-bump.md ---
+
+---
+Slug: release-doc-conflict-version-only-vs-full-bump
+Status: open
+Created: 2026-07-23
+---
+
+# Release-doc conflict: version.json-only vs full multi-file bump
+
+## Symptom
+
+Two release docs disagree and neither is marked stale:
+
+- `.lovable/how-to-release.md`: "The only human-edited release version file is root `version.json`." Explicitly forbids touching `manifest.json`, `readme.md`, `changelog.md`, or constants "only to propagate the version."
+- `.lovable/prompts/08-bump-version.md` + `pipeline/06-versioning.md`: require bumping `manifest.json`, `src/shared/constants.ts` (`EXTENSION_VERSION`), `standalone-scripts/macro-controller/src/shared-state.ts` (`VERSION`), each `standalone-scripts/*/src/instruction.ts`, `changelog.md`, and pinning the version in root `readme.md`.
+
+`shared-version.ts` re-exports `pkg.version` from `../version.json`, which points at the how-to-release.md model as the technically-correct one; the other doc predates the single-source-of-truth refactor tracked by `.lovable/plans/pending/29-version-json-single-source-of-truth.md`.
+
+## v5.9.0 note
+
+The v5.9.0 turn followed the hybrid used in v5.7.0/v5.8.0: `version.json` + both `changelog.md` files + `readme.md` pins (installer snippets are user-visible strings, not code version literals, so the ban on "propagating" does not apply).
+
+## Action
+
+Decide canonical doc and delete or rewrite the loser:
+- If how-to-release.md wins: strip the version-site table from `pipeline/06-versioning.md` and the multi-file section from `08-bump-version.md`.
+- If the multi-file model wins: re-introduce the version literals as hand-edited and mark `29-version-json-single-source-of-truth` as reverted.
+
+## Status
+
+open
+
+--- ISSUE: 17-prompt-library-modal-round-trip-parallel-flake.md ---
+
+---
+Slug: prompt-library-modal-round-trip-parallel-flake
+Status: open
+Created: 2026-07-23
+---
+
+# `prompt-library-modal-round-trip.test.ts`: 2 tests fail under parallel vitest, pass in isolation
+
+## Symptom
+
+`bunx vitest run standalone-scripts/macro-controller` reports:
+
+```
+ FAIL standalone-scripts/macro-controller/src/ui/__tests__/prompt-library-modal-round-trip.test.ts
+   > serialises fixture prompts on Export and re-imports every entry ...
+   AssertionError: expected null not to be null
+   > produces a PromptsBundleV1 envelope ...
+   AssertionError: expected null not to be null
+```
+
+In isolation the same 2 tests pass in ~300 ms.
+
+## Root cause (hypothesis)
+
+The test stubs `URL.createObjectURL` on the global `URL` inside `beforeEach` and assigns the received blob to a module-scoped `capturedBlob`. Under parallel workers other suites that also touch `URL.createObjectURL` can overwrite the global before this file's assertion resolves, leaving `capturedBlob` null.
+
+## Fix
+
+- Replace direct property assignment with `vi.stubGlobal('URL', ...)` in `beforeEach` and `vi.unstubAllGlobals()` in `afterEach`, OR
+- Poll `URL.createObjectURL.mock.calls[0][0]` instead of a closed-over variable, OR
+- Move the file into a `serial` describe block.
+
+## Status
+
+open
+
+--- ISSUE: 18-two-parallel-import-uis.md ---
+
+---
+Slug: two-parallel-import-uis
+Status: open
+Created: 2026-07-23
+---
+
+# Two parallel drag-drop import UIs coexist in the macro-controller
+
+## Symptom
+
+`standalone-scripts/macro-controller/src/ui/` ships two import modals:
+
+- `prompt-library-modal.ts` (`openPromptLibraryModal`): root-level drop zone, JSON-only, boolean `overwrite` merge strategy, ~20 dedicated tests, exercised end-to-end by v5.9.0's new drop-import E2E test.
+- `prompt-import-modal.ts` (`openPromptImportModal`): six-stage state machine (`idle`->`parsing`->`preview`->`committing`->`done`->`error`), per-row `RowAction` (`add`/`overwrite`/`skip`/`rename`), zip/sqlite/json support, only 1 integration test found.
+
+Panel wiring for the newer modal was not verified in v5.9.0.
+
+## Action
+
+1. `rg -n "openPromptImportModal|openPromptLibraryModal" standalone-scripts/macro-controller/src` to confirm the entry point for each.
+2. Retire the one that is not user-facing OR fold its tests into the survivor.
+3. If both must coexist (e.g. admin-only), document the split in `.lovable/memory/features/prompts-import-export-user-scope.md`.
+
+## Status
+
+open
+
+--- ISSUE: 19-workspace-move-v2-live-verification.md ---
+
+---
+Slug: workspace-move-v2-live-verification
+Status: open
+Created: 2026-07-23
+---
+
+# Workspace-move v2 lacks live-call proof
+
+## Symptom
+
+`standalone-scripts/macro-controller/src/api/ws-move.ts` implements the membership-scoped `moveV2` per `standalone-scripts/macro-controller/spec/workspace-move/01-membership-scoped-api-v2.md`. It typechecks and unit tests pass, but no live call against `https://api.lovable.dev/workspaces/{ws}/memberships/{user}` has confirmed:
+
+- HTTP verb (`PATCH` vs `POST`).
+- Body shape (destination workspace id key: `targetWorkspaceId` vs `workspaceId`).
+- Preflight `OPTIONS` requirements and CORS allow-list.
+
+The spec is marked `PENDING-VERIFY`.
+
+## Action
+
+1. Trigger a real workspace-move from the extension UI against a throwaway account.
+2. Capture the network trace and diff against the spec.
+3. Update the spec with verified values, drop `PENDING-VERIFY`, and pin URL + verb in a regression test.
+
+## Status
+
+open
+
+--- ISSUE: 20-e2e-user-scope-export-seed-invariant.md ---
+
+# 20 - E2E user-scope export seed invariant
+
+**Opened:** 2026-07-27
+**Severity:** Low (test authoring guardrail)
+
+## Rule
+
+Any Playwright/Vitest test that exercises `exportPromptsToJson` (or code paths that go through `filterUserAddedEntries`) MUST seed entries with `isDefault: false`. Default-flagged rows are filtered out by the v5.9.0 user-scope export refactor, so the download blob never fires and `page.waitForEvent('download')` times out.
+
+## Background
+
+`tests/e2e/prompt-export-import-roundtrip.spec.ts` regressed in CI after v5.9.0 because both seeded entries had `isDefault: true`. Fixed in v5.11.0 by flipping the flag and adding an inline comment on the seed block.
+
+## Action
+
+- If a similar timeout appears in another export-related suite, first check the `isDefault` flag on the seed rows.
+- Consider hoisting a shared helper `seedUserAddedEntries(page, entries)` under `tests/e2e/harness/` that forces `isDefault: false` so future authors cannot regress this.
+
+## References
+- `standalone-scripts/macro-controller/src/ui/prompt-io.ts` (`filterUserAddedEntries`)
+- `.lovable/memory/features/prompts-import-export-user-scope.md`
+- changelog `v5.11.0`

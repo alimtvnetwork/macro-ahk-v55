@@ -67,15 +67,6 @@ describe('substituteToken', () => {
     expect(substituteToken('{{count}}', 'n', 3)).toBe('{{count}}');
   });
 
-  it('replaces legacy uppercase N when the persisted key is lowercase n', () => {
-    expect(substituteToken('{{n}} and {{N}} and ${N}', 'n', 6))
-      .toBe('6 and 6 and 6');
-  });
-
-  it('replaces current lowercase n when the persisted key is legacy uppercase N', () => {
-    expect(substituteToken('# Next {{n}} steps and ${n}', 'N', 2))
-      .toBe('# Next 2 steps and 2');
-  });
 
   it('is regex-safe for keys with allowed dots/colons/hyphens', () => {
     expect(substituteToken('{{plan.count}} ${plan.count}', 'plan.count', 4))

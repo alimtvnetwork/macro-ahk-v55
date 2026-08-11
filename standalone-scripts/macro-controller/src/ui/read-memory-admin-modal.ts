@@ -98,7 +98,7 @@ async function deactivateRow(row: ReadMemoryRow): Promise<boolean> {
 function styleCell(cell: HTMLElement, extra = ''): void {
   cell.style.cssText =
     'padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.1);'
-    + 'font-size:11px;color:#e5e7eb;vertical-align:middle;' + extra;
+    + 'font-size:11px;color:hsl(var(--foreground));vertical-align:middle;' + extra;
 }
 
 function buildStatusBadge(row: ReadMemoryRow): HTMLElement {
@@ -106,11 +106,11 @@ function buildStatusBadge(row: ReadMemoryRow): HTMLElement {
   const isCanonical = row.Slug === CANONICAL_SLUG;
   const active = row.IsDefault === 1;
   const label = isCanonical ? 'Canonical' : (active ? 'Active' : 'Disabled');
-  const bg = isCanonical ? '#7c3aed' : (active ? '#dc2626' : '#4b5563');
+  const bg = isCanonical ? 'hsl(var(--primary))' : (active ? 'hsl(var(--destructive))' : '#4b5563');
   badge.textContent = label;
   badge.style.cssText =
     'display:inline-block;padding:2px 6px;border-radius:3px;font-size:10px;'
-    + 'font-weight:600;color:#fff;background:' + bg + ';';
+    + 'font-weight:600;color:hsl(var(--foreground));background:' + bg + ';';
 
   return badge;
 }
@@ -125,7 +125,7 @@ function buildDeactivateButton(row: ReadMemoryRow, onDone: () => void): HTMLElem
   btn.style.cssText =
     'padding:4px 10px;border-radius:4px;font-size:10px;font-weight:600;'
     + 'border:1px solid rgba(255,255,255,0.15);cursor:' + (disabled ? 'not-allowed' : 'pointer') + ';'
-    + 'color:#fff;background:' + (disabled ? 'rgba(75,85,99,0.4)' : '#dc2626') + ';';
+    + 'color:hsl(var(--foreground));background:' + (disabled ? 'rgba(75,85,99,0.4)' : 'hsl(var(--destructive))') + ';';
   if (isCanonical) {
     btn.title = 'Cannot deactivate the canonical Read Memory prompt';
   }
@@ -159,7 +159,7 @@ function buildTableHeader(): HTMLElement {
   for (const label of ['Slug', 'Name', 'Status', 'Action']) {
     const th = document.createElement('th');
     th.textContent = label;
-    styleCell(th, 'font-weight:700;color:#fff;');
+    styleCell(th, 'font-weight:700;color:hsl(var(--foreground));');
     tr.appendChild(th);
   }
 
@@ -193,7 +193,7 @@ function buildRow(row: ReadMemoryRow, onDone: () => void): HTMLElement {
 function buildEmptyState(): HTMLElement {
   const empty = document.createElement('div');
   empty.textContent = 'No Read Memory prompts found in the database.';
-  empty.style.cssText = 'padding:16px;text-align:center;color:#9ca3af;font-size:12px;';
+  empty.style.cssText = 'padding:16px;text-align:center;color:hsl(var(--muted-foreground));font-size:12px;';
 
   return empty;
 }
@@ -201,7 +201,7 @@ function buildEmptyState(): HTMLElement {
 function buildLoadingState(): HTMLElement {
   const loading = document.createElement('div');
   loading.textContent = 'Loading Read Memory prompts…';
-  loading.style.cssText = 'padding:16px;text-align:center;color:#9ca3af;font-size:12px;';
+  loading.style.cssText = 'padding:16px;text-align:center;color:hsl(var(--muted-foreground));font-size:12px;';
 
   return loading;
 }
@@ -228,10 +228,10 @@ function buildHeader(onClose: () => void): HTMLElement {
     + 'background:linear-gradient(135deg,#1a0b2e,#2d1b4e);';
   const title = document.createElement('div');
   title.textContent = '🛡 Read Memory Admin';
-  title.style.cssText = 'font-size:13px;font-weight:700;color:#fff;';
+  title.style.cssText = 'font-size:13px;font-weight:700;color:hsl(var(--foreground));';
   const close = document.createElement('span');
   close.textContent = '✕';
-  close.style.cssText = 'cursor:pointer;color:#fff;font-size:16px;padding:0 6px;';
+  close.style.cssText = 'cursor:pointer;color:hsl(var(--foreground));font-size:16px;padding:0 6px;';
   close.onclick = onClose;
   header.appendChild(title);
   header.appendChild(close);
@@ -272,7 +272,7 @@ function buildPanel(): HTMLElement {
   panel.style.cssText =
     'width:min(760px,92vw);max-height:80vh;overflow:auto;'
     + 'background:#0f0620;border:1px solid rgba(124,58,237,0.6);'
-    + 'border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,0.6);color:#e5e7eb;';
+    + 'border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,0.6);color:hsl(var(--foreground));';
 
   return panel;
 }

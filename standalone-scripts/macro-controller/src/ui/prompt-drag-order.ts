@@ -414,9 +414,9 @@ function handleDragOver(event: DragEvent, item: HTMLElement): void {
   clearDropIndicators(findDropdownRoot(item));
   const insertBefore = shouldInsertBefore(event, item);
   if (insertBefore) {
-    item.style.borderTop = '2px solid #7c3aed';
+    item.style.borderTop = '2px solid hsl(var(--primary))';
   } else {
-    item.style.borderBottom = '2px solid #7c3aed';
+    item.style.borderBottom = '2px solid hsl(var(--primary))';
   }
 }
 

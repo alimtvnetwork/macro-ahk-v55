@@ -83,7 +83,7 @@ function makeBtn(label: string, variant: ButtonVariantType): HTMLButtonElement {
   btn.type = 'button';
   btn.textContent = label;
   const base = 'padding:6px 14px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,0.12);';
-  const primary = 'background:rgba(124,58,237,0.85);color:#fff;';
+  const primary = 'background:rgba(124,58,237,0.85);color:hsl(var(--foreground));';
   const ghost = 'background:rgba(255,255,255,0.06);color:#ddd;';
   applyStyle(btn, base + (variant === 'primary' ? primary : ghost));
 
@@ -124,10 +124,10 @@ function buildPreviewTable(rows: PreviewRow[], onChange: () => void): HTMLElemen
 
 function conflictBadge(state: PreviewRow['conflict']): string {
   const colors: Record<PreviewRow['conflict'], string> = {
-    new: '#22c55e',
-    update: '#f59e0b',
-    identical: '#6b7280',
-    duplicate: '#ef4444',
+    new: 'hsl(var(--success))',
+    update: 'hsl(var(--warning))',
+    identical: 'hsl(var(--muted-foreground))',
+    duplicate: 'hsl(var(--destructive))',
   };
   const color = colors[state];
 
@@ -322,13 +322,13 @@ function renderPreview(body: HTMLElement, state: ModalState, rerender: () => voi
   applyStyle(header, 'display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:11px;color:#bbb;');
   const format = state.format ?? 'json';
   const counts = countByAction(state.rows);
-  header.innerHTML = '<span>Format: <b style="color:#fff;">' + format.toUpperCase() + '</b> &middot; Source: <b style="color:#fff;">'
+  header.innerHTML = '<span>Format: <b style="color:hsl(var(--foreground));">' + format.toUpperCase() + '</b> &middot; Source: <b style="color:hsl(var(--foreground));">'
     + escapeHtml(state.filename) + '</b></span>'
     + '<span>' + state.rows.length + ' entries &middot; '
-    + '<span style="color:#22c55e;">+' + counts.add + '</span> / '
-    + '<span style="color:#f59e0b;">~' + counts.overwrite + '</span> / '
+    + '<span style="color:hsl(var(--success));">+' + counts.add + '</span> / '
+    + '<span style="color:hsl(var(--warning));">~' + counts.overwrite + '</span> / '
     + '<span style="color:#a78bfa;">R' + counts.rename + '</span> / '
-    + '<span style="color:#6b7280;">S' + counts.skip + '</span></span>';
+    + '<span style="color:hsl(var(--muted-foreground));">S' + counts.skip + '</span></span>';
   body.appendChild(header);
 
   // Step 16: bulk conflict actions.
@@ -395,7 +395,7 @@ function renderCommitting(body: HTMLElement, count: number): void {
 function renderDone(body: HTMLElement, added: number, updated: number): void {
   body.innerHTML = '';
   const box = document.createElement('div');
-  applyStyle(box, 'padding:32px;text-align:center;color:#22c55e;');
+  applyStyle(box, 'padding:32px;text-align:center;color:hsl(var(--success));');
   box.innerHTML = '<div style="font-size:32px;margin-bottom:8px;">✅</div>'
     + '<div style="font-size:13px;color:#ddd;">Imported <b>' + added + '</b> new, <b>' + updated + '</b> updated</div>';
   body.appendChild(box);
@@ -414,7 +414,7 @@ interface RenderErrorInput {
 function renderError(body: HTMLElement, input: RenderErrorInput): void {
   body.innerHTML = '';
   const panel = document.createElement('div');
-  applyStyle(panel, 'border:1px solid #ef4444;background:rgba(239,68,68,0.08);border-radius:6px;padding:12px;color:#fecaca;');
+  applyStyle(panel, 'border:1px solid hsl(var(--destructive));background:rgba(239,68,68,0.08);border-radius:6px;padding:12px;color:#fecaca;');
 
   // Code badge + heading row.
   const headRow = document.createElement('div');

@@ -580,10 +580,10 @@ function renderAll(blocks: ReadonlyArray<WorkspaceBlock>, tabIndex: OpenTabIndex
       return acc + (b.projects?.length ?? 0); 
     }, 0)
     : 0;
-  let html = '<div style="font-size:10px;color:#94a3b8;padding:0 0 6px 0;">'
+  let html = '<div style="font-size:10px;color:hsl(var(--muted-foreground));padding:0 0 6px 0;">'
         + workspaceBlocks.length + '/' + blocks.length + ' workspace' + (blocks.length === 1 ? '' : 's')
         + ' · ' + totalOpen + ' open project tab' + (totalOpen === 1 ? '' : 's')
-        + (filterActive ? ' · <span style="color:#fbbf24;">' + matchCount + ' match' + (matchCount === 1 ? '' : 'es') + '</span>' : '')
+        + (filterActive ? ' · <span style="color:hsl(var(--warning));">' + matchCount + ' match' + (matchCount === 1 ? '' : 'es') + '</span>' : '')
         + (capturedAt ? ' · ' + escapeHtml(capturedAt) : '')
         + '</div>';
   let visibleBlocks = 0;
@@ -643,25 +643,25 @@ function renderBlock(b: WorkspaceBlock, tabIndex: OpenTabIndex): string {
     }).length
     : 0;
   const headerSuffix = b.loading
-    ? '<span style="color:#64748b;font-weight:400;"> (loading…)</span>'
+    ? '<span style="color:hsl(var(--muted-foreground));font-weight:400;"> (loading…)</span>'
     : b.error
       ? '<span style="color:#fca5a5;font-weight:400;" title="' + escapeHtml(b.error) + '"> (error)</span>'
-      : '<span style="color:#64748b;font-weight:400;"> (' + (b.projects?.length ?? 0) + ')</span>'
-              + (openCount > 0 ? ' <span style="color:#fbbf24;font-weight:400;">· ' + openCount + ' open</span>' : '');
+      : '<span style="color:hsl(var(--muted-foreground));font-weight:400;"> (' + (b.projects?.length ?? 0) + ')</span>'
+              + (openCount > 0 ? ' <span style="color:hsl(var(--warning));font-weight:400;">· ' + openCount + ' open</span>' : '');
 
   let body = '';
   if (b.loading) {
-    body = '<div style="color:#64748b;font-size:10px;padding:3px 4px;font-style:italic;">Fetching projects…</div>';
+    body = '<div style="color:hsl(var(--muted-foreground));font-size:10px;padding:3px 4px;font-style:italic;">Fetching projects…</div>';
   } else if (b.error) {
     body = '<div style="color:#fca5a5;font-size:10px;padding:4px 6px;background:rgba(239,68,68,0.08);'
-            + 'border-left:2px solid #ef4444;border-radius:2px;">'
+            + 'border-left:2px solid hsl(var(--destructive));border-radius:2px;">'
             + '<div style="margin-bottom:2px;">⚠ Failed to load projects.</div>'
             + '<div style="color:#cbd5e1;opacity:0.8;font-family:monospace;word-break:break-word;">'
             + escapeHtml(b.error) + '</div>'
-            + '<div style="color:#94a3b8;margin-top:3px;font-style:italic;">Click ↻ Refresh to retry.</div>'
+            + '<div style="color:hsl(var(--muted-foreground));margin-top:3px;font-style:italic;">Click ↻ Refresh to retry.</div>'
             + '</div>';
   } else if ((b.projects?.length ?? 0) === 0) {
-    body = '<div style="color:#64748b;font-size:10px;padding:3px 4px;font-style:italic;">'
+    body = '<div style="color:hsl(var(--muted-foreground));font-size:10px;padding:3px 4px;font-style:italic;">'
             + 'No projects in this workspace yet.</div>';
   } else {
     // Show open ones first.
@@ -689,7 +689,7 @@ function renderBlock(b: WorkspaceBlock, tabIndex: OpenTabIndex): string {
         +   'letter-spacing:0.5px;padding:2px 4px;border-bottom:1px solid rgba(124,58,237,0.3);'
         +   'margin-bottom:2px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px;" '
         +   'title="Click to ' + (collapsed ? 'expand' : 'collapse') + '">'
-        +   '<span style="display:inline-block;width:10px;color:#94a3b8;">' + caret + '</span>'
+        +   '<span style="display:inline-block;width:10px;color:hsl(var(--muted-foreground));">' + caret + '</span>'
         +   '<span style="flex:1;">' + escapeHtml(wsName) + headerSuffix + '</span>'
         + '</div>'
         + (collapsed ? '' : body)
@@ -702,12 +702,12 @@ function renderProjectRow(p: ProjectEntry, tabIndex: OpenTabIndex, isOpenFlag: b
     : null;
   const url = tab?.url ?? ('https://lovable.dev/projects/' + p.id);
   const dot = isOpenFlag
-    ? '<span style="color:#10b981;margin-right:4px;" title="Open in Chrome">●</span>'
+    ? '<span style="color:hsl(var(--success));margin-right:4px;" title="Open in Chrome">●</span>'
     : '<span style="margin-right:4px;color:#334155;">○</span>';
   const nameColor = isOpenFlag ? '#67e8f9' : '#cbd5e1';
   const fontWeight = isOpenFlag ? '700' : '400';
   const bg = isOpenFlag ? 'background:rgba(16,185,129,0.08);' : '';
-  const idLabel = '<span style="color:#64748b;font-size:9px;">' + escapeHtml(p.id) + '</span>';
+  const idLabel = '<span style="color:hsl(var(--muted-foreground));font-size:9px;">' + escapeHtml(p.id) + '</span>';
   const repoBadge = p.githubRepo
     ? ('<span title="' + escapeHtml(p.githubRepo + (p.githubBranch ? '@' + p.githubBranch : ''))
             + '" style="display:inline-flex;align-items:center;gap:2px;padding:1px 5px;border-radius:8px;'
@@ -717,11 +717,11 @@ function renderProjectRow(p: ProjectEntry, tabIndex: OpenTabIndex, isOpenFlag: b
     : '';
   const openIcon = '<span data-open-url="' + escapeHtml(url) + '" '
         + 'title="Open in new tab" '
-        + 'style="color:' + (isOpenFlag ? '#10b981' : '#64748b') + ';font-size:12px;padding:0 4px;cursor:pointer;'
+        + 'style="color:' + (isOpenFlag ? 'hsl(var(--success))' : 'hsl(var(--muted-foreground))') + ';font-size:12px;padding:0 4px;cursor:pointer;'
         + 'border-radius:3px;" '
         + 'onmouseover="this.style.background=\'rgba(124,58,237,0.25)\';this.style.color=\'#a78bfa\'" '
         + 'onmouseout="this.style.background=\'transparent\';this.style.color=\''
-        + (isOpenFlag ? '#10b981' : '#64748b') + '\'">↗</span>';
+        + (isOpenFlag ? 'hsl(var(--success))' : 'hsl(var(--muted-foreground))') + '\'">↗</span>';
 
   return ''
         + '<div data-open-url="' + escapeHtml(url) + '" '
@@ -780,7 +780,7 @@ function createTitleBar(panel: HTMLElement): HTMLElement {
   title.style.cssText = 'font-size:11px;color:' + cPrimaryLighter + ';font-weight:700;';
   title.textContent = '📂 Projects — by Workspace';
   const closeBtn = document.createElement('span');
-  closeBtn.style.cssText = 'cursor:pointer;color:#94a3b8;font-size:14px;padding:0 4px;';
+  closeBtn.style.cssText = 'cursor:pointer;color:hsl(var(--muted-foreground));font-size:14px;padding:0 4px;';
   closeBtn.textContent = '✕';
   closeBtn.onclick = function (): void {
     removeProjectsModal(); 
@@ -817,7 +817,7 @@ function createSearchBar(onChange: () => void): HTMLElement {
   input.placeholder = 'Search projects by name, repo, branch, or id…';
   input.value = state.searchQuery;
   input.style.cssText =
-        'flex:1;background:rgba(0,0,0,0.35);color:#f1f5f9;border:1px solid rgba(124,58,237,0.30);'
+        'flex:1;background:rgba(0,0,0,0.35);color:hsl(var(--foreground));border:1px solid rgba(124,58,237,0.30);'
         + 'border-radius:4px;padding:4px 8px;font-size:11px;font-family:inherit;outline:none;';
   input.addEventListener('input', function () {
     state.searchQuery = input.value;
@@ -831,7 +831,7 @@ function createSearchBar(onChange: () => void): HTMLElement {
   clear.type = 'button';
   clear.textContent = '✕';
   clear.title = 'Clear search';
-  clear.style.cssText = 'background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:12px;padding:2px 6px;';
+  clear.style.cssText = 'background:transparent;border:none;color:hsl(var(--muted-foreground));cursor:pointer;font-size:12px;padding:2px 6px;';
   clear.onclick = function (): void {
     input.value = '';
     state.searchQuery = '';
@@ -857,8 +857,8 @@ function createSearchBar(onChange: () => void): HTMLElement {
       btn.style.cssText =
                 'border-radius:10px;padding:2px 10px;font-size:10px;cursor:pointer;font-family:inherit;'
                 + (active
-                  ? 'background:rgba(251,191,36,0.20);color:#fbbf24;border:1px solid rgba(251,191,36,0.50);'
-                  : 'background:rgba(15,23,42,0.40);color:#94a3b8;border:1px solid rgba(124,58,237,0.30);');
+                  ? 'background:rgba(251,191,36,0.20);color:hsl(var(--warning));border:1px solid rgba(251,191,36,0.50);'
+                  : 'background:rgba(15,23,42,0.40);color:hsl(var(--muted-foreground));border:1px solid rgba(124,58,237,0.30);');
     }
 
     btn.onclick = function (): void {
@@ -897,7 +897,7 @@ function createSearchBar(onChange: () => void): HTMLElement {
   workspaceChips.style.cssText = 'display:flex;align-items:center;gap:4px;flex-wrap:wrap;min-width:0;';
 
   const workspaceStatus = document.createElement('span');
-  workspaceStatus.style.cssText = 'color:#64748b;margin-left:auto;white-space:nowrap;';
+  workspaceStatus.style.cssText = 'color:hsl(var(--muted-foreground));margin-left:auto;white-space:nowrap;';
 
   const paintWorkspaceFilters = function (): void {
     renderWorkspaceFilterChips(workspaceChips, workspaceStatus, onChange);
@@ -907,7 +907,7 @@ function createSearchBar(onChange: () => void): HTMLElement {
 
   const chipsLabel = document.createElement('span');
   chipsLabel.textContent = 'Filter:';
-  chipsLabel.style.cssText = 'color:#64748b;';
+  chipsLabel.style.cssText = 'color:hsl(var(--muted-foreground));';
 
   row2.appendChild(chipsLabel);
   row2.appendChild(chipOpen);
@@ -927,7 +927,7 @@ function createSearchBar(onChange: () => void): HTMLElement {
 
 function createCreditsRangeRow(onChange: () => void): HTMLElement {
   const row = document.createElement('div');
-  row.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:10px;flex-wrap:wrap;color:#64748b;';
+  row.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:10px;flex-wrap:wrap;color:hsl(var(--muted-foreground));';
 
   const label = document.createElement('span');
   label.textContent = 'Credits used:';
@@ -940,7 +940,7 @@ function createCreditsRangeRow(onChange: () => void): HTMLElement {
     input.placeholder = placeholder;
     const initial = getValue();
     input.value = initial === null ? '' : String(initial);
-    input.style.cssText = 'width:70px;background:rgba(0,0,0,0.35);color:#f1f5f9;border:1px solid rgba(124,58,237,0.30);'
+    input.style.cssText = 'width:70px;background:rgba(0,0,0,0.35);color:hsl(var(--foreground));border:1px solid rgba(124,58,237,0.30);'
             + 'border-radius:4px;padding:2px 6px;font-size:10px;font-family:inherit;outline:none;';
     input.addEventListener('input', function () {
       const raw = input.value.trim();
@@ -1036,7 +1036,7 @@ function paintWorkspaceFilterChip(button: HTMLButtonElement, ws: WorkspaceCredit
   button.style.cssText = 'border-radius:10px;padding:2px 8px;font-size:10px;cursor:pointer;font-family:inherit;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'
         + (isVisible
           ? 'background:rgba(16,185,129,0.14);color:#86efac;border:1px solid rgba(16,185,129,0.45);'
-          : 'background:rgba(15,23,42,0.45);color:#64748b;border:1px solid rgba(100,116,139,0.35);');
+          : 'background:rgba(15,23,42,0.45);color:hsl(var(--muted-foreground));border:1px solid rgba(100,116,139,0.35);');
 }
 
 function createFooter(
@@ -1047,12 +1047,12 @@ function createFooter(
   footer.style.cssText = 'padding:6px 10px;border-top:1px solid rgba(124,58,237,0.3);display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;';
 
   const legend = document.createElement('span');
-  legend.style.cssText = 'font-size:9px;color:#64748b;flex:1;min-width:120px;';
-  legend.innerHTML = '<span style="color:#10b981;">●</span> open in Chrome &nbsp; <span style="color:#334155;">○</span> closed';
+  legend.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));flex:1;min-width:120px;';
+  legend.innerHTML = '<span style="color:hsl(var(--success));">●</span> open in Chrome &nbsp; <span style="color:#334155;">○</span> closed';
 
   const status = document.createElement('span');
   status.id = 'marco-projects-export-status';
-  status.style.cssText = 'font-size:9px;color:#94a3b8;flex-basis:100%;order:3;min-height:11px;';
+  status.style.cssText = 'font-size:9px;color:hsl(var(--muted-foreground));flex-basis:100%;order:3;min-height:11px;';
   status.textContent = '';
 
   const actions = document.createElement('span');
@@ -1063,7 +1063,7 @@ function createFooter(
   exportBtn.id = 'marco-projects-export-btn';
   exportBtn.textContent = '⬇ Export CSV';
   exportBtn.title = 'Export all loaded projects to CSV with workspace, credits, GitHub repo + branch, version, and last activity';
-  exportBtn.style.cssText = 'padding:3px 10px;background:#1e3a5f;color:#cbd5e1;border:1px solid #3b6fa0;border-radius:3px;font-size:10px;cursor:pointer;';
+  exportBtn.style.cssText = 'padding:3px 10px;background:hsl(var(--secondary));color:#cbd5e1;border:1px solid #3b6fa0;border-radius:3px;font-size:10px;cursor:pointer;';
   exportBtn.onclick = function (): void {
     onExport(status); 
   };
@@ -1071,7 +1071,7 @@ function createFooter(
   const refresh = document.createElement('button');
   refresh.type = 'button';
   refresh.textContent = '⟳ Refresh';
-  refresh.style.cssText = 'padding:3px 10px;background:#1e3a5f;color:#cbd5e1;border:1px solid #3b6fa0;border-radius:3px;font-size:10px;cursor:pointer;';
+  refresh.style.cssText = 'padding:3px 10px;background:hsl(var(--secondary));color:#cbd5e1;border:1px solid #3b6fa0;border-radius:3px;font-size:10px;cursor:pointer;';
   refresh.onclick = function (): void {
     onRefresh(); 
   };
@@ -1248,13 +1248,13 @@ function exportCsv(statusEl: HTMLElement): void {
 
   state.exporting = true;
   setExportButtonDisabled(true);
-  statusEl.style.color = '#94a3b8';
+  statusEl.style.color = 'hsl(var(--muted-foreground))';
   statusEl.textContent = 'Building CSV…';
   const csv = buildCsv(rows);
   downloadCsv(filename, csv);
   state.exporting = false;
   setExportButtonDisabled(false);
-  statusEl.style.color = '#10b981';
+  statusEl.style.color = 'hsl(var(--success))';
   statusEl.textContent = '✓ Exported ' + rows.length + ' project'
         + (rows.length === 1 ? '' : 's') + ' → ' + filename;
   if (fallbackCount > 0) {

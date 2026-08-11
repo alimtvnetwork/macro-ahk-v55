@@ -55,7 +55,7 @@ export function buildHeaderPill(label: string, title: string, onClick: (e: Event
   const pill = document.createElement('span');
   pill.textContent = label;
   pill.title = title;
-  pill.style.cssText = 'cursor:pointer;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600;color:#fff;background:rgba(124,58,237,0.55);border:1px solid rgba(255,255,255,0.1);';
+  pill.style.cssText = 'cursor:pointer;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600;color:hsl(var(--foreground));background:rgba(124,58,237,0.55);border:1px solid rgba(255,255,255,0.1);';
   pill.onmouseover = function() {
     pill.style.background = 'rgba(124,58,237,0.85)'; 
   };
@@ -139,7 +139,7 @@ async function exportAsSqlite(): Promise<void> {
 function makeExportOption(pop: HTMLElement, label: string, run: () => Promise<void>): HTMLElement {
   const option = document.createElement('span');
   option.textContent = label;
-  option.style.cssText = 'cursor:pointer;padding:5px 12px;border-radius:4px;font-size:10px;font-weight:600;color:#fff;background:rgba(124,58,237,0.55);white-space:nowrap;';
+  option.style.cssText = 'cursor:pointer;padding:5px 12px;border-radius:4px;font-size:10px;font-weight:600;color:hsl(var(--foreground));background:rgba(124,58,237,0.55);white-space:nowrap;';
   option.onmouseover = function() {
     option.style.background = 'rgba(124,58,237,0.85)'; 
   };
@@ -249,7 +249,7 @@ function makeIoSectionHeader(text: string): HTMLElement {
 function makeIoOptionRow(pop: HTMLElement, label: string, run: () => Promise<void> | void): HTMLElement {
   const row = document.createElement('span');
   row.textContent = label;
-  row.style.cssText = 'cursor:pointer;padding:5px 12px;border-radius:4px;font-size:10px;font-weight:600;color:#fff;background:rgba(124,58,237,0.55);white-space:nowrap;';
+  row.style.cssText = 'cursor:pointer;padding:5px 12px;border-radius:4px;font-size:10px;font-weight:600;color:hsl(var(--foreground));background:rgba(124,58,237,0.55);white-space:nowrap;';
   row.onmouseover = function() {
     row.style.background = 'rgba(124,58,237,0.85)'; 
   };

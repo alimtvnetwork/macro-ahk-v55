@@ -41,7 +41,7 @@ vi.mock('../../shared-state', async (importOriginal) => {
 
   return {
     ...actual,
-    cPanelFg: '#fff',
+    cPanelFg: 'hsl(var(--foreground))',
     cPrimaryLight: '#a78bfa',
   };
 });

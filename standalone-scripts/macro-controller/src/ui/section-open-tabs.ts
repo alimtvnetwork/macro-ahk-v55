@@ -56,7 +56,7 @@ function createRefreshButton(onRefresh: () => void): HTMLButtonElement {
   const refreshBtn = document.createElement('button');
   refreshBtn.type = 'button';
   refreshBtn.textContent = '⟳ Refresh';
-  refreshBtn.style.cssText = 'margin-top:4px;padding:2px 8px;background:#1e3a5f;color:#cbd5e1;border:1px solid #3b6fa0;border-radius:3px;font-size:9px;cursor:pointer;';
+  refreshBtn.style.cssText = 'margin-top:4px;padding:2px 8px;background:hsl(var(--secondary));color:#cbd5e1;border:1px solid #3b6fa0;border-radius:3px;font-size:9px;cursor:pointer;';
   refreshBtn.onclick = function (e: Event): void {
     e.stopPropagation();
     onRefresh();
@@ -92,7 +92,7 @@ export function createOpenTabsSection(): OpenTabsSectionResult {
 
   const panel = document.createElement('div');
   panel.id = PANEL_ID;
-  panel.style.cssText = 'padding:4px;background:rgba(0,0,0,.5);border:1px solid #1e3a5f;border-radius:3px;max-height:160px;overflow-y:auto;';
+  panel.style.cssText = 'padding:4px;background:rgba(0,0,0,.5);border:1px solid hsl(var(--secondary));border-radius:3px;max-height:160px;overflow-y:auto;';
   panel.innerHTML = renderEmpty('Click to load.');
 
   async function refresh(): Promise<void> {
@@ -171,18 +171,18 @@ function renderList(tabs: ReadonlyArray<OpenLovableTabInfoView>, capturedAt: str
 function buildWorkspaceLabel(t: OpenLovableTabInfoView): string {
   if (t.projectName !== null) {
     const tag = t.bindingSource === 'probe'
-      ? ' <span style="color:#9ca3af;font-size:8px;">(via probe)</span>'
+      ? ' <span style="color:hsl(var(--muted-foreground));font-size:8px;">(via probe)</span>'
       : '';
 
-    return '<span style="color:#10b981;">' + escapeHtml(t.projectName) + '</span>' + tag;
+    return '<span style="color:hsl(var(--success));">' + escapeHtml(t.projectName) + '</span>' + tag;
   }
 
   if (t.detectedWorkspaceName) {
     const sourceTag = t.detectedWorkspaceSource
-      ? ' <span style="color:#9ca3af;font-size:8px;">(' + escapeHtml(t.detectedWorkspaceSource) + ')</span>'
+      ? ' <span style="color:hsl(var(--muted-foreground));font-size:8px;">(' + escapeHtml(t.detectedWorkspaceSource) + ')</span>'
       : '';
 
-    return '<span style="color:#fbbf24;">' + escapeHtml(t.detectedWorkspaceName) + '</span>' + sourceTag;
+    return '<span style="color:hsl(var(--warning));">' + escapeHtml(t.detectedWorkspaceName) + '</span>' + sourceTag;
   }
 
   const reason = t.probeError
@@ -190,7 +190,7 @@ function buildWorkspaceLabel(t: OpenLovableTabInfoView): string {
     : (t.bindingSource === 'injection' ? 'unknown project' : 'not bound');
   const truncated = reason.length > 40 ? reason.slice(0, 40) + '…' : reason;
 
-  return '<span style="color:#9ca3af;font-style:italic;" title="' + escapeHtml(reason) + '">'
+  return '<span style="color:hsl(var(--muted-foreground));font-style:italic;" title="' + escapeHtml(reason) + '">'
         + escapeHtml(truncated)
         + '</span>';
 }
@@ -201,7 +201,7 @@ function renderRow(t: OpenLovableTabInfoView): string {
   const wsLabel = buildWorkspaceLabel(t);
 
   const activeBadge = t.active
-    ? '<span style="color:#fbbf24;margin-right:4px;" title="Active in window">●</span>'
+    ? '<span style="color:hsl(var(--warning));margin-right:4px;" title="Active in window">●</span>'
     : '';
   const focusBadge = t.windowFocused
     ? '<span style="color:#60a5fa;margin-right:4px;" title="Focused window">◆</span>'
@@ -211,7 +211,7 @@ function renderRow(t: OpenLovableTabInfoView): string {
   const copyBtn = ''
         + '<button type="button" data-copy-url="' + escapeHtml(t.url) + '" '
         +   'title="Copy tab URL to clipboard" '
-        +   'style="margin-left:4px;padding:1px 6px;background:#1e3a5f;color:#cbd5e1;border:1px solid #3b6fa0;border-radius:3px;font-size:9px;cursor:pointer;flex-shrink:0;">'
+        +   'style="margin-left:4px;padding:1px 6px;background:hsl(var(--secondary));color:#cbd5e1;border:1px solid #3b6fa0;border-radius:3px;font-size:9px;cursor:pointer;flex-shrink:0;">'
         +   '⎘ Copy'
         + '</button>';
 
@@ -219,11 +219,11 @@ function renderRow(t: OpenLovableTabInfoView): string {
         + '<div style="font-size:10px;font-family:monospace;padding:3px 4px;border-top:1px solid rgba(255,255,255,0.06);">'
         +   '<div style="display:flex;align-items:center;gap:4px;">'
         +     focusBadge + activeBadge
-        +     '<span style="color:#e2e8f0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + escapeHtml(t.title) + '">' + titleSafe + '</span>'
+        +     '<span style="color:hsl(var(--foreground));flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + escapeHtml(t.title) + '">' + titleSafe + '</span>'
         +     copyBtn
         +   '</div>'
         +   '<div style="color:' + cPanelFgDim + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + escapeHtml(t.url) + '">' + urlSafe + '</div>'
-        +   '<div style="color:#9ca3af;">↳ workspace: ' + wsLabel + '</div>'
+        +   '<div style="color:hsl(var(--muted-foreground));">↳ workspace: ' + wsLabel + '</div>'
         +   whyLine
         + '</div>';
 }
@@ -250,7 +250,7 @@ async function copyToClipboard(url: string, btn: HTMLElement): Promise<void> {
     btn.style.background = '#065f46';
     window.setTimeout(function (): void {
       btn.textContent = originalText;
-      btn.style.background = '#1e3a5f';
+      btn.style.background = 'hsl(var(--secondary))';
     }, 1200);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
@@ -259,7 +259,7 @@ async function copyToClipboard(url: string, btn: HTMLElement): Promise<void> {
     btn.style.background = '#7f1d1d';
     window.setTimeout(function (): void {
       btn.textContent = originalText;
-      btn.style.background = '#1e3a5f';
+      btn.style.background = 'hsl(var(--secondary))';
     }, 1500);
   }
 }
@@ -272,29 +272,29 @@ async function copyToClipboard(url: string, btn: HTMLElement): Promise<void> {
  */
 function renderWhyLine(t: OpenLovableTabInfoView): string {
   const sourceLabel = t.bindingSource === 'injection'
-    ? '<span style="color:#10b981;">injection</span>'
+    ? '<span style="color:hsl(var(--success));">injection</span>'
     : t.bindingSource === 'probe'
-      ? '<span style="color:#fbbf24;">probe</span>'
-      : '<span style="color:#9ca3af;">none</span>';
+      ? '<span style="color:hsl(var(--warning));">probe</span>'
+      : '<span style="color:hsl(var(--muted-foreground));">none</span>';
 
   let ruleLabel: string;
   if (t.matchedRule !== null) {
     const originTag = t.matchedRule.origin === 'injection-record'
       ? ''
-      : ' <span style="color:#9ca3af;font-size:8px;">(evaluated)</span>';
+      : ' <span style="color:hsl(var(--muted-foreground));font-size:8px;">(evaluated)</span>';
     const patternSafe = escapeHtml(t.matchedRule.pattern);
     const patternShort = t.matchedRule.pattern.length > 50
       ? escapeHtml(t.matchedRule.pattern.slice(0, 50) + '…')
       : patternSafe;
     ruleLabel = ''
-            + '<span style="color:#9ca3af;">' + escapeHtml(t.matchedRule.matchType) + '</span> '
+            + '<span style="color:hsl(var(--muted-foreground));">' + escapeHtml(t.matchedRule.matchType) + '</span> '
             + '<span style="color:#cbd5e1;" title="' + patternSafe + '">"' + patternShort + '"</span>'
             + originTag;
   } else {
-    ruleLabel = '<span style="color:#9ca3af;font-style:italic;">no project rule matched</span>';
+    ruleLabel = '<span style="color:hsl(var(--muted-foreground));font-style:italic;">no project rule matched</span>';
   }
 
-  return '<div style="color:#9ca3af;font-size:9px;">↳ via ' + sourceLabel + ' · ' + ruleLabel + '</div>';
+  return '<div style="color:hsl(var(--muted-foreground));font-size:9px;">↳ via ' + sourceLabel + ' · ' + ruleLabel + '</div>';
 }
 
 function shortenUrl(url: string): string {

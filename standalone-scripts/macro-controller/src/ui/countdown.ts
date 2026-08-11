@@ -37,27 +37,27 @@ export function createCountdownCtx(
 /** Resolve countdown color based on seconds remaining. */
 function countdownColor(secs: number): string {
   if (secs <= 10) {
-    return '#ef4444';
+    return 'hsl(var(--destructive))';
   }
 
   if (secs <= 30) {
-    return '#f59e0b';
+    return 'hsl(var(--warning))';
   }
 
-  return '#fbbf24';
+  return 'hsl(var(--warning))';
 }
 
 /** Resolve progress bar color based on percentage. */
 function progressColor(pct: number): string {
   if (pct > 80) {
-    return '#ef4444';
+    return 'hsl(var(--destructive))';
   }
 
   if (pct > 50) {
-    return '#f59e0b';
+    return 'hsl(var(--warning))';
   }
 
-  return '#10b981';
+  return 'hsl(var(--success))';
 }
 
 /** Update inline countdown text element if present. */
@@ -94,7 +94,7 @@ function renderStopGlyph(btn: HTMLElement): void {
   btn.style.fontSize = '0';
   const square = document.createElement('span');
   square.setAttribute('aria-hidden', 'true');
-  square.style.cssText = 'display:block;width:12px;height:12px;background:#fff;border-radius:1px;';
+  square.style.cssText = 'display:block;width:12px;height:12px;background:hsl(var(--foreground));border-radius:1px;';
   btn.appendChild(square);
 }
 

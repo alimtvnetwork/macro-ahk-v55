@@ -50,9 +50,9 @@ vi.mock('../next-selector-control', () => ({
   buildNextSelectorControl: () => document.createElement('span'),
 }));
 vi.mock('../../shared-state', () => ({
-  cPanelFg: '#fff',
+  cPanelFg: 'hsl(var(--foreground))',
   cPrimaryLight: '#a78bfa',
-  cSectionBg: '#111',
+  cSectionBg: 'hsl(var(--background))',
 }));
 
 import {
