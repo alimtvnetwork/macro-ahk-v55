@@ -111,3 +111,13 @@ pnpm-lock.yaml
 .npmrc
 scripts/check-spec-links.baseline.json
 /.gitmap/backup
+
+# =============================================================================
+# Test outputs and reports
+# =============================================================================
+test-results/
+test_reports/
+test-reports/
+test_results/
+vitest-results.json
+test-result.md
