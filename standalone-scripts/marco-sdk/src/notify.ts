@@ -82,86 +82,6 @@ const _recentToasts = new Map<string, number>();
 let _dedupTimer: ReturnType<typeof setInterval> | null = null;
 
 /* ------------------------------------------------------------------ */
-/*  Default theme colors (overridable via window.__MARCO_THEME__)      */
-/* ------------------------------------------------------------------ */
-
-interface ToastColors { bg: string; border: string; icon: string; text: string; }
-
-function resolveColors(): Record<string, ToastColors> {
-  let errorBg = "#3a1014", errorPale = "#fecaca";
-  let warningBg = "#33260f", warningBorder = "#f59e0b", warningText = "#fde68a"; // eslint-disable-line prefer-const
-  let infoBg = "#0f172a", infoBorder = "#38bdf8", infoText = "#dbeafe";
-  let successBg = "#052e1a", successBorder = "#22c55e"; const successText = "#bbf7d0";
-  let errorBorder = "#ef4444";
-
-  try {
-        interface ThemeStatusColors { errorBg?: string; errorPale?: string; warningBg?: string; successBg?: string }
-        interface ThemeToastGroup { bg?: string; border?: string; text?: string }
-        interface ThemeColors { warning?: string; success?: string; error?: string; status?: ThemeStatusColors; toast?: { info?: ThemeToastGroup } }
-        interface ThemePreset { colors?: ThemeColors }
-        interface ThemeRoot { presets?: Record<string, ThemePreset>; activePreset?: string; colors?: ThemeColors }
-
-        const themeRoot = ((window as unknown as Record<string, unknown>).__MARCO_THEME__ || {}) as ThemeRoot;
-        const presets = themeRoot.presets || {};
-        const activeKey = themeRoot.activePreset || "dark";
-        const theme: ThemePreset = presets.dark || presets[activeKey] || {};
-        const TC = theme.colors || {};
-        const TSt = TC.status || {};
-        const TToast = TC.toast || {};
-        if (TSt.errorBg) {
-          errorBg = TSt.errorBg;
-        }
-
-        if (TSt.errorPale) {
-          errorPale = TSt.errorPale;
-        }
-
-        if (TSt.warningBg) {
-          warningBg = TSt.warningBg;
-        }
-
-        if (TC.warning) {
-          warningBorder = TC.warning;
-        }
-
-        if (TSt.successBg) {
-          successBg = TSt.successBg;
-        }
-
-        if (TC.success) {
-          successBorder = TC.success;
-        }
-
-        if (TC.error) {
-          errorBorder = TC.error;
-        }
-
-        if (TToast.info) {
-          if (TToast.info.bg) {
-            infoBg = TToast.info.bg;
-          }
-
-          if (TToast.info.border) {
-            infoBorder = TToast.info.border;
-          }
-
-          if (TToast.info.text) {
-            infoText = TToast.info.text;
-          }
-        }
-  } catch { /* fallback defaults */ } // allow-swallow: missing theme tokens fall back to defaults
-
-  return {
-    error:   { bg: errorBg,   border: errorBorder,   icon: "\u274C", text: errorPale },
-    warn:    { bg: warningBg,  border: warningBorder, icon: "\u26A0\uFE0F", text: warningText },
-    info:    { bg: infoBg,     border: infoBorder,    icon: "\u2139\uFE0F", text: infoText },
-    success: { bg: successBg,  border: successBorder, icon: "\u2705", text: successText },
-  };
-}
-
-/* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
-/* ------------------------------------------------------------------ */
 
 function formatRequestDetail(rd: RequestDetail): string {
   const lines: string[] = [];
@@ -210,7 +130,8 @@ function ensureDedupCleanup(): void {
       } 
     });
     if (_recentToasts.size === 0 && _dedupTimer) {
-      clearInterval(_dedupTimer); _dedupTimer = null; 
+      clearInterval(_dedupTimer);
+      _dedupTimer = null; 
     }
   }, 30000);
 }
@@ -366,16 +287,25 @@ function showToast(message: string, level: ToastLevelType = "error", opts: Toast
 
     navigator.clipboard.writeText(copyText).then(
       () => {
-        copyBtn.textContent = "\u2713"; setTimeout(() => {
+        copyBtn.textContent = "\u2713";
+        setTimeout(() => {
           copyBtn.textContent = "\uD83D\uDCCB"; 
         }, 1500); 
       },
       () => {
-        /* fallback */ const ta = document.createElement("textarea"); ta.value = copyText; ta.style.cssText = "position:fixed;opacity:0;"; document.body.appendChild(ta); ta.select(); try {
-          document.execCommand("copy"); copyBtn.textContent = "\u2713"; 
+        /* fallback */
+        const ta = document.createElement("textarea");
+        ta.value = copyText;
+        ta.style.cssText = "position:fixed;opacity:0;";
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+          copyBtn.textContent = "\u2713"; 
         } catch { /* */ }
 
-        document.body.removeChild(ta); setTimeout(() => {
+        document.body.removeChild(ta);
+        setTimeout(() => {
           copyBtn.textContent = "\uD83D\uDCCB"; 
         }, 1500); 
       }, // allow-swallow: execCommand fallback for old browsers; UI continues regardless
@@ -395,7 +325,8 @@ function showToast(message: string, level: ToastLevelType = "error", opts: Toast
   };
 
   closeBtn.onclick = (e: MouseEvent) => {
-    e.stopPropagation(); dismissToast(toast); 
+    e.stopPropagation();
+    dismissToast(toast); 
   };
 
   actionsDiv.appendChild(copyBtn);
@@ -410,13 +341,15 @@ function showToast(message: string, level: ToastLevelType = "error", opts: Toast
 
   // Animate in
   requestAnimationFrame(() => {
-    toast.style.opacity = "1"; toast.style.transform = "translateX(0)"; 
+    toast.style.opacity = "1";
+    toast.style.transform = "translateX(0)"; 
   });
 
   // Overflow — dismiss oldest
   const overflow = _queue.length - MAX_VISIBLE;
   for (let i = 0; i < overflow; i++) {
-    const oldest = _queue[0]; if (oldest) {
+    const oldest = _queue[0];
+    if (oldest) {
       dismissToast(oldest);
     } 
   }

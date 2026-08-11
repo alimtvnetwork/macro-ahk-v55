@@ -42,61 +42,7 @@ interface UseLibraryPanelStateArgs {
     readonly projectRow: { readonly ProjectId: number | string } | null;
 }
 
-export function useLibraryPanelState(args: UseLibraryPanelStateArgs) {
-  const projectKey = args.projectRow?.ProjectId ?? "__noproject__";
-
-  // Selection ---------------------------------------------------------
-  const [selected, setSelected] = useState<Set<number>>(new Set());
-  const [selectionOrder, setSelectionOrder] = useState<ReadonlyArray<number>>([]);
-
-  // Persisted per-project ---------------------------------------------
-  const [activeGroupId, setActiveGroupId] = usePersistedState<number | null>(
-    `marco.library.activeGroup.${projectKey}`,
-    null,
-    decodeNullableNumber,
-  );
-  const [expanded, setExpanded] = usePersistedState<Set<number>>(
-    `marco.library.expanded.${projectKey}`,
-    new Set(),
-    decodeNumberSet,
-  );
-
-  // Bi-directional selection sync with in-page controller --------------
-  const recorderSel = useRecorderSelection("options");
-  useEffect(() => {
-    recorderSel.select({ StepGroupId: activeGroupId, StepId: null });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeGroupId]);
-  useEffect(() => {
-    if (recorderSel.selection.StepGroupId === activeGroupId) {
-      return;
-    }
-
-    setActiveGroupId(recorderSel.selection.StepGroupId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recorderSel.selection.StepGroupId]);
-
-  // Toolbar toggles + top-level dialogs -------------------------------
-  const [showArchived, setShowArchived] = useState(false);
-  const [batchOpen, setBatchOpen] = useState(false);
-  const [runGroupDialog, setRunGroupDialog] = useState<RunGroupDialogState>({
-    open: false, group: null,
-  });
-  const [batchRenameOpen, setBatchRenameOpen] = useState(false);
-  const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
-  const [webhookOpen, setWebhookOpen] = useState(false);
-  const [inputSourceOpen, setInputSourceOpen] = useState(false);
-  const [waitDialog, setWaitDialog] = useState<WaitDialogState>({
-    open: false, stepId: null, stepLabel: null,
-  });
-
-  // Step wait snapshot -------------------------------------------------
-  const [stepWaits, setStepWaits] = useState<ReadonlyMap<number, WaitConfig>>(
-    () => readAllStepWaits(),
-  );
-  const refreshStepWaits = () => setStepWaits(readAllStepWaits());
-
-  // Hover + tree dialogs ----------------------------------------------
+function useLibraryPanelGroupDialogs() {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [createDialog, setCreateDialog] = useState<CreateDialogState>({
     open: false, parent: null, name: "",
@@ -107,6 +53,16 @@ export function useLibraryPanelState(args: UseLibraryPanelStateArgs) {
   const [deleteDialog, setDeleteDialog] = useState<GroupTargetDialogState>({
     open: false, group: null,
   });
+
+  return {
+    hoveredId, setHoveredId,
+    createDialog, setCreateDialog,
+    renameDialog, setRenameDialog,
+    deleteDialog, setDeleteDialog,
+  };
+}
+
+function useLibraryPanelStepDialogs() {
   const [inputsDialog, setInputsDialog] = useState<GroupTargetDialogState>({
     open: false, group: null,
   });
@@ -120,9 +76,77 @@ export function useLibraryPanelState(args: UseLibraryPanelStateArgs) {
     open: false, step: null,
   });
 
+  return {
+    inputsDialog, setInputsDialog,
+    csvDialog, setCsvDialog,
+    stepEditor, setStepEditor,
+    deleteStepDialog, setDeleteStepDialog,
+  };
+}
+
+function useLibraryPanelToggles() {
+  const [showArchived, setShowArchived] = useState(false);
+  const [batchOpen, setBatchOpen] = useState(false);
+  const [runGroupDialog, setRunGroupDialog] = useState<RunGroupDialogState>({
+    open: false, group: null,
+  });
+  const [batchRenameOpen, setBatchRenameOpen] = useState(false);
+  const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
+  const [webhookOpen, setWebhookOpen] = useState(false);
+  const [inputSourceOpen, setInputSourceOpen] = useState(false);
+  const [waitDialog, setWaitDialog] = useState<WaitDialogState>({
+    open: false, stepId: null, stepLabel: null,
+  });
+
+  return {
+    showArchived, setShowArchived, batchOpen, setBatchOpen,
+    runGroupDialog, setRunGroupDialog, batchRenameOpen, setBatchRenameOpen,
+    batchDeleteOpen, setBatchDeleteOpen, webhookOpen, setWebhookOpen,
+    inputSourceOpen, setInputSourceOpen, waitDialog, setWaitDialog,
+  };
+}
+
+// eslint-disable-next-line max-lines-per-function
+export function useLibraryPanelState(args: UseLibraryPanelStateArgs) {
+  const projectKey = args.projectRow?.ProjectId ?? "__noproject__";
+
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [selectionOrder, setSelectionOrder] = useState<ReadonlyArray<number>>([]);
+
+  const [activeGroupId, setActiveGroupId] = usePersistedState<number | null>(
+    `marco.library.activeGroup.${projectKey}`,
+    null,
+    decodeNullableNumber,
+  );
+  const [expanded, setExpanded] = usePersistedState<Set<number>>(
+    `marco.library.expanded.${projectKey}`,
+    new Set(),
+    decodeNumberSet,
+  );
+
+  const recorderSel = useRecorderSelection("options");
+  useEffect(() => {
+    recorderSel.select({ StepGroupId: activeGroupId, StepId: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeGroupId]);
+  useEffect(() => {
+    if (recorderSel.selection.StepGroupId !== activeGroupId) {
+      setActiveGroupId(recorderSel.selection.StepGroupId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recorderSel.selection.StepGroupId]);
+
+  const toggles = useLibraryPanelToggles();
+
+  const [stepWaits, setStepWaits] = useState<ReadonlyMap<number, WaitConfig>>(
+    () => readAllStepWaits(),
+  );
+  const refreshStepWaits = () => setStepWaits(readAllStepWaits());
+
+  const groupDialogs = useLibraryPanelGroupDialogs();
+  const stepDialogs = useLibraryPanelStepDialogs();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Optimistic reorder overrides --------------------------------------
   const [pendingGroupOrder, setPendingGroupOrder] = useState<
         ReadonlyMap<number | "root", ReadonlyArray<number>>
     >(() => new Map());
@@ -131,30 +155,14 @@ export function useLibraryPanelState(args: UseLibraryPanelStateArgs) {
     >(() => new Map());
 
   return {
-    selected, setSelected,
-    selectionOrder, setSelectionOrder,
-    activeGroupId, setActiveGroupId,
-    expanded, setExpanded,
-    showArchived, setShowArchived,
-    batchOpen, setBatchOpen,
-    runGroupDialog, setRunGroupDialog,
-    batchRenameOpen, setBatchRenameOpen,
-    batchDeleteOpen, setBatchDeleteOpen,
-    webhookOpen, setWebhookOpen,
-    inputSourceOpen, setInputSourceOpen,
-    waitDialog, setWaitDialog,
+    selected, setSelected, selectionOrder, setSelectionOrder,
+    activeGroupId, setActiveGroupId, expanded, setExpanded,
+    ...toggles,
     stepWaits, refreshStepWaits,
-    hoveredId, setHoveredId,
-    createDialog, setCreateDialog,
-    renameDialog, setRenameDialog,
-    deleteDialog, setDeleteDialog,
-    inputsDialog, setInputsDialog,
-    csvDialog, setCsvDialog,
-    stepEditor, setStepEditor,
-    deleteStepDialog, setDeleteStepDialog,
+    ...groupDialogs,
+    ...stepDialogs,
     fileInputRef,
-    pendingGroupOrder, setPendingGroupOrder,
-    pendingStepOrder, setPendingStepOrder,
+    pendingGroupOrder, setPendingGroupOrder, pendingStepOrder, setPendingStepOrder,
   };
 }
 
@@ -163,6 +171,7 @@ export function useLibraryPanelState(args: UseLibraryPanelStateArgs) {
  * library. Runs whenever the library snapshot changes so cross-tab
  * deletions and import-with-replace clean up the persisted state.
  */
+// eslint-disable-next-line max-lines-per-function
 export function useLibraryStatePrune(deps: {
     readonly libProjectReady: boolean;
     readonly groupsById: ReadonlyMap<number, StepGroupRow>;
@@ -188,7 +197,8 @@ export function useLibraryStatePrune(deps: {
     let needsPrune = false;
     for (const id of expanded) {
       if (!groupsById.has(id)) {
-        needsPrune = true; break; 
+        needsPrune = true;
+        break; 
       }
     }
 

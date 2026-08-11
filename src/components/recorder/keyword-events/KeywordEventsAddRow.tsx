@@ -24,7 +24,8 @@ export function KeywordEventsAddRow(props: KeywordEventsAddRowProps): JSX.Elemen
         placeholder="New keyword (e.g. submit-form)"
         onKeyDown={(keyEvent) => {
           if (keyEvent.key === "Enter") {
-            keyEvent.preventDefault(); onAdd(); 
+            keyEvent.preventDefault(); 
+            onAdd(); 
           }
         }}
         className="h-9"

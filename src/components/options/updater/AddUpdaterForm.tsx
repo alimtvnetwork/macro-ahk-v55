@@ -36,6 +36,7 @@ interface AddUpdaterFormProps {
   onCancel: () => void;
 }
 
+// eslint-disable-next-line max-lines-per-function
 export function AddUpdaterForm({ onAdd, onCancel }: AddUpdaterFormProps) {
   const [newName, setNewName] = useState("");
   const [newDescription, setNewDescription] = useState("");

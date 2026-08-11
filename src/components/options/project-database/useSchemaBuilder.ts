@@ -180,6 +180,7 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
     reader.readAsText(file);
   }, []);
 
+  // eslint-disable-next-line max-lines-per-function
   const handleApply = useCallback(async () => {
     const validTables = tables.filter((t) => t.name.trim() && t.columns.some((c) => c.name.trim()));
     if (validTables.length === 0) {
@@ -224,7 +225,6 @@ export function useSchemaBuilder(projectSlug: string, onMigrationComplete: () =>
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-// eslint-disable-next-line max-lines-per-function -- builds nested schema payload structure
 function buildSchemaPayload(validTables: TableDefinition[]) {
   return {
     version: "1.0.0",
@@ -234,30 +234,7 @@ function buildSchemaPayload(validTables: TableDefinition[]) {
         tableDef.Description = t.description.trim();
       }
 
-      tableDef.Columns = t.columns.filter((c) => c.name.trim()).map((c) => {
-        const col: Record<string, unknown> = { Name: c.name.trim(), Type: c.type };
-        if (c.nullable) {
-          col.Nullable = true;
-        }
-
-        if (c.unique) {
-          col.Unique = true;
-        }
-
-        if (c.defaultValue) {
-          col.Default = c.defaultValue;
-        }
-
-        if (c.description) {
-          col.Description = c.description;
-        }
-
-        if (c.validation) {
-          col.Validation = c.validation;
-        }
-
-        return col;
-      });
+      tableDef.Columns = t.columns.filter((c) => c.name.trim()).map(buildColumnDef);
 
       if (t.relations.length > 0) {
         tableDef.Relations = t.relations
@@ -271,4 +248,29 @@ function buildSchemaPayload(validTables: TableDefinition[]) {
       return tableDef;
     }),
   };
+}
+
+function buildColumnDef(c: ColumnWithValidation) {
+  const col: Record<string, unknown> = { Name: c.name.trim(), Type: c.type };
+  if (c.nullable) {
+    col.Nullable = true;
+  }
+
+  if (c.unique) {
+    col.Unique = true;
+  }
+
+  if (c.defaultValue) {
+    col.Default = c.defaultValue;
+  }
+
+  if (c.description) {
+    col.Description = c.description;
+  }
+
+  if (c.validation) {
+    col.Validation = c.validation;
+  }
+
+  return col;
 }

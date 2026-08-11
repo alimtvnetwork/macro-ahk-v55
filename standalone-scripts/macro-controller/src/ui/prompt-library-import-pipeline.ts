@@ -7,7 +7,7 @@ import { renderImportErrorBanner, clearImportErrorBanner, logLibraryImportFailur
 import { renderPartialImportErrors, clearPartialImportErrors, showImportProgress, hideImportProgress, updateImportProgress } from './prompt-library-progress';
 import { validateImportFile } from './prompt-library-preview';
 import { ModalRefs, LOG_SCOPE, IMPORT_FAILED_PREFIX, TOAST_ERROR } from './prompt-library-types';
-import { logError, logError } from '../error-utils';
+import { logError } from '../error-utils';
 import { PreviewTriggerType } from "../types/enums";
 
 export function ensureSpinnerStyle(doc: Document): void {
@@ -143,6 +143,45 @@ function _handleImportValidationError(
   focusErrorBanner(refs);
 }
 
+async function _executeImportFileBody(
+  refs: ModalRefs,
+  file: File,
+  renderAllRoles: (r: ModalRefs) => Promise<void>,
+  origin: PreviewTriggerType,
+  retrying: boolean,
+  retry: () => void
+): Promise<'import' | 'banner' | null> {
+  try {
+    const text = await file.text();
+    const parsed = await executeImportParse(refs, text, file);
+    if (!parsed) {
+      return 'banner';
+    }
+
+    const { summary, results } = await executeImportDb(refs, parsed, renderAllRoles);
+
+    refs.status.textContent = (retrying ? 'Retry succeeded. ' : '') + summary;
+    refs.lastImportFailed = false;
+    clearImportErrorBanner(refs);
+    renderPartialImportErrors(refs, results.errors, parsed.errors);
+    if (origin === 'drop') {
+      return 'import';
+    }
+
+    return null;
+  } catch (err) {
+    logError('MacroController', 'Unknown error');
+    logLibraryImportFailure('thrown', 'threw during read/parse for name=' + file.name, err);
+    const reason = extractImportErrorReason(err);
+    refs.status.textContent = IMPORT_FAILED_PREFIX + reason;
+    renderImportErrorBanner(refs, IMPORT_FAILED_PREFIX + reason, 'Check the browser console for details and try again.', retry);
+    showToast(IMPORT_FAILED_PREFIX + reason, TOAST_ERROR);
+    refs.lastImportFailed = true;
+
+    return 'banner';
+  }
+}
+
 export async function handleImportFile(
   refs: ModalRefs,
   file: File,
@@ -177,46 +216,18 @@ export async function handleImportFile(
   clearPartialImportErrors(refs);
 
   refs.status.textContent = attemptPrefix + file.name + ' ...';
-  let focusAfter: 'import' | 'banner' | null = null;
   
-  try {
-    const text = await file.text();
-    const parsed = await executeImportParse(refs, text, file);
-    if (!parsed) {
-      focusAfter = 'banner';
+  const focusAfter = await _executeImportFileBody(refs, file, renderAllRoles, origin, retrying, retry);
 
-      return;
-    }
-
-    const { summary, results } = await executeImportDb(refs, parsed, renderAllRoles);
-
-    refs.status.textContent = (retrying ? 'Retry succeeded. ' : '') + summary;
-    refs.lastImportFailed = false;
-    clearImportErrorBanner(refs);
-    renderPartialImportErrors(refs, results.errors, parsed.errors);
-    if (origin === 'drop') {
-      focusAfter = 'import';
-    }
-  } catch (err) {
-    logError('MacroController', 'Unknown error');
-    logLibraryImportFailure('thrown', 'threw during read/parse for name=' + file.name, err);
-    const reason = extractImportErrorReason(err);
-    refs.status.textContent = IMPORT_FAILED_PREFIX + reason;
-    renderImportErrorBanner(refs, IMPORT_FAILED_PREFIX + reason, 'Check the browser console for details and try again.', retry);
-    showToast(IMPORT_FAILED_PREFIX + reason, TOAST_ERROR);
-    refs.lastImportFailed = true;
-    focusAfter = 'banner';
-  } finally {
-    fileInput.value = '';
-    fileInput.disabled = false;
-    importBtn.disabled = false;
-    importBtn.removeAttribute('aria-busy');
-    hideImportSpinner(importBtn, originalLabel);
-    hideImportProgress(refs);
-    if (focusAfter === 'import') {
-      restoreFocusToImportButton(refs);
-    } else if (focusAfter === 'banner') {
-      focusErrorBanner(refs);
-    }
+  fileInput.value = '';
+  fileInput.disabled = false;
+  importBtn.disabled = false;
+  importBtn.removeAttribute('aria-busy');
+  hideImportSpinner(importBtn, originalLabel);
+  hideImportProgress(refs);
+  if (focusAfter === 'import') {
+    restoreFocusToImportButton(refs);
+  } else if (focusAfter === 'banner') {
+    focusErrorBanner(refs);
   }
 }

@@ -598,9 +598,11 @@ export function startInlineRename(wsId: string, currentName: string): void {
 
   input.onkeydown = function (e: KeyboardEvent) {
     if (e.key === 'Enter') {
-      e.preventDefault(); doCommit(); 
+      e.preventDefault();
+      doCommit(); 
     } else if (e.key === 'Escape') {
-      e.preventDefault(); doCancel(); 
+      e.preventDefault();
+      doCancel(); 
     }
   };
 

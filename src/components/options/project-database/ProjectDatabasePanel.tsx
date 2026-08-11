@@ -332,12 +332,14 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
               <RefreshCw className="h-3 w-3 mr-1" /> Refresh
             </Button>
             <Button variant="outline" size="sm" onClick={() => {
-              setShowCreateDbForm(!showCreateDbForm); setShowCreateForm(false); 
+              setShowCreateDbForm(!showCreateDbForm);
+              setShowCreateForm(false); 
             }} className="h-7 text-xs">
               <Database className="h-3 w-3 mr-1" /> Create Database
             </Button>
             <Button size="sm" onClick={() => {
-              setShowCreateForm(!showCreateForm); setShowCreateDbForm(false); 
+              setShowCreateForm(!showCreateForm);
+              setShowCreateDbForm(false); 
             }} className="h-7 text-xs">
               <Plus className="h-3 w-3 mr-1" /> Create Table
             </Button>
@@ -349,7 +351,8 @@ export function ProjectDatabasePanel({ projectId, projectSlug }: ProjectDatabase
               projectSlug={projectSlug}
               userDbCount={userDbCount}
               onCreated={() => {
-                setShowCreateDbForm(false); void refreshTables(); 
+                setShowCreateDbForm(false);
+                void refreshTables(); 
               }}
               onCancel={() => setShowCreateDbForm(false)}
             />

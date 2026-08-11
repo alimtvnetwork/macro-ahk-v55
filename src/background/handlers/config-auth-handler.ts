@@ -586,62 +586,46 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
       const result = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         world: "MAIN",
-        func: function scanLocalStorageForJwt(): string | null { // eslint-disable-line sonarjs/cognitive-complexity -- localStorage scan with priority matching
+        func: function scanLocalStorageForJwt(): string | null {  
           try {
-            const len = localStorage.length;
-            // Priority 1: Supabase auth token (sb-*-auth-token)
-            for (let i = 0; i < len; i++) {
-              const key = localStorage.key(i);
-              if (!key) {
-                continue;
-              }
-
-              if (key.startsWith("sb-") && key.includes("-auth-token")) {
-                const raw = localStorage.getItem(key);
-                if (!raw) {
-                  continue;
-                }
-
-                try {
-                  const parsed = JSON.parse(raw);
-                  const token = parsed?.access_token
-                                        ?? parsed?.currentSession?.access_token
-                                        ?? parsed?.session?.access_token;
-                  if (typeof token === "string" && token.startsWith("eyJ") && token.split(".").length === 3) {
-                    return token;
-                  }
-                } catch (err) {
-                  if (raw.startsWith("eyJ") && raw.split(".").length === 3) {
-                    return raw;
-                  }
-                }
-              }
-            }
-
-            // Priority 2: Lovable-specific auth keys
-            const lovableKeys = ["lovable-auth-token", "lovable:token", "auth-token", "supabase.auth.token"];
-            for (let j = 0; j < lovableKeys.length; j++) {
-              const storedToken = localStorage.getItem(lovableKeys[j]);
-              if (!storedToken) {
-                continue;
+            const check = (raw: string | null) => {
+              if (!raw) {
+                return null;
               }
 
               try {
-                const p2 = JSON.parse(storedToken);
-                const t2 = p2?.access_token ?? p2?.currentSession?.access_token ?? p2?.token;
-                if (typeof t2 === "string" && t2.startsWith("eyJ") && t2.split(".").length === 3) {
-                  return t2;
+                const parsed = JSON.parse(raw);
+                const token = parsed?.access_token ?? parsed?.currentSession?.access_token ?? parsed?.session?.access_token ?? parsed?.token;
+                if (typeof token === "string" && token.startsWith("eyJ") && token.split(".").length === 3) {
+                  return token;
                 }
-              } catch (parseErr) {
-                logSampledDebug(BgLogTag.CONFIG_AUTH, "token parse failed", "Failed to parse storedToken", parseErr instanceof Error ? parseErr : String(parseErr));
-                if (storedToken.startsWith("eyJ") && storedToken.split(".").length === 3) {
-                  return storedToken;
+              } catch { /* ignore */ }
+
+              if (raw.startsWith("eyJ") && raw.split(".").length === 3) {
+                return raw;
+              }
+
+              return null;
+            };
+
+            for (let i = 0; i < localStorage.length; i++) {
+              const key = localStorage.key(i);
+              if (key && key.startsWith("sb-") && key.includes("-auth-token")) {
+                const res = check(localStorage.getItem(key));
+                if (res) {
+                  return res;
                 }
               }
             }
-          } catch (lsErr) {
-            logSampledDebug(BgLogTag.CONFIG_AUTH, "localStorage scan unavailable", "localStorage scan unavailable", lsErr instanceof Error ? lsErr : String(lsErr));
-          }
+
+            const lovableKeys = ["lovable-auth-token", "lovable:token", "auth-token", "supabase.auth.token"];
+            for (const key of lovableKeys) {
+              const res = check(localStorage.getItem(key));
+              if (res) {
+                return res;
+              }
+            }
+          } catch { /* ignore */ }
 
           return null;
         },
@@ -806,45 +790,16 @@ function extractJwtFromAuthTokenPayload(payload: unknown, depth = 0): string | n
 
 /** Extracts project ID from a URL string. */
 function extractProjectIdFromUrl(url: string): string | null {
-  // Pattern 1: /projects/{id} (editor URL)
   const pathMatch = url.match(/\/projects\/([^/?#]+)/);
   if (pathMatch) {
     return pathMatch[1];
   }
 
-  try {
-    const hostname = new URL(url).hostname;
-    const firstLabel = hostname.split(".")[0] ?? "";
-
-    // Pattern 2: id-preview--{uuid}.{domain}
-    const idPreviewLabelMatch = firstLabel.match(/^id-preview--([a-f0-9-]{36})$/i);
-    if (idPreviewLabelMatch) {
-      return idPreviewLabelMatch[1];
-    }
-
-    // Pattern 3: {uuid}--preview.{domain} or {uuid}-preview.{domain}
-    const previewSuffixLabelMatch = firstLabel.match(/^([a-f0-9-]{36})(?:--preview|-preview)$/i);
-    if (previewSuffixLabelMatch) {
-      return previewSuffixLabelMatch[1];
-    }
-
-    // Pattern 4: bare UUID subdomain: {uuid}.lovableproject.com
-    const bareUuidLabelMatch = firstLabel.match(/^([a-f0-9-]{36})$/i);
-    if (bareUuidLabelMatch) {
-      return bareUuidLabelMatch[1];
-    }
-  } catch (urlErr) {
-    // Fall through to legacy string regex checks below. Debug only — this
-    // catch fires for any non-URL input passed to extractProjectId.
-    logSampledDebug(
-      BgLogTag.CONFIG_AUTH,
-      "extractProjectId",
-      "URL parse failed, using legacy regex fallback",
-      urlErr instanceof Error ? urlErr : String(urlErr)
-    );
+  const fromDomain = extractProjectIdFromHostname(url);
+  if (fromDomain) {
+    return fromDomain;
   }
 
-  // Legacy fallback regexes (defensive)
   const subdomainMatch = url.match(/id-preview--([a-f0-9-]{36})\./i);
   if (subdomainMatch) {
     return subdomainMatch[1];
@@ -858,6 +813,37 @@ function extractProjectIdFromUrl(url: string): string | null {
   const bareUuidSubdomainMatch = url.match(/https?:\/\/([a-f0-9-]{36})\.[^/]+/i);
   if (bareUuidSubdomainMatch) {
     return bareUuidSubdomainMatch[1];
+  }
+
+  return null;
+}
+
+function extractProjectIdFromHostname(url: string): string | null {
+  try {
+    const hostname = new URL(url).hostname;
+    const firstLabel = hostname.split(".")[0] ?? "";
+
+    const idPreviewLabelMatch = firstLabel.match(/^id-preview--([a-f0-9-]{36})$/i);
+    if (idPreviewLabelMatch) {
+      return idPreviewLabelMatch[1];
+    }
+
+    const previewSuffixLabelMatch = firstLabel.match(/^([a-f0-9-]{36})(?:--preview|-preview)$/i);
+    if (previewSuffixLabelMatch) {
+      return previewSuffixLabelMatch[1];
+    }
+
+    const bareUuidLabelMatch = firstLabel.match(/^([a-f0-9-]{36})$/i);
+    if (bareUuidLabelMatch) {
+      return bareUuidLabelMatch[1];
+    }
+  } catch (urlErr) {
+    logSampledDebug(
+      BgLogTag.CONFIG_AUTH,
+      "extractProjectId",
+      "URL parse failed, using legacy regex fallback",
+      urlErr instanceof Error ? urlErr : String(urlErr)
+    );
   }
 
   return null;

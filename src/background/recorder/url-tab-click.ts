@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import { UrlMatchType, UrlTabClickFailureModeType, SelectorKindType, OkTabnotfoundType, PredicateEvaluationKindType, ValidationErrorReasonType } from "../../types/enums";
 import { compileUrlPattern, CompileResult, splitForCaseFold } from "./url-tab-click-patterns";

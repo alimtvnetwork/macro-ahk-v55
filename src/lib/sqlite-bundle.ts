@@ -439,6 +439,28 @@ function parsePromptCategories(raw: Record<string, unknown>): string[] {
   return out;
 }
 
+function _insertPromptCategoryLinks(
+  db: Database,
+  promptCategoryMap: Map<string, string[]>,
+  now: string
+): void {
+  const linkStmt = db.prepare(`
+    INSERT INTO PromptsToCategory (PromptUid, CategoryName, CreatedAt)
+    VALUES (?, ?, ?)
+  `);
+  for (const [promptUid, cats] of promptCategoryMap.entries()) {
+    if (!promptUid) {
+      continue;
+    }
+
+    for (const catName of cats) {
+      linkStmt.run([promptUid, catName, now]);
+    }
+  }
+
+  linkStmt.free();
+}
+
 /**
  * v6: write PromptsCategory + PromptsToCategory rows so multi-category
  * linkage survives round-trip. Categories are deduplicated across the
@@ -480,21 +502,7 @@ function insertPromptCategories(
   catStmt.free();
 
   // 3) Insert junction rows for each (PromptUid, CategoryName).
-  const linkStmt = db.prepare(`
-    INSERT INTO PromptsToCategory (PromptUid, CategoryName, CreatedAt)
-    VALUES (?, ?, ?)
-  `);
-  for (const [promptUid, cats] of promptCategoryMap.entries()) {
-    if (!promptUid) {
-      continue;
-    }
-
-    for (const catName of cats) {
-      linkStmt.run([promptUid, catName, now]);
-    }
-  }
-
-  linkStmt.free();
+  _insertPromptCategoryLinks(db, promptCategoryMap, now);
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -555,7 +563,8 @@ export async function exportAllAsSqliteZip(): Promise<void> {
   const dbData = db.export();
   db.close();
 
-  const JSZipCtor = await loadJSZip(); const zip = new JSZipCtor();
+  const JSZipCtor = await loadJSZip();
+  const zip = new JSZipCtor();
   zip.file(DB_FILENAME, dbData);
 
   const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE" });
@@ -618,7 +627,8 @@ export async function exportProjectAsSqliteZip(project: StoredProject): Promise<
   const dbData = db.export();
   db.close();
 
-  const JSZipCtor = await loadJSZip(); const zip = new JSZipCtor();
+  const JSZipCtor = await loadJSZip();
+  const zip = new JSZipCtor();
   zip.file(DB_FILENAME, dbData);
 
   const safeName = project.name.replace(/[^a-zA-Z0-9_-]/g, "_").toLowerCase();
@@ -1044,6 +1054,38 @@ function readPromptCategoriesTable(db: Database): Map<string, string[]> {
   return out;
 }
 
+function _mapPromptRow(
+  row: SqlValue[],
+  cols: string[],
+  strict: boolean,
+  catsByPromptUid: Map<string, string[]>
+): PromptEntry {
+  const rowObject = Object.fromEntries(cols.map((c: string, i: number) => [c, row[i]]));
+  const uid = resolveUid(rowObject, strict);
+  const junctionCats = catsByPromptUid.get(uid);
+  // v6 preferred: rebuild comma-separated list from junction.
+  // Fallback: pre-v6 Prompts.Category single value.
+  const singularCategory = (col(rowObject, "Category", "category", strict) as string) ?? undefined;
+  const category = junctionCats && junctionCats.length > 0
+    ? junctionCats.join(", ")
+    : singularCategory;
+
+  return {
+    id: uid,
+    // v5 — Slug column is now actually written. v4 bundles return
+    // undefined here, which the Task Next resolver treats as "no slug".
+    slug: (rowObject["Slug"] as string) ?? undefined,
+    name: (col(rowObject, "Name", "name", strict) as string),
+    text: (col(rowObject, "Text", "text", strict) as string),
+    order: (col(rowObject, "RunOrder", "run_order", strict) as number) ?? 0,
+    isDefault: col(rowObject, "IsDefault", "is_default", strict) === 1,
+    isFavorite: col(rowObject, "IsFavorite", "is_favorite", strict) === 1,
+    category,
+    createdAt: (col(rowObject, "CreatedAt", "created_at", strict) as string),
+    updatedAt: (col(rowObject, "UpdatedAt", "updated_at", strict) as string),
+  } as PromptEntry;
+}
+
 function readPrompts(db: Database, strict = false): PromptEntry[] {
   try {
     let rows;
@@ -1074,32 +1116,7 @@ function readPrompts(db: Database, strict = false): PromptEntry[] {
 
     const cols = rows[0].columns;
 
-    return rows[0].values.map((row: SqlValue[]) => {
-      const rowObject = Object.fromEntries(cols.map((c: SqlValue, i: number) => [c, row[i]]));
-      const uid = resolveUid(rowObject, strict);
-      const junctionCats = catsByPromptUid.get(uid);
-      // v6 preferred: rebuild comma-separated list from junction.
-      // Fallback: pre-v6 Prompts.Category single value.
-      const singularCategory = (col(rowObject, "Category", "category", strict) as string) ?? undefined;
-      const category = junctionCats && junctionCats.length > 0
-        ? junctionCats.join(", ")
-        : singularCategory;
-
-      return {
-        id: uid,
-        // v5 — Slug column is now actually written. v4 bundles return
-        // undefined here, which the Task Next resolver treats as "no slug".
-        slug: (rowObject["Slug"] as string) ?? undefined,
-        name: (col(rowObject, "Name", "name", strict) as string),
-        text: (col(rowObject, "Text", "text", strict) as string),
-        order: (col(rowObject, "RunOrder", "run_order", strict) as number) ?? 0,
-        isDefault: col(rowObject, "IsDefault", "is_default", strict) === 1,
-        isFavorite: col(rowObject, "IsFavorite", "is_favorite", strict) === 1,
-        category,
-        createdAt: (col(rowObject, "CreatedAt", "created_at", strict) as string),
-        updatedAt: (col(rowObject, "UpdatedAt", "updated_at", strict) as string),
-      } as PromptEntry;
-    });
+    return rows[0].values.map((row: SqlValue[]) => _mapPromptRow(row, cols, strict, catsByPromptUid));
   } catch (err) {
     void 0;
 
@@ -1116,7 +1133,8 @@ export async function previewSqliteZip(
 ): Promise<BundlePreview> {
   const strict = options?.strictPascalCase ?? false;
   const arrayBuffer = await file.arrayBuffer();
-  const JSZipCtor = await loadJSZip(); const zip = await JSZipCtor.loadAsync(arrayBuffer);
+  const JSZipCtor = await loadJSZip();
+  const zip = await JSZipCtor.loadAsync(arrayBuffer);
 
   const dbFile = zip.file(DB_FILENAME);
   if (!dbFile) {
@@ -1265,7 +1283,8 @@ export async function mergeFromSqliteZip(
 async function extractBundle(file: File, options?: ImportOptions) {
   const strict = options?.strictPascalCase ?? false;
   const arrayBuffer = await file.arrayBuffer();
-  const JSZipCtor = await loadJSZip(); const zip = await JSZipCtor.loadAsync(arrayBuffer);
+  const JSZipCtor = await loadJSZip();
+  const zip = await JSZipCtor.loadAsync(arrayBuffer);
   const dbFile = zip.file(DB_FILENAME);
   if (!dbFile) {
     throw new Error(`Invalid bundle: missing ${DB_FILENAME} inside the zip`);
@@ -1429,7 +1448,8 @@ export async function exportPromptsAsSqliteZip(): Promise<void> {
   const dbData = db.export();
   db.close();
 
-  const JSZipCtor = await loadJSZip(); const zip = new JSZipCtor();
+  const JSZipCtor = await loadJSZip();
+  const zip = new JSZipCtor();
   zip.file(DB_FILENAME, dbData);
   const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE" });
   await triggerDownload(blob, "marco-prompts-backup.zip");
@@ -1442,7 +1462,8 @@ async function extractPromptsBundle(
 ): Promise<PromptEntry[]> {
   const strict = options?.strictPascalCase ?? false;
   const arrayBuffer = await file.arrayBuffer();
-  const JSZipCtor = await loadJSZip(); const zip = await JSZipCtor.loadAsync(arrayBuffer);
+  const JSZipCtor = await loadJSZip();
+  const zip = await JSZipCtor.loadAsync(arrayBuffer);
   const dbFile = zip.file(DB_FILENAME);
   if (!dbFile) {
     throw new Error(`Invalid bundle: missing ${DB_FILENAME} inside the zip`);

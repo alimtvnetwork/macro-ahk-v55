@@ -235,10 +235,12 @@ function buildBindButton(state: State): HTMLButtonElement {
   btn.className = "btn btn-primary";
   btn.textContent = "Bind";
   btn.addEventListener(Events.MOUSEDOWN, (e) => {
-    e.preventDefault(); e.stopPropagation(); 
+    e.preventDefault();
+    e.stopPropagation(); 
   });
   btn.addEventListener(Events.CLICK, (e) => {
-    e.stopPropagation(); commitTemplate(state); 
+    e.stopPropagation();
+    commitTemplate(state); 
   });
   state.bindBtn = btn;
 
@@ -251,7 +253,8 @@ function buildClearButton(state: State): HTMLButtonElement {
   btn.className = "btn btn-secondary";
   btn.textContent = "Clear";
   btn.addEventListener(Events.MOUSEDOWN, (e) => {
-    e.preventDefault(); e.stopPropagation(); 
+    e.preventDefault();
+    e.stopPropagation(); 
   });
   btn.addEventListener(Events.CLICK, (e) => {
     e.stopPropagation();

@@ -74,37 +74,20 @@ export interface HttpFailureReport {
 
 const isOk = (status: number): boolean => status >= HTTP_OK_MIN && status < HTTP_OK_MAX;
 
+const STATUS_REASONS: Record<number, string> = {
+  [HttpCodes.UNAUTHORIZED]: "Unauthorized — token missing/expired (do NOT retry; do NOT refresh in a loop).",
+  [HttpCodes.FORBIDDEN]: "Forbidden — caller lacks permission for this resource.",
+  [HttpCodes.NOT_FOUND]: "Not Found — endpoint or resource does not exist at this URL.",
+  405: "Method Not Allowed — server rejected this HTTP method; do NOT swap methods and retry.",
+  408: "Request Timeout — server-side timeout.",
+  [HttpCodes.CONFLICT]: "Conflict — server state disagrees with request.",
+  410: "Gone — resource permanently removed.",
+  429: "Rate Limited — STOP all calls to this host immediately.",
+};
+
 const reasonForStatus = (status: number): string => {
-  if (status === HttpCodes.UNAUTHORIZED) {
-    return "Unauthorized — token missing/expired (do NOT retry; do NOT refresh in a loop).";
-  }
-
-  if (status === HttpCodes.FORBIDDEN) {
-    return "Forbidden — caller lacks permission for this resource.";
-  }
-
-  if (status === HttpCodes.NOT_FOUND) {
-    return "Not Found — endpoint or resource does not exist at this URL.";
-  }
-
-  if (status === 405) {
-    return "Method Not Allowed — server rejected this HTTP method; do NOT swap methods and retry.";
-  }
-
-  if (status === 408) {
-    return "Request Timeout — server-side timeout.";
-  }
-
-  if (status === HttpCodes.CONFLICT) {
-    return "Conflict — server state disagrees with request.";
-  }
-
-  if (status === 410) {
-    return "Gone — resource permanently removed.";
-  }
-
-  if (status === 429) {
-    return "Rate Limited — STOP all calls to this host immediately.";
+  if (STATUS_REASONS[status]) {
+    return STATUS_REASONS[status];
   }
 
   if (status >= HttpCodes.INTERNAL_SERVER_ERROR && status < 600) {

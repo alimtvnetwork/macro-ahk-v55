@@ -35,7 +35,8 @@ import { initMacroDb } from '../macro-db';
 import { enforceSingleDefaultPerRole } from '../prompt-role-db';
 
 beforeEach(() => {
-  captured.length = 0; nextResponse = { ok: true, isFail: false, isSuccess: true }; 
+  captured.length = 0;
+  nextResponse = { ok: true, isFail: false, isSuccess: true }; 
 });
 
 describe('Prompt table schema (step 3)', () => {

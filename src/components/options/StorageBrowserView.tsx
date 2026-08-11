@@ -234,7 +234,9 @@ export function StorageBrowserView() {
         primaryKeys={tableInfo?.primaryKeys ?? ["id"]}
         isView={selectedIsView}
         onBack={() => {
-          setSelectedTable(null); setSelectedIsView(false); void loadTables(); 
+          setSelectedTable(null);
+          setSelectedIsView(false);
+          void loadTables(); 
         }}
       />
     );
@@ -391,7 +393,8 @@ export function StorageBrowserView() {
                     <div key={table.name} className="anim-fade-in-up" style={{ animationDelay: `${i * 0.05}s` }}>
                       <button
                         onClick={() => {
-                          setSelectedTable(table.name); setSelectedIsView(false); 
+                          setSelectedTable(table.name);
+                          setSelectedIsView(false); 
                         }}
                         className="w-full text-left p-4 rounded-lg border border-border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200 group"
                       >
@@ -425,7 +428,8 @@ export function StorageBrowserView() {
                       <div key={view.name} className="anim-fade-in-up" style={{ animationDelay: `${i * 0.05}s` }}>
                         <button
                           onClick={() => {
-                            setSelectedTable(view.name); setSelectedIsView(true); 
+                            setSelectedTable(view.name);
+                            setSelectedIsView(true); 
                           }}
                           className="w-full text-left p-4 rounded-lg border border-dashed border-border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200 group"
                         >

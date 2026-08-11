@@ -50,8 +50,13 @@ export function buildEditorEl(row: PromptRow): EditorEls {
   const saveBtn = document.createElement('button');
   saveBtn.textContent = 'Save';
   saveBtn.style.cssText = btnCss('#2f4a2f', '#d6f5d6');
-  bar.appendChild(cancelBtn); bar.appendChild(saveBtn);
-  wrap.appendChild(nameInput); wrap.appendChild(tokenEls.row); wrap.appendChild(valuesEls.row); wrap.appendChild(bodyInput); wrap.appendChild(bar);
+  bar.appendChild(cancelBtn);
+  bar.appendChild(saveBtn);
+  wrap.appendChild(nameInput);
+  wrap.appendChild(tokenEls.row);
+  wrap.appendChild(valuesEls.row);
+  wrap.appendChild(bodyInput);
+  wrap.appendChild(bar);
 
   return {
     wrap, nameInput, bodyInput,
@@ -99,7 +104,8 @@ export function openInlineEditor(refs: ModalRefs, rowEl: HTMLElement, row: Promp
   const ed = buildEditorEl(row);
   rowEl.replaceWith(ed.wrap);
   const cancel = (): void => {
-    refs.activeEditor = null; void renderAllRoles(refs); 
+    refs.activeEditor = null;
+    void renderAllRoles(refs); 
   };
 
   const save = (): void => {

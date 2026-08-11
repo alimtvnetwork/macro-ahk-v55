@@ -183,7 +183,8 @@ export function ProjectCreateForm({ availableScripts, availableConfigs, onSave, 
           <div className="space-y-2">
             <div
               onDragOver={(e) => {
-                e.preventDefault(); setIsDragOver(true); 
+                e.preventDefault();
+                setIsDragOver(true); 
               }}
               onDragLeave={() => setIsDragOver(false)}
               onDrop={handleFolderDrop}

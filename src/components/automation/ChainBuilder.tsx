@@ -1,11 +1,3 @@
-// @ts-nocheck
-/**
- * ChainBuilder — Spec 21
- *
- * Visual editor for creating/editing automation chains.
- * Supports dragging steps between top-level, condition-then, and condition-else.
- */
-
 import { useState, useMemo, useCallback } from "react";
 import type { AutomationChain, ChainStep, StepCondition, TriggerType, TriggerConfig as TriggerConfigType } from "@/lib/automation-types";
 import { createDefaultStep, STEP_TYPE_META } from "@/lib/automation-types";
@@ -343,7 +335,8 @@ export function ChainBuilder({ chain, onSave, onCancel }: Props) {
 
         {/* Trigger */}
         <TriggerConfigPanel triggerType={triggerType} triggerConfig={triggerConfig} onChange={(t, c) => {
-          setTriggerType(t); setTriggerConfig(c); 
+          setTriggerType(t);
+          setTriggerConfig(c); 
         }} />
 
         {/* Steps */}

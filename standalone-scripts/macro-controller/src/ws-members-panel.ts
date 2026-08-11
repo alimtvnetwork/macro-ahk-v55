@@ -664,6 +664,34 @@ function cssEscape(value: string): string {
   });
 }
 
+function bindMenuDismissHandlers(menu: HTMLElement): void {
+  setTimeout(function () {
+    const outside = function (e: MouseEvent): void {
+      const t = e.target as Node | null;
+      if (t && menu.contains(t)) {
+        return;
+      }
+
+      closeMemberActionMenu();
+      document.removeEventListener('mousedown', outside, true);
+      document.removeEventListener('keydown', key, true);
+    };
+
+    const key = function (e: KeyboardEvent): void {
+      if (e.key !== 'Escape') {
+        return;
+      }
+
+      closeMemberActionMenu();
+      document.removeEventListener('mousedown', outside, true);
+      document.removeEventListener('keydown', key, true);
+    };
+
+    document.addEventListener('mousedown', outside, true);
+    document.addEventListener('keydown', key, true);
+  }, 10);
+}
+
 function openMemberActionMenu(
   panelEl: HTMLElement,
   anchor: HTMLElement,
@@ -710,31 +738,7 @@ function openMemberActionMenu(
   document.body.appendChild(menu);
 
   // Dismiss on outside click / Esc.
-  setTimeout(function () {
-    const outside = function (e: MouseEvent): void {
-      const t = e.target as Node | null;
-      if (t && menu.contains(t)) {
-        return;
-      }
-
-      closeMemberActionMenu();
-      document.removeEventListener('mousedown', outside, true);
-      document.removeEventListener('keydown', key, true);
-    };
-
-    const key = function (e: KeyboardEvent): void {
-      if (e.key !== 'Escape') {
-        return;
-      }
-
-      closeMemberActionMenu();
-      document.removeEventListener('mousedown', outside, true);
-      document.removeEventListener('keydown', key, true);
-    };
-
-    document.addEventListener('mousedown', outside, true);
-    document.addEventListener('keydown', key, true);
-  }, 10);
+  bindMenuDismissHandlers(menu);
 }
 
 // v3.4.3 (task 13) — Submit invite + optimistic insert. Reverts on failure.

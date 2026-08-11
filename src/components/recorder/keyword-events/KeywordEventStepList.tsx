@@ -69,7 +69,8 @@ export function KeywordEventStepList(props: KeywordEventStepListProps): JSX.Elem
             variant="ghost"
             className="ml-auto h-5 px-1.5 text-[10px]"
             onClick={(clickEvent) => {
-              clickEvent.stopPropagation(); stepSelection.clear(); 
+              clickEvent.stopPropagation(); 
+              stepSelection.clear(); 
             }}
             data-testid={`keyword-event-step-selection-clear-${event.Id}`}
           >
@@ -163,7 +164,8 @@ function StepRow(props: StepRowProps): JSX.Element {
         data-selected={selected ? "true" : undefined}
         data-step-disabled={stepDisabled ? "true" : undefined}
         onClick={(clickEvent) => {
-          clickEvent.stopPropagation(); onRowClick(step.Id, clickEvent); 
+          clickEvent.stopPropagation(); 
+          onRowClick(step.Id, clickEvent); 
         }}
       >
         <div className="flex items-center gap-2">
@@ -192,7 +194,8 @@ function StepRow(props: StepRowProps): JSX.Element {
             <Button
               size="icon" variant="ghost" className="h-6 w-6"
               onClick={(clickEvent) => {
-                clickEvent.stopPropagation(); onMoveStep(step.Id, "up"); 
+                clickEvent.stopPropagation(); 
+                onMoveStep(step.Id, "up"); 
               }}
               disabled={index === 0}
               aria-label="Move step up"
@@ -202,7 +205,8 @@ function StepRow(props: StepRowProps): JSX.Element {
             <Button
               size="icon" variant="ghost" className="h-6 w-6"
               onClick={(clickEvent) => {
-                clickEvent.stopPropagation(); onMoveStep(step.Id, "down"); 
+                clickEvent.stopPropagation(); 
+                onMoveStep(step.Id, "down"); 
               }}
               disabled={index === event.Steps.length - 1}
               aria-label="Move step down"
@@ -212,7 +216,8 @@ function StepRow(props: StepRowProps): JSX.Element {
             <Button
               size="icon" variant="ghost" className="h-6 w-6 text-destructive"
               onClick={(clickEvent) => {
-                clickEvent.stopPropagation(); onRemoveStep(step.Id); 
+                clickEvent.stopPropagation(); 
+                onRemoveStep(step.Id); 
               }}
               aria-label="Remove step"
             >

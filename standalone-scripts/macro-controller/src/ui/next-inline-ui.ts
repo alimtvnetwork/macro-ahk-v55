@@ -1369,7 +1369,8 @@ function _registerNextInlineTeardownOnce(): void {
   _pagehideRegistered = true;
   window.addEventListener('pagehide', function () {
     if (_observer) {
-      _observer.disconnect(); _observer = null; 
+      _observer.disconnect();
+      _observer = null; 
     }
 
     while (_dropupClosers.length) {
@@ -1386,7 +1387,8 @@ function _registerNextInlineTeardownOnce(): void {
 /** Test-only: reset teardown state and disconnect observers. */
 export function __resetNextInlineForTests(): void {
   if (_observer) {
-    _observer.disconnect(); _observer = null; 
+    _observer.disconnect();
+    _observer = null; 
   }
 
   while (_dropupClosers.length) {

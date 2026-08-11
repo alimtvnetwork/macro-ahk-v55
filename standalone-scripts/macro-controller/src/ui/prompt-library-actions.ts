@@ -56,13 +56,13 @@ export async function handleDelete(
       try {
         showToast(msgText, 'error'); 
       } catch (err) {
-        console.error();
+        logError(LOG_SCOPE, 'error', err);
       }
 
       try {
         window.alert(msgText); 
       } catch (err) {
-        console.error();
+        logError(LOG_SCOPE, 'error', err);
       }
 
       return;
@@ -72,7 +72,7 @@ export async function handleDelete(
     try {
       showToast('Deleted prompt "' + row.Slug + '"', 'success'); 
     } catch (err) {
-      console.error();
+      logError(LOG_SCOPE, 'error', err);
     }
 
     await renderAllRoles(refs);

@@ -70,7 +70,8 @@ describe('prompt-library-modal - aria-live announcement of import errors', () =>
     mocks.showToast.mockReset();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks(); 
   });
 
   it('exposes the error banner as an assertive, atomic live region', async () => {

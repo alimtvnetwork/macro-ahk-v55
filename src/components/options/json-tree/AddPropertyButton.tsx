@@ -22,8 +22,7 @@ interface AddPropertyButtonProps {
   onAdd: (key: string, value: JsonValue) => void;
 }
 
-/** Button that expands into an inline form for adding a new property. */
-export function AddPropertyButton({ onAdd }: AddPropertyButtonProps) {
+function useAddPropertyState(onAdd: (key: string, value: JsonValue) => void) {
   const [isAdding, setIsAdding] = useState(false);
   const [newKey, setNewKey] = useState("");
   const [newType, setNewType] = useState<NewPropertyType>("string");
@@ -51,6 +50,13 @@ export function AddPropertyButton({ onAdd }: AddPropertyButtonProps) {
       setIsAdding(false);
     }
   };
+
+  return { isAdding, setIsAdding, newKey, setNewKey, newType, setNewType, handleAdd, handleKeyDown };
+}
+
+/** Button that expands into an inline form for adding a new property. */
+export function AddPropertyButton({ onAdd }: AddPropertyButtonProps) {
+  const { isAdding, setIsAdding, newKey, setNewKey, newType, setNewType, handleAdd, handleKeyDown } = useAddPropertyState(onAdd);
 
   if (isAdding) {
     return (

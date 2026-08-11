@@ -26,6 +26,7 @@ export interface RecorderControlBarProps {
     readonly className?: string;
 }
 
+/* eslint-disable max-lines-per-function */
 export function RecorderControlBar(props: RecorderControlBarProps): JSX.Element {
   const { projectSlug, className } = props;
   const { session, start, pause, resume, stop } = useRecordingSession();

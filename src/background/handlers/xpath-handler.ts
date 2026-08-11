@@ -56,44 +56,6 @@ export async function handleToggleXPathRecorder(
  *
  * Strategy: pick the active tab in the last-focused normal window so the
  * recorder lands on the user's real web page (e.g. github.com), not on the
- * Options/Popup tab that initiated the toggle. Falls back to the active tab
- * in the current window, then to any active tab, and finally null.
- */
-async function resolveTargetTabId(): Promise<number | null> {
-  const optionsUrl = chrome.runtime.getURL("");
-
-  const isWebTab = (url: string | undefined): boolean => {
-    if (url === undefined) {
-      return false;
-    }
-
-    if (url.startsWith(optionsUrl)) {
-      return false;
-    }
-
-    if (url.startsWith("chrome://")) {
-      return false;
-    }
-
-    if (url.startsWith("chrome-extension://")) {
-      return false;
-    }
-
-    if (url.startsWith("edge://")) {
-      return false;
-    }
-
-    if (url.startsWith("about:")) {
-      return false;
-    }
-
-    return true;
-  };
-
-  const queries: chrome.tabs.QueryInfo[] = [
-    { active: true, lastFocusedWindow: true, windowType: "normal" },
-    { active: true, currentWindow: true },
-    { active: true },
   ];
 
   for (const query of queries) {

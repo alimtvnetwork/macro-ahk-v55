@@ -61,7 +61,8 @@ describe('prompt-library-modal - Choose file button', () => {
     document.body.innerHTML = ''; 
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks(); 
   });
 
   it('renders a visible, keyboard-focusable button with an accessible label', async () => {

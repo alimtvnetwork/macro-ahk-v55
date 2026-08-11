@@ -405,15 +405,12 @@ function splitSqlStatements(sql: string): string[] {
   for (let i = 0; i < sql.length; i++) {
     const ch = sql[i];
     const next = sql[i + 1];
+    
     if (quote) {
-      current += ch;
-      if (ch === quote && next === quote) {
-        current += next;
-        i++;
-      } else if (ch === quote) {
-        quote = null;
-      }
-
+      const res = processQuoteChar(ch, next, quote);
+      current += res.append;
+      quote = res.newQuote;
+      i += res.skip;
       continue;
     }
 
@@ -445,6 +442,18 @@ function splitSqlStatements(sql: string): string[] {
   pushSqlStatement(statements, current);
 
   return statements;
+}
+
+function processQuoteChar(ch: string, next: string, quote: "'" | "\""): { append: string, newQuote: "'" | "\"" | null, skip: number } {
+  if (ch === quote && next === quote) {
+    return { append: ch + next, newQuote: quote, skip: 1 };
+  }
+
+  if (ch === quote) {
+    return { append: ch, newQuote: null, skip: 0 };
+  }
+
+  return { append: ch, newQuote: quote, skip: 0 };
 }
 
 function skipLineComment(sql: string, start: number): number {

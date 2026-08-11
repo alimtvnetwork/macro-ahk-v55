@@ -30,9 +30,61 @@ interface Props {
     projectSlug: string;
 }
 
+function RecorderDataView({
+  ctrl,
+  projectSlug,
+}: {
+  ctrl: ReturnType<typeof useRecorderVisualisationController>;
+  projectSlug: string;
+}) {
+  const { data } = ctrl;
+  if (data === null) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-4">
+      <RecorderVisualisationHeader
+        dataSources={data.dataSources}
+        stepCount={data.steps.length}
+        selfTestRunning={ctrl.selfTestRunning}
+        onSelfTest={() => {
+          void ctrl.handleSelfTest(); 
+        }}
+        onExport={ctrl.handleExport}
+      />
+      {data.steps.length === 0 ? (
+        <RecorderEmptyState
+          projectSlug={projectSlug}
+          hasDbError={false}
+          onReload={() => {
+            void ctrl.reload(); 
+          }}
+        />
+      ) : (
+        <RecorderVisualisationBody
+          steps={data.steps}
+          dataSources={data.dataSources}
+          bindings={data.bindings}
+          selectedStepId={ctrl.selectedStepId}
+          selectors={ctrl.selectors}
+          selectorsLoading={ctrl.selectorsLoading}
+          tagsByStep={ctrl.tagsByStep}
+          onSelectStep={ctrl.setSelectedStepId}
+          onDelete={ctrl.handleDelete}
+          onRename={ctrl.handleRename}
+          onDescriptionSave={ctrl.handleDescriptionSave}
+          onTagsSave={ctrl.handleTagsSave}
+          onLinkChange={ctrl.handleLinkChange}
+        />
+      )}
+    </div>
+  );
+}
+
 export default function RecorderVisualisationPanel({ projectSlug }: Props): JSX.Element | null {
   const ctrl = useRecorderVisualisationController(projectSlug);
-  const { data, loading, error, reload } = ctrl;
+  const { loading, error, reload } = ctrl;
 
   if (loading) {
     return (
@@ -59,46 +111,5 @@ export default function RecorderVisualisationPanel({ projectSlug }: Props): JSX.
     );
   }
 
-  if (data === null) {
-    return null;
-  }
-
-  return (
-    <div className="space-y-4">
-      <RecorderVisualisationHeader
-        dataSources={data.dataSources}
-        stepCount={data.steps.length}
-        selfTestRunning={ctrl.selfTestRunning}
-        onSelfTest={() => {
-          void ctrl.handleSelfTest(); 
-        }}
-        onExport={ctrl.handleExport}
-      />
-      {data.steps.length === 0 ? (
-        <RecorderEmptyState
-          projectSlug={projectSlug}
-          hasDbError={false}
-          onReload={() => {
-            void reload(); 
-          }}
-        />
-      ) : (
-        <RecorderVisualisationBody
-          steps={data.steps}
-          dataSources={data.dataSources}
-          bindings={data.bindings}
-          selectedStepId={ctrl.selectedStepId}
-          selectors={ctrl.selectors}
-          selectorsLoading={ctrl.selectorsLoading}
-          tagsByStep={ctrl.tagsByStep}
-          onSelectStep={ctrl.setSelectedStepId}
-          onDelete={ctrl.handleDelete}
-          onRename={ctrl.handleRename}
-          onDescriptionSave={ctrl.handleDescriptionSave}
-          onTagsSave={ctrl.handleTagsSave}
-          onLinkChange={ctrl.handleLinkChange}
-        />
-      )}
-    </div>
-  );
+  return <RecorderDataView ctrl={ctrl} projectSlug={projectSlug} />;
 }

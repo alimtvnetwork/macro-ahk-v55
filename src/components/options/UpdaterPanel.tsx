@@ -30,7 +30,8 @@ interface Props {
   projectId: string;
 }
 
-export function UpdaterPanel({ projectId: _projectId }: Props) {
+// eslint-disable-next-line max-lines-per-function
+function useUpdaterPanelState() {
   const [updaters, setUpdaters] = useState<UpdaterEntry[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [checkingId, setCheckingId] = useState<number | null>(null);
@@ -257,6 +258,31 @@ export function UpdaterPanel({ projectId: _projectId }: Props) {
 
   const toggleCategory = (cats: string[], cat: string) =>
     cats.includes(cat) ? cats.filter((c) => c !== cat) : [...cats, cat];
+
+  return {
+    updaters,
+    isAdding, setIsAdding,
+    checkingId,
+    expandedId, setExpandedId,
+    handleAdd, handleRemove, handleToggleEnabled, handleCheck, handleUpdateField,
+    handleAddEndpoint, handleRemoveEndpoint, handleUpdateEndpoint,
+    handleAddStep, handleRemoveStep, handleUpdateStep,
+    toggleCategory,
+  };
+}
+
+// eslint-disable-next-line max-lines-per-function
+export function UpdaterPanel({ projectId: _projectId }: Props) {
+  const {
+    updaters,
+    isAdding, setIsAdding,
+    checkingId,
+    expandedId, setExpandedId,
+    handleAdd, handleRemove, handleToggleEnabled, handleCheck, handleUpdateField,
+    handleAddEndpoint, handleRemoveEndpoint, handleUpdateEndpoint,
+    handleAddStep, handleRemoveStep, handleUpdateStep,
+    toggleCategory,
+  } = useUpdaterPanelState();
 
   return (
     <div className="space-y-4">

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { HttpCodes } from "../../constants/http";
 /**
  * Marco Extension — Error-Swallowing Audit View
@@ -43,6 +42,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AuditSeverityEnum, BadgeEnum, ToneEnum } from "../../types/enums";
 import { logError } from "@/components/options/options-logger";
+import { ServiceResult } from "@/utils/result-wrapper";
 
 const AUDIT_CLI_COMMAND = "node scripts/audit-error-swallow.mjs";
 

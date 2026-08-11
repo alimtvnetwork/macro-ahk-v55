@@ -106,7 +106,8 @@ function buildWsCreditFromSummary(): WorkspaceCredit {
 
 describe('Issue 117 — pipeline: RCA payload → credit summary → badge', () => {
   beforeEach(() => {
-    vi.useFakeTimers(); vi.setSystemTime(new Date(NOW_MS)); 
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(NOW_MS)); 
   });
   afterEach(() => {
     vi.useRealTimers(); 

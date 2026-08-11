@@ -346,11 +346,13 @@ function validateNoBackgroundDynamicImport(): Plugin {
             i++;
             while (i < n) {
               if (src[i] === "\\") {
-                i += 2; continue; 
+                i += 2;
+                continue; 
               }
 
               if (src[i] === quote) {
-                i++; break; 
+                i++;
+                break; 
               }
 
               i++;

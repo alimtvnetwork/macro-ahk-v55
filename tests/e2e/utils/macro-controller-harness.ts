@@ -218,7 +218,8 @@ export async function mountMacroControllerHarness(
 
       page.once('pageerror', onPageError);
       setTimeout(() => {
-        page.off('pageerror', onPageError); resolve(null); 
+        page.off('pageerror', onPageError);
+        resolve(null); 
       }, 250);
     });
     await page.addScriptTag({ content: bundleSource });

@@ -18,48 +18,43 @@ export interface AggregateCounts {
 }
 
 export function aggregate(reports: ReadonlyArray<BatchGroupReport>): AggregateCounts {
-  let groupsRun = 0;
-  let executed = 0;
-  let skipped = 0;
-  let entered = 0;
-  let failures = 0;
+  return reports.reduce(accumulateReport, {
+    GroupsRun: 0,
+    StepsExecuted: 0,
+    StepsSkipped: 0,
+    GroupsEntered: 0,
+    Failures: 0,
+  });
+}
 
-  for (const r of reports) {
-    if (r.Status === "Succeeded" || r.Status === "Failed") {
-      groupsRun++;
-    }
+function accumulateReport(acc: AggregateCounts, r: BatchGroupReport): AggregateCounts {
+  let { GroupsRun, StepsExecuted, StepsSkipped, GroupsEntered, Failures } = acc;
 
-    if (r.Status === "Failed") {
-      failures++;
-    }
-
-    const result = r.Result;
-    if (result === null) {
-      continue;
-    }
-
-    // Successful runs ship the canonical counters directly. We
-    // still walk the trace for failed runs because RunGroupFailure
-    // only carries the partial trace, not pre-computed counts.
-    if (result.Ok) {
-      executed += result.StepsExecuted;
-      skipped += result.StepsSkipped;
-      entered += result.GroupsEntered;
-    } else {
-      const partial = countsFromTrace(result.Trace);
-      executed += partial.Executed;
-      skipped += partial.Skipped;
-      entered += partial.Entered;
-    }
+  if (r.Status === "Succeeded" || r.Status === "Failed") {
+    GroupsRun++;
   }
 
-  return {
-    GroupsRun: groupsRun,
-    StepsExecuted: executed,
-    StepsSkipped: skipped,
-    GroupsEntered: entered,
-    Failures: failures,
-  };
+  if (r.Status === "Failed") {
+    Failures++;
+  }
+
+  const result = r.Result;
+  if (result === null) {
+    return { GroupsRun, StepsExecuted, StepsSkipped, GroupsEntered, Failures };
+  }
+
+  if (result.Ok) {
+    StepsExecuted += result.StepsExecuted;
+    StepsSkipped += result.StepsSkipped;
+    GroupsEntered += result.GroupsEntered;
+  } else {
+    const partial = countsFromTrace(result.Trace);
+    StepsExecuted += partial.Executed;
+    StepsSkipped += partial.Skipped;
+    GroupsEntered += partial.Entered;
+  }
+
+  return { GroupsRun, StepsExecuted, StepsSkipped, GroupsEntered, Failures };
 }
 
 export function countsFromTrace(trace: ReadonlyArray<RunStepTraceEntry>): {

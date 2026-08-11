@@ -113,13 +113,15 @@ describe('prompt-library-modal - invalid Import is rejected end-to-end', () => {
   }
 
   it('rejects non-JSON garbage', async () => {
-    await openPromptLibraryModal(); await flush();
+    await openPromptLibraryModal();
+    await flush();
     await dropFile('this is not json at all {{{');
     assertRejectionContract();
   });
 
   it('rejects an empty file', async () => {
-    await openPromptLibraryModal(); await flush();
+    await openPromptLibraryModal();
+    await flush();
     await dropFile('');
     // Empty file is caught by client-side validation before parse, so the
     // logError code is 'import validation failed' rather than 'import parse failed'.
@@ -135,13 +137,15 @@ describe('prompt-library-modal - invalid Import is rejected end-to-end', () => {
   });
 
   it('rejects an envelope missing entries[]', async () => {
-    await openPromptLibraryModal(); await flush();
+    await openPromptLibraryModal();
+    await flush();
     await dropFile(JSON.stringify({ schemaVersion: 1, notEntries: [] }));
     assertRejectionContract();
   });
 
   it('rejects an envelope whose rows all lack required fields', async () => {
-    await openPromptLibraryModal(); await flush();
+    await openPromptLibraryModal();
+    await flush();
     // schemaVersion + entries present, but every row is missing name/text.
     await dropFile(JSON.stringify({
       schemaVersion: 1,
@@ -154,13 +158,15 @@ describe('prompt-library-modal - invalid Import is rejected end-to-end', () => {
   });
 
   it('rejects a bare array of invalid rows', async () => {
-    await openPromptLibraryModal(); await flush();
+    await openPromptLibraryModal();
+    await flush();
     await dropFile(JSON.stringify([{ name: '' }, { text: 123 }, null]));
     assertRejectionContract();
   });
 
   it('ignores a file-input change with no file selected (no error, no import)', async () => {
-    await openPromptLibraryModal(); await flush();
+    await openPromptLibraryModal();
+    await flush();
     const fileInput = document.querySelector<HTMLInputElement>('[data-testid="library-import-file"]')!;
     Object.defineProperty(fileInput, 'files', { value: [], configurable: true });
     fileInput.dispatchEvent(new Event('change'));

@@ -241,7 +241,8 @@ function _buildToolsCollapsible(
   };
 
   settingsGearBtn.onclick = function(e: Event) {
-    e.stopPropagation(); showSettingsDialog(settingsDeps); 
+    e.stopPropagation();
+    showSettingsDialog(settingsDeps); 
   };
 
   toolsCol.header.style.cssText += 'display:flex;align-items:center;';

@@ -128,8 +128,9 @@ export function TagsSection(props: TagsSectionProps): JSX.Element {
           onChange={(event) => setDraftTag(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Enter") {
-              event.preventDefault(); onAdd(); 
-            } 
+              event.preventDefault();
+              onAdd();
+            }
           }}
           placeholder="Add tag..."
           className="font-mono text-xs h-8"

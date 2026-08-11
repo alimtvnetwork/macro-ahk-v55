@@ -23,11 +23,14 @@ interface GroupFormDialogProps {
   editGroup?: ProjectGroup | null;
 }
 
-export function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: GroupFormDialogProps) {
-  const [name, setName] = useState(editGroup?.Name ?? "");
-  const [settings, setSettings] = useState(editGroup?.SharedSettingsJson ?? "");
+function useGroupSubmit(
+  name: string,
+  settings: string,
+  editGroup: ProjectGroup | null | undefined,
+  onOpenChange: (open: boolean) => void,
+  onSaved: () => void,
+) {
   const [saving, setSaving] = useState(false);
-
   const isEdit = !!editGroup?.Id;
 
   const handleSave = useCallback(async () => {
@@ -64,6 +67,15 @@ export function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: Grou
       setSaving(false);
     }
   }, [name, settings, isEdit, editGroup, onOpenChange, onSaved]);
+
+  return { saving, isEdit, handleSave };
+}
+
+// eslint-disable-next-line max-lines-per-function
+export function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: GroupFormDialogProps) {
+  const [name, setName] = useState(editGroup?.Name ?? "");
+  const [settings, setSettings] = useState(editGroup?.SharedSettingsJson ?? "");
+  const { saving, isEdit, handleSave } = useGroupSubmit(name, settings, editGroup, onOpenChange, onSaved);
 
   const hasName = !!name.trim();
   const shouldDisableSave = saving || !hasName;

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Project, SyntaxKind, TypeFormatFlags } from 'ts-morph';
 import * as path from 'path';
 

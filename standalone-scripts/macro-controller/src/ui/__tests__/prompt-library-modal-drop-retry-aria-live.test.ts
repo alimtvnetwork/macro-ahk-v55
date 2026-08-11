@@ -70,7 +70,8 @@ describe('prompt-library-modal - retry announcement after failed drop', () => {
     io.parsePromptsText.mockReturnValue({ valid: [{ name: 'p', text: 'body {{n}}' }] as never, errors: [] });
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks(); 
   });
 
   it('announces "Retrying import" on the next drop after a failure, and "Retry succeeded" on success', async () => {
@@ -90,17 +91,22 @@ describe('prompt-library-modal - retry announcement after failed drop', () => {
 
     // Attempt 1: fails.
     fireDrop(root, 'first.json');
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
     expect(s.textContent ?? '').toMatch(/Import failed:.*DB write refused/);
 
     // Attempt 2 begins: retry announcement visible while performPromptImport is pending.
     fireDrop(root, 'second.json');
-    await tick(); await tick();
+    await tick();
+    await tick();
     expect(s.textContent ?? '').toMatch(/^Retrying import: second\.json/);
 
         // Now resolve, and confirm the success message is prefixed with "Retry succeeded.".
         resolveSecond!({ added: 2, updated: 0, errors: [] });
-        await tick(); await tick(); await tick();
+        await tick();
+        await tick();
+        await tick();
         expect(s.textContent ?? '').toMatch(/^Retry succeeded\. Import: \+2 added/);
   });
 
@@ -113,10 +119,13 @@ describe('prompt-library-modal - retry announcement after failed drop', () => {
     await tick();
     const root = getRoot();
     fireDrop(root, 'first.json');
-    await tick(); await tick();
+    await tick();
+    await tick();
     expect(status().textContent ?? '').toMatch(/^Importing first\.json/);
         resolveFirst!({ added: 1, updated: 0, errors: [] });
-        await tick(); await tick(); await tick();
+        await tick();
+        await tick();
+        await tick();
         expect(status().textContent ?? '').not.toMatch(/Retry/);
   });
 });

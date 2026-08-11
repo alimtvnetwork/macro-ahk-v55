@@ -43,7 +43,9 @@ import { seedPlanNextPrompts } from '../seed-plan-next';
 import { logError } from "../../error-utils";
 
 beforeEach(() => {
-  captured.length = 0; responsesQueue = []; logCalls.length = 0;
+  captured.length = 0;
+  responsesQueue = [];
+  logCalls.length = 0;
   try {
     localStorage.removeItem('marco_last_seed_telemetry'); 
   } catch (err) {

@@ -21,34 +21,17 @@ export interface UseRecorderStepDetailArgs {
     readonly onLinkChange: (stepId: number, slot: StepLinkSlot, target: string | null) => Promise<void>;
 }
 
-export function useRecorderStepDetail(args: UseRecorderStepDetailArgs) {
-  const { step, tags, onRename, onDescriptionSave, onTagsSave, onLinkChange } = args;
-
+function useStepName(step: StepRow, onRename: (stepId: number, newName: string) => Promise<void>) {
   const [draftName, setDraftName] = useState(step.VariableName);
   const [renameError, setRenameError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [draftDesc, setDraftDesc] = useState(step.Description ?? "");
-  const [descSaving, setDescSaving] = useState(false);
-  const [descError, setDescError] = useState<string | null>(null);
-
-  const [draftTag, setDraftTag] = useState("");
-  const [tagsError, setTagsError] = useState<string | null>(null);
-
-  const [linkError, setLinkError] = useState<string | null>(null);
-
   useEffect(() => {
     setDraftName(step.VariableName);
     setRenameError(null);
-    setDraftDesc(step.Description ?? "");
-    setDescError(null);
-    setDraftTag("");
-    setTagsError(null);
-    setLinkError(null);
-  }, [step.StepId, step.VariableName, step.Description]);
+  }, [step.StepId, step.VariableName]);
 
   const isDirty = draftName !== step.VariableName;
-  const isDescDirty = draftDesc !== (step.Description ?? "");
 
   const handleSave = useCallback(async () => {
     if (!isDirty) {
@@ -58,13 +41,29 @@ export function useRecorderStepDetail(args: UseRecorderStepDetailArgs) {
     setIsSaving(true);
     setRenameError(null);
     try {
-      await onRename(step.StepId, draftName.trim()); 
+      await onRename(step.StepId, draftName.trim());
     } catch (err) {
-      setRenameError(errorText(err)); 
+      setRenameError(errorText(err));
     } finally {
-      setIsSaving(false); 
+      setIsSaving(false);
     }
   }, [isDirty, draftName, onRename, step.StepId]);
+
+  return { draftName, setDraftName, renameError, isSaving, isDirty, handleSave };
+}
+
+// eslint-disable-next-line max-lines-per-function
+function useStepDescription(step: StepRow, onDescriptionSave: (stepId: number, description: string | null) => Promise<void>) {
+  const [draftDesc, setDraftDesc] = useState(step.Description ?? "");
+  const [descSaving, setDescSaving] = useState(false);
+  const [descError, setDescError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setDraftDesc(step.Description ?? "");
+    setDescError(null);
+  }, [step.StepId, step.Description]);
+
+  const isDescDirty = draftDesc !== (step.Description ?? "");
 
   const handleDescSave = useCallback(async () => {
     if (!isDescDirty) {
@@ -77,11 +76,24 @@ export function useRecorderStepDetail(args: UseRecorderStepDetailArgs) {
       const trimmed = draftDesc.trim();
       await onDescriptionSave(step.StepId, trimmed.length === 0 ? null : trimmed);
     } catch (err) {
-      setDescError(errorText(err)); 
+      setDescError(errorText(err));
     } finally {
-      setDescSaving(false); 
+      setDescSaving(false);
     }
   }, [isDescDirty, draftDesc, onDescriptionSave, step.StepId]);
+
+  return { draftDesc, setDraftDesc, descSaving, descError, isDescDirty, handleDescSave };
+}
+
+// eslint-disable-next-line max-lines-per-function
+function useStepTags(step: StepRow, tags: ReadonlyArray<string>, onTagsSave: (stepId: number, tags: ReadonlyArray<string>) => Promise<void>) {
+  const [draftTag, setDraftTag] = useState("");
+  const [tagsError, setTagsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setDraftTag("");
+    setTagsError(null);
+  }, [step.StepId]);
 
   const handleAddTag = useCallback(async () => {
     const next = draftTag.trim();
@@ -92,25 +104,36 @@ export function useRecorderStepDetail(args: UseRecorderStepDetailArgs) {
     if (tags.includes(next)) {
       setDraftTag("");
 
-      return; 
+      return;
     }
 
     setTagsError(null);
     try {
-      await onTagsSave(step.StepId, [...tags, next]); setDraftTag(""); 
+      await onTagsSave(step.StepId, [...tags, next]);
+      setDraftTag("");
     } catch (err) {
-      setTagsError(errorText(err)); 
+      setTagsError(errorText(err));
     }
   }, [draftTag, tags, onTagsSave, step.StepId]);
 
   const handleRemoveTag = useCallback(async (name: string) => {
     setTagsError(null);
     try {
-      await onTagsSave(step.StepId, tags.filter((tag) => tag !== name)); 
+      await onTagsSave(step.StepId, tags.filter((tag) => tag !== name));
     } catch (err) {
-      setTagsError(errorText(err)); 
+      setTagsError(errorText(err));
     }
   }, [tags, onTagsSave, step.StepId]);
+
+  return { draftTag, setDraftTag, tagsError, handleAddTag, handleRemoveTag };
+}
+
+function useStepLinks(step: StepRow, onLinkChange: (stepId: number, slot: StepLinkSlot, target: string | null) => Promise<void>) {
+  const [linkError, setLinkError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLinkError(null);
+  }, [step.StepId]);
 
   const handleLinkSave = useCallback(async (slot: StepLinkSlot, raw: string) => {
     setLinkError(null);
@@ -118,14 +141,25 @@ export function useRecorderStepDetail(args: UseRecorderStepDetailArgs) {
       const trimmed = raw.trim();
       await onLinkChange(step.StepId, slot, trimmed.length === 0 ? null : trimmed);
     } catch (err) {
-      setLinkError(errorText(err)); 
+      setLinkError(errorText(err));
     }
   }, [onLinkChange, step.StepId]);
 
+  return { linkError, handleLinkSave };
+}
+
+export function useRecorderStepDetail(args: UseRecorderStepDetailArgs) {
+  const { step, tags, onRename, onDescriptionSave, onTagsSave, onLinkChange } = args;
+
+  const nameProps = useStepName(step, onRename);
+  const descProps = useStepDescription(step, onDescriptionSave);
+  const tagProps = useStepTags(step, tags, onTagsSave);
+  const linkProps = useStepLinks(step, onLinkChange);
+
   return {
-    draftName, setDraftName, renameError, isSaving, isDirty, handleSave,
-    draftDesc, setDraftDesc, descSaving, descError, isDescDirty, handleDescSave,
-    draftTag, setDraftTag, tagsError, handleAddTag, handleRemoveTag,
-    linkError, handleLinkSave,
+    ...nameProps,
+    ...descProps,
+    ...tagProps,
+    ...linkProps,
   };
 }

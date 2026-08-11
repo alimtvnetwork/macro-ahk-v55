@@ -572,7 +572,8 @@ async function commitRevisions(
   let orphanCount = 0;
   for (const r of revisionsIn) {
     if (!committedSlugs.has(r.Slug)) {
-      orphanCount++; continue; 
+      orphanCount++;
+      continue; 
     }
 
     const bucket = groups.get(r.Slug);
@@ -611,6 +612,45 @@ async function commitRevisions(
   void totalRevisionsInput;
 }
 
+async function _commitCacheEntries(
+  cacheEntries: CachedPromptEntry[],
+  overwrite: boolean
+): Promise<{ merged: CachedPromptEntry[]; results: PromptImportResults }> {
+  const record = await readJsonCopy();
+  const existing = record ? record.entries : [];
+  const { merged, results } = mergePrompts(existing, cacheEntries, overwrite);
+
+  const { writeJsonCopy, clearPromptCache } = await import('./prompt-cache');
+  await writeJsonCopy(merged);
+  await clearPromptCache();
+
+  const { invalidatePromptCache } = await import('./prompt-loader');
+  invalidatePromptCache();
+
+  return { merged, results };
+}
+
+function _finalizeImportResults(
+  results: PromptImportResults,
+  total: number,
+  dbUpserted: number,
+  dbErrors: string[],
+  defaultsProtected: number,
+  droppedCount: number,
+  roleFilter: string | undefined
+): void {
+  results.total = total;
+  results.updated += dbUpserted;
+  results.errors.push(...dbErrors);
+  if (defaultsProtected > 0) {
+    results.defaultsProtected = (results.defaultsProtected ?? 0) + defaultsProtected;
+  }
+
+  if (droppedCount > 0) {
+    results.errors.push(`${droppedCount} entries skipped (roleFilter=${String(roleFilter)})`);
+  }
+}
+
 export async function performPromptImport(
   importedPrompts: CachedPromptEntry[],
   options: PerformPromptImportOptions = {}
@@ -633,27 +673,17 @@ export async function performPromptImport(
   const { dbEntries, cacheEntries } = bridge.partitionByRole(kept);
   const dbResult = await bridge.commitDbEntries(dbEntries);
 
-  const record = await readJsonCopy();
-  const existing = record ? record.entries : [];
-  const { merged, results } = mergePrompts(existing, cacheEntries, options.overwrite !== false);
+  const { results } = await _commitCacheEntries(cacheEntries, options.overwrite !== false);
 
-  const { writeJsonCopy, clearPromptCache } = await import('./prompt-cache');
-  await writeJsonCopy(merged);
-  await clearPromptCache();
-
-  const { invalidatePromptCache } = await import('./prompt-loader');
-  invalidatePromptCache();
-
-  results.total = importedPrompts.length;
-  results.updated += dbResult.upserted;
-  results.errors.push(...dbResult.errors);
-  if (dbResult.defaultsProtected > 0) {
-    results.defaultsProtected = (results.defaultsProtected ?? 0) + dbResult.defaultsProtected;
-  }
-
-  if (droppedCount > 0) {
-    results.errors.push(`${droppedCount} entries skipped (roleFilter=${String(options.roleFilter)})`);
-  }
+  _finalizeImportResults(
+    results,
+    importedPrompts.length,
+    dbResult.upserted,
+    dbResult.errors,
+    dbResult.defaultsProtected,
+    droppedCount,
+    options.roleFilter
+  );
 
   emit({
     phase: 'entries',

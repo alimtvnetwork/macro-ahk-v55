@@ -378,7 +378,8 @@ export function ProjectsList({ projects, loading, onSave, onDelete, availableScr
             {/* Folder drop zone */}
             <div
               onDragOver={(e) => {
-                e.preventDefault(); setIsDragOver(true); 
+                e.preventDefault();
+                setIsDragOver(true); 
               }}
               onDragLeave={() => setIsDragOver(false)}
               onDrop={handleFolderDrop}

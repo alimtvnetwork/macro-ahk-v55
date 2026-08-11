@@ -347,13 +347,18 @@ export function doDropReorder(
   try {
     deps.lib.reorderSiblings(parentId, next);
   } catch (caught) {
-    deps.setPendingGroupOrder((prev) => {
-      const m = new Map(prev); m.delete(parentKey);
-
-      return m;
-    });
-    toast.error(caught instanceof Error ? caught.message : "Reorder failed");
+    revertPendingGroupOrder(deps, parentKey, caught);
   }
+}
+
+function revertPendingGroupOrder(deps: MutationDeps, parentKey: number | "root", caught: unknown): void {
+  deps.setPendingGroupOrder((prev) => {
+    const m = new Map(prev);
+    m.delete(parentKey);
+
+    return m;
+  });
+  toast.error(caught instanceof Error ? caught.message : "Reorder failed");
 }
 
 export function doStepDropReorder(
@@ -376,11 +381,16 @@ export function doStepDropReorder(
   try {
     deps.lib.reorderSteps(stepGroupId, next);
   } catch (caught) {
-    deps.setPendingStepOrder((prev) => {
-      const m = new Map(prev); m.delete(stepGroupId);
-
-      return m;
-    });
-    toast.error(caught instanceof Error ? caught.message : "Reorder failed");
+    revertPendingStepOrder(deps, stepGroupId, caught);
   }
+}
+
+function revertPendingStepOrder(deps: MutationDeps, stepGroupId: number, caught: unknown): void {
+  deps.setPendingStepOrder((prev) => {
+    const m = new Map(prev);
+    m.delete(stepGroupId);
+
+    return m;
+  });
+  toast.error(caught instanceof Error ? caught.message : "Reorder failed");
 }

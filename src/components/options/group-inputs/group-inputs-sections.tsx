@@ -26,7 +26,8 @@ export function DropZone(props: DropZoneProps): JSX.Element {
   return (
     <div
       onDragOver={(event) => {
-        event.preventDefault(); if (!dragOver) {
+        event.preventDefault();
+        if (!dragOver) {
           setDragOver(true);
         } 
       }}

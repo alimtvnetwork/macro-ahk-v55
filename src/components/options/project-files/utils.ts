@@ -1,56 +1,52 @@
 import { LanguageType } from "../../../types/enums";
 import { ProjectFile, FileNode } from "./types";
 
+function sortNodes(nodes: FileNode[]) {
+  nodes.sort((a, b) => {
+    const hasDifferentType = a.isDir !== b.isDir;
+    if (hasDifferentType) {
+      return a.isDir ? -1 : 1;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
+  nodes.forEach((n) => {
+    if (n.isDir) {
+      sortNodes(n.children);
+    }
+  });
+}
+
+function insertFileIntoTree(root: FileNode, file: ProjectFile) {
+  const parts = file.filename.split("/");
+  let current = root;
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    const isLastPart = i === parts.length - 1;
+    const path = parts.slice(0, i + 1).join("/");
+
+    if (isLastPart) {
+      current.children.push({ name: part, path, isDir: false, children: [], file });
+      continue;
+    }
+    
+    let dir = current.children.find((c) => c.isDir && c.name === part);
+    if (!dir) {
+      dir = { name: part, path, isDir: true, children: [] };
+      current.children.push(dir);
+    }
+
+    current = dir as FileNode;
+  }
+}
+
 export function buildTree(files: ProjectFile[]): FileNode[] {
   const root: FileNode = { name: "", path: "", isDir: true, children: [] };
 
   for (const file of files) {
-    const parts = file.filename.split("/");
-    let current = root;
-
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
-      const isLastPart = i === parts.length - 1;
-      const path = parts.slice(0, i + 1).join("/");
-
-      if (isLastPart) {
-        current.children.push({
-          name: part,
-          path,
-          isDir: false,
-          children: [],
-          file,
-        });
-        continue;
-      }
-      
-      let dir = current.children.find((c) => c.isDir && c.name === part);
-      const isDirMissing = !dir;
-      if (isDirMissing) {
-        dir = { name: part, path, isDir: true, children: [] };
-        current.children.push(dir);
-      }
-
-      // @ts-ignore - dir is guaranteed to be defined here
-      current = dir;
-    }
+    insertFileIntoTree(root, file);
   }
-
-  const sortNodes = (nodes: FileNode[]) => {
-    nodes.sort((a, b) => {
-      const hasDifferentType = a.isDir !== b.isDir;
-      if (hasDifferentType) {
-        return a.isDir ? -1 : 1;
-      }
-
-      return a.name.localeCompare(b.name);
-    });
-    nodes.forEach((n) => {
-      if (n.isDir) {
-        sortNodes(n.children);
-      }
-    });
-  };
 
   sortNodes(root.children);
 

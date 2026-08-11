@@ -21,7 +21,7 @@ import { buildDeletePreview } from "@/hooks/use-step-group-batch-actions";
 import { useListPanelSelection } from "./use-list-panel-selection";
 import { useListPanelView } from "./use-list-panel-view";
 
-export function useListPanelState() {
+function useListPanelApis() {
   const lib = useStepLibrary();
   const exportApi = useStepGroupExport({
     Lib: lib.Lib,
@@ -32,6 +32,33 @@ export function useListPanelState() {
     lib: { Lib: lib.Lib, Project: lib.Project, SqlJs: lib.SqlJs },
     onAfterImport: lib.refresh,
   });
+
+  return { lib, exportApi, importApi };
+}
+
+function useBatchActionsState(
+  selectedIds: ReadonlySet<number>,
+  lib: ReturnType<typeof useStepLibrary>,
+  exportApi: ReturnType<typeof useStepGroupExport>
+) {
+  const [batchRenameOpen, setBatchRenameOpen] = useState(false);
+  const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
+
+  const deletePreview = useMemo(
+    () => buildDeletePreview(Array.from(selectedIds), lib.Groups, lib.StepsByGroup),
+    [selectedIds, lib.Groups, lib.StepsByGroup],
+  );
+
+  const exportSelected = () => {
+    exportApi.requestExport(Array.from(selectedIds), true);
+  };
+
+  return { batchRenameOpen, setBatchRenameOpen, batchDeleteOpen, setBatchDeleteOpen, deletePreview, exportSelected };
+}
+
+// eslint-disable-next-line max-lines-per-function
+export function useListPanelState() {
+  const { lib, exportApi, importApi } = useListPanelApis();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [query, setQuery] = useState("");
 
@@ -61,18 +88,7 @@ export function useListPanelState() {
   }, [lib.Project, view.groupsById, activeGroupId, setActiveGroupId]);
 
   const selection = useListPanelSelection(view.filtered, lib.Groups);
-
-  const [batchRenameOpen, setBatchRenameOpen] = useState(false);
-  const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
-
-  const deletePreview = useMemo(
-    () => buildDeletePreview(Array.from(selection.selected), lib.Groups, lib.StepsByGroup),
-    [selection.selected, lib.Groups, lib.StepsByGroup],
-  );
-
-  const exportSelected = () => {
-    exportApi.requestExport(Array.from(selection.selected), true);
-  };
+  const batchState = useBatchActionsState(selection.selected, lib, exportApi);
 
   return {
     lib,
@@ -85,12 +101,7 @@ export function useListPanelState() {
     setActiveGroupId,
     ...view,
     ...selection,
-    batchRenameOpen,
-    setBatchRenameOpen,
-    batchDeleteOpen,
-    setBatchDeleteOpen,
-    deletePreview,
-    exportSelected,
+    ...batchState,
     projectName: lib.Project?.Name ?? null,
     allGroups: lib.Groups,
     onToggleStep: lib.setStepDisabled,

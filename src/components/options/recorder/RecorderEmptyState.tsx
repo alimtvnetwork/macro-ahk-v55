@@ -23,14 +23,14 @@ interface CauseRow {
     readonly action?: { label: string; onClick: () => void };
 }
 
-export function RecorderEmptyState({
-  projectSlug,
-  hasDbError,
-  onReload,
-}: RecorderEmptyStateProps): JSX.Element {
+function getCauses(
+  projectSlug: string,
+  hasDbError: boolean,
+  onReload: () => void,
+): ReadonlyArray<CauseRow> {
   const projectMissing = projectSlug.trim().length === 0;
 
-  const causes: ReadonlyArray<CauseRow> = [
+  return [
     {
       title: "Project selected",
       detail: projectMissing
@@ -56,6 +56,14 @@ export function RecorderEmptyState({
       status: "warn",
     },
   ];
+}
+
+export function RecorderEmptyState({
+  projectSlug,
+  hasDbError,
+  onReload,
+}: RecorderEmptyStateProps): JSX.Element {
+  const causes = getCauses(projectSlug, hasDbError, onReload);
 
   return (
     <div className="border border-border rounded-md bg-card/50 p-6 space-y-4">

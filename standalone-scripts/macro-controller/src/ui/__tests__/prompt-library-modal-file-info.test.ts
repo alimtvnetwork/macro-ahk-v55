@@ -64,7 +64,8 @@ describe('prompt-library-modal - selected file info', () => {
     document.body.innerHTML = ''; 
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('is hidden until a file is selected', async () => {

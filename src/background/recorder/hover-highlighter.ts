@@ -408,7 +408,8 @@ function buildHighlighterHandle(
     SetMode(mode) {
       state.OperationModeType = mode;
       if (mode === "off") {
-        state.HoverTarget = null; state.AncestorOffset = 0; 
+        state.HoverTarget = null;
+        state.AncestorOffset = 0; 
       }
 
       schedulePaint();
@@ -417,10 +418,13 @@ function buildHighlighterHandle(
       return state.OperationModeType; 
     },
     Outline(target) {
-      state.HoverTarget = target; state.AncestorOffset = 0; schedulePaint(); 
+      state.HoverTarget = target;
+      state.AncestorOffset = 0;
+      schedulePaint(); 
     },
     Destroy() {
-      detachHighlighterListeners(doc, handlers); host.remove(); 
+      detachHighlighterListeners(doc, handlers);
+      host.remove(); 
     },
   };
 }

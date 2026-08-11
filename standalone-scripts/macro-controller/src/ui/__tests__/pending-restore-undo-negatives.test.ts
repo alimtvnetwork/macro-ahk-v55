@@ -82,7 +82,8 @@ describe('pending-restore-undo: negative branches (PlanTierType 22 gap #6)', () 
         document.querySelector<HTMLButtonElement>('[data-testid="undo-toast-action"]')!.click();
         expect(readPendingRestoreUndo()).toBeNull();
         await vi.runAllTimersAsync();
-        await Promise.resolve(); await Promise.resolve();
+        await Promise.resolve();
+        await Promise.resolve();
         expect(upsertPrompt).toHaveBeenCalledTimes(1);
         const toastCalls = asMock(showToast).mock.calls;
         expect(toastCalls.some((c) => String(c[0]).includes('Undo failed') && String(c[0]).includes('DRIFT') && c[1] === 'error')).toBe(true);
@@ -99,7 +100,8 @@ describe('pending-restore-undo: negative branches (PlanTierType 22 gap #6)', () 
     hydratePendingRestoreUndo(now);
         document.querySelector<HTMLButtonElement>('[data-testid="undo-toast-action"]')!.click();
         await vi.runAllTimersAsync();
-        await Promise.resolve(); await Promise.resolve();
+        await Promise.resolve();
+        await Promise.resolve();
         expect(deletePromptById).toHaveBeenCalledWith(42);
         const toastCalls = asMock(showToast).mock.calls;
         expect(toastCalls.some((c) => String(c[0]).includes('ROW_LOCKED') && c[1] === 'error')).toBe(true);

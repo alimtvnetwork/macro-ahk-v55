@@ -159,17 +159,11 @@ interface PreviewRow {
     readonly Issue: string | null;
 }
 
-function buildPreview(
+function getExternalSiblings(
   targets: ReadonlyArray<StepGroupRow>,
-  allGroups: ReadonlyArray<StepGroupRow>,
-  transform: TransformInput,
-): ReadonlyArray<PreviewRow> {
+  allGroups: ReadonlyArray<StepGroupRow>
+) {
   const targetIds = new Set(targets.map((g) => g.StepGroupId));
-
-  // Sibling names that are NOT being renamed, indexed by parent.
-  // Renames within the batch are validated separately below so two
-  // selected siblings swapping into each other don't trip the
-  // single-name validator.
   const externalSiblingsByParent = new Map<number | null, string[]>();
   for (const g of allGroups) {
     if (targetIds.has(g.StepGroupId)) {
@@ -182,8 +176,40 @@ function buildPreview(
     externalSiblingsByParent.set(key, entries);
   }
 
-  // Track new names *within* the batch per parent — clashes inside
-  // the batch are also surfaced (two groups both renamed to "Foo").
+  return externalSiblingsByParent;
+}
+
+function resolveIntraBatchDuplicates(
+  rows: PreviewRow[],
+  targets: ReadonlyArray<StepGroupRow>,
+  newNamesByParent: Map<number | null, Map<string, number>>
+): PreviewRow[] {
+  return rows.map((r) => {
+    if (r.Issue !== null || !r.Changed) {
+      return r;
+    }
+
+    const target = targets.find((g) => g.StepGroupId === r.Id);
+    if (!target) {
+      return r;
+    }
+
+    const parent = target.ParentStepGroupId ?? null;
+    const count = newNamesByParent.get(parent)?.get(r.NewName.trim().toLowerCase()) ?? 0;
+    if (count > 1) {
+      return { ...r, Issue: "Two selected groups would share this name." };
+    }
+
+    return r;
+  });
+}
+
+function buildPreview(
+  targets: ReadonlyArray<StepGroupRow>,
+  allGroups: ReadonlyArray<StepGroupRow>,
+  transform: TransformInput,
+): ReadonlyArray<PreviewRow> {
+  const externalSiblingsByParent = getExternalSiblings(targets, allGroups);
   const newNamesByParent = new Map<number | null, Map<string, number>>();
 
   const rows: PreviewRow[] = targets.map((g, i) => {
@@ -194,7 +220,6 @@ function buildPreview(
     const baseIssue = validateStepGroupName(newName, externals);
     const issue: string | null = newName === g.Name ? null : baseIssue;
 
-    // Record for intra-batch clash detection (post-trim, lowered).
     const slot = newNamesByParent.get(parent) ?? new Map<string, number>();
     const key = trimmed.toLowerCase();
     slot.set(key, (slot.get(key) ?? 0) + 1);
@@ -209,30 +234,7 @@ function buildPreview(
     };
   });
 
-  // Second pass: flag intra-batch duplicates.
-  return rows.map((r) => {
-    if (r.Issue !== null) {
-      return r;
-    }
-
-    if (!r.Changed) {
-      return r;
-    }
-
-    const target = targets.find((g) => g.StepGroupId === r.Id);
-    if (target === undefined) {
-      return r;
-    }
-
-    const parent = target.ParentStepGroupId ?? null;
-    const slot = newNamesByParent.get(parent);
-    const count = slot?.get(r.NewName.trim().toLowerCase()) ?? 0;
-    if (count > 1) {
-      return { ...r, Issue: "Two selected groups would share this name." };
-    }
-
-    return r;
-  });
+  return resolveIntraBatchDuplicates(rows, targets, newNamesByParent);
 }
 
 /* ------------------------------------------------------------------ */
@@ -504,21 +506,18 @@ export default function BatchRenameDialog({
             <Pencil className="h-4 w-4" /> Batch rename
           </DialogTitle>
           <DialogDescription>
-                        Renames every selected group using the chosen transform.
-                        Preview the result below, Apply is blocked until all
-                        conflicts are resolved.
+            Renames every selected group using the chosen transform.
+            Preview the result below, Apply is blocked until all
+            conflicts are resolved.
           </DialogDescription>
         </DialogHeader>
         <ModeTabs form={form} />
-        <PreviewSummary changedCount={changedCount}
-          total={preview.length} issueCount={issueCount} />
+        <PreviewSummary changedCount={changedCount} total={preview.length} issueCount={issueCount} />
         <PreviewList preview={preview} />
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-                        Cancel
-          </Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button onClick={handleApply} disabled={!canApply}>
-                        Rename {changedCount} group{changedCount === 1 ? "" : "s"}
+            Rename {changedCount} group{changedCount === 1 ? "" : "s"}
           </Button>
         </DialogFooter>
       </DialogContent>

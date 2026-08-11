@@ -56,7 +56,8 @@ function usePauseDraft(value: number | undefined, enabled: boolean): DraftState 
     draftValid,
     parsed,
     setDraft: (raw) => {
-      draftRef.current = raw; setDraft(raw); 
+      draftRef.current = raw; 
+      setDraft(raw); 
     },
   };
 }

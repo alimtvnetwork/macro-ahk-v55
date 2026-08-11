@@ -181,6 +181,25 @@ function useRequestExport(
   );
 }
 
+function handleExportSuccess(
+  manifestCounts: { StepGroups: number; Steps: number },
+  zipFileName: string,
+  zipBytes: Uint8Array,
+  setLastExport: React.Dispatch<React.SetStateAction<LastExportSummary | null>>,
+) {
+  triggerZipDownload(zipBytes, zipFileName);
+  setLastExport({
+    FileName: zipFileName,
+    GroupCount: manifestCounts.StepGroups,
+    StepCount: manifestCounts.Steps,
+    At: new Date().toISOString(),
+  });
+  toast.success(
+    `Exported ${manifestCounts.StepGroups} group(s)`,
+    { description: `${manifestCounts.Steps} steps, ${zipFileName}` },
+  );
+}
+
 function useConfirmExport(
   lib: StepLibrarySliceForExport,
   previewState: ExportPreviewState,
@@ -216,17 +235,7 @@ function useConfirmExport(
       return; 
     }
 
-    triggerZipDownload(result.ZipBytes, result.ZipFileName);
-    setLastExport({
-      FileName: result.ZipFileName,
-      GroupCount: result.Manifest.Counts.StepGroups,
-      StepCount: result.Manifest.Counts.Steps,
-      At: new Date().toISOString(),
-    });
-    toast.success(
-      `Exported ${result.Manifest.Counts.StepGroups} group(s)`,
-      { description: `${result.Manifest.Counts.Steps} steps, ${result.ZipFileName}` },
-    );
+    handleExportSuccess(result.Manifest.Counts, result.ZipFileName, result.ZipBytes, setLastExport);
   }, [previewState.Pending, lib, showError, setPreviewState, setLastExport]);
 }
 

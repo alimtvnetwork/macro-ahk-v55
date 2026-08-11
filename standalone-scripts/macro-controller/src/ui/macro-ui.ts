@@ -161,25 +161,34 @@ export function buildTaskQueueSection(): HTMLElement { // eslint-disable-line ma
   
   activeTab.onclick = () => {
     _activeQueueTab = 'active';
-    activeTab.style.background = cPrimary; activeTab.style.color = '#fff';
-    historyTab.style.background = cPanelBgAlt; historyTab.style.color = '#64748b';
-    liveTab.style.background = cPanelBgAlt; liveTab.style.color = '#64748b';
+    activeTab.style.background = cPrimary;
+    activeTab.style.color = '#fff';
+    historyTab.style.background = cPanelBgAlt;
+    historyTab.style.color = '#64748b';
+    liveTab.style.background = cPanelBgAlt;
+    liveTab.style.color = '#64748b';
     refreshTaskQueueUI(listContainer);
   };
   
   historyTab.onclick = () => {
     _activeQueueTab = 'history';
-    historyTab.style.background = cPrimary; historyTab.style.color = '#fff';
-    activeTab.style.background = cPanelBgAlt; activeTab.style.color = '#64748b';
-    liveTab.style.background = cPanelBgAlt; liveTab.style.color = '#64748b';
+    historyTab.style.background = cPrimary;
+    historyTab.style.color = '#fff';
+    activeTab.style.background = cPanelBgAlt;
+    activeTab.style.color = '#64748b';
+    liveTab.style.background = cPanelBgAlt;
+    liveTab.style.color = '#64748b';
     refreshTaskQueueUI(listContainer);
   };
 
   liveTab.onclick = () => {
     _activeQueueTab = 'live';
-    liveTab.style.background = cPrimary; liveTab.style.color = '#fff';
-    activeTab.style.background = cPanelBgAlt; activeTab.style.color = '#64748b';
-    historyTab.style.background = cPanelBgAlt; historyTab.style.color = '#64748b';
+    liveTab.style.background = cPrimary;
+    liveTab.style.color = '#fff';
+    activeTab.style.background = cPanelBgAlt;
+    activeTab.style.color = '#64748b';
+    historyTab.style.background = cPanelBgAlt;
+    historyTab.style.color = '#64748b';
     refreshTaskQueueUI(listContainer);
   };
   

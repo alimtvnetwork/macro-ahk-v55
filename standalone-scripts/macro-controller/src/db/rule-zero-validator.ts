@@ -124,7 +124,8 @@ export function countTopLevelSteps(body: string): number {
 
   for (const line of lines) {
     if (RE_FENCE.test(line)) {
-      inFence = !inFence; continue; 
+      inFence = !inFence;
+      continue; 
     }
 
     if (inFence) {

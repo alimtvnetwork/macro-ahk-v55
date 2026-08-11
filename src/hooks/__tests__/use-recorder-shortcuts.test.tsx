@@ -59,10 +59,14 @@ afterEach(() => {
 
 describe("useRecorderShortcuts", () => {
   it("does nothing when there is no session", () => {
-    const onResume = vi.fn(); const onPause = vi.fn(); const onStop = vi.fn();
+    const onResume = vi.fn();
+    const onPause = vi.fn();
+    const onStop = vi.fn();
     render(<Probe session={null} onResume={onResume} onPause={onPause} onStop={onStop} />);
     act(() => {
-      fireChord("p"); fireChord(";"); fireChord("."); 
+      fireChord("p");
+      fireChord(";");
+      fireChord("."); 
     });
     expect(onResume).not.toHaveBeenCalled();
     expect(onPause).not.toHaveBeenCalled();
@@ -70,7 +74,9 @@ describe("useRecorderShortcuts", () => {
   });
 
   it("Ctrl+Alt+; pauses while Recording (and P is a no-op)", () => {
-    const onResume = vi.fn(); const onPause = vi.fn(); const onStop = vi.fn();
+    const onResume = vi.fn();
+    const onPause = vi.fn();
+    const onStop = vi.fn();
     render(<Probe session={buildSession("Recording")} onResume={onResume} onPause={onPause} onStop={onStop} />);
     act(() => {
       fireChord(";"); 
@@ -83,7 +89,9 @@ describe("useRecorderShortcuts", () => {
   });
 
   it("Ctrl+Alt+P resumes while Paused (and ; is a no-op)", () => {
-    const onResume = vi.fn(); const onPause = vi.fn(); const onStop = vi.fn();
+    const onResume = vi.fn();
+    const onPause = vi.fn();
+    const onStop = vi.fn();
     render(<Probe session={buildSession("Paused")} onResume={onResume} onPause={onPause} onStop={onStop} />);
     act(() => {
       fireChord("p"); 

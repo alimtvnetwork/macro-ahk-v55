@@ -108,7 +108,8 @@ describe('prompt-library-modal - drag-and-drop honors the import concurrency gua
       .mockImplementation(async () => ({ added: 0, updated: 0, errors: [] }));
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks(); 
   });
 
   it('drops during an in-flight import are ignored; only one performPromptImport call', async () => {

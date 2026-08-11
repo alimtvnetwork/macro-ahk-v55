@@ -79,21 +79,12 @@ export default function StepLibraryErrorState({ error, onRetry, onReset }: StepL
           </div>
         </div>
 
-        <div className="rounded border bg-muted/30 px-3 py-2 text-xs">
-          <button
-            type="button"
-            onClick={() => setShowDetails((s) => !s)}
-            className="font-medium text-muted-foreground hover:text-foreground"
-            aria-expanded={showDetails}
-          >
-            {showDetails ? "Hide technical details" : "Show technical details"}
-          </button>
-          {showDetails && (
-            <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap break-words font-mono text-[11px] text-muted-foreground">
-              {error.Kind}: {error.Message}
-            </pre>
-          )}
-        </div>
+        <ErrorTechnicalDetails
+          kind={error.Kind}
+          message={error.Message}
+          showDetails={showDetails}
+          onToggle={() => setShowDetails((s) => !s)}
+        />
 
         <div className="flex flex-wrap items-center justify-end gap-2">
           {/* Reset is the destructive escape hatch — always
@@ -114,28 +105,75 @@ export default function StepLibraryErrorState({ error, onRetry, onReset }: StepL
           </Button>
         </div>
       </Card>
+      <ResetLibraryDialog
+        open={confirmReset}
+        onOpenChange={setConfirmReset}
+        onReset={onReset}
+      />
+    </div>
+  );
+}
 
-      <AlertDialog open={confirmReset} onOpenChange={setConfirmReset}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Reset the step library?</AlertDialogTitle>
-            <AlertDialogDescription>
+function ResetLibraryDialog({
+  open,
+  onOpenChange,
+  onReset,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onReset: () => void;
+}) {
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Reset the step library?</AlertDialogTitle>
+          <AlertDialogDescription>
                             This permanently deletes the saved step-group database from
                             your browser. Any groups, steps, or input data not exported
                             to a ZIP bundle will be lost. The page will reload.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={onReset}
-            >
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            onClick={onReset}
+          >
                             Reset and reload
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+function ErrorTechnicalDetails({
+  kind,
+  message,
+  showDetails,
+  onToggle,
+}: {
+  kind: string;
+  message: string;
+  showDetails: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="rounded border bg-muted/30 px-3 py-2 text-xs">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="font-medium text-muted-foreground hover:text-foreground"
+        aria-expanded={showDetails}
+      >
+        {showDetails ? "Hide technical details" : "Show technical details"}
+      </button>
+      {showDetails && (
+        <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap break-words font-mono text-[11px] text-muted-foreground">
+          {kind}: {message}
+        </pre>
+      )}
     </div>
   );
 }

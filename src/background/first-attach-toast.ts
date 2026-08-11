@@ -124,7 +124,8 @@ function toastPagePayload(origin: string): void {
     let timeoutId: ReturnType<typeof window.setTimeout> | null = null;
     function cleanup(): void {
       if (timeoutId !== null) {
-        window.clearTimeout(timeoutId); timeoutId = null; 
+        window.clearTimeout(timeoutId);
+        timeoutId = null; 
       }
 
       r.removeEventListener(Events.CLICK, onClick);

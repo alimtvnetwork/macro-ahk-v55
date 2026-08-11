@@ -110,7 +110,8 @@ describe('prompt-library-modal - visible error banner on invalid Import', () => 
     mocks.showToast.mockReset();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('renders the error banner hidden by default', async () => {

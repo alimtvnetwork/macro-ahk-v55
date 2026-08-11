@@ -43,7 +43,8 @@ export function buildDropdownHeader(
   // three separate Export / Import / IO pills. Legacy builders remain
   // exported for tests + direct callers.
   right.appendChild(buildImportExportButton(rerender));
-  void promptCtx; void taskNextDeps;
+  void promptCtx;
+  void taskNextDeps;
   right.appendChild(buildResetOrderButton(rerender));
   right.appendChild(buildLoadButton(rerender));
   header.appendChild(right);
@@ -135,11 +136,13 @@ function buildLoadButton(rerender: Rerender): HTMLElement {
   btn.title = 'Reload prompts from database';
   btn.style.cssText = 'cursor:pointer;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600;color:#fff;background:' + cPrimary + ';border:1px solid rgba(255,255,255,0.1);';
   btn.onmouseover = function() {
-    btn.style.background = cPrimaryLight; btn.style.transform = 'scale(1.05)'; 
+    btn.style.background = cPrimaryLight;
+    btn.style.transform = 'scale(1.05)'; 
   };
 
   btn.onmouseout = function() {
-    btn.style.background = cPrimary; btn.style.transform = ''; 
+    btn.style.background = cPrimary;
+    btn.style.transform = ''; 
   };
 
   btn.onclick = function(e: Event) {

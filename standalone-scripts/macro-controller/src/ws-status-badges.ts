@@ -67,9 +67,13 @@ export function buildRefillBadgeHtml(ws: WorkspaceCredit): string {
   let bg = 'rgba(71,85,105,0.35)';
   let border = 'rgba(148,163,184,0.5)';
   if (days === 0) {
-    fg = '#bae6fd'; bg = 'rgba(2,132,199,0.45)'; border = '#38bdf8';
+    fg = '#bae6fd';
+    bg = 'rgba(2,132,199,0.45)';
+    border = '#38bdf8';
   } else if (days <= 3) {
-    fg = '#fde68a'; bg = 'rgba(180,83,9,0.45)'; border = '#f59e0b';
+    fg = '#fde68a';
+    bg = 'rgba(180,83,9,0.45)';
+    border = '#f59e0b';
   }
 
   return '<span class="loop-ws-refill-badge" style="font-size:9px;color:' + fg

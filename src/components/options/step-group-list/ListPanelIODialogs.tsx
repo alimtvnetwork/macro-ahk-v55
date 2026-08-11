@@ -39,20 +39,8 @@ interface ListPanelIODialogsProps {
     onBatchDeleteConfirm: Parameters<typeof BatchDeleteDialog>[0]["onConfirm"];
 }
 
-export function ListPanelIODialogs(props: ListPanelIODialogsProps) {
-  const {
-    exportApi,
-    importApi,
-    allGroups,
-    selectedGroups,
-    deletePreview,
-    batchRenameOpen,
-    setBatchRenameOpen,
-    batchDeleteOpen,
-    setBatchDeleteOpen,
-    onBatchRenameApply,
-    onBatchDeleteConfirm,
-  } = props;
+function ExportDialogs(props: { readonly exportApi: ExportApi }) {
+  const { exportApi } = props;
 
   return (
     <>
@@ -70,7 +58,15 @@ export function ListPanelIODialogs(props: ListPanelIODialogsProps) {
         onOpenChange={exportApi.setErrorOpen}
         explanation={exportApi.errorState.Explanation}
       />
+    </>
+  );
+}
 
+function ImportDialogs(props: { readonly importApi: ImportApi }) {
+  const { importApi } = props;
+
+  return (
+    <>
       <ImportSummaryDialog
         open={importApi.summaryState.Open}
         onOpenChange={importApi.setSummaryOpen}
@@ -83,7 +79,35 @@ export function ListPanelIODialogs(props: ListPanelIODialogsProps) {
         explanation={importApi.errorState.Explanation}
         fileName={importApi.errorState.FileName}
       />
+    </>
+  );
+}
 
+function BatchDialogs(props: {
+  readonly allGroups: ReadonlyArray<StepGroupRow>;
+  readonly selectedGroups: ReadonlyArray<StepGroupRow>;
+  readonly deletePreview: DeletePreview;
+  readonly batchRenameOpen: boolean;
+  readonly setBatchRenameOpen: Dispatch<SetStateAction<boolean>>;
+  readonly batchDeleteOpen: boolean;
+  readonly setBatchDeleteOpen: Dispatch<SetStateAction<boolean>>;
+  readonly onBatchRenameApply: Parameters<typeof BatchRenameDialog>[0]["onApply"];
+  readonly onBatchDeleteConfirm: Parameters<typeof BatchDeleteDialog>[0]["onConfirm"];
+}) {
+  const {
+    allGroups,
+    selectedGroups,
+    deletePreview,
+    batchRenameOpen,
+    setBatchRenameOpen,
+    batchDeleteOpen,
+    setBatchDeleteOpen,
+    onBatchRenameApply,
+    onBatchDeleteConfirm,
+  } = props;
+
+  return (
+    <>
       <BatchRenameDialog
         open={batchRenameOpen}
         onOpenChange={setBatchRenameOpen}
@@ -96,6 +120,40 @@ export function ListPanelIODialogs(props: ListPanelIODialogsProps) {
         onOpenChange={setBatchDeleteOpen}
         rows={deletePreview}
         onConfirm={onBatchDeleteConfirm}
+      />
+    </>
+  );
+}
+
+export function ListPanelIODialogs(props: ListPanelIODialogsProps) {
+  const {
+    exportApi,
+    importApi,
+    allGroups,
+    selectedGroups,
+    deletePreview,
+    batchRenameOpen,
+    setBatchRenameOpen,
+    batchDeleteOpen,
+    setBatchDeleteOpen,
+    onBatchRenameApply,
+    onBatchDeleteConfirm,
+  } = props;
+
+  return (
+    <>
+      <ExportDialogs exportApi={exportApi} />
+      <ImportDialogs importApi={importApi} />
+      <BatchDialogs
+        allGroups={allGroups}
+        selectedGroups={selectedGroups}
+        deletePreview={deletePreview}
+        batchRenameOpen={batchRenameOpen}
+        setBatchRenameOpen={setBatchRenameOpen}
+        batchDeleteOpen={batchDeleteOpen}
+        setBatchDeleteOpen={setBatchDeleteOpen}
+        onBatchRenameApply={onBatchRenameApply}
+        onBatchDeleteConfirm={onBatchDeleteConfirm}
       />
     </>
   );

@@ -123,7 +123,8 @@ export function startCountdownTick(ctx: CountdownCtx) {
 
 export function stopCountdownTick(ctx: CountdownCtx) {
   if (ctx.countdownTickId) {
-    trackedClearInterval(ctx.countdownTickId); ctx.countdownTickId = null; 
+    trackedClearInterval(ctx.countdownTickId);
+    ctx.countdownTickId = null; 
   }
 
   ctx.countdownBadge.style.display = 'none';

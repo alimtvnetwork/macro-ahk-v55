@@ -235,11 +235,13 @@ export function stopLoop(): boolean {
   state.__cycleRetryPending = false;
 
   if (state.loopIntervalId) {
-    trackedClearInterval(state.loopIntervalId); state.loopIntervalId = null; 
+    trackedClearInterval(state.loopIntervalId);
+    state.loopIntervalId = null; 
   }
 
   if (state.countdownIntervalId) {
-    trackedClearInterval(state.countdownIntervalId); state.countdownIntervalId = null; 
+    trackedClearInterval(state.countdownIntervalId);
+    state.countdownIntervalId = null; 
   }
 
   log('=== LOOP STOPPED ===', 'success');

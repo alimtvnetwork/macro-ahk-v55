@@ -230,7 +230,8 @@ export function ProjectsSection() {
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) {
-              void handleSqliteFileChange(file); e.target.value = ""; 
+              void handleSqliteFileChange(file);
+              e.target.value = ""; 
             }
           }}
         />

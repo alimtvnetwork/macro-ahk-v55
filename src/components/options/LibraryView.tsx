@@ -183,19 +183,23 @@ export function AssetCard({ asset, links, onSync, onDelete, onViewDetail }: Asse
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
                 <DropdownMenuItem onClick={e => {
-                  e.stopPropagation(); onSync(asset.Id); 
+                  e.stopPropagation();
+                  onSync(asset.Id); 
                 }}>
                   <RefreshCw className="h-3.5 w-3.5 mr-2" />
                   Sync to projects
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={e => {
-                  e.stopPropagation(); navigator.clipboard.writeText(asset.Slug); toast.success("Slug copied"); 
+                  e.stopPropagation();
+                  navigator.clipboard.writeText(asset.Slug);
+                  toast.success("Slug copied"); 
                 }}>
                   <Copy className="h-3.5 w-3.5 mr-2" />
                   Copy slug
                 </DropdownMenuItem>
                 <DropdownMenuItem className="text-destructive" onClick={e => {
-                  e.stopPropagation(); setDeleteOpen(true); 
+                  e.stopPropagation();
+                  setDeleteOpen(true); 
                 }}>
                   <Trash2 className="h-3.5 w-3.5 mr-2" />
                   Delete
@@ -628,7 +632,8 @@ function AssetDetailPanel({ asset, links, onBack, onSync, onDelete, onLinkStateC
           Sync to projects
         </Button>
         <Button size="sm" variant="outline" onClick={() => {
-          navigator.clipboard.writeText(asset.ContentJson); toast.success("Content copied"); 
+          navigator.clipboard.writeText(asset.ContentJson);
+          toast.success("Content copied"); 
         }}>
           <Copy className="h-3.5 w-3.5 mr-1" />
           Copy content
@@ -986,14 +991,16 @@ export function LibraryView() {
               <Input
                 value={search}
                 onChange={e => {
-                  setSearch(e.target.value); setPage(0); 
+                  setSearch(e.target.value);
+                  setPage(0); 
                 }}
                 placeholder="Search assets…"
                 className="h-8 text-sm pl-8"
               />
             </div>
             <Tabs value={filterType} onValueChange={v => {
-              setFilterType(v as AssetType | "all"); setPage(0); 
+              setFilterType(v as AssetType | "all");
+              setPage(0); 
             }}>
               <TabsList className="h-8">
                 <TabsTrigger value="all" className="text-xs px-2 h-6">All</TabsTrigger>
@@ -1053,7 +1060,9 @@ export function LibraryView() {
                 <>
                   <p className="text-sm">No assets match your filter.</p>
                   <Button size="sm" variant="ghost" onClick={() => {
-                    setSearch(""); setFilterType("all"); setPage(0); 
+                    setSearch("");
+                    setFilterType("all");
+                    setPage(0); 
                   }}>
                     Clear filters
                   </Button>

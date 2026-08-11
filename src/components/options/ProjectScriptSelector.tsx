@@ -305,7 +305,8 @@ function ScriptEntryCard({
                         variant="secondary"
                         className="text-[10px] gap-1 cursor-pointer hover:bg-primary/20"
                         onClick={() => {
-                          setActiveTab(b.configId); setExpanded(true); 
+                          setActiveTab(b.configId);
+                          setExpanded(true); 
                         }}
                       >
                         <span className="text-[8px] font-mono text-muted-foreground">#{ci + 1}</span>
@@ -315,7 +316,8 @@ function ScriptEntryCard({
                           type="button"
                           className="ml-0.5 hover:text-destructive"
                           onClick={(e) => {
-                            e.stopPropagation(); handleRemoveConfig(b.configId); 
+                            e.stopPropagation();
+                            handleRemoveConfig(b.configId); 
                           }}
                         >
                           <X className="h-2.5 w-2.5" />

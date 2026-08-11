@@ -80,6 +80,38 @@ interface ParseState {
     resetParsed: () => void;
 }
 
+function useCsvAcceptText(
+  setParsed: React.Dispatch<React.SetStateAction<ParsedCsvState | null>>,
+  setParseError: React.Dispatch<React.SetStateAction<string | null>>,
+  setMappings: React.Dispatch<React.SetStateAction<ReadonlyArray<ColumnMapping>>>,
+  setRowIndex: React.Dispatch<React.SetStateAction<number>>
+) {
+  return useCallback((text: string, fileName: string | null): void => {
+    const result = parseCsv(text);
+
+    if (result.Ok === false) {
+      setParsed(null);
+      setMappings([]);
+      setParseError(result.Reason);
+
+      return;
+    }
+
+    setParseError(null);
+    setParsed({ Csv: result, FileName: fileName });
+    setMappings(buildInitialMappings(result.Headers));
+    setRowIndex(0);
+  }, [setParsed, setParseError, setMappings, setRowIndex]);
+}
+
+function useCsvUpdateMapping(setMappings: React.Dispatch<React.SetStateAction<ReadonlyArray<ColumnMapping>>>) {
+  return useCallback((column: string, patch: Partial<Omit<ColumnMapping, "Column">>) => {
+    setMappings((prev) => prev.map((entry) => {
+      return entry.Column === column ? { ...entry, ...patch } : entry;
+    }));
+  }, [setMappings]);
+}
+
 function useCsvParseState(open: boolean): ParseState {
   const [parsed, setParsed] = useState<ParsedCsvState | null>(null);
   const [parseError, setParseError] = useState<string | null>(null);
@@ -97,28 +129,8 @@ function useCsvParseState(open: boolean): ParseState {
     setRowIndex(0);
   }, [open]);
 
-  const acceptText = useCallback((text: string, fileName: string | null): void => {
-    const result = parseCsv(text);
-
-    if (result.Ok === false) {
-      setParsed(null);
-      setMappings([]);
-      setParseError(result.Reason);
-
-      return;
-    }
-
-    setParseError(null);
-    setParsed({ Csv: result, FileName: fileName });
-    setMappings(buildInitialMappings(result.Headers));
-    setRowIndex(0);
-  }, []);
-
-  const updateMapping = useCallback((column: string, patch: Partial<Omit<ColumnMapping, "Column">>) => {
-    setMappings((prev) => prev.map((entry) => {
-      return entry.Column === column ? { ...entry, ...patch } : entry;
-    }));
-  }, []);
+  const acceptText = useCsvAcceptText(setParsed, setParseError, setMappings, setRowIndex);
+  const updateMapping = useCsvUpdateMapping(setMappings);
 
   const resetParsed = useCallback(() => {
     setParsed(null);
@@ -201,11 +213,12 @@ interface UseApplyOptions {
     readonly onOpenChange: (open: boolean) => void;
 }
 
-function useCsvApplyHandler(options: UseApplyOptions): ApplyHandler {
-  const { parsed, mappings, rowIndex, groupId, groupName, onApply, onOpenChange } = options;
-  const { toast } = useToast();
-
-  const buildResult = useMemo<BuildBagResult | null>(() => {
+function useCsvBuildResult(
+  parsed: ParsedCsvState | null,
+  mappings: ReadonlyArray<ColumnMapping>,
+  rowIndex: number
+): BuildBagResult | null {
+  return useMemo<BuildBagResult | null>(() => {
     if (parsed === null) {
       return null;
     }
@@ -217,6 +230,12 @@ function useCsvApplyHandler(options: UseApplyOptions): ApplyHandler {
 
     return buildBagFromRow({ Headers: parsed.Csv.Headers, Row: row, Mappings: mappings });
   }, [parsed, mappings, rowIndex]);
+}
+
+function useCsvApplyHandler(options: UseApplyOptions): ApplyHandler {
+  const { parsed, mappings, rowIndex, groupId, groupName, onApply, onOpenChange } = options;
+  const { toast } = useToast();
+  const buildResult = useCsvBuildResult(parsed, mappings, rowIndex);
 
   const handleApply = useCallback(() => {
     if (groupId === null || buildResult === null || buildResult.Ok === false) {
@@ -234,32 +253,37 @@ function useCsvApplyHandler(options: UseApplyOptions): ApplyHandler {
   return { buildResult, handleApply };
 }
 
-export function useCsvInputController(opts: UseCsvInputControllerOptions): CsvInputController {
-  const { open, groupId, groupName, onApply, onOpenChange } = opts;
-  const [pasted, setPasted] = useState("");
-  const [dragOver, setDragOver] = useState(false);
+function useCsvResetEffect(open: boolean, setPasted: (s: string) => void, setDragOver: (b: boolean) => void) {
   useEffect(() => {
     if (open) {
       setPasted("");
       setDragOver(false); 
     } 
-  }, [open]);
+  }, [open, setPasted, setDragOver]);
+}
+
+export function useCsvInputController(opts: UseCsvInputControllerOptions): CsvInputController {
+  const { open, groupId, groupName, onApply, onOpenChange } = opts;
+  const [pasted, setPasted] = useState("");
+  const [dragOver, setDragOver] = useState(false);
+  useCsvResetEffect(open, setPasted, setDragOver);
 
   const parseState = useCsvParseState(open);
-  const fileHandlers = useCsvFileHandlers(parseState.acceptText, setPasted, setDragOver);
+  const { acceptText, parsed, parseError, mappings, rowIndex, setRowIndex, updateMapping, resetParsed } = parseState;
+  const fileHandlers = useCsvFileHandlers(acceptText, setPasted, setDragOver);
   const apply = useCsvApplyHandler({
-    parsed: parseState.parsed, mappings: parseState.mappings, rowIndex: parseState.rowIndex,
+    parsed, mappings, rowIndex,
     groupId, groupName, onApply, onOpenChange,
   });
-  const handleParseClick = useCallback(() => parseState.acceptText(pasted, null), [pasted, parseState]);
+  const handleParseClick = useCallback(() => acceptText(pasted, null), [pasted, acceptText]);
 
   return {
-    pasted, parsed: parseState.parsed, parseError: parseState.parseError,
-    mappings: parseState.mappings, rowIndex: parseState.rowIndex, dragOver,
+    pasted, parsed, parseError,
+    mappings, rowIndex, dragOver,
     buildResult: apply.buildResult,
-    setPasted, setRowIndex: parseState.setRowIndex, setDragOver,
+    setPasted, setRowIndex, setDragOver,
     handleParseClick, handleFilePick: fileHandlers.handleFilePick, handleDrop: fileHandlers.handleDrop,
-    updateMapping: parseState.updateMapping, handleApply: apply.handleApply,
-    resetParsed: parseState.resetParsed,
+    updateMapping, handleApply: apply.handleApply,
+    resetParsed,
   };
 }

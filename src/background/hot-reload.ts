@@ -80,6 +80,19 @@ export function stopHotReload(): void {
 /*  Polling Logic                                                      */
 /* ------------------------------------------------------------------ */
 
+async function handleBuildChanged(currentBuildId: string): Promise<void> {
+  const previousBuildId = lastKnownBuildId;
+  lastKnownBuildId = currentBuildId;
+  const cacheSyncResult = await syncCacheWithBuildId(currentBuildId);
+  console.log(
+    "[hot-reload] Build changed: %s → %s — cleared %d cache entries, reloading!",
+    previousBuildId,
+    currentBuildId,
+    cacheSyncResult.cleared,
+  );
+  chrome.runtime.reload();
+}
+
 /** Fetches build-meta.json and triggers reload if buildId changed. */
 async function pollBuildMeta(): Promise<void> {
   try {
@@ -119,16 +132,7 @@ async function pollBuildMeta(): Promise<void> {
     const isBuildChanged = currentBuildId !== lastKnownBuildId;
 
     if (isBuildChanged) {
-      const previousBuildId = lastKnownBuildId;
-      lastKnownBuildId = currentBuildId;
-      const cacheSyncResult = await syncCacheWithBuildId(currentBuildId);
-      console.log(
-        "[hot-reload] Build changed: %s → %s — cleared %d cache entries, reloading!",
-        previousBuildId,
-        currentBuildId,
-        cacheSyncResult.cleared,
-      );
-      chrome.runtime.reload();
+      await handleBuildChanged(currentBuildId);
     }
   } catch (err) {
     logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 

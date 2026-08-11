@@ -108,7 +108,8 @@ describe('prompt-library-modal - dragover dropEffect during import', () => {
     io.parsePromptsText.mockClear();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks(); 
   });
 
   it('reports dropEffect="copy" when idle, "none" while import runs, and "copy" again after it resolves', async () => {
@@ -132,7 +133,9 @@ describe('prompt-library-modal - dragover dropEffect during import', () => {
 
     // Resolve the pending import.
     io.release();
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
 
     // Controls restored; dragover advertises 'copy' again.
     expect(btn.disabled).toBe(false);

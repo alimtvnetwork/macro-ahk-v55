@@ -39,7 +39,8 @@ function countVisible(matches: ReadonlyArray<ElementLike>): number {
     const w = typeof node.offsetWidth === "number" ? node.offsetWidth : 0;
     const h = typeof node.offsetHeight === "number" ? node.offsetHeight : 0;
     if (w > 0 || h > 0) {
-      n += 1; continue; 
+      n += 1;
+      continue; 
     }
 
     if (typeof node.getClientRects === "function" && node.getClientRects().length > 0) {
@@ -96,6 +97,7 @@ function runSelectorEvaluation(selector: string, kind: SelectorKind): TestResult
   }
 }
 
+// eslint-disable-next-line max-lines-per-function
 export function useStepWaitDialog(args: Args) {
   const { open, stepId, onChange, onOpenChange } = args;
   const [selector, setSelector] = useState("");

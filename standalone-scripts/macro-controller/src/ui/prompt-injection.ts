@@ -462,7 +462,9 @@ function _buildFileDropZone(body: HTMLElement, contentArea: HTMLTextAreaElement,
   dropZone.style.cssText = 'border:2px dashed ' + cPrimaryBorderA + ';border-radius:8px;padding:16px;text-align:center;color:' + cPanelFgDim + ';font-size:11px;margin-bottom:12px;transition:all .2s;cursor:pointer;';
   dropZone.innerHTML = '📁 Drop <b>.md</b>, <b>.txt</b>, or <b>.prompt</b> file here<br><span style="font-size:10px;color:#4b5563;">or click to browse</span>';
   const fileInput = document.createElement('input');
-  fileInput.type = 'file'; fileInput.accept = '.md,.txt,.prompt'; fileInput.style.display = 'none';
+  fileInput.type = 'file';
+  fileInput.accept = '.md,.txt,.prompt';
+  fileInput.style.display = 'none';
   dropZone.onclick = function() {
     fileInput.click(); 
   };
@@ -473,14 +475,21 @@ function _buildFileDropZone(body: HTMLElement, contentArea: HTMLTextAreaElement,
   };
 
   dropZone.addEventListener('dragover', function(e: Event) {
-    e.preventDefault(); e.stopPropagation(); (this as HTMLElement).style.borderColor = cPrimary; (this as HTMLElement).style.background = 'rgba(124,58,237,0.1)'; 
+    e.preventDefault();
+    e.stopPropagation();
+    (this as HTMLElement).style.borderColor = cPrimary;
+    (this as HTMLElement).style.background = 'rgba(124,58,237,0.1)'; 
   });
   dropZone.addEventListener('dragleave', function(e: Event) {
-    e.preventDefault(); (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimary; (this as HTMLElement).style.background = 'transparent'; 
+    e.preventDefault();
+    (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimary;
+    (this as HTMLElement).style.background = 'transparent'; 
   });
   dropZone.addEventListener('drop', function(e: DragEvent) {
-    e.preventDefault(); e.stopPropagation();
-    (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimary; (this as HTMLElement).style.background = 'transparent';
+    e.preventDefault();
+    e.stopPropagation();
+    (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimary;
+    (this as HTMLElement).style.background = 'transparent';
     if (e.dataTransfer && e.dataTransfer.files.length > 0) {
       handleFile(e.dataTransfer.files[0], fileRefs);
     }
@@ -544,7 +553,8 @@ function collectExistingCategories(): string[] {
   for (const entry of existingEntries) {
     const ec = (entry.category || '').trim();
     if (ec && !catSeen[ec.toLowerCase()]) {
-      existingCats.push(ec); catSeen[ec.toLowerCase()] = true; 
+      existingCats.push(ec);
+      catSeen[ec.toLowerCase()] = true; 
     }
   }
 
@@ -572,18 +582,7 @@ function _buildCategorySelect(initialData: Record<string, unknown>): { catWrap: 
     (this as HTMLElement).style.borderColor = CssFragmentType.BorderPrimaryStrong; 
   };
 
-  const noneOpt = document.createElement('option');
-  noneOpt.value = ''; noneOpt.textContent = '— No category —';
-  catSelect.appendChild(noneOpt);
-  for (const cat of existingCats) {
-    const opt = document.createElement('option');
-    opt.value = cat; opt.textContent = cat;
-    catSelect.appendChild(opt);
-  }
-
-  const customOpt = document.createElement('option');
-  customOpt.value = '__custom__'; customOpt.textContent = '✏️ Custom category…';
-  catSelect.appendChild(customOpt);
+  _populateCategoryOptions(catSelect, existingCats);
 
   const catCustomInput = document.createElement('input');
   catCustomInput.type = 'text';
@@ -610,24 +609,7 @@ function _buildCategorySelect(initialData: Record<string, unknown>): { catWrap: 
 
   const initialCat = ((initialData.category as string) || '').trim();
   const lockedCategory = ((initialData.__lockedCategory as string) || '').trim();
-  if (initialCat) {
-    const matchIdx = existingCats.findIndex(function(c) {
-      return c.toLowerCase() === initialCat.toLowerCase(); 
-    });
-    if (matchIdx !== -1) {
-      catSelect.value = existingCats[matchIdx]; 
-    } else {
-      // Ensure the initial category (e.g. locked 'plan'/'next' for role-scoped
-      // prompts) is a real option even when no other prompt has surfaced it
-      // yet. Without this the select would silently fall back to '— No
-      // category —' and the user would see an empty combo when editing the
-      // PlanTierType/Next chip prompts.
-      const injected = document.createElement('option');
-      injected.value = initialCat; injected.textContent = initialCat;
-      catSelect.insertBefore(injected, catSelect.lastChild);
-      catSelect.value = initialCat;
-    }
-  }
+  _applyInitialCategory(initialCat, existingCats, catSelect);
 
   // Role governance: lock the picker to the role name for plan/next editors.
   // The role IS the category and is authoritative in the DB, so we prevent
@@ -643,6 +625,42 @@ function _buildCategorySelect(initialData: Record<string, unknown>): { catWrap: 
   catWrap.appendChild(catCustomInput);
 
   return { catWrap, catSelect, catCustomInput };
+}
+
+function _populateCategoryOptions(catSelect: HTMLSelectElement, existingCats: string[]): void {
+  const noneOpt = document.createElement('option');
+  noneOpt.value = '';
+  noneOpt.textContent = '— No category —';
+  catSelect.appendChild(noneOpt);
+  for (const cat of existingCats) {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    catSelect.appendChild(opt);
+  }
+
+  const customOpt = document.createElement('option');
+  customOpt.value = '__custom__';
+  customOpt.textContent = '✏️ Custom category…';
+  catSelect.appendChild(customOpt);
+}
+
+function _applyInitialCategory(initialCat: string, existingCats: string[], catSelect: HTMLSelectElement): void {
+  if (initialCat) {
+    const matchIdx = existingCats.findIndex(function(c) {
+      return c.toLowerCase() === initialCat.toLowerCase(); 
+    });
+    if (matchIdx !== -1) {
+      catSelect.value = existingCats[matchIdx]; 
+    } else {
+      // Ensure the initial category is a real option even when no other prompt has surfaced it.
+      const injected = document.createElement('option');
+      injected.value = initialCat;
+      injected.textContent = initialCat;
+      catSelect.insertBefore(injected, catSelect.lastChild);
+      catSelect.value = initialCat;
+    }
+  }
 }
 
 function buildSlug(role: PromptRole, name: string, editPrompt: EditablePrompt | null): string {
@@ -940,7 +958,7 @@ function _buildPromptModalFooter(
     try {
       window.localStorage.setItem(diffPersistKey, open ? '1' : '0'); 
     } catch (err) {
-      console.error();
+      // Ignored: storage unavailable
     }
   };
 
@@ -1133,13 +1151,15 @@ function _buildPromptModalFooter(
     const name = titleInput.value.trim();
     const text = contentArea.value.trim();
     if (!name) {
-      showPasteToast('❌ Title is required', true); titleInput.focus();
+      showPasteToast('❌ Title is required', true);
+      titleInput.focus();
 
       return; 
     }
 
     if (!text) {
-      showPasteToast('❌ Content is required', true); contentArea.focus();
+      showPasteToast('❌ Content is required', true);
+      contentArea.focus();
 
       return; 
     }

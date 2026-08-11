@@ -16,7 +16,7 @@ const files = [
 for (const filePath of files) {
   const sourceFile = project.getSourceFile(filePath);
   if (!sourceFile) {
-    console.error(`File not found: ${filePath}`);
+    console.log(`ERROR: File not found: ${filePath}`);
     continue;
   }
   

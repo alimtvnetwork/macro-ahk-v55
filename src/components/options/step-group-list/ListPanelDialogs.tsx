@@ -78,128 +78,170 @@ interface ListPanelDialogsProps {
     readonly submitDelete: () => void;
 }
 
-export function ListPanelDialogs(props: ListPanelDialogsProps): JSX.Element {
-  const {
-    projectName,
-    createDialog, setCreateDialog, createError, submitCreate,
-    renameDialog, setRenameDialog, renameError, submitRename,
-    deleteDialog, setDeleteDialog, submitDelete,
-  } = props;
+function CreateGroupDialog(props: {
+    readonly projectName: string | null;
+    readonly createDialog: CreateDialogState;
+    readonly setCreateDialog: (next: CreateDialogState) => void;
+    readonly createError: string | null;
+    readonly submitCreate: () => void;
+}) {
+  const { projectName, createDialog, setCreateDialog, createError, submitCreate } = props;
 
   return (
+    <Dialog
+      open={createDialog.open}
+      onOpenChange={(open) =>
+        setCreateDialog(open
+          ? { ...createDialog, open: true }
+          : { open: false, name: "" })
+      }
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create top-level group</DialogTitle>
+          <DialogDescription>
+                          Groups bundle related steps. The new group will appear at the
+                          root of {projectName ?? "this project"}.
+          </DialogDescription>
+        </DialogHeader>
+        <ValidatedNameField
+          id="list-create-group-name"
+          label="Name"
+          value={createDialog.name}
+          error={createError}
+          placeholder="e.g. Checkout flow"
+          onChange={(v) => setCreateDialog({ ...createDialog, name: v })}
+          onSubmit={submitCreate}
+        />
+        <DialogFooter>
+          <Button
+            variant="ghost"
+            onClick={() => setCreateDialog({ open: false, name: "" })}
+          >
+                          Cancel
+          </Button>
+          <Button onClick={submitCreate} disabled={createError !== null}>
+            <FilePlus2 className="mr-1 h-4 w-4" />
+                          Create
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function RenameGroupDialog(props: {
+    readonly renameDialog: RenameDialogState;
+    readonly setRenameDialog: (next: RenameDialogState) => void;
+    readonly renameError: string | null;
+    readonly submitRename: () => void;
+}) {
+  const { renameDialog, setRenameDialog, renameError, submitRename } = props;
+
+  return (
+    <Dialog
+      open={renameDialog.open}
+      onOpenChange={(open) =>
+        setRenameDialog(open
+          ? { ...renameDialog, open: true }
+          : { open: false, group: null, name: "" })
+      }
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Rename group</DialogTitle>
+          <DialogDescription>
+                          Sibling group names must be unique within the same parent.
+          </DialogDescription>
+        </DialogHeader>
+        <ValidatedNameField
+          id="list-rename-group-name"
+          label="New name"
+          value={renameDialog.name}
+          error={renameError}
+          onChange={(v) => setRenameDialog({ ...renameDialog, name: v })}
+          onSubmit={submitRename}
+        />
+        <DialogFooter>
+          <Button
+            variant="ghost"
+            onClick={() =>
+              setRenameDialog({ open: false, group: null, name: "" })
+            }
+          >
+                          Cancel
+          </Button>
+          <Button onClick={submitRename} disabled={renameError !== null}>
+                          Rename
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function DeleteGroupDialog(props: {
+    readonly deleteDialog: DeleteDialogState;
+    readonly setDeleteDialog: (next: DeleteDialogState) => void;
+    readonly submitDelete: () => void;
+}) {
+  const { deleteDialog, setDeleteDialog, submitDelete } = props;
+
+  return (
+    <AlertDialog
+      open={deleteDialog.open}
+      onOpenChange={(open) =>
+        setDeleteDialog(open
+          ? { ...deleteDialog, open: true }
+          : { open: false, group: null })
+      }
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+                          Delete "{deleteDialog.group?.Name}"?
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+                          This permanently removes the group and every nested
+                          group + step inside it. This cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={submitDelete}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            <Trash2 className="mr-1 h-4 w-4" />
+                          Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+export function ListPanelDialogs(props: ListPanelDialogsProps): JSX.Element {
+  return (
     <>
-      {/* ---------- Create dialog ---------- */}
-      <Dialog
-        open={createDialog.open}
-        onOpenChange={(open) =>
-          setCreateDialog(open
-            ? { ...createDialog, open: true }
-            : { open: false, name: "" })
-        }
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create top-level group</DialogTitle>
-            <DialogDescription>
-                            Groups bundle related steps. The new group will appear at the
-                            root of {projectName ?? "this project"}.
-            </DialogDescription>
-          </DialogHeader>
-          <ValidatedNameField
-            id="list-create-group-name"
-            label="Name"
-            value={createDialog.name}
-            error={createError}
-            placeholder="e.g. Checkout flow"
-            onChange={(v) => setCreateDialog({ ...createDialog, name: v })}
-            onSubmit={submitCreate}
-          />
-          <DialogFooter>
-            <Button
-              variant="ghost"
-              onClick={() => setCreateDialog({ open: false, name: "" })}
-            >
-                            Cancel
-            </Button>
-            <Button onClick={submitCreate} disabled={createError !== null}>
-              <FilePlus2 className="mr-1 h-4 w-4" />
-                            Create
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* ---------- Rename dialog ---------- */}
-      <Dialog
-        open={renameDialog.open}
-        onOpenChange={(open) =>
-          setRenameDialog(open
-            ? { ...renameDialog, open: true }
-            : { open: false, group: null, name: "" })
-        }
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Rename group</DialogTitle>
-            <DialogDescription>
-                            Sibling group names must be unique within the same parent.
-            </DialogDescription>
-          </DialogHeader>
-          <ValidatedNameField
-            id="list-rename-group-name"
-            label="New name"
-            value={renameDialog.name}
-            error={renameError}
-            onChange={(v) => setRenameDialog({ ...renameDialog, name: v })}
-            onSubmit={submitRename}
-          />
-          <DialogFooter>
-            <Button
-              variant="ghost"
-              onClick={() =>
-                setRenameDialog({ open: false, group: null, name: "" })
-              }
-            >
-                            Cancel
-            </Button>
-            <Button onClick={submitRename} disabled={renameError !== null}>
-                            Rename
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* ---------- Delete confirmation ---------- */}
-      <AlertDialog
-        open={deleteDialog.open}
-        onOpenChange={(open) =>
-          setDeleteDialog(open
-            ? { ...deleteDialog, open: true }
-            : { open: false, group: null })
-        }
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-                            Delete "{deleteDialog.group?.Name}"?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-                            This permanently removes the group and every nested
-                            group + step inside it. This cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={submitDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              <Trash2 className="mr-1 h-4 w-4" />
-                            Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <CreateGroupDialog
+        projectName={props.projectName}
+        createDialog={props.createDialog}
+        setCreateDialog={props.setCreateDialog}
+        createError={props.createError}
+        submitCreate={props.submitCreate}
+      />
+      <RenameGroupDialog
+        renameDialog={props.renameDialog}
+        setRenameDialog={props.setRenameDialog}
+        renameError={props.renameError}
+        submitRename={props.submitRename}
+      />
+      <DeleteGroupDialog
+        deleteDialog={props.deleteDialog}
+        setDeleteDialog={props.setDeleteDialog}
+        submitDelete={props.submitDelete}
+      />
     </>
   );
 }

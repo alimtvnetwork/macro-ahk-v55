@@ -60,23 +60,6 @@ export async function handleSdkAuthRefresh(): Promise<string | null> {
 }
 
 /** AUTH_IS_EXPIRED — checks if the current token appears expired. */
-export async function handleSdkAuthIsExpired(): Promise<boolean> {
-  const result = await handleGetToken();
-
-  return result.token === null;
-}
-
-/** AUTH_GET_JWT — returns the raw JWT/session ID string. */
-export async function handleSdkAuthGetJwt(): Promise<string | null> {
-  const result = await handleGetToken();
-
-  return result.token;
-}
-
-/* ------------------------------------------------------------------ */
-/*  COOKIES handlers                                                   */
-/* ------------------------------------------------------------------ */
-
 /** COOKIES_GET — get a single cookie value by name. */
 export async function handleSdkCookiesGet(
   payload: MessageRequest,

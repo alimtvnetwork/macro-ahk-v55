@@ -49,52 +49,8 @@ export function FormSnapshotTable({ snapshot, embedded, title }: FormSnapshotTab
 
   const body = (
     <div className="space-y-2" data-testid="form-snapshot-table">
-      <header className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted-foreground">
-        <ClipboardList className="h-3 w-3" aria-hidden />
-        <span className="font-medium">{heading}</span>
-        <Badge variant="secondary" className="text-[10px]">
-          {snapshot.Fields.length} field{snapshot.Fields.length === 1 ? "" : "s"}
-        </Badge>
-        {snapshot.Form.Id !== null && (
-          <span className="text-[11px] text-muted-foreground normal-case tracking-normal">
-                        #{snapshot.Form.Id}
-          </span>
-        )}
-        {snapshot.Verbose ? (
-          <Badge variant="default" className="ml-auto text-[10px]" title="Captured under verbose logging — values included (sensitive fields masked)">
-                        VALUES
-          </Badge>
-        ) : (
-          <Badge variant="outline" className="ml-auto text-[10px]" title="Verbose logging was OFF — only field names + types captured">
-            <EyeOff className="h-2.5 w-2.5 mr-1" aria-hidden />
-                        NAMES ONLY
-          </Badge>
-        )}
-      </header>
-
-      <ScrollArea className="max-h-56 pr-2">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="text-[10px] uppercase tracking-wide text-muted-foreground border-b border-border">
-              <th className="text-left font-medium py-1 pr-2">Field</th>
-              <th className="text-left font-medium py-1 pr-2">Type</th>
-              {snapshot.Verbose && (
-                <th className="text-left font-medium py-1">Value</th>
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {snapshot.Fields.map((f, i) => (
-              <FieldRow
-                key={`${f.Name}-${i}`}
-                field={f}
-                value={valueByName.get(f.Name) ?? null}
-                showValue={snapshot.Verbose}
-              />
-            ))}
-          </tbody>
-        </table>
-      </ScrollArea>
+      <FormSnapshotHeader snapshot={snapshot} heading={heading} />
+      <FormSnapshotTableContent snapshot={snapshot} valueByName={valueByName} />
     </div>
   );
 
@@ -111,6 +67,61 @@ export function FormSnapshotTable({ snapshot, embedded, title }: FormSnapshotTab
     >
       {body}
     </section>
+  );
+}
+
+function FormSnapshotHeader({ snapshot, heading }: { readonly snapshot: FormSnapshot; readonly heading: string }) {
+  return (
+    <header className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted-foreground">
+      <ClipboardList className="h-3 w-3" aria-hidden />
+      <span className="font-medium">{heading}</span>
+      <Badge variant="secondary" className="text-[10px]">
+        {snapshot.Fields.length} field{snapshot.Fields.length === 1 ? "" : "s"}
+      </Badge>
+      {snapshot.Form.Id !== null && (
+        <span className="text-[11px] text-muted-foreground normal-case tracking-normal">
+                      #{snapshot.Form.Id}
+        </span>
+      )}
+      {snapshot.Verbose ? (
+        <Badge variant="default" className="ml-auto text-[10px]" title="Captured under verbose logging — values included (sensitive fields masked)">
+                      VALUES
+        </Badge>
+      ) : (
+        <Badge variant="outline" className="ml-auto text-[10px]" title="Verbose logging was OFF — only field names + types captured">
+          <EyeOff className="h-2.5 w-2.5 mr-1" aria-hidden />
+                      NAMES ONLY
+        </Badge>
+      )}
+    </header>
+  );
+}
+
+function FormSnapshotTableContent({ snapshot, valueByName }: { readonly snapshot: FormSnapshot; readonly valueByName: Map<string, { Value: string; Masked: boolean }> }) {
+  return (
+    <ScrollArea className="max-h-56 pr-2">
+      <table className="w-full text-xs">
+        <thead>
+          <tr className="text-[10px] uppercase tracking-wide text-muted-foreground border-b border-border">
+            <th className="text-left font-medium py-1 pr-2">Field</th>
+            <th className="text-left font-medium py-1 pr-2">Type</th>
+            {snapshot.Verbose && (
+              <th className="text-left font-medium py-1">Value</th>
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          {snapshot.Fields.map((f, i) => (
+            <FieldRow
+              key={`${f.Name}-${i}`}
+              field={f}
+              value={valueByName.get(f.Name) ?? null}
+              showValue={snapshot.Verbose}
+            />
+          ))}
+        </tbody>
+      </table>
+    </ScrollArea>
   );
 }
 

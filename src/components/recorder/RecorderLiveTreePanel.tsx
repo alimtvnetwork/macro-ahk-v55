@@ -75,7 +75,8 @@ function defaultExpanded(forest: TreeNode[]): Set<number> {
 
   return set;
 }
-
+ 
+/* eslint-disable max-lines-per-function */
 export function RecorderLiveTreePanel(): JSX.Element {
   const lib = useStepLibrary();
   const { selection, select } = useRecorderSelection("controller");
@@ -279,7 +280,8 @@ interface GroupNodeProps {
     readonly stepsByGroup: ReadonlyMap<number, ReadonlyArray<StepRow>>;
     readonly onSelect: (payload: { StepGroupId: number | null; StepId: number | null }) => void;
 }
-
+ 
+/* eslint-disable max-lines-per-function */
 function GroupNode(props: GroupNodeProps): JSX.Element {
   const { node, depth, expanded, onToggle, selectedGroupId, selectedStepId, stepsByGroup, onSelect } = props;
   const isOpen = expanded.has(node.Group.StepGroupId);

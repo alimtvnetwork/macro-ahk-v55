@@ -366,88 +366,107 @@ async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
   return out;
 }
 
+function handleClearAllFilters(body: HTMLElement, target: HTMLElement): boolean {
+  const clearAll = target.closest('[data-clear-filters]') as HTMLElement | null;
+  if (!clearAll) {
+    return false;
+  }
+
+  const panel = body.closest('#' + DIALOG_ID) as HTMLElement | null;
+  state.searchQuery = '';
+  const input = panel?.querySelector('[data-search-input]') as HTMLInputElement | null;
+  if (input) {
+    input.value = '';
+  }
+
+  if (state.filterOpenOnly) {
+    const c = panel?.querySelector('[data-chip="open"]') as HTMLButtonElement | null;
+    c?.click();
+  }
+
+  if (state.filterHasRepo) {
+    const c = panel?.querySelector('[data-chip="repo"]') as HTMLButtonElement | null;
+    c?.click();
+  }
+
+  state.hiddenWorkspaces.clear();
+  state.creditsUsedMin = null;
+  state.creditsUsedMax = null;
+  const minInput = panel?.querySelector('[data-credits-min]') as HTMLInputElement | null;
+  const maxInput = panel?.querySelector('[data-credits-max]') as HTMLInputElement | null;
+  if (minInput) {
+    minInput.value = '';
+  }
+
+  if (maxInput) {
+    maxInput.value = '';
+  }
+
+  state.refreshWorkspaceFilter?.();
+  renderBody(body);
+
+  return true;
+}
+
+function handleWorkspaceToggle(body: HTMLElement, target: HTMLElement): boolean {
+  const toggle = target.closest('[data-ws-toggle]') as HTMLElement | null;
+  if (!toggle) {
+    return false;
+  }
+
+  const wsId = toggle.getAttribute('data-ws-toggle') ?? '';
+  if (!wsId) {
+    return true;
+  }
+
+  if (state.collapsed.has(wsId)) {
+    state.collapsed.delete(wsId);
+  } else {
+    state.collapsed.add(wsId);
+  }
+
+  saveCollapsedState();
+  renderBody(body);
+
+  return true;
+}
+
+function handleRowClick(target: HTMLElement): boolean {
+  const row = target.closest('[data-open-url]') as HTMLElement | null;
+  if (!row) {
+    return false;
+  }
+
+  const url = row.getAttribute('data-open-url') ?? '';
+  if (!url) {
+    return true;
+  }
+
+  try {
+    window.open(url, '_blank', 'noopener');
+  } catch (err) {
+    log('Projects: open tab failed: ' + String(err), 'warn');
+  }
+
+  return true;
+}
+
 function attachRowClicks(body: HTMLElement): void {
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   body.addEventListener('click', function (e: Event): void {
     const target = e.target as HTMLElement | null;
     if (!target) {
       return;
     }
 
-    // Clear-all-filters action from the zero-results panel.
-    const clearAll = target.closest('[data-clear-filters]') as HTMLElement | null;
-    if (clearAll) {
-      const panel = body.closest('#' + DIALOG_ID) as HTMLElement | null;
-      state.searchQuery = '';
-      const input = panel?.querySelector('[data-search-input]') as HTMLInputElement | null;
-      if (input) {
-        input.value = '';
-      }
-
-      if (state.filterOpenOnly) {
-        const c = panel?.querySelector('[data-chip="open"]') as HTMLButtonElement | null;
-        c?.click();
-      }
-
-      if (state.filterHasRepo) {
-        const c = panel?.querySelector('[data-chip="repo"]') as HTMLButtonElement | null;
-        c?.click();
-      }
-
-      state.hiddenWorkspaces.clear();
-      state.creditsUsedMin = null;
-      state.creditsUsedMax = null;
-      const minInput = panel?.querySelector('[data-credits-min]') as HTMLInputElement | null;
-      const maxInput = panel?.querySelector('[data-credits-max]') as HTMLInputElement | null;
-      if (minInput) {
-        minInput.value = '';
-      }
-
-      if (maxInput) {
-        maxInput.value = '';
-      }
-
-      state.refreshWorkspaceFilter?.();
-      renderBody(body);
-
+    if (handleClearAllFilters(body, target)) {
       return;
     }
 
-    // Workspace header toggle takes precedence over row click.
-    const toggle = target.closest('[data-ws-toggle]') as HTMLElement | null;
-    if (toggle) {
-      const wsId = toggle.getAttribute('data-ws-toggle') ?? '';
-      if (!wsId) {
-        return;
-      }
-
-      if (state.collapsed.has(wsId)) {
-        state.collapsed.delete(wsId);
-      } else {
-        state.collapsed.add(wsId);
-      }
-
-      saveCollapsedState();
-      renderBody(body);
-
+    if (handleWorkspaceToggle(body, target)) {
       return;
     }
 
-    const row = target.closest('[data-open-url]') as HTMLElement | null;
-    if (!row) {
-      return;
-    }
-
-    const url = row.getAttribute('data-open-url') ?? '';
-    if (!url) {
-      return;
-    }
-
-    try {
-      window.open(url, '_blank', 'noopener'); 
-    } catch (err) {
-      log('Projects: open tab failed: ' + String(err), 'warn'); 
-    }
+    handleRowClick(target);
   });
 }
 
@@ -843,7 +862,9 @@ function createSearchBar(onChange: () => void): HTMLElement {
     }
 
     btn.onclick = function (): void {
-      toggle(); paint(); onChange(); 
+      toggle();
+      paint();
+      onChange(); 
     };
 
     paint();
@@ -924,14 +945,16 @@ function createCreditsRangeRow(onChange: () => void): HTMLElement {
     input.addEventListener('input', function () {
       const raw = input.value.trim();
       if (raw === '') {
-        setValue(null); onChange();
+        setValue(null);
+        onChange();
 
         return; 
       }
 
       const n = Number(raw);
       if (Number.isFinite(n) && n >= 0) {
-        setValue(n); onChange();
+        setValue(n);
+        onChange();
 
         return; 
       }
@@ -1072,7 +1095,8 @@ function attachDrag(panel: HTMLElement, bar: HTMLElement, closeBtn: HTMLElement)
 
     dragging = true;
     const r = panel.getBoundingClientRect();
-    offX = e.clientX - r.left; offY = e.clientY - r.top;
+    offX = e.clientX - r.left;
+    offY = e.clientY - r.top;
     bar.style.cursor = 'grabbing';
     e.preventDefault();
   };
@@ -1088,7 +1112,8 @@ function attachDrag(panel: HTMLElement, bar: HTMLElement, closeBtn: HTMLElement)
   };
 
   const onUp = function (): void {
-    dragging = false; bar.style.cursor = 'grab'; 
+    dragging = false;
+    bar.style.cursor = 'grab'; 
   };
 
   bar.addEventListener('mousedown', onDown);

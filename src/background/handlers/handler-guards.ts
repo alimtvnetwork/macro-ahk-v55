@@ -138,19 +138,23 @@ export function safeBind(
     }
 
     if (v === null) {
-      out.push(null); continue; 
+      out.push(null);
+      continue; 
     }
 
     if (typeof v === "string" || typeof v === "number") {
-      out.push(v); continue; 
+      out.push(v);
+      continue; 
     }
 
     if (v instanceof Uint8Array) {
-      out.push(v); continue; 
+      out.push(v);
+      continue; 
     }
 
     if (typeof v === "boolean") {
-      out.push(v ? 1 : 0); continue; 
+      out.push(v ? 1 : 0);
+      continue; 
     }
 
     // Fallback: stringify objects so they at least don't crash sql.js

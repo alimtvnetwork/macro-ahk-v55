@@ -152,44 +152,76 @@ interface AttemptRowProps {
 
 function AttemptRow({ attempt, history, showHistory, onPromote, isPromoting }: AttemptRowProps) {
   const matched = attempt.Matched;
-  const Icon = matched ? CheckCircle2 : XCircle;
-  const tone = matched ? "text-emerald-500" : "text-destructive";
   const border = attempt.IsPrimary
     ? matched ? "border-emerald-500/40" : "border-destructive/40"
     : "border-border";
 
+  return (
+    <li className={`rounded-md border ${border} bg-card p-2.5 text-xs space-y-1`}>
+      <AttemptRowHeader attempt={attempt} onPromote={onPromote} isPromoting={isPromoting} />
+      <AttemptRowDetails attempt={attempt} history={history} showHistory={showHistory} />
+    </li>
+  );
+}
+
+function AttemptRowHeader({
+  attempt,
+  onPromote,
+  isPromoting,
+}: {
+  readonly attempt: SelectorEvaluationAttempt;
+  readonly onPromote: ((selectorId: number) => void) | null;
+  readonly isPromoting: boolean;
+}) {
+  const matched = attempt.Matched;
+  const Icon = matched ? CheckCircle2 : XCircle;
+  const tone = matched ? "text-emerald-500" : "text-destructive";
   const canPromote = onPromote !== null && matched && !attempt.IsPrimary;
 
   return (
-    <li className={`rounded-md border ${border} bg-card p-2.5 text-xs space-y-1`}>
-      <div className="flex items-center gap-2">
-        <Icon className={`h-3.5 w-3.5 ${tone}`} aria-hidden />
-        <Badge variant="outline" className="text-[10px] px-1.5 py-0">{attempt.Kind}</Badge>
-        {attempt.IsPrimary && (
-          <Badge variant="default" className="text-[10px] px-1.5 py-0">PRIMARY</Badge>
-        )}
-        <code className="text-muted-foreground truncate" title={attempt.Expression}>
-          {attempt.Expression}
-        </code>
-        <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0">
-          {attempt.MatchCount} match{attempt.MatchCount === 1 ? "" : "es"}
-        </Badge>
-        {canPromote && (
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-6 px-2 text-[10px]"
-            onClick={() => onPromote!(attempt.SelectorId)}
-            disabled={isPromoting}
-            aria-label={`Promote selector ${attempt.SelectorId} to primary`}
-            title="Promote this fallback to primary for this step"
-          >
-            <Star className="h-3 w-3 mr-1" />
-            {isPromoting ? "Promoting…" : "Promote to primary"}
-          </Button>
-        )}
-      </div>
+    <div className="flex items-center gap-2">
+      <Icon className={`h-3.5 w-3.5 ${tone}`} aria-hidden />
+      <Badge variant="outline" className="text-[10px] px-1.5 py-0">{attempt.Kind}</Badge>
+      {attempt.IsPrimary && (
+        <Badge variant="default" className="text-[10px] px-1.5 py-0">PRIMARY</Badge>
+      )}
+      <code className="text-muted-foreground truncate" title={attempt.Expression}>
+        {attempt.Expression}
+      </code>
+      <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0">
+        {attempt.MatchCount} match{attempt.MatchCount === 1 ? "" : "es"}
+      </Badge>
+      {canPromote && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-6 px-2 text-[10px]"
+          onClick={() => onPromote!(attempt.SelectorId)}
+          disabled={isPromoting}
+          aria-label={`Promote selector ${attempt.SelectorId} to primary`}
+          title="Promote this fallback to primary for this step"
+        >
+          <Star className="h-3 w-3 mr-1" />
+          {isPromoting ? "Promoting…" : "Promote to primary"}
+        </Button>
+      )}
+    </div>
+  );
+}
 
+function AttemptRowDetails({
+  attempt,
+  history,
+  showHistory,
+}: {
+  readonly attempt: SelectorEvaluationAttempt;
+  readonly history: SelectorHistoryBucket | null;
+  readonly showHistory: boolean;
+}) {
+  const matched = attempt.Matched;
+
+  return (
+    <>
       {attempt.ResolvedExpression !== attempt.Expression && (
         <div className="text-[11px] text-muted-foreground pl-5">
                     Resolved: <code>{attempt.ResolvedExpression}</code>
@@ -213,10 +245,11 @@ function AttemptRow({ attempt, history, showHistory, onPromote, isPromoting }: A
                     No prior replay history for this selector.
         </div>
       )}
-    </li>
+    </>
   );
 }
-
+ 
+/* eslint-disable max-lines-per-function */
 export function SelectorComparisonPanel({ comparison, stepId, url, history, onPromoteToPrimary, failureReport, onDownload }: SelectorComparisonPanelProps) {
   const { Attempts, PrimaryMatched, AnyFallbackMatched, DriftDetected } = comparison;
   const hasHistory = history !== undefined;
@@ -249,49 +282,15 @@ export function SelectorComparisonPanel({ comparison, stepId, url, history, onPr
 
   return (
     <Card>
-      <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          <Crosshair className="h-4 w-4 text-primary" />
-                    Selector Comparison
-          <Badge
-            variant={PrimaryMatched ? "secondary" : "destructive"}
-            className="ml-1 text-[10px]"
-          >
-            {PrimaryMatched ? "Primary OK" : "Primary failed"}
-          </Badge>
-          {AnyFallbackMatched && (
-            <Badge variant="outline" className="text-[10px]">Fallback found</Badge>
-          )}
-        </CardTitle>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <Switch
-              id="show-history"
-              checked={showHistory && hasHistory}
-              onCheckedChange={(v) => setShowHistory(Boolean(v))}
-              disabled={!hasHistory}
-              aria-label="Show prior replay outcomes per selector"
-            />
-            <LabelType
-              htmlFor="show-history"
-              className={`text-[11px] flex items-center gap-1 ${hasHistory ? "" : "text-muted-foreground"}`}
-            >
-              <History className="h-3 w-3" aria-hidden />
-                            History
-            </LabelType>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExport}
-            disabled={Attempts.length === 0}
-            aria-label="Export selector comparison as JSON"
-          >
-            <FileDown className="h-3.5 w-3.5 mr-1.5" />
-                        Export selector comparison
-          </Button>
-        </div>
-      </CardHeader>
+      <SelectorComparisonPanelHeader
+        PrimaryMatched={PrimaryMatched}
+        AnyFallbackMatched={AnyFallbackMatched}
+        showHistory={showHistory}
+        setShowHistory={setShowHistory}
+        hasHistory={hasHistory}
+        AttemptsLength={Attempts.length}
+        handleExport={handleExport}
+      />
       <CardContent className="space-y-3">
         {DriftDetected && (
           <div className="flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-xs text-amber-700 dark:text-amber-300">
@@ -325,5 +324,70 @@ export function SelectorComparisonPanel({ comparison, stepId, url, history, onPr
         )}
       </CardContent>
     </Card>
+  );
+}
+ 
+/* eslint-disable max-lines-per-function */
+function SelectorComparisonPanelHeader({
+  PrimaryMatched,
+  AnyFallbackMatched,
+  showHistory,
+  setShowHistory,
+  hasHistory,
+  AttemptsLength,
+  handleExport,
+}: {
+  readonly PrimaryMatched: boolean;
+  readonly AnyFallbackMatched: boolean;
+  readonly showHistory: boolean;
+  readonly setShowHistory: (v: boolean) => void;
+  readonly hasHistory: boolean;
+  readonly AttemptsLength: number;
+  readonly handleExport: () => void;
+}) {
+  return (
+    <CardHeader className="pb-2 flex flex-row items-center justify-between">
+      <CardTitle className="text-sm font-semibold flex items-center gap-2">
+        <Crosshair className="h-4 w-4 text-primary" />
+                  Selector Comparison
+        <Badge
+          variant={PrimaryMatched ? "secondary" : "destructive"}
+          className="ml-1 text-[10px]"
+        >
+          {PrimaryMatched ? "Primary OK" : "Primary failed"}
+        </Badge>
+        {AnyFallbackMatched && (
+          <Badge variant="outline" className="text-[10px]">Fallback found</Badge>
+        )}
+      </CardTitle>
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5">
+          <Switch
+            id="show-history"
+            checked={showHistory && hasHistory}
+            onCheckedChange={(v) => setShowHistory(Boolean(v))}
+            disabled={!hasHistory}
+            aria-label="Show prior replay outcomes per selector"
+          />
+          <LabelType
+            htmlFor="show-history"
+            className={`text-[11px] flex items-center gap-1 ${hasHistory ? "" : "text-muted-foreground"}`}
+          >
+            <History className="h-3 w-3" aria-hidden />
+                          History
+          </LabelType>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExport}
+          disabled={AttemptsLength === 0}
+          aria-label="Export selector comparison as JSON"
+        >
+          <FileDown className="h-3.5 w-3.5 mr-1.5" />
+                      Export selector comparison
+        </Button>
+      </div>
+    </CardHeader>
   );
 }

@@ -141,7 +141,8 @@ function useWebhookLog(open: boolean) {
   const [payloadOpenIdx, setPayloadOpenIdx] = useState<number | null>(null);
   useEffect(() => {
     if (open) {
-      setLog(getDeliveryLog()); setSearchQuery(""); 
+      setLog(getDeliveryLog());
+      setSearchQuery(""); 
     } 
   }, [open]);
   const logCounts = useMemo(() => computeLogCounts(log), [log]);
@@ -174,12 +175,15 @@ function useRepairHandler(logCtl: ReturnType<typeof useWebhookLog>, setRepairBus
     setRepairBusy(true);
     try {
       const report = repairDeliveryLog();
-      logCtl.setLog(getDeliveryLog()); logCtl.setExpandedIdx(null); logCtl.setPayloadOpenIdx(null);
+      logCtl.setLog(getDeliveryLog());
+      logCtl.setExpandedIdx(null);
+      logCtl.setPayloadOpenIdx(null);
       announceRepairResult(report);
     } catch (err) {
       toast.error(`Repair failed: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
-      setRepairBusy(false); setRepairConfirmOpen(false);
+      setRepairBusy(false);
+      setRepairConfirmOpen(false);
     }
   };
 }
@@ -191,12 +195,18 @@ export function useWebhookSettingsState(open: boolean, onOpenChange: (open: bool
   const [repairConfirmOpen, setRepairConfirmOpen] = useState(false);
   const [repairBusy, setRepairBusy] = useState(false);
   const handleSave = () => {
-    const saved = saveWebhookConfig(draftCtl.draft); draftCtl.setDraft(saved); toast.success("Webhook settings saved"); onOpenChange(false); 
+    const saved = saveWebhookConfig(draftCtl.draft);
+    draftCtl.setDraft(saved);
+    toast.success("Webhook settings saved");
+    onOpenChange(false); 
   };
 
   const handleTest = useTestHandler(draftCtl.draft, draftCtl.setDraft, logCtl.setLog, setBusy);
   const handleClearLog = () => {
-    clearDeliveryLog(); logCtl.setLog([]); logCtl.setExpandedIdx(null); logCtl.setPayloadOpenIdx(null); 
+    clearDeliveryLog();
+    logCtl.setLog([]);
+    logCtl.setExpandedIdx(null);
+    logCtl.setPayloadOpenIdx(null); 
   };
 
   const refreshLog = () => logCtl.setLog(getDeliveryLog());

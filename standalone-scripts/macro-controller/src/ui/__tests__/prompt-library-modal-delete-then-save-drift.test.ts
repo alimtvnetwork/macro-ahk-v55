@@ -87,7 +87,8 @@ beforeEach(() => {
   mocks.upsertPrompt.mockImplementation(async () => (new DbResult(true, 99)));
 });
 afterEach(() => {
-  document.body.innerHTML = ''; vi.restoreAllMocks(); 
+  document.body.innerHTML = '';
+  vi.restoreAllMocks(); 
 });
 
 describe('prompt-library-modal — delete removes row + drift guard persists on next Save', () => {

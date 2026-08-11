@@ -65,7 +65,8 @@ export function buildWaterfallSection(): { waterfallContainer: HTMLElement; rend
   };
 
   refreshWfBtn.onclick = function (e: MouseEvent) {
-    e.stopPropagation(); renderWaterfall(); 
+    e.stopPropagation();
+    renderWaterfall();
   };
 
   return { waterfallContainer, renderWaterfall };

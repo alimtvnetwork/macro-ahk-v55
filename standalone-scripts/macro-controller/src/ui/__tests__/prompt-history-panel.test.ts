@@ -161,7 +161,8 @@ describe('openPromptHistoryPanel', () => {
     const originalCreate = URL.createObjectURL;
     const originalRevoke = URL.revokeObjectURL;
     URL.createObjectURL = vi.fn(() => {
-      const u = 'blob:mock-' + created.length; created.push(u);
+      const u = 'blob:mock-' + created.length;
+      created.push(u);
 
       return u; 
     });

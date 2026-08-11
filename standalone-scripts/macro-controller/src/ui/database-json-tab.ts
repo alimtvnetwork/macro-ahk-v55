@@ -149,7 +149,8 @@ export function buildJsonTab(
 
   const clearBtn = el('button', DomIdType.JsonBtn, '🗑️ Clear');
   clearBtn.onclick = () => {
-    editor.value = ''; logEl.textContent = ''; 
+    editor.value = '';
+    logEl.textContent = ''; 
   };
 
   actions.appendChild(clearBtn);

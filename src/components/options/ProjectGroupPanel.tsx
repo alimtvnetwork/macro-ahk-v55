@@ -765,7 +765,8 @@ export function ProjectGroupPanel({ groups, onRefresh }: ProjectGroupPanelProps)
         group={selectedGroup}
         onBack={() => setSelectedGroup(null)}
         onRefresh={() => {
-          setSelectedGroup(null); onRefresh(); 
+          setSelectedGroup(null);
+          onRefresh(); 
         }}
       />
     );

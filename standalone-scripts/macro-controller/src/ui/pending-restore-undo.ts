@@ -138,7 +138,7 @@ export function clearPendingRestoreUndo(): void {
   try {
     store.removeItem(STORAGE_KEY);
   } catch (err) {
-    console.error();
+    logError(LOG_SCOPE, 'clear failed', err);
   }
 }
 

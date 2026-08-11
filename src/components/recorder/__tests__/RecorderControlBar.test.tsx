@@ -40,7 +40,8 @@ beforeEach(() => {
   window.localStorage.clear(); 
 });
 afterEach(() => {
-  cleanup(); window.localStorage.clear(); 
+  cleanup(); 
+  window.localStorage.clear(); 
 });
 
 describe("RecorderControlBar", () => {

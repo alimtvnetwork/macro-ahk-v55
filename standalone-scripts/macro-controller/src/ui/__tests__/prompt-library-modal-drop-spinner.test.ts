@@ -103,7 +103,8 @@ describe('prompt-library-modal - spinner + label during drag-and-drop import', (
     io.performPromptImport.mockClear();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks(); 
   });
 
   it('shows spinner + "Importing…" label on the Import button during a drop, and restores after success', async () => {
@@ -114,7 +115,8 @@ describe('prompt-library-modal - spinner + label during drag-and-drop import', (
     const originalLabel = btn.textContent ?? 'Import';
 
     fireDrop(getRoot(), 'a.json');
-    await tick(); await tick();
+    await tick();
+    await tick();
 
     // Mid-import: label swapped and spinner present.
     expect(btn.textContent).toContain('Importing');
@@ -123,7 +125,9 @@ describe('prompt-library-modal - spinner + label during drag-and-drop import', (
     expect(btn.getAttribute('aria-busy')).toBe('true');
 
     io.release(true);
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
 
     // Restored after success.
     expect(btn.textContent).toBe(originalLabel);
@@ -140,13 +144,16 @@ describe('prompt-library-modal - spinner + label during drag-and-drop import', (
     const originalLabel = btn.textContent ?? 'Import';
 
     fireDrop(getRoot(), 'b.json');
-    await tick(); await tick();
+    await tick();
+    await tick();
 
     expect(btn.querySelector('[data-testid="library-import-spinner"]')).not.toBeNull();
     expect(btn.textContent).toContain('Importing');
 
     io.release(false);
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
 
     expect(btn.textContent).toBe(originalLabel);
     expect(btn.querySelector('[data-testid="library-import-spinner"]')).toBeNull();

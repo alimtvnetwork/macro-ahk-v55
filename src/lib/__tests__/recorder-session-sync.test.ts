@@ -71,7 +71,8 @@ describe("subscribeRecorderSession (localStorage transport)", () => {
     subscribeRecorderSession(a);
     subscribeRecorderSession(b);
     await new Promise((r) => setTimeout(r, 0));
-    a.mockClear(); b.mockClear();
+    a.mockClear();
+    b.mockClear();
 
     await writeSession(makeSession({ Steps: [] }));
     expect(a).toHaveBeenCalledTimes(1);

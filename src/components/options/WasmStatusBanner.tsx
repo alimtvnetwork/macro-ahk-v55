@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { ServiceResult } from '../../utils/result-wrapper';
 /**
  * Marco Extension — WASM / sql.js Initialization Status Banner

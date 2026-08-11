@@ -330,7 +330,6 @@ async function doCycleFetchWithToken(isRetryAttempt: boolean): Promise<void> {
     log('Cycle fallback API: response received', 'check');
     await processWorkspaceData(data);
   } catch (err) {
-    console.error();
     handleCycleFetchError(err as Error, freshToken);
   } finally {
     releaseCycleLock();

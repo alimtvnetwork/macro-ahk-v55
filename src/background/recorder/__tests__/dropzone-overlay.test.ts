@@ -15,7 +15,8 @@ import { FireDragType } from "../../../types/enums";
 
 let handle: DropZoneHandle | null = null;
 afterEach(() => {
-  handle?.Destroy(); handle = null; 
+  handle?.Destroy();
+  handle = null; 
 });
 
 function fireDrag(type: FireDragType, files?: File[]): DragEvent {

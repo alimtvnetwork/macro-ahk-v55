@@ -18,7 +18,8 @@ import { PLAN_NEXT_SEED_ROWS } from '../../seed/plan-next-prompts';
 import { clearDiffPrefs } from './helpers/clear-diff-prefs';
 
 beforeEach(() => {
-  document.body.innerHTML = ''; clearDiffPrefs(); 
+  document.body.innerHTML = '';
+  clearDiffPrefs(); 
 });
 
 function dispatchCtrlD(target: EventTarget, opts?: Partial<KeyboardEventInit>): boolean {

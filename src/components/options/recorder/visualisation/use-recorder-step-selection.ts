@@ -54,6 +54,31 @@ function useAutoSelectFirstStep(
   }, [data, selectedStepId, setSelectedStepId]);
 }
 
+function fetchSelectorsForStep(
+  selectedStepId: number,
+  loadSelectors: LoadSelectors,
+  setSelectors: (rows: ReadonlyArray<SelectorRow>) => void,
+  setSelectorsLoading: (loading: boolean) => void,
+) {
+  let cancelled = false;
+  setSelectorsLoading(true);
+  void loadSelectors(selectedStepId)
+    .then((rows) => {
+      if (!cancelled) {
+        setSelectors(rows);
+      }
+    })
+    .finally(() => {
+      if (!cancelled) {
+        setSelectorsLoading(false);
+      }
+    });
+
+  return () => {
+    cancelled = true;
+  };
+}
+
 function useFetchSelectorsOnStepChange(
   selectedStepId: number | null,
   loadSelectors: LoadSelectors,
@@ -67,22 +92,6 @@ function useFetchSelectorsOnStepChange(
       return;
     }
 
-    let cancelled = false;
-    setSelectorsLoading(true);
-    loadSelectors(selectedStepId)
-      .then((rows) => {
-        if (!cancelled) {
-          setSelectors(rows);
-        } 
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setSelectorsLoading(false);
-        } 
-      });
-
-    return () => {
-      cancelled = true; 
-    };
+    return fetchSelectorsForStep(selectedStepId, loadSelectors, setSelectors, setSelectorsLoading);
   }, [selectedStepId, loadSelectors, setSelectors, setSelectorsLoading]);
 }

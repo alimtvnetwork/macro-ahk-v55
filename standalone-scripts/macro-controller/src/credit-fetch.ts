@@ -505,7 +505,8 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
     return 0;
   });
   if (proZeroMutated + proOneMutated > 0) {
-    syncCreditStateFromApi(); mc().updateUI(); 
+    syncCreditStateFromApi();
+    mc().updateUI(); 
   }
 }
 

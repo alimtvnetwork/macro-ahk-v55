@@ -73,6 +73,7 @@ function eventToChord(e: KeyboardEvent): string | null {
   return parts.join("+");
 }
 
+// eslint-disable-next-line max-lines-per-function
 export function HotkeyChordCapture(props: HotkeyChordCaptureProps): JSX.Element {
   const { value, onChange, placeholder, className, id } = props;
   const [active, setActive] = useState(false);

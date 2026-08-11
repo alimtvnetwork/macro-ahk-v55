@@ -79,7 +79,8 @@ function _buildTitleElements(deps: PanelBuilderDeps, plCtx: PanelLayoutCtx) {
   versionSpan.textContent = 'v' + VERSION;
   versionSpan.title = 'Click to see About info';
   versionSpan.onclick = function(e: Event) {
-    e.stopPropagation(); showAboutModal(); 
+    e.stopPropagation();
+    showAboutModal(); 
   };
 
   const authBadge = buildAuthBadge();
@@ -106,7 +107,8 @@ function _buildTitleElements(deps: PanelBuilderDeps, plCtx: PanelLayoutCtx) {
   panelToggleSpan.textContent = plCtx.panelState === 'minimized' ? '[ + ]' : '[ - ]';
   panelToggleSpan.title = 'Minimize / Expand panel';
   panelToggleSpan.onclick = function(e: Event) {
-    e.stopPropagation(); toggleMinimize(plCtx); 
+    e.stopPropagation();
+    toggleMinimize(plCtx); 
   };
 
   plCtx.panelToggleSpan = panelToggleSpan;
@@ -116,7 +118,8 @@ function _buildTitleElements(deps: PanelBuilderDeps, plCtx: PanelLayoutCtx) {
   hideBtn.textContent = '[ x ]';
   hideBtn.title = 'Close and fully remove controller (re-inject to restore)';
   hideBtn.onclick = function(e: Event) {
-    e.stopPropagation(); destroyPanel(); 
+    e.stopPropagation();
+    destroyPanel(); 
   };
 
   return {

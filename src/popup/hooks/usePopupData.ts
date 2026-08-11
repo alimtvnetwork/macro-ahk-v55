@@ -125,40 +125,30 @@ export function usePopupData() {
   // forever (waking the SW each time).
   useEffect(() => {
     void loadData();
-
     let intervalId: ReturnType<typeof setInterval> | null = null;
-    const startPolling = () => {
-      if (intervalId !== null) {
-        return;
-      }
-
-      intervalId = setInterval(() => void loadData(), 30_000);
-    };
-
-    const stopPolling = () => {
-      if (intervalId !== null) {
-        clearInterval(intervalId); intervalId = null; 
-      }
-    };
-
     const onVisChange = () => {
-      if (document.hidden) {
-        stopPolling();
-      } else {
-        // Refresh immediately on becoming visible to catch up on missed ticks.
+      if (document.hidden && intervalId !== null) {
+        clearInterval(intervalId);
+        intervalId = null;
+      } else if (!document.hidden) {
         void loadData();
-        startPolling();
+        if (intervalId === null) {
+          intervalId = setInterval(() => void loadData(), 30_000);
+        }
       }
     };
 
     if (!document.hidden) {
-      startPolling();
+      intervalId = setInterval(() => void loadData(), 30_000);
     }
 
     document.addEventListener("visibilitychange", onVisChange);
 
     return () => {
-      stopPolling();
+      if (intervalId !== null) {
+        clearInterval(intervalId);
+      }
+
       document.removeEventListener("visibilitychange", onVisChange);
     };
   }, [loadData]);

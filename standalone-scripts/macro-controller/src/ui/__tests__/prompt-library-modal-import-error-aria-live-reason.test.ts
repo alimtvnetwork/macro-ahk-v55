@@ -72,7 +72,8 @@ describe('prompt-library-modal - aria-live announces import failure reason', () 
     io.performPromptImport.mockReset();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('renders the thrown Error.message inside the role="alert" aria-live banner', async () => {
@@ -81,7 +82,9 @@ describe('prompt-library-modal - aria-live announces import failure reason', () 
     await openPromptLibraryModal();
     await tick();
     fireFile('boom.json');
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
 
     const b = banner();
     // Live region attributes remain intact.
@@ -107,7 +110,9 @@ describe('prompt-library-modal - aria-live announces import failure reason', () 
     await openPromptLibraryModal();
     await tick();
     fireFile('bad.json');
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
 
     expect(banner().textContent).toContain('Unknown error');
   });
@@ -121,12 +126,16 @@ describe('prompt-library-modal - aria-live announces import failure reason', () 
     await tick();
 
     fireFile('a.json');
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
     expect(banner().textContent).toContain('First failure');
     expect(banner().textContent).not.toContain('Second failure');
 
     fireFile('b.json');
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
     // First-failure text is gone, second-failure text is announced.
     expect(banner().textContent).toContain('Second failure');
     expect(banner().textContent).not.toContain('First failure');

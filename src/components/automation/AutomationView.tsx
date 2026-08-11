@@ -205,7 +205,8 @@ export function AutomationView() {
     runnerRef.current?.cancel(); 
   }, []);
   const handleDismiss = useCallback(() => {
-    setExecution(null); runnerRef.current = null; 
+    setExecution(null);
+    runnerRef.current = null; 
   }, []);
 
   const handleExport = useCallback(() => {

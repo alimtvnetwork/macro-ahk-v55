@@ -42,6 +42,7 @@ export interface SelfTestResult {
 interface InsertResponse { isOk: true; step: { StepId: number } }
 interface ListResponse  { steps: ReadonlyArray<{ StepId: number; VariableName: string }> }
 
+// eslint-disable-next-line max-lines-per-function
 export async function runRecorderSelfTest(projectSlug: string): Promise<SelfTestResult> {
   if (projectSlug.trim().length === 0) {
     throw new RecorderSelfTestError("insert", projectSlug, "ProjectSlug is empty — select a project first.");
@@ -54,23 +55,7 @@ export async function runRecorderSelfTest(projectSlug: string): Promise<SelfTest
   const insertedStepId = await insertDummyStep(projectSlug, variableName);
 
   try {
-    const after = await listSteps(projectSlug, "verify");
-    const found = after.find((s) => s.StepId === insertedStepId);
-    if (found === undefined) {
-      throw new RecorderSelfTestError(
-        "verify",
-        projectSlug,
-        `Inserted StepId=${insertedStepId} not present in RECORDER_STEP_LIST after write.`,
-      );
-    }
-
-    if (found.VariableName !== variableName) {
-      throw new RecorderSelfTestError(
-        "verify",
-        projectSlug,
-        `Round-trip mismatch — wrote VariableName='${variableName}', read '${found.VariableName}'.`,
-      );
-    }
+    const after = await verifyInsertedStep(projectSlug, insertedStepId, variableName);
 
     await deleteStep(projectSlug, insertedStepId);
 
@@ -92,26 +77,52 @@ export async function runRecorderSelfTest(projectSlug: string): Promise<SelfTest
   }
 }
 
+async function verifyInsertedStep(projectSlug: string, insertedStepId: number, variableName: string) {
+  const after = await listSteps(projectSlug, "verify");
+  const found = after.find((s) => s.StepId === insertedStepId);
+  if (found === undefined) {
+    throw new RecorderSelfTestError(
+      "verify",
+      projectSlug,
+      `Inserted StepId=${insertedStepId} not present in RECORDER_STEP_LIST after write.`,
+    );
+  }
+
+  if (found.VariableName !== variableName) {
+    throw new RecorderSelfTestError(
+      "verify",
+      projectSlug,
+      `Round-trip mismatch — wrote VariableName='${variableName}', read '${found.VariableName}'.`,
+    );
+  }
+
+  return after;
+}
+
+function createDummyDraft(variableName: string) {
+  return {
+    StepKindId: STEP_KIND_WAIT,
+    VariableName: variableName,
+    LabelType: "Recorder self-test (auto-cleanup)",
+    InlineJs: null,
+    ParamsJson: null,
+    IsBreakpoint: false,
+    Selectors: [{
+      SelectorKindId: SELECTOR_KIND_CSS,
+      Expression: ".__marco_selftest__",
+      AnchorSelectorId: null,
+      IsPrimary: true,
+    }],
+  };
+}
+
 async function insertDummyStep(projectSlug: string, variableName: string): Promise<number> {
   try {
     const response = await sendMessage<InsertResponse>({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       type: "RECORDER_STEP_INSERT" as any,
       projectSlug,
-      draft: {
-        StepKindId: STEP_KIND_WAIT,
-        VariableName: variableName,
-        LabelType: "Recorder self-test (auto-cleanup)",
-        InlineJs: null,
-        ParamsJson: null,
-        IsBreakpoint: false,
-        Selectors: [{
-          SelectorKindId: SELECTOR_KIND_CSS,
-          Expression: ".__marco_selftest__",
-          AnchorSelectorId: null,
-          IsPrimary: true,
-        }],
-      },
+      draft: createDummyDraft(variableName),
     });
     if (typeof response?.step?.StepId !== "number") {
       throw new Error("RECORDER_STEP_INSERT returned no StepId");

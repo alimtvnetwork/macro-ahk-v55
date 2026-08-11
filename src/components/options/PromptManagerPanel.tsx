@@ -658,7 +658,8 @@ export function PromptManagerPanel() {
               : "border-border hover:border-muted-foreground/40"
           }`}
           onDragOver={(e) => {
-            e.preventDefault(); setDragOver(true); 
+            e.preventDefault();
+            setDragOver(true); 
           }}
           onDragLeave={() => setDragOver(false)}
           onDrop={(e) => {

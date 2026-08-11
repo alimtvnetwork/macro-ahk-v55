@@ -172,11 +172,13 @@ export function renderPromptIODialog(): void { // eslint-disable-line max-lines-
   clearBtn.textContent = '🗑 Clear All Prompts';
   clearBtn.style.cssText = 'background:transparent;border:none;color:#ef4444;font-size:10px;cursor:pointer;padding:4px 8px;border-radius:4px;opacity:0.7;';
   clearBtn.onmouseenter = () => {
-    clearBtn.style.opacity = '1'; clearBtn.style.background = 'rgba(239,68,68,0.1)'; 
+    clearBtn.style.opacity = '1';
+    clearBtn.style.background = 'rgba(239,68,68,0.1)'; 
   };
 
   clearBtn.onmouseleave = () => {
-    clearBtn.style.opacity = '0.7'; clearBtn.style.background = 'transparent'; 
+    clearBtn.style.opacity = '0.7';
+    clearBtn.style.background = 'transparent'; 
   };
 
   clearBtn.onclick = async () => {

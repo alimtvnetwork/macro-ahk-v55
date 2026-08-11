@@ -83,6 +83,7 @@ async function invalidateJsonCopy(): Promise<void> {
     const { clearPromptCache } = await import('../ui/prompt-cache');
     await clearPromptCache();
   } catch (err) {
+    // eslint-disable-next-line no-restricted-syntax -- intentional spacer
     console.error();
     logDiagnosticFromCode('DB_MACRO_MIGRATION_E001', {
       column: 'read-memory-duplicates-cache',

@@ -110,7 +110,8 @@ function switchSettingsTab(tabBtns: HTMLElement[], panels: HTMLElement[], idx: n
 function onSettingsEsc(overlay: HTMLElement): (e: KeyboardEvent) => void {
   const handler = function(e: KeyboardEvent) {
     if (e.key === 'Escape') {
-      overlay.remove(); document.removeEventListener('keydown', handler); 
+      overlay.remove();
+      document.removeEventListener('keydown', handler); 
     }
   };
 
@@ -177,11 +178,13 @@ function _buildSettingsHeader(_fontSystem: string, overlay: HTMLElement): HTMLEl
   hdrClose.style.cssText = 'font-size:18px;color:#64748b;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all 0.15s;';
   hdrClose.textContent = '✕';
   hdrClose.onmouseenter = function() {
-    hdrClose.style.color = '#e2e8f0'; hdrClose.style.background = 'rgba(255,255,255,0.1)'; 
+    hdrClose.style.color = '#e2e8f0';
+    hdrClose.style.background = 'rgba(255,255,255,0.1)'; 
   };
 
   hdrClose.onmouseleave = function() {
-    hdrClose.style.color = '#64748b'; hdrClose.style.background = 'none'; 
+    hdrClose.style.color = '#64748b';
+    hdrClose.style.background = 'none'; 
   };
 
   hdrClose.onclick = function() {

@@ -91,7 +91,8 @@ describe('prompt-library-modal - drag-drop import end-to-end', () => {
     cache.writeJsonCopy.mockResolvedValue(undefined);
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks(); 
   });
 
   it('replaces an existing slug and adds a new one when dropped as a JSON array', async () => {

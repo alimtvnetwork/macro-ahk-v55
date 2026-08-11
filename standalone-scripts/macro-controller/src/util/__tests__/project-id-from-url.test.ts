@@ -99,9 +99,15 @@ describe('subscribeProjectNameChange + notifyIfProjectRenamed', () => {
   it('tracks names per projectId independently', () => {
     const callback = vi.fn();
     subscribeProjectNameChange(callback);
-    mockedId = 'proj-A'; mockedName = 'A1'; notifyIfProjectRenamed();
-    mockedId = 'proj-B'; mockedName = 'B1'; notifyIfProjectRenamed();
-    mockedId = 'proj-A'; mockedName = 'A2'; notifyIfProjectRenamed();
+    mockedId = 'proj-A';
+    mockedName = 'A1';
+    notifyIfProjectRenamed();
+    mockedId = 'proj-B';
+    mockedName = 'B1';
+    notifyIfProjectRenamed();
+    mockedId = 'proj-A';
+    mockedName = 'A2';
+    notifyIfProjectRenamed();
     expect(callback).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledWith('proj-A', 'A1', 'A2');
   });
@@ -109,16 +115,20 @@ describe('subscribeProjectNameChange + notifyIfProjectRenamed', () => {
   it('unsubscribe stops further notifications', () => {
     const callback = vi.fn();
     const unsub = subscribeProjectNameChange(callback);
-    mockedId = 'proj-1'; mockedName = 'X'; notifyIfProjectRenamed();
+    mockedId = 'proj-1';
+    mockedName = 'X';
+    notifyIfProjectRenamed();
     unsub();
-    mockedName = 'Y'; notifyIfProjectRenamed();
+    mockedName = 'Y';
+    notifyIfProjectRenamed();
     expect(callback).not.toHaveBeenCalled();
   });
 
   it('silently ignores calls with no projectId — never fires with a null id', () => {
     const callback = vi.fn();
     subscribeProjectNameChange(callback);
-    mockedId = null; mockedName = 'Anything';
+    mockedId = null;
+    mockedName = 'Anything';
     notifyIfProjectRenamed();
     expect(callback).not.toHaveBeenCalled();
   });
@@ -130,8 +140,11 @@ describe('subscribeProjectNameChange + notifyIfProjectRenamed', () => {
     const good = vi.fn();
     subscribeProjectNameChange(bad);
     subscribeProjectNameChange(good);
-    mockedId = 'p'; mockedName = 'a'; notifyIfProjectRenamed();
-    mockedName = 'b'; notifyIfProjectRenamed();
+    mockedId = 'p';
+    mockedName = 'a';
+    notifyIfProjectRenamed();
+    mockedName = 'b';
+    notifyIfProjectRenamed();
     expect(bad).toHaveBeenCalledTimes(1);
     expect(good).toHaveBeenCalledTimes(1);
   });

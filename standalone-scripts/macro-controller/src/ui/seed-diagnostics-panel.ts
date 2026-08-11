@@ -126,14 +126,16 @@ function renderE005Summary(summary: PromptEditE005Summary): HTMLDivElement {
   const timeSpan = document.createElement('span');
   timeSpan.textContent = formatLocal(summary.at);
   timeSpan.style.color = '#94a3b8';
-  top.appendChild(codeSpan); top.appendChild(timeSpan);
+  top.appendChild(codeSpan);
+  top.appendChild(timeSpan);
   const detail = document.createElement('div');
   detail.style.cssText = 'color:#cbd5e1;margin-top:3px;font-family:ui-monospace,monospace;';
   detail.textContent =
     'owner=' + summary.slugOwnerRole
     + '  mismatch=' + summary.orphanRoleMismatch
     + '  site=' + summary.site;
-  row.appendChild(top); row.appendChild(detail);
+  row.appendChild(top);
+  row.appendChild(detail);
   if (summary.reason) {
     const reason = document.createElement('div');
     reason.style.cssText = 'color:#f87171;margin-top:2px;white-space:pre-wrap;';
@@ -339,7 +341,9 @@ function renderStageRow(stage: SeedStageReport): HTMLDivElement {
   const detail = document.createElement('span');
   detail.style.cssText = 'flex:1;color:#cbd5e1;';
   detail.textContent = buildStageDetail(stage);
-  row.appendChild(dot); row.appendChild(name); row.appendChild(detail);
+  row.appendChild(dot);
+  row.appendChild(name);
+  row.appendChild(detail);
 
   return row;
 }
@@ -389,11 +393,13 @@ function renderTraceRow(evt: DiagnosticToastEvent): HTMLDivElement {
   const timeSpan = document.createElement('span');
   timeSpan.textContent = formatLocal(evt.at);
   timeSpan.style.cssText = 'color:#94a3b8;';
-  top.appendChild(codeSpan); top.appendChild(timeSpan);
+  top.appendChild(codeSpan);
+  top.appendChild(timeSpan);
   const body = document.createElement('div');
   body.style.cssText = 'color:#cbd5e1;margin-top:2px;white-space:pre-wrap;';
   body.textContent = evt.title + (evt.detail ? '\n' + evt.detail : '');
-  row.appendChild(top); row.appendChild(body);
+  row.appendChild(top);
+  row.appendChild(body);
 
   return row;
 }

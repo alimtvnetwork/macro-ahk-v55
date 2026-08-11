@@ -93,7 +93,8 @@ describe('prompt-library-modal — token-drift guard integration on Save', () =>
     mocks.upsertPrompt.mockReset();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks(); 
   });
 
   it('DB rejects with token-drift -> status shows "Save failed: ..." and modal stays open', async () => {

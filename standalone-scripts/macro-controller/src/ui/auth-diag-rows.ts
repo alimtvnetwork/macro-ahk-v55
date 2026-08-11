@@ -172,11 +172,13 @@ function _appendHelpIcon(diagRow: DiagRowElements, helpText: string): void {
 
   helpIcon.appendChild(tooltip);
   helpIcon.onmouseover = function() {
-    tooltip.style.display = 'block'; helpIcon.style.opacity = '1'; 
+    tooltip.style.display = 'block';
+    helpIcon.style.opacity = '1';
   };
 
   helpIcon.onmouseout = function() {
-    tooltip.style.display = 'none'; helpIcon.style.opacity = '0.7'; 
+    tooltip.style.display = 'none';
+    helpIcon.style.opacity = '0.7';
   };
 
   diagRow.row.appendChild(helpIcon);

@@ -67,6 +67,7 @@ interface Props {
     readonly draftUrl: string;
 }
 
+// eslint-disable-next-line max-lines-per-function
 export function DeliveryLogSection(props: Props) {
   const {
     log,
@@ -182,7 +183,8 @@ export function DeliveryLogSection(props: Props) {
           searchQuery={searchQuery}
           statusFilter={statusFilter}
           onReset={() => {
-            setStatusFilter("all"); setSearchQuery(""); 
+            setStatusFilter("all");
+            setSearchQuery(""); 
           }}
         />
       ) : (
@@ -309,6 +311,15 @@ function LogEntries({
   );
 }
 
+interface LogEntryRowProps {
+    readonly entry: WebhookDeliveryResult;
+    readonly idx: number;
+    readonly expanded: boolean;
+    readonly onToggle: () => void;
+    readonly payloadOpen: boolean;
+    readonly onTogglePayload: () => void;
+}
+
 function LogEntryRow({
   entry,
   idx,
@@ -316,14 +327,7 @@ function LogEntryRow({
   onToggle,
   payloadOpen,
   onTogglePayload,
-}: {
-    readonly entry: WebhookDeliveryResult;
-    readonly idx: number;
-    readonly expanded: boolean;
-    readonly onToggle: () => void;
-    readonly payloadOpen: boolean;
-    readonly onTogglePayload: () => void;
-}) {
+}: LogEntryRowProps) {
   const presentation = presentVariant(entry);
   const hasSummaryDetail = presentation.summaryDetail !== null;
 

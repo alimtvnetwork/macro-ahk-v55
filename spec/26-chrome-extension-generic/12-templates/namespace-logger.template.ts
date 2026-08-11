@@ -45,8 +45,12 @@ const consoleSink: LogSink = {
     const head = `[${entry.namespace}] ${entry.message}`;
     const tail = entry.context ?? entry.error ?? undefined;
     switch (entry.severity) {
-      case "info": console.log(head, tail ?? ""); break;
-      case "warn": console.warn(head, tail ?? ""); break;
+      case "info":
+        console.log(head, tail ?? "");
+        break;
+      case "warn":
+        console.warn(head, tail ?? "");
+        break;
       case "error":
       case "fatal":
         // eslint-disable-next-line no-restricted-syntax -- template: this IS the namespace Logger implementation; console.error is the terminal sink

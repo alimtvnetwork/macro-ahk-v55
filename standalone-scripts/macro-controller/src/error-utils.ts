@@ -141,8 +141,10 @@ export function logError(scope: string, message: string, error?: CaughtError): v
   const base = prefix(scope) + message;
    
   if (error !== undefined) {
+    // eslint-disable-next-line no-restricted-syntax -- intentional fallback when SDK logger is missing
     console.error(base, error); 
   } else {
+    // eslint-disable-next-line no-restricted-syntax -- intentional fallback when SDK logger is missing
     console.error(base); 
   }
 }

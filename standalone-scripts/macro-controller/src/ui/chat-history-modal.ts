@@ -177,16 +177,7 @@ async function reloadList(projectId: string, listEl: HTMLElement, statusEl: HTML
   }
 }
 
-export function showChatHistoryModal(): void {
-  const existing = document.getElementById(MODAL_ID);
-  if (existing) {
-    existing.remove();
-
-    return; 
-  }
-
-  injectStyles();
-
+function buildModalUI() {
   const container = document.createElement('div');
   container.id = MODAL_ID;
   container.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
@@ -232,6 +223,21 @@ export function showChatHistoryModal(): void {
   modal.appendChild(list);
   modal.appendChild(status);
   container.appendChild(modal);
+  
+  return { container, copyBtn, refreshBtn, list, status };
+}
+
+export function showChatHistoryModal(): void {
+  const existing = document.getElementById(MODAL_ID);
+  if (existing) {
+    existing.remove();
+
+    return; 
+  }
+
+  injectStyles();
+
+  const { container, copyBtn, refreshBtn, list, status } = buildModalUI();
   document.body.appendChild(container);
 
   const projectId = extractProjectIdFromUrl();

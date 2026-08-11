@@ -63,7 +63,8 @@ vi.mock('../../db/project-chat-submit-db', () => ({
     let updated = 0;
     for (const row of rows) {
       if (row.ProjectId === projectId) {
-        row.ProjectName = newName; updated++; 
+        row.ProjectName = newName;
+        updated++; 
       }
     }
 
@@ -106,7 +107,9 @@ async function seed(count: number): Promise<void> {
 }
 
 beforeEach(() => {
-  rows.length = 0; blobs.clear(); nextRowId = 1;
+  rows.length = 0;
+  blobs.clear();
+  nextRowId = 1;
   document.body.innerHTML = '';
   vi.clearAllMocks();
 });

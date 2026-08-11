@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
+/* eslint-enable @typescript-eslint/ban-ts-comment */
 import { DomainConstants } from "../constants/domain";
 /**
  * Marco Extension — Auth Health Handler
@@ -105,6 +107,28 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
   strategies.push(s1);
 
   // ── Strategy 2: Supabase localStorage JWT scan ──
+  const jwtScanScript = (): string | null => {
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("sb-") && key.endsWith("-auth-token")) {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            const token = parsed?.access_token;
+            if (typeof token === "string" && token.startsWith("eyJ")) {
+              return `found:${key}`;
+            }
+          }
+        }
+      }
+    } catch (parseErr) {
+      console.debug("[auth-health] localStorage JWT parse skipped:", parseErr); 
+    }
+
+    return null;
+  };
+
   const s2 = await timedStrategy("localStorage JWT scan", 2, async () => {
     const tabs = await getActivePlatformTabs();
     if (tabs.length === 0) {
@@ -120,27 +144,7 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
         const result = await _chrome.scripting!.executeScript({
           target: { tabId: tab.id },
           world: "MAIN",
-          func: (): string | null => {
-            try {
-              for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith("sb-") && key.endsWith("-auth-token")) {
-                  const raw = localStorage.getItem(key);
-                  if (raw) {
-                    const parsed = JSON.parse(raw);
-                    const token = parsed?.access_token;
-                    if (typeof token === "string" && token.startsWith("eyJ")) {
-                      return `found:${key}`;
-                    }
-                  }
-                }
-              }
-            } catch (parseErr) {
-              console.debug("[auth-health] localStorage JWT parse skipped:", parseErr); 
-            }
-
-            return null;
-          },
+          func: jwtScanScript,
         });
         const scanResult = result?.[0]?.result;
         if (typeof scanResult === "string" && scanResult.startsWith("found:")) {

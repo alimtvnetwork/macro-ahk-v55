@@ -35,7 +35,8 @@ const PANEL_ID = 'marco-ws-members-panel';
 
 describe('ws-members-panel dispatch', () => {
   beforeEach(() => {
-    vi.useFakeTimers(); document.body.innerHTML = ''; 
+    vi.useFakeTimers();
+    document.body.innerHTML = ''; 
   });
   afterEach(() => {
     hideWsMembersPanel();

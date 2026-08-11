@@ -31,6 +31,7 @@ export class ServiceResult<T = unknown, E = unknown> {
 
       return new ServiceResult(true, result);
     } catch (e) {
+      // eslint-disable-next-line no-restricted-syntax
       console.error("[Marco] DB Error", e);
 
       return new ServiceResult(false, undefined, e);

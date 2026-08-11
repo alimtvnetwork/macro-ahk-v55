@@ -79,7 +79,8 @@ function readDirEntries(dir: FileSystemDirectoryEntry): Promise<FileSystemEntry[
     const batch = () => {
       reader.readEntries((entries) => {
         if (entries.length > 0) {
-          all.push(...entries); batch(); 
+          all.push(...entries);
+          batch(); 
         } else {
           resolve(all);
         }

@@ -85,25 +85,7 @@ export function buildHamburgerMenu(deps: MenuBuilderDeps): MenuBuilderResult {
   _addExportSubmenu(menuCtx, menuDropdown);
   _addReadSubmenu(menuCtx, menuDropdown);
 
-  menuDropdown.appendChild(createMenuSep());
-  menuDropdown.appendChild(createMenuItem(menuCtx, '📜', 'Changelog', 'View version history and recent changes', function() {
-    showChangelogModal(); 
-  }));
-  menuDropdown.appendChild(createMenuItem(menuCtx, '🗄️', 'Database', 'Browse project database tables and rows', function() {
-    showDatabaseModal(); 
-  }));
-  menuDropdown.appendChild(createMenuItem(menuCtx, '📂', 'Projects', 'Show open Lovable projects grouped by workspace', function() {
-    showProjectsModal(); 
-  }));
-  menuDropdown.appendChild(createMenuItem(menuCtx, '💰', 'Credit Totals', 'Show aggregated credit usage across workspaces', function() {
-    showCreditTotalsModal(); 
-  }));
-  menuDropdown.appendChild(createMenuItem(menuCtx, '📋', 'Task Queue', 'View pending and active prompt tasks', function() {
-    showTaskQueueModal(); 
-  }));
-  menuDropdown.appendChild(createMenuItem(menuCtx, '📖', 'Chat History', 'Browse and export chat submissions for this project', function() {
-    showChatHistoryModal(); 
-  }));
+  _addStaticMenuItems(menuCtx, menuDropdown);
 
   _addAutoAttachSection(menuCtx, menuDropdown);
 
@@ -144,16 +126,42 @@ export function buildHamburgerMenu(deps: MenuBuilderDeps): MenuBuilderResult {
   };
 }
 
+function _addStaticMenuItems(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLElement }, menuDropdown: HTMLElement): void {
+  menuDropdown.appendChild(createMenuSep());
+  menuDropdown.appendChild(createMenuItem(menuCtx, '📜', 'Changelog', 'View version history and recent changes', function() {
+    showChangelogModal(); 
+  }));
+  menuDropdown.appendChild(createMenuItem(menuCtx, '🗄️', 'Database', 'Browse project database tables and rows', function() {
+    showDatabaseModal(); 
+  }));
+  menuDropdown.appendChild(createMenuItem(menuCtx, '📂', 'Projects', 'Show open Lovable projects grouped by workspace', function() {
+    showProjectsModal(); 
+  }));
+  menuDropdown.appendChild(createMenuItem(menuCtx, '💰', 'Credit Totals', 'Show aggregated credit usage across workspaces', function() {
+    showCreditTotalsModal(); 
+  }));
+  menuDropdown.appendChild(createMenuItem(menuCtx, '📋', 'Task Queue', 'View pending and active prompt tasks', function() {
+    showTaskQueueModal(); 
+  }));
+  menuDropdown.appendChild(createMenuItem(menuCtx, '📖', 'Chat History', 'Browse and export chat submissions for this project', function() {
+    showChatHistoryModal(); 
+  }));
+}
+
 // ── Loop Submenu ──
 function _addLoopSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLElement }, menuDropdown: HTMLElement, startLoop: (dir: string) => void): void {
   const loopMenu = createSubmenu(menuCtx, '🔄', 'Loop');
   loopMenu.panel.appendChild(createMenuItem(menuCtx, '▲', 'Loop Up', 'Start loop in UP direction', function() {
     markUserGesture('menu-builder/loop-up');
-    state.direction = LoopDirectionType.Up; log('Direction set to: UP'); startLoop('up');
+    state.direction = LoopDirectionType.Up;
+    log('Direction set to: UP');
+    startLoop('up');
   }));
   loopMenu.panel.appendChild(createMenuItem(menuCtx, '▼', 'Loop Down', 'Start loop in DOWN direction', function() {
     markUserGesture('menu-builder/loop-down');
-    state.direction = LoopDirectionType.Down; log('Direction set to: DOWN'); startLoop('down');
+    state.direction = LoopDirectionType.Down;
+    log('Direction set to: DOWN');
+    startLoop('down');
   }));
   menuDropdown.appendChild(loopMenu.el);
 }
@@ -168,7 +176,8 @@ function _addForceSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLEle
       return; 
     }
 
-    forceMoveTracker.set(); moveToAdjacentWorkspace('up');
+    forceMoveTracker.set();
+    moveToAdjacentWorkspace('up');
   }));
   forceMenu.panel.appendChild(createMenuItem(menuCtx, '⏬', 'Force Move Down', 'Force move project to next workspace via API (Ctrl+Down)', function() {
     if (forceMoveTracker.isInFlight()) {
@@ -177,7 +186,8 @@ function _addForceSubmenu(menuCtx: { menuBtnStyle: string; menuDropdown: HTMLEle
       return; 
     }
 
-    forceMoveTracker.set(); moveToAdjacentWorkspace('down');
+    forceMoveTracker.set();
+    moveToAdjacentWorkspace('down');
   }));
   menuDropdown.appendChild(forceMenu.el);
 }

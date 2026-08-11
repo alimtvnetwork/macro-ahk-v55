@@ -115,7 +115,8 @@ export function migrateSavedOrder(saved: readonly string[]): string[] {
 
   for (const slug of defaults.slice(0, defaults.length - terminalCount)) {
     if (!seen.has(slug)) {
-      kept.push(slug); seen.add(slug); 
+      kept.push(slug);
+      seen.add(slug); 
     }
   }
 

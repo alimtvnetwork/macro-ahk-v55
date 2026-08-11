@@ -622,7 +622,8 @@ function wireTogglePopover(
 
   function onKey(e: KeyboardEvent): void {
     if (e.key === 'Escape') {
-      e.stopPropagation(); close(); 
+      e.stopPropagation();
+      close();
     }
   }
 
@@ -871,8 +872,14 @@ function buildWaitControls(): WaitControls {
 
   const modeSel = document.createElement('select');
   modeSel.style.cssText = 'padding:2px 4px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:10px;';
-  const optA = document.createElement('option'); optA.value = WAIT_MODE_SUBMIT_READY; optA.textContent = 'auto (submit ready)'; modeSel.appendChild(optA);
-  const optB = document.createElement('option'); optB.value = WAIT_MODE_FIXED_DELAY; optB.textContent = 'fixed delay'; modeSel.appendChild(optB);
+  const optA = document.createElement('option');
+  optA.value = WAIT_MODE_SUBMIT_READY;
+  optA.textContent = 'auto (submit ready)';
+  modeSel.appendChild(optA);
+  const optB = document.createElement('option');
+  optB.value = WAIT_MODE_FIXED_DELAY;
+  optB.textContent = 'fixed delay';
+  modeSel.appendChild(optB);
   modeSel.value = repeatLoopState.waitMode;
   modeSel.onchange = function () {
     setRepeatWaitMode(modeSel.value as RepeatWaitMode); 
@@ -881,7 +888,9 @@ function buildWaitControls(): WaitControls {
   wrap.appendChild(modeSel);
 
   const delayInput = document.createElement('input');
-  delayInput.type = 'number'; delayInput.min = '1'; delayInput.max = '3600';
+  delayInput.type = 'number';
+  delayInput.min = '1';
+  delayInput.max = '3600';
   delayInput.value = String(repeatLoopState.delaySec);
   delayInput.title = 'Fixed delay between iterations (seconds)';
   delayInput.style.cssText = 'width:52px;padding:2px 4px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:10px;';
@@ -890,14 +899,20 @@ function buildWaitControls(): WaitControls {
   };
 
   wrap.appendChild(delayInput);
-  const sUnit = document.createElement('span'); sUnit.textContent = 's'; sUnit.style.cssText = 'font-size:10px;opacity:0.7;'; wrap.appendChild(sUnit);
+  const sUnit = document.createElement('span');
+  sUnit.textContent = 's';
+  sUnit.style.cssText = 'font-size:10px;opacity:0.7;';
+  wrap.appendChild(sUnit);
 
   for (const s of DELAY_PRESETS_SEC) {
     const b = document.createElement('button');
-    b.type = 'button'; b.textContent = s + 's'; b.title = 'Set fixed delay to ' + s + 's';
+    b.type = 'button';
+    b.textContent = s + 's';
+    b.title = 'Set fixed delay to ' + s + 's';
     b.style.cssText = 'padding:1px 4px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);border-radius:3px;color:' + cPanelFg + ';cursor:pointer;font-size:9px;';
     b.onclick = function () {
-      setRepeatWaitMode(WAIT_MODE_FIXED_DELAY); setRepeatDelaySec(s); 
+      setRepeatWaitMode(WAIT_MODE_FIXED_DELAY);
+      setRepeatDelaySec(s);
     };
 
     wrap.appendChild(b);
@@ -1156,7 +1171,8 @@ function buildControl(opts: { compact: boolean; useLocalCollapse: boolean }): HT
   let tickId: ReturnType<typeof trackedSetInterval> | null = null;
   const teardown = (): void => {
     if (tickId !== null) {
-      trackedClearInterval(tickId); tickId = null; 
+      trackedClearInterval(tickId);
+      tickId = null;
     }
 
     repeatLoopState.subscribers.delete(render);

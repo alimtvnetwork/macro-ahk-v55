@@ -1,20 +1,3 @@
-// @ts-nocheck
-/**
- * Marco Extension — Grouped Key-Value Handler (Issue 60)
- *
- * CRUD operations for GroupedKv table in logs.db.
- * All column names use PascalCase per database naming convention.
- *
- * Validates required fields via handler-guards so missing 'group' or 'key'
- * payload fields return a clean isOk:false response instead of triggering
- * "tried to bind a value of an unknown type (undefined)" inside sql.js.
- *
- * @see src/background/handlers/handler-guards.ts — input validation
- * @see .lovable/memory/architecture/project-scoped-database.md — Project-scoped DB
- */
-
-import type { Database as SqlJsDatabase } from "sql.js";
-// @ts-nocheck
 /**
  * Marco Extension — Grouped Key-Value Handler (Issue 60)
  *
@@ -79,7 +62,7 @@ export async function handleGkvGet(
     [group, key],
   ));
   if (execRes.isFail) {
-    return { isOk: false, errorMessage: String(execRes.error) } as any;
+    return { isOk: false, errorMessage: String(execRes.error) } as HandlerErrorResponse;
   }
 
   const result = execRes.data!;
@@ -160,7 +143,7 @@ export async function handleGkvList(
     "SELECT Key, Value FROM GroupedKv WHERE GroupName = ? ORDER BY Key ASC",
   ));
   if (stmtResult.isFail) {
-    return { isOk: false, errorMessage: String(stmtResult.error) } as any;
+    return { isOk: false, errorMessage: String(stmtResult.error) } as HandlerErrorResponse;
   }
 
   const stmt = stmtResult.data!;

@@ -19,7 +19,8 @@ const MS_PER_DAY = 86_400_000;
 // Freeze the system clock so relative-time formatters (Date.now()) inside
 // ws-hover-card.ts produce deterministic projections (Warning starts on, etc.).
 beforeAll(() => {
-  vi.useFakeTimers(); vi.setSystemTime(new Date(NOW)); 
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date(NOW)); 
 });
 afterAll(() => {
   vi.useRealTimers(); 

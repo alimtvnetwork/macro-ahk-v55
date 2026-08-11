@@ -389,6 +389,7 @@ function orderByAncestry(rows: ReadonlyArray<StepGroupRow>): StepGroupRow[] {
 /*  Top-level entrypoint                                               */
 /* ------------------------------------------------------------------ */
 
+/* eslint-disable max-lines-per-function */
 export async function runStepGroupImport(
   init: RunStepGroupImportInit,
 ): Promise<StepGroupImportResult> {
@@ -797,6 +798,7 @@ interface InsertStepsInput {
 // rewritten TargetStepGroupId. This avoids depending on insertion order
 // of group IDs (the runtime CHECK constraint requires a non-null target
 // for RunGroup steps, so we cannot defer FK validation).
+/* eslint-disable max-lines-per-function */
 function insertSteps(input: InsertStepsInput): number {
   const { destLib, graph, idMap } = input;
   let stepCount = 0;

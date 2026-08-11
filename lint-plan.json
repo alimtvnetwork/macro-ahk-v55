@@ -1,0 +1,2136 @@
+{
+  "totalFiles": 298,
+  "numTasks": 60,
+  "files": [
+    {
+      "filePath": "D:\\work\\macro-ahk\\.lovable\\scratch\\enum-migrator.ts",
+      "errorCount": 4,
+      "rules": {
+        "id-denylist": 2,
+        "max-lines-per-function": 1,
+        "no-useless-escape": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\.lovable\\scratch\\enum-renamer.ts",
+      "errorCount": 2,
+      "rules": {
+        "id-denylist": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\.lovable\\scratch\\migrate-fast.ts",
+      "errorCount": 15,
+      "rules": {
+        "id-denylist": 13,
+        "@typescript-eslint/no-explicit-any": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\kv-handler.original.ts",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\migrate-isfail.ts",
+      "errorCount": 1,
+      "rules": {
+        "sonarjs/no-collapsible-if": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\original_modal.ts",
+      "errorCount": 25,
+      "rules": {
+        "max-lines-per-function": 16,
+        "max-statements-per-line": 9
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\refactor.ts",
+      "errorCount": 1,
+      "rules": {
+        "no-restricted-syntax": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\rename_enums.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 1,
+        "no-restricted-syntax": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\spec\\26-chrome-extension-generic\\12-templates\\namespace-logger.template.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\auth-health-handler.ts",
+      "errorCount": 2,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1,
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\first-attach-toast.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\handlers\\config-auth-handler.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\handlers\\file-storage-handler.ts",
+      "errorCount": 4,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1,
+        "max-lines-per-function": 1,
+        "@typescript-eslint/no-explicit-any": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\handlers\\grouped-kv-handler.ts",
+      "errorCount": 3,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1,
+        "@typescript-eslint/no-explicit-any": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\handlers\\handler-guards.ts",
+      "errorCount": 4,
+      "rules": {
+        "max-statements-per-line": 4
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\handlers\\injection-toast.ts",
+      "errorCount": 12,
+      "rules": {
+        "max-statements-per-line": 12
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\handlers\\kv-handler.ts",
+      "errorCount": 2,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\handlers\\project-api-handler.ts",
+      "errorCount": 1,
+      "rules": {
+        "sonarjs/cognitive-complexity": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\handlers\\prompt-handler.ts",
+      "errorCount": 7,
+      "rules": {
+        "max-lines-per-function": 1,
+        "max-statements-per-line": 6
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\handlers\\recorder-capture-handler.ts",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\handlers\\script-info-handler.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\handlers\\sdk-bridge-handler.ts",
+      "errorCount": 1,
+      "rules": {
+        "sonarjs/no-identical-functions": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\handlers\\xpath-handler.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\hot-reload.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\injection-diagnostics.ts",
+      "errorCount": 1,
+      "rules": {
+        "sonarjs/no-duplicate-string": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\project-db-manager.ts",
+      "errorCount": 1,
+      "rules": {
+        "sonarjs/no-duplicate-string": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\__tests__\\dropzone-overlay.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\chrome-tabs-adapter.ts",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\data-source-parsers.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\field-binding-overlay.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\hover-highlighter.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\new-tab-tracker.ts",
+      "errorCount": 2,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1,
+        "no-restricted-syntax": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\__tests__\\hotkey-executor.edge-cases.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\__tests__\\hotkey-executor.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\csv-parse.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\export-bundle.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\import-bundle.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\replay-bridge.ts",
+      "errorCount": 2,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1,
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\step-library\\run-batch.ts",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\url-tab-click.ts",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\recorder\\xpath-of-element.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\session-log-writer.ts",
+      "errorCount": 2,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1,
+        "sonarjs/no-duplicate-string": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\sw-shims.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\background\\wasm-integrity.ts",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\automation\\AutomationView.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\automation\\ChainBuilder.tsx",
+      "errorCount": 2,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1,
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\automation\\TriggerConfig.tsx",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\AutoAttachDiagnosticsPanel.tsx",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\BatchRenameDialog.tsx",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\BatchRunDialog.tsx",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\BundleExchangePanel.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\ErrorSwallowAuditView.tsx",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\GroupFormDialog.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\ImportSummaryDialog.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\LibraryView.tsx",
+      "errorCount": 7,
+      "rules": {
+        "max-statements-per-line": 7
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\MonacoCodeEditor.tsx",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\ProjectCreateForm.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\ProjectDetailView.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\ProjectFilesPanel.tsx",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\ProjectGroupPanel.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\ProjectScriptSelector.tsx",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\ProjectsList.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\PromptChainPanel.tsx",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\PromptEditForm.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\PromptManagerPanel.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\ReproBuildErrorPanel.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\RunResultsSummaryPanel.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\ScriptBundleDetailView.tsx",
+      "errorCount": 7,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1,
+        "max-statements-per-line": 6
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\ScriptsList.tsx",
+      "errorCount": 4,
+      "rules": {
+        "max-statements-per-line": 4
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\StepEditorDialog.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\StepGroupLibraryPanel.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\StepLibraryErrorState.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\StorageBrowserView.tsx",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\StorageRuntimePanels.tsx",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\UpdaterPanel.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\WasmStatusBanner.tsx",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\WebhookSettingsDialog.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\csv-input\\CsvDropZone.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\csv-input\\use-csv-input-controller.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-lines-per-function": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\data-browser\\DataBrowserPanel.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\group-inputs\\group-inputs-sections.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\group-inputs\\use-group-inputs-controller.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\json-tree\\AddPropertyButton.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\project-database\\JsonSchemaTab.tsx",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\project-database\\ProjectDatabasePanel.tsx",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\project-database\\SchemaTab.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\project-database\\useConfigDb.ts",
+      "errorCount": 5,
+      "rules": {
+        "max-statements-per-line": 3,
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\project-database\\useSchemaBuilder.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\project-detail\\ProjectHeader.tsx",
+      "errorCount": 5,
+      "rules": {
+        "max-statements-per-line": 5
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\project-files\\utils.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 1,
+        "@typescript-eslint/ban-ts-comment": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\project-storage.ts",
+      "errorCount": 1,
+      "rules": {
+        "id-denylist": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\recorder\\RecorderEmptyState.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\recorder\\RecorderStepGraph.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\recorder\\RecorderVisualisationHeader.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\recorder\\RecorderVisualisationPanel.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\recorder\\recorder-self-test.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\recorder\\recorder-step-detail\\recorder-step-sections.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\recorder\\recorder-step-detail\\use-recorder-step-detail.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 1,
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\recorder\\visualisation\\use-recorder-step-selection.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\run-group\\use-run-group-controller.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\run-results-summary-aggregate.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-library\\LibraryTwoPaneBody.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-library\\StepRowItem.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-library\\TreeNodeRow.tsx",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-library\\mutation-handlers.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-lines-per-function": 1,
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-library\\use-export-import.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-library\\use-library-panel-state.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-lines-per-function": 2,
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-library\\use-library-selection.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-library\\use-view-model.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-list\\ListPanelDetailsCard.tsx",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-list\\ListPanelDialogs.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-list\\ListPanelGroupRow.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-list\\ListPanelGroupsList.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-list\\ListPanelHeader.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-list\\ListPanelIODialogs.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-list\\batch-handlers.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-list\\list-panel-mutation-helpers.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-list\\use-list-panel-selection.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-list\\use-list-panel-state.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-group-list\\use-list-panel-view.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\step-wait\\use-step-wait-dialog.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 1,
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\token-seeder-diagnostics-cache.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\updater\\AddUpdaterForm.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\updater\\updater-types.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\webhook-settings\\DeliveryLogSection.tsx",
+      "errorCount": 3,
+      "rules": {
+        "max-lines-per-function": 2,
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\options\\webhook-settings\\use-webhook-settings-state.ts",
+      "errorCount": 5,
+      "rules": {
+        "max-statements-per-line": 5
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\popup\\InjectionCopyButton.tsx",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 1,
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\DriftElementDiffView.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\FailureDetailsPanel.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\FailureReportsPanel.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\FormSnapshotTable.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\HotkeyChordCapture.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\KeywordEventBulkContextMenu.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\KeywordEventStepContextMenu.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\LiveRecordedActionsTree.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\RecorderControlBar.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\RecorderLiveTreePanel.tsx",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\SelectorComparisonPanel.tsx",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\SelectorReplayTracePanel.tsx",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\SelectorTesterPanel.tsx",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 1,
+        "sonarjs/cognitive-complexity": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\__tests__\\RecorderControlBar.test.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\keyword-events\\KeywordEventStepList.tsx",
+      "errorCount": 5,
+      "rules": {
+        "max-statements-per-line": 5
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\keyword-events\\KeywordEventsAddRow.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\recorder\\keyword-events\\PauseAfterRow.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\ui\\context-menu.tsx",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/no-explicit-any": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\ui\\dropdown-menu.tsx",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/no-explicit-any": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\ui\\menubar.tsx",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/no-explicit-any": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\components\\ui\\select.tsx",
+      "errorCount": 1,
+      "rules": {
+        "@typescript-eslint/no-explicit-any": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\content-scripts\\message-relay.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\hooks\\__tests__\\use-draggable.test.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\hooks\\__tests__\\use-recorder-shortcuts.test.tsx",
+      "errorCount": 4,
+      "rules": {
+        "max-statements-per-line": 4
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\hooks\\step-library\\step-library-hooks.ts",
+      "errorCount": 8,
+      "rules": {
+        "max-statements-per-line": 8
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\hooks\\use-auto-run-chain-after-recording.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\hooks\\use-draggable.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 1,
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\hooks\\use-recorder-project-data.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 1,
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\hooks\\use-recording-session.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\hooks\\use-shift-click-selection.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\hooks\\use-step-group-export.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\hooks\\use-visibility-paused-interval.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\lib\\__tests__\\keyword-event-chain-timeline.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\lib\\__tests__\\recorder-session-sync.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\lib\\chain-runner.ts",
+      "errorCount": 2,
+      "rules": {
+        "@typescript-eslint/no-explicit-any": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\lib\\folder-parser.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\lib\\keyword-event-chain.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\lib\\recorder-session-sync.ts",
+      "errorCount": 2,
+      "rules": {
+        "sonarjs/no-duplicate-string": 1,
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\lib\\sqlite-bundle.ts",
+      "errorCount": 8,
+      "rules": {
+        "max-lines-per-function": 2,
+        "max-statements-per-line": 6
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\options\\sections\\DiagnosticsPanel.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\options\\sections\\ProjectsSection.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\options\\sections\\editor\\ScriptsConfigEditor.tsx",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\pages\\Options.tsx",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\popup\\hooks\\usePopupData.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 1,
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\shared\\http-fail-fast.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\src\\utils\\result-wrapper.ts",
+      "errorCount": 1,
+      "rules": {
+        "no-restricted-syntax": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\__tests__\\past-due-credit-pipeline.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\__tests__\\plan-13-e2e.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\__tests__\\tasks-toggle-hover-open.test.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\__tests__\\ws-hover-card-compact.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\__tests__\\ws-hover-card-refill.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\__tests__\\ws-hover-card.snapshot.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\__tests__\\ws-members-panel.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\auth-resolve.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\capture\\__tests__\\chat-submit-window-panel.integration.test.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\credit-fetch.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\db\\__tests__\\prompt-role-db.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\db\\macro-db.ts",
+      "errorCount": 1,
+      "rules": {
+        "sonarjs/no-duplicate-string": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\db\\rule-zero-validator.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\db\\validate-read-memory-duplicates.ts",
+      "errorCount": 1,
+      "rules": {
+        "no-restricted-syntax": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\error-utils.ts",
+      "errorCount": 2,
+      "rules": {
+        "no-restricted-syntax": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\errors\\__tests__\\log-diagnostic-logger-shapes.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\loop-controls.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\loop-cycle-fallback.ts",
+      "errorCount": 1,
+      "rules": {
+        "no-restricted-syntax": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\macro-looping.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\remix-modal.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\rename-bulk.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\seed\\__tests__\\seed-plan-next.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\settings-modal.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\startup-persistence.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 1,
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\pending-restore-undo-negatives.test.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-editor-diff-shortcut.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-history-panel.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-aria-live-import-error.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-choose-file-button.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-delete-drift.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-delete-then-save-drift.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-dragover-drop-effect.test.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-concurrency-guard.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-failure-aria-live.test.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-failure-banner-focus.test.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-failure-rearm.test.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-failure-recovery.test.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-import-e2e.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-retry-aria-live.test.ts",
+      "errorCount": 6,
+      "rules": {
+        "max-statements-per-line": 6
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-spinner.test.ts",
+      "errorCount": 5,
+      "rules": {
+        "max-statements-per-line": 5
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-success-aria-live.test.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-success-clears-error-banner.test.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-success-file-input-reset.test.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-success-focus-restore.test.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-success-label-reset.test.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-success-rearm.test.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-drop-zone-keyboard.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-file-info.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-focus-after-invalid-import.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-friendly-error.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-import-aria-busy-lifecycle.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-import-concurrency-guard.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-import-error-aria-live-reason.test.ts",
+      "errorCount": 5,
+      "rules": {
+        "max-statements-per-line": 5
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-import-failure-recovery.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-import-file-input-reset.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-import-file-validation.test.ts",
+      "errorCount": 5,
+      "rules": {
+        "max-statements-per-line": 5
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-import-spinner.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-invalid-import.test.ts",
+      "errorCount": 6,
+      "rules": {
+        "max-statements-per-line": 6
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-reset-row.test.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\__tests__\\prompt-library-modal-retry-button.test.ts",
+      "errorCount": 4,
+      "rules": {
+        "max-statements-per-line": 4
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\auth-diag-rows.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\auth-diag-waterfall.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\bulk-rename.ts",
+      "errorCount": 4,
+      "rules": {
+        "max-statements-per-line": 4
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\chat-history-modal.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\check-button.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\chip-gear-picker.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\confirm-dialog.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 1,
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\countdown.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\database-json-tab.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\hot-reload-section.ts",
+      "errorCount": 1,
+      "rules": {
+        "sonarjs/no-duplicate-string": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\keyboard-handlers.ts",
+      "errorCount": 5,
+      "rules": {
+        "max-statements-per-line": 5
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\macro-ui.ts",
+      "errorCount": 9,
+      "rules": {
+        "max-statements-per-line": 9
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\menu-builder.ts",
+      "errorCount": 5,
+      "rules": {
+        "max-lines-per-function": 1,
+        "max-statements-per-line": 4
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\menu-helpers.ts",
+      "errorCount": 4,
+      "rules": {
+        "max-statements-per-line": 4
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\next-inline-ui.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\panel-controls.ts",
+      "errorCount": 7,
+      "rules": {
+        "max-statements-per-line": 7
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\panel-header.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\panel-layout.ts",
+      "errorCount": 1,
+      "rules": {
+        "sonarjs/no-duplicate-string": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\panel-sections.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\pending-restore-undo.ts",
+      "errorCount": 1,
+      "rules": {
+        "no-restricted-syntax": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\plan-task-ui.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\projects-modal.ts",
+      "errorCount": 7,
+      "rules": {
+        "max-lines-per-function": 2,
+        "max-statements-per-line": 5
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-cache.ts",
+      "errorCount": 4,
+      "rules": {
+        "max-statements-per-line": 4
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-diff.ts",
+      "errorCount": 5,
+      "rules": {
+        "max-statements-per-line": 5
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-drag-order.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-dropdown-header.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-dropdown-io.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-dropdown.ts",
+      "errorCount": 6,
+      "rules": {
+        "max-statements-per-line": 5,
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-editor.ts",
+      "errorCount": 5,
+      "rules": {
+        "no-restricted-syntax": 5
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-history-panel.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 1,
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-import-modal.ts",
+      "errorCount": 6,
+      "rules": {
+        "max-statements-per-line": 5,
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-injection.ts",
+      "errorCount": 14,
+      "rules": {
+        "max-statements-per-line": 12,
+        "max-lines-per-function": 1,
+        "no-restricted-syntax": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-io-dialog.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-io.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 1,
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-actions.ts",
+      "errorCount": 3,
+      "rules": {
+        "no-restricted-syntax": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-editor.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-import-pipeline.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-modal.ts",
+      "errorCount": 4,
+      "rules": {
+        "max-statements-per-line": 4
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-preview.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 1,
+        "sonarjs/no-duplicate-string": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-progress.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-library-token-inputs.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-order-indicator.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\prompt-utils.ts",
+      "errorCount": 5,
+      "rules": {
+        "max-statements-per-line": 3,
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\repeat-loop-ui.ts",
+      "errorCount": 8,
+      "rules": {
+        "max-statements-per-line": 8
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\save-prompt-task-next.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\seed-diagnostics-panel.ts",
+      "errorCount": 5,
+      "rules": {
+        "max-statements-per-line": 5
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\settings-tab-panels.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 1,
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\settings-ui.ts",
+      "errorCount": 3,
+      "rules": {
+        "max-statements-per-line": 3
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\task-next-ui.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\task-splitter-ui.ts",
+      "errorCount": 16,
+      "rules": {
+        "no-restricted-syntax": 1,
+        "max-statements-per-line": 15
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\tools-sections-builder.ts",
+      "errorCount": 9,
+      "rules": {
+        "max-statements-per-line": 9
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\ws-dropdown-builder.ts",
+      "errorCount": 5,
+      "rules": {
+        "max-statements-per-line": 5
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ui\\ws-filter-menu.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-lines-per-function": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\util\\__tests__\\project-id-from-url.test.ts",
+      "errorCount": 8,
+      "rules": {
+        "max-statements-per-line": 8
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-checkbox-handler.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-context-menu.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-hover-card.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-members-fetch.ts",
+      "errorCount": 1,
+      "rules": {
+        "no-restricted-syntax": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-members-panel.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-lines-per-function": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\macro-controller\\src\\ws-status-badges.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\marco-sdk\\src\\notify.ts",
+      "errorCount": 10,
+      "rules": {
+        "max-lines-per-function": 1,
+        "max-statements-per-line": 9
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\marco-sdk\\src\\prompts.ts",
+      "errorCount": 4,
+      "rules": {
+        "max-statements-per-line": 4
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\standalone-scripts\\marco-sdk\\src\\utils.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\tests\\e2e\\utils\\macro-controller-harness.ts",
+      "errorCount": 1,
+      "rules": {
+        "max-statements-per-line": 1
+      }
+    },
+    {
+      "filePath": "D:\\work\\macro-ahk\\vite.config.extension.ts",
+      "errorCount": 2,
+      "rules": {
+        "max-statements-per-line": 2
+      }
+    }
+  ]
+}

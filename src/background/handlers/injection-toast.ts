@@ -52,7 +52,8 @@ export async function showInjectionToastInTab(
           loader.style.opacity = "0";
           loader.style.transform = exitTransform;
           loaderTimer = setTimeout(() => {
-            loaderTimer = null; loader.remove(); 
+            loaderTimer = null; 
+            loader.remove(); 
           }, Timings.ANIMATION_DURATION);
         }
 
@@ -121,15 +122,18 @@ export async function showInjectionToastInTab(
         let removeTimer: ReturnType<typeof setTimeout> | null = null;
         const cleanup = () => {
           if (loaderTimer !== null) {
-            clearTimeout(loaderTimer); loaderTimer = null; 
+            clearTimeout(loaderTimer); 
+            loaderTimer = null; 
           }
 
           if (dismissTimer !== null) {
-            clearTimeout(dismissTimer); dismissTimer = null; 
+            clearTimeout(dismissTimer); 
+            dismissTimer = null; 
           }
 
           if (removeTimer !== null) {
-            clearTimeout(removeTimer); removeTimer = null; 
+            clearTimeout(removeTimer); 
+            removeTimer = null; 
           }
 
           window.removeEventListener("pagehide", cleanup);
@@ -141,7 +145,8 @@ export async function showInjectionToastInTab(
 
         const dismiss = () => {
           if (dismissTimer !== null) {
-            clearTimeout(dismissTimer); dismissTimer = null; 
+            clearTimeout(dismissTimer); 
+            dismissTimer = null; 
           }
 
           toast.style.opacity = "0";
@@ -195,7 +200,8 @@ export async function showInjectionFailureToastInTab(
           loader.style.opacity = "0";
           loader.style.transform = exitTransform;
           loaderTimer = setTimeout(() => {
-            loaderTimer = null; loader.remove(); 
+            loaderTimer = null; 
+            loader.remove(); 
           }, Timings.ANIMATION_DURATION);
         }
 
@@ -276,15 +282,18 @@ export async function showInjectionFailureToastInTab(
         // eslint-disable-next-line sonarjs/no-identical-functions
         const cleanup = () => {
           if (loaderTimer !== null) {
-            clearTimeout(loaderTimer); loaderTimer = null; 
+            clearTimeout(loaderTimer); 
+            loaderTimer = null; 
           }
 
           if (dismissTimer !== null) {
-            clearTimeout(dismissTimer); dismissTimer = null; 
+            clearTimeout(dismissTimer); 
+            dismissTimer = null; 
           }
 
           if (removeTimer !== null) {
-            clearTimeout(removeTimer); removeTimer = null; 
+            clearTimeout(removeTimer); 
+            removeTimer = null; 
           }
 
           window.removeEventListener("pagehide", cleanup);
@@ -297,7 +306,8 @@ export async function showInjectionFailureToastInTab(
         // eslint-disable-next-line sonarjs/no-identical-functions
         const dismiss = () => {
           if (dismissTimer !== null) {
-            clearTimeout(dismissTimer); dismissTimer = null; 
+            clearTimeout(dismissTimer); 
+            dismissTimer = null; 
           }
 
           toast.style.opacity = "0";
@@ -391,11 +401,13 @@ export async function showInjectionLoadingToast(tabId: number, scriptCount: numb
         let removeTimer: ReturnType<typeof setTimeout> | null = null;
         const cleanup = () => {
           if (dismissTimer !== null) {
-            clearTimeout(dismissTimer); dismissTimer = null; 
+            clearTimeout(dismissTimer); 
+            dismissTimer = null; 
           }
 
           if (removeTimer !== null) {
-            clearTimeout(removeTimer); removeTimer = null; 
+            clearTimeout(removeTimer); 
+            removeTimer = null; 
           }
 
           window.removeEventListener("pagehide", cleanup);

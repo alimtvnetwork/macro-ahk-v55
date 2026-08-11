@@ -98,7 +98,8 @@ describe('prompt-library-modal - Import disabled while an import is in progress'
     io.parsePromptsText.mockClear();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('disables Import + file input mid-flight and only calls performPromptImport once', async () => {

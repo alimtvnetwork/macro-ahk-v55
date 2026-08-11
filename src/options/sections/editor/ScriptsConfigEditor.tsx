@@ -203,7 +203,8 @@ export function ScriptsConfigEditor({ projectScripts, onChange }: ScriptsConfigE
           style={{ fontSize: 12, padding: "4px 8px", maxWidth: 200 }}
           onChange={(e) => {
             if (e.target.value) {
-              addFromLibrary(e.target.value); e.target.value = ""; 
+              addFromLibrary(e.target.value);
+              e.target.value = ""; 
             } 
           }}
           defaultValue=""

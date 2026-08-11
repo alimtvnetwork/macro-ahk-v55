@@ -157,11 +157,13 @@ function writeCache(entries: PromptEntry[]): Promise<void> {
           const store = tx.objectStore(IDB_STORE);
           store.put({ id: IDB_KEY, schemaVersion: CACHE_SCHEMA_VERSION, entries, fetchedAt: Date.now(), hash });
           tx.oncomplete = () => {
-            db.close(); resolve(); 
+            db.close();
+            resolve(); 
           };
 
           tx.onerror = () => {
-            db.close(); resolve(); 
+            db.close();
+            resolve(); 
           };
         } catch {
           resolve();
@@ -182,11 +184,13 @@ function clearCache(): Promise<void> {
           const store = tx.objectStore(IDB_STORE);
           store.delete(IDB_KEY);
           tx.oncomplete = () => {
-            db.close(); resolve(); 
+            db.close();
+            resolve(); 
           };
 
           tx.onerror = () => {
-            db.close(); resolve(); 
+            db.close();
+            resolve(); 
           };
         } catch {
           resolve();

@@ -50,9 +50,8 @@ function buildTree(groups: ReadonlyArray<StepGroupRow>): TreeNode[] {
   return visit(null);
 }
 
-export default function StepGroupLibraryPanel() {
-  const lib = useStepLibrary();
-
+// eslint-disable-next-line max-lines-per-function
+function useStepGroupLibraryWiring(lib: ReturnType<typeof useStepLibrary>) {
   const state = useLibraryPanelState({ projectRow: lib.Project ?? null });
   const {
     setSelected, setSelectionOrder,
@@ -118,6 +117,13 @@ export default function StepGroupLibraryPanel() {
     lib, selected, importApi, fileInputRef,
   });
 
+  return { state, viewModel, mutations, exportImport, selection, importApi };
+}
+
+export default function StepGroupLibraryPanel() {
+  const lib = useStepLibrary();
+  const wiring = useStepGroupLibraryWiring(lib);
+
   if (lib.Loading) {
     return (
       <div className="flex h-full items-center justify-center text-muted-foreground">
@@ -139,12 +145,12 @@ export default function StepGroupLibraryPanel() {
   return (
     <StepGroupLibraryBody
       lib={lib}
-      state={state}
-      viewModel={viewModel}
-      mutations={mutations}
-      exportImport={exportImport}
-      selection={selection}
-      importApi={importApi}
+      state={wiring.state}
+      viewModel={wiring.viewModel}
+      mutations={wiring.mutations}
+      exportImport={wiring.exportImport}
+      selection={wiring.selection}
+      importApi={wiring.importApi}
     />
   );
 }

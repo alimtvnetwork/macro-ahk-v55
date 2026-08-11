@@ -29,6 +29,31 @@ export interface RecorderVisualisationHeaderProps {
     readonly onExport: (format: ExportFormat) => void;
 }
 
+function ExportMenu({ stepCount, onExport }: { stepCount: number; onExport: (format: ExportFormat) => void }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 gap-1.5"
+          disabled={stepCount === 0}
+          title={stepCount === 0
+            ? "Record at least one step before exporting"
+            : `Export ${stepCount} step(s)`}
+        >
+          <Download className="h-3.5 w-3.5" />
+                        Export
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => onExport("json")}>Download as JSON</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onExport("csv")}>Download as CSV</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 export function RecorderVisualisationHeader(props: RecorderVisualisationHeaderProps): JSX.Element {
   const { dataSources, stepCount, selfTestRunning, onSelfTest, onExport } = props;
 
@@ -61,26 +86,7 @@ export function RecorderVisualisationHeader(props: RecorderVisualisationHeaderPr
             : <FlaskConical className="h-3.5 w-3.5" />}
                     Run self-test
         </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 gap-1.5"
-              disabled={stepCount === 0}
-              title={stepCount === 0
-                ? "Record at least one step before exporting"
-                : `Export ${stepCount} step(s)`}
-            >
-              <Download className="h-3.5 w-3.5" />
-                            Export
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onExport("json")}>Download as JSON</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onExport("csv")}>Download as CSV</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ExportMenu stepCount={stepCount} onExport={onExport} />
       </div>
     </div>
   );

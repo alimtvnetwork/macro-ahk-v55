@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * ScriptBundleDetailView — Detail/editor view for a single script bundle.
  * Mirrors ProjectDetailView pattern with the bundle editor from ScriptsList.
@@ -143,7 +142,8 @@ function EntryRow({
           className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30"
           disabled={!canMoveUp}
           onClick={(e) => {
-            e.stopPropagation(); onMoveUp(); 
+            e.stopPropagation();
+            onMoveUp(); 
           }}
         >
           <ChevronUp className="h-3 w-3" />
@@ -153,7 +153,8 @@ function EntryRow({
           className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30"
           disabled={!canMoveDown}
           onClick={(e) => {
-            e.stopPropagation(); onMoveDown(); 
+            e.stopPropagation();
+            onMoveDown(); 
           }}
         >
           <ChevronDown className="h-3 w-3" />
@@ -162,7 +163,8 @@ function EntryRow({
           type="button"
           className="p-0.5 text-muted-foreground hover:text-destructive"
           onClick={(e) => {
-            e.stopPropagation(); onRemove(); 
+            e.stopPropagation();
+            onRemove(); 
           }}
         >
           <X className="h-3 w-3" />
@@ -417,7 +419,8 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
               value={name}
               className="flex-1"
               onChange={(e) => {
-                setName(e.target.value); markDirty(); 
+                setName(e.target.value);
+                markDirty(); 
               }}
             />
           </div>
@@ -425,7 +428,8 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
             placeholder="Description (optional)"
             value={description}
             onChange={(e) => {
-              setDescription(e.target.value); markDirty(); 
+              setDescription(e.target.value);
+              markDirty(); 
             }}
           />
 
@@ -440,7 +444,8 @@ export function ScriptBundleDetailView({ script, configs, onSave, onSaveConfig, 
               value={updateUrl}
               className="flex-1 h-8 text-xs font-mono"
               onChange={(e) => {
-                setUpdateUrl(e.target.value); markDirty(); 
+                setUpdateUrl(e.target.value);
+                markDirty(); 
               }}
             />
             <Button

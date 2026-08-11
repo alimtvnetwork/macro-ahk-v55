@@ -807,30 +807,34 @@ function PreviewSummaryBanner({ summary }: { readonly summary: ReturnType<typeof
       data-testid="keyword-events-bulk-rename-issues"
     >
       <div>Cannot apply: {parts.join(" · ")}.</div>
-      {collidingRows.length > 0 && (
-        <details
-          className="mt-1.5"
-          data-testid="keyword-events-bulk-rename-collision-details"
-        >
-          <summary className="cursor-pointer select-none font-medium underline-offset-2 hover:underline">
-                        Show {collidingRows.length} collision{collidingRows.length === 1 ? "" : "s"}
-          </summary>
-          <ul className="mt-1.5 space-y-0.5 pl-3 font-mono">
-            {collidingRows.map(row => (
-              <li
-                key={row.Id}
-                data-testid="keyword-events-bulk-rename-collision-row"
-                data-row-id={row.Id}
-              >
-                <span className="font-semibold">{row.Next || "(empty)"}</span>
-                {" → already used by "}
-                <span>{row.CollidesWith.map(k => `“${k}”`).join(", ")}</span>
-              </li>
-            ))}
-          </ul>
-        </details>
-      )}
+      {collidingRows.length > 0 && <CollisionDetailsList collidingRows={collidingRows} />}
     </div>
+  );
+}
+
+function CollisionDetailsList({ collidingRows }: { readonly collidingRows: Array<ReturnType<typeof computeSequencePreview>["Rows"][number]> }) {
+  return (
+    <details
+      className="mt-1.5"
+      data-testid="keyword-events-bulk-rename-collision-details"
+    >
+      <summary className="cursor-pointer select-none font-medium underline-offset-2 hover:underline">
+                    Show {collidingRows.length} collision{collidingRows.length === 1 ? "" : "s"}
+      </summary>
+      <ul className="mt-1.5 space-y-0.5 pl-3 font-mono">
+        {collidingRows.map(row => (
+          <li
+            key={row.Id}
+            data-testid="keyword-events-bulk-rename-collision-row"
+            data-row-id={row.Id}
+          >
+            <span className="font-semibold">{row.Next || "(empty)"}</span>
+            {" → already used by "}
+            <span>{row.CollidesWith.map(k => `“${k}”`).join(", ")}</span>
+          </li>
+        ))}
+      </ul>
+    </details>
   );
 }
 

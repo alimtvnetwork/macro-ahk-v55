@@ -111,20 +111,23 @@ function _buildJsExecutorSection(deps: ToolsSectionsDeps): { section: HTMLElemen
   jsTextbox.onkeydown = function(e: KeyboardEvent) {
     const isCtrlEnter = e.ctrlKey && e.key === 'Enter';
     if (isCtrlEnter) {
-      e.preventDefault(); executeJs();
+      e.preventDefault();
+      executeJs();
 
       return; 
     }
 
     const isSingleLine = (jsTextbox.value || '').indexOf('\n') === -1;
     if (e.key === 'ArrowUp' && isSingleLine) {
-      e.preventDefault(); navigateLoopJsHistory('up');
+      e.preventDefault();
+      navigateLoopJsHistory('up');
 
       return; 
     }
 
     if (e.key === 'ArrowDown' && isSingleLine) {
-      e.preventDefault(); navigateLoopJsHistory('down');
+      e.preventDefault();
+      navigateLoopJsHistory('down');
 
       return; 
     }
@@ -230,7 +233,8 @@ function _buildJsLogsSection(): HTMLElement {
   copyLogBtn.textContent = 'Copy';
   copyLogBtn.style.cssText = 'padding:2px 6px;background:' + cPanelBgAlt + ';color:#c9a8ef;border:1px solid ' + cPrimary + ';border-radius:2px;font-size:9px;cursor:pointer;';
   copyLogBtn.onclick = function(e: Event) {
-    e.preventDefault(); e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
     copyLogsToClipboard();
     const countEl = document.getElementById(DomIdType.LoopLogCount);
     if (countEl) {
@@ -249,7 +253,9 @@ function _buildJsLogsSection(): HTMLElement {
   downloadLogBtn.title = 'Download logs';
   downloadLogBtn.style.cssText = 'padding:2px 6px;background:' + cPanelBgAlt + ';color:#c9a8ef;border:1px solid ' + cPrimary + ';border-radius:2px;font-size:9px;cursor:pointer;';
   downloadLogBtn.onclick = function(e: Event) {
-    e.preventDefault(); e.stopPropagation(); downloadLogs(); 
+    e.preventDefault();
+    e.stopPropagation();
+    downloadLogs(); 
   };
 
   const clearLogBtn = document.createElement('button');
@@ -257,7 +263,8 @@ function _buildJsLogsSection(): HTMLElement {
   clearLogBtn.title = 'Clear all logs';
   clearLogBtn.style.cssText = 'padding:2px 6px;background:#7f1d1d;color:#fca5a5;border:1px solid #991b1b;border-radius:2px;font-size:9px;cursor:pointer;';
   clearLogBtn.onclick = function(e: Event) {
-    e.preventDefault(); e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
     clearAllLogs();
     const countEl = document.getElementById(DomIdType.LoopLogCount);
     if (countEl) {
@@ -297,7 +304,8 @@ function _buildRecentErrorsSection(): HTMLElement {
   };
 
   copyAllErrBtn.onclick = function(e: Event) {
-    e.preventDefault(); e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
     const text = _formatAllRecentErrors();
     navigator.clipboard.writeText(text).then(function() {
       copyAllErrBtn.textContent = '✓';
@@ -322,7 +330,8 @@ function _buildRecentErrorsSection(): HTMLElement {
   };
 
   dlErrBtn.onclick = function(e: Event) {
-    e.preventDefault(); e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
     const text = _formatAllRecentErrors();
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -349,7 +358,8 @@ function _buildRecentErrorsSection(): HTMLElement {
   };
 
   clearErrBtn.onclick = function(e: Event) {
-    e.preventDefault(); e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
     recentErrors.length = 0;
     _renderRecentErrorsList(errListContainer);
     const countEl = document.getElementById('loop-recent-errors-count');

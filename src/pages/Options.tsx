@@ -486,7 +486,8 @@ const OptionsPage = () => {
                           onSaveConfig={cSave}
                           onDelete={handleDeleteScript}
                           onBack={() => {
-                            setViewDirection("back"); setSelection({ type: "section", section: "scripts" }); 
+                            setViewDirection("back");
+                            setSelection({ type: "section", section: "scripts" }); 
                           }}
                         />
                       );
@@ -507,7 +508,8 @@ const OptionsPage = () => {
                           onSave={pSave}
                           onDelete={handleDeleteProject}
                           onBack={() => {
-                            setViewDirection("back"); setSelection({ type: "section", section: "projects" }); 
+                            setViewDirection("back");
+                            setSelection({ type: "section", section: "projects" }); 
                           }}
                         />
                       );

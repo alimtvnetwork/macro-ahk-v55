@@ -11,6 +11,13 @@ function getDescriptiveName(name: string, values: string[]): string {
   return name;
 }
 
+const specificWeirdNames: Record<string, string> = {
+  "SemanticSemanticToneEnum1": "SemanticToneExtendedType",
+  "SemanticSemanticKindEnum1": "SemanticKindExtendedType",
+  "ApplyQuotaResultResult": "ApplyQuotaResultType",
+  "ApplyErrorRateResultResult": "ApplyErrorRateResultType"
+};
+
 function getNewName(oldName: string, values: string[]): string {
   if (oldName.endsWith("Type")) {
     return oldName;
@@ -18,21 +25,8 @@ function getNewName(oldName: string, values: string[]): string {
     
   let baseName = oldName;
     
-  // Handle some specific weird ones
-  if (baseName === "SemanticSemanticToneEnum1") {
-    return "SemanticToneExtendedType";
-  }
-
-  if (baseName === "SemanticSemanticKindEnum1") {
-    return "SemanticKindExtendedType";
-  }
-
-  if (baseName === "ApplyQuotaResultResult") {
-    return "ApplyQuotaResultType";
-  }
-
-  if (baseName === "ApplyErrorRateResultResult") {
-    return "ApplyErrorRateResultType";
+  if (specificWeirdNames[baseName]) {
+    return specificWeirdNames[baseName];
   }
     
   baseName = getDescriptiveName(baseName, values);
@@ -70,7 +64,7 @@ const renames = new Map<string, string>();
 for (const filePath of filesToProcess) {
   const file = project.getSourceFile(filePath);
   if (!file) {
-    console.error("Could not find", filePath);
+    console.log("ERROR: Could not find", filePath);
     continue;
   }
     

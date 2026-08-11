@@ -72,7 +72,8 @@ interface CsvScanState { current: string; inQuotes: boolean; skipNext: boolean }
 
 function scanQuotedChar(ch: string, next: string | undefined, state: CsvScanState): void {
   if (ch === '"' && next === '"') {
-    state.current += '"'; state.skipNext = true;
+    state.current += '"';
+    state.skipNext = true;
 
     return; 
   }
@@ -100,7 +101,8 @@ function scanCsvChar(ch: string, next: string | undefined, state: CsvScanState, 
   }
 
   if (ch === ",") {
-    out.push(state.current.trim()); state.current = "";
+    out.push(state.current.trim());
+    state.current = "";
 
     return; 
   }
@@ -113,7 +115,8 @@ function parseCsvLine(line: string): string[] {
   const state: CsvScanState = { current: "", inQuotes: false, skipNext: false };
   for (let i = 0; i < line.length; i++) {
     if (state.skipNext) {
-      state.skipNext = false; continue; 
+      state.skipNext = false;
+      continue; 
     }
 
     scanCsvChar(line[i]!, line[i + 1], state, out);

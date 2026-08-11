@@ -119,7 +119,6 @@ export async function fetchMembersForMany(
       bulkCache.set(id, res);
       results.push(res);
     } catch (e: unknown) {
-      console.error();
       results.push({ wsId: id, wsName, members: [], error: e instanceof Error ? e.message : String(e) });
     }
   }

@@ -83,7 +83,8 @@ export function DataBrowserPanel() {
       <StorageCategoryCards
         active={activeCategory}
         onSelect={(cat) => {
-          setActiveCategory(cat); setGlobalSearch(""); 
+          setActiveCategory(cat);
+          setGlobalSearch(""); 
         }}
         dbStats={dbStats}
         sessionStats={{ count: session.count, sizeFormatted: formatSize(session.totalSize), loading: session.loading }}

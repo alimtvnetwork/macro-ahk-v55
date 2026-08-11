@@ -88,7 +88,8 @@ describe('prompt-library-modal - aria-busy toggles for both success and failure'
     io.performPromptImport.mockReset();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('sets aria-busy="true" mid-flight and removes it after a successful import', async () => {

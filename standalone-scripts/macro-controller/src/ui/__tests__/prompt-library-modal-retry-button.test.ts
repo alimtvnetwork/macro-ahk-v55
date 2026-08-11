@@ -66,15 +66,19 @@ async function pickFile(file: File): Promise<void> {
   Object.defineProperty(input, 'files', { value: [file], configurable: true });
   input.dispatchEvent(new Event('change'));
   // Two ticks: microtask for handleImportFile + macrotask for finally block.
-  await tick(); await tick(); await tick();
+  await tick();
+  await tick();
+  await tick();
 }
 
 describe('prompt-library-modal - Retry import button', () => {
   beforeEach(() => {
-    document.body.innerHTML = ''; performPromptImport.mockReset(); 
+    document.body.innerHTML = '';
+    performPromptImport.mockReset();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('renders a Retry button in the error banner when the import throws', async () => {
@@ -101,7 +105,9 @@ describe('prompt-library-modal - Retry import button', () => {
     const btn = getRetryBtn();
     expect(btn).toBeTruthy();
         btn!.click();
-        await tick(); await tick(); await tick();
+        await tick();
+        await tick();
+        await tick();
         expect(performPromptImport).toHaveBeenCalledTimes(2);
         const banner = document.querySelector<HTMLDivElement>('[data-testid="library-import-error"]')!;
         expect(banner.hidden).toBe(true);

@@ -166,7 +166,8 @@ function buildCustomCountRow(
   input.onkeydown = function (event: KeyboardEvent) {
     const isEnter = event.key === 'Enter';
     if (isEnter) {
-      event.stopPropagation(); goButton.click(); 
+      event.stopPropagation();
+      goButton.click();
     }
   };
 

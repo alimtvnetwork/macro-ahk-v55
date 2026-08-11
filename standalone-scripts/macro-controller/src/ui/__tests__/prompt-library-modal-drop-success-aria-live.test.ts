@@ -74,7 +74,8 @@ describe('prompt-library-modal - drop success is announced via aria-live', () =>
     io.performPromptImport.mockClear();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks(); 
   });
 
   it('the polite status region announces the import summary after a successful drop', async () => {
@@ -88,7 +89,11 @@ describe('prompt-library-modal - drop success is announced via aria-live', () =>
     expect(status.getAttribute('aria-atomic')).toBe('true');
 
     fireDrop(getRoot(), 'ok.json');
-    await tick(); await tick(); await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
+    await tick();
+    await tick();
 
     expect(io.performPromptImport).toHaveBeenCalledTimes(1);
     // The success summary must be present in the polite live region so

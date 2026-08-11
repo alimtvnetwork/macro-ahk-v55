@@ -216,7 +216,8 @@ export function triggerLoopMoveFromSelection(): void {
   if (!wsId) {
     const fallback = resolveFromKeyboardNav() ?? resolveFromCheckedBox();
     if (fallback) {
-      wsId = fallback.wsId; wsName = fallback.wsName; 
+      wsId = fallback.wsId;
+      wsName = fallback.wsName; 
     }
   }
 

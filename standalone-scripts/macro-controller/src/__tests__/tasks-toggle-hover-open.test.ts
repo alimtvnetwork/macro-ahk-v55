@@ -30,11 +30,13 @@ function buildHarness(): { btn: HTMLElement; group: HTMLElement; root: HTMLEleme
   document.body.appendChild(root);
 
   function open(): void {
-    group.style.display = 'block'; btn.textContent = '🎯 Tasks ▾'; 
+    group.style.display = 'block';
+    btn.textContent = '🎯 Tasks ▾'; 
   }
 
   function close(): void {
-    group.style.display = 'none'; btn.textContent = '🎯 Tasks ▸'; 
+    group.style.display = 'none';
+    btn.textContent = '🎯 Tasks ▸'; 
   }
 
   btn.addEventListener('mouseenter', open);

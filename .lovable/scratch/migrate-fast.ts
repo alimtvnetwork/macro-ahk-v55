@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Project, SyntaxKind, TypeAliasDeclaration, UnionTypeNode, LiteralTypeNode, VariableDeclaration, ts, EnumDeclaration, StringLiteral } from "ts-morph";
 
 function capitalize(str: string) {

@@ -177,7 +177,8 @@ export function ProjectHeader({ project, onSave, onDelete, onBack, onSwitchTab }
     }
 
     if (e.key === "Escape") {
-      setEditName(project.name); setEditingName(false); 
+      setEditName(project.name);
+      setEditingName(false); 
     }
   };
 
@@ -187,7 +188,8 @@ export function ProjectHeader({ project, onSave, onDelete, onBack, onSwitchTab }
     }
 
     if (e.key === "Escape") {
-      setEditVersion(project.version); setEditingVersion(false); 
+      setEditVersion(project.version);
+      setEditingVersion(false); 
     }
   };
 
@@ -211,7 +213,8 @@ export function ProjectHeader({ project, onSave, onDelete, onBack, onSwitchTab }
                   ref={nameInputRef}
                   value={editName}
                   onChange={(e) => {
-                    setEditName(e.target.value); markDirty(); 
+                    setEditName(e.target.value);
+                    markDirty(); 
                   }}
                   onBlur={handleNameBlur}
                   onKeyDown={handleNameKeyDown}
@@ -236,7 +239,8 @@ export function ProjectHeader({ project, onSave, onDelete, onBack, onSwitchTab }
                     ref={versionInputRef}
                     value={editVersion}
                     onChange={(e) => {
-                      setEditVersion(e.target.value); markDirty(); 
+                      setEditVersion(e.target.value);
+                      markDirty(); 
                     }}
                     onBlur={handleVersionBlur}
                     onKeyDown={handleVersionKeyDown}
@@ -267,7 +271,8 @@ export function ProjectHeader({ project, onSave, onDelete, onBack, onSwitchTab }
               <Input
                 value={editDesc}
                 onChange={(e) => {
-                  setEditDesc(e.target.value); markDirty(); 
+                  setEditDesc(e.target.value);
+                  markDirty(); 
                 }}
                 placeholder="Description (optional)"
                 className="h-6 text-xs text-muted-foreground border-none shadow-none px-2 bg-transparent focus-visible:bg-muted/30 focus-visible:ring-1 transition-all flex-1"

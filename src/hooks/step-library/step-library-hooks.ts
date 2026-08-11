@@ -321,21 +321,24 @@ function useGroupCrud(deps: MutationDeps, after: () => void) {
       return;
     }
 
-    deps.lib.renameGroup(id, name); after();
+    deps.lib.renameGroup(id, name);
+    after();
   }, [deps, after]);
   const deleteGroup = useCallback<UseStepLibraryApi["deleteGroup"]>((id) => {
     if (deps.lib === null) {
       return;
     }
 
-    deps.lib.deleteGroup(id); after();
+    deps.lib.deleteGroup(id);
+    after();
   }, [deps, after]);
   const setGroupArchived = useCallback<UseStepLibraryApi["setGroupArchived"]>((id, archived) => {
     if (deps.lib === null) {
       return;
     }
 
-    deps.lib.setGroupArchived(id, archived); after();
+    deps.lib.setGroupArchived(id, archived);
+    after();
   }, [deps, after]);
 
   return { createGroup, renameGroup, deleteGroup, setGroupArchived };
@@ -371,7 +374,8 @@ function useGroupOrdering(deps: MutationDeps, after: () => void) {
       return;
     }
 
-    deps.lib.reorderGroups(deps.project.ProjectId, parent, orderedIds); after();
+    deps.lib.reorderGroups(deps.project.ProjectId, parent, orderedIds);
+    after();
   }, [deps, after]);
 
   return { moveGroupWithinParent, reorderSiblings };
@@ -393,21 +397,24 @@ function useStepCrud(deps: MutationDeps, after: () => void) {
       return;
     }
 
-    deps.lib.updateStep(input); after();
+    deps.lib.updateStep(input);
+    after();
   }, [deps, after]);
   const deleteStep = useCallback<UseStepLibraryApi["deleteStep"]>((stepId) => {
     if (deps.lib === null) {
       return;
     }
 
-    deps.lib.deleteStep(stepId); after();
+    deps.lib.deleteStep(stepId);
+    after();
   }, [deps, after]);
   const setStepDisabled = useCallback<UseStepLibraryApi["setStepDisabled"]>((stepId, disabled) => {
     if (deps.lib === null) {
       return;
     }
 
-    deps.lib.setStepDisabled(stepId, disabled); after();
+    deps.lib.setStepDisabled(stepId, disabled);
+    after();
   }, [deps, after]);
 
   return { appendStep, updateStep, deleteStep, setStepDisabled };
@@ -438,7 +445,8 @@ function useStepOrdering(deps: MutationDeps, after: () => void) {
       return;
     }
 
-    deps.lib.reorderSteps(stepGroupId, orderedStepIds); after();
+    deps.lib.reorderSteps(stepGroupId, orderedStepIds);
+    after();
   }, [deps, after]);
 
   return { moveStepWithinGroup, reorderSteps };

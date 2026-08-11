@@ -72,7 +72,8 @@ describe('prompt-library-modal - drop-path failure aria-live announcement', () =
     io.performPromptImport.mockReset();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks(); 
   });
 
   it('announces the failure reason via assertive aria-live banner after a failed drop', async () => {
@@ -83,7 +84,9 @@ describe('prompt-library-modal - drop-path failure aria-live announcement', () =
 
     const root = getRoot();
     fireDrop(root, 'bad.json');
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
 
     // Assertive banner: role=alert, aria-live=assertive, aria-atomic=true, visible.
     const banner = document.querySelector<HTMLElement>('[data-testid="library-import-error"]');

@@ -172,11 +172,13 @@ function partitionSelection(
   for (const id of selected) {
     const row = byId.get(id);
     if (row === undefined) {
-      missing.push(id); continue; 
+      missing.push(id);
+      continue; 
     }
 
     if (row.ProjectId !== projectId) {
-      wrongProject.push(id); continue; 
+      wrongProject.push(id);
+      continue; 
     }
 
     seedIds.push(id);

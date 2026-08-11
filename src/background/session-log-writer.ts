@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import { Timings } from "../constants/timing";
 import { ServiceResult } from '../utils/result-wrapper';
@@ -55,6 +56,7 @@ const EVENTS_LOG = "events.log";
 const ERRORS_LOG = "errors.log";
 const SCRIPTS_LOG = "scripts.log";
 const LOG_SEPARATOR = "============================================================";
+const SWALLOWED_ERROR_MSG = "Automatically caught swallowed error";
 
 /* ------------------------------------------------------------------ */
 /*  State                                                              */
@@ -514,12 +516,12 @@ export async function listSessionsWithTimestamps(): Promise<SessionInfo[]> {
               latestMs = file.lastModified;
             }
           }catch (err) {
-            logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
+            logCaughtError(BgLogTag.MARCO, SWALLOWED_ERROR_MSG, err); 
           }
           // allow-swallow: missing log file is expected
         }
       }catch (err) {
-        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
+        logCaughtError(BgLogTag.MARCO, SWALLOWED_ERROR_MSG, err); 
       }
       // allow-swallow: unreadable session dir is skipped
 
@@ -607,13 +609,13 @@ export async function browseOpfsSessions(): Promise<{
           }
         }
       } catch (err) {
-        logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
+        logCaughtError(BgLogTag.MARCO, SWALLOWED_ERROR_MSG, err); 
       }
 
       sessions.push({ sessionId: sid, absolutePath: absoluteDirPath, files, totalSizeBytes });
     }
   } catch (err) {
-    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
+    logCaughtError(BgLogTag.MARCO, SWALLOWED_ERROR_MSG, err); 
   }
 
   sessions.sort((a, b) => Number(b.sessionId) - Number(a.sessionId));

@@ -114,30 +114,8 @@ export function updateImportProgress(refs: ModalRefs, progress: ImportProgress):
   p.bar.setAttribute(ATTR_ARIA_VALUETEXT, 'Import complete');
 }
 
-export function renderPartialImportErrors(
-  refs: ModalRefs,
-  entryErrors: readonly string[],
-  parseErrors: readonly string[],
-): void {
-  const panel = refs.partialErrorsPanel;
-  if (!panel) {
-    return;
-  }
-
-  panel.textContent = '';
+function buildPartialErrorsDetails(entryErrors: readonly string[], parseErrors: readonly string[]): HTMLDetailsElement {
   const total = entryErrors.length + parseErrors.length;
-  if (total === 0) {
-    panel.hidden = true;
-    panel.style.display = 'none';
-
-    return;
-  }
-
-  const header = document.createElement('div');
-  header.style.cssText = 'font-weight:600;margin-bottom:6px;';
-  header.textContent = 'Partial import: ' + String(total) + ' entr' + (total === 1 ? 'y' : 'ies') + ' failed';
-  panel.appendChild(header);
-
   const details = document.createElement('details');
   details.open = total <= 5;
   const summary = document.createElement('summary');
@@ -171,6 +149,35 @@ export function renderPartialImportErrors(
   }
 
   details.appendChild(list);
+
+  return details;
+}
+
+export function renderPartialImportErrors(
+  refs: ModalRefs,
+  entryErrors: readonly string[],
+  parseErrors: readonly string[],
+): void {
+  const panel = refs.partialErrorsPanel;
+  if (!panel) {
+    return;
+  }
+
+  panel.textContent = '';
+  const total = entryErrors.length + parseErrors.length;
+  if (total === 0) {
+    panel.hidden = true;
+    panel.style.display = 'none';
+
+    return;
+  }
+
+  const header = document.createElement('div');
+  header.style.cssText = 'font-weight:600;margin-bottom:6px;';
+  header.textContent = 'Partial import: ' + String(total) + ' entr' + (total === 1 ? 'y' : 'ies') + ' failed';
+  panel.appendChild(header);
+
+  const details = buildPartialErrorsDetails(entryErrors, parseErrors);
 
   const dismiss = document.createElement('button');
   dismiss.type = 'button';

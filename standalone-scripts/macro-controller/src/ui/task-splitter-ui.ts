@@ -425,7 +425,7 @@ async function parseAndEnqueueLatestReply(expectedN: number): Promise<void> {
     log('TaskSplitter: enqueued ' + added.length + '/' + expectedN + ' tasks for project ' + projectId, 'info');
     showPasteToast('✅ Task Splitter: queued ' + added.length + ' tasks', false);
   } catch (caught: CaughtError) {
-    console.error();
+    logError('TaskSplitter', 'enqueue failed', caught);
     reportSplitterParseFailure(caught, expectedN);
   }
 }
@@ -625,7 +625,9 @@ function buildControl(): HTMLElement {
   header.appendChild(progress);
   header.appendChild(chevron);
   header.onclick = function () {
-    state.collapsed = !state.collapsed; persist(); notify(); 
+    state.collapsed = !state.collapsed;
+    persist();
+    notify(); 
   };
 
   root.appendChild(header);
@@ -643,55 +645,77 @@ function buildControl(): HTMLElement {
   // Row 1: N + Delay
   const row1 = document.createElement('div');
   row1.style.cssText = ROW_STYLE;
-  const nLbl = document.createElement('span'); nLbl.textContent = 'Steps'; nLbl.style.opacity = '0.8';
+  const nLbl = document.createElement('span');
+  nLbl.textContent = 'Steps';
+  nLbl.style.opacity = '0.8';
   const nInput = makeInput(String(state.stepCount), '50px');
-  nInput.type = 'number'; nInput.min = String(STEP_MIN); nInput.max = String(STEP_MAX);
+  nInput.type = 'number';
+  nInput.min = String(STEP_MIN);
+  nInput.max = String(STEP_MAX);
   nInput.oninput = function () {
     state.stepCount = clamp(parseInt(nInput.value, 10), STEP_MIN, STEP_MAX);
-    persist(); notify();
+    persist();
+    notify();
   };
 
-  const dLbl = document.createElement('span'); dLbl.textContent = 'Delay'; dLbl.style.opacity = '0.8'; dLbl.style.marginLeft = '6px';
+  const dLbl = document.createElement('span');
+  dLbl.textContent = 'Delay';
+  dLbl.style.opacity = '0.8';
+  dLbl.style.marginLeft = '6px';
   const dSel = makeSelect();
   for (const s of DELAY_PRESETS_SEC) {
-    const o = document.createElement('option'); o.value = String(s); o.textContent = s + 's'; dSel.appendChild(o);
+    const o = document.createElement('option');
+    o.value = String(s);
+    o.textContent = s + 's';
+    dSel.appendChild(o);
   }
 
   dSel.value = String(state.delaySec);
   dSel.onchange = function () {
-    state.delaySec = parseInt(dSel.value, 10) || DELAY_DEFAULT; persist(); 
+    state.delaySec = parseInt(dSel.value, 10) || DELAY_DEFAULT;
+    persist(); 
   };
 
-  row1.appendChild(nLbl); row1.appendChild(nInput);
-  row1.appendChild(dLbl); row1.appendChild(dSel);
+  row1.appendChild(nLbl);
+  row1.appendChild(nInput);
+  row1.appendChild(dLbl);
+  row1.appendChild(dSel);
   body.appendChild(row1);
 
   // Row 2: Split prompt
   const row2 = document.createElement('div');
   row2.style.cssText = ROW_STYLE;
-  const sLbl = document.createElement('span'); sLbl.textContent = 'Split'; sLbl.style.opacity = '0.8';
+  const sLbl = document.createElement('span');
+  sLbl.textContent = 'Split';
+  sLbl.style.opacity = '0.8';
   const sSel = makeSelect();
   sSel.style.flex = '1';
   populatePromptSelect(sSel, state.splitPromptSlug, '⚙ Auto: PlanTierType ${N}');
   sSel.onchange = function () {
-    state.splitPromptSlug = sSel.value; persist(); 
+    state.splitPromptSlug = sSel.value;
+    persist(); 
   };
 
-  row2.appendChild(sLbl); row2.appendChild(sSel);
+  row2.appendChild(sLbl);
+  row2.appendChild(sSel);
   body.appendChild(row2);
 
   // Row 3: Per-step prompt
   const row3 = document.createElement('div');
   row3.style.cssText = ROW_STYLE;
-  const pLbl = document.createElement('span'); pLbl.textContent = 'Step'; pLbl.style.opacity = '0.8';
+  const pLbl = document.createElement('span');
+  pLbl.textContent = 'Step';
+  pLbl.style.opacity = '0.8';
   const pSel = makeSelect();
   pSel.style.flex = '1';
   populatePromptSelect(pSel, state.perStepPromptSlug, '⚙ Auto: Next ${N} steps');
   pSel.onchange = function () {
-    state.perStepPromptSlug = pSel.value; persist(); 
+    state.perStepPromptSlug = pSel.value;
+    persist(); 
   };
 
-  row3.appendChild(pLbl); row3.appendChild(pSel);
+  row3.appendChild(pLbl);
+  row3.appendChild(pSel);
   body.appendChild(row3);
 
   // Row 4: action buttons

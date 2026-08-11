@@ -57,7 +57,8 @@ describe("executeHotkeyStep", () => {
     const env = {
       document: fakeDoc as unknown as Document,
       setTimeout: ((cb: () => void, ms: number) => {
-        setTimeoutCalls.push(ms); cb();
+        setTimeoutCalls.push(ms);
+        cb();
 
         return 0; 
       }) as typeof setTimeout,

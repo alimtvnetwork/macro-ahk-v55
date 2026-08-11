@@ -64,7 +64,8 @@ async function attemptInitialLoad(role: PromptRole): Promise<{ res: ListRes; ini
     resetSqlBridgeCache();
     const retry = await listPromptsByRole(role);
     if (retry.isSuccess) {
-      res = retry; initialReason = null; 
+      res = retry;
+      initialReason = null; 
     }
   }
 
@@ -219,7 +220,8 @@ function promptPickerModal(rows: PromptRow[], opts: PickPromptOptions): Promise<
     ok.type = 'button';
     ok.textContent = opts.confirmLabel ?? 'Select';
     ok.style.cssText = 'padding:6px 14px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);border:none;border-radius:5px;color:#fff;cursor:pointer;font-size:12px;font-weight:600;';
-    row.appendChild(cancel); row.appendChild(ok);
+    row.appendChild(cancel);
+    row.appendChild(ok);
     dlg.appendChild(row);
     overlay.appendChild(dlg);
     document.body.appendChild(overlay);

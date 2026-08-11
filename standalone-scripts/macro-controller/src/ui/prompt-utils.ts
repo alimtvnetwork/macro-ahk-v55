@@ -377,14 +377,16 @@ function _buildCountdown(durationMs: number): {
       const remaining = Math.max(0, durationMs - (Date.now() - startedAt.t));
       label.textContent = Math.ceil(remaining / 1000) + 's';
       if (remaining <= 0 && tickId !== null) {
-        clearInterval(tickId); tickId = null; 
+        clearInterval(tickId);
+        tickId = null;
       }
     }, 250);
   };
 
   const stop = function(): void {
     if (tickId !== null) {
-      clearInterval(tickId); tickId = null; 
+      clearInterval(tickId);
+      tickId = null;
     }
   };
 
@@ -625,6 +627,35 @@ export async function resolveDynamicVariables(text: string): Promise<string | nu
   return resolvedText;
 }
 
+function _createVariableModalHeader(): HTMLDivElement {
+  const header = document.createElement('div');
+  header.style.cssText = 'font-size:14px;font-weight:700;color:#3daee9;margin-bottom:8px;';
+  header.textContent = 'Variables Required';
+
+  return header;
+}
+
+function _createVariableInputRow(v: string, inputs: Record<string, HTMLInputElement>, modal: HTMLDivElement): void {
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
+  
+  const label = document.createElement('label');
+  label.textContent = v;
+  label.style.cssText = 'font-size:11px;color:#94a3b8;font-weight:600;';
+  row.appendChild(label);
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = `Enter value for ${v}...`;
+  input.style.cssText = 'background:#252536;border:1px solid #313147;border-radius:6px;padding:8px 10px;color:#fff;font-size:12px;outline:none;';
+  input.onfocus = () => input.style.borderColor = '#007acc';
+  input.onblur = () => input.style.borderColor = '#313147';
+  
+  row.appendChild(input);
+  modal.appendChild(row);
+  inputs[v] = input;
+}
+
 /**
  * Show a simple modal to collect variable values.
  */
@@ -636,33 +667,10 @@ function showVariableInputModal(vars: string[]): Promise<Record<string, string> 
     const modal = document.createElement('div');
     modal.style.cssText = 'background:#1e1e2e;border:1px solid #313147;border-radius:12px;width:400px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,0.5);display:flex;flex-direction:column;gap:12px;';
     
-    const header = document.createElement('div');
-    header.style.cssText = 'font-size:14px;font-weight:700;color:#3daee9;margin-bottom:8px;';
-    header.textContent = 'Variables Required';
-    modal.appendChild(header);
+    modal.appendChild(_createVariableModalHeader());
 
     const inputs: Record<string, HTMLInputElement> = {};
-    
-    vars.forEach(v => {
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
-      
-      const label = document.createElement('label');
-      label.textContent = v;
-      label.style.cssText = 'font-size:11px;color:#94a3b8;font-weight:600;';
-      row.appendChild(label);
-      
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.placeholder = `Enter value for ${v}...`;
-      input.style.cssText = 'background:#252536;border:1px solid #313147;border-radius:6px;padding:8px 10px;color:#fff;font-size:12px;outline:none;';
-      input.onfocus = () => input.style.borderColor = '#007acc';
-      input.onblur = () => input.style.borderColor = '#313147';
-      
-      row.appendChild(input);
-      modal.appendChild(row);
-      inputs[v] = input;
-    });
+    vars.forEach(v => _createVariableInputRow(v, inputs, modal));
 
     const footer = document.createElement('div');
     footer.style.cssText = 'display:flex;justify-content:flex-end;gap:8px;margin-top:8px;';
@@ -671,7 +679,8 @@ function showVariableInputModal(vars: string[]): Promise<Record<string, string> 
     cancelBtn.textContent = 'Cancel';
     cancelBtn.style.cssText = 'padding:6px 12px;font-size:12px;background:transparent;border:1px solid #313147;color:#94a3b8;border-radius:6px;cursor:pointer;';
     cancelBtn.onclick = () => {
-      overlay.remove(); resolve(null); 
+      overlay.remove();
+      resolve(null);
     };
     
     const submitBtn = document.createElement('button');

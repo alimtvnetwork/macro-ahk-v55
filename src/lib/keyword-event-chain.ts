@@ -224,7 +224,8 @@ export async function runKeywordEventChain(
 
   for (let i = 0; i < enabled.length; i += 1) {
     if (options.signal?.aborted) {
-      aborted = true; break; 
+      aborted = true;
+      break; 
     }
 
     const ev = enabled[i];
@@ -246,7 +247,8 @@ export async function runKeywordEventChain(
     }
 
     if (result.Aborted) {
-      aborted = true; break; 
+      aborted = true;
+      break; 
     }
 
     const isLast = i === enabled.length - 1;
@@ -262,7 +264,8 @@ export async function runKeywordEventChain(
         try {
           await pause(effective, options.signal); 
         } catch (err) {
-          aborted = true;break;
+          aborted = true;
+          break;
         }
       }
     }

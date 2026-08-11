@@ -211,22 +211,7 @@ function shimObservers(): void {
   }
 }
 
-function shimMiscApis(): void {
-  if (typeof requestAnimationFrame === "undefined") {
-    _g.requestAnimationFrame = (callback: (...args: unknown[]) => void) => setTimeout(callback, 0);
-    _g.cancelAnimationFrame = (id: number) => clearTimeout(id);
-  }
-
-  if (typeof CustomEvent === "undefined") {
-    _g.CustomEvent = class ShimCustomEvent extends Event {
-      detail: unknown;
-      constructor(type: string, params?: { detail?: unknown }) {
-        super(type);
-        this.detail = params?.detail ?? null;
-      }
-    };
-  }
-
+function shimDomParserAndSerializer(): void {
   if (typeof DOMParser === "undefined") {
     _g.DOMParser = class DOMParser {
       parseFromString() {
@@ -239,6 +224,25 @@ function shimMiscApis(): void {
     _g.XMLSerializer = class XMLSerializer {
       serializeToString() {
         return ""; 
+      }
+    };
+  }
+}
+
+function shimMiscApis(): void {
+  shimDomParserAndSerializer();
+
+  if (typeof requestAnimationFrame === "undefined") {
+    _g.requestAnimationFrame = (callback: (...args: unknown[]) => void) => setTimeout(callback, 0);
+    _g.cancelAnimationFrame = (id: number) => clearTimeout(id);
+  }
+
+  if (typeof CustomEvent === "undefined") {
+    _g.CustomEvent = class ShimCustomEvent extends Event {
+      detail: unknown;
+      constructor(type: string, params?: { detail?: unknown }) {
+        super(type);
+        this.detail = params?.detail ?? null;
       }
     };
   }

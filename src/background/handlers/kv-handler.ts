@@ -1,20 +1,3 @@
-// @ts-nocheck
-/**
- * Marco Extension — Project-Scoped Key-Value Handler (Issue 50)
- *
- * CRUD operations for ProjectKv table in logs.db.
- * All column names use PascalCase per database naming convention.
- *
- * Every entry point validates required fields via handler-guards before
- * issuing a SQLite bind, so missing payload fields surface as a clean
- * isOk:false response instead of a "tried to bind a value of an unknown
- * type (undefined)" crash inside sql.js.
- *
- * @see src/background/handlers/handler-guards.ts — input validation + safeBind
- * @see .lovable/memory/architecture/project-scoped-database.md — Project-scoped DB
- */
-
-// @ts-nocheck
 /**
  * Marco Extension — Project-Scoped Key-Value Handler (Issue 50)
  *

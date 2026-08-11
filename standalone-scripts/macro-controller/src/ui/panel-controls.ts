@@ -220,11 +220,13 @@ function buildStartStopButton(deps: PanelBuilderDeps, btnStyle: string): { wrap:
   startStopBtn.title = 'Start loop';
   startStopBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnStartGrad + ';color:#fff;border-radius:8px;min-width:36px;width:36px;font-size:14px;text-align:center;padding:6px 0;box-shadow:' + cBtnStartGlow + CssFragmentType.Border1pxSolidRgba + ';position:relative;';
   startStopBtn.onmouseenter = function() {
-    startStopBtn.style.filter = 'brightness(1.12)'; startStopBtn.style.boxShadow = '0 2px 8px rgba(0,200,83,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; 
+    startStopBtn.style.filter = 'brightness(1.12)';
+    startStopBtn.style.boxShadow = '0 2px 8px rgba(0,200,83,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; 
   };
 
   startStopBtn.onmouseleave = function() {
-    startStopBtn.style.filter = ''; startStopBtn.style.boxShadow = cBtnStartGlow; 
+    startStopBtn.style.filter = '';
+    startStopBtn.style.boxShadow = cBtnStartGlow; 
   };
 
   startStopBtn.onclick = function() {
@@ -249,7 +251,8 @@ function buildStartStopButton(deps: PanelBuilderDeps, btnStyle: string): { wrap:
   // (they pressed Start, then a transient credit pause kicked in). Re-mark the gesture so the
   // resume is honored without forcing the user to click again mid-loop.
   const cdCtx = createCountdownCtx(startStopBtn, countdownBadge, function(d: string) {
-    markUserGesture('panel-controls/countdown-resume'); deps.startLoop(d); 
+    markUserGesture('panel-controls/countdown-resume');
+    deps.startLoop(d); 
   }, deps.stopLoop);
   nsWrite('_internal.updateStartStopBtn', function(running: boolean) {
     updateStartStopBtn(cdCtx, running); 
@@ -334,11 +337,13 @@ function buildCreditButton(deps: PanelBuilderDeps, btnStyle: string): HTMLElemen
   creditBtn.title = 'Fetch credit status via API and refresh workspace bars';
   creditBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnCreditGrad + ';color:#1a1a2e;font-size:' + tFontTiny + ';padding:6px 12px;box-shadow:' + cBtnCreditGlow + CssFragmentType.Border1pxSolidRgba;
   creditBtn.onmouseenter = function() {
-    creditBtn.style.filter = 'brightness(1.12)'; creditBtn.style.boxShadow = '0 2px 8px rgba(245,158,11,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; 
+    creditBtn.style.filter = 'brightness(1.12)';
+    creditBtn.style.boxShadow = '0 2px 8px rgba(245,158,11,0.4), inset 0 1px 0 rgba(255,255,255,0.2)'; 
   };
 
   creditBtn.onmouseleave = function() {
-    creditBtn.style.filter = ''; creditBtn.style.boxShadow = cBtnCreditGlow; 
+    creditBtn.style.filter = '';
+    creditBtn.style.boxShadow = cBtnCreditGlow; 
   };
 
   let creditInFlight = false;
@@ -388,11 +393,13 @@ function buildPromptsDropdown(_deps: PanelBuilderDeps, btnStyle: string): Prompt
   promptsBtn.title = 'Select a prompt to paste or copy';
   promptsBtn.style.cssText = btnStyle + CssFragmentType.Background + cBtnPromptGrad + ';color:#fff;font-size:' + tFontTiny + ';padding:6px 12px;box-shadow:' + cBtnPromptGlow + CssFragmentType.Border1pxSolidRgba;
   promptsBtn.onmouseenter = function() {
-    promptsBtn.style.filter = 'brightness(1.15)'; promptsBtn.style.boxShadow = '0 0 20px rgba(0,198,255,0.55)'; 
+    promptsBtn.style.filter = 'brightness(1.15)';
+    promptsBtn.style.boxShadow = '0 0 20px rgba(0,198,255,0.55)'; 
   };
 
   promptsBtn.onmouseleave = function() {
-    promptsBtn.style.filter = ''; promptsBtn.style.boxShadow = cBtnPromptGlow; 
+    promptsBtn.style.filter = '';
+    promptsBtn.style.boxShadow = cBtnPromptGlow; 
   };
 
   const promptsDropdown = document.createElement('div');

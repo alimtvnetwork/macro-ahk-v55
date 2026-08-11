@@ -402,24 +402,14 @@ function probeDetectedWorkspaceFromPage(
   };
 
   const onReply = (event: MessageEvent): void => {
-    if (event.source !== window) {
-      return;
-    }
-
     const data = event.data as Record<string, unknown> | null;
-    if (!data) {
-      return;
-    }
-
-    if (data.source !== PROBE_RESPONSE_SOURCE) {
-      return;
-    }
-
-    if (data.type !== PROBE_TYPE) {
-      return;
-    }
-
-    if (data.requestId !== requestId) {
+    if (
+      event.source !== window ||
+      !data ||
+      data.source !== PROBE_RESPONSE_SOURCE ||
+      data.type !== PROBE_TYPE ||
+      data.requestId !== requestId
+    ) {
       return;
     }
 

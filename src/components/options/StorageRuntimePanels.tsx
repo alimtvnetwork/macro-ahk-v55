@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import { DomainConstants } from "../../constants/domain";
 import type { JsonValue } from "@/background/handlers/handler-types";

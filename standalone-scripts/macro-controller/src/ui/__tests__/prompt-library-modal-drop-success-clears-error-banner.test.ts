@@ -72,7 +72,8 @@ describe('prompt-library-modal - success clears previous failure banner', () => 
     io.performPromptImport.mockReset();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks(); 
   });
 
   it('hides and empties the error banner after a successful retry drop', async () => {
@@ -87,7 +88,9 @@ describe('prompt-library-modal - success clears previous failure banner', () => 
 
     // First drop fails: banner is visible with the failure reason.
     fireDrop(root, 'first.json');
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
 
     const banner = document.querySelector<HTMLElement>('[data-testid="library-import-error"]');
     expect(banner).not.toBeNull();
@@ -96,7 +99,9 @@ describe('prompt-library-modal - success clears previous failure banner', () => 
 
     // Second drop succeeds.
     fireDrop(root, 'second.json');
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
 
     // Banner is cleared: hidden, empty, and display:none.
     expect(banner!.hidden).toBe(true);

@@ -77,7 +77,8 @@ function triggerDownload(blob: Blob, filename: string): void {
   document.body.appendChild(anchor);
   anchor.click();
   setTimeout(function() {
-    anchor.remove(); URL.revokeObjectURL(url); 
+    anchor.remove();
+    URL.revokeObjectURL(url); 
   }, Timings.POLL_INTERVAL_FAST);
 }
 

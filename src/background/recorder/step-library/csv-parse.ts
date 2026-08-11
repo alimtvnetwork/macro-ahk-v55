@@ -194,7 +194,8 @@ function stepUnquoted(source: string, i: number, ch: string, delimiter: string, 
   }
 
   if (ch === delimiter) {
-    state.row.push(state.field); state.field = "";
+    state.row.push(state.field);
+    state.field = "";
 
     return i; 
   }
@@ -320,7 +321,8 @@ function detectDelimiter(source: string): DelimiterType {
     const ch = source[i];
     if (ch === '"') {
       if (inQuotes && source[i + 1] === '"') {
-        i++; continue; 
+        i++;
+        continue; 
       }
 
       inQuotes = !inQuotes;

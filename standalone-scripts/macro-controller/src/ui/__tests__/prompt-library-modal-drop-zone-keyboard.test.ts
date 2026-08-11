@@ -61,7 +61,8 @@ describe('prompt-library-modal - drop zone keyboard navigation', () => {
     document.body.innerHTML = ''; 
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('exposes the drop zone as a keyboard-focusable button with an accessible label', async () => {

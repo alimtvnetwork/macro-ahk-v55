@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Marco Extension — Batch Run Dialog
  *

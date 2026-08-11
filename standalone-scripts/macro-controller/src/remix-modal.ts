@@ -280,7 +280,8 @@ export function showRemixModal(opts: RemixModalOpts): void {
   setTimeout(function () {
     const ni = el.querySelector<HTMLInputElement>('[data-marco-el="name"]');
     if (ni) {
-      ni.focus(); ni.select(); 
+      ni.focus();
+      ni.select(); 
     }
   }, 30);
 }

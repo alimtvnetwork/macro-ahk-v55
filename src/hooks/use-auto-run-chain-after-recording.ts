@@ -73,33 +73,39 @@ export function shouldAutoRun(
   return next === null || next.Phase === "Idle";
 }
 
+function useAutoRunChainRefs(opts: UseAutoRunChainOptions) {
+  const settingsRef = useRef<KeywordEventChainSettings>(opts.settings);
+  const eventsRef = useRef<ReadonlyArray<KeywordEvent>>(opts.events);
+  const startCbRef = useRef<UseAutoRunChainOptions["onAutoRunStart"]>(opts.onAutoRunStart);
+  const endCbRef = useRef<UseAutoRunChainOptions["onAutoRunEnd"]>(opts.onAutoRunEnd);
+  const runnerRef = useRef<UseAutoRunChainOptions["chainRunner"]>(opts.chainRunner);
+
+  useEffect(() => {
+    settingsRef.current = opts.settings; 
+  }, [opts.settings]);
+  useEffect(() => {
+    eventsRef.current = opts.events; 
+  }, [opts.events]);
+  useEffect(() => {
+    startCbRef.current = opts.onAutoRunStart; 
+  }, [opts.onAutoRunStart]);
+  useEffect(() => {
+    endCbRef.current = opts.onAutoRunEnd; 
+  }, [opts.onAutoRunEnd]);
+  useEffect(() => {
+    runnerRef.current = opts.chainRunner; 
+  }, [opts.chainRunner]);
+
+  return { settingsRef, eventsRef, startCbRef, endCbRef, runnerRef };
+}
+
 export function useAutoRunChainAfterRecording(opts: UseAutoRunChainOptions): void {
-  const { settings, events, session, onAutoRunStart, onAutoRunEnd, chainRunner } = opts;
+  const { session } = opts;
   const prevSessionRef = useRef<RecordingSession | null>(null);
   // Keep the *latest* values in refs so the effect closes over only
   // `session` — we don't want to re-fire the chain just because the
   // settings or events list changed mid-recording.
-  const settingsRef = useRef<KeywordEventChainSettings>(settings);
-  const eventsRef = useRef<ReadonlyArray<KeywordEvent>>(events);
-  const startCbRef = useRef<UseAutoRunChainOptions["onAutoRunStart"]>(onAutoRunStart);
-  const endCbRef = useRef<UseAutoRunChainOptions["onAutoRunEnd"]>(onAutoRunEnd);
-  const runnerRef = useRef<UseAutoRunChainOptions["chainRunner"]>(chainRunner);
-
-  useEffect(() => {
-    settingsRef.current = settings; 
-  }, [settings]);
-  useEffect(() => {
-    eventsRef.current = events; 
-  }, [events]);
-  useEffect(() => {
-    startCbRef.current = onAutoRunStart; 
-  }, [onAutoRunStart]);
-  useEffect(() => {
-    endCbRef.current = onAutoRunEnd; 
-  }, [onAutoRunEnd]);
-  useEffect(() => {
-    runnerRef.current = chainRunner; 
-  }, [chainRunner]);
+  const { settingsRef, eventsRef, startCbRef, endCbRef, runnerRef } = useAutoRunChainRefs(opts);
 
   useEffect(() => {
     const prev = prevSessionRef.current;
@@ -133,6 +139,12 @@ export function useAutoRunChainAfterRecording(opts: UseAutoRunChainOptions): voi
       .catch((caught: unknown) => {
         // The chain runner traps its own errors and resolves with a
         // result; this catch is purely defensive against custom
+
+        endCbRef.current?.(result);
+      })
+      .catch((caught: unknown) => {
+        // The chain runner traps its own errors and resolves with a
+        // result; this catch is purely defensive against custom
         // runners passed in by tests.
         logError("useAutoRunChainAfterRecording", "Custom runner rejected — default runner always resolves; investigate test/runner injection", caught);
       });
@@ -140,5 +152,5 @@ export function useAutoRunChainAfterRecording(opts: UseAutoRunChainOptions): voi
     return () => {
       cancelled = true; 
     };
-  }, [session]);
+  }, [session, endCbRef, eventsRef, runnerRef, settingsRef, startCbRef]);
 }

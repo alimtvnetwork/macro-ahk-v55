@@ -111,7 +111,8 @@ export function DiagnosticsPanel() {
 
     const stopPolling = () => {
       if (timerRef.current) {
-        clearInterval(timerRef.current); timerRef.current = null; 
+        clearInterval(timerRef.current);
+        timerRef.current = null; 
       }
     };
 

@@ -284,7 +284,8 @@ function StepSequenceRenameDialog(props: StepSequenceRenameDialogProps): JSX.Ele
         <form
           className="space-y-3"
           onSubmit={(e) => {
-            e.preventDefault(); handleApply(); 
+            e.preventDefault();
+            handleApply();
           }}
         >
           <div className="grid grid-cols-2 gap-3">

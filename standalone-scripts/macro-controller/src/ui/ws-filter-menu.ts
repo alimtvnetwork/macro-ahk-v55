@@ -190,34 +190,8 @@ function persistCompactMode(active: boolean): void {
   }
 }
 
-/** Build the popover panel (initially hidden). */
-function buildFilterRowConfigs(deps: WsFilterMenuDeps): FilterRowConfig[] {
+function buildFilterRowConfigsPart2(deps: WsFilterMenuDeps): FilterRowConfig[] {
   return [
-    {
-      id: ID_FREE_FILTER, icon: '🆓', label: 'Free only', hint: 'daily > 0',
-      initialActive: deps.getLoopWsFreeOnly(),
-      onToggle: function (active: boolean) {
-        deps.setLoopWsFreeOnly(active); 
-      },
-    },
-    {
-      id: ID_ROLLOVER_FILTER, icon: '🔄', label: 'Rollover only', hint: 'rollover > 0',
-      initialActive: false,
-      onToggle: function () { /* state lives on data-active attr */ },
-    },
-    {
-      id: ID_BILLING_FILTER, icon: '💰', label: 'Billing only', hint: 'billing > 0',
-      initialActive: false,
-      onToggle: function () { /* state lives on data-active attr */ },
-    },
-    {
-      id: ID_EXPIRED_CREDITS_FILTER, icon: '⏰', label: 'Expired w/ credits',
-      hint: 'available > 5, sorted desc',
-      initialActive: deps.getLoopWsExpiredWithCredits(),
-      onToggle: function (active: boolean) {
-        deps.setLoopWsExpiredWithCredits(active); 
-      },
-    },
     {
       id: ID_EXPIRING_FILTER, icon: '⚠️', label: 'Expiring',
       hint: 'past-due only, sorted by urgency',
@@ -253,6 +227,38 @@ function buildFilterRowConfigs(deps: WsFilterMenuDeps): FilterRowConfig[] {
   ];
 }
 
+/** Build the popover panel (initially hidden). */
+function buildFilterRowConfigs(deps: WsFilterMenuDeps): FilterRowConfig[] {
+  return [
+    {
+      id: ID_FREE_FILTER, icon: '🆓', label: 'Free only', hint: 'daily > 0',
+      initialActive: deps.getLoopWsFreeOnly(),
+      onToggle: function (active: boolean) {
+        deps.setLoopWsFreeOnly(active); 
+      },
+    },
+    {
+      id: ID_ROLLOVER_FILTER, icon: '🔄', label: 'Rollover only', hint: 'rollover > 0',
+      initialActive: false,
+      onToggle: function () { /* state lives on data-active attr */ },
+    },
+    {
+      id: ID_BILLING_FILTER, icon: '💰', label: 'Billing only', hint: 'billing > 0',
+      initialActive: false,
+      onToggle: function () { /* state lives on data-active attr */ },
+    },
+    {
+      id: ID_EXPIRED_CREDITS_FILTER, icon: '⏰', label: 'Expired w/ credits',
+      hint: 'available > 5, sorted desc',
+      initialActive: deps.getLoopWsExpiredWithCredits(),
+      onToggle: function (active: boolean) {
+        deps.setLoopWsExpiredWithCredits(active); 
+      },
+    },
+    ...buildFilterRowConfigsPart2(deps),
+  ];
+}
+
 /**
  * Build the credit-sort section header (separator label inside the popover).
  */
@@ -267,28 +273,28 @@ function buildCreditSortHeader(): HTMLElement {
   return h;
 }
 
+function syncVisualState(activeMode: CreditSortModeType): void {
+  for (const { id, mode } of CREDIT_SORT_ROW_IDS) {
+    const el = document.getElementById(id);
+    if (!el) {
+      continue;
+    }
+
+    const isActive = mode === activeMode;
+    el.setAttribute(DataAttrType.Active, isActive ? 'true' : 'false');
+    const chip = el.querySelector('.marco-credit-sort-chip') as HTMLElement | null;
+    if (chip) {
+      chip.textContent = isActive ? '◉' : '○';
+    }
+  }
+}
+
 /**
  * Set of all credit-sort rows — clicking one activates exclusively (radio).
  * Returns the list of row elements so the caller can append them.
  */
 function buildCreditSortRows(populate: () => void): HTMLElement[] {
   const rows: HTMLElement[] = [];
-
-  function syncVisualState(activeMode: CreditSortModeType): void {
-    for (const { id, mode } of CREDIT_SORT_ROW_IDS) {
-      const el = document.getElementById(id);
-      if (!el) {
-        continue;
-      }
-
-      const isActive = mode === activeMode;
-      el.setAttribute(DataAttrType.Active, isActive ? 'true' : 'false');
-      const chip = el.querySelector('.marco-credit-sort-chip') as HTMLElement | null;
-      if (chip) {
-        chip.textContent = isActive ? '◉' : '○';
-      }
-    }
-  }
 
   const meta: ReadonlyArray<{ id: string; mode: CreditSortModeType; icon: string; label: string; hint: string }> = [
     { id: ID_CREDIT_SORT_HIGH, mode: 'high', icon: '⬇', label: 'High credit', hint: 'all, desc' },

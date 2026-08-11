@@ -61,7 +61,8 @@ function useSessionSubscription(
     });
 
     return () => {
-      cancelled = true; unsubscribe(); 
+      cancelled = true;
+      unsubscribe(); 
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

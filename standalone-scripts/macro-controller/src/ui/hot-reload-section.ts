@@ -1,4 +1,6 @@
 const ERROR_CONTEXT_AUTOCATCH = "AutoCatch", ERROR_MSG_UNHANDLED = "Unhandled exception";
+const ERROR_CONTEXT_MACRO = 'MacroController';
+const ERROR_MSG_UNKNOWN = 'Unknown error';
 import { Timings } from "../constants/timing";
 /**
  * MacroLoop Controller — Script Re-Inject Section (Issue 77, Task 8.5)
@@ -58,7 +60,7 @@ function saveStateBeforeReinject(): void {
       });
       localStorage.setItem(REINJECT_KEYS.creditData, creditSnapshot);
     } catch (_e) {
-      logError('MacroController', 'Unknown error');
+      logError(ERROR_CONTEXT_MACRO, ERROR_MSG_UNKNOWN);
       logSub('Re-inject: credit snapshot save failed — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
     }
 
@@ -88,7 +90,7 @@ export function restoreReinjectState(): { restored: boolean; loopWasRunning: boo
       try {
         localStorage.removeItem(k); 
       } catch (_e) {
-        logError('MacroController', 'Unknown error');
+        logError(ERROR_CONTEXT_MACRO, ERROR_MSG_UNKNOWN);
         logSub('Re-inject: failed to clear key ' + k + ' — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
       }
     });
@@ -132,7 +134,7 @@ export function checkAndRestoreReinjectState(): { restored: boolean; loopWasRunn
       try {
         localStorage.removeItem(k); 
       } catch (_e) {
-        logError('MacroController', 'Unknown error');
+        logError(ERROR_CONTEXT_MACRO, ERROR_MSG_UNKNOWN);
         logSub('Re-inject: failed to clear key ' + k + ' — ' + (_e instanceof Error ? _e.message : String(_e)), 1);
       }
     });
@@ -247,7 +249,7 @@ function performVersionCheck(ctx: VersionCheckCtx): void {
   try {
     resultPromise = sendToExtension('GET_SCRIPT_INFO', { scriptName: 'macroController' }) as Promise<ExtensionResponse> | undefined;
   } catch (err) {
-    logError('MacroController', 'Unknown error');
+    logError(ERROR_CONTEXT_MACRO, ERROR_MSG_UNKNOWN);
     resultPromise = undefined;
   }
 

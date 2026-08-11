@@ -22,7 +22,7 @@ const RESULT_WEBHOOK_ALIAS_IMPORT =
 const RESULT_WEBHOOK_REL_PATH =
   "src/background/recorder/step-library/result-webhook.ts";
 
-export function ReproBuildErrorPanel() {
+function useCopyToClipboard(text: string, timeout = 2000) {
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<number | null>(null);
 
@@ -32,19 +32,25 @@ export function ReproBuildErrorPanel() {
     }
   }, []);
 
-  const handleClick = async () => {
+  const copy = async () => {
     try {
-      await navigator.clipboard.writeText(REPRO_COMMAND);
+      await navigator.clipboard.writeText(text);
       setCopied(true);
       if (timerRef.current !== null) {
         clearTimeout(timerRef.current);
       }
 
-      timerRef.current = window.setTimeout(() => setCopied(false), 2000);
-    } catch (err) { /* swallowed */
+      timerRef.current = window.setTimeout(() => setCopied(false), timeout);
+    } catch (err) {
       setCopied(false);
     }
   };
+
+  return { copied, copy };
+}
+
+export function ReproBuildErrorPanel() {
+  const { copied, copy } = useCopyToClipboard(REPRO_COMMAND);
 
   return (
     <Card className="p-4 space-y-3">
@@ -69,7 +75,7 @@ export function ReproBuildErrorPanel() {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button size="sm" onClick={handleClick}>
+        <Button size="sm" onClick={copy}>
           {copied ? "Command copied ✓" : "Reproduce build error"}
         </Button>
         <code className="text-xs font-mono text-muted-foreground">

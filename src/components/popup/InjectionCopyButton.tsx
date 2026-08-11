@@ -199,6 +199,7 @@ export function InjectionCopyButton() {
   // broadcast (same channel use-error-count.ts uses) instead of polling
   // every 15s. The poll is kept as a slow fallback (60s) and is paused
   // while the popup tab is hidden.
+  // eslint-disable-next-line max-lines-per-function
   useEffect(() => {
     let cancelled = false;
     let prevCount = 0;
@@ -269,7 +270,8 @@ export function InjectionCopyButton() {
 
     const stopPoll = (): void => {
       if (pollTimerId !== null) {
-        clearInterval(pollTimerId); pollTimerId = null; 
+        clearInterval(pollTimerId);
+        pollTimerId = null; 
       }
     };
 

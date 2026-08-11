@@ -94,7 +94,8 @@ describe('prompt-library-modal - drop-path failure recovery', () => {
     io.performPromptImport.mockReset();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks(); 
   });
 
   it('re-enables controls, restores focus to Import button, and re-arms the drop zone after a failed drop import', async () => {
@@ -114,7 +115,9 @@ describe('prompt-library-modal - drop-path failure recovery', () => {
 
     // Drop -> triggers failing import.
     fireDrop(root, 'first.json');
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
 
     // Controls fully restored after failure.
     expect(btn.disabled).toBe(false);
@@ -138,7 +141,9 @@ describe('prompt-library-modal - drop-path failure recovery', () => {
 
     // A follow-up drop actually invokes performPromptImport a second time.
     fireDrop(root, 'second.json');
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
     expect(io.performPromptImport).toHaveBeenCalledTimes(2);
   });
 });

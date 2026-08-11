@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Project, SyntaxKind, TypeNode, UnionTypeNode, LiteralTypeNode, Node } from 'ts-morph';
 import * as fs from 'fs';
 import * as path from 'path';

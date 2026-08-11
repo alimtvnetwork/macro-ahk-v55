@@ -603,7 +603,8 @@ export async function runTaskNextQueue(deps: TaskNextDeps, count: number): Promi
     for (let k = 0; k < n; k++) {
       const status = await runTaskNextCycle(deps, legacyText, k, n, waitForLovableIdle);
       if (status !== 'ok') {
-        reportCycleStatus(status, k, n); break; 
+        reportCycleStatus(status, k, n);
+        break; 
       }
     }
 

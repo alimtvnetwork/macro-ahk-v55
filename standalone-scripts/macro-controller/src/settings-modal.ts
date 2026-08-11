@@ -307,7 +307,8 @@ export function showSettingsModal(): void {
       if (action === 'close' || action === 'cancel') {
         hideSettingsModal();
       } else if (action === 'submit') {
-        snapshotInputs(); void doSubmit(); 
+        snapshotInputs();
+        void doSubmit();
       } else if (action === 'reset') {
         void doReset();
       }

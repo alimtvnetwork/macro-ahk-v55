@@ -9,21 +9,11 @@ import { useMemo, useState } from "react";
 
 import type { StepGroupRow } from "@/background/recorder/step-library/db";
 
-export function useListPanelSelection(
-  filtered: ReadonlyArray<StepGroupRow>,
-  allGroups: ReadonlyArray<StepGroupRow>,
+// eslint-disable-next-line max-lines-per-function
+function useSelectionToggles(
+  visibleIds: ReadonlyArray<number>,
+  setSelected: React.Dispatch<React.SetStateAction<ReadonlySet<number>>>,
 ) {
-  const [selected, setSelected] = useState<ReadonlySet<number>>(new Set());
-
-  const visibleIds = useMemo(
-    () => filtered.map((g) => g.StepGroupId),
-    [filtered],
-  );
-  const allVisibleSelected =
-        visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
-  const someVisibleSelected =
-        !allVisibleSelected && visibleIds.some((id) => selected.has(id));
-
   const toggleOne = (id: number, on: boolean) => {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -55,6 +45,27 @@ export function useListPanelSelection(
   };
 
   const clearSelection = () => setSelected(new Set());
+
+  return { toggleOne, toggleAllVisible, clearSelection };
+}
+
+// eslint-disable-next-line max-lines-per-function
+export function useListPanelSelection(
+  filtered: ReadonlyArray<StepGroupRow>,
+  allGroups: ReadonlyArray<StepGroupRow>,
+) {
+  const [selected, setSelected] = useState<ReadonlySet<number>>(new Set());
+
+  const visibleIds = useMemo(
+    () => filtered.map((g) => g.StepGroupId),
+    [filtered],
+  );
+  const allVisibleSelected =
+        visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
+  const someVisibleSelected =
+        !allVisibleSelected && visibleIds.some((id) => selected.has(id));
+
+  const { toggleOne, toggleAllVisible, clearSelection } = useSelectionToggles(visibleIds, setSelected);
 
   const selectedGroups = useMemo(
     () => allGroups.filter((g) => selected.has(g.StepGroupId)),

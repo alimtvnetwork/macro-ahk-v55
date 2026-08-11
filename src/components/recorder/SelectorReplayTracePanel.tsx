@@ -74,10 +74,8 @@ function StatusIcon({ status }: { readonly status: TraceStepStatus }) {
   }
 }
 
-export function SelectorReplayTracePanel({ report, embedded }: SelectorReplayTracePanelProps) {
-  const trace = buildReplayTrace(report.Selectors);
-
-  const body = (
+function SelectorReplayTracePanelBody({ trace, report }: { readonly trace: ReturnType<typeof buildReplayTrace>; readonly report: FailureReport }) {
+  return (
     <div className="space-y-2.5" data-testid="selector-replay-trace">
       <SummaryBar
         total={trace.Summary.Total}
@@ -105,6 +103,12 @@ export function SelectorReplayTracePanel({ report, embedded }: SelectorReplayTra
       )}
     </div>
   );
+}
+
+export function SelectorReplayTracePanel({ report, embedded }: SelectorReplayTracePanelProps) {
+  const trace = buildReplayTrace(report.Selectors);
+
+  const body = <SelectorReplayTracePanelBody trace={trace} report={report} />;
 
   if (embedded === true) {
     return (
@@ -192,9 +196,6 @@ function SummaryBar({
 }
 
 function TraceStepRow({ step }: { readonly step: TraceStep }) {
-  const showResolvedDistinct =
-        step.ResolvedExpression !== step.Expression && step.Expression.length > 0;
-
   return (
     <li
       data-testid="trace-step-row"
@@ -203,28 +204,44 @@ function TraceStepRow({ step }: { readonly step: TraceStep }) {
       data-role={step.Role}
       className={`relative rounded-md border ${STATUS_TONE[step.Status]} p-2 text-xs space-y-1`}
     >
-      <div className="flex items-center gap-2 flex-wrap">
-        <Badge variant="outline" className="text-[10px] font-mono px-1.5 py-0">
-                    #{step.Order}
-        </Badge>
-        <StatusIcon status={step.Status} />
-        <Badge
-          variant={step.Status === "matched" ? "default" : "outline"}
-          className="text-[10px] px-1.5 py-0"
-        >
-          {STATUS_LABEL[step.Status]}
-        </Badge>
-        <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-          {step.Role}
-        </Badge>
-        <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-          {step.Strategy}
-        </Badge>
-        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 ml-auto">
-          {step.MatchCount} match{step.MatchCount === 1 ? "" : "es"}
-        </Badge>
-      </div>
+      <TraceStepRowHeader step={step} />
+      <TraceStepRowDetails step={step} />
+    </li>
+  );
+}
 
+function TraceStepRowHeader({ step }: { readonly step: TraceStep }) {
+  return (
+    <div className="flex items-center gap-2 flex-wrap">
+      <Badge variant="outline" className="text-[10px] font-mono px-1.5 py-0">
+                  #{step.Order}
+      </Badge>
+      <StatusIcon status={step.Status} />
+      <Badge
+        variant={step.Status === "matched" ? "default" : "outline"}
+        className="text-[10px] px-1.5 py-0"
+      >
+        {STATUS_LABEL[step.Status]}
+      </Badge>
+      <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+        {step.Role}
+      </Badge>
+      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+        {step.Strategy}
+      </Badge>
+      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 ml-auto">
+        {step.MatchCount} match{step.MatchCount === 1 ? "" : "es"}
+      </Badge>
+    </div>
+  );
+}
+
+function TraceStepRowDetails({ step }: { readonly step: TraceStep }) {
+  const showResolvedDistinct =
+        step.ResolvedExpression !== step.Expression && step.Expression.length > 0;
+
+  return (
+    <>
       <div className="pl-5">
         <code
           className="block break-all font-mono text-foreground"
@@ -253,6 +270,6 @@ function TraceStepRow({ step }: { readonly step: TraceStep }) {
           )}
         </span>
       </div>
-    </li>
+    </>
   );
 }

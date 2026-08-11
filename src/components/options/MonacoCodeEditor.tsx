@@ -125,11 +125,13 @@ function highlightJavascript(raw: string): string {
       let j = i + 1;
       while (j < raw.length) {
         if (raw[j] === "\\" && q !== "`") {
-          j += 2; continue; 
+          j += 2;
+          continue; 
         }
 
         if (raw[j] === q) {
-          j++; break; 
+          j++;
+          break; 
         }
 
         if (q !== "`" && raw[j] === "\n") {

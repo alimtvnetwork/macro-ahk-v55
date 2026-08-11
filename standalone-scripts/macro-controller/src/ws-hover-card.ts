@@ -743,6 +743,70 @@ interface WsHoverHandlerStore {
   _wsHoverCardOut?: (e: MouseEvent) => void;
 }
 
+function handleWorkspaceHoverOver(e: MouseEvent, lookup: WsLookup): void {
+  const config = getWorkspaceLifecycleConfig();
+  if (!config.enableWorkspaceHoverDetails) {
+    return;
+  }
+
+  const target = e.target as HTMLElement | null;
+  if (!target) {
+    return;
+  }
+
+  const nameEl = target.closest(SEL_WS_NAME) as HTMLElement | null;
+  if (!nameEl) {
+    return;
+  }
+
+  const item = nameEl.closest(SEL_WS_ITEM) as HTMLElement | null;
+  if (!item) {
+    return;
+  }
+
+  const wsId = item.getAttribute('data-ws-id') || '';
+  if (!wsId) {
+    return;
+  }
+
+  const ws = lookup(wsId);
+  if (!ws) {
+    return;
+  }
+
+  cancelHideTimer();
+  const status = getEffectiveStatus(ws, config);
+  const card = ensureCardElement();
+  card.innerHTML = buildWorkspaceHoverHtml(ws, status, config);
+  positionCard(card, item);
+}
+
+function handleWorkspaceHoverOut(e: MouseEvent): void {
+  const target = e.target as HTMLElement | null;
+  if (!target) {
+    return;
+  }
+
+  if (!target.closest(SEL_WS_NAME)) {
+    return;
+  }
+
+  const related = e.relatedTarget as HTMLElement | null;
+  if (related && related.closest(SEL_WS_NAME)) {
+    return;
+  }
+
+  // Don't hide immediately — give the user time to move onto the card and
+  // click <details> or copy IDs. The card's own mouseenter cancels the timer.
+  if (related && related.closest('#' + HOVERCARD_ID)) {
+    cancelHideTimer();
+
+    return;
+  }
+
+  scheduleHide();
+}
+
 /**
  * Attach delegated `mouseover`/`mouseout` listeners to the workspace list
  * container. Triggers only when the cursor enters a `.loop-ws-name` span.
@@ -760,68 +824,10 @@ export function attachWorkspaceHoverCard(listEl: HTMLElement, lookup: WsLookup):
   }
 
   const overHandler = function (e: MouseEvent): void {
-    const config = getWorkspaceLifecycleConfig();
-    if (!config.enableWorkspaceHoverDetails) {
-      return;
-    }
-
-    const target = e.target as HTMLElement | null;
-    if (!target) {
-      return;
-    }
-
-    const nameEl = target.closest(SEL_WS_NAME) as HTMLElement | null;
-    if (!nameEl) {
-      return;
-    }
-
-    const item = nameEl.closest(SEL_WS_ITEM) as HTMLElement | null;
-    if (!item) {
-      return;
-    }
-
-    const wsId = item.getAttribute('data-ws-id') || '';
-    if (!wsId) {
-      return;
-    }
-
-    const ws = lookup(wsId);
-    if (!ws) {
-      return;
-    }
-
-    cancelHideTimer();
-    const status = getEffectiveStatus(ws, config);
-    const card = ensureCardElement();
-    card.innerHTML = buildWorkspaceHoverHtml(ws, status, config);
-    positionCard(card, item);
+    handleWorkspaceHoverOver(e, lookup);
   };
 
-  const outHandler = function (e: MouseEvent): void {
-    const target = e.target as HTMLElement | null;
-    if (!target) {
-      return;
-    }
-
-    if (!target.closest(SEL_WS_NAME)) {
-      return;
-    }
-
-    const related = e.relatedTarget as HTMLElement | null;
-    if (related && related.closest(SEL_WS_NAME)) {
-      return;
-    }
-
-    // Don't hide immediately — give the user time to move onto the card and
-    // click <details> or copy IDs. The card's own mouseenter cancels the timer.
-    if (related && related.closest('#' + HOVERCARD_ID)) {
-      cancelHideTimer();
-
-      return;
-    }
-
-    scheduleHide();
-  };
+  const outHandler = handleWorkspaceHoverOut;
 
   store._wsHoverCardOver = overHandler;
   store._wsHoverCardOut = outHandler;

@@ -161,11 +161,11 @@ interface PointerDragRefs {
     readonly activePointerRef: React.MutableRefObject<number | null>;
 }
 
-function usePointerDragHandlers(
+function usePointerMoveAndUpHandlers(
   refs: PointerDragRefs,
   setPosition: React.Dispatch<React.SetStateAction<DragPosition | null>>,
   setIsDragging: React.Dispatch<React.SetStateAction<boolean>>,
-): (e: React.PointerEvent<HTMLElement>) => void {
+) {
   const { containerRef, offsetRef, activePointerRef } = refs;
 
   const onPointerMove = useCallback((e: PointerEvent) => {
@@ -200,6 +200,17 @@ function usePointerDragHandlers(
       return p; 
     });
   }, [activePointerRef, onPointerMove, setIsDragging, setPosition]);
+
+  return { onPointerMove, onPointerUp };
+}
+
+function usePointerDragHandlers(
+  refs: PointerDragRefs,
+  setPosition: React.Dispatch<React.SetStateAction<DragPosition | null>>,
+  setIsDragging: React.Dispatch<React.SetStateAction<boolean>>,
+): (e: React.PointerEvent<HTMLElement>) => void {
+  const { containerRef, offsetRef, activePointerRef } = refs;
+  const { onPointerMove, onPointerUp } = usePointerMoveAndUpHandlers(refs, setPosition, setIsDragging);
 
   return useCallback((e: React.PointerEvent<HTMLElement>) => {
     if (e.button !== 0) {
@@ -237,7 +248,8 @@ export function useDraggable(): UseDraggableResult {
     setIsDragging,
   );
   const reset = useCallback(() => {
-    setPosition(null); clearStoredPosition(); 
+    setPosition(null);
+    clearStoredPosition(); 
   }, []);
 
   return {

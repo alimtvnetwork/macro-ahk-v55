@@ -132,31 +132,38 @@ function handleCtrlOnlyShortcut(e: KeyboardEvent, deps: KeyboardHandlerDeps): bo
   }
 
   if (e.key === ',' || e.code === 'Comma') {
-    e.preventDefault(); showSettingsDialog(settingsDeps);
+    e.preventDefault();
+    showSettingsDialog(settingsDeps);
 
     return true; 
   }
 
   if (e.key === '1') {
-    e.preventDefault(); positionLoopController(plCtx, 'bottom-left');
+    e.preventDefault();
+    positionLoopController(plCtx, 'bottom-left');
 
     return true; 
   }
 
   if (e.key === '3') {
-    e.preventDefault(); positionLoopController(plCtx, 'bottom-right');
+    e.preventDefault();
+    positionLoopController(plCtx, 'bottom-right');
 
     return true; 
   }
 
   if (e.key === 'ArrowUp') {
-    e.preventDefault(); log('Ctrl+Up → Force Move UP via API'); forceSwitch('up');
+    e.preventDefault();
+    log('Ctrl+Up → Force Move UP via API');
+    forceSwitch('up');
 
     return true; 
   }
 
   if (e.key === 'ArrowDown') {
-    e.preventDefault(); log('Ctrl+Down → Force Move DOWN via API'); forceSwitch('down');
+    e.preventDefault();
+    log('Ctrl+Down → Force Move DOWN via API');
+    forceSwitch('down');
 
     return true; 
   }

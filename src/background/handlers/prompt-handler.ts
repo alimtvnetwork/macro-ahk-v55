@@ -323,24 +323,9 @@ async function migrateFromStorageIfNeeded(): Promise<void> {
       return;
     }
 
-    try {
-      const syncResult = await chrome.storage.sync.get(LEGACY_STORAGE_KEY);
-      const syncData = syncResult[LEGACY_STORAGE_KEY];
-      if (Array.isArray(syncData) && syncData.length > 0 && legacyPrompts.length === 0) {
-        for (const prompt of syncData) {
-          insertPromptRow(prompt as PromptEntry);
-        }
-
-        await chrome.storage.sync.remove(LEGACY_STORAGE_KEY);
-        console.log(`[prompts] Migrated ${syncData.length} prompts from sync → SQLite`);
-        markDirty();
-
-        return;
-      }
-    } catch (syncErr) {
-      // chrome.storage.sync may be unavailable (rare in MV3, but possible
-      // when sync is disabled at the browser level). Migration falls through.
-      console.debug("[prompts] chrome.storage.sync legacy migration unavailable:", syncErr);
+    const handledBySync = await attemptSyncMigration(legacyPrompts);
+    if (handledBySync) {
+      return;
     }
 
     for (const prompt of legacyPrompts) {
@@ -631,26 +616,32 @@ export async function handleSavePrompt(payload: { prompt: Partial<PromptEntry> }
     const values: (string | number)[] = [];
 
     if (input.prompt.name !== undefined) {
-      setClauses.push("Name = ?"); values.push(input.prompt.name); 
+      setClauses.push("Name = ?"); 
+      values.push(input.prompt.name); 
     }
 
     if (input.prompt.text !== undefined) {
-      setClauses.push("Text = ?"); values.push(input.prompt.text); 
+      setClauses.push("Text = ?"); 
+      values.push(input.prompt.text); 
     }
 
     if (input.prompt.order !== undefined) {
-      setClauses.push("SortOrder = ?"); values.push(input.prompt.order); 
+      setClauses.push("SortOrder = ?"); 
+      values.push(input.prompt.order); 
     }
 
     if (input.prompt.isFavorite !== undefined) {
-      setClauses.push("IsFavorite = ?"); values.push(input.prompt.isFavorite ? 1 : 0); 
+      setClauses.push("IsFavorite = ?"); 
+      values.push(input.prompt.isFavorite ? 1 : 0); 
     }
 
     if (input.prompt.tags !== undefined) {
-      setClauses.push("Tags = ?"); values.push(parseTagsField(input.prompt.tags).join(", ")); 
+      setClauses.push("Tags = ?"); 
+      values.push(parseTagsField(input.prompt.tags).join(", ")); 
     }
 
-    setClauses.push("UpdatedAt = ?"); values.push(now);
+    setClauses.push("UpdatedAt = ?"); 
+    values.push(now);
     values.push(Number(promptId));
 
     ServiceResult.wrapDb(() => ServiceResult.wrapDb(() => db.run(`UPDATE Prompts SET ${setClauses.join(", ")} WHERE Id = ?`, values)));

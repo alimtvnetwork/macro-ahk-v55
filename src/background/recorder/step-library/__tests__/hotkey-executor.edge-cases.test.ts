@@ -61,7 +61,8 @@ function makeRecordingEnv(querySelectorImpl?: (sel: string) => Element | null): 
   const env: HotkeyDispatchEnv & { captured: CapturedEvent[]; timeoutDelays: number[] } = {
     document: fakeDoc as unknown as Document,
     setTimeout: ((cb: () => void, ms: number) => {
-      timeoutDelays.push(ms); cb();
+      timeoutDelays.push(ms);
+      cb();
 
       return 0; 
     }) as typeof setTimeout,

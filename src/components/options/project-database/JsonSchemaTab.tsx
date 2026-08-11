@@ -581,7 +581,11 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
             size="sm"
             className="h-7 text-xs gap-1"
             onClick={() => {
-              setSchemaJson(EXAMPLE_SCHEMA); setLastResult(null); setLastError(null); setDocsOutput(null); setDiffMode(false); 
+              setSchemaJson(EXAMPLE_SCHEMA);
+              setLastResult(null);
+              setLastError(null);
+              setDocsOutput(null);
+              setDiffMode(false); 
             }}
           >
             <RotateCcw className="h-3 w-3" /> Reset
@@ -615,7 +619,8 @@ export function JsonSchemaTab({ projectSlug, onMigrationComplete }: Props) {
               </p>
               <div className="flex gap-1">
                 <Button variant="ghost" size="sm" className="h-6 text-[10px] gap-1" onClick={() => {
-                  navigator.clipboard.writeText(SCHEMA_GUIDE); toast.success("Guide copied"); 
+                  navigator.clipboard.writeText(SCHEMA_GUIDE);
+                  toast.success("Guide copied"); 
                 }}>
                   <ClipboardCopy className="h-3 w-3" /> Copy
                 </Button>

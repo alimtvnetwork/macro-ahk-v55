@@ -81,7 +81,8 @@ describe('prompt-library-modal - drop zone re-arms after a successful import', (
     io.performPromptImport.mockClear();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('dragover reports copy and a second drop invokes performPromptImport again', async () => {
@@ -91,7 +92,11 @@ describe('prompt-library-modal - drop zone re-arms after a successful import', (
 
     // First drop: succeeds.
     fireDrop(root, 'first.json');
-    await tick(); await tick(); await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
+    await tick();
+    await tick();
     expect(io.performPromptImport).toHaveBeenCalledTimes(1);
 
     // Drop zone is idle again: dragover should advertise 'copy'.
@@ -100,7 +105,11 @@ describe('prompt-library-modal - drop zone re-arms after a successful import', (
 
     // Second drop: must be accepted (drop zone re-armed).
     fireDrop(root, 'second.json');
-    await tick(); await tick(); await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
+    await tick();
+    await tick();
     expect(io.performPromptImport).toHaveBeenCalledTimes(2);
   });
 });

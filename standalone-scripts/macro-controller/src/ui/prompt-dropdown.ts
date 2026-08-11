@@ -961,11 +961,13 @@ function _appendPresetCounts(taskNextSub: HTMLElement, promptsDropdown: HTMLElem
     subItem.appendChild(queueBtn);
 
     subItem.onmouseover = function() {
-      (this as HTMLElement).style.background = cBtnMenuHover; queueBtn.style.opacity = '1'; 
+      (this as HTMLElement).style.background = cBtnMenuHover;
+      queueBtn.style.opacity = '1'; 
     };
 
     subItem.onmouseout = function() {
-      (this as HTMLElement).style.background = 'transparent'; queueBtn.style.opacity = '0.6'; 
+      (this as HTMLElement).style.background = 'transparent';
+      queueBtn.style.opacity = '0.6'; 
     };
     
     label.onclick = function(e: Event) {
@@ -991,7 +993,10 @@ function _appendCustomCountRow(taskNextSub: HTMLElement, promptsDropdown: HTMLEl
   customLabel.style.cssText = 'font-size:12px;color:' + cPrimaryLight + ';';
   customRow.appendChild(customLabel);
   const customInput = document.createElement('input');
-  customInput.type = 'number'; customInput.min = '1'; customInput.max = '999'; customInput.placeholder = '#';
+  customInput.type = 'number';
+  customInput.min = '1';
+  customInput.max = '999';
+  customInput.placeholder = '#';
   customInput.style.cssText = 'width:50px;padding:3px 5px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:12px;';
   customInput.onclick = function(e: Event) {
     e.stopPropagation(); 
@@ -999,7 +1004,8 @@ function _appendCustomCountRow(taskNextSub: HTMLElement, promptsDropdown: HTMLEl
 
   customRow.appendChild(customInput);
   const goBtn = document.createElement('span');
-  goBtn.textContent = '▶'; goBtn.title = 'Go';
+  goBtn.textContent = '▶';
+  goBtn.title = 'Go';
   goBtn.style.cssText = 'cursor:pointer;font-size:13px;color:' + cPrimary + ';';
   goBtn.onclick = function(e: Event) {
     e.stopPropagation();
@@ -1021,7 +1027,8 @@ function _appendCustomCountRow(taskNextSub: HTMLElement, promptsDropdown: HTMLEl
 
   customInput.onkeydown = function(e: KeyboardEvent) {
     if (e.key === 'Enter') {
-      e.stopPropagation(); goBtn.click(); 
+      e.stopPropagation();
+      goBtn.click(); 
     } 
   };
 
@@ -1149,6 +1156,43 @@ function bindPromptItemClick(
   };
 }
 
+function _buildPromptItemSourceBadge(p: PromptEntry): HTMLElement | null {
+  if (!p.slug) {
+    return null;
+  }
+
+  const src = getSlugPositionSource(p.slug);
+  const meta = POSITION_SOURCE_META[src.source];
+  const sourceBadge = document.createElement('span');
+  sourceBadge.setAttribute('data-position-source', src.source);
+  sourceBadge.textContent = meta.glyph;
+  sourceBadge.title =
+    meta.tooltip +
+    '\nSlug: ' + p.slug +
+    '\nStorage key: ' + src.storageKey +
+    '\nMigration rev: ' + src.migrationRev + ' / current ' + src.currentRev;
+  sourceBadge.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;min-width:14px;height:14px;padding:0 4px;border-radius:7px;background:' + meta.bg + ';color:#fff;font-size:9px;font-weight:700;margin-right:5px;flex-shrink:0;cursor:help;';
+
+  return sourceBadge;
+}
+
+function _buildPromptItemContentWrap(p: PromptEntry, hasText: boolean): HTMLElement {
+  const nameSpan = document.createElement('span');
+  nameSpan.textContent = p.name + (hasText ? '' : ' (text not loaded)');
+  nameSpan.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25;';
+  nameSpan.title = p.text || 'Prompt text not available, click Load to refresh';
+
+  const contentWrap = document.createElement('div');
+  contentWrap.style.cssText = 'flex:1;display:flex;flex-direction:row;align-items:center;gap:6px;overflow:hidden;min-width:0;';
+  contentWrap.appendChild(nameSpan);
+  const tagsWrap = renderTagsWrap(resolveTags(p));
+  if (tagsWrap) {
+    contentWrap.appendChild(tagsWrap);
+  }
+
+  return contentWrap;
+}
+
 function renderPromptItem(
   idx: number, p: PromptEntry, promptsDropdown: HTMLElement,
   promptsCfg: ReturnType<typeof getPromptsConfig>, ctx: PromptContext, taskNextDeps: TaskNextDeps
@@ -1178,35 +1222,12 @@ function renderPromptItem(
   badge.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;background:' + (hasText ? cPrimary : 'rgba(124,58,237,0.3)') + ';color:' + cPanelFg + ';font-size:10px;font-weight:700;margin-right:5px;flex-shrink:0;';
   item.appendChild(badge);
 
-  if (p.slug) {
-    const src = getSlugPositionSource(p.slug);
-    const meta = POSITION_SOURCE_META[src.source];
-    const sourceBadge = document.createElement('span');
-    sourceBadge.setAttribute('data-position-source', src.source);
-    sourceBadge.textContent = meta.glyph;
-    sourceBadge.title =
-      meta.tooltip +
-      '\nSlug: ' + p.slug +
-      '\nStorage key: ' + src.storageKey +
-      '\nMigration rev: ' + src.migrationRev + ' / current ' + src.currentRev;
-    sourceBadge.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;min-width:14px;height:14px;padding:0 4px;border-radius:7px;background:' + meta.bg + ';color:#fff;font-size:9px;font-weight:700;margin-right:5px;flex-shrink:0;cursor:help;';
+  const sourceBadge = _buildPromptItemSourceBadge(p);
+  if (sourceBadge) {
     item.appendChild(sourceBadge);
   }
 
-  const nameSpan = document.createElement('span');
-  nameSpan.textContent = p.name + (hasText ? '' : ' (text not loaded)');
-  nameSpan.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25;';
-  nameSpan.title = p.text || 'Prompt text not available, click Load to refresh';
-
-  const contentWrap = document.createElement('div');
-  contentWrap.style.cssText = 'flex:1;display:flex;flex-direction:row;align-items:center;gap:6px;overflow:hidden;min-width:0;';
-  contentWrap.appendChild(nameSpan);
-  const tagsWrap = renderTagsWrap(resolveTags(p));
-  if (tagsWrap) {
-    contentWrap.appendChild(tagsWrap);
-  }
-
-  item.appendChild(contentWrap);
+  item.appendChild(_buildPromptItemContentWrap(p, hasText));
 
   const actions = document.createElement('span');
   actions.setAttribute('data-prompt-actions', '');

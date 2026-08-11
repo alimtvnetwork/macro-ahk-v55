@@ -77,9 +77,11 @@ function getChrome(): ChromeApiLike | null {
   return api;
 }
 
+const CHROME_STORAGE = "chrome.storage";
+
 export function detectTransport(): RecorderSyncTransport {
   if (getChrome()?.storage?.local !== undefined) {
-    return "chrome.storage"; 
+    return CHROME_STORAGE; 
   }
 
   if (typeof window !== "undefined" && typeof window.localStorage !== "undefined") {
@@ -122,7 +124,7 @@ const memoryStore = { current: null as RecordingSession | null };
 
 export async function readSession(): Promise<RecordingSession | null> {
   const transport = detectTransport();
-  if (transport === "chrome.storage") {
+  if (transport === CHROME_STORAGE) {
     const local = getChrome()!.storage!.local!;
     const result = await local.get(RECORDER_SESSION_STORAGE_KEY);
 
@@ -149,7 +151,7 @@ export async function readSession(): Promise<RecordingSession | null> {
 
 export async function writeSession(session: RecordingSession): Promise<void> {
   const transport = detectTransport();
-  if (transport === "chrome.storage") {
+  if (transport === CHROME_STORAGE) {
     const local = getChrome()!.storage!.local!;
     if (session.Phase === "Idle") {
       await local.remove(RECORDER_SESSION_STORAGE_KEY);
@@ -214,34 +216,27 @@ function dispatch(session: RecordingSession | null): void {
   }
 }
 
-function installTransport(): void {
-  if (installedTransport !== null) {
-    return; 
+function installChromeTransport(): void {
+  const onChanged = getChrome()?.storage?.onChanged;
+  if (onChanged !== undefined) {
+    chromeListener = (changes, area) => {
+      if (area !== "local") {
+        return; 
+      }
+
+      const change = changes[RECORDER_SESSION_STORAGE_KEY];
+      if (change === undefined) {
+        return; 
+      }
+
+      dispatch(parseSession(change.newValue));
+    };
+
+    onChanged.addListener(chromeListener);
   }
+}
 
-  const transport = detectTransport();
-  installedTransport = transport;
-
-  if (transport === "chrome.storage") {
-    const onChanged = getChrome()?.storage?.onChanged;
-    if (onChanged !== undefined) {
-      chromeListener = (changes, area) => {
-        if (area !== "local") {
-          return; 
-        }
-
-        const change = changes[RECORDER_SESSION_STORAGE_KEY];
-        if (change === undefined) {
-          return; 
-        }
-
-        dispatch(parseSession(change.newValue));
-      };
-
-      onChanged.addListener(chromeListener);
-    }
-  }
-
+function installWindowTransport(): void {
   if (typeof window !== "undefined") {
     domStorageListener = (e: StorageEvent) => {
       if (e.key !== RECORDER_SESSION_STORAGE_KEY) {
@@ -263,6 +258,21 @@ function installTransport(): void {
     window.addEventListener("storage", domStorageListener);
     window.addEventListener(LOCAL_CHANGE_EVENT, localBusListener);
   }
+}
+
+function installTransport(): void {
+  if (installedTransport !== null) {
+    return; 
+  }
+
+  const transport = detectTransport();
+  installedTransport = transport;
+
+  if (transport === CHROME_STORAGE) {
+    installChromeTransport();
+  }
+
+  installWindowTransport();
 }
 
 function teardownTransport(): void {

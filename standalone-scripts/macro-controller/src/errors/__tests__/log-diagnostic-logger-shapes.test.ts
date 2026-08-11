@@ -44,7 +44,8 @@ function spyOnFallback(): FallbackSpies {
     err,
     log,
     restore: () => {
-      err.mockRestore(); log.mockRestore(); 
+      err.mockRestore();
+      log.mockRestore(); 
     },
   };
 }

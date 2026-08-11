@@ -332,7 +332,8 @@ function debounce<A extends unknown[]>(fn: (...args: A) => void, ms: number): (.
     }
 
     timer = setTimeout(function () {
-      timer = null; fn(...args); 
+      timer = null;
+      fn(...args); 
     }, ms);
   };
 }
@@ -350,7 +351,8 @@ function throttle<A extends unknown[]>(fn: (...args: A) => void, ms: number): (.
     const remaining = ms - (now - last);
     if (remaining <= 0) {
       if (timer !== null) {
-        clearTimeout(timer); timer = null; 
+        clearTimeout(timer);
+        timer = null; 
       }
 
       last = now;

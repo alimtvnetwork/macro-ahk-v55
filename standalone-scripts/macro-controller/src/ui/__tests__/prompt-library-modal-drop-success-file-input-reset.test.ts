@@ -75,7 +75,8 @@ describe('prompt-library-modal - drop success clears file input value', () => {
     io.performPromptImport.mockClear();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('fileInput.value is empty after a successful drop-triggered import', async () => {
@@ -87,7 +88,11 @@ describe('prompt-library-modal - drop success clears file input value', () => {
     fileInput.value = '';
 
     fireDrop(getRoot(), 'ok.json');
-    await tick(); await tick(); await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
+    await tick();
+    await tick();
 
     expect(io.performPromptImport).toHaveBeenCalledTimes(1);
     expect(fileInput.value).toBe('');

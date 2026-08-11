@@ -87,7 +87,8 @@ describe("timeline reducer", () => {
     }
 
     if (b.Kind === "Step") {
-      expect(b.LabelType).toBe("Wait 250ms"); expect(b.StepIndex).toBe(1); 
+      expect(b.LabelType).toBe("Wait 250ms");
+      expect(b.StepIndex).toBe(1); 
     }
   });
 

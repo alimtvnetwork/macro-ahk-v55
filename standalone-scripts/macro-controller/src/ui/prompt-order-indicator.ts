@@ -133,7 +133,8 @@ export function buildPromptOrderIndicator(): HTMLElement {
   });
   badge.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault(); openOrderPopover(badge); 
+      e.preventDefault();
+      openOrderPopover(badge); 
     }
   });
 

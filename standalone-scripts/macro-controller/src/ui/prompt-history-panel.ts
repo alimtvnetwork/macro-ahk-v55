@@ -220,7 +220,8 @@ function renderLastImportError(): void {
   clear.setAttribute('type', 'button');
   clear.style.cssText = 'background:transparent;border:1px solid #7f1d1d;color:#fca5a5;font-size:10px;padding:0 6px;border-radius:3px;cursor:pointer;flex-shrink:0;';
   clear.onclick = () => {
-    _lastImportError = null; renderLastImportError(); 
+    _lastImportError = null;
+    renderLastImportError(); 
   };
 
   host.appendChild(label);
@@ -412,13 +413,7 @@ function buildLastErrorArea(doc: Document): HTMLElement {
   return lastErr;
 }
 
-function buildPanel(
-  doc: Document,
-  slug: string,
-  revisions: PromptRevisionRow[],
-  role: PromptRole,
-  deps: HistoryPanelDeps,
-): HTMLElement {
+function _buildPanelContainer(doc: Document, slug: string): { overlay: HTMLElement; card: HTMLElement } {
   const overlay = doc.createElement('div');
   overlay.id = PANEL_ID;
   overlay.setAttribute('role', 'dialog');
@@ -428,6 +423,18 @@ function buildPanel(
   const card = doc.createElement('div');
   card.style.cssText = 'background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;width:min(720px,92vw);max-height:82vh;display:flex;flex-direction:column;gap:10px;font-family:system-ui,sans-serif;color:#e5e7eb;';
   overlay.appendChild(card);
+
+  return { overlay, card };
+}
+
+function buildPanel(
+  doc: Document,
+  slug: string,
+  revisions: PromptRevisionRow[],
+  role: PromptRole,
+  deps: HistoryPanelDeps,
+): HTMLElement {
+  const { overlay, card } = _buildPanelContainer(doc, slug);
 
   card.appendChild(buildPanelHeader(doc, slug, role, revisions, deps));
 

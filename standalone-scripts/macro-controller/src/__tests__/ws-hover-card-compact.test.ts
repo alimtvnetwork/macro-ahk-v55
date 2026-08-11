@@ -20,7 +20,8 @@ const NOW = Date.parse('2026-04-22T00:00:00Z');
 const MS_PER_DAY = 86_400_000;
 
 beforeAll(() => {
-  vi.useFakeTimers(); vi.setSystemTime(new Date(NOW)); 
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date(NOW)); 
 });
 afterAll(() => {
   vi.useRealTimers(); 

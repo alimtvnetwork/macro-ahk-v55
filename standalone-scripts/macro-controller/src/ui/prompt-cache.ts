@@ -170,11 +170,13 @@ function writeRecord(storeName: string, record: Record<string, unknown>): Promis
         const tx = db.transaction(storeName, 'readwrite');
         tx.objectStore(storeName).put(record);
         tx.oncomplete = function() {
-          db.close(); resolve(); 
+          db.close();
+          resolve(); 
         };
 
         tx.onerror = function() {
-          db.close(); resolve(); 
+          db.close();
+          resolve(); 
         };
       } catch (e) {
         logError('MacroController', 'Unknown error');
@@ -195,11 +197,13 @@ function deleteRecord(storeName: string, key: string): Promise<void> {
         const tx = db.transaction(storeName, 'readwrite');
         tx.objectStore(storeName).delete(key);
         tx.oncomplete = function() {
-          db.close(); resolve(); 
+          db.close();
+          resolve(); 
         };
 
         tx.onerror = function() {
-          db.close(); resolve(); 
+          db.close();
+          resolve(); 
         };
       } catch (_e) {
         log('[PromptCache] deleteRecord(' + storeName + ') transaction failed: ' + (_e instanceof Error ? _e.message : String(_e)), 'warn');

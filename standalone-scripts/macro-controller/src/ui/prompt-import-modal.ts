@@ -273,7 +273,8 @@ function renderIdle(body: HTMLElement, onFile: (file: File) => void): void {
     + '<div style="font-size:13px;color:#ddd;margin-bottom:4px;">Drop a .json, .zip, or .sqlite file here</div>'
     + '<div style="font-size:11px;color:#888;">or click to choose a file</div>';
   drop.ondragover = (ev) => {
-    ev.preventDefault(); drop.style.background = 'rgba(124,58,237,0.12)'; 
+    ev.preventDefault();
+    drop.style.background = 'rgba(124,58,237,0.12)'; 
   };
 
   drop.ondragleave = () => {
@@ -294,7 +295,8 @@ function renderIdle(body: HTMLElement, onFile: (file: File) => void): void {
     input.type = 'file';
     input.accept = '.json,.zip,.sqlite,.db';
     input.onchange = () => {
-      const f = input.files && input.files[0]; if (f) {
+      const f = input.files && input.files[0];
+      if (f) {
         onFile(f);
       } 
     };
@@ -453,7 +455,8 @@ function renderError(body: HTMLElement, input: RenderErrorInput): void {
   applyStyle(retry, 'color:#93c5fd;cursor:pointer;font-size:11px;');
   retry.textContent = 'Try another file';
   retry.onclick = (ev) => {
-    ev.preventDefault(); input.onRetry(); 
+    ev.preventDefault();
+    input.onRetry(); 
   };
 
   actions.appendChild(retry);
@@ -464,7 +467,8 @@ function renderError(body: HTMLElement, input: RenderErrorInput): void {
     audit.textContent = 'View audit entry (' + input.auditId.slice(0, 24) + '...)';
     audit.title = 'Audit id: ' + input.auditId;
     audit.onclick = (ev) => {
-      ev.preventDefault(); input.onViewAudit(); 
+      ev.preventDefault();
+      input.onViewAudit(); 
     };
 
     actions.appendChild(audit);
@@ -667,7 +671,8 @@ export function openPromptImportModal(deps: ImportModalDeps): void {
   const refs: ModalRefs = { root, body, primaryBtn, cancelBtn, onCommit: async () => { /* set below */ } };
   const rerender = (): void => renderStage(state, refs, deps, transition);
   const transition = (next: Stage): void => {
-    state.stage = next; rerender(); 
+    state.stage = next;
+    rerender(); 
   };
 
   refs.onCommit = () => performImportCommit(state, refs, deps, transition, close);
@@ -724,31 +729,33 @@ function renderStage(state: ModalState, refs: ModalRefs, deps: ImportModalDeps, 
       hint: state.errorHint,
       auditId: state.errorAuditId,
       onRetry: () => transition('idle'),
-      onViewAudit: () => {
-        // Deep-link: dump the audit entry to the console so power users
-        // can inspect. Step 27's E2E asserts on this log line.
-        void import('./prompt-import-audit').then((mod) => {
-          const entry = mod.readImportAudit().find((e) => e.id === state.errorAuditId);
-          void import('./prompt-import-errors').then((errMod) => {
-            errMod.logStructured({
-              namespace: 'ImportModal', code: 'AUDIT_ENTRY_VIEW', level: 'info',
-              fields: {
-                auditId: state.errorAuditId,
-                found: !!entry,
-                status: entry?.status,
-                actions: entry ? entry.actions.length : 0,
-              },
-            });
-            if (entry) {
-              console.log('[ImportModal] Audit entry:', entry);
-            }
-          });
-        });
-      },
+      onViewAudit: () => _handleViewAudit(state.errorAuditId),
     });
 
     return;
   }
+}
+
+function _handleViewAudit(errorAuditId: string): void {
+  // Deep-link: dump the audit entry to the console so power users
+  // can inspect. Step 27's E2E asserts on this log line.
+  void import('./prompt-import-audit').then((mod) => {
+    const entry = mod.readImportAudit().find((e) => e.id === errorAuditId);
+    void import('./prompt-import-errors').then((errMod) => {
+      errMod.logStructured({
+        namespace: 'ImportModal', code: 'AUDIT_ENTRY_VIEW', level: 'info',
+        fields: {
+          auditId: errorAuditId,
+          found: !!entry,
+          status: entry?.status,
+          actions: entry ? entry.actions.length : 0,
+        },
+      });
+      if (entry) {
+        console.log('[ImportModal] Audit entry:', entry);
+      }
+    });
+  });
 }
 
 async function startParse(

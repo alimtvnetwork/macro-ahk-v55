@@ -203,6 +203,16 @@ function PrimaryTabPanels({ activeTab, project, allProjects, availableScripts, a
         />
         <DevGuideSection namespace={sdkNamespace} section="variables" targetUrls={targetUrls} />
       </LazyTabContent>
+      <SecondaryTabPanels activeTab={activeTab} project={project} allProjects={allProjects} availableScripts={availableScripts} availableConfigs={availableConfigs} onSave={onSave} sdkNamespace={sdkNamespace} projectSlug={projectSlug} />
+    </>
+  );
+}
+
+function SecondaryTabPanels({ activeTab, project, onSave, sdkNamespace, projectSlug }: TabsBodyProps) {
+  const targetUrls = project.targetUrls ?? [];
+
+  return (
+    <>
       <LazyTabContent value="xpath" activeTab={activeTab}>
         <XPathPanel
           chatBoxXPath={project.settings?.chatBoxXPath}

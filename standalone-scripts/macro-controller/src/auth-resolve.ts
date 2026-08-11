@@ -21,6 +21,72 @@ import {
 // SDK AuthTokenUtils accessor
 // ============================================
 
+const fallbackAuthUtils: MarcoSDKAuthTokenUtils = {
+  normalizeBearerToken(raw: string): string {
+    return (raw || '').trim().replace(/^Bearer\s+/i, '');
+  },
+  isJwtToken(raw: string): boolean {
+    const token = (raw || '').trim().replace(/^Bearer\s+/i, '');
+
+    return token.startsWith('eyJ') && token.split('.').length === 3;
+  },
+  isUsableToken(raw: string): boolean {
+    const token = (raw || '').trim().replace(/^Bearer\s+/i, '');
+    if (!token || token.length < 10) {
+      return false;
+    }
+
+    if (/\s/.test(token)) {
+      return false;
+    }
+
+    if (token[0] === '{' || token[0] === '[') {
+      return false;
+    }
+
+    return token.startsWith('eyJ') && token.split('.').length === 3;
+  },
+  extractBearerTokenFromUnknown(raw: unknown): string {
+    if (typeof raw !== 'string') {
+      return '';
+    }
+
+    const normalized = this.normalizeBearerToken(raw);
+    if (this.isUsableToken(normalized)) {
+      return normalized;
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      if (parsed === null || typeof parsed !== 'object') {
+        return '';
+      }
+
+      const candidates = [parsed.token, parsed.access_token, parsed.authToken, parsed.sessionId];
+      for (const candidate of candidates) {
+        if (typeof candidate !== 'string') {
+          continue;
+        }
+
+        const nested = this.normalizeBearerToken(candidate);
+        if (this.isUsableToken(nested)) {
+          return nested;
+        }
+      }
+    } catch (e: unknown) {
+      log('auth-resolve: fallback extractBearerTokenFromUnknown JSON parse failed — ' + toErrorMessage(e), 'debug');
+    }
+
+    return '';
+  },
+  scanSupabaseLocalStorage(): string {
+    return '';
+  },
+  extractSupabaseTokenFromRaw(): string {
+    return '';
+  },
+};
+
 /**
  * Get the AuthTokenUtils from the SDK.
  * Falls back to a minimal inline implementation if SDK is not loaded yet.
@@ -34,71 +100,7 @@ function getAuthUtils(): MarcoSDKAuthTokenUtils {
   // Minimal fallback for early boot before SDK is available
   log('auth-resolve: marco.authUtils not available, using inline fallback', 'warn');
 
-  return {
-    normalizeBearerToken(raw: string): string {
-      return (raw || '').trim().replace(/^Bearer\s+/i, '');
-    },
-    isJwtToken(raw: string): boolean {
-      const token = (raw || '').trim().replace(/^Bearer\s+/i, '');
-
-      return token.startsWith('eyJ') && token.split('.').length === 3;
-    },
-    isUsableToken(raw: string): boolean {
-      const token = (raw || '').trim().replace(/^Bearer\s+/i, '');
-      if (!token || token.length < 10) {
-        return false;
-      }
-
-      if (/\s/.test(token)) {
-        return false;
-      }
-
-      if (token[0] === '{' || token[0] === '[') {
-        return false;
-      }
-
-      return token.startsWith('eyJ') && token.split('.').length === 3;
-    },
-    extractBearerTokenFromUnknown(raw: unknown): string {
-      if (typeof raw !== 'string') {
-        return '';
-      }
-
-      const normalized = this.normalizeBearerToken(raw);
-      if (this.isUsableToken(normalized)) {
-        return normalized;
-      }
-
-      try {
-        const parsed = JSON.parse(raw) as Record<string, unknown>;
-        if (parsed === null || typeof parsed !== 'object') {
-          return '';
-        }
-
-        const candidates = [parsed.token, parsed.access_token, parsed.authToken, parsed.sessionId];
-        for (const candidate of candidates) {
-          if (typeof candidate !== 'string') {
-            continue;
-          }
-
-          const nested = this.normalizeBearerToken(candidate);
-          if (this.isUsableToken(nested)) {
-            return nested;
-          }
-        }
-      } catch (e: unknown) {
-        log('auth-resolve: fallback extractBearerTokenFromUnknown JSON parse failed — ' + toErrorMessage(e), 'debug');
-      }
-
-      return '';
-    },
-    scanSupabaseLocalStorage(): string {
-      return '';
-    },
-    extractSupabaseTokenFromRaw(): string {
-      return '';
-    },
-  };
+  return fallbackAuthUtils;
 }
 
 // Re-export SDK utilities for backward compatibility with existing consumers

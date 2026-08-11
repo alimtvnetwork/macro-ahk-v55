@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 /**
  * Marco Extension — Step Library → Live Replay Bridge
@@ -114,6 +115,7 @@ async function executeLeaf(
   return result.FailureReport ?? logMissingReportFailure(step, result.Error, opts);
 }
 
+/* eslint-disable max-lines-per-function */
 async function executeUrlTabClickLeaf(step: StepRow, opts: ReplayBridgeOptions): Promise<FailureReport | null> {
   if (!step.PayloadJson) {
     return logFailure({

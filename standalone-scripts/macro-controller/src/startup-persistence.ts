@@ -92,7 +92,8 @@ export function setupPersistenceObserver(createUI: () => void): () => void {
 
   function cancelPending(): void {
     if (reinjectTimer) {
-      clearTimeout(reinjectTimer); reinjectTimer = null; 
+      clearTimeout(reinjectTimer);
+      reinjectTimer = null; 
     }
 
     if (reinjectIdleHandle !== null && idleWin.cancelIdleCallback) {
@@ -151,14 +152,10 @@ export function setupPersistenceObserver(createUI: () => void): () => void {
     observer.disconnect();
     cancelPending();
     detachVisibility();
-    window.removeEventListener('pagehide', onPageHide);
+    window.removeEventListener('pagehide', teardown);
   }
 
-  function onPageHide(): void {
-    teardown(); 
-  }
-
-  window.addEventListener('pagehide', onPageHide, { once: true });
+  window.addEventListener('pagehide', teardown, { once: true });
 
   return teardown;
 }

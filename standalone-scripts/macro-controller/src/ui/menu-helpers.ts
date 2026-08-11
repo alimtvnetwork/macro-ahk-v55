@@ -72,7 +72,8 @@ function positionSub(ctx: SubmenuCtx): void {
 // Step A5: recompute on scroll/resize while open; tear down on close.
 function showSub(ctx: SubmenuCtx): void {
   if (ctx.hideTimer) {
-    clearTimeout(ctx.hideTimer); ctx.hideTimer = null; 
+    clearTimeout(ctx.hideTimer);
+    ctx.hideTimer = null; 
   }
 
   ctx.subPanel.style.visibility = 'hidden';
@@ -111,7 +112,8 @@ function hideSub(ctx: SubmenuCtx): void {
 
 function scheduleSub(ctx: SubmenuCtx): void {
   if (ctx.hideTimer) {
-    clearTimeout(ctx.hideTimer); ctx.hideTimer = null; 
+    clearTimeout(ctx.hideTimer);
+    ctx.hideTimer = null; 
   }
 
   ctx.hideTimer = setTimeout(function() {
@@ -119,19 +121,7 @@ function scheduleSub(ctx: SubmenuCtx): void {
   }, 150);
 }
 
-export function createSubmenu(ctx: MenuCtx, icon: string, label: string): { el: HTMLElement; panel: HTMLElement } {
-  const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'position:relative;';
-  const subPanel = document.createElement('div');
-
-  const trigger = document.createElement('button');
-  trigger.style.cssText = ctx.menuBtnStyle + 'justify-content:space-between;';
-  trigger.innerHTML = '<span style="display:flex;align-items:center;gap:4px;"><span style="font-size:12px;width:18px;text-align:center;">' + icon + '</span><span>' + label + '</span></span><span style="font-size:10px;opacity:0.6;">▸</span>';
-  trigger.setAttribute('aria-haspopup', 'menu');
-  trigger.setAttribute(ATTR_ARIA_EXPANDED, 'false');
-
-  const subCtx: SubmenuCtx = { hideTimer: null, trigger: trigger, subPanel: subPanel, reflowHandler: null };
-
+function attachSubmenuEvents(trigger: HTMLElement, subPanel: HTMLElement, wrapper: HTMLElement, subCtx: SubmenuCtx): void {
   trigger.onmouseover = function() {
     trigger.style.background = 'rgba(139,92,246,0.2)';
     showSub(subCtx);
@@ -156,17 +146,17 @@ export function createSubmenu(ctx: MenuCtx, icon: string, label: string): { el: 
 
   trigger.onkeydown = function(e) {
     if (e.key === 'Escape') {
-      hideSub(subCtx); trigger.setAttribute(ATTR_ARIA_EXPANDED, 'false'); trigger.focus(); 
+      hideSub(subCtx);
+      trigger.setAttribute(ATTR_ARIA_EXPANDED, 'false');
+      trigger.focus(); 
     }
   };
 
-  subPanel.setAttribute('data-marco-submenu', label);
-  subPanel.setAttribute('role', 'menu');
-  subPanel.setAttribute('aria-label', label);
-  subPanel.style.cssText = 'display:none;position:fixed;min-width:170px;background:' + cPanelBg + ';border:1px solid ' + cPrimary + ';border-radius:' + lDropdownRadius + ';z-index:100004;box-shadow:' + lDropdownShadow + ';padding:4px 0;';
   subPanel.onkeydown = function(e) {
     if (e.key === 'Escape') {
-      hideSub(subCtx); trigger.setAttribute(ATTR_ARIA_EXPANDED, 'false'); trigger.focus(); 
+      hideSub(subCtx);
+      trigger.setAttribute(ATTR_ARIA_EXPANDED, 'false');
+      trigger.focus(); 
     }
   };
 
@@ -185,6 +175,27 @@ export function createSubmenu(ctx: MenuCtx, icon: string, label: string): { el: 
   wrapper.onmouseout = function() {
     scheduleSub(subCtx); 
   };
+}
+
+export function createSubmenu(ctx: MenuCtx, icon: string, label: string): { el: HTMLElement; panel: HTMLElement } {
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'position:relative;';
+  const subPanel = document.createElement('div');
+
+  const trigger = document.createElement('button');
+  trigger.style.cssText = ctx.menuBtnStyle + 'justify-content:space-between;';
+  trigger.innerHTML = '<span style="display:flex;align-items:center;gap:4px;"><span style="font-size:12px;width:18px;text-align:center;">' + icon + '</span><span>' + label + '</span></span><span style="font-size:10px;opacity:0.6;">▸</span>';
+  trigger.setAttribute('aria-haspopup', 'menu');
+  trigger.setAttribute(ATTR_ARIA_EXPANDED, 'false');
+
+  const subCtx: SubmenuCtx = { hideTimer: null, trigger: trigger, subPanel: subPanel, reflowHandler: null };
+
+  attachSubmenuEvents(trigger, subPanel, wrapper, subCtx);
+
+  subPanel.setAttribute('data-marco-submenu', label);
+  subPanel.setAttribute('role', 'menu');
+  subPanel.setAttribute('aria-label', label);
+  subPanel.style.cssText = 'display:none;position:fixed;min-width:170px;background:' + cPanelBg + ';border:1px solid ' + cPrimary + ';border-radius:' + lDropdownRadius + ';z-index:100004;box-shadow:' + lDropdownShadow + ';padding:4px 0;';
 
   wrapper.appendChild(trigger);
   document.body.appendChild(subPanel);

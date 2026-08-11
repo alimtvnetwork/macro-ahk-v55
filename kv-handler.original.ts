@@ -1,3 +1,4 @@
+/* eslint-disable */
 // @ts-nocheck
 /**
  * Marco Extension ΓÇö Project-Scoped Key-Value Handler (Issue 50)

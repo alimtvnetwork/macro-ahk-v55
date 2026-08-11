@@ -78,7 +78,8 @@ describe('prompt-library-modal - drop success resets label to literal "Import"',
     io.performPromptImport.mockClear();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('spinner is gone and button label is exactly "Import" after a successful drop-triggered import', async () => {
@@ -92,7 +93,10 @@ describe('prompt-library-modal - drop success resets label to literal "Import"',
 
     fireDrop(getRoot(), 'ok.json');
     // Await the full async chain: file.text() -> parse -> performPromptImport -> renderAllRoles.
-    await tick(); await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
+    await tick();
 
     expect(io.performPromptImport).toHaveBeenCalledTimes(1);
     // Post-success: spinner removed, label reset to the literal "Import".

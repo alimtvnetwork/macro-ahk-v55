@@ -114,35 +114,40 @@ function useTreeNodeDrag(
   };
 
   const onDrop = (event: React.DragEvent<HTMLDivElement>): void => {
-    event.preventDefault();
-    setDragOver(false);
-    const raw = event.dataTransfer.getData(DRAG_MIME);
-    if (raw === "") {
-      return;
-    }
-
-    try {
-      const payload = JSON.parse(raw) as { id: number; parentId: number | null };
-      // Cross-parent drag: ignored intentionally.
-      if (payload.parentId !== parentId) {
-        return;
-      }
-
-      if (payload.id === id) {
-        return;
-      }
-
-      onDropReorder(parentId, payload.id, id);
-    } catch (caught) {
-      logError(
-        "StepGroupLibraryPanel.handleDropReorder.group",
-        "Malformed drag payload — DataTransfer JSON.parse failed",
-        caught,
-      );
-    }
+    handleDropEvent(event, id, parentId, onDropReorder, setDragOver);
   };
 
   return { dragOver, onDragStart, onDragOver, onDragLeave, onDrop };
+}
+
+function handleDropEvent(
+  event: React.DragEvent<HTMLDivElement>,
+  id: number,
+  parentId: number | null,
+  onDropReorder: TreeNodeRowProps["onDropReorder"],
+  setDragOver: (isDragOver: boolean) => void
+): void {
+  event.preventDefault();
+  setDragOver(false);
+  const raw = event.dataTransfer.getData(DRAG_MIME);
+  if (raw === "") {
+    return;
+  }
+
+  try {
+    const payload = JSON.parse(raw) as { id: number; parentId: number | null };
+    if (payload.parentId !== parentId || payload.id === id) {
+      return;
+    }
+
+    onDropReorder(parentId, payload.id, id);
+  } catch (caught) {
+    logError(
+      "StepGroupLibraryPanel.handleDropReorder.group",
+      "Malformed drag payload — DataTransfer JSON.parse failed",
+      caught,
+    );
+  }
 }
 
 function TreeNodeMoveArrows(props: {
@@ -367,24 +372,22 @@ function TreeNodeRowBody(body: RowBodyProps): JSX.Element {
   const { isArchived, isFirst, isLast, isHovered } = body;
   const { node, depth, hoveredId, onHover } = props;
   const drag = useTreeNodeDrag(id, parentId, props.onDropReorder);
-  const onMouseEnter = (event: React.MouseEvent<HTMLDivElement>): void => {
-    event.stopPropagation();
-    onHover(id);
-  };
-
-  const onMouseLeave = (event: React.MouseEvent<HTMLDivElement>): void => {
-    event.stopPropagation();
-    if (hoveredId === id) {
-      onHover(null);
-    }
-  };
 
   return (
     <div
       draggable
       onDragStart={drag.onDragStart} onDragOver={drag.onDragOver}
       onDragLeave={drag.onDragLeave} onDrop={drag.onDrop}
-      onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}
+      onMouseEnter={(e) => {
+        e.stopPropagation();
+        onHover(id);
+      }}
+      onMouseLeave={(e) => {
+        e.stopPropagation();
+        if (hoveredId === id) {
+          onHover(null);
+        }
+      }}
       data-hovered={isHovered ? "true" : undefined}
       className={rowClassName({ isActive, isHovered, isArchived, dragOver: drag.dragOver })}
       style={{ paddingLeft: `${depth * 16 + 8}px` }}

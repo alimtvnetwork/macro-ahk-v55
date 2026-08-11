@@ -102,7 +102,8 @@ function RepairConfirmDialog({ state }: { state: SettingsState }) {
           <AlertDialogCancel disabled={state.repairBusy}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
-              e.preventDefault(); state.handleRepair(); 
+              e.preventDefault();
+              state.handleRepair(); 
             }}
             disabled={state.repairBusy}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"

@@ -143,7 +143,8 @@ import { LabelType } from './types';
   // ── Persist factories for self-healing ──
   nsWrite('_internal.createUIWrapper', createUIWrapper);
   nsWrite('_internal.createUIManager', function() {
-    const ui = new UIManager(); ui.setCreateFn(createUIWrapper);
+    const ui = new UIManager();
+    ui.setCreateFn(createUIWrapper);
 
     return ui; 
   });

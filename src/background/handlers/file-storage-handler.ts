@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Marco Extension — Project File Storage Handler (Issue 50)
  *
@@ -87,13 +86,17 @@ export async function handleFileSave(
     return missingFieldError("dataBase64", "file:save");
   }
 
+  return saveFileToDb(projectId, filename, bindOpt(raw.mimeType), dataBase64);
+}
+
+function saveFileToDb(projectId: string, filename: string, mimeType: string | null, dataBase64: string): { isOk: true; id: string } | HandlerErrorResponse {
   const db = getDb();
   const size = Math.round((dataBase64.length * 3) / 4);
 
   const runRes = ServiceResult.wrapDb(() => db.run(
     `INSERT INTO ProjectFiles (ProjectId, Filename, MimeType, Data, Size, CreatedAt)
          VALUES (?, ?, ?, ?, ?, datetime('now'))`,
-    [projectId, filename, bindOpt(raw.mimeType), dataBase64, size],
+    [projectId, filename, mimeType, dataBase64, size],
   ));
   if (runRes.isFail) {
     return { isOk: false, errorMessage: String(runRes.error) };
@@ -127,7 +130,7 @@ export async function handleFileGet(
     [fileId],
   ));
   if (execRes.isFail) {
-    return { isOk: false, errorMessage: String(execRes.error) } as any;
+    return { isOk: false, errorMessage: String(execRes.error) } as HandlerErrorResponse;
   }
 
   const result = execRes.data!;
@@ -165,7 +168,7 @@ export async function handleFileList(
     "SELECT Id, ProjectId, Filename, MimeType, Size, CreatedAt FROM ProjectFiles WHERE ProjectId = ? ORDER BY CreatedAt DESC",
   ));
   if (stmtResult.isFail) {
-    return { isOk: false, errorMessage: String(stmtResult.error) } as any;
+    return { isOk: false, errorMessage: String(stmtResult.error) } as HandlerErrorResponse;
   }
 
   const stmt = stmtResult.data!;

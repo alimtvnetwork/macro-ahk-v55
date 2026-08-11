@@ -27,8 +27,69 @@ export interface UseRunGroupControllerArgs {
     readonly group: StepGroupRow | null;
 }
 
+interface RunState {
+  running: boolean;
+  setRunning: (v: boolean) => void;
+  result: RunGroupResult | null;
+  setResult: (v: RunGroupResult | null) => void;
+  durationMs: number;
+  setDurationMs: (v: number) => void;
+}
+
+// eslint-disable-next-line max-lines-per-function
+function useGroupRunHandler(
+  args: UseRunGroupControllerArgs,
+  liveMode: boolean,
+  state: RunState
+) {
+  const { db, projectId, group } = args;
+  const { setRunning, setResult, setDurationMs } = state;
+
+  return useCallback(async () => {
+    if (db === null || projectId === null || group === null) {
+      toast.error("Library not ready");
+
+      return;
+    }
+
+    setRunning(true);
+    const executor = liveMode ? createLiveReplayExecutor({ Doc: document }) : previewExecutor;
+    const startedAt = performance.now();
+    
+    const runResult = await runGroup({ db, projectId, rootGroupId: group.StepGroupId, executeLeafStep: executor });
+    const elapsed = Math.max(0, Math.round(performance.now() - startedAt));
+    
+    setResult(runResult);
+    setDurationMs(elapsed);
+    setRunning(false);
+    
+    if (runResult.Ok) {
+      toast.success(`Ran "${group.Name}" - ${runResult.StepsExecuted} step(s) in ${formatDuration(elapsed)}`);
+    } else {
+      toast.error(`Run failed: ${runResult.Reason}`);
+    }
+  }, [db, projectId, group, liveMode, setRunning, setResult, setDurationMs]);
+}
+
+function useSummaryReports(result: RunGroupResult | null, group: StepGroupRow | null, durationMs: number) {
+  return useMemo<ReadonlyArray<BatchGroupReport>>(() => {
+    if (result === null || group === null) {
+      return [];
+    }
+
+    return [{
+      StepGroupId: group.StepGroupId,
+      Status: result.Ok ? "Succeeded" : "Failed",
+      StartedAt: null,
+      EndedAt: null,
+      DurationMs: durationMs,
+      Result: result,
+    }];
+  }, [result, group, durationMs]);
+}
+
 export function useRunGroupController(args: UseRunGroupControllerArgs) {
-  const { open, db, projectId, group } = args;
+  const { open, group } = args;
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<RunGroupResult | null>(null);
   const [durationMs, setDurationMs] = useState(0);
@@ -43,49 +104,13 @@ export function useRunGroupController(args: UseRunGroupControllerArgs) {
     }
   }, [open, group?.StepGroupId]);
 
-  const handleRun = useCallback(async () => {
-    if (db === null || projectId === null || group === null) {
-      toast.error("Library not ready");
+  const handleRun = useGroupRunHandler(
+    args,
+    liveMode,
+    { running, setRunning, result, setResult, durationMs, setDurationMs }
+  );
 
-      return;
-    }
-
-    setRunning(true);
-    const executor: LeafStepExecutor = liveMode
-      ? createLiveReplayExecutor({ Doc: document })
-      : previewExecutor;
-    const startedAt = performance.now();
-    const runResult = await runGroup({
-      db,
-      projectId,
-      rootGroupId: group.StepGroupId,
-      executeLeafStep: executor,
-    });
-    const elapsed = Math.max(0, Math.round(performance.now() - startedAt));
-    setResult(runResult);
-    setDurationMs(elapsed);
-    setRunning(false);
-    if (runResult.Ok) {
-      toast.success(`Ran "${group.Name}" - ${runResult.StepsExecuted} step(s) in ${formatDuration(elapsed)}`);
-    } else {
-      toast.error(`Run failed: ${runResult.Reason}`);
-    }
-  }, [db, projectId, group, liveMode]);
-
-  const summaryReports = useMemo<ReadonlyArray<BatchGroupReport>>(() => {
-    if (result === null || group === null) {
-      return [];
-    }
-
-    return [{
-      StepGroupId: group.StepGroupId,
-      Status: result.Ok ? "Succeeded" : "Failed",
-      StartedAt: null,
-      EndedAt: null,
-      DurationMs: durationMs,
-      Result: result,
-    }];
-  }, [result, group, durationMs]);
+  const summaryReports = useSummaryReports(result, group, durationMs);
 
   return { running, result, durationMs, liveMode, setLiveMode, handleRun, summaryReports };
 }

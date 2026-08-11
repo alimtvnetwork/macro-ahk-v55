@@ -208,7 +208,8 @@ function ImportSection({ disabled, onImportFile, lastImport }: ImportSectionProp
       <div className="text-sm font-medium">Import a bundle</div>
       <div
         onDragOver={(event) => {
-          event.preventDefault(); setDragOver(true); 
+          event.preventDefault();
+          setDragOver(true); 
         }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}

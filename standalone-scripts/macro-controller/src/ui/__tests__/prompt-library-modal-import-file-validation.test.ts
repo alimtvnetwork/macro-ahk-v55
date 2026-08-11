@@ -83,7 +83,8 @@ describe('prompt-library-modal - import file validation', () => {
     io.performPromptImport.mockResolvedValue({ added: 0, updated: 0, errors: [] });
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('rejects non-JSON extension (.txt) with an inline error banner and does not call performPromptImport', async () => {
@@ -91,7 +92,8 @@ describe('prompt-library-modal - import file validation', () => {
     await tick();
     const bad = new File(['hello'], 'notes.txt', { type: 'text/plain' });
     fireDrop(root(), bad);
-    await tick(); await tick();
+    await tick();
+    await tick();
 
     expect(io.performPromptImport).not.toHaveBeenCalled();
     expect(banner()?.hidden).toBe(false);
@@ -109,7 +111,8 @@ describe('prompt-library-modal - import file validation', () => {
     await tick();
     const huge = new File([new Uint8Array(6 * 1024 * 1024)], 'big.json', { type: 'application/json' });
     fireDrop(root(), huge);
-    await tick(); await tick();
+    await tick();
+    await tick();
 
     expect(io.performPromptImport).not.toHaveBeenCalled();
     expect(banner()?.textContent ?? '').toMatch(/too large/i);
@@ -121,7 +124,8 @@ describe('prompt-library-modal - import file validation', () => {
     await tick();
     const empty = new File([], 'empty.json', { type: 'application/json' });
     fireDrop(root(), empty);
-    await tick(); await tick();
+    await tick();
+    await tick();
 
     expect(io.performPromptImport).not.toHaveBeenCalled();
     expect(banner()?.textContent ?? '').toMatch(/empty/i);
@@ -133,7 +137,9 @@ describe('prompt-library-modal - import file validation', () => {
     await tick();
     const good = new File(['{"entries":[]}'], 'library.json', { type: 'application/json' });
     fireDrop(root(), good);
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
 
     expect(io.performPromptImport).toHaveBeenCalledTimes(1);
     expect(banner()?.hidden ?? true).toBe(true);

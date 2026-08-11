@@ -65,7 +65,8 @@ describe('prompt-library-modal — per-row ↺ Reset', () => {
     mocks.upsertPrompt.mockImplementation(async () => (new DbResult(true, 1)));
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('renders the Reset button for a seeded slug whose Body diverges from the seed', async () => {

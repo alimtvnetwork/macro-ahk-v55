@@ -221,7 +221,8 @@ function FileDropZone({
           : "border-border hover:border-primary/40 hover:bg-muted/30"
       }`}
       onDragOver={(e) => {
-        e.preventDefault(); setIsDragOver(true); 
+        e.preventDefault();
+        setIsDragOver(true); 
       }}
       onDragLeave={() => setIsDragOver(false)}
       onDrop={handleDrop}
@@ -278,7 +279,8 @@ function EntryRow({
           className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30"
           disabled={!canMoveUp}
           onClick={(e) => {
-            e.stopPropagation(); onMoveUp(); 
+            e.stopPropagation();
+            onMoveUp(); 
           }}
         >
           <ChevronUp className="h-3 w-3" />
@@ -288,7 +290,8 @@ function EntryRow({
           className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30"
           disabled={!canMoveDown}
           onClick={(e) => {
-            e.stopPropagation(); onMoveDown(); 
+            e.stopPropagation();
+            onMoveDown(); 
           }}
         >
           <ChevronDown className="h-3 w-3" />
@@ -297,7 +300,8 @@ function EntryRow({
           type="button"
           className="p-0.5 text-muted-foreground hover:text-destructive"
           onClick={(e) => {
-            e.stopPropagation(); onRemove(); 
+            e.stopPropagation();
+            onRemove(); 
           }}
         >
           <X className="h-3 w-3" />

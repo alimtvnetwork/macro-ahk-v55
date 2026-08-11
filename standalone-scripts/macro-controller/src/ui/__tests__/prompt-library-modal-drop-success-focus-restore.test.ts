@@ -75,7 +75,8 @@ describe('prompt-library-modal - drop success returns focus to Import button', (
     io.performPromptImport.mockClear();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('focus lands on the Import button after a successful drop-triggered import', async () => {
@@ -90,7 +91,11 @@ describe('prompt-library-modal - drop success returns focus to Import button', (
 
     fireDrop(getRoot(), 'ok.json');
     // Await file.text() -> parse -> performPromptImport -> renderAllRoles -> finally.
-    await tick(); await tick(); await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
+    await tick();
+    await tick();
 
     expect(io.performPromptImport).toHaveBeenCalledTimes(1);
     // Post-success invariants: unlocked and focused.

@@ -117,89 +117,117 @@ export function DriftElementDiffView({ primary, fallback, diff, history, now }: 
   );
 }
 
-function DriftTimelineStrip({ timeline }: { timeline: DriftTimeline }) {
-  const { State, LastSuccess, FirstDrift, HealthyDurationMs, FailuresSinceDrift } = timeline;
+function HealthyDriftTimelineStrip({ timeline }: { timeline: DriftTimeline }) {
+  const { LastSuccess } = timeline;
+  if (!LastSuccess) {
+    return null;
+  }
 
-  if (State === "healthy" && LastSuccess !== null) {
-    return (
-      <div className="flex items-center gap-2 rounded-md border border-emerald-500/40 bg-emerald-500/5 px-3 py-2 text-xs">
-        <Clock className="h-3.5 w-3.5 text-emerald-500 shrink-0" aria-hidden />
-        <span className="font-medium text-emerald-700 dark:text-emerald-300">
+  return (
+    <div className="flex items-center gap-2 rounded-md border border-emerald-500/40 bg-emerald-500/5 px-3 py-2 text-xs">
+      <Clock className="h-3.5 w-3.5 text-emerald-500 shrink-0" aria-hidden />
+      <span className="font-medium text-emerald-700 dark:text-emerald-300">
                     No drift on record
-        </span>
-        <span className="text-muted-foreground">
+      </span>
+      <span className="text-muted-foreground">
                     last ok {LastSuccess.RelativeLabel}
-        </span>
-        <code className="ml-auto text-[10px] text-muted-foreground" title={LastSuccess.At}>
+      </span>
+      <code className="ml-auto text-[10px] text-muted-foreground" title={LastSuccess.At}>
                     run #{LastSuccess.RunId}
-        </code>
-      </div>
-    );
+      </code>
+    </div>
+  );
+}
+
+function AlwaysFailingDriftTimelineStrip({ timeline }: { timeline: DriftTimeline }) {
+  const { FirstDrift, FailuresSinceDrift } = timeline;
+  if (!FirstDrift) {
+    return null;
   }
 
-  if (State === "always-failing" && FirstDrift !== null) {
-    return (
-      <div className="flex items-center gap-2 rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-xs">
-        <Clock className="h-3.5 w-3.5 text-destructive shrink-0" aria-hidden />
-        <span className="font-medium text-destructive">Never matched</span>
-        <span className="text-muted-foreground">
+  return (
+    <div className="flex items-center gap-2 rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-xs">
+      <Clock className="h-3.5 w-3.5 text-destructive shrink-0" aria-hidden />
+      <span className="font-medium text-destructive">Never matched</span>
+      <span className="text-muted-foreground">
                     first failure {FirstDrift.RelativeLabel}
-          {FailuresSinceDrift > 1 && ` · ${FailuresSinceDrift} failures total`}
-        </span>
-        <code className="ml-auto text-[10px] text-muted-foreground" title={FirstDrift.At}>
+        {FailuresSinceDrift > 1 && ` · ${FailuresSinceDrift} failures total`}
+      </span>
+      <code className="ml-auto text-[10px] text-muted-foreground" title={FirstDrift.At}>
                     run #{FirstDrift.RunId}
-        </code>
-      </div>
-    );
+      </code>
+    </div>
+  );
+}
+
+// eslint-disable-next-line max-lines-per-function
+function DriftedDriftTimelineStrip({ timeline }: { timeline: DriftTimeline }) {
+  const { LastSuccess, FirstDrift, HealthyDurationMs, FailuresSinceDrift } = timeline;
+  if (!LastSuccess || !FirstDrift) {
+    return null;
   }
 
-  if (State === "drifted" && LastSuccess !== null && FirstDrift !== null) {
-    return (
-      <div className="rounded-md border border-amber-500/40 bg-amber-500/5 px-3 py-2 text-xs space-y-1.5">
-        <div className="flex items-center gap-1.5 font-medium text-amber-700 dark:text-amber-300">
-          <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                    Drift timeline
-          {HealthyDurationMs !== null && (
-            <Badge variant="outline" className="ml-1 border-amber-500/40 text-[10px] text-amber-700 dark:text-amber-300">
-                            healthy for {formatDuration(HealthyDurationMs)}
-            </Badge>
-          )}
-        </div>
-        <div className="flex items-center gap-2 font-mono">
-          <span
-            className="flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-emerald-700 dark:text-emerald-300"
-            title={LastSuccess.At}
-          >
-            <CheckCircle2 className="h-3 w-3" aria-hidden />
-                        ok · {LastSuccess.RelativeLabel}
-            <span className="text-[10px] text-muted-foreground">
-                            #{LastSuccess.RunId}
-            </span>
-          </span>
-          <ArrowRight className="h-3 w-3 text-muted-foreground" aria-hidden />
-          <span
-            className="flex items-center gap-1 rounded bg-destructive/10 px-1.5 py-0.5 text-destructive"
-            title={FirstDrift.At}
-          >
-            <AlertTriangle className="h-3 w-3" aria-hidden />
-                        drift · {FirstDrift.RelativeLabel}
-            <span className="text-[10px] text-muted-foreground">
-                            #{FirstDrift.RunId}
-            </span>
-          </span>
-          {FailuresSinceDrift > 1 && (
-            <span className="ml-auto text-[10px] text-muted-foreground">
-                            +{FailuresSinceDrift - 1} more failure{FailuresSinceDrift === 2 ? "" : "s"}
-            </span>
-          )}
-        </div>
-        {FirstDrift.Error !== null && (
-          <div className="text-[11px] text-muted-foreground italic break-words">
-                        First error: {FirstDrift.Error}
-          </div>
+  return (
+    <div className="rounded-md border border-amber-500/40 bg-amber-500/5 px-3 py-2 text-xs space-y-1.5">
+      <div className="flex items-center gap-1.5 font-medium text-amber-700 dark:text-amber-300">
+        <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  Drift timeline
+        {HealthyDurationMs !== null && (
+          <Badge variant="outline" className="ml-1 border-amber-500/40 text-[10px] text-amber-700 dark:text-amber-300">
+                          healthy for {formatDuration(HealthyDurationMs)}
+          </Badge>
         )}
       </div>
-    );
+      <div className="flex items-center gap-2 font-mono">
+        <span
+          className="flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-emerald-700 dark:text-emerald-300"
+          title={LastSuccess.At}
+        >
+          <CheckCircle2 className="h-3 w-3" aria-hidden />
+                      ok · {LastSuccess.RelativeLabel}
+          <span className="text-[10px] text-muted-foreground">
+                          #{LastSuccess.RunId}
+          </span>
+        </span>
+        <ArrowRight className="h-3 w-3 text-muted-foreground" aria-hidden />
+        <span
+          className="flex items-center gap-1 rounded bg-destructive/10 px-1.5 py-0.5 text-destructive"
+          title={FirstDrift.At}
+        >
+          <AlertTriangle className="h-3 w-3" aria-hidden />
+                      drift · {FirstDrift.RelativeLabel}
+          <span className="text-[10px] text-muted-foreground">
+                          #{FirstDrift.RunId}
+          </span>
+        </span>
+        {FailuresSinceDrift > 1 && (
+          <span className="ml-auto text-[10px] text-muted-foreground">
+                          +{FailuresSinceDrift - 1} more failure{FailuresSinceDrift === 2 ? "" : "s"}
+          </span>
+        )}
+      </div>
+      {FirstDrift.Error !== null && (
+        <div className="text-[11px] text-muted-foreground italic break-words">
+                      First error: {FirstDrift.Error}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DriftTimelineStrip({ timeline }: { timeline: DriftTimeline }) {
+  const { State } = timeline;
+
+  if (State === "healthy") {
+    return <HealthyDriftTimelineStrip timeline={timeline} />;
+  }
+
+  if (State === "always-failing") {
+    return <AlwaysFailingDriftTimelineStrip timeline={timeline} />;
+  }
+
+  if (State === "drifted") {
+    return <DriftedDriftTimelineStrip timeline={timeline} />;
   }
 
   return null;

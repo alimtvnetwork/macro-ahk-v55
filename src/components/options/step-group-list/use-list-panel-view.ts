@@ -35,6 +35,19 @@ interface UseListPanelViewArgs {
     readonly query: string;
 }
 
+function useFilteredGroups(groups: ReadonlyArray<StepGroupRow>, query: string) {
+  const sortedGroups = useMemo(
+    () => groups.slice().sort((a, b) => a.Name.localeCompare(b.Name)),
+    [groups],
+  );
+
+  return useMemo(
+    () => sortedGroups.filter((g) => matchesQuery(g, query.trim())),
+    [sortedGroups, query],
+  );
+}
+
+// eslint-disable-next-line max-lines-per-function
 export function useListPanelView({
   groups,
   stepsByGroup,
@@ -51,15 +64,7 @@ export function useListPanelView({
     return m;
   }, [groups]);
 
-  const sortedGroups = useMemo(
-    () => groups.slice().sort((a, b) => a.Name.localeCompare(b.Name)),
-    [groups],
-  );
-
-  const filtered = useMemo(
-    () => sortedGroups.filter((g) => matchesQuery(g, query.trim())),
-    [sortedGroups, query],
-  );
+  const filtered = useFilteredGroups(groups, query);
 
   const activeGroup = useMemo(
     () => (activeGroupId === null ? null : (groupsById.get(activeGroupId) ?? null)),

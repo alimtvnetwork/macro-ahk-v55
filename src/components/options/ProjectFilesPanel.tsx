@@ -718,12 +718,14 @@ export function ProjectFilesPanel({ projectId }: Props) {
                 <Upload className="h-3 w-3" />
               </Button>
               <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => {
-                setShowNewFile(!showNewFile); setShowNewFolder(false); 
+                setShowNewFile(!showNewFile);
+                setShowNewFolder(false); 
               }} title="New file">
                 <Plus className="h-3 w-3" />
               </Button>
               <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => {
-                setShowNewFolder(!showNewFolder); setShowNewFile(false); 
+                setShowNewFolder(!showNewFolder);
+                setShowNewFile(false); 
               }} title="New folder">
                 <FolderPlus className="h-3 w-3" />
               </Button>
@@ -840,7 +842,8 @@ export function ProjectFilesPanel({ projectId }: Props) {
                     size="icon"
                     className="h-7 w-7"
                     onClick={() => {
-                      setRenaming(true); setRenameValue(selectedFile.filename); 
+                      setRenaming(true);
+                      setRenameValue(selectedFile.filename); 
                     }}
                     title="Rename"
                   >

@@ -184,7 +184,8 @@ function _appendActionButtons(header: HTMLElement, deps: WsDropdownDeps): void {
   wsSelectAllBtn.title = 'Select all / deselect all workspaces';
   wsSelectAllBtn.style.cssText = 'padding:1px 5px;background:' + cPrimaryHL + ';color:' + cPrimaryLighter + ';border:1px solid rgba(139,92,246,0.4);border-radius:3px;font-size:8px;cursor:pointer;';
   wsSelectAllBtn.onclick = function(e: Event) {
-    e.preventDefault(); e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
     const perWs = loopCreditState.perWorkspace || [];
     const allChecked = Object.keys(getLoopWsCheckedIds()).length >= perWs.length && perWs.length > 0;
     if (allChecked) {
@@ -210,7 +211,9 @@ function _appendActionButtons(header: HTMLElement, deps: WsDropdownDeps): void {
   wsRenameBtn.title = 'Bulk rename selected workspaces';
   wsRenameBtn.style.cssText = 'display:none;padding:1px 6px;background:rgba(234,179,8,0.2);color:#facc15;border:1px solid rgba(234,179,8,0.4);border-radius:3px;font-size:8px;cursor:pointer;font-weight:700;';
   wsRenameBtn.onclick = function(e: Event) {
-    e.preventDefault(); e.stopPropagation(); renderBulkRenameDialog(); 
+    e.preventDefault();
+    e.stopPropagation();
+    renderBulkRenameDialog(); 
   };
 
   header.appendChild(wsRenameBtn);
@@ -225,7 +228,8 @@ function _appendActionButtons(header: HTMLElement, deps: WsDropdownDeps): void {
   wsFocusBtn.title = 'Scroll to and highlight the current workspace in the list';
   wsFocusBtn.style.cssText = 'margin-left:auto;padding:2px 7px;background:rgba(139,92,246,0.2);color:' + cPrimaryLighter + ';border:1px solid rgba(139,92,246,0.4);border-radius:3px;font-size:9px;cursor:pointer;';
   wsFocusBtn.onclick = function(e: Event) {
-    e.preventDefault(); e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
     handleFocusCurrent(populateLoopWorkspaceDropdown, setLoopWsNavIndex, fetchLoopCreditsWithDetect, autoDetectLoopCurrentWorkspace);
   };
 
@@ -244,7 +248,8 @@ function _buildUndoBtn(
   wsUndoBtn.title = 'Undo last bulk rename';
   wsUndoBtn.style.cssText = 'display:none;padding:1px 6px;background:rgba(239,68,68,0.2);color:#f87171;border:1px solid rgba(239,68,68,0.4);border-radius:3px;font-size:8px;cursor:pointer;font-weight:700;';
   wsUndoBtn.onclick = function(e: Event) {
-    e.preventDefault(); e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
     if (getRenameHistory().length === 0) {
       log('[Rename] Nothing to undo', 'warn');
 
@@ -342,7 +347,9 @@ function _buildMoveRow(triggerLoopMoveFromSelection: () => void): HTMLElement {
   };
 
   moveBtn.onclick = function(e: Event) {
-    e.preventDefault(); e.stopPropagation(); triggerLoopMoveFromSelection(); 
+    e.preventDefault();
+    e.stopPropagation();
+    triggerLoopMoveFromSelection(); 
   };
 
   const moveStatus = document.createElement('div');

@@ -172,6 +172,39 @@ async function sendSetStepLink(projectSlug: string, stepId: number, slot: StepLi
 /*  Hook                                                               */
 /* ------------------------------------------------------------------ */
 
+function useRecorderProjectMutations(
+  projectSlug: string,
+  setData: React.Dispatch<React.SetStateAction<RecorderProjectData | null>>,
+  setTagsByStep: React.Dispatch<React.SetStateAction<ReadonlyMap<number, ReadonlyArray<string>>>>
+) {
+  const spliceStep = useCallback((updated: StepRow) => {
+    setData((prev) => prev === null ? prev : {
+      ...prev,
+      steps: prev.steps.map((s) => (s.StepId === updated.StepId ? updated : s)),
+    });
+  }, [setData]);
+
+  const updateStepMeta = useCallback(async (stepId: number, patch: StepMetaPatch) => {
+    spliceStep(await sendUpdateStepMeta(projectSlug, stepId, patch));
+  }, [projectSlug, spliceStep]);
+
+  const setStepTags = useCallback(async (stepId: number, tags: ReadonlyArray<string>) => {
+    const next = await sendSetStepTags(projectSlug, stepId, tags);
+    setTagsByStep((prev) => {
+      const m = new Map(prev);
+      m.set(stepId, next);
+
+      return m; 
+    });
+  }, [projectSlug, setTagsByStep]);
+
+  const setStepLink = useCallback(async (stepId: number, slot: StepLinkSlot, targetProjectSlug: string | null) => {
+    spliceStep(await sendSetStepLink(projectSlug, stepId, slot, targetProjectSlug));
+  }, [projectSlug, spliceStep]);
+
+  return { updateStepMeta, setStepTags, setStepLink };
+}
+
 export function useRecorderProjectData(projectSlug: string): HookResult {
   const [data, setData] = useState<RecorderProjectData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -197,34 +230,11 @@ export function useRecorderProjectData(projectSlug: string): HookResult {
 
   const loadSelectors = useCallback((stepId: number) => fetchSelectors(projectSlug, stepId), [projectSlug]);
 
-  const spliceStep = useCallback((updated: StepRow) => {
-    setData((prev) => prev === null ? prev : {
-      ...prev,
-      steps: prev.steps.map((s) => (s.StepId === updated.StepId ? updated : s)),
-    });
-  }, []);
-
-  const updateStepMeta = useCallback(async (stepId: number, patch: StepMetaPatch) => {
-    spliceStep(await sendUpdateStepMeta(projectSlug, stepId, patch));
-  }, [projectSlug, spliceStep]);
-
-  const setStepTags = useCallback(async (stepId: number, tags: ReadonlyArray<string>) => {
-    const next = await sendSetStepTags(projectSlug, stepId, tags);
-    setTagsByStep((prev) => {
-      const m = new Map(prev); m.set(stepId, next);
-
-      return m; 
-    });
-  }, [projectSlug]);
-
-  const setStepLink = useCallback(async (stepId: number, slot: StepLinkSlot, targetProjectSlug: string | null) => {
-    spliceStep(await sendSetStepLink(projectSlug, stepId, slot, targetProjectSlug));
-  }, [projectSlug, spliceStep]);
+  const mutations = useRecorderProjectMutations(projectSlug, setData, setTagsByStep);
 
   useEffect(() => {
     void reload(); 
   }, [reload]);
 
-  return { data, loading, error, reload, loadSelectors, tagsByStep, updateStepMeta, setStepTags, setStepLink };
+  return { data, loading, error, reload, loadSelectors, tagsByStep, ...mutations };
 }
-

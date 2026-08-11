@@ -45,7 +45,8 @@ function createTimerControls(tickRef: TickRef, intervalMs: number): {
 
   const stop = (): void => {
     if (timerId !== null) {
-      clearInterval(timerId); timerId = null; 
+      clearInterval(timerId);
+      timerId = null; 
     }
   };
 
@@ -67,7 +68,8 @@ function installVisibilityLoop(tickRef: TickRef, intervalMs: number): () => void
 
   document.addEventListener("visibilitychange", handleVisibility);
   if (!document.hidden) {
-    tickRef.current(); start(); 
+    tickRef.current();
+    start(); 
   }
 
   return () => {

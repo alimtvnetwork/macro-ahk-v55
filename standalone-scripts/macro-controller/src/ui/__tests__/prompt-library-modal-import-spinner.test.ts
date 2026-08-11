@@ -90,7 +90,8 @@ describe('prompt-library-modal - spinner shown while performPromptImport runs', 
     io.performPromptImport.mockClear();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('renders spinner + "Importing…" mid-flight and restores "Import" on completion', async () => {

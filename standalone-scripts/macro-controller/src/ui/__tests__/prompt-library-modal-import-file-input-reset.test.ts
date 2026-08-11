@@ -83,7 +83,8 @@ describe('prompt-library-modal - file input resets after import failure so same 
     io.performPromptImport.mockReset();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('clears fileInput.value after a rejected import and re-selecting the same file re-invokes performPromptImport', async () => {

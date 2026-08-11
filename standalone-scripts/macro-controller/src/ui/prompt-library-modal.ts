@@ -31,7 +31,8 @@ function handleModalKey(refs: ModalRefs, e: KeyboardEvent): void {
 
   if (e.key === 'Escape') {
     if (refs.activeEditor) {
-      e.preventDefault(); refs.activeEditor.cancel();
+      e.preventDefault();
+      refs.activeEditor.cancel();
 
       return; 
     }
@@ -66,19 +67,22 @@ function applyTabTrap(root: HTMLElement, e: KeyboardEvent): void {
   const active = document.activeElement as HTMLElement | null;
   const insideModal = active !== null && root.contains(active);
   if (!insideModal) {
-    e.preventDefault(); first.focus();
+    e.preventDefault();
+    first.focus();
 
     return; 
   }
 
   if (e.shiftKey && active === first) {
-    e.preventDefault(); last.focus();
+    e.preventDefault();
+    last.focus();
 
     return; 
   }
 
   if (!e.shiftKey && active === last) {
-    e.preventDefault(); first.focus(); 
+    e.preventDefault();
+    first.focus(); 
   }
 }
 

@@ -96,36 +96,44 @@ function useStepRowDrag(
   };
 
   const onDrop = (event: React.DragEvent<HTMLLIElement>): void => {
-    event.preventDefault();
-    setDragOver(false);
-    const raw = event.dataTransfer.getData(STEP_DRAG_MIME);
-    if (raw === "") {
-      return;
-    }
-
-    try {
-      const payload = JSON.parse(raw) as { stepId: number; stepGroupId: number };
-      // Reject cross-group drops at the UI level — the runner has
-      // no concept of "move a step into another group" yet.
-      if (payload.stepGroupId !== stepGroupId) {
-        return;
-      }
-
-      if (payload.stepId === stepId) {
-        return;
-      }
-
-      onDropReorder(stepGroupId, payload.stepId, stepId);
-    } catch (caught) {
-      logError(
-        "StepGroupLibraryPanel.handleDropReorder.step",
-        "Malformed drag payload — DataTransfer JSON.parse failed",
-        caught,
-      );
-    }
+    handleDropEvent(event, stepGroupId, stepId, onDropReorder, setDragOver);
   };
 
   return { dragOver, dragging, onDragStart, onDragEnd, onDragOver, onDragLeave, onDrop };
+}
+
+function handleDropEvent(
+  event: React.DragEvent<HTMLLIElement>,
+  stepGroupId: number,
+  stepId: number,
+  onDropReorder: StepRowItemProps["onDropReorder"],
+  setDragOver: (isDragOver: boolean) => void
+): void {
+  event.preventDefault();
+  setDragOver(false);
+  const raw = event.dataTransfer.getData(STEP_DRAG_MIME);
+  if (raw === "") {
+    return;
+  }
+
+  try {
+    const payload = JSON.parse(raw) as { stepId: number; stepGroupId: number };
+    if (payload.stepGroupId !== stepGroupId) {
+      return;
+    }
+
+    if (payload.stepId === stepId) {
+      return;
+    }
+
+    onDropReorder(stepGroupId, payload.stepId, stepId);
+  } catch (caught) {
+    logError(
+      "StepGroupLibraryPanel.handleDropReorder.step",
+      "Malformed drag payload — DataTransfer JSON.parse failed",
+      caught,
+    );
+  }
 }
 
 function StepRowLabel(props: {

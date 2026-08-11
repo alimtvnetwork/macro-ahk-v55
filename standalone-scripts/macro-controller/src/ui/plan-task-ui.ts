@@ -260,7 +260,10 @@ function appendCustomStepRow(sub: HTMLElement, dropdown: HTMLElement): void {
   lbl.style.cssText = 'font-size:10px;color:' + cPrimaryLight + ';';
   row.appendChild(lbl);
   const inp = document.createElement('input');
-  inp.type = 'number'; inp.min = '1'; inp.max = '999'; inp.placeholder = '#';
+  inp.type = 'number';
+  inp.min = '1';
+  inp.max = '999';
+  inp.placeholder = '#';
   inp.style.cssText = 'width:50px;padding:3px 5px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:10px;';
   inp.onclick = function(e: Event) {
     e.stopPropagation(); 
@@ -268,7 +271,8 @@ function appendCustomStepRow(sub: HTMLElement, dropdown: HTMLElement): void {
 
   row.appendChild(inp);
   const go = document.createElement('span');
-  go.textContent = '▶'; go.title = 'PlanTierType';
+  go.textContent = '▶';
+  go.title = 'PlanTierType';
   go.style.cssText = 'cursor:pointer;font-size:11px;color:' + cPrimary + ';';
   go.onclick = function(e: Event) {
     e.stopPropagation();
@@ -285,7 +289,8 @@ function appendCustomStepRow(sub: HTMLElement, dropdown: HTMLElement): void {
 
   inp.onkeydown = function(e: KeyboardEvent) {
     if (e.key === 'Enter') {
-      e.stopPropagation(); go.click(); 
+      e.stopPropagation();
+      go.click(); 
     } 
   };
 

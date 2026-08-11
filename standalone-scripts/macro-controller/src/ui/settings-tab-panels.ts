@@ -296,26 +296,26 @@ export function buildTaskNextPanel(makeField: MakeFieldFn): TaskNextPanelResult 
 
 // ── Logging Panel ──
 
+function makeLoggingToggle(label: string, checked: boolean): HTMLElement {
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid ' + cPanelBorder + ';';
+  const lbl = document.createElement('span');
+  lbl.style.cssText = 'font-size:11px;color:' + cPanelText + ';';
+  lbl.textContent = label;
+  const sw = document.createElement('input');
+  sw.type = 'checkbox';
+  sw.checked = checked;
+  sw.style.cssText = 'width:16px;height:16px;cursor:pointer;accent-color:' + cPrimary + ';';
+  row.appendChild(lbl);
+  row.appendChild(sw);
+
+  return row;
+}
+
 export function buildLoggingPanel(deps: SettingsDeps): LoggingPanelResult {
   const { btnStyle, showToast } = deps;
   const panel = document.createElement('div');
   const logCfg = getLogConfig();
-
-  const makeToggle = function(label: string, checked: boolean): HTMLElement {
-    const row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid ' + cPanelBorder + ';';
-    const lbl = document.createElement('span');
-    lbl.style.cssText = 'font-size:11px;color:' + cPanelText + ';';
-    lbl.textContent = label;
-    const sw = document.createElement('input');
-    sw.type = 'checkbox';
-    sw.checked = checked;
-    sw.style.cssText = 'width:16px;height:16px;cursor:pointer;accent-color:' + cPrimary + ';';
-    row.appendChild(lbl);
-    row.appendChild(sw);
-
-    return row;
-  };
 
   const masterTitle = document.createElement('div');
   masterTitle.style.cssText = CssFragmentType.FontSize11pxFontWeight700Color + cSectionHeader + ';margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;';
@@ -330,7 +330,7 @@ export function buildLoggingPanel(deps: SettingsDeps): LoggingPanelResult {
     { key: 'activityLogUi', label: 'Activity Log Panel', value: logCfg.activityLogUi },
   ];
   masterFields.forEach(function(f) {
-    const row = makeToggle(f.label, f.value);
+    const row = makeLoggingToggle(f.label, f.value);
     const inp = row.querySelector('input') as HTMLInputElement;
     logToggles[f.key] = inp;
     panel.appendChild(row);
@@ -344,7 +344,7 @@ export function buildLoggingPanel(deps: SettingsDeps): LoggingPanelResult {
   const levelKeys = ['debug', 'info', 'warn', 'error', 'success', 'delegate', 'check', 'skip', 'sub'];
   const levelToggles: Record<string, HTMLInputElement> = {};
   levelKeys.forEach(function(key) {
-    const row = makeToggle(key.charAt(0).toUpperCase() + key.slice(1), logCfg.levels[key] !== false);
+    const row = makeLoggingToggle(key.charAt(0).toUpperCase() + key.slice(1), logCfg.levels[key] !== false);
     const inp = row.querySelector('input') as HTMLInputElement;
     levelToggles[key] = inp;
     panel.appendChild(row);
@@ -755,7 +755,8 @@ function _buildPerWsRow(
       delete map[wsId]; 
     })
       .then(function () {
-        showToast('Removed override for ' + wsId, 'info'); onChange(); 
+        showToast('Removed override for ' + wsId, 'info');
+        onChange();
       });
   };
 

@@ -158,7 +158,8 @@ export function useShiftClickSelection<Id extends SelectionId>(
     setSelected(new Set(ids)); 
   }, []);
   const clear = useCallback(() => {
-    setSelected(new Set<Id>()); setAnchor(null); 
+    setSelected(new Set<Id>());
+    setAnchor(null); 
   }, []);
   const isSelected = useCallback((id: Id) => selected.has(id), [selected]);
 

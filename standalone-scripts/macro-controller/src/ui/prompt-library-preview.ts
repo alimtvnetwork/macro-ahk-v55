@@ -124,6 +124,58 @@ export function renderPreviewPanel(
   void refs;
 }
 
+function safeClearInput(input: HTMLInputElement): void {
+  try {
+    input.value = ''; 
+  } catch (err) {
+    logError('MacroController', 'Unknown error');
+  }
+}
+
+async function doPreviewImport(
+  refs: ModalRefs,
+  file: File,
+  previewFileInput: HTMLInputElement,
+  importBtn: HTMLButtonElement,
+  fileInput: HTMLInputElement,
+  handleImportFile: (r: ModalRefs, f: File, fi: HTMLInputElement, ib: HTMLButtonElement, o: PreviewTriggerType) => Promise<void>,
+  panel: HTMLDivElement
+): Promise<void> {
+  const text = await file.text();
+  const parsed = parsePromptsText(text);
+  if (parsed.errors.length > 0 && parsed.valid.length === 0) {
+    const friendly = buildFriendlyImportError(parsed.errors, file.name);
+    refs.status.textContent = 'Preview parse failed: ' + friendly.headline;
+    renderImportErrorBanner(refs, friendly.headline, friendly.hint);
+    showToast(PREVIEW_FAILED_PREFIX + friendly.headline, TOAST_ERROR);
+
+    return;
+  }
+
+  const roleSel = refs.importRoleSelect?.value;
+  const roleFilter = (roleSel === 'plan' || roleSel === 'next' || roleSel === 'generic') ? roleSel : undefined;
+  const opts: Parameters<typeof previewPromptImport>[1] = {};
+  if (roleFilter) {
+    opts.roleFilter = roleFilter;
+  }
+
+  if (parsed.revisions && parsed.revisions.length > 0) {
+    opts.revisions = parsed.revisions;
+  }
+
+  const preview = await previewPromptImport(parsed.valid, opts);
+  renderPreviewPanel(refs, panel, preview, file, parsed.errors.length, () => {
+    hidePreviewPanel(panel);
+    safeClearInput(previewFileInput);
+    void handleImportFile(refs, file, fileInput, importBtn, 'click');
+  }, () => {
+    hidePreviewPanel(panel);
+    safeClearInput(previewFileInput);
+    refs.status.textContent = 'Preview cancelled.';
+  });
+  refs.status.textContent = 'Preview ready for ' + file.name + '.';
+}
+
 export async function computeAndRenderPreview(
   refs: ModalRefs,
   file: File,
@@ -142,60 +194,14 @@ export async function computeAndRenderPreview(
     refs.status.textContent = 'Preview rejected: ' + invalid.headline;
     renderImportErrorBanner(refs, invalid.headline, invalid.hint);
     showToast(PREVIEW_FAILED_PREFIX + invalid.headline, TOAST_ERROR);
-    try {
-      previewFileInput.value = ''; 
-    } catch (err) {
-      logError('MacroController', 'Unknown error');
-    }
+    safeClearInput(previewFileInput);
 
     return;
   }
 
   refs.status.textContent = 'Previewing ' + file.name + ' ...';
   try {
-    const text = await file.text();
-    const parsed = parsePromptsText(text);
-    if (parsed.errors.length > 0 && parsed.valid.length === 0) {
-      const friendly = buildFriendlyImportError(parsed.errors, file.name);
-      refs.status.textContent = 'Preview parse failed: ' + friendly.headline;
-      renderImportErrorBanner(refs, friendly.headline, friendly.hint);
-      showToast(PREVIEW_FAILED_PREFIX + friendly.headline, TOAST_ERROR);
-
-      return;
-    }
-
-    const roleSel = refs.importRoleSelect?.value;
-    const roleFilter = (roleSel === 'plan' || roleSel === 'next' || roleSel === 'generic') ? roleSel : undefined;
-    const opts: Parameters<typeof previewPromptImport>[1] = {};
-    if (roleFilter) {
-      opts.roleFilter = roleFilter;
-    }
-
-    if (parsed.revisions && parsed.revisions.length > 0) {
-      opts.revisions = parsed.revisions;
-    }
-
-    const preview = await previewPromptImport(parsed.valid, opts);
-    renderPreviewPanel(refs, panel, preview, file, parsed.errors.length, () => {
-      hidePreviewPanel(panel);
-      try {
-        previewFileInput.value = ''; 
-      } catch (err) {
-        logError('MacroController', 'Unknown error');
-      }
-
-      void handleImportFile(refs, file, fileInput, importBtn, 'click');
-    }, () => {
-      hidePreviewPanel(panel);
-      try {
-        previewFileInput.value = ''; 
-      } catch (err) {
-        logError('MacroController', 'Unknown error');
-      }
-
-      refs.status.textContent = 'Preview cancelled.';
-    });
-    refs.status.textContent = 'Preview ready for ' + file.name + '.';
+    await doPreviewImport(refs, file, previewFileInput, importBtn, fileInput, handleImportFile, panel);
   } catch (err) {
     logError('MacroController', 'Unknown error');
     logLibraryImportFailure('preview', 'threw during read/parse for name=' + file.name, err);

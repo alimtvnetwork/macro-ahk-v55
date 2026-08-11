@@ -223,6 +223,27 @@ export class BulkRenameManager {
 
   // CQ16: Extracted from bulkRename closure → private method
    
+  private _handleForbidden(
+    idx: number,
+    entry: BulkRenameEntry,
+    entries: BulkRenameEntry[],
+    results: BulkRenameResults,
+    onProgress: (results: BulkRenameResults, done: boolean) => void,
+    forceRetry: boolean | undefined,
+    consecutiveFailures: number,
+  ): void {
+    log('[Rename] ⛔ ' + (idx + 1) + '/' + entries.length + ' — "' + entry.oldName + '" SKIPPED (forbidden cache)', 'warn');
+    results.skipped++;
+
+    if (onProgress) {
+      onProgress(results, false);
+    }
+
+    setTimeout(() => {
+      this._doNextRename(idx + 1, entries, results, onProgress, forceRetry, consecutiveFailures); 
+    }, MODAL_ANIMATION_DELAY_MS);
+  }
+
   private _doNextRename(
     idx: number,
     entries: BulkRenameEntry[],
@@ -249,16 +270,7 @@ export class BulkRenameManager {
     const isForbidden = !forceRetry && hasForbidden(entry.wsId);
 
     if (isForbidden) {
-      log('[Rename] ⛔ ' + (idx + 1) + '/' + entries.length + ' — "' + entry.oldName + '" SKIPPED (forbidden cache)', 'warn');
-      results.skipped++;
-
-      if (onProgress) {
-        onProgress(results, false);
-      }
-
-      setTimeout(() => {
-        this._doNextRename(idx + 1, entries, results, onProgress, forceRetry, consecutiveFailures); 
-      }, MODAL_ANIMATION_DELAY_MS);
+      this._handleForbidden(idx, entry, entries, results, onProgress, forceRetry, consecutiveFailures);
 
       return;
     }

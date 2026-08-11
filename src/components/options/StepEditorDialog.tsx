@@ -132,9 +132,7 @@ function hydrateHotkeyForm(
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
-export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Element {
-  const { open, mode, groups, onCancel, onSubmit } = props;
-
+function useStepEditorFormState(open: boolean, mode: StepEditorMode | null) {
   const [kind, setKind] = useState<StepKindId>(StepKindId.Click);
   const [label, setLabel] = useState("");
   const [payloadJson, setPayloadJson] = useState("");
@@ -145,7 +143,6 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
   const patchUrlTabClick = (patch: Partial<UrlTabClickFormState>): void =>
     setUrlTabClick((prev) => ({ ...prev, ...patch }));
 
-  // Reset form whenever the dialog (re-)opens with a new mode.
   useEffect(() => {
     if (!open || mode === null) {
       return;
@@ -180,12 +177,19 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
     );
   }, [open, mode]);
 
-  /**
-     * Forbid self-reference and (lightly) descendant-loops at the UI
-     * level by hiding the current group and its descendants from the
-     * target picker.
-     */
-  const targetCandidates = useMemo(() => {
+  return {
+    kind, setKind,
+    label, setLabel,
+    payloadJson, setPayloadJson,
+    targetGroupId, setTargetGroupId,
+    hotkeyChords, setHotkeyChords,
+    hotkeyWaitMs, setHotkeyWaitMs,
+    urlTabClick, patchUrlTabClick
+  };
+}
+
+function useTargetCandidates(groups: ReadonlyArray<StepGroupRow>, mode: StepEditorMode | null) {
+  return useMemo(() => {
     if (mode === null) {
       return groups;
     }
@@ -209,6 +213,23 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
 
     return groups.filter((group) => !descendants.has(group.StepGroupId) && !group.IsArchived);
   }, [groups, mode]);
+}
+
+// eslint-disable-next-line max-lines-per-function
+export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Element {
+  const { open, mode, groups, onCancel, onSubmit } = props;
+
+  const {
+    kind, setKind,
+    label, setLabel,
+    payloadJson, setPayloadJson,
+    targetGroupId, setTargetGroupId,
+    hotkeyChords, setHotkeyChords,
+    hotkeyWaitMs, setHotkeyWaitMs,
+    urlTabClick, patchUrlTabClick
+  } = useStepEditorFormState(open, mode);
+
+  const targetCandidates = useTargetCandidates(groups, mode);
 
   const handleSubmit = (): void => {
     let result: BuildResult;

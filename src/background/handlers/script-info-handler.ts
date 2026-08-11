@@ -121,6 +121,21 @@ function getPrimaryOutputFile(instruction: InstructionManifest): string | null {
 /*  GET_SCRIPT_INFO                                                    */
 /* ------------------------------------------------------------------ */
 
+async function getScriptFileSize(folder: string, outputFile: string): Promise<number | null> {
+  try {
+    const scriptUrl = chrome.runtime.getURL(`projects/scripts/${folder}/${outputFile}`);
+    const headRes = ServiceResult.wrapFetch(await fetch(scriptUrl, { method: "HEAD" }));
+    const cl = headRes.headers.get("content-length");
+    if (cl) {
+      return parseInt(cl, 10);
+    }
+  } catch (err) {
+    logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
+  }
+
+  return null;
+}
+
 /* Handler function is inherently sequential — suppress false positive */
 export async function handleGetScriptInfo(
   message: MessageRequest,
@@ -141,20 +156,7 @@ export async function handleGetScriptInfo(
       return { isOk: false, errorMessage: `No scripts declared in instruction.json for ${folder}` };
     }
 
-    // Optionally get file size
-    let sizeBytes: number | null = null;
-    try {
-      const scriptUrl = chrome.runtime.getURL(
-        `projects/scripts/${folder}/${outputFile}`,
-      );
-      const headRes = ServiceResult.wrapFetch(await fetch(scriptUrl, { method: "HEAD" }));
-      const cl = headRes.headers.get("content-length");
-      if (cl) {
-        sizeBytes = parseInt(cl, 10);
-      }
-    } catch (err) {
-      logCaughtError(BgLogTag.MARCO, "Automatically caught swallowed error", err); 
-    }
+    const sizeBytes = await getScriptFileSize(folder, outputFile);
 
     return {
       isOk: true,

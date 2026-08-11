@@ -2,6 +2,10 @@
  * useConfigDb — State and data operations for ConfigDbTab
  *
  * Extracted from ConfigDbTab.tsx to keep the component under max-lines-per-function.
+/**
+ * useConfigDb — State and data operations for ConfigDbTab
+ *
+ * Extracted from ConfigDbTab.tsx to keep the component under max-lines-per-function.
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -15,6 +19,32 @@ export interface ConfigRow {
   Value: string;
   ValueType: string;
   UpdatedAt: string;
+}
+
+async function updateConfigValue(project: string, section: string, key: string, value: string) {
+  return await sendMessage<{ isOk: boolean; errorMessage?: string }>({
+    type: "PROJECT_CONFIG_UPDATE", project, section, key, value,
+  });
+}
+
+async function saveBulkUpdates(projectSlug: string, dirtyEntries: [string, string][]) {
+  let saved = 0;
+  let failed = 0;
+  for (const [ek, editedValue] of dirtyEntries) {
+    const [section, key] = ek.split("::");
+    try {
+      const resp = await updateConfigValue(projectSlug, section, key, editedValue);
+      if (resp.isOk) {
+        saved++;
+      } else {
+        failed++;
+      }
+    } catch {
+      failed++;
+    }
+  }
+
+  return { saved, failed };
 }
 
 // eslint-disable-next-line max-lines-per-function -- hook managing config CRUD state
@@ -34,7 +64,8 @@ export function useConfigDb(projectSlug: string) {
         type: "PROJECT_CONFIG_READ", project: projectSlug,
       });
       if (resp.isOk && resp.rows) {
-        setRows(resp.rows); setEdits({}); 
+        setRows(resp.rows);
+        setEdits({}); 
       } else {
         toast.error(resp.errorMessage || "Failed to read config"); 
       }
@@ -49,6 +80,7 @@ export function useConfigDb(projectSlug: string) {
     void load(); 
   }, [load]);
 
+  // eslint-disable-next-line max-lines-per-function
   const handleSave = async (row: ConfigRow) => {
     const ek = editKey(row.Section, row.Key);
     const newValue = edits[ek];
@@ -58,14 +90,12 @@ export function useConfigDb(projectSlug: string) {
 
     setSaving(ek);
     try {
-      const resp = await sendMessage<{ isOk: boolean; errorMessage?: string }>({
-        type: "PROJECT_CONFIG_UPDATE", project: projectSlug,
-        section: row.Section, key: row.Key, value: newValue,
-      });
+      const resp = await updateConfigValue(projectSlug, row.Section, row.Key, newValue);
       if (resp.isOk) {
         toast.success(`Updated ${row.Section}.${row.Key}`);
         setEdits((prev) => {
-          const next = { ...prev }; delete next[ek];
+          const next = { ...prev };
+          delete next[ek];
 
           return next; 
         });
@@ -91,23 +121,7 @@ export function useConfigDb(projectSlug: string) {
     }
 
     setBulkSaving(true);
-    let saved = 0;
-    let failed = 0;
-    for (const [ek, editedValue] of dirtyEntries) {
-      const [section, key] = ek.split("::");
-      try {
-        const resp = await sendMessage<{ isOk: boolean }>({
-          type: "PROJECT_CONFIG_UPDATE", project: projectSlug, section, key, value: editedValue,
-        });
-        if (resp.isOk) {
-          saved++;
-        } else {
-          failed++;
-        }
-      } catch (err) {
-        failed++;
-      }
-    }
+    const { saved, failed } = await saveBulkUpdates(projectSlug, dirtyEntries);
 
     setBulkSaving(false);
     if (failed > 0) {
@@ -127,7 +141,8 @@ export function useConfigDb(projectSlug: string) {
         type: "PROJECT_CONFIG_RECONSTRUCT", project: projectSlug,
       });
       if (resp.isOk) {
-        toast.success("Config reconstructed from source"); void load(); 
+        toast.success("Config reconstructed from source");
+        void load(); 
       } else {
         toast.error(resp.errorMessage || "Reconstruct failed"); 
       }

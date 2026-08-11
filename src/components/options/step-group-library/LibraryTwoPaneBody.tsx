@@ -35,81 +35,75 @@ interface Props {
 }
 
 export function LibraryTwoPaneBody(props: Props) {
-  const { lib, state, viewModel, mutations, exportImport, selection } = props;
-  const {
-    selected, activeGroupId, setActiveGroupId,
-    hoveredId, setHoveredId,
-    setCreateDialog, setRenameDialog, setDeleteDialog,
-    setInputsDialog, setCsvDialog,
-    setStepEditor, setWaitDialog, setDeleteStepDialog,
-    setRunGroupDialog, stepWaits,
-  } = state;
-  const {
-    query, setQuery, trimmedQuery,
-    tree, filteredTree, effectiveExpanded,
-    activeGroup, activeSteps,
-  } = viewModel;
-  const {
-    handleMove, handleArchiveToggle,
-    handleDropReorder, handleStepDropReorder,
-    handleStepMove,
-  } = mutations;
-  const { handleExport, handleImportClick } = exportImport;
-  const { toggleOne, toggleSubtree, toggleExpanded } = selection;
-
   return (
     <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[minmax(320px,420px)_1fr]">
-      <LibraryTreePane
-        tree={tree}
-        filteredTree={filteredTree}
-        query={query}
-        trimmedQuery={trimmedQuery}
-        setQuery={setQuery}
-        selected={selected}
-        effectiveExpanded={effectiveExpanded}
-        activeGroupId={activeGroupId}
-        hoveredId={hoveredId}
-        setHoveredId={setHoveredId}
-        toggleOne={toggleOne}
-        toggleSubtree={toggleSubtree}
-        toggleExpanded={toggleExpanded}
-        setActiveGroupId={setActiveGroupId}
-        onCreateChild={(parentId) => setCreateDialog({ open: true, parent: parentId, name: "" })}
-        onRename={(g) => setRenameDialog({ open: true, group: g, name: g.Name })}
-        onDelete={(g) => setDeleteDialog({ open: true, group: g })}
-        onExportOne={(id) => handleExport([id])}
-        onMove={handleMove}
-        onArchiveToggle={handleArchiveToggle}
-        onApplyInputs={(g) => setInputsDialog({ open: true, group: g })}
-        onImportCsvInputs={(g) => setCsvDialog({ open: true, group: g })}
-        hasInputs={(gid) => lib.GroupInputs.has(gid)}
-        onDropReorder={handleDropReorder}
-        onCreateRoot={() => setCreateDialog({ open: true, parent: null, name: "" })}
-        onImportClick={handleImportClick}
-      />
-      <LibraryStepPane
-        activeGroup={activeGroup}
-        activeSteps={activeSteps}
-        stepWaits={stepWaits}
-        groupInputs={lib.GroupInputs}
-        onOpenInputs={(g) => setInputsDialog({ open: true, group: g })}
-        onOpenCsv={(g) => setCsvDialog({ open: true, group: g })}
-        onCreateStep={(g) => setStepEditor({ open: true, mode: { Kind: "create", StepGroupId: g.StepGroupId } })}
-        onRunGroup={(g) => setRunGroupDialog({ open: true, group: g })}
-        onStepMove={handleStepMove}
-        onStepDropReorder={handleStepDropReorder}
-        onStepToggleDisabled={(step, nextDisabled) => {
-          lib.setStepDisabled(step.StepId, nextDisabled);
-          toast.success(
-            nextDisabled
-              ? `Step "${step.LabelType ?? step.StepId}" disabled, will be skipped on run`
-              : `Step "${step.LabelType ?? step.StepId}" enabled`,
-          );
-        }}
-        onStepEdit={(step) => setStepEditor({ open: true, mode: { Kind: "edit", Step: step } })}
-        onStepEditWait={(step) => setWaitDialog({ open: true, stepId: step.StepId, stepLabel: step.LabelType })}
-        onStepDelete={(step) => setDeleteStepDialog({ open: true, step })}
-      />
+      {renderTreePane(props)}
+      {renderStepPane(props)}
     </div>
+  );
+}
+
+function renderTreePane(props: Props) {
+  const { lib, state, viewModel, mutations, exportImport, selection } = props;
+
+  return (
+    <LibraryTreePane
+      tree={viewModel.tree}
+      filteredTree={viewModel.filteredTree}
+      query={viewModel.query}
+      trimmedQuery={viewModel.trimmedQuery}
+      setQuery={viewModel.setQuery}
+      selected={state.selected}
+      effectiveExpanded={viewModel.effectiveExpanded}
+      activeGroupId={state.activeGroupId}
+      hoveredId={state.hoveredId}
+      setHoveredId={state.setHoveredId}
+      toggleOne={selection.toggleOne}
+      toggleSubtree={selection.toggleSubtree}
+      toggleExpanded={selection.toggleExpanded}
+      setActiveGroupId={state.setActiveGroupId}
+      onCreateChild={(parentId) => state.setCreateDialog({ open: true, parent: parentId, name: "" })}
+      onRename={(g) => state.setRenameDialog({ open: true, group: g, name: g.Name })}
+      onDelete={(g) => state.setDeleteDialog({ open: true, group: g })}
+      onExportOne={(id) => exportImport.handleExport([id])}
+      onMove={mutations.handleMove}
+      onArchiveToggle={mutations.handleArchiveToggle}
+      onApplyInputs={(g) => state.setInputsDialog({ open: true, group: g })}
+      onImportCsvInputs={(g) => state.setCsvDialog({ open: true, group: g })}
+      hasInputs={(gid) => lib.GroupInputs.has(gid)}
+      onDropReorder={mutations.handleDropReorder}
+      onCreateRoot={() => state.setCreateDialog({ open: true, parent: null, name: "" })}
+      onImportClick={exportImport.handleImportClick}
+    />
+  );
+}
+
+function renderStepPane(props: Props) {
+  const { lib, state, viewModel, mutations } = props;
+
+  return (
+    <LibraryStepPane
+      activeGroup={viewModel.activeGroup}
+      activeSteps={viewModel.activeSteps}
+      stepWaits={state.stepWaits}
+      groupInputs={lib.GroupInputs}
+      onOpenInputs={(g) => state.setInputsDialog({ open: true, group: g })}
+      onOpenCsv={(g) => state.setCsvDialog({ open: true, group: g })}
+      onCreateStep={(g) => state.setStepEditor({ open: true, mode: { Kind: "create", StepGroupId: g.StepGroupId } })}
+      onRunGroup={(g) => state.setRunGroupDialog({ open: true, group: g })}
+      onStepMove={mutations.handleStepMove}
+      onStepDropReorder={mutations.handleStepDropReorder}
+      onStepToggleDisabled={(step, nextDisabled) => {
+        lib.setStepDisabled(step.StepId, nextDisabled);
+        toast.success(
+          nextDisabled
+            ? `Step "${step.LabelType ?? step.StepId}" disabled, will be skipped on run`
+            : `Step "${step.LabelType ?? step.StepId}" enabled`,
+        );
+      }}
+      onStepEdit={(step) => state.setStepEditor({ open: true, mode: { Kind: "edit", Step: step } })}
+      onStepEditWait={(step) => state.setWaitDialog({ open: true, stepId: step.StepId, stepLabel: step.LabelType })}
+      onStepDelete={(step) => state.setDeleteStepDialog({ open: true, step })}
+    />
   );
 }

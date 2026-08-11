@@ -59,7 +59,8 @@ vi.mock('../db/project-chat-submit-db', () => ({
     let touched = 0;
     for (const r of rows) {
       if (r.ProjectId === pid) {
-        r.ProjectName = newName; touched += 1; 
+        r.ProjectName = newName;
+        touched += 1; 
       }
     }
 

@@ -94,7 +94,7 @@ async function collectRoleList(role: PromptRole, snapshot: RoleSnapshot): Promis
 
     snapshot.roleListError = listed.isSuccess ? '(empty)' : (listed.error ?? 'unknown');
   } catch (err) {
-    console.error();
+    logError(err instanceof Error ? err : new Error(String(err)));
     snapshot.roleListThrew = err instanceof Error ? err.message : String(err);
   }
 }
@@ -129,7 +129,7 @@ async function collectSlugOwner(
     const bySlug = await getPromptBySlug(slug);
     recordSlugOwner(bySlug as Parameters<typeof recordSlugOwner>[0], role, snapshot);
   } catch (err) {
-    console.error();
+    logError(err instanceof Error ? err : new Error(String(err)));
     snapshot.slugLookupThrew = err instanceof Error ? err.message : String(err);
   }
 }
@@ -163,6 +163,34 @@ export interface OpenPromptEditorInput {
   prefill?: { name?: string; text?: string; category?: string; tags?: string[] };
 }
 
+function resolvePromptRoleLabel(role: PromptRole): string {
+  if (role === 'plan') {
+    return 'PlanTierType';
+  }
+
+  if (role === 'next') {
+    return 'Next';
+  }
+
+  return 'Generic';
+}
+
+function resolvePrefill(input: OpenPromptEditorInput): OpenPromptEditorInput['prefill'] | undefined {
+  if (input.promptId !== undefined) {
+    return input.prefill;
+  }
+
+  return input.prefill ?? buildAddNewTemplatePrefill(input.role);
+}
+
+function resolveTemplatePreview(input: OpenPromptEditorInput): { body: string; slug?: string } | undefined {
+  if (input.promptId !== undefined) {
+    return undefined;
+  }
+
+  return buildTemplatePreviewForRole(input.role);
+}
+
 /**
  * Open the shared prompt editor. Never throws: every failure is logged via
  * `logError('PromptEditor', ...)` and surfaced as a toast so the user is
@@ -185,17 +213,15 @@ export async function openPromptEditor(input: OpenPromptEditorInput): Promise<vo
       ? await loadEditablePrompt(input.role, input.promptId)
       : null;
     const requiredTokens = await resolveRequiredTokensForRole(input.role);
-    const roleLabel = input.role === 'plan' ? 'PlanTierType' : input.role === 'next' ? 'Next' : 'Generic';
+    const roleLabel = resolvePromptRoleLabel(input.role);
+
     // Add-new mode (no promptId, no explicit prefill): seed the editor with
     // the canonical role default body so the user starts from a working
     // template that already contains the required {{n}} token, instead of a
     // blank textarea that fails Rule-0 / token drift on save.
-    const prefill = input.promptId === undefined
-      ? (input.prefill ?? buildAddNewTemplatePrefill(input.role))
-      : input.prefill;
-    const templatePreview = input.promptId === undefined
-      ? buildTemplatePreviewForRole(input.role)
-      : undefined;
+    const prefill = resolvePrefill(input);
+    const templatePreview = resolveTemplatePreview(input);
+
     const modalOptions: Parameters<typeof openPromptCreationModal>[4] = { requiredTokens, roleLabel, role: input.role };
     if (templatePreview) {
       modalOptions.templatePreview = templatePreview;
@@ -203,7 +229,7 @@ export async function openPromptEditor(input: OpenPromptEditorInput): Promise<vo
 
     openPromptCreationModal(rc.ctx, rc.taskNextDeps, editPrompt, prefill, modalOptions);
   } catch (err) {
-    console.error();
+    logError(err instanceof Error ? err : new Error(String(err)));
     const reason = err instanceof Error ? err.message : String(err);
     reportEditorFailure(
       'PROMPT_EDIT_E003',
@@ -268,7 +294,7 @@ async function resolveRequiredTokensForRole(role: PromptRole): Promise<string[]>
       }
     }
   } catch (err) {
-    console.error();
+    logError(err instanceof Error ? err : new Error(String(err)));
     const snap = await buildRoleDiagnosticSnapshot(role);
     const context: DiagnosticContext = {
       ...snap,
@@ -411,6 +437,21 @@ async function handleOpenDefaultError(
   );
 }
 
+async function handleMissingDefault(
+  role: PromptRole,
+  seedRow: { slug: string; name: string; body: string },
+): Promise<{ handled: boolean; newResult?: Awaited<ReturnType<typeof getDefaultPromptForRole>> }> {
+  const repairedId = await selfHealMissingDefault(role, seedRow);
+  const newResult = await getDefaultPromptForRole(role);
+  if (newResult.isSuccess && !newResult.value && repairedId !== null) {
+    await openPromptEditor({ role, promptId: repairedId });
+
+    return { handled: true };
+  }
+
+  return { handled: false, newResult };
+}
+
 /**
  * Open the editor pre-loaded with the default row for `role`. Convenience
  * entry used by the PlanTierType / Next chip "Edit default" gear items so the caller
@@ -421,13 +462,15 @@ export async function openDefaultPromptEditor(role: PromptRole): Promise<void> {
   try {
     await runPreflightSeed(role);
     let result = await getDefaultPromptForRole(role);
-    if (result.isSuccess && !result.value && seedRow) {
-      const repairedId = await selfHealMissingDefault(role, seedRow);
-      result = await getDefaultPromptForRole(role);
-      if (result.isSuccess && !result.value && repairedId !== null) {
-        await openPromptEditor({ role, promptId: repairedId });
 
+    if (result.isSuccess && !result.value && seedRow) {
+      const heal = await handleMissingDefault(role, seedRow);
+      if (heal.handled) {
         return;
+      }
+
+      if (heal.newResult) {
+        result = heal.newResult;
       }
     }
 
@@ -451,7 +494,7 @@ export async function openDefaultPromptEditor(role: PromptRole): Promise<void> {
       '❌ No default prompt found for ' + role,
     );
   } catch (err) {
-    console.error();
+    logError(err instanceof Error ? err : new Error(String(err)));
     await handleOpenDefaultError(role, seedRow, err);
   }
 }

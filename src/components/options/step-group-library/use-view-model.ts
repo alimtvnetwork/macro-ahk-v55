@@ -56,22 +56,36 @@ export interface StepGroupLibraryViewModel {
     readonly deletePreview: ReturnType<typeof buildDeletePreview>;
 }
 
-export function useStepGroupLibraryViewModel(
-  params: UseStepGroupLibraryViewModelParams,
-): StepGroupLibraryViewModel {
-  const {
-    lib,
-    showArchived,
-    pendingGroupOrder,
-    setPendingGroupOrder,
-    pendingStepOrder,
-    setPendingStepOrder,
-    expanded,
-    activeGroupId,
-    selected,
-    buildTree,
-  } = params;
+function sortGroupsByOrder(
+  a: StepGroupRow,
+  b: StepGroupRow,
+  positionByParent: Map<number | "root", Map<number, number>>,
+) {
+  const aKey = (a.ParentStepGroupId ?? "root") as number | "root";
+  const bKey = (b.ParentStepGroupId ?? "root") as number | "root";
+  if (aKey !== bKey) {
+    return 0;
+  }
 
+  const positions = positionByParent.get(aKey);
+  if (positions === undefined) {
+    return 0;
+  }
+
+  const ai = positions.get(a.StepGroupId);
+  const bi = positions.get(b.StepGroupId);
+  if (ai === undefined || bi === undefined) {
+    return 0;
+  }
+
+  return ai - bi;
+}
+
+function useLibraryGroups(
+  lib: StepLibrary,
+  showArchived: boolean,
+  pendingGroupOrder: ReadonlyMap<number | "root", ReadonlyArray<number>>,
+) {
   const visibleGroups = useMemo(
     () => (showArchived ? lib.Groups : lib.Groups.filter((g) => !g.IsArchived)),
     [lib.Groups, showArchived],
@@ -89,30 +103,18 @@ export function useStepGroupLibraryViewModel(
       positionByParent.set(parentKey, m);
     }
 
-    return [...visibleGroups].sort((a, b) => {
-      const aKey = (a.ParentStepGroupId ?? "root") as number | "root";
-      const bKey = (b.ParentStepGroupId ?? "root") as number | "root";
-      if (aKey !== bKey) {
-        return 0;
-      }
-
-      const positions = positionByParent.get(aKey);
-      if (positions === undefined) {
-        return 0;
-      }
-
-      const ai = positions.get(a.StepGroupId);
-      const bi = positions.get(b.StepGroupId);
-      if (ai === undefined || bi === undefined) {
-        return 0;
-      }
-
-      return ai - bi;
-    });
+    return [...visibleGroups].sort((a, b) => sortGroupsByOrder(a, b, positionByParent));
   }, [visibleGroups, pendingGroupOrder]);
 
-  const tree = useMemo(() => buildTree(orderedGroups), [orderedGroups, buildTree]);
+  return { orderedGroups };
+}
 
+// eslint-disable-next-line max-lines-per-function
+function useGroupOrderSettle(
+  lib: StepLibrary,
+  pendingGroupOrder: ReadonlyMap<number | "root", ReadonlyArray<number>>,
+  setPendingGroupOrder: (next: ReadonlyMap<number | "root", ReadonlyArray<number>>) => void,
+) {
   useEffect(() => {
     if (pendingGroupOrder.size === 0) {
       return;
@@ -135,9 +137,16 @@ export function useStepGroupLibraryViewModel(
       setPendingGroupOrder(new Map());
     }
   }, [lib.Groups, pendingGroupOrder, setPendingGroupOrder]);
+}
 
+// eslint-disable-next-line max-lines-per-function
+function useLibraryTreeSearch(
+  tree: TreeNode[],
+  expanded: ReadonlySet<number>,
+) {
   const [query, setQuery] = useState("");
   const trimmedQuery = query.trim().toLowerCase();
+  
   const { filteredTree, autoExpand } = useMemo(() => {
     if (trimmedQuery === "") {
       return { filteredTree: tree, autoExpand: null as Set<number> | null };
@@ -179,6 +188,16 @@ export function useStepGroupLibraryViewModel(
     return merged;
   }, [expanded, autoExpand]);
 
+  return { query, setQuery, trimmedQuery, filteredTree, effectiveExpanded };
+}
+
+// eslint-disable-next-line max-lines-per-function
+function useActiveGroupSteps(
+  lib: StepLibrary,
+  activeGroupId: number | null,
+  pendingStepOrder: ReadonlyMap<number, ReadonlyArray<number>>,
+  setPendingStepOrder: (next: ReadonlyMap<number, ReadonlyArray<number>>) => void,
+) {
   const activeGroup = useMemo(
     () => lib.Groups.find((g) => g.StepGroupId === activeGroupId) ?? null,
     [lib.Groups, activeGroupId],
@@ -231,6 +250,27 @@ export function useStepGroupLibraryViewModel(
     }
   }, [lib.StepsByGroup, pendingStepOrder, setPendingStepOrder]);
 
+  return { activeGroup, activeSteps };
+}
+
+// eslint-disable-next-line max-lines-per-function
+export function useStepGroupLibraryViewModel(
+  params: UseStepGroupLibraryViewModelParams,
+): StepGroupLibraryViewModel {
+  const {
+    lib, showArchived, pendingGroupOrder, setPendingGroupOrder,
+    pendingStepOrder, setPendingStepOrder, expanded,
+    activeGroupId, selected, buildTree,
+  } = params;
+
+  const { orderedGroups } = useLibraryGroups(lib, showArchived, pendingGroupOrder);
+  const tree = useMemo(() => buildTree(orderedGroups), [orderedGroups, buildTree]);
+  
+  useGroupOrderSettle(lib, pendingGroupOrder, setPendingGroupOrder);
+  
+  const search = useLibraryTreeSearch(tree, expanded);
+  const active = useActiveGroupSteps(lib, activeGroupId, pendingStepOrder, setPendingStepOrder);
+
   const groupsById = useMemo(() => {
     const m = new Map<number, StepGroupRow>();
     for (const g of lib.Groups) {
@@ -251,14 +291,9 @@ export function useStepGroupLibraryViewModel(
   );
 
   return {
-    query,
-    setQuery,
-    trimmedQuery,
+    ...search,
     tree,
-    filteredTree,
-    effectiveExpanded,
-    activeGroup,
-    activeSteps,
+    ...active,
     groupsById,
     selectedGroups,
     deletePreview,

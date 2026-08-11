@@ -75,6 +75,7 @@ export interface LiveRecordedActionsTreeProps {
     readonly selectedStepId?: string | null;
 }
 
+// eslint-disable-next-line max-lines-per-function
 export function LiveRecordedActionsTree(props: LiveRecordedActionsTreeProps): JSX.Element {
   const { className, onStepClick, selectedStepId: controlledStepId } = props;
 

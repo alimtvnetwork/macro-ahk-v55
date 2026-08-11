@@ -74,7 +74,8 @@ describe('prompt-library-modal - focus + modal persistence after invalid import'
     mocks.showToast.mockReset();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('keeps the modal mounted after an invalid JSON import', async () => {

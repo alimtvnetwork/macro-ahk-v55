@@ -85,6 +85,7 @@ export function intervalLabel(minutes: number): string {
 export const STATUS_UP_TO_DATE = "up-to-date" as const;
 export const STATUS_UPDATE_AVAILABLE = "update-available" as const;
 
+// eslint-disable-next-line max-lines-per-function
 export function mapBackendEntry(u: Record<string, unknown>): UpdaterEntry {
   const cats = typeof u.Categories === "string" && u.Categories
     ? (u.Categories as string).split(", ").filter(Boolean)

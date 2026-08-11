@@ -57,7 +57,8 @@ function buildPositionalXPath(el: Element): string {
     const parent: Element | null = current.parentElement;
     const tag = current.tagName.toLowerCase();
     if (parent === null) {
-      segments.unshift(`/${tag}`); break; 
+      segments.unshift(`/${tag}`);
+      break; 
     }
 
     segments.unshift(`/${tag}[${positionAmongSameTagSiblings(current)}]`);

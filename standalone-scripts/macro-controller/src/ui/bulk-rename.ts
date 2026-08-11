@@ -388,7 +388,8 @@ function _createRenameTitleBar(panel: HTMLElement, count: number): HTMLElement {
   };
 
   const onDragMouseUp = function() {
-    isDragging = false; titleBar.style.cursor = 'grab'; 
+    isDragging = false;
+    titleBar.style.cursor = 'grab'; 
   };
 
   titleBar.addEventListener('mousedown', onDragMouseDown);
@@ -622,7 +623,10 @@ function _wireStartNumInput(
 
 function _appendDelayAndEta(body: HTMLElement, count: number): { delaySlider: HTMLInputElement; etaRow: HTMLElement; updateStaticEta: () => void } {
   const delaySlider = document.createElement('input') as HTMLInputElement;
-  delaySlider.type = 'range'; delaySlider.min = '100'; delaySlider.max = '10000'; delaySlider.step = '100';
+  delaySlider.type = 'range';
+  delaySlider.min = '100';
+  delaySlider.max = '10000';
+  delaySlider.step = '100';
   delaySlider.value = String(getRenameDelayMs());
   delaySlider.style.cssText = 'flex:1;accent-color:' + cPrimaryLight + ';height:4px;';
   const delayVal = document.createElement('span');
@@ -679,7 +683,8 @@ function _buildRenameButtons(
   cancelBtn.textContent = 'Cancel';
   cancelBtn.style.cssText = 'padding:4px 12px;background:rgba(100,116,139,0.3);color:#94a3b8;border:1px solid #475569;border-radius:4px;font-size:10px;cursor:pointer;';
   cancelBtn.onclick = function () {
-    _autoSave(inputs); removeBulkRenameDialog(); 
+    _autoSave(inputs);
+    removeBulkRenameDialog(); 
   };
 
   const stopBtn = document.createElement('button');
@@ -687,7 +692,8 @@ function _buildRenameButtons(
   stopBtn.id = 'rename-stop-btn';
   stopBtn.style.cssText = 'display:none;padding:4px 12px;background:rgba(239,68,68,0.3);color:#f87171;border:1px solid rgba(239,68,68,0.4);border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;';
   stopBtn.onclick = function () {
-    cancelRename(); log('[Rename] Stop requested by user', 'warn'); 
+    cancelRename();
+    log('[Rename] Stop requested by user', 'warn'); 
   };
 
   const applyBtn = document.createElement('button');

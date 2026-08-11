@@ -80,7 +80,8 @@ describe('prompt-library-modal - controls re-enable + focus after import failure
     io.performPromptImport.mockClear();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
   });
 
   it('re-enables Import + file input, restores label, and returns focus after a thrown import', async () => {

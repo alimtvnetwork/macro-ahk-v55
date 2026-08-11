@@ -93,10 +93,11 @@ const GROUP_LABEL: Readonly<Record<ReasonGroup, string>> = {
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
-export function FailureDetailsPanel({ report, embedded }: FailureDetailsPanelProps) {
+function FailureDetailsContent({ report }: { report: FailureReport }) {
   const group = REASON_GROUP[report.Reason] ?? "other";
   const targetXPath = report.DomContext?.XPath ?? null;
-  const body = (
+
+  return (
     <div className="space-y-3">
       <ReasonBanner
         reason={report.Reason}
@@ -122,7 +123,9 @@ export function FailureDetailsPanel({ report, embedded }: FailureDetailsPanelPro
       <SourceFooter file={report.SourceFile} timestamp={report.Timestamp} stepId={report.StepId} stepKind={report.StepKind} />
     </div>
   );
+}
 
+export function FailureDetailsPanel({ report, embedded }: FailureDetailsPanelProps) {
   if (embedded === true) {
     return (
       <section
@@ -130,7 +133,7 @@ export function FailureDetailsPanel({ report, embedded }: FailureDetailsPanelPro
         data-testid="failure-details-panel"
         className="rounded-md border border-border bg-card/40 p-3"
       >
-        {body}
+        <FailureDetailsContent report={report} />
       </section>
     );
   }
@@ -146,7 +149,7 @@ export function FailureDetailsPanel({ report, embedded }: FailureDetailsPanelPro
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent>{body}</CardContent>
+      <CardContent><FailureDetailsContent report={report} /></CardContent>
     </Card>
   );
 }

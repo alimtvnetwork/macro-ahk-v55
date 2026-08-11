@@ -25,37 +25,63 @@ function collectDescendantIds(node: TreeNode, out: Set<number>): void {
   }
 }
 
+function getNextSelected(prev: Set<number>, ids: ReadonlyArray<number>, on: boolean): Set<number> {
+  const next = new Set(prev);
+  for (const id of ids) {
+    if (on) {
+      next.add(id);
+    } else {
+      next.delete(id);
+    }
+  }
+
+  return next;
+}
+
+function getNextSelectionOrder(prev: ReadonlyArray<number>, ids: ReadonlyArray<number>, on: boolean): ReadonlyArray<number> {
+  if (!on) {
+    return prev.filter((id) => !ids.includes(id));
+  }
+
+  const seen = new Set(prev);
+  const additions = ids.filter((id) => !seen.has(id));
+
+  return additions.length === 0 ? prev : [...prev, ...additions];
+}
+
+function doApplySelection(
+  on: boolean,
+  ids: ReadonlyArray<number>,
+  setSelected: (updater: (prev: Set<number>) => Set<number>) => void,
+  setSelectionOrder: (
+        updater: (prev: ReadonlyArray<number>) => ReadonlyArray<number>,
+    ) => void,
+) {
+  setSelected((prev) => getNextSelected(prev, ids, on));
+  setSelectionOrder((prev) => getNextSelectionOrder(prev, ids, on));
+}
+
+function toggleExpandedAction(setExpanded: UseLibrarySelectionArgs["setExpanded"], id: number) {
+  setExpanded((prev) => {
+    const next = new Set(prev);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+
+    return next;
+  });
+}
+
 export function useLibrarySelection(args: UseLibrarySelectionArgs) {
   const { setSelected, setSelectionOrder, setExpanded } = args;
 
   const applySelection = (on: boolean, ids: ReadonlyArray<number>) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      for (const id of ids) {
-        if (on) {
-          next.add(id);
-        } else {
-          next.delete(id);
-        }
-      }
-
-      return next;
-    });
-    setSelectionOrder((prev) => {
-      if (!on) {
-        return prev.filter((id) => !ids.includes(id));
-      }
-
-      const seen = new Set(prev);
-      const additions = ids.filter((id) => !seen.has(id));
-
-      return additions.length === 0 ? prev : [...prev, ...additions];
-    });
+    doApplySelection(on, ids, setSelected, setSelectionOrder);
   };
 
-  const toggleOne = (id: number, on: boolean) => {
-    applySelection(on, [id]);
-  };
+  const toggleOne = (id: number, on: boolean) => applySelection(on, [id]);
 
   const toggleSubtree = (node: TreeNode, on: boolean) => {
     const ids = new Set<number>();
@@ -68,18 +94,7 @@ export function useLibrarySelection(args: UseLibrarySelectionArgs) {
     setSelectionOrder(() => []);
   };
 
-  const toggleExpanded = (id: number) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-
-      return next;
-    });
-  };
+  const toggleExpanded = (id: number) => toggleExpandedAction(setExpanded, id);
 
   return { toggleOne, toggleSubtree, clearSelection, toggleExpanded };
 }

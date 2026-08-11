@@ -69,7 +69,8 @@ describe('prompt-library-modal - focus moves to error banner on drop failure', (
     mocks.showToast.mockReset();
   });
   afterEach(() => {
-    document.body.innerHTML = ''; vi.restoreAllMocks(); 
+    document.body.innerHTML = '';
+    vi.restoreAllMocks(); 
   });
 
   it('moves keyboard focus to the aria-live error banner after a failed drag-and-drop import', async () => {
@@ -79,7 +80,9 @@ describe('prompt-library-modal - focus moves to error banner on drop failure', (
     const root = document.querySelector<HTMLElement>('[data-testid="prompt-library-modal"]')
             ?? (document.body.firstElementChild as HTMLElement);
     fireDrop(root);
-    await tick(); await tick(); await tick();
+    await tick();
+    await tick();
+    await tick();
 
     const banner = document.querySelector<HTMLElement>('[data-testid="library-import-error"]');
     expect(banner).not.toBeNull();
